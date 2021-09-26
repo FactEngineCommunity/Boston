@@ -38,6 +38,11 @@ Namespace RDS
             End Set
         End Property
 
+        ''' <summary>
+        ''' Creates a variable name for the Table, as in when needed for TypeQL queries for TypeDB.
+        '''   NB An Alias is added as part of FEQL processing.
+        ''' </summary>
+        ''' <returns></returns>
         Public ReadOnly Property DBVariableName As String
             Get
                 If Me.FBMModelElement Is Nothing Then
@@ -627,9 +632,21 @@ Namespace RDS
                                   Where Relation.ResponsibleFactType.Id = arFactType.Id
                                   Select Relation
 
+                If larRelation.Count = 0 Then
+
+                    For Each lrRelation In Me.getOutgoingRelations
+
+                        If lrRelation.DestinationTable.FBMModelElement.hasModelElementAsDownstreamSubtype(aarFBMModelObject(1)) And
+                            aarFBMModelObject.Contains(lrRelation.OriginTable.FBMModelElement) Then
+                            Return lrRelation
+                        End If
+                    Next
+
+                End If
+
                 Return larRelation.First
 
-            Catch
+            Catch ex As Exception
                 Dim lsMessage = "Error trying to find a relation between ModelElements, "
                 Dim liInd = 1
                 For Each lrModelElement In aarFBMModelObject

@@ -84,6 +84,9 @@
                 liInd = 1
                 Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
                 Me.ProjectionColumn = larProjectionColumn
+
+                'Remove UnaryFactTypes from ProjectionColumns, because UnaryFactTypes in TypeDB store the OID rather than a field per se.
+                Me.ProjectionColumn.RemoveAll(Function(x) x.Table.FBMModelElement.isUnaryFactType And x.isPartOfPrimaryKey)
 #End Region
 
 
@@ -290,13 +293,23 @@
                 For Each lrNode In larFromNodes.FindAll(Function(x) x.FBMModelObject.isUnaryFactType)
 
                     lsTDBQuery &= "("
-                    liInd = 0
+
                     Dim lrFactType As FBM.FactType = lrNode.FBMModelObject
                     Dim lrRole As FBM.Role = lrFactType.RoleGroup(0)
 
+                    'See if a QueryEdge exists that maps to the Table of the UnaryFactType.
+                    Dim larUnaryFactTypeQueryEdge = From QueryEdge In Me.QueryEdges
+                                                    Where QueryEdge.FBMFactType.IsLinkFactType
+                                                    Where QueryEdge.TargetNode IsNot Nothing
+                                                    Where QueryEdge.TargetNode.FBMModelObject Is lrRole.JoinedORMObject
+                                                    Select QueryEdge
 
-                    lsTDBQuery &= lrRole.Name & ": $" & lrRole.getCorrespondingRDSTable.DatabaseName ' & lrNode.Alias
-                    liInd += 1
+                    If larUnaryFactTypeQueryEdge.Count > 0 Then
+                        lrNode = larUnaryFactTypeQueryEdge.First.TargetNode
+                        lsTDBQuery &= lrRole.Name & ": $" & lrNode.DBVariableName & lrNode.Alias
+                    Else
+                        lsTDBQuery &= lrRole.Name & ": $" & lrRole.getCorrespondingRDSTable.DatabaseName
+                    End If
 
                     lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName
 
@@ -314,10 +327,6 @@
 
                     lsTDBQuery &= ";" & vbCrLf
                 Next
-
-
-
-
 #End Region
 
                 '=================================================================================================
@@ -380,6 +389,8 @@
 
                 larWhereEdges.AddRange(larSpecialDerivedQueryEdges.ToList)
 
+                '20210926-VM-This might be better served by removing QueryEdges that have already been processed.
+                larWhereEdges.RemoveAll(Function(x) x.BaseNode.FBMModelObject.isUnaryFactType)
 
                 '20210911-VM-Moved to top so that variables can be put in From clause.
                 'Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)

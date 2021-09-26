@@ -115,12 +115,24 @@
 
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
+
                 If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
-                    lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
+                    If Me.WHICHSELECTStatement.MODELELEMENTNAME.Count > 1 Then
+                        Me.WHICHCLAUSE = New FEQL.WHICHCLAUSE
+                        Call Me.GetParseTreeTokensReflection(Me.WHICHCLAUSE, Me.WHICHSELECTStatement.WHICHCLAUSE(0))
+                        Select Case Me.getWHICHClauseType(Me.WHICHCLAUSE, Me.WHICHSELECTStatement.WHICHCLAUSE(0))
+                            Case Is = FactEngine.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+                            Case Else
+                                lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTSUFFIX
+                        End Select
+
+                    Else
+                        lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
+                    End If
+
                 Else
                     lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTSUFFIX
                 End If
-
 
                 If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
                     If Me.WHICHSELECTStatement.NODE.Count <> Me.WHICHSELECTStatement.MODELELEMENTNAME.Count Then
@@ -130,7 +142,7 @@
                             Next
                             lrQueryGraph.HeadNode.HasIdentifier = True
                         End If
-                        If lrQueryGraph.HeadNode.Alias Is Nothing Then
+                        If lrQueryGraph.HeadNode.Alias Is Nothing And Me.WHICHSELECTStatement.MODELELEMENTNAME.Count = 1 Then
                             lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTSUFFIX
                         End If
                     End If

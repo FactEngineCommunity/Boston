@@ -44,6 +44,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
             If m_tree.Errors.Count > 0 Then
               If m_scanner.EndPos > Me.MaxDistance Then
@@ -57,6 +58,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -70,6 +72,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FOLLOWINGREADINGTEXT
 
@@ -82,6 +85,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.EQUALS, TokenType.KEYWDLESSTHAN, TokenType.KEYWDGREATERTHAN}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -218,6 +222,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -231,6 +236,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: COMPARITOR
 
@@ -243,6 +249,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseMultExpr(node) ' NonTerminal Rule: MultExpr
@@ -434,6 +441,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -447,6 +455,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: AddExpr
 
@@ -459,6 +468,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseAtom(node) ' NonTerminal Rule: Atom
@@ -650,6 +660,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -663,6 +674,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MultExpr
 
@@ -675,6 +687,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDTODAY, TokenType.NUMBER, TokenType.MODELELEMENTNAME, TokenType.BROPEN}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -1290,6 +1303,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1303,6 +1317,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: Atom
 
@@ -1315,6 +1330,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseAddExpr(node) ' NonTerminal Rule: AddExpr
@@ -1400,6 +1416,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1413,6 +1430,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FORMULA
 
@@ -1425,6 +1443,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.KEYWDTODAY) ' Terminal Rule: KEYWDTODAY
             n = node.CreateNode(tok, tok.ToString() )
@@ -1445,6 +1464,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1458,6 +1478,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: RESERVEDWORD
 
@@ -1470,6 +1491,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -1543,6 +1565,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1556,6 +1579,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDITIONALMODELELEMENT
 
@@ -1568,6 +1592,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -1634,6 +1659,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1647,6 +1673,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDITIONALCOLUMNNAME
 
@@ -1659,6 +1686,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -1725,6 +1753,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1738,6 +1767,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDITIONALCOMPARISON
 
@@ -1750,6 +1780,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -1879,6 +1910,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1892,6 +1924,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDITIONALQUOTEDIDENTIFIER
 
@@ -1904,6 +1937,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -1970,6 +2004,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -1983,6 +2018,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDITIONALVALUE
 
@@ -1995,6 +2031,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -2068,6 +2105,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -2081,6 +2119,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ASCLAUSE
 
@@ -2093,6 +2132,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -2192,6 +2232,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -2205,6 +2246,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: BRACKTEDCOLMNLIST
 
@@ -2217,6 +2259,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseCOLUMNNAME(node) ' NonTerminal Rule: COLUMNNAME
@@ -2285,6 +2328,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -2298,6 +2342,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: COLUMNLIST
 
@@ -2310,6 +2355,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.STAR, TokenType.COLUMNNAMESTR, TokenType.KEYWDCOUNTSTAR}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -2455,6 +2501,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -2468,6 +2515,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: COLUMNNAME
 
@@ -2480,6 +2528,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -2579,6 +2628,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -2592,6 +2642,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: COMPARISON
 
@@ -2604,6 +2655,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseCOMPARISON(node) ' NonTerminal Rule: COMPARISON
@@ -2663,6 +2715,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -2676,6 +2729,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: COMPARISONLIST
 
@@ -2688,6 +2742,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDDATATYPELOGICALTRUEFALSE, TokenType.KEYWDDATATYPELOGICALYESNO, TokenType.KEYWDDATATYPEAUTOCOUNTER, TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION, TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION, TokenType.KEYWDDATATYPESIGNEDBIGINTEGER, TokenType.KEYWDDATATYPESIGNEDINTEGER, TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER, TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER, TokenType.KEYWDDATATYPEOBJECTID, TokenType.KEYWDDATATYPEROWID, TokenType.KEYWDDATATYPERAWDATAOLEOBJECT, TokenType.KEYWDDATATYPERAWDATA, TokenType.KEYWDDATATYPEAUTOTIMESTAMP, TokenType.KEYWDDATATYPEDATE, TokenType.KEYWDDATATYPEDATETIME, TokenType.KEYWDDATATYPETIME}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -3606,6 +3661,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -3619,6 +3675,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DATATYPE
 
@@ -3631,6 +3688,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH, TokenType.KEYWDDATATYPERAWDATALARGELENGTH, TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH, TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH, TokenType.KEYWDDATATYPESTRINGLARGELENGTH, TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH}) ' Choice Rule
@@ -4024,6 +4082,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -4037,6 +4096,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DATATYPELENGTH
 
@@ -4049,6 +4109,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION, TokenType.KEYWDDATATYPEDECIMAL, TokenType.KEYWDDATATYPEMONEY}) ' Choice Rule
@@ -4304,6 +4365,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -4317,6 +4379,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DATATYPEPRECISION
 
@@ -4329,6 +4392,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             ParseNODEPROPERTYNAMEIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYNAMEIDENTIFICATION
             If m_tree.Errors.Count > 0 Then
               If m_scanner.EndPos > Me.MaxDistance Then
@@ -4342,6 +4406,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -4355,6 +4420,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTPREDICATE
 
@@ -4367,6 +4433,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -4473,6 +4540,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -4486,6 +4554,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPENAMESTR
 
@@ -4498,6 +4567,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
@@ -4768,6 +4838,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -4781,6 +4852,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPEPREDICATE
 
@@ -4793,6 +4865,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
@@ -4949,6 +5022,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -4962,6 +5036,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPESIMPLEPREDICATE
 
@@ -4974,6 +5049,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -5108,6 +5184,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -5121,6 +5198,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: INSERTCOLUMNLIST
 
@@ -5133,6 +5211,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
@@ -5289,6 +5368,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -5302,6 +5382,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MATCHPREDICATE
 
@@ -5314,6 +5395,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
@@ -5584,6 +5666,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -5597,6 +5680,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MATCHFACTTYPEPREDICATE
 
@@ -5609,6 +5693,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDMIN, TokenType.KEYWDMAX}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -6035,6 +6120,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -6048,6 +6134,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MINMAXELEMENT
 
@@ -6060,6 +6147,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.PREBOUNDREADINGTEXT}) ' Option Rule
@@ -6226,6 +6314,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -6239,6 +6328,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MODELELEMENT
 
@@ -6251,6 +6341,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDENTITYTYPES, TokenType.KEYWDVALUETYPES, TokenType.KEYWDFACTTYPES, TokenType.KEYWDROLECONSTRAINTS, TokenType.KEYWDMODELNOTES}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -6479,6 +6570,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -6492,6 +6584,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MODELELEMENTPLURAL
 
@@ -6504,6 +6597,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -6610,6 +6704,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -6623,6 +6718,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MODELELEMENTSTR
 
@@ -6635,6 +6731,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDENTITYTYPE, TokenType.KEYWDVALUETYPE, TokenType.KEYWDMODEL}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -6771,6 +6868,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -6784,6 +6882,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MODELMODELELEMENT
 
@@ -6796,6 +6895,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -7034,6 +7134,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -7047,6 +7148,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODESTMT
 
@@ -7059,6 +7161,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.PREBOUNDREADINGTEXT}) ' Option Rule
@@ -7301,6 +7404,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -7314,6 +7418,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODE
 
@@ -7326,6 +7431,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -7509,6 +7615,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -7522,6 +7629,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODEPROPERTYIDENTIFICATION
 
@@ -7534,6 +7642,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.MODELELEMENTNAME, TokenType.BROPEN}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -8606,6 +8715,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -8619,6 +8729,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODEPROPERTYNAMEIDENTIFICATION
 
@@ -8631,6 +8742,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.BROPEN}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -8700,6 +8812,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -8713,6 +8826,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NODEIDENTIFICATION
 
@@ -8725,6 +8839,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.NUMBER) ' Terminal Rule: NUMBER
             n = node.CreateNode(tok, tok.ToString() )
@@ -8745,6 +8860,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -8758,6 +8874,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NUMBER1
 
@@ -8770,6 +8887,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             lbProblemSolved = True
                         tok = m_scanner.Scan(TokenType.NUMBER) ' Terminal Rule: NUMBER
             n = node.CreateNode(tok, tok.ToString() )
@@ -8790,6 +8908,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -8803,6 +8922,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: NUMBER2
 
@@ -8815,6 +8935,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             Do ' OneOrMore Rule
                 lbProblemSolved = True
                                 tok = m_scanner.Scan(TokenType.PREDICATE) ' Terminal Rule: PREDICATE
@@ -8841,6 +8962,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -8854,6 +8976,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: PREDICATECLAUSE
 
@@ -8866,6 +8989,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -9028,6 +9152,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -9041,6 +9166,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: PROPERTYIDENTIFIER
 
@@ -9053,6 +9179,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -9229,6 +9356,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -9242,6 +9370,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: QUOTEDIDENTIFIER
 
@@ -9254,6 +9383,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.COLON, TokenType.CARRET, TokenType.BANG, TokenType.LIKECOMPARITOR}) ' Choice Rule
@@ -9580,6 +9710,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -9593,6 +9724,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: QUOTEDIDENTIFIERLIST
 
@@ -9605,6 +9737,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -9792,6 +9925,7 @@ Namespace FEQL
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -9805,6 +9939,7 @@ Namespace FEQL
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: QUOTEDPROPERTYIDENTIFIERLIST
 
@@ -9817,6 +9952,7 @@ Namespace FEQL
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -10740,6 +10876,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -10753,6 +10890,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: RECURSIVECLAUSE
 
@@ -10765,6 +10903,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -11080,6 +11219,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -11093,6 +11233,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: REFERENCEMODECLAUSE
 
@@ -11105,6 +11246,7 @@ lbProblemSolved =                                 ParseNUMBER2(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.STAR, TokenType.KEYWDMIN, TokenType.KEYWDMAX, TokenType.KEYWDCOUNTSTAR, TokenType.MODELELEMENTNAME}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -11862,6 +12004,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -11875,6 +12018,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: RETURNCOLUMN
 
@@ -11887,6 +12031,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -12083,6 +12228,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -12096,6 +12242,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: RETURNCLAUSE
 
@@ -12108,6 +12255,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
@@ -12378,6 +12526,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -12391,6 +12540,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: RETURNFACTTYPEPREDICATE
 
@@ -12403,6 +12553,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYIDENTIFICATION
@@ -12673,6 +12824,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -12686,6 +12838,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: RETURNPREDICATE
 
@@ -12698,6 +12851,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -12804,6 +12958,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -12817,6 +12972,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ROLENAMESTR
 
@@ -12829,6 +12985,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -12895,6 +13052,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -12908,6 +13066,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: SETCLAUSE
 
@@ -12920,6 +13079,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -13054,6 +13214,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -13067,6 +13228,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: VALUELIST
 
@@ -13079,6 +13241,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -13185,6 +13348,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -13198,6 +13362,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: VALUESTRING
 
@@ -13210,6 +13375,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -13448,6 +13614,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -13461,6 +13628,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDENTITYTYPESTMT
 
@@ -13473,6 +13641,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -13766,6 +13935,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -13779,6 +13949,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDFACTSTMT
 
@@ -13791,6 +13962,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -14029,6 +14201,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -14042,6 +14215,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDFACTTYPESTMT
 
@@ -14054,6 +14228,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -14311,6 +14486,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -14324,6 +14500,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDROLESTMT
 
@@ -14336,6 +14513,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -14554,6 +14732,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -14567,6 +14746,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDMODELELEMENTSTMT
 
@@ -14579,6 +14759,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -14817,6 +14998,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -14830,6 +15012,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ADDVALUETYPESTMT
 
@@ -14842,6 +15025,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -14977,6 +15161,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -14990,6 +15175,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ASSERTSTMT
 
@@ -15002,6 +15188,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -15117,6 +15304,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -15130,6 +15318,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: BINARYFACTTYPEMANYTOONEDEFINITIONSTMT
 
@@ -15142,6 +15331,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -15215,6 +15405,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -15228,6 +15419,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONNECTTOMODELSTMT
 
@@ -15240,6 +15432,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPESTMT(node) ' NonTerminal Rule: FACTTYPESTMT
@@ -15374,6 +15567,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -15387,6 +15581,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTEITHEROREXTERNAL
 
@@ -15399,6 +15594,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseSUBTYPESTMT(node) ' NonTerminal Rule: SUBTYPESTMT
@@ -15533,6 +15729,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -15546,6 +15743,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTEITHERORSUBTYPE
 
@@ -15558,6 +15756,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -15680,6 +15879,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -15693,6 +15893,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTEITHEROR
 
@@ -15705,6 +15906,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -16178,6 +16380,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -16191,6 +16394,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTEXTERNALUNIQUENESS
 
@@ -16203,6 +16407,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -16482,6 +16687,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -16495,6 +16701,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTINCLUSIVEOR
 
@@ -16507,6 +16714,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -16629,6 +16837,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -16642,6 +16851,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTEXTERNALSTMT
 
@@ -16654,6 +16864,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -16878,6 +17089,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -16891,6 +17103,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CONSTRAINTMANDATORY
 
@@ -16903,6 +17116,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -16969,6 +17183,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -16982,6 +17197,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATECONCEPTSTMT
 
@@ -16994,6 +17210,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -17185,6 +17402,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -17198,6 +17416,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATEDATABASESTMT
 
@@ -17210,6 +17429,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -17276,6 +17496,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -17289,6 +17510,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATEENTITYTYPESTMT
 
@@ -17301,6 +17523,7 @@ lbProblemSolved =                         ParseASCLAUSE(node) ' NonTerminal Rule
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -17501,6 +17724,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -17514,6 +17738,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATEFACTTYPESTMT
 
@@ -17526,6 +17751,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -17592,6 +17818,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -17605,6 +17832,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATEMODELSTMT
 
@@ -17617,6 +17845,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDENTITYTYPE, TokenType.KEYWDFACTTYPE, TokenType.KEYWDVALUETYPE}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -17718,6 +17947,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -17731,6 +17961,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATEMODELELEMENTSTMT
 
@@ -17743,6 +17974,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -20986,6 +21218,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -20999,6 +21232,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATESTMT
 
@@ -21011,6 +21245,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -21077,6 +21312,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21090,6 +21326,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: CREATEVALUETYPESTMT
 
@@ -21102,6 +21339,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDLOCATION, TokenType.KEYWDTYPE}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -21171,6 +21409,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21184,6 +21423,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DATABASECREATECLAUSE
 
@@ -21196,6 +21436,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -21302,6 +21543,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21315,6 +21557,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DATABASELOCATIONCLAUSE
 
@@ -21327,6 +21570,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -21433,6 +21677,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21446,6 +21691,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DATABASETYPECLAUSE
 
@@ -21458,6 +21704,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -21580,6 +21827,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21593,6 +21841,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DELETESTMT
 
@@ -21605,6 +21854,7 @@ lbProblemSolved =                         ParseFACTTYPENAMESTR(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -21807,6 +22057,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21820,6 +22071,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DELETEFROMCLAUSE
 
@@ -21832,6 +22084,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -21964,6 +22217,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -21977,6 +22231,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DELETEALLSTMT
 
@@ -21989,6 +22244,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -22156,6 +22412,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -22169,6 +22426,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DELETEFACTSTMT
 
@@ -22181,6 +22439,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -22335,6 +22594,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -22348,6 +22608,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONCLAUSE
 
@@ -22360,6 +22621,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME, TokenType.KEYWDTODAY, TokenType.NUMBER, TokenType.BROPEN}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -22623,6 +22885,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -22636,6 +22899,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONSUBCLAUSE
 
@@ -22648,6 +22912,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             ParseFORMULA(node) ' NonTerminal Rule: FORMULA
             If m_tree.Errors.Count > 0 Then
               If m_scanner.EndPos > Me.MaxDistance Then
@@ -22661,6 +22926,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -22674,6 +22940,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONFORMULA
 
@@ -22686,6 +22953,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDA, TokenType.KEYWDAN}) ' Choice Rule
@@ -23028,6 +23296,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -23041,6 +23310,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVEDFACTTYPESTMT
 
@@ -23053,6 +23323,7 @@ lbProblemSolved =                         ParseONPAGESTMT(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
@@ -23173,6 +23444,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -23186,6 +23458,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTREADING
 
@@ -23198,6 +23471,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -23508,6 +23782,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -23521,6 +23796,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONFACTREADING
 
@@ -23533,6 +23809,7 @@ lbProblemSolved =                                     ParseMODELELEMENT(node) ' 
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDAND, TokenType.KEYWDWHICH}) ' Option Rule
@@ -32173,6 +32450,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -32186,6 +32464,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONWHICHCLAUSE
 
@@ -32198,6 +32477,7 @@ lbProblemSolved =                                     ParseWHICHTHATCLAUSE(node)
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -34962,6 +35242,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -34975,6 +35256,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONWHICHTHATCLAUSE
 
@@ -34987,6 +35269,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -35126,6 +35409,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -35139,6 +35423,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DESCRIBESTMT
 
@@ -35151,6 +35436,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDDID, TokenType.KEYWDDOES}) ' Choice Rule
@@ -35492,6 +35778,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -35505,6 +35792,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DIDSELECTSTMT
 
@@ -35517,6 +35805,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -35625,6 +35914,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -35638,6 +35928,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
 
@@ -35650,6 +35941,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -35851,6 +36143,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -35864,6 +36157,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ENUMERATESTMT
 
@@ -35876,6 +36170,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -35949,6 +36244,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -35962,6 +36258,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: EXPRESSION
 
@@ -35974,6 +36271,7 @@ lbProblemSolved =                         ParseWRITTENASCLAUSE(node) ' NonTermin
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -36075,6 +36373,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -36088,6 +36387,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: EXPRESSIONPART
 
@@ -36100,6 +36400,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -36192,6 +36493,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -36205,6 +36507,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: EXISTSSTMT
 
@@ -36217,6 +36520,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -36651,6 +36955,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -36664,6 +36969,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: EXTERNALUNIQUENESSCONSTRAINTSTMT
 
@@ -36676,6 +36982,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -36834,6 +37141,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -36847,6 +37155,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPEISWHERESTMT
 
@@ -36859,6 +37168,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPEIDENTIFICATION(node) ' NonTerminal Rule: FACTTYPEIDENTIFICATION
@@ -37013,6 +37323,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -37026,6 +37337,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPESTMT
 
@@ -37038,6 +37350,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -37174,6 +37487,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -37187,6 +37501,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPEIDENTIFICATION
 
@@ -37199,6 +37514,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead(TokenType.PREDICATE) ' ZeroOrMore Rule
             While tok.Type = TokenType.PREDICATE
             m_tree.Errors.Clear
@@ -37274,6 +37590,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -37287,6 +37604,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPEPARTCLAUSE
 
@@ -37299,6 +37617,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -37372,6 +37691,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -37385,6 +37705,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: BINARYFACTTYPECLAUSE
 
@@ -37397,6 +37718,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -38726,6 +39048,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -38739,6 +39062,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTTYPEPRODUCTION
 
@@ -38751,6 +39075,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseNODEPROPERTYNAMEIDENTIFICATION(node) ' NonTerminal Rule: NODEPROPERTYNAMEIDENTIFICATION
@@ -38865,6 +39190,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -38878,6 +39204,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FACTSTMT
 
@@ -38890,6 +39217,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -39029,6 +39357,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -39042,6 +39371,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: GETSUPERTYPESTMT
 
@@ -39054,6 +39384,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -39208,6 +39539,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -39221,6 +39553,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: GROUPBYCLAUSE
 
@@ -39233,6 +39566,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -39387,6 +39721,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -39400,6 +39735,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: HAVINGCLAUSE
 
@@ -39412,6 +39748,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.NUMBER, TokenType.SINGLEQUOTE}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -39488,6 +39825,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -39501,6 +39839,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: INDIVIDUALIDENTIFIER
 
@@ -39513,6 +39852,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -39685,6 +40025,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -39698,6 +40039,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: INMODELSTMT
 
@@ -39710,6 +40052,7 @@ lbProblemSolved =                         ParseMATHCLAUSE(node) ' NonTerminal Ru
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -39980,6 +40323,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -39993,6 +40337,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: INSERTSTMT
 
@@ -40005,6 +40350,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40071,6 +40417,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40084,6 +40431,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ITISMANDATORYTHATSTMNT
 
@@ -40096,6 +40444,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40162,6 +40511,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40175,6 +40525,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: LISTSTMT
 
@@ -40187,6 +40538,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40279,6 +40631,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40292,6 +40645,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MATCHFACTTYPESTMT
 
@@ -40304,6 +40658,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40396,6 +40751,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40409,6 +40765,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MATCHSELECTSETFACTTYPESTMT
 
@@ -40421,6 +40778,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40598,6 +40956,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40611,6 +40970,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MATHCLAUSE
 
@@ -40623,6 +40983,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40771,6 +41132,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40784,6 +41146,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: MATCHSELECTSTMT
 
@@ -40796,6 +41159,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -40968,6 +41332,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -40981,6 +41346,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ONPAGESTMT
 
@@ -40993,6 +41359,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -41099,6 +41466,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41112,6 +41480,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: OPENMODELSTMT
 
@@ -41124,6 +41493,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -41278,6 +41648,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41291,6 +41662,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ORDERBYCLAUSE
 
@@ -41303,6 +41675,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
@@ -41362,6 +41735,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41375,6 +41749,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: PREDICATENODEPROPERTYIDENTIFICATION
 
@@ -41387,6 +41762,7 @@ lbProblemSolved =                         ParseINMODELSTMT(node) ' NonTerminal R
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -41664,6 +42040,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41677,6 +42054,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: SELECTSTMT
 
@@ -41689,6 +42067,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -41762,6 +42141,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41775,6 +42155,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: SHOWSTMT
 
@@ -41787,6 +42168,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -41860,6 +42242,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41873,6 +42256,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: SUBTYPECLAUSE
 
@@ -41885,6 +42269,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
             lbProblemSolved =                     ParseFACTTYPEIDENTIFICATION(node) ' NonTerminal Rule: FACTTYPEIDENTIFICATION
@@ -41951,6 +42336,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -41964,6 +42350,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: SUBTYPESTMT
 
@@ -41976,6 +42363,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.BROPEN}) ' Option Rule
@@ -42364,6 +42752,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -42377,6 +42766,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: TABLEIDENTIFICATION
 
@@ -42389,6 +42779,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -42698,6 +43089,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -42711,6 +43103,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: UPDATESTMT
 
@@ -42723,6 +43116,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -43215,6 +43609,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -43228,6 +43623,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: VALUETYPEISWRITTENASSTMT
 
@@ -43240,6 +43636,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -43341,6 +43738,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -43354,6 +43752,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WHERESTMT
 
@@ -43366,6 +43765,7 @@ lbProblemSolved =                         ParseWHERESTMT(node) ' NonTerminal Rul
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDIS, TokenType.PREDICATE, TokenType.KEYWDTHAT, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -46130,6 +46530,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -46143,6 +46544,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WHICHTHATCLAUSE
 
@@ -46155,6 +46557,7 @@ lbProblemSolved =                                 ParseRECURSIVECLAUSE(node) ' N
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDAND, TokenType.KEYWDWHICH, TokenType.KEYWDWHEREALSO}) ' Option Rule
@@ -54230,6 +54633,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -54243,6 +54647,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WHICHCLAUSE
 
@@ -54255,6 +54660,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -54502,6 +54908,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -54515,6 +54922,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WITHCLAUSE
 
@@ -54527,6 +54935,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDWHICH, TokenType.KEYWDSHOWME}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -54617,6 +55026,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -54630,6 +55040,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: QUERYBEGINNING
 
@@ -54642,6 +55053,7 @@ lbProblemSolved =                                     ParseMATHCLAUSE(node) ' No
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.KEYWDWHICH, TokenType.KEYWDSHOWME, TokenType.BROPEN}) ' Choice Rule
@@ -55234,6 +55646,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -55247,6 +55660,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WHICHSELECTSTMT
 
@@ -55259,6 +55673,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -55384,6 +55799,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -55397,6 +55813,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WITHPREDICATESTMT
 
@@ -55409,6 +55826,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 lbProblemSolved = True
@@ -55901,6 +56319,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -55914,6 +56333,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: WRITTENASCLAUSE
 
@@ -55926,6 +56346,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
 
              ' Concat Rule
                                 tok = m_scanner.LookAhead({TokenType.MODELELEMENTNAME, TokenType.PREBOUNDREADINGTEXT}) ' Choice Rule
@@ -56207,6 +56628,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -56220,6 +56642,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: DERIVATIONSTMT
 
@@ -56232,6 +56655,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             Dim liOriginalRange as Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
+            Try
             tok = m_scanner.LookAhead({TokenType.KEYWDCONNECTTOMODEL, TokenType.KEYWDADDFACT, TokenType.KEYWDASSERT, TokenType.KEYWDDATABASE, TokenType.KEYWDCREATE, TokenType.KEYWDDELETE, TokenType.KEYWDDELETEALL, TokenType.KEYWDDELETEFACT, TokenType.KEYWDDESCRIBE, TokenType.KEYWDDID, TokenType.KEYWDDOES, TokenType.KEYWDSHOW, TokenType.KEYWDEACH, TokenType.KEYWDEITHER, TokenType.KEYWDA, TokenType.KEYWDAN, TokenType.KEYWDENUMERATE, TokenType.KEYWDMATCH, TokenType.MODELELEMENTNAME, TokenType.PREBOUNDREADINGTEXT, TokenType.KEYWDWHICH, TokenType.KEYWDSHOWME, TokenType.BROPEN}) ' Choice Rule
             
                 m_tree.Optionals.Clear
@@ -57122,6 +57546,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
             If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
               m_tree.Optionals.Clear()
             End If
+            Finally
             If lbProblemSolved Then
               parent.Token.UpdateRange(node.Token)
               Me.MaxDistance = node.Token.EndPos
@@ -57135,6 +57560,7 @@ lbProblemSolved =                         ParseORDERBYCLAUSE(node) ' NonTerminal
               m_scanner.StartPos = liOriginalRange
               parent.Nodes.Remove(node)
             End If
+            End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: Start
 
