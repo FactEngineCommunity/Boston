@@ -135,7 +135,7 @@
                 larFromNodes.RemoveAll(Function(x) larSubQueryNodes.Contains(x))
 
                 liInd = 0
-                For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not x.FBMModelObject.IsDerived)
+                For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not (x.FBMModelObject.IsDerived Or x.FBMModelObject.isUnaryFactType))
                     lsTDBQuery &= "$" & lrQueryNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & " isa " & lrQueryNode.RDSTable.DatabaseName
 
                     '----------------------------------------------------
@@ -284,6 +284,41 @@
                     lsTDBQuery &= ";" & vbCrLf
 
                 Next
+
+#Region "Unary FactType Nodes"
+
+                For Each lrNode In larFromNodes.FindAll(Function(x) x.FBMModelObject.isUnaryFactType)
+
+                    lsTDBQuery &= "("
+                    liInd = 0
+                    Dim lrFactType As FBM.FactType = lrNode.FBMModelObject
+                    Dim lrRole As FBM.Role = lrFactType.RoleGroup(0)
+
+
+                    lsTDBQuery &= lrRole.Name & ": $" & lrRole.getCorrespondingRDSTable.DatabaseName ' & lrNode.Alias
+                    liInd += 1
+
+                    lsTDBQuery &= ") isa " & lrFactType.getCorrespondingRDSTable.DatabaseName
+
+                    '----------------------------------------------------
+                    'Return Columns
+                    Dim larReturnColumn = From Column In Me.ProjectionColumn
+                                          Where (Column.Table.Name = lrFactType.getCorrespondingRDSTable.Name Or
+                                                 lrFactType.isSubtypeOfModelElement(Column.Table.FBMModelElement))
+                                          Where Not Column.isPartOfPrimaryKey
+                                          Select Column
+
+                    For Each lrReturnColumn In larReturnColumn
+                        lsTDBQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.TemporaryAlias & lrReturnColumn.Name
+                    Next
+
+                    lsTDBQuery &= ";" & vbCrLf
+                Next
+
+
+
+
+#End Region
 
                 '=================================================================================================
                 'Derived FactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables

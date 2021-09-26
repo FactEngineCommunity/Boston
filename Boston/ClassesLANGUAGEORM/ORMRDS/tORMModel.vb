@@ -1207,7 +1207,7 @@ Namespace FBM
                                        Select Table
 
                         lrOriginTable = larTable.First
-                        lrDestinationTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.JoinedORMObject.Id)
+                        lrDestinationTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.JoinedORMObject.GetTopmostNonAbsorbedSupertype.Id)
 
                         If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
 

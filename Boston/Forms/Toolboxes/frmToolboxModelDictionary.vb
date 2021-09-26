@@ -908,63 +908,29 @@ Public Class frmToolboxModelDictionary
 
     Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
 
-        Select Case Me.TreeView1.SelectedNode.Tag.GetType
-            Case Is = GetType(FBM.EntityType),
-                      GetType(FBM.ValueType),
-                      GetType(FBM.FactType)
-                Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
-            Case Is = GetType(RDS.Table)
-                Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
-                Me.ToolStripMenuItemRemoveFromModel.Enabled = False
-                Me.ToolStripMenuItemViewOnPage.Enabled = False
-            Case Else
-                Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
+        Try
+            Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                Case Is = GetType(FBM.EntityType),
+                          GetType(FBM.ValueType),
+                          GetType(FBM.FactType)
+                    Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
+                Case Is = GetType(RDS.Table)
+                    Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
+                    Me.ToolStripMenuItemRemoveFromModel.Enabled = False
+                    Me.ToolStripMenuItemViewOnPage.Enabled = False
+                Case Else
+                    Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
 
-        End Select
+            End Select
 
-        '20200725-Remove if everything seems okay. Is covered in MouseDown
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        'Dim larPage As List(Of FBM.Page)
-        'Dim lrPage As FBM.Page
-        'Dim lrModelObject As FBM.ModelObject
-
-        'lrModelObject = Me.TreeView1.SelectedNode.Tag
-
-        'Select Case lrModelObject.ConceptType
-        '    Case Is = pcenumConceptType.EntityType
-        '        larPage = Me.zrORMModel.GetPagesContainingModelObject(lrModelObject)
-        '        If larPage.Count > 0 Then
-        '            Me.ViewOnPageToolStripMenuItem.Enabled = True
-        '            For Each lrPage In larPage
-        '                '----------------------------------------------------------
-        '                'Try and find the Page within the EnterpriseView.TreeView
-        '                '  NB If 'Core' Pages are not shown for the model, 
-        '                '  they will not be in the TreeView and so a menuOption
-        '                '  is now added for those hidden Pages.
-        '                '----------------------------------------------------------
-
-        '                Dim lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
-        '                                                                       lrModelObject,
-        '                                                                       Me.zrORMModel.ModelId,
-        '                                                                       pcenumLanguage.ORMModel,
-        '                                                                       Nothing,
-        '                                                                       lrPage.PageId)
-
-        '                lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-
-        '                If IsSomething(lr_enterprise_view) Then
-        '                    '---------------------------------------------------
-        '                    'Add the Page(Name) to the MenuOption.DropDownItems
-        '                    '---------------------------------------------------
-        '                    Dim lo_menu_option = Me.ViewOnPageToolStripMenuItem.DropDownItems.Add(lrPage.Name)
-        '                    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-        '                    AddHandler lo_menu_option.Click, AddressOf Me.OpenORMDiagram
-        '                End If
-        '            Next
-        '        Else
-        '            Me.ViewOnPageToolStripMenuItem.Enabled = False
-        '        End If
-        'End Select
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

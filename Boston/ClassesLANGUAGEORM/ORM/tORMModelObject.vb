@@ -813,6 +813,29 @@ Namespace FBM
 
         End Function
 
+        Public Function isUnaryFactType() As Boolean
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).Arity = 1 Then Return True
+                    Case Else
+                        Return False
+                End Select
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+        End Function
+
         Public Function isReferenceModeValueType() As Boolean
 
             Try

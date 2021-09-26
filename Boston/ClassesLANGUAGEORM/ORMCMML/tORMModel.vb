@@ -786,6 +786,10 @@ Namespace FBM
 
                     Dim lrTable As RDS.Table = Me.RDS.Table.Find(Function(x) x.Name = lrFactType.RoleGroup(0).JoinedORMObject.Id)
 
+                    If lrTable Is Nothing Then
+                        lrTable = Me.RDS.Table.Find(Function(x) x.Name = lrFactType.RoleGroup(0).JoinedORMObject.GetTopmostNonAbsorbedSupertype.Id)
+                    End If
+
                     Dim lsColumnName = "DummyFactTypeReadingRequired"
 
                     If lrFactType.FactTypeReading.Count > 0 Then

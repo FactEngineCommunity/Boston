@@ -860,7 +860,7 @@ Namespace FBM
                                 Select Case Me.JoinedORMObject.GetType
                                     Case Is = GetType(FBM.EntityType)
                                         If Me.JoinsEntityType.HasSimpleReferenceScheme Then
-                                            lsColumnName = Me.JoinsEntityType.ReferenceModeValueType.Id
+                                            lsColumnName = CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeValueType.Id
                                         ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
                                             Throw New Exception("Called for Entity Type with Compound Reference Scheme.")
                                         Else
@@ -1974,7 +1974,7 @@ Namespace FBM
                                     '  * Remove the Original Column
                                     '---------------------------------------------------------
 
-                                    Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable
+                                    Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable()
 
                                     Dim larCoveredRoles As New List(Of FBM.Role)
                                     Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).

@@ -889,6 +889,28 @@ Namespace FBM
                                                 lrIndex = larExistingIndex.First
                                             Else
                                                 'Not a biggie at this stage, but do need to fix this.
+                                                'CodeSafe: Create the index.
+                                                Dim larIndexColumn As New List(Of RDS.Column)
+                                                larIndexColumn.Add(lrColumn)
+
+                                                Dim lsQualifier As String = lrTable.generateUniqueQualifier("PK")
+                                                Dim lbIsPrimaryKey As Boolean = True
+                                                Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                                lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
+
+                                                'Add the new Index
+                                                lrIndex = New RDS.Index(lrTable,
+                                                                        lsIndexName,
+                                                                        lsQualifier,
+                                                                        pcenumODBCAscendingOrDescending.Ascending,
+                                                                        lbIsPrimaryKey,
+                                                                        True,
+                                                                        False,
+                                                                        larIndexColumn,
+                                                                        False,
+                                                                        True)
+
+                                                Call lrTable.addIndex(lrIndex)
                                             End If
                                         Else
                                             lrIndex = larExistingIndex.First
