@@ -484,12 +484,12 @@
                 If arQueryEdge.FBMFactType.Arity = 2 Then
                     If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
                         If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
-                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id Then
                                 If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
                                     arQueryEdge.IsReciprocal = True
                                 End If
                             ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
-                                    arQueryEdge.IsReciprocal = True
+                                arQueryEdge.IsReciprocal = True
                             End If
                         End If
                     End If
@@ -767,7 +767,7 @@
 
             If arQueryEdge.FBMFactType IsNot Nothing Then 'May be PartialFactTypeMatch and hasn't found the FactType yet.
                 If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
-                    If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                    If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType And arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id Then
                         If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
                             arQueryEdge.IsReciprocal = True
                         End If
@@ -777,6 +777,22 @@
                        arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                     If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
                         arQueryEdge.IsReciprocal = True
+                    End If
+                End If
+            End If
+
+            If arQueryEdge.FBMFactType IsNot Nothing Then
+                If arQueryEdge.FBMFactType.Arity = 2 Then
+                    If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                        If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
+                                If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
+                                    arQueryEdge.IsReciprocal = True
+                                End If
+                            ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
+                                arQueryEdge.IsReciprocal = True
+                            End If
+                        End If
                     End If
                 End If
             End If
@@ -1232,6 +1248,22 @@
                 arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
                 If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
                     arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
+                End If
+            End If
+
+            If arQueryEdge.FBMFactType IsNot Nothing Then
+                If arQueryEdge.FBMFactType.Arity = 2 Then
+                    If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                        If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id Then
+                                If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
+                                    arQueryEdge.IsReciprocal = True
+                                End If
+                            ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
+                                arQueryEdge.IsReciprocal = True
+                            End If
+                        End If
+                    End If
                 End If
             End If
 
