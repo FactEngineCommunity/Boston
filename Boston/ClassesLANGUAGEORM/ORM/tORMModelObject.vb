@@ -315,7 +315,34 @@ Namespace FBM
         End Property
 
 
+        ''' <summary>
+        ''' Used for TypeDB schema generation only at this stage. Defaults to 'entity' for an Entity Type or 'relation' for a Fact Type etc if no Supertype is found.
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property PrimarySupertypeName As String
+            Get
+                Dim lsPrimarySupertypeName As String = "thing"
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueType)
+                        lsPrimarySupertypeName = "attribute"
+                    Case Is = GetType(FBM.EntityType)
+                        lsPrimarySupertypeName = "entity"
+                    Case Is = GetType(FBM.FactType)
+                        lsPrimarySupertypeName = "relation"
+                End Select
 
+                If Me.SubtypeRelationship.Count > 0 Then
+                    Dim lrPrimarySubtypeRelationship As FBM.tSubtypeRelationship
+                    lrPrimarySubtypeRelationship = Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship)
+                    If lrPrimarySubtypeRelationship IsNot Nothing Then
+                        lsPrimarySupertypeName = lrPrimarySubtypeRelationship.parentEntityType.Id
+                    End If
+                End If
+
+                Return lsPrimarySupertypeName
+            End Get
+
+        End Property
 
         ''' <summary>
         ''' Used for hiding or showing property elements.

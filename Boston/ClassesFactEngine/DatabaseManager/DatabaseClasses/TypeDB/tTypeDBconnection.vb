@@ -171,14 +171,14 @@ Namespace FactEngine.TypeDB
                                         Dim loEncoding As String = loValue.Type.Encoding.ToString
                                             Dim loValueType As String = loValue.Type.ValueType.ToString
                                             If Not (loEncoding.StartsWith("Attribute") Or loEncoding.StartsWith("Relation")) Then
-                                                Debugger.Break()
+                                                'Debugger.Break()
                                             End If
 
                                         Catch ex As Exception
                                             'Not a biggie at this stage.
                                         End Try
                                     Case Else
-                                        Debugger.Break()
+                                        'Debugger.Break()
                                 End Select
 
                                 Try

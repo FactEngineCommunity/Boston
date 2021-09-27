@@ -82,10 +82,9 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "5.9"
+            psApplicationApplicationVersionNr = "5.8"
             psApplicationDatabaseVersionNr = "1.29"
-            'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.          
-
+            'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
