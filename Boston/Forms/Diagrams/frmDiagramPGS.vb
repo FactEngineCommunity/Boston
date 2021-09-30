@@ -353,59 +353,94 @@ Public Class frmDiagramPGS
 
             For Each lrNode As PGS.Node In Me.zrPage.ERDiagram.Entity
 
-                For Each lrRDSRelation In lrNode.RDSTable.getOutgoingRelations
+                If lrNode.RDSTable.isPGSRelation And lrNode.RDSTable.Arity < 3 Then
+                    'Need to load the relation for the joined Nodes, not the PGSRelation.
+                    'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
 
-                    lrDestinationNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.DestinationTable.Name)
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
 
-                    If lrDestinationNode IsNot Nothing Then
-                        'The Destination Table is on the Page.
-                        lrOriginNode = lrNode
+                    Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
 
-                        If (lrOriginNode.NodeType = pcenumPGSEntityType.Relationship) And (lrOriginNode.RDSTable.CountNonValueTypeColumns < 3) Then
+                    Dim larDestinationModelObjects = lrFactType.getDesinationModelObjects
 
+                    Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
+                                                                                      x.DestinationTable.Name = larDestinationModelObjects(1).Id)
 
-                            'For binary-manyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
-                            If Not larLoadedRelationNodes.Contains(lrOriginNode) Then
-
-                                Dim lrPGSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRDSRelation.Id)
-                                Call Me.zrPage.displayPGSRelationNodeLink(lrOriginNode, lrRDSRelation)
-
-                                larLoadedRelationNodes.Add(lrOriginNode)
-                            End If
-                        Else 'Is Not a PGSRelation
-
-                            Dim lrPGSRelation As New ERD.Relation(Me.zrPage.Model,
-                                                              Me.zrPage,
-                                                              lrRDSRelation.Id,
-                                                              lrOriginNode,
-                                                              lrRDSRelation.OriginMultiplicity,
-                                                              lrRDSRelation.RelationOriginIsMandatory,
-                                                              lrRDSRelation.ContributesToPrimaryKey,
-                                                              lrDestinationNode,
-                                                              lrRDSRelation.DestinationMultiplicity,
-                                                              lrRDSRelation.RelationDestinationIsMandatory)
-
-                                lrPGSRelation.OriginPredicate = lrRDSRelation.OriginPredicate
-                                lrPGSRelation.DestinationPredicate = lrRDSRelation.DestinationPredicate
-                                lrPGSRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
-
-                                '====================================================================
-                                'RDS
-                                lrPGSRelation.RDSRelation = lrRDSRelation
-
-                                Me.zrPage.ERDiagram.Relation.Add(lrPGSRelation)
-
-                                Dim lrLink As PGS.Link
-                                lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrOriginNode, lrDestinationNode, Nothing, Nothing, lrPGSRelation)
-                                lrLink.DisplayAndAssociate()
-                                lrPGSRelation.Link = lrLink
-                                lrOriginNode.Relation.Add(lrPGSRelation)
-
-                            End If
-
+                    Dim lbAllFound As Boolean = True
+                    For Each lrModelObject In larDestinationModelObjects
+                        If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                            lbAllFound = False
                         End If
+                    Next
 
-                Next
+                    If lbAllFound Then
+                        If lrNode.RDSTable.isPGSRelation Then
+                            Call Me.zrPage.DisplayPGSRelationNodeLink(lrNode, lrRDSRelation)
+                            lrNode.Shape.Visible = False
+                            For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
+                                lrEdge.Visible = False
+                            Next
+                        End If
+                    End If
+                Else
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
+                    Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
+                End If
+
+                '20210929-VM-Was not getting PGSRelations
+                'For Each lrRDSRelation In lrNode.RDSTable.getOutgoingRelations
+
+                '    lrDestinationNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.DestinationTable.Name)
+
+                '    If lrDestinationNode IsNot Nothing Then
+                '        'The Destination Table is on the Page.
+                '        lrOriginNode = lrNode
+
+                '        If (lrOriginNode.NodeType = pcenumPGSEntityType.Relationship) And (lrOriginNode.RDSTable.CountNonValueTypeColumns < 3) Then
+
+
+                '            'For BinaryManyToMany relations, the ORM relationship is actually a PGS relation, rather than a PGS Node.
+                '            If Not larLoadedRelationNodes.Contains(lrOriginNode) Then
+
+                '                Dim lrPGSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.Id = lrRDSRelation.Id)
+                '                Call Me.zrPage.displayPGSRelationNodeLink(lrOriginNode, lrRDSRelation)
+
+                '                larLoadedRelationNodes.Add(lrOriginNode)
+                '            End If
+                '        Else 'Is Not a PGSRelation
+
+                '            Dim lrPGSRelation As New ERD.Relation(Me.zrPage.Model,
+                '                                          Me.zrPage,
+                '                                          lrRDSRelation.Id,
+                '                                          lrOriginNode,
+                '                                          lrRDSRelation.OriginMultiplicity,
+                '                                          lrRDSRelation.RelationOriginIsMandatory,
+                '                                          lrRDSRelation.ContributesToPrimaryKey,
+                '                                          lrDestinationNode,
+                '                                          lrRDSRelation.DestinationMultiplicity,
+                '                                          lrRDSRelation.RelationDestinationIsMandatory)
+
+                '            lrPGSRelation.OriginPredicate = lrRDSRelation.OriginPredicate
+                '            lrPGSRelation.DestinationPredicate = lrRDSRelation.DestinationPredicate
+                '            lrPGSRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
+
+                '            '====================================================================
+                '            'RDS
+                '            lrPGSRelation.RDSRelation = lrRDSRelation
+
+                '            Me.zrPage.ERDiagram.Relation.Add(lrPGSRelation)
+
+                '            Dim lrLink As PGS.Link
+                '            lrLink = New PGS.Link(Me.zrPage, lrFactInstance, lrOriginNode, lrDestinationNode, Nothing, Nothing, lrPGSRelation)
+                '            lrLink.DisplayAndAssociate()
+                '            lrPGSRelation.Link = lrLink
+                '            lrOriginNode.Relation.Add(lrPGSRelation)
+
+                '        End If
+
+                '    End If
+
+                'Next
 
             Next
 
@@ -1086,6 +1121,7 @@ Public Class frmDiagramPGS
 
         End If
 
+        Call Me.layoutSelfJoiningLinks()
         Call Me.resetNodeAndLinkColors()
 
     End Sub

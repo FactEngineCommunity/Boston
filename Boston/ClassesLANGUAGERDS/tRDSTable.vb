@@ -110,6 +110,7 @@ Namespace RDS
             End Get
         End Property
 
+        Public RolesPlayed As New List(Of RDS.Plays)
 
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
@@ -1553,6 +1554,22 @@ Namespace RDS
             End Try
 
         End Sub
+
+        Public Function PlaysRole(ByVal asRoleName As String) As Boolean
+
+            Try
+                Return Me.RolesPlayed.Find(Function(x) x.RoleName = asRoleName) IsNot Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
 
         Public Sub setName(ByVal asNewName As String)
             Try

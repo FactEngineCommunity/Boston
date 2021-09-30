@@ -2090,10 +2090,13 @@ Namespace FBM
 
         Public Function loadCMMLRelation(ByRef arRelation As RDS.Relation,
                                          Optional ByRef arOriginEntity As FBM.FactDataInstance = Nothing,
-                                         Optional ByRef arDestinationEntity As FBM.FactDataInstance = Nothing) As ERD.Relation
+                                         Optional ByRef arDestinationEntity As FBM.FactDataInstance = Nothing,
+                                         Optional ByRef abAddToPage As Boolean = True) As ERD.Relation
 
             Try
-                Call Me.addRDSRelation(arRelation)
+                If abAddToPage Then
+                    Call Me.addRDSRelation(arRelation)
+                End If
 
                 Dim lrERDRelation As New ERD.Relation(Me.Model,
                                                       Me,
@@ -2106,7 +2109,7 @@ Namespace FBM
                                                       arRelation.DestinationMultiplicity,
                                                       arRelation.RelationDestinationIsMandatory)
 
-                lrERDRelation.RDSRelation = arRelation 'Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+                lrERDRelation.RDSRelation = arRelation
                 lrERDRelation.RelationFactType = arRelation.ResponsibleFactType
 
                 Return lrERDRelation
@@ -2737,7 +2740,7 @@ Namespace FBM
 
                             Dim lrRelation As ERD.Relation
                             If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lsRelationId).Count = 0 Then
-                                lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOrigingEREntity, lrDestinationgEREntity)
+                                lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOrigingEREntity, lrDestinationgEREntity, False)
                                 Me.ERDiagram.Relation.Add(lrRelation)
                             Else
                                 lrRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lsRelationId)
@@ -2757,7 +2760,7 @@ Namespace FBM
                 Next 'From/To arPGSNode
 
                 Call Me.MakeDirty()
-                Call Me.Save()
+                If abAddToPage Then Call Me.Save()
 
             Catch ex As Exception
                 Dim lsMessage1 As String

@@ -255,6 +255,35 @@ Namespace RDS
 
         End Function
 
+        Public Function getTableByRolePlayed(ByVal asRoleName As String) As RDS.Table
+
+            Try
+                Dim larTable = From Table In Me.Table
+                               From Plays In Table.RolesPlayed
+                               Where Plays.RoleName = asRoleName
+                               Select Table
+
+                If larTable.Count > 0 Then
+                    Return larTable.First
+                Else
+                    Throw New Exception("Method called where there is no Table that plays the Role named:" & asRoleName)
+                End If
+
+                Return Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Puts the tables in Relationship Order.
         ''' </summary>

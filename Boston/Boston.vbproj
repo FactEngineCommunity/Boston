@@ -537,6 +537,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeDerivationText.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
+    <Compile Include="ClassesLANGUAGERDS\TypeDBSpecific\tRDSPlays.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDStartStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDEndStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTM\tSTMEndStateIndicator.vb" />
