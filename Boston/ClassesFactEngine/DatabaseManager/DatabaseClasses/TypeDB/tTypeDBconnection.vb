@@ -182,6 +182,11 @@ Namespace FactEngine.TypeDB
                             Debugger.Break()
                         End If
                     Next
+
+                    If larColumn.Count = 0 Then
+                        'Have no choice, need to use all Columns in Table.
+                        larColumn.AddRange(arTable.Column)
+                    End If
                 End If
 
                 lsIndexName = arTable.Name & "_PK"

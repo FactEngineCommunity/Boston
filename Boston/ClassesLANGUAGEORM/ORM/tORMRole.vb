@@ -2509,7 +2509,9 @@ Namespace FBM
         ''' </summary>
         ''' <param name="asName"></param>
         ''' <remarks></remarks>
-        Public Overrides Function setName(ByVal asName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+        Public Overrides Function setName(ByVal asName As String,
+                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
 
             Try
 

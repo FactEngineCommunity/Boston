@@ -2588,7 +2588,9 @@ Namespace FBM
         ''' </summary>
         ''' <param name="asNewName"></param>
         ''' <remarks>Preconditions: The uniqueness of the new EntityType.Name amoungst EntityTypes, ValueTypes, FactTypes and RoleConstraints has already been verified.</remarks>
-        Public Overrides Function SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+        Public Overrides Function SetName(ByVal asNewName As String,
+                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
             '-----------------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Richmond.
             '  A EntityType.Id/Name represents the same thing accross all Models in Richmond, otherwise the Richmond 
@@ -2682,7 +2684,9 @@ Namespace FBM
 
                 '-------------------------------------------------------------
                 'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
-                Me.Model.Save()
+                If Not abSuppressModelSave Then
+                    Me.Model.Save()
+                End If
 
                 Return True
 

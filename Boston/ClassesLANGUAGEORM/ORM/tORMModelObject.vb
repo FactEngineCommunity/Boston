@@ -1132,7 +1132,9 @@ Namespace FBM
         End Sub
 
 
-        Public Overridable Function setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+        Public Overridable Function setName(ByVal asNewName As String,
+                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                            Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
             'See inherited Classes.
         End Function
 

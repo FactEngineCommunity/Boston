@@ -71,6 +71,7 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.CheckBoxReverseEngineeringShowExtraInformation = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -255,12 +256,13 @@ Partial Class frmCRUDModel
         Me.GroupBoxReverseEngineering.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxReverseEngineering.Controls.Add(Me.CheckBoxReverseEngineeringShowExtraInformation)
         Me.GroupBoxReverseEngineering.Controls.Add(Me.GroupBoxREMessages)
         Me.GroupBoxReverseEngineering.Controls.Add(Me.ProgressBarReverseEngineering)
         Me.GroupBoxReverseEngineering.Controls.Add(Me.ButtonReverseEngineerDatabase)
         Me.GroupBoxReverseEngineering.Location = New System.Drawing.Point(13, 10)
         Me.GroupBoxReverseEngineering.Name = "GroupBoxReverseEngineering"
-        Me.GroupBoxReverseEngineering.Size = New System.Drawing.Size(596, 404)
+        Me.GroupBoxReverseEngineering.Size = New System.Drawing.Size(596, 483)
         Me.GroupBoxReverseEngineering.TabIndex = 15
         Me.GroupBoxReverseEngineering.TabStop = False
         Me.GroupBoxReverseEngineering.Text = "Reverse Engineering"
@@ -273,11 +275,11 @@ Partial Class frmCRUDModel
         Me.GroupBoxREMessages.Controls.Add(Me.RichTextBoxREErrorMessages)
         Me.GroupBoxREMessages.Controls.Add(Me.LabelPromptErrorMessages)
         Me.GroupBoxREMessages.Controls.Add(Me.RichTextBoxREMessages)
-        Me.GroupBoxREMessages.Location = New System.Drawing.Point(13, 68)
+        Me.GroupBoxREMessages.Location = New System.Drawing.Point(13, 78)
         Me.GroupBoxREMessages.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBoxREMessages.Name = "GroupBoxREMessages"
         Me.GroupBoxREMessages.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBoxREMessages.Size = New System.Drawing.Size(569, 321)
+        Me.GroupBoxREMessages.Size = New System.Drawing.Size(569, 390)
         Me.GroupBoxREMessages.TabIndex = 6
         Me.GroupBoxREMessages.TabStop = False
         Me.GroupBoxREMessages.Text = "Messages:"
@@ -287,17 +289,17 @@ Partial Class frmCRUDModel
         Me.RichTextBoxREErrorMessages.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.RichTextBoxREErrorMessages.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.RichTextBoxREErrorMessages.Location = New System.Drawing.Point(11, 187)
+        Me.RichTextBoxREErrorMessages.Location = New System.Drawing.Point(11, 200)
         Me.RichTextBoxREErrorMessages.Name = "RichTextBoxREErrorMessages"
         Me.RichTextBoxREErrorMessages.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical
-        Me.RichTextBoxREErrorMessages.Size = New System.Drawing.Size(544, 129)
+        Me.RichTextBoxREErrorMessages.Size = New System.Drawing.Size(544, 185)
         Me.RichTextBoxREErrorMessages.TabIndex = 7
         Me.RichTextBoxREErrorMessages.Text = ""
         '
         'LabelPromptErrorMessages
         '
         Me.LabelPromptErrorMessages.AutoSize = True
-        Me.LabelPromptErrorMessages.Location = New System.Drawing.Point(8, 171)
+        Me.LabelPromptErrorMessages.Location = New System.Drawing.Point(8, 184)
         Me.LabelPromptErrorMessages.Name = "LabelPromptErrorMessages"
         Me.LabelPromptErrorMessages.Size = New System.Drawing.Size(37, 13)
         Me.LabelPromptErrorMessages.TabIndex = 6
@@ -365,7 +367,7 @@ Partial Class frmCRUDModel
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(629, 445)
+        Me.TabControl1.Size = New System.Drawing.Size(629, 524)
         Me.TabControl1.TabIndex = 9
         '
         'Tab1
@@ -375,7 +377,7 @@ Partial Class frmCRUDModel
         Me.Tab1.Margin = New System.Windows.Forms.Padding(2)
         Me.Tab1.Name = "Tab1"
         Me.Tab1.Padding = New System.Windows.Forms.Padding(2)
-        Me.Tab1.Size = New System.Drawing.Size(621, 360)
+        Me.Tab1.Size = New System.Drawing.Size(621, 419)
         Me.Tab1.TabIndex = 0
         Me.Tab1.Text = "Database"
         Me.Tab1.UseVisualStyleBackColor = True
@@ -388,7 +390,7 @@ Partial Class frmCRUDModel
         Me.Advanced.Margin = New System.Windows.Forms.Padding(2)
         Me.Advanced.Name = "Advanced"
         Me.Advanced.Padding = New System.Windows.Forms.Padding(2)
-        Me.Advanced.Size = New System.Drawing.Size(621, 360)
+        Me.Advanced.Size = New System.Drawing.Size(621, 419)
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
@@ -410,7 +412,7 @@ Partial Class frmCRUDModel
         Me.TabPageReverseEngineering.Location = New System.Drawing.Point(4, 22)
         Me.TabPageReverseEngineering.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPageReverseEngineering.Name = "TabPageReverseEngineering"
-        Me.TabPageReverseEngineering.Size = New System.Drawing.Size(621, 419)
+        Me.TabPageReverseEngineering.Size = New System.Drawing.Size(621, 498)
         Me.TabPageReverseEngineering.TabIndex = 2
         Me.TabPageReverseEngineering.Text = "Reverse Engineering"
         Me.TabPageReverseEngineering.UseVisualStyleBackColor = True
@@ -420,7 +422,7 @@ Partial Class frmCRUDModel
         Me.TabPageConnection.Controls.Add(Me.GroupBoxConnection)
         Me.TabPageConnection.Location = New System.Drawing.Point(4, 22)
         Me.TabPageConnection.Name = "TabPageConnection"
-        Me.TabPageConnection.Size = New System.Drawing.Size(621, 360)
+        Me.TabPageConnection.Size = New System.Drawing.Size(621, 419)
         Me.TabPageConnection.TabIndex = 3
         Me.TabPageConnection.Text = "Connection"
         Me.TabPageConnection.UseVisualStyleBackColor = True
@@ -565,11 +567,21 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
+        'CheckBoxReverseEngineeringShowExtraInformation
+        '
+        Me.CheckBoxReverseEngineeringShowExtraInformation.AutoSize = True
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Location = New System.Drawing.Point(13, 56)
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Name = "CheckBoxReverseEngineeringShowExtraInformation"
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Size = New System.Drawing.Size(133, 17)
+        Me.CheckBoxReverseEngineeringShowExtraInformation.TabIndex = 7
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Text = "Show extra information"
+        Me.CheckBoxReverseEngineeringShowExtraInformation.UseVisualStyleBackColor = True
+        '
         'frmCRUDModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(763, 461)
+        Me.ClientSize = New System.Drawing.Size(763, 540)
         Me.Controls.Add(Me.ButtonApply)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
@@ -583,6 +595,7 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.ResumeLayout(False)
         Me.GroupBoxDatabase.PerformLayout()
         Me.GroupBoxReverseEngineering.ResumeLayout(False)
+        Me.GroupBoxReverseEngineering.PerformLayout()
         Me.GroupBoxREMessages.ResumeLayout(False)
         Me.GroupBoxREMessages.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -645,4 +658,5 @@ Partial Class frmCRUDModel
     Friend WithEvents LabelPromptWarehouseName As Label
     Friend WithEvents TextBoxPort As TextBox
     Friend WithEvents LabelPromptPort As Label
+    Friend WithEvents CheckBoxReverseEngineeringShowExtraInformation As CheckBox
 End Class

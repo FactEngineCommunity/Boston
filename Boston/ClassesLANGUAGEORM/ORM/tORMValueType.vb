@@ -931,7 +931,9 @@ Namespace FBM
 
         End Sub
 
-        Public Overrides Function SetName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+        Public Overrides Function SetName(ByVal asNewName As String,
+                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
 
             '-----------------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Richmond.

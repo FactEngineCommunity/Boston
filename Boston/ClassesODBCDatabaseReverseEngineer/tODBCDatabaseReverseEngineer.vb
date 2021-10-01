@@ -16,6 +16,11 @@ Public Class ProgressObject
 
 End Class
 
+Public Enum pcenumReverseEngineeringErrorReportType
+    Information
+    [Error]
+End Enum
+
 Public Class ODBCDatabaseReverseEngineer
 
     Private Model As FBM.Model 'The model to which the database schema is to be mapped.
@@ -38,6 +43,8 @@ Public Class ODBCDatabaseReverseEngineer
 
     Private [BackgroundWorker] As System.ComponentModel.BackgroundWorker = Nothing
 
+    Private ShowExtraInformation As Boolean = True
+
     '=========================================================================================================================================================
     ''' <summary>
     ''' Constructor.
@@ -46,11 +53,13 @@ Public Class ODBCDatabaseReverseEngineer
     Public Sub New(ByRef arModel As FBM.Model,
                    ByVal asDatabaseConnectionString As String,
                    ByVal abCreatePagePerTable As Boolean,
-                   Optional ByRef arBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+                   Optional ByRef arBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                   Optional ByVal abShowExtraInformation As Boolean = True)
         Me.Model = arModel
         Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(asDatabaseConnectionString)
         Me.CreatePagePerTable = abCreatePagePerTable
         Me.BackgroundWorker = arBackgroundWorker
+        Me.ShowExtraInformation = abShowExtraInformation
     End Sub
 
     ''' <summary>
@@ -120,8 +129,6 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.SetProgressBarValue(40, "Loaded Relations for Tables. ")
 
             Call Me.makeCapCamelCaseNames()
-
-
 
             Call Me.TempModel.RDS.orderTablesByRelations()
             Call Me.SetProgressBarValue(45)
@@ -296,8 +303,6 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.SetProgressBarValue(90, "Creating Fact Types straight to Value Types.")
             For Each lrTable In Me.TempModel.RDS.Table
 
-                If lrTable.Name = "Person" Then Debugger.Break()
-
                 Dim larValueTypeColumns = From Column In lrTable.Column
                                           Where lasNonReferenceModeValueTypeNames.Contains(LCase(Column.Name))
                                           Where Not Column.isPartOfPrimaryKey
@@ -411,7 +416,7 @@ Public Class ODBCDatabaseReverseEngineer
                 Dim lsNewName As String = ""
                 lsNewName = loLanguageGeneric.GetNounOverviewForWord(lrTable.Name)
                 If lsNewName IsNot Nothing And lsNewName <> lrTable.Name Then
-                    Call lrTable.FBMModelElement.setName(MakeCapCamelCase(lsNewName))
+                    Call lrTable.FBMModelElement.setName(MakeCapCamelCase(lsNewName), False, True)
                 End If
                 Call Me.AppendProgress(".")
             Next
@@ -509,7 +514,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                     Catch ex As Exception
                         'Not a biggie at this stage.
-                        Call Me.ReportError("Information: Couldn't rename column/s in Table, " & lrOriginTable.Name & ". Sticking with the name/s generated.")
+                        Call Me.ReportError("Information: Couldn't rename column/s in Table, " & lrOriginTable.Name & ". Sticking with the name/s generated.", pcenumReverseEngineeringErrorReportType.Information)
                     End Try
 
                 Catch ex As Exception
@@ -555,8 +560,8 @@ Public Class ODBCDatabaseReverseEngineer
                     Else
                         lsUniqueValueTypeName = lrColumn.Name
                     End If
-                    'Create the ValueType
 
+                    'Create the ValueType
                     Dim lrValueType As FBM.ValueType
 
                     lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrColumn.Name, True)
@@ -677,6 +682,12 @@ Public Class ODBCDatabaseReverseEngineer
                 End If
 
                 Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrPrimaryKeyColumn.DataType.DataType)
+
+                Dim lrVTTable As RDS.Table = Me.TempModel.RDS.Table.Find(Function(x) x.Name = lsValueTypeName)
+                If lrVTTable IsNot Nothing Then
+                    lsValueTypeName = lrEntityType.Id & "_" & lsValueTypeName
+                End If
+
                 lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
                 lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
 
@@ -822,10 +833,20 @@ Public Class ODBCDatabaseReverseEngineer
 
     End Sub
 
-    Private Sub ReportError(asErrorMessage As String)
+    Private Sub ReportError(asErrorMessage As String,
+                            Optional aiReverseEngineeringErrorType As pcenumReverseEngineeringErrorReportType = pcenumReverseEngineeringErrorReportType.Error)
 
         Dim lrProgressObject As New ProgressObject(True, asErrorMessage)
-        Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
+
+        Select Case aiReverseEngineeringErrorType
+            Case Is = pcenumReverseEngineeringErrorReportType.Error
+                Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
+            Case Is = pcenumReverseEngineeringErrorReportType.Information
+                If Me.ShowExtraInformation Then
+                    Me.BackgroundWorker.ReportProgress(Me.ProgressPercentage, lrProgressObject)
+                End If
+        End Select
+
     End Sub
 
     Private Sub SetProgressBarValue(ByVal aiValue As Integer, Optional asMessage As String = Nothing)

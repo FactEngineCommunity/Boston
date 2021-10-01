@@ -843,7 +843,9 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Function setName(ByVal asNewName As String, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+        Public Overrides Function setName(ByVal asNewName As String,
+                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
 
             '----------------------------------------------------------------------------------------------
             'Modify the FactData referenced by the FactData instance.

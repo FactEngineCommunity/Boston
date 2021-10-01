@@ -411,7 +411,8 @@ Public Class frmCRUDModel
                 Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel,
                                                                          Trim(Me.TextBoxDatabaseConnectionString.Text),
                                                                          True,
-                                                                         Me.BackgroundWorker)
+                                                                         Me.BackgroundWorker,
+                                                                         Me.CheckBoxReverseEngineeringShowExtraInformation.Checked)
 
                 Call Me.AddREMessage("- Reverse engineering started.")
                 Dim lsErrorMessage As String = ""
@@ -428,6 +429,8 @@ Public Class frmCRUDModel
 
                 Me.ButtonReverseEngineerDatabase.Enabled = False
             End With
+
+            Me.ProgressBarReverseEngineering.Visible = False
 
         Catch ex As Exception
             Dim lsMessage As String
