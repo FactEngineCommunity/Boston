@@ -88,6 +88,8 @@ Public Class ODBCDatabaseReverseEngineer
         '   Loop
         '=====================================================================================================================
         Try
+            Dim lrTable As RDS.Table
+
             Me.TempModel.TargetDatabaseType = Me.Model.TargetDatabaseType
             Me.TempModel.TargetDatabaseConnectionString = Me.Model.TargetDatabaseConnectionString
             Me.TempModel.Port = Me.Model.Port
@@ -106,6 +108,8 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.getTables()
             Call Me.SetProgressBarValue(10, "Loaded Tables.")
 
+            lrTable = Me.TempModel.RDS.Table.Find(Function(x) x.Name = "location-hierarchy")
+
             Call Me.GetColumns()
             Call Me.SetProgressBarValue(20, "Loaded Columns for Tables.")
 
@@ -113,9 +117,11 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.SetProgressBarValue(30, "Loaded Indexes for Tables.")
 
             Call Me.getRelations()
-            Call Me.SetProgressBarValue(40, "Loaded Relations for Tables.")
+            Call Me.SetProgressBarValue(40, "Loaded Relations for Tables. ")
 
-            Call Me.makeCapCamelCaseNames
+            Call Me.makeCapCamelCaseNames()
+
+
 
             Call Me.TempModel.RDS.orderTablesByRelations()
             Call Me.SetProgressBarValue(45)
@@ -125,7 +131,8 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.createTablesForSingleColumnPKTables()
             Call Me.SetProgressBarValue(60, "Created Tables for Single Primary Key Column Tables.")
 
-            Call Me.SetProgressBarValue(70, "Creating other Value Types.")
+            Call Me.SetProgressBarValue(70, "Creating other Value Types. ")
+
             For Each lrTable In Me.TempModel.RDS.Table
 
                 'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
@@ -133,12 +140,13 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.createValueTypesByTable(lrTable)
 
 #Region "Create ObjectifiedFactTypes"
+
                 Call Me.AppendProgress(".")
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
                     If lrTable.getPrimaryKeyColumns.Count = 1 Then
                         'Is an EntityType, and should already be a ModelElement in the Model.
-                        Call Me.ReportError("Error: " & lrTable.Name & " should already be a Model Element/Entity Type in the Model.")
+                        Call Me.ReportError($"Error: Creating Objectified Fact Types: {lrTable.Name} should already be a Model Element/Entity Type in the Model because it has a Single Column Primary Key.")
                     Else
                         'Create an ObjectifiedFactType
                         Dim lrFactType As FBM.FactType
@@ -150,6 +158,11 @@ Public Class ODBCDatabaseReverseEngineer
                             If lrColumn.hasOutboundRelation Then
                                 Dim lrRelation = lrColumn.Relation.Find(Function(x) x.OriginTable IsNot Nothing)
                                 Dim lrDestinationTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
+
+                                If lrDestinationTable Is Nothing Then
+                                    Throw New Exception($"Creating Objectified Fact Types. For: {lrTable.Name}. Destination Table does not exist: " & lrRelation.DestinationTable.Name)
+                                End If
+
                                 lrModelElement = lrDestinationTable.FBMModelElement
                                 If lrModelElement Is Nothing Then
                                     lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
@@ -179,7 +192,7 @@ Public Class ODBCDatabaseReverseEngineer
 
                             lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
                             Me.Model.AddFactType(lrFactType)
-                            lrFactType.Objectify() 'Add to model first, so LinkFactTypes have something to join to.
+                            lrFactType.Objectify(True) 'Add to model first, so LinkFactTypes have something to join to.
 
                             'Create the internalUniquenessConstraint.
                             Dim larRole As New List(Of FBM.Role)
@@ -265,6 +278,12 @@ Public Class ODBCDatabaseReverseEngineer
             Next
 
             '-----------------------------------------------------------------------------
+            'Create Tables for all missing Tables.
+            Call Me.SetProgressBarValue(85, "Creating Tables/Objectified Fact Types for remaining Tables/Relations.")
+            '20211001-VM-Add code here for instance for Periodic-Event in TypeDB Social Network, where the PrimaryKey is
+            'not for what it relates, but rather the Columns, Start-Date and End-Date.
+
+            '-----------------------------------------------------------------------------
             'Create FactTypes for all other Relations.
             Call Me.createFactTypesForAllOtherRelations()
 
@@ -276,6 +295,8 @@ Public Class ODBCDatabaseReverseEngineer
 
             Call Me.SetProgressBarValue(90, "Creating Fact Types straight to Value Types.")
             For Each lrTable In Me.TempModel.RDS.Table
+
+                If lrTable.Name = "Person" Then Debugger.Break()
 
                 Dim larValueTypeColumns = From Column In lrTable.Column
                                           Where lasNonReferenceModeValueTypeNames.Contains(LCase(Column.Name))
@@ -351,7 +372,7 @@ Public Class ODBCDatabaseReverseEngineer
                             Dim lrColumn As RDS.Column
                             For Each lrTempColumn In lrUniqueNonPKIndex.Column
 
-                                Dim lrTable As RDS.Table = Me.Model.RDS.getTableByName(lrTempTable.Name)
+                                lrTable = Me.Model.RDS.getTableByName(lrTempTable.Name)
 
                                 lrColumn = lrTable.Column.Find(Function(x) LCase(x.Name) = LCase(lrTempColumn.Name))
                                 larRole.Add(lrColumn.ActiveRole)
@@ -398,7 +419,9 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.SetProgressBarValue(100)
 
         Catch ex As Exception
-            Me.ReportError(ex.Message)
+            Me.ReportError(ex.Message & vbCrLf & ex.StackTrace)
+
+            Return False
         End Try
 
         Return True
@@ -408,6 +431,7 @@ Public Class ODBCDatabaseReverseEngineer
     Private Sub createFactTypesForAllOtherRelations()
 
         Try
+            Dim lsMessage As String = ""
             Call Me.SetProgressBarValue(80)
 
             For Each lrRelation In Me.TempModel.RDS.Relation.FindAll(Function(x) Not x.isPrimaryKeyBasedRelation).ToArray
@@ -419,11 +443,17 @@ Public Class ODBCDatabaseReverseEngineer
                 Try
                     Dim lrOriginTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.OriginTable.Name)
                     If lrOriginTable Is Nothing Then
-                        Throw New Exception("Couldn't find Origin Table, " & lrRelation.OriginTable.Name & ", in the Model.")
+                        lsMessage = "Couldn't find Origin Table, " & lrRelation.OriginTable.Name & ", in the Model."
+                        lsMessage.AppendDoubleLineBreak($"Relation between: Origin Table: {lrRelation.OriginTable.Name}, Destination Table: {lrRelation.DestinationTable.Name}")
+                        Throw New Exception(lsMessage)
                     End If
                     lrModelElement1 = lrOriginTable.FBMModelElement
 
                     Dim lrDestinationTable = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
+                    If lrDestinationTable Is Nothing Then
+                        Throw New Exception("Couldn't find Destination Table, " & lrRelation.DestinationTable.Name & ", in the Model.")
+                    End If
+
                     lrModelElement2 = lrDestinationTable.FBMModelElement
 
                     larModelElement.Add(lrModelElement1)
@@ -483,7 +513,7 @@ Public Class ODBCDatabaseReverseEngineer
                     End Try
 
                 Catch ex As Exception
-                    Throw New Exception("Error creating Fact Type" & ex.Message)
+                    Throw New Exception("Error creating Fact Type: " & ex.Message)
                 End Try
 
                 Call Me.AppendProgress(".")
@@ -614,6 +644,7 @@ Public Class ODBCDatabaseReverseEngineer
         Dim lrPage As FBM.Page
 
         For Each lrTable In Me.TempModel.RDS.Table
+
             If lrTable.hasSingleColumnPrimaryKey Then
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
@@ -646,7 +677,7 @@ Public Class ODBCDatabaseReverseEngineer
                 End If
 
                 Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrPrimaryKeyColumn.DataType.DataType)
-                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType)
+                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
                 lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
 
             End If
@@ -749,6 +780,7 @@ Public Class ODBCDatabaseReverseEngineer
         Try
 
             For Each lrTable In Me.TempModel.RDS.Table
+
                 For Each lrColumn In Me.Model.DatabaseConnection.getColumnsByTable(lrTable)
                     lrTable.Column.Add(lrColumn)
                 Next

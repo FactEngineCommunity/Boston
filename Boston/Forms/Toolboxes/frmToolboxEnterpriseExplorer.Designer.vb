@@ -62,7 +62,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.StateTransitionDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddSTDPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.EmptyModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemEmptyModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideAllotherModelsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -296,9 +296,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.EmptyModelToolStripMenuItem, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 380)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 402)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -410,13 +410,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
         Me.ToolStripSeparator1.Size = New System.Drawing.Size(204, 6)
         '
-        'EmptyModelToolStripMenuItem
+        'ToolStripMenuItemEmptyModel
         '
-        Me.EmptyModelToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.empty16x16
-        Me.EmptyModelToolStripMenuItem.Name = "EmptyModelToolStripMenuItem"
-        Me.EmptyModelToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.EmptyModelToolStripMenuItem.Text = "E&mpty Model"
-        Me.EmptyModelToolStripMenuItem.Visible = False
+        Me.ToolStripMenuItemEmptyModel.Image = Global.Boston.My.Resources.MenuImages.empty16x16
+        Me.ToolStripMenuItemEmptyModel.Name = "ToolStripMenuItemEmptyModel"
+        Me.ToolStripMenuItemEmptyModel.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemEmptyModel.Text = "E&mpty Model"
+        Me.ToolStripMenuItemEmptyModel.Visible = False
         '
         'HideToolStripMenuItem
         '
@@ -620,7 +620,7 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents LabelHelpTips As System.Windows.Forms.Label
     Friend WithEvents DeleteModelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents EmptyModelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemEmptyModel As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CopyPageToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemPastePage As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator

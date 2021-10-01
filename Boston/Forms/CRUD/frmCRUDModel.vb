@@ -417,6 +417,7 @@ Public Class frmCRUDModel
                 Dim lsErrorMessage As String = ""
                 If Not lrReverseEngineer.ReverseEngineerDatabase(lsErrorMessage) Then
                     Me.ErrorProvider.SetError(Me.ButtonReverseEngineerDatabase, lsErrorMessage)
+                    Call Me.AddREMessage("- Failed.", Color.Red, True)
                 Else
                     Call Me.AddREMessage("- Finished reverse engineering the database.")
                     Call Me.AddREMessage("- Saving the model.")
@@ -562,6 +563,13 @@ Public Class frmCRUDModel
                 Me.zrModel.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag
                 Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
                 Me.zrModel.IsDatabaseSynchronised = Me.CheckBoxIsDatabaseSynchronised.Checked
+
+                Me.zrModel.Server = Trim(Me.TextBoxServerName.Text)
+                Me.zrModel.Database = Trim(Me.TextBoxDatabaseName.Text)
+                Me.zrModel.Schema = Trim(Me.TextBoxSchemaName.Text)
+                Me.zrModel.Warehouse = Trim(Me.TextBoxWarehouseName.Text)
+                Me.zrModel.DatabaseRole = Trim(Me.TextBoxRoleName.Text)
+                Me.zrModel.Port = Trim(Me.TextBoxPort.Text)
 
                 Try
                     If Me.zrModel.TreeNode IsNot Nothing Then

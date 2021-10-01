@@ -2135,7 +2135,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Private Sub EmptyModelToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EmptyModelToolStripMenuItem.Click
+    Private Sub EmptyModelToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemEmptyModel.Click
 
         Dim liInd As Integer = 0
         Dim lrPage As FBM.Page
@@ -4195,6 +4195,7 @@ Public Class frmToolboxEnterpriseExplorer
 
         If My.Settings.SuperuserMode = True Then
             Me.ToolStripMenuItemFixModelErrors.Visible = True
+            Me.ToolStripMenuItemEmptyModel.Visible = True
         End If
 
     End Sub

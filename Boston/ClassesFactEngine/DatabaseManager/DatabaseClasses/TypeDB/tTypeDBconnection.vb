@@ -137,7 +137,8 @@ Namespace FactEngine.TypeDB
             Dim larIndex As New List(Of RDS.Index)
 
             Try
-                Dim larKeyAttributesArray = client.getAttributes(arTable.Name, True)
+                Dim larKeyAttributesArrayType = client.getAttributes(arTable.Name, True)
+                Dim larKeyAttributes = larKeyAttributesArrayType.ToList
 
                 Dim lsIndexName As String = ""
                 Dim lbIsUnique As Boolean = False
@@ -152,26 +153,31 @@ Namespace FactEngine.TypeDB
 
                 Dim lasIndexNames As New List(Of String)
 
-                For Each lrAttribute In larKeyAttributesArray
+                For Each lrAttribute In larKeyAttributes.ToArray
                     'Will only be one Column in Key for TypeDB at this stage.                    
                     lsColumnName = lrAttribute.Label
 
                     lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
                     larColumn.Add(lrColumn)
+                    larKeyAttributes.Remove(lrAttribute)
+                    Exit For
                 Next
 
+                Dim larUsedColumn As New List(Of RDS.Column)
                 If larColumn.Count = 0 Then
                     'Likely a Relation
                     For Each lsRelatedRoleName In arTable.RelatedRoleNames
                         Dim lrTable As RDS.Table = arTable.Model.getTableByRoleNamePlayed(lsRelatedRoleName, False)
 
                         If lrTable IsNot Nothing Then
-                            lrColumn = arTable.Column.Find(Function(x) x.Name = lrTable.Name)
+                            lrColumn = arTable.Column.Find(Function(x) x.Name = lrTable.Name And Not larUsedColumn.Contains(x))
                         Else
+                            'ValueType
                             lrColumn = arTable.Column.Find(Function(x) x.Name = lsRelatedRoleName)
                         End If
                         If lrColumn IsNot Nothing Then
                             larColumn.Add(lrColumn)
+                            larUsedColumn.Add(lrColumn)
                         Else
                             Debugger.Break()
                         End If
@@ -198,6 +204,45 @@ Namespace FactEngine.TypeDB
                                         True)
 
                 larIndex.Add(lrIndex)
+
+#Region "Other Indexes"
+
+                Dim liInd As Integer = 1
+                If larKeyAttributes.Count > 1 Then
+
+                    For Each lrAttribute In larKeyAttributes
+                        larColumn.Clear()
+
+                        'Will only be one Column in Key for TypeDB at this stage.                    
+                        lsColumnName = lrAttribute.Label
+
+                        lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
+                        larColumn.Add(lrColumn)
+
+                        lsIndexName = arTable.Name & "_UC"
+                        lbIsUnique = True
+                        lsQualifier = "UC"
+                        lbIsPrimaryKey = True
+                        liIndexSequence = liInd
+                        lbIgnoreNulls = False
+
+                        lrIndex = New RDS.Index(arTable,
+                                        lsIndexName,
+                                        lsQualifier,
+                                        pcenumODBCAscendingOrDescending.Ascending,
+                                        lbIsPrimaryKey,
+                                        lbIsUnique,
+                                        lbIgnoreNulls,
+                                        larColumn,
+                                        False,
+                                        False,
+                                        True)
+
+                        larIndex.Add(lrIndex)
+                        liInd += 1
+                    Next
+                End If
+#End Region
 
                 Return larIndex
 
@@ -344,6 +389,7 @@ Namespace FactEngine.TypeDB
 
             Dim larTable As New List(Of RDS.Table)
             Try
+
                 Dim lsTableName As String
                 Dim lrTable As RDS.Table = Nothing
 

@@ -3483,7 +3483,7 @@ Namespace FBM
         ''' Objectifies the FactType
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub Objectify()
+        Public Sub Objectify(Optional ByVal abSuppressSave As Boolean = False)
 
             Try
                 Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Nothing, False)
@@ -3494,7 +3494,9 @@ Namespace FBM
 
                 Call Me.SetIsObjectified(True, True)
 
-                Me.Model.Save()
+                If Not abSuppressSave Then
+                    Me.Model.Save()
+                End If
 
                 '====================================================================
                 'RDS
@@ -3559,7 +3561,7 @@ Namespace FBM
 
                 End If
 
-                    Call Me.Model.MakeDirty(True, False)
+                Call Me.Model.MakeDirty(True, False)
 
                 RaiseEvent Objectified()
 

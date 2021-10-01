@@ -2252,7 +2252,8 @@ Namespace FBM
                                     Optional ByVal abSimpleAssignment As Boolean = False,
                                     Optional ByVal asValueTypeName As String = Nothing,
                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                    Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength)
+                                    Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
+                                    Optional ByVal abSuppressModelSave As Boolean = False)
 
             Try
                 If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then
@@ -2330,7 +2331,9 @@ Namespace FBM
                 End If
 
                 'So much happens/changes, so save.
-                Call Me.Model.Save()
+                If Not abSuppressModelSave Then
+                    Call Me.Model.Save()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String
