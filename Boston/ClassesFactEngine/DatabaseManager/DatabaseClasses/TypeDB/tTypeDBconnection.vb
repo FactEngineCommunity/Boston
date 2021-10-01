@@ -329,7 +329,7 @@ Namespace FactEngine.TypeDB
                 Dim lrOriginColumn As RDS.Column = Nothing
                 Dim lrDestinationColumn As RDS.Column = Nothing
 
-
+                If arTable.Name = "parentship" Then Debugger.Break()
 
                 Dim Relations = client.getRelations()
                 For Each Relation In Relations
@@ -343,7 +343,14 @@ Namespace FactEngine.TypeDB
 
                             If lrDestinationTable IsNot Nothing Then
 
-                                lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRelationPart.Label)
+                                Dim lrTable As RDS.Table = arTable.Model.getTableByRoleNamePlayedInRelation(lrRelationPart.Label, arTable.Name, False)
+
+                                If lrTable IsNot Nothing Then
+                                    lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrTable.Name)
+                                Else
+                                    lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRelationPart.Label)
+                                End If
+
                                 lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.isPartOfPrimaryKey)
 
                                 lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
@@ -439,6 +446,8 @@ Namespace FactEngine.TypeDB
                                 lrTable.RelatedRoleNames.Add(lrRelationPart.Label)
                             End If
                         Next
+
+                        lrTable.IsDBRelation = True
 
                         larTable.Add(lrTable)
                         'End If

@@ -529,13 +529,19 @@ Public Class frmDiagramORM
 
         Dim larFactType = (From Role In Me.zrPage.Model.Role
                            Where Role.JoinedORMObject.Id = aoModelObject.Id
-                           Select Role.FactType).Distinct
+                           Select Role.FactType).Distinct.ToList
 
         loPoint.X = CInt(Math.Floor((300 - 10 + 1) * Rnd())) + 10
         loPoint.Y = CInt(Math.Floor((300 - 10 + 1) * Rnd())) + 10
 
+        If Me.zrPage.GetType = GetType(FBM.DiagramSpyPage) Then
+            If Not My.Settings.DiagramSpyShowLinkFactTypes Then
+                larFactType.RemoveAll(Function(x) x.IsLinkFactType)
+            End If
+        End If
 
         For Each lrFactType In larFactType
+
             If lrFactType.IsObjectified Then
                 Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If

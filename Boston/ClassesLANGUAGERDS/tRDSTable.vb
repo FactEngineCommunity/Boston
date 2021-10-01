@@ -122,6 +122,11 @@ Namespace RDS
         ''' </summary>
         Public RelatedRoleNames As New List(Of String)
 
+        ''' <summary>
+        ''' Used in reverse engineering. TypeDB Specific at this stage. True if the Table is the result of a Relation in the database.
+        ''' </summary>
+        Public IsDBRelation As Boolean = False
+
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)

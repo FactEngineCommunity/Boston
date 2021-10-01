@@ -155,5 +155,8 @@
     <Setting Name="AutoCompleteSingleClickSelects" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="DiagramSpyShowLinkFactTypes" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

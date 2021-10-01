@@ -31,6 +31,7 @@ Public Class frmToolboxEnterpriseExplorer
     Private zrProject As ClientServer.Project
     Private zsNamespaceId As String
     Private zbDraggingOver As Boolean = False
+    Private ziMouseButton As MouseButtons
 
 
     Private Sub frm_enterprise_tree_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -1044,7 +1045,9 @@ Public Class frmToolboxEnterpriseExplorer
 
                             lrModel = loObject.tag
 
-                            If MouseButtons = MouseButtons.Right Then Exit Sub
+                            '=================================================================
+                            'Right Mouse Button
+                            If (MouseButtons = MouseButtons.Right) Or (Me.ziMouseButton = MouseButtons.Right) Then Exit Sub
 
                             Me.TreeView.SelectedNode.Expand()
 
@@ -4370,7 +4373,9 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub TreeView_NodeMouseClick(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView.NodeMouseClick
         If e.Button = MouseButtons.Right Then
+            Me.ziMouseButton = e.Button
             Me.TreeView.SelectedNode = e.Node
+
         End If
     End Sub
 

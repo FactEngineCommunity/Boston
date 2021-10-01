@@ -551,6 +551,12 @@ Public Class ODBCDatabaseReverseEngineer
 
                     Dim lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
 
+                    If lrModelElement IsNot Nothing Then
+                        If arTable.IsDBRelation And lrModelElement.GetType <> GetType(FBM.ValueType) Then
+                            GoTo Skip
+                        End If
+                    End If
+
                     Dim lsUniqueValueTypeName As String
                     If lrModelElement IsNot Nothing Then
                         lsUniqueValueTypeName = lrColumn.Name
@@ -574,6 +580,9 @@ Public Class ODBCDatabaseReverseEngineer
                     'Add the ValueType to the Model
                     Me.Model.AddValueType(lrValueType)
                     lrValueType.SetDBName(lrColumn.DatabaseName)
+
+Skip: 'Because is not a ValueType
+
                 End If
 
             Next
@@ -660,6 +669,9 @@ Public Class ODBCDatabaseReverseEngineer
                 Dim lsReferenceMode As String = ""
                 Dim lrPrimaryKeyColumn As RDS.Column
                 lrPrimaryKeyColumn = lrTable.Index.Find(Function(x) x.IsPrimaryKey = True).Column(0)
+                If lrPrimaryKeyColumn Is Nothing Then
+                    Throw New Exception($"CreateTablesForSingleColumnPKTables: Table: {lrTable.Name}: No Primary Key Column found.")
+                End If
                 lsValueTypeName = lrPrimaryKeyColumn.Name
 
                 Dim items As Array

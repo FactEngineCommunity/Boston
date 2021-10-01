@@ -328,7 +328,9 @@ Public Class frmCRUDModel
 
                     Case Is = pcenumDatabaseType.TypeDB
 
-                        Call Me.zrModel.connectToDatabase()
+                        If Not Me.zrModel.connectToDatabase Then
+                            Throw New Exception("Failed to connect to database")
+                        End If
 
                         Me.LabelOpenSuccessfull.ForeColor = Color.Green
                         Me.LabelOpenSuccessfull.Text = "Success"
@@ -384,6 +386,11 @@ Public Class frmCRUDModel
 
         Try
             Dim lasSchemaName As New List(Of String)
+
+            If Not Me.TestConnection Then
+                MsgBox("Connection to the database failed.")
+                Exit Sub
+            End If
 
             '------------------------------------------------------------------------------------------
             'Check to see that Reverse Engineering is supported for the datatabase type of the model.

@@ -276,7 +276,7 @@ Namespace FBM
         ''' <summary>
         ''' Connects to the database if it is not already connected
         ''' </summary>
-        Public Sub connectToDatabase()
+        Public Function connectToDatabase() As Boolean
 
             Try
                 If Me.DatabaseConnection Is Nothing Then
@@ -303,6 +303,8 @@ Namespace FBM
                     Me.RDS.DatabaseDataType = csvReader.GetRecords(Of DatabaseDataType).ToList
                 End If
 
+                Return True
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -310,8 +312,10 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, ex.StackTrace, False,, True)
+
+                Return False
             End Try
-        End Sub
+        End Function
 
         Public Sub createCMMLAttribute(ByVal asEntityName As String,
                                        ByVal asAttributeName As String,
