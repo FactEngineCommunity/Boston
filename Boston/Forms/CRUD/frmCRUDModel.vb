@@ -228,9 +228,11 @@ Public Class frmCRUDModel
     Private Function TestConnection() As Boolean
 
         Try
-            If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
-                MsgBox("Please provide a Connection String for the database.")
-                Return False
+            If Me.zrModel.RequiresConnectionString Then
+                If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
+                    MsgBox("Please provide a Connection String for the database.")
+                    Return False
+                End If
             End If
 
 
@@ -323,6 +325,14 @@ Public Class frmCRUDModel
                         Me.LabelOpenSuccessfull.Visible = True
 
                         lrODBCConnection.Close()
+
+                    Case Is = pcenumDatabaseType.TypeDB
+
+                        Call Me.zrModel.connectToDatabase()
+
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                        Me.LabelOpenSuccessfull.Text = "Success"
+                        Me.LabelOpenSuccessfull.Visible = True
                     Case Else
 
                         Me.LabelOpenSuccessfull.ForeColor = Color.Red
@@ -377,7 +387,7 @@ Public Class frmCRUDModel
 
             '------------------------------------------------------------------------------------------
             'Check to see that Reverse Engineering is supported for the datatabase type of the model.
-            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake}
+            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake, pcenumDatabaseType.TypeDB}
 
             If Not larSupportedDatabases.Contains(Me.zrModel.TargetDatabaseType) Then
                 MsgBox("The database type of this model is not supported. Please contact support.")

@@ -7,17 +7,17 @@ Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 Imports System.Text.RegularExpressions
 
 Namespace FBM
-    <Serializable()> _
+    <Serializable()>
     Public Class Model
         Implements IEquatable(Of FBM.Model)
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ConceptType As pcenumConceptType = pcenumConceptType.Model
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelId As String = System.Guid.NewGuid.ToString
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Overridable Property ModelId() As String 'GUID
             Get
                 Return Me._ModelId
@@ -27,8 +27,8 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Public SharedModel As New Viev.FBM.Interface.Model
 
         ''' <summary>
@@ -39,7 +39,7 @@ Namespace FBM
 
         Public Name As String = ""
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public AllowCheckForErrors As Boolean = False
 
         <XmlIgnore()>
@@ -57,35 +57,35 @@ Namespace FBM
         <XmlIgnore()>
         Public STMLoading As Boolean = False 'Used to stop loading of Pages when the STM (State Transition Model) has not finished loading under threading. See also RDSLoading above.
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public LoadedFromXMLFile As Boolean = False
 
         '<XmlIgnore()> _
         '<DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public IsDirty As Boolean = False 'True if the Model needs to be saved back to the database, else False
 
         Public ShortDescription As String = ""
         Public LongDescription As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public EnterpriseId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public SubjectAreaId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ProjectId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ProjectPhaseId As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public SolutionId As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsEnterpriseModel As Boolean = False 'True - If the Model represents that one allowable EnterpriseModel for the Enterprise, ELSE False
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsConceptualModel As Boolean = True 'Default
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsPhysicalModel As Boolean = False
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsNamespace As Boolean = False
 
         <XmlIgnore()>
@@ -98,8 +98,8 @@ Namespace FBM
         <XmlIgnore()>
         Public [Dictionary] As New Dictionary(Of String, Integer)
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelDictionary As New List(Of FBM.DictionaryEntry)
         Public Overridable Property ModelDictionary() As List(Of FBM.DictionaryEntry)
             Get
@@ -111,8 +111,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _EntityType As New List(Of FBM.EntityType)
         Public Overridable Property EntityType() As List(Of FBM.EntityType)
             Get
@@ -123,8 +123,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueType As New List(Of FBM.ValueType)
         Public Overridable Property ValueType() As List(Of FBM.ValueType)
             Get
@@ -135,8 +135,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _FactType As New List(Of FBM.FactType)
         Public Overridable Property FactType() As List(Of FBM.FactType)
             Get
@@ -158,10 +158,10 @@ Namespace FBM
             End Get
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Role As New List(Of FBM.Role)
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Overridable Property Role() As List(Of FBM.Role)
             Get
                 Return Me._Role
@@ -171,8 +171,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _RoleConstraint As New List(Of FBM.RoleConstraint)
         Public Overridable Property RoleConstraint() As List(Of FBM.RoleConstraint)
             Get
@@ -183,8 +183,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelNote As New List(Of FBM.ModelNote)
         Public Overridable Property ModelNote() As List(Of FBM.ModelNote)
             Get
@@ -195,8 +195,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelError As New List(Of FBM.ModelError)
         Public Property ModelError() As List(Of FBM.ModelError)
             Get
@@ -212,8 +212,8 @@ Namespace FBM
         ''' NB LinFu requires Overridable Properties to work.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Page As New List(Of FBM.Page)
         Public Overridable Property Page() As List(Of FBM.Page)
             Get
@@ -267,11 +267,11 @@ Namespace FBM
         '  way that an SQL relational database has its own Parser
         ' for SQL statements.
         '-------------------------------------------------------
-        <XmlIgnore()> _
-        <NonSerialized()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <NonSerialized()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ORMQL As New ORMQL.Processor(Me)
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Overridable Property ORMQL() As ORMQL.Processor
             Get
                 Return Me._ORMQL
@@ -281,8 +281,8 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Private Parser As New TinyPG.Parser(New TinyPG.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         <NonSerialized()>
         <XmlIgnore()>
@@ -312,23 +312,35 @@ Namespace FBM
         <XmlIgnore()>
         Public Port As String 'E.g. As needed by TypeDB for a Session/Connection. See also the physical model.
 
+        Public ReadOnly Property RequiresConnectionString As Boolean
+            Get
+                Select Case Me.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.None,
+                              pcenumDatabaseType.TypeDB
+                        Return False
+                    Case Else
+                        Return True
+                End Select
+            End Get
+        End Property
+
         <NonSerialized()>
         Public Event Deleting()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event FinishedErrorChecking()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event MadeDirty(ByVal abGlobalBroadcast As Boolean)
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event ModelErrorAdded()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event ModelErrorRemoved(ByVal arModelError As FBM.ModelError)
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event ModelErrorsCleared()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event StructureModified() 'Used, for example, to refresh the ModelDictionary toolbox. Used in leiu of making the model dirty and saving the entire model.
         <NonSerialized()>
         Public Event ModelUpdated()
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event ModelErrorsUpdated()
         <NonSerialized()>
         Public Event RDSColumnAdded(ByRef arColumn As RDS.Column)
@@ -356,9 +368,9 @@ Namespace FBM
 
         End Sub
 
-        Sub New(ByVal aiLanguageId As pcenumLanguage, _
-                ByVal as_model_name As String, _
-                ByVal as_ModelId As String, _
+        Sub New(ByVal aiLanguageId As pcenumLanguage,
+                ByVal as_model_name As String,
+                ByVal as_ModelId As String,
                 Optional ByVal arNamespace As ClientServer.Namespace = Nothing)
 
             MyBase.New()
@@ -1702,7 +1714,7 @@ Namespace FBM
 
         End Function
 
-        Public Sub AddFactType(ByRef arFactType As FBM.FactType, _
+        Public Sub AddFactType(ByRef arFactType As FBM.FactType,
                                Optional ByVal abMakeModelDirty As Boolean = False,
                                Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                Optional arConceptInstance As FBM.ConceptInstance = Nothing)
@@ -1971,7 +1983,7 @@ Namespace FBM
         ''' </summary>
         ''' <returns>tEntityType</returns>
         ''' <remarks></remarks>
-        Public Function CreateEntityType(Optional ByVal asEntityTypeName As String = Nothing, _
+        Public Function CreateEntityType(Optional ByVal asEntityTypeName As String = Nothing,
                                          Optional ByVal abAddToModel As Boolean = True) As FBM.EntityType
 
             Dim lrEntityType As FBM.EntityType
@@ -2385,11 +2397,11 @@ Namespace FBM
         ''' <param name="abAddtoModel"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function CreateFactType(ByVal asFactTypeName As String, _
-                                       Optional ByRef aarReferencedObject As List(Of FBM.ModelObject) = Nothing, _
-                                       Optional ByVal abIsReferenceModeFactType As Boolean = False, _
-                                       Optional ByVal abMakeModelDirty As Boolean = True, _
-                                       Optional ByVal abIsLinkFactType As Boolean = False, _
+        Public Function CreateFactType(ByVal asFactTypeName As String,
+                                       Optional ByRef aarReferencedObject As List(Of FBM.ModelObject) = Nothing,
+                                       Optional ByVal abIsReferenceModeFactType As Boolean = False,
+                                       Optional ByVal abMakeModelDirty As Boolean = True,
+                                       Optional ByVal abIsLinkFactType As Boolean = False,
                                        Optional ByVal arLinkFactTypeRole As FBM.Role = Nothing,
                                        Optional ByVal abAddtoModel As Boolean = True,
                                        Optional ByRef arPage As FBM.Page = Nothing) As FBM.FactType
@@ -2501,9 +2513,9 @@ Namespace FBM
 
             CreateUniqueEntityTypeName = lsTrialEntityTypeName
 
-            If Me.EntityType.Exists(AddressOf lrEntityType.EqualsByName) Or _
-               TableEntityType.ExistsEntityType(lrEntityType) Or _
-                Me.ExistsModelElement(lsTrialEntityTypeName) Or _
+            If Me.EntityType.Exists(AddressOf lrEntityType.EqualsByName) Or
+               TableEntityType.ExistsEntityType(lrEntityType) Or
+                Me.ExistsModelElement(lsTrialEntityTypeName) Or
                 Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
                 CreateUniqueEntityTypeName = Me.CreateUniqueEntityTypeName(asRootEntityTypeName, aiCounter + 1)
             Else
@@ -2530,7 +2542,7 @@ Namespace FBM
             CreateUniqueFactTypeName = lsTrialFactTypeName
 
             If Me.FactType.Exists(AddressOf lrFactType.EqualsByName) Or
-               Me.ExistsModelElement(lsTrialFactTypeName) Or _
+               Me.ExistsModelElement(lsTrialFactTypeName) Or
                Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
                 CreateUniqueFactTypeName = Me.CreateUniqueFactTypeName(asRootFactTypeName, aiCounter + 1)
             ElseIf abIncludeDatabaseLookup Then
@@ -2635,8 +2647,8 @@ Namespace FBM
                 End If
 
                 CreateUniqueRoleConstraintName = Me.CreateUniqueRoleConstraintName(asRootRoleConstraintName, aiCounter + 1)
-                Else
-                    Return lsTrialRoleConstraintName
+            Else
+                Return lsTrialRoleConstraintName
             End If
 
         End Function
@@ -2720,10 +2732,10 @@ Namespace FBM
         ''' <param name="aarRole"></param>
         ''' <returns>A new unique Role Constraint, as created for the Model.</returns>
         ''' <remarks></remarks>
-        Public Function CreateRoleConstraint(ByVal aiRoleConstraintType As pcenumRoleConstraintType, _
-                                             Optional ByVal aarRole As List(Of FBM.Role) = Nothing, _
-                                             Optional ByVal asRoleConstraintName As String = Nothing, _
-                                             Optional ByVal aiLevelNr As Integer = Nothing, _
+        Public Function CreateRoleConstraint(ByVal aiRoleConstraintType As pcenumRoleConstraintType,
+                                             Optional ByVal aarRole As List(Of FBM.Role) = Nothing,
+                                             Optional ByVal asRoleConstraintName As String = Nothing,
+                                             Optional ByVal aiLevelNr As Integer = Nothing,
                                              Optional ByVal abMakeModelDirty As Boolean = False,
                                              Optional ByVal abAddToModel As Boolean = True
                                              ) As FBM.RoleConstraint
@@ -2888,8 +2900,8 @@ Namespace FBM
             'Remove all SimpleReferenceModes from EntityTypes that have them....so that the respective
             '  RoleConstraints can be removed from the Model.
             '----------------------------------------------------------------------------------------------------------
-            Dim larEntityType = From EntityType In Me.EntityType _
-                                Where EntityType.HasSimpleReferenceScheme _
+            Dim larEntityType = From EntityType In Me.EntityType
+                                Where EntityType.HasSimpleReferenceScheme
                                 Select EntityType
 
             For Each lrEntityType In larEntityType
@@ -3033,7 +3045,7 @@ Namespace FBM
                     End If
 
                     Throw New Exception(lsMessage)
-                    End If
+                End If
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -3491,8 +3503,8 @@ Namespace FBM
         Public Sub RemoveRolesThatReferenceNothing(ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
-                Dim larRole = From Role In Me.Role _
-                              Where Role.JoinedORMObject Is Nothing _
+                Dim larRole = From Role In Me.Role
+                              Where Role.JoinedORMObject Is Nothing
                               Select Role
 
                 Dim lrFactType As FBM.FactType
@@ -3645,7 +3657,7 @@ Namespace FBM
                 'OrganicComputing:SafeCode: Remove all Roles that reference Nothing
                 '  - Users may create FactTypes/Roles through the GUI and forget to assign 
                 '  a ModelObject (as reference) to one or more Roles within the FactType.
-                Call Me.RemoveRolesThatReferenceNothing(False)                
+                Call Me.RemoveRolesThatReferenceNothing(False)
 
                 '----------------------------------------------
                 'First, check to see if the Model itself exists
@@ -3823,12 +3835,12 @@ Namespace FBM
 
         End Sub
 
-        Public Function ModelObjectIsSubtypeOfModelObject(ByRef arCandidateSubtypeModelObject As FBM.ModelObject, _
+        Public Function ModelObjectIsSubtypeOfModelObject(ByRef arCandidateSubtypeModelObject As FBM.ModelObject,
                                                           ByRef arCandidateSupertypeModelObject As FBM.ModelObject) As Boolean
 
             Try
-                Dim laiValidConceptTypes() As pcenumConceptType = {pcenumConceptType.ValueType, _
-                                                                   pcenumConceptType.EntityType, _
+                Dim laiValidConceptTypes() As pcenumConceptType = {pcenumConceptType.ValueType,
+                                                                   pcenumConceptType.EntityType,
                                                                    pcenumConceptType.FactType}
 
                 If Array.IndexOf(laiValidConceptTypes, arCandidateSubtypeModelObject.ConceptType) = -1 Then
@@ -3906,10 +3918,10 @@ Namespace FBM
 
         End Function
 
-        Public Function GetJoinPathBetweenRoles(ByVal arFirstRole As FBM.Role, _
-                                                ByVal arSecondRole As FBM.Role, _
-                                                ByRef abSuccessfull As Boolean, _
-                                                ByRef aiJoinPathError As pcenumJoinPathError, _
+        Public Function GetJoinPathBetweenRoles(ByVal arFirstRole As FBM.Role,
+                                                ByVal arSecondRole As FBM.Role,
+                                                ByRef abSuccessfull As Boolean,
+                                                ByRef aiJoinPathError As pcenumJoinPathError,
                                                 ByRef aarPathCovered As List(Of FBM.Role),
                                                 ByVal arRoleConstraint As FBM.RoleConstraint,
                                                 ByRef aarUniqueRolesCovered As List(Of FBM.Role)) As FBM.JoinPath
@@ -3945,12 +3957,12 @@ Namespace FBM
                     abSuccessfull = False
                     Return lrJoinPath
                 ElseIf aarPathCovered.Contains(arFirstRole) Then
-                '-----------------------------------------------------------------------
-                'Have gone around in circles on some sort of circular JoinPath. 
-                '  Must stop otherwise this recurrent procedure will continue forever.
-                '-----------------------------------------------------------------------
-                aiJoinPathError = pcenumJoinPathError.CircularPathFound
-                abSuccessfull = False
+                    '-----------------------------------------------------------------------
+                    'Have gone around in circles on some sort of circular JoinPath. 
+                    '  Must stop otherwise this recurrent procedure will continue forever.
+                    '-----------------------------------------------------------------------
+                    aiJoinPathError = pcenumJoinPathError.CircularPathFound
+                    abSuccessfull = False
                 End If
 
                 If arRoleConstraint.ExistingArgumentsContainsMemberOfRoleList(aarPathCovered) Then
@@ -4030,10 +4042,10 @@ Namespace FBM
                                             larTempPathCovered.AddRange(aarPathCovered)
                                             larTempPathCovered.Add(lrTraversedRole)
 
-                                            lrContinuingJoinPath.AppendJoinPath(Me.GetJoinPathBetweenRoles(lrTraversedRole, _
-                                                                                                 arSecondRole, _
-                                                                                                 abSuccessfull, _
-                                                                                                 aiJoinPathError, _
+                                            lrContinuingJoinPath.AppendJoinPath(Me.GetJoinPathBetweenRoles(lrTraversedRole,
+                                                                                                 arSecondRole,
+                                                                                                 abSuccessfull,
+                                                                                                 aiJoinPathError,
                                                                                                  larTempPathCovered,
                                                                                                  arRoleConstraint,
                                                                                                  aarUniqueRolesCovered))
@@ -4068,7 +4080,7 @@ Namespace FBM
                                     '-------------------------------------------------------------------------------------------
                                     'Ambiguous Join Path.
                                     '-------------------------------------------------------------------------------------------
-                                    Dim liTemp = From JoinPath In larSuccessfulJoinPathContinuation _
+                                    Dim liTemp = From JoinPath In larSuccessfulJoinPathContinuation
                                                  Select JoinPath.RolePath.Count
                                                  Order By Count
 
@@ -4460,10 +4472,10 @@ Namespace FBM
                 Dim larJoinPathCovered As New List(Of FBM.Role)
                 Dim larAllRolesCovered As New List(Of FBM.Role)
                 For Each lrRole In aarRole.FindAll(Function(x) x.Id <> lrFirstRole.Id)
-                    lrJoinPath.AppendJoinPath(Me.GetJoinPathBetweenRoles(lrFirstRole, _
-                                                                       lrRole, _
-                                                                       lbSuccessful, _
-                                                                       aiJoinPathError, _
+                    lrJoinPath.AppendJoinPath(Me.GetJoinPathBetweenRoles(lrFirstRole,
+                                                                       lrRole,
+                                                                       lbSuccessful,
+                                                                       aiJoinPathError,
                                                                        larJoinPathCovered,
                                                                        arRoleConstraint,
                                                                        larAllRolesCovered))
@@ -4521,11 +4533,11 @@ Namespace FBM
             Dim lsPageId As String = arPage.PageId
             Dim lsFactId As String = arFact.Id
 
-            Dim liReturnCount = (From pg In Me.Page, _
-                                     fti In pg.FactTypeInstance, _
-                                       f In fti.Fact _
-                                     Where f.Id = lsFactId _
-                                     And pg.PageId <> lsPageId).Count
+            Dim liReturnCount = (From pg In Me.Page,
+                                     fti In pg.FactTypeInstance,
+                                       f In fti.Fact
+                                 Where f.Id = lsFactId _
+                                 And pg.PageId <> lsPageId).Count
 
             If liReturnCount > 0 Then
                 Return True
@@ -5275,9 +5287,9 @@ Namespace FBM
                             lrRelation.DestinationColumns.Add(lrDestinationPKColumn)
                         Next
                         lrColumn.Relation.Add(lrRelation)
-                            Call Me.RDS.addRelation(lrRelation)
-                        Next
+                        Call Me.RDS.addRelation(lrRelation)
                     Next
+                Next
 
 #End Region
 
@@ -5594,5 +5606,7 @@ Namespace FBM
         Protected Overrides Sub Finalize()
             MyBase.Finalize()
         End Sub
+
     End Class
+
 End Namespace

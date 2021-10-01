@@ -74,7 +74,6 @@ Namespace FactEngine.TypeDB
                     lasKeyAttribute.Add(attribute.Label)
                 Next
 
-
                 For Each attribute In attributes
                     lsColumnName = attribute.Label
                     lbIsMandatory = lasKeyAttribute.Contains(attribute.Label)
@@ -85,6 +84,33 @@ Namespace FactEngine.TypeDB
 
                     larColumn.Add(lrColumn)
                 Next
+
+                Try
+                    Dim larRelationPart = client.getRelates(arTable.Name)
+                    For Each lrRelationPart In larRelationPart
+
+                        If lrRelationPart.Label <> "role" Then
+
+                            Dim lrTable As RDS.Table = arTable.Model.getTableByRoleNamePlayed(lrRelationPart.Label, False)
+                            If lrTable IsNot Nothing Then
+                                lsColumnName = lrTable.createUniqueColumnName(Nothing, lrTable.Name, 0)
+                            Else
+                                'Must be ValueType and not a Table.
+                                lsColumnName = lrRelationPart.Label
+                            End If
+
+                            lbIsMandatory = True
+                            lrColumn = New RDS.Column(arTable, lsColumnName, Nothing, Nothing, lbIsMandatory)
+                            lrColumn.DataType = New RDS.DataType
+                            lrColumn.DataType.DataType = "string"
+                            lrColumn.DatabaseName = lrColumn.Name
+
+                            larColumn.Add(lrColumn)
+                        End If
+                    Next
+                Catch ex As Exception
+                    'Not a biggie. If have no relates, then don't worry about it.
+                End Try
 
                 Return larColumn
 
@@ -127,21 +153,37 @@ Namespace FactEngine.TypeDB
                 Dim lasIndexNames As New List(Of String)
 
                 For Each lrAttribute In larKeyAttributesArray
-                    larColumn.Clear()
-
                     'Will only be one Column in Key for TypeDB at this stage.                    
-                    lsIndexName = arTable.Name & "_PK"
-                    lbIsUnique = True
-                    lsQualifier = "PK"
-                    lbIsPrimaryKey = True
-                    liIndexSequence = 1
-                    lbIgnoreNulls = False
                     lsColumnName = lrAttribute.Label
 
                     lrColumn = arTable.Column.Find(Function(x) x.Name = lsColumnName)
                     larColumn.Add(lrColumn)
-
                 Next
+
+                If larColumn.Count = 0 Then
+                    'Likely a Relation
+                    For Each lsRelatedRoleName In arTable.RelatedRoleNames
+                        Dim lrTable As RDS.Table = arTable.Model.getTableByRoleNamePlayed(lsRelatedRoleName, False)
+
+                        If lrTable IsNot Nothing Then
+                            lrColumn = arTable.Column.Find(Function(x) x.Name = lrTable.Name)
+                        Else
+                            lrColumn = arTable.Column.Find(Function(x) x.Name = lsRelatedRoleName)
+                        End If
+                        If lrColumn IsNot Nothing Then
+                            larColumn.Add(lrColumn)
+                        Else
+                            Debugger.Break()
+                        End If
+                    Next
+                End If
+
+                lsIndexName = arTable.Name & "_PK"
+                lbIsUnique = True
+                lsQualifier = "PK"
+                lbIsPrimaryKey = True
+                liIndexSequence = 1
+                lbIgnoreNulls = False
 
                 lrIndex = New RDS.Index(arTable,
                                         lsIndexName,
@@ -151,7 +193,7 @@ Namespace FactEngine.TypeDB
                                         lbIsUnique,
                                         lbIgnoreNulls,
                                         larColumn,
-                                        True,
+                                        False,
                                         False,
                                         True)
 
@@ -230,83 +272,55 @@ Namespace FactEngine.TypeDB
         Public Overrides Function getForeignKeyRelationshipsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
 
             Dim larRelation As New List(Of RDS.Relation)
+
             Try
-                Dim lrRecordset As ORMQL.Recordset
-
-                Dim Relations = client.getRelations()
-
                 Dim lrRelation As RDS.Relation = Nothing
                 Dim lrDestinationTable As RDS.Table = Nothing
                 Dim lrOriginColumn As RDS.Column = Nothing
                 Dim lrDestinationColumn As RDS.Column = Nothing
-                Dim lasToTableNames As New List(Of String)
 
-                While Not lrRecordset.EOF
-                    'https://stackoverflow.com/questions/48508140/how-do-i-get-information-about-foreign-keys-in-sqlite
-                    'Columns
-                    '====================
-                    'id
-                    'seq (0 based by table)
-                    'table  (To Table)
-                    'from   (Column)
-                    'to     (To Column)
-                    'on_update  ('NO ACTION')
-                    'on_delete
-                    'match
-                    lrDestinationTable = Me.FBMModel.RDS.getTableByName(lrRecordset("table").Data)
 
-                    While Not lrRecordset.EOF
 
-                        lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("from").Data)
-                        lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.Name = lrRecordset("to").Data)
-                        If lrDestinationColumn Is Nothing Then
-                            'Try and find the DestinationColumn another way.
-                            If lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing Then
-                                If lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Count = 1 Then
-                                    lrDestinationColumn = lrDestinationTable.Index.Find(Function(x) x.IsPrimaryKey).Column.First
-                                Else
-                                    Throw New Exception("Foreign key from Table, '" & arTable.Name & "', to table, '" & lrDestinationTable.Name & "', has a Column that can not be found in the referenced table. Try making the Column in '" & lrDestinationTable.Name & "' match those in table, " & arTable.Name)
+                Dim Relations = client.getRelations()
+                For Each Relation In Relations
+
+                    If arTable.Name = Relation.Label Then
+                        Dim larRelationPart = client.getRelates(Relation.Label)
+
+                        For Each lrRelationPart In larRelationPart
+
+                            lrDestinationTable = Me.FBMModel.RDS.getTableByRoleNamePlayed(lrRelationPart.Label, False)
+
+                            If lrDestinationTable IsNot Nothing Then
+
+                                lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRelationPart.Label)
+                                lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.isPartOfPrimaryKey)
+
+                                lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                                  arTable,
+                                                                  pcenumCMMLMultiplicity.Many,
+                                                                  True,
+                                                                  True,
+                                                                  "involves",
+                                                                  lrDestinationTable,
+                                                                  pcenumCMMLMultiplicity.One,
+                                                                  False,
+                                                                  "is involed in",
+                                                                  Nothing)
+
+                                If lrOriginColumn IsNot Nothing Then
+                                    lrRelation.OriginColumns.Add(lrOriginColumn)
+                                    lrOriginColumn.Relation.Add(lrRelation)
                                 End If
+                                If lrDestinationColumn IsNot Nothing Then
+                                    lrRelation.DestinationColumns.Add(lrDestinationColumn)
+                                End If
+
+                                larRelation.Add(lrRelation)
                             End If
-
-                        End If
-
-                        If Not lasToTableNames.Contains(lrRecordset("table").Data) Then
-
-                            lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
-                                                  arTable,
-                                                  pcenumCMMLMultiplicity.Many,
-                                                  True,
-                                                  lrOriginColumn.isPartOfPrimaryKey,
-                                                  "involves",
-                                                  lrDestinationTable,
-                                                  pcenumCMMLMultiplicity.One,
-                                                  lrDestinationColumn.IsMandatory,
-                                                  "is involed in",
-                                                  Nothing)
-                            larRelation.Add(lrRelation)
-                        End If
-
-                        lrOriginColumn.Relation.Add(lrRelation)
-                        lrRelation.OriginColumns.Add(lrOriginColumn)
-                        lrRelation.DestinationColumns.Add(lrDestinationColumn)
-
-                        lrRecordset.MoveNext()
-
-                        If Not lrRecordset.EOF Then
-                            If lrRecordset("table").Data <> lrDestinationTable.Name Then
-                                lrRecordset.CurrentFactIndex -= 1
-                                Exit While
-                            End If
-                            lasToTableNames.AddUnique(lrDestinationTable.Name)
-                        End If
-
-                    End While
-
-                    lrRecordset.MoveNext()
-                End While
-
-
+                        Next
+                    End If
+                Next
                 Return larRelation
 
             Catch ex As Exception
@@ -344,6 +358,7 @@ Namespace FactEngine.TypeDB
                         Dim larRoleAttributes = client.getPlays(lsTableName)
                         For Each lrRoleAttribute In larRoleAttributes
                             Dim lrPlays As New RDS.Plays(lrRoleAttribute.Scope, lrRoleAttribute.Label)
+                            lrTable.RolesPlayed.Add(lrPlays)
                         Next
 
                         larTable.Add(lrTable)
@@ -354,12 +369,28 @@ Namespace FactEngine.TypeDB
 
                 For Each lrRelation In Relations
 
-                    Dim larAttributes = client.getAttributes(lrRelation.Label)
-                    If larAttributes.Count > 0 Then
+                    If Not lrRelation.Label = "relation" Then
+
+                        Dim larAttributes = client.getAttributes(lrRelation.Label)
+                        'If larAttributes.Count > 0 Then
                         lsTableName = Trim(lrRelation.Label)
                         lrTable = New RDS.Table(Me.FBMModel.RDS, lsTableName, Nothing)
 
+                        Dim larRoleAttributes = client.getPlays(lsTableName)
+                        For Each lrRoleAttribute In larRoleAttributes
+                            Dim lrPlays As New RDS.Plays(lrRoleAttribute.Scope, lrRoleAttribute.Label)
+                            lrTable.RolesPlayed.Add(lrPlays)
+                        Next
+
+                        Dim larRelationPart = client.getRelates(lsTableName)
+                        For Each lrRelationPart In larRelationPart
+                            If lrRelationPart.Label <> "role" Then
+                                lrTable.RelatedRoleNames.Add(lrRelationPart.Label)
+                            End If
+                        Next
+
                         larTable.Add(lrTable)
+                        'End If
                     End If
                 Next
 

@@ -110,7 +110,17 @@ Namespace RDS
             End Get
         End Property
 
+        ''' <summary>
+        ''' TypeDB specific. The Roles 'played' by the Table.
+        ''' </summary>
         Public RolesPlayed As New List(Of RDS.Plays)
+
+        ''' <summary>
+        ''' TypeDB specific. The Roles 'related' by the Table.
+        '''   I.e. e.g. If the Table is a 'relation' in TypeDB...then the set of RoleNames that the Table/Relation relates.
+        '''   i.e. e.g. As in an ObjectifiedFactType, is the set of RoleNames related by the Table.
+        ''' </summary>
+        Public RelatedRoleNames As New List(Of String)
 
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)

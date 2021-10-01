@@ -268,7 +268,11 @@ Namespace RDS
         Public Function isPrimaryKeyBasedRelation() As Boolean
 
             Try
-                Return Me.OriginColumns.First.isPartOfPrimaryKey
+                If Me.OriginColumns.Count > 0 Then
+                    Return Me.OriginColumns.First.isPartOfPrimaryKey
+                Else
+                    Return False
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

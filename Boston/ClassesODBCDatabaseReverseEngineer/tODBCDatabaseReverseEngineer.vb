@@ -90,6 +90,9 @@ Public Class ODBCDatabaseReverseEngineer
         Try
             Me.TempModel.TargetDatabaseType = Me.Model.TargetDatabaseType
             Me.TempModel.TargetDatabaseConnectionString = Me.Model.TargetDatabaseConnectionString
+            Me.TempModel.Port = Me.Model.Port
+            Me.TempModel.Database = Me.Model.Database
+            Me.TempModel.Server = Me.Model.Server
 
             Me.Model.connectToDatabase()
             Me.TempModel.connectToDatabase()
@@ -591,6 +594,7 @@ Public Class ODBCDatabaseReverseEngineer
         Try
 
             For Each lrTable In Me.Model.DatabaseConnection.getTables()
+                lrTable.Model = Me.TempModel.RDS
                 Me.TempModel.RDS.Table.Add(lrTable)
             Next
 

@@ -255,7 +255,8 @@ Namespace RDS
 
         End Function
 
-        Public Function getTableByRolePlayed(ByVal asRoleName As String) As RDS.Table
+        Public Function getTableByRoleNamePlayed(ByVal asRoleName As String,
+                                                 Optional ByVal abThrowErrorMessage As Boolean = True) As RDS.Table
 
             Try
                 Dim larTable = From Table In Me.Table
@@ -277,7 +278,9 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                If abThrowErrorMessage Then
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End If
 
                 Return Nothing
             End Try
