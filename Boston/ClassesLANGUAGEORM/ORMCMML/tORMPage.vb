@@ -2658,7 +2658,8 @@ Namespace FBM
         End Sub
 
         Public Sub loadRelationsForPGSNode(ByRef arPGSNode As PGS.Node,
-                                           Optional ByVal abAddToPage As Boolean = False)
+                                           Optional ByVal abAddToPage As Boolean = False,
+                                           Optional ByRef aasLoadedRelationIds As List(Of String) = Nothing)
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
@@ -2669,6 +2670,10 @@ Namespace FBM
             Try
                 'List of the Relations loaded onto the Page. Used so that a relation that links an Node to itself is not loaded twice.
                 Dim lasRelationId As New List(Of String)
+
+                If aasLoadedRelationIds IsNot Nothing Then
+                    lasRelationId.AddRange(aasLoadedRelationIds)
+                End If
 
                 '20180609-VM-ToDo-lrFactInstance is used for a Link (below) but set to nothing in particular (above).
 
@@ -2768,6 +2773,10 @@ Namespace FBM
 
                 Call Me.MakeDirty()
                 If abAddToPage Then Call Me.Save()
+
+                If aasLoadedRelationIds IsNot Nothing Then
+                    aasLoadedRelationIds = lasRelationId
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String

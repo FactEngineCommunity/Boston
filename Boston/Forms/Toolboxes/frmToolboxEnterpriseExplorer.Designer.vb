@@ -89,6 +89,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New Boston.BostonTreeView()
+        Me.UnhideASelectedModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -298,7 +299,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 402)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 380)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -509,33 +510,33 @@ Partial Class frmToolboxEnterpriseExplorer
         'ContextMenuStrip_ORMModels
         '
         Me.ContextMenuStrip_ORMModels.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1, Me.UnhideHiddenModelsToolStripMenuItem})
+        Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1, Me.UnhideHiddenModelsToolStripMenuItem, Me.UnhideASelectedModelToolStripMenuItem})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(205, 100)
+        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(213, 152)
         '
         'ToolStripMenuItemAddModel
         '
         Me.ToolStripMenuItemAddModel.Image = Global.Boston.My.Resources.MenuImages.DatabaseAdd16x16
         Me.ToolStripMenuItemAddModel.Name = "ToolStripMenuItemAddModel"
-        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(204, 30)
+        Me.ToolStripMenuItemAddModel.Size = New System.Drawing.Size(212, 30)
         Me.ToolStripMenuItemAddModel.Text = "&Add Model"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(201, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(209, 6)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(204, 30)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(212, 30)
         Me.ToolStripMenuItem1.Text = "&Import .fbm File"
         '
         'UnhideHiddenModelsToolStripMenuItem
         '
         Me.UnhideHiddenModelsToolStripMenuItem.Name = "UnhideHiddenModelsToolStripMenuItem"
-        Me.UnhideHiddenModelsToolStripMenuItem.Size = New System.Drawing.Size(204, 30)
+        Me.UnhideHiddenModelsToolStripMenuItem.Size = New System.Drawing.Size(212, 30)
         Me.UnhideHiddenModelsToolStripMenuItem.Text = "&Unhide Hidden Models"
         '
         'HelpProvider
@@ -575,6 +576,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
+        '
+        'UnhideASelectedModelToolStripMenuItem
+        '
+        Me.UnhideASelectedModelToolStripMenuItem.Name = "UnhideASelectedModelToolStripMenuItem"
+        Me.UnhideASelectedModelToolStripMenuItem.Size = New System.Drawing.Size(212, 30)
+        Me.UnhideASelectedModelToolStripMenuItem.Text = "&Unhide a selected Model"
         '
         'frmToolboxEnterpriseExplorer
         '
@@ -660,4 +667,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents TocqlFileToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents HideAllotherModelsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemFixModelErrors As ToolStripMenuItem
+    Friend WithEvents UnhideASelectedModelToolStripMenuItem As ToolStripMenuItem
 End Class

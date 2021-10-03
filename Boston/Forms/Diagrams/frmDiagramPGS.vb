@@ -330,6 +330,8 @@ Public Class frmDiagramPGS
                 '----------------------------------------------
                 If lrPGSNode.NodeType <> pcenumPGSEntityType.Relationship Then
                     lrPGSNode.DisplayAndAssociate()
+                ElseIf lrPGSNode.RDSTable.PGSArity >= 3 Then
+                    lrPGSNode.DisplayAndAssociate()
                 End If
 
                 If lrPGSNode.RDSTable.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
@@ -348,8 +350,9 @@ Public Class frmDiagramPGS
             '=======================================================
             Dim larLoadedRelationNodes As New List(Of PGS.Node)
             Dim lrOriginNode As PGS.Node = Nothing
-            Dim lrDestinationNode As PGS.Node
+            Dim lrDestinationNode As PGS.Node = Nothing
 
+            Dim lasLoadedRelationIds As New List(Of String)
 
             For Each lrNode As PGS.Node In Me.zrPage.ERDiagram.Entity.ToArray
 
@@ -386,8 +389,8 @@ Public Class frmDiagramPGS
                         End If
                     End If
                 Else
-                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
-                    Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False, lasLoadedRelationIds)
+                    'Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
                 End If
 
                 '20210929-VM-Was not getting PGSRelations
@@ -1472,191 +1475,202 @@ Public Class frmDiagramPGS
 
         Dim item As ToolStripItem = CType(sender, ToolStripItem)
 
-        Me.HiddenDiagram.Nodes.Clear()
-        Call Me.DiagramView.SendToBack()
-        Call Me.HiddenDiagramView.BringToFront()
+        Try
 
-        Dim loDiagrammingShape As MindFusion.Diagramming.Shape
+            Me.HiddenDiagram.Nodes.Clear()
+            Call Me.DiagramView.SendToBack()
+            Call Me.HiddenDiagramView.BringToFront()
 
-        Dim lrNode As New PGS.Node
-        If TypeOf (Me.zrPage.SelectedObject(0)) Is PGS.Node Then
-            lrNode = Me.zrPage.SelectedObject(0)
-            loDiagrammingShape = Shapes.Ellipse
-        Else
-            Dim lrRelation As ERD.Relation
-            lrRelation = Me.zrPage.SelectedObject(0)
+            Dim loDiagrammingShape As MindFusion.Diagramming.Shape
 
-            If lrRelation.IsPGSRelationNode Then
-                lrNode = New PGS.Node(Me.zrPage, lrRelation.ActualPGSNode.Id)
+            Dim lrNode As New PGS.Node
+            If TypeOf (Me.zrPage.SelectedObject(0)) Is PGS.Node Then
+                lrNode = Me.zrPage.SelectedObject(0)
+                loDiagrammingShape = Shapes.Ellipse
             Else
-                lrNode = New PGS.Node(Me.zrPage, lrRelation.RelationFactType.Id)
-            End If
+                Dim lrRelation As ERD.Relation
+                lrRelation = Me.zrPage.SelectedObject(0)
 
-            lrNode.X = lrRelation.Link.Link.Bounds.X
-            lrNode.Y = lrRelation.Link.Link.Bounds.Y
-
-            lrNode.shape.SetRect(New RectangleF(lrRelation.Link.Link.Bounds.X,
-                                 lrRelation.Link.Link.Bounds.Y,
-                                 lrRelation.Link.Link.Bounds.Width,
-                                 lrRelation.Link.Link.Bounds.Height),
-                                 False)
-
-            loDiagrammingShape = Shapes.RoundRect
-        End If
-
-        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode
-        'lrShapeNode = lrPageObject.Shape.Clone(False)
-        lrShapeNode = New MindFusion.Diagramming.ShapeNode(lrNode.shape)
-        lrShapeNode.Shape = loDiagrammingShape
-        lrShapeNode.HandlesStyle = HandlesStyle.InvisibleMove
-        lrShapeNode.SetRect(lrNode.shape.Bounds, False)
-        lrShapeNode.Font = New System.Drawing.Font("Arial", 10) 'lrShapeNode.Font = Me.zrPage.Diagram.Font
-        lrShapeNode.TextFormat.Alignment = StringAlignment.Center
-        lrShapeNode.Text = lrNode.Data
-        lrShapeNode.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
-        lrShapeNode.TextFormat.Alignment = StringAlignment.Center
-        lrShapeNode.TextFormat.LineAlignment = StringAlignment.Center
-        Me.MorphVector(0).Shape = lrShapeNode
-
-
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
-            lrEnterpriseView = item.Tag
-            prApplication.WorkingPage = lrEnterpriseView.Tag
-
-            '------------------------------------------------------
-            'Get the X,Y co-ordinates of the Entity being morphed
-            '------------------------------------------------------
-            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
-            lrPage = lrEnterpriseView.Tag
-
-            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance(lrPage.Model, pcenumLanguage.ORMModel, lrNode.Data, True, 0, 0)
-            Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrPage.Model, lrPage, pcenumLanguage.ORMModel, lrNode.Data, True, 0, 0)
-
-            lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-            lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
-
-            If lrPage.Loaded Then
-                If IsSomething(lrFactTypeInstance) Then
-                    Me.MorphVector(0).EndPoint = New Point(lrFactTypeInstance.X, lrFactTypeInstance.Y)
-                    If lrFactTypeInstance.Shape IsNot Nothing Then
-                        Me.MorphVector(0).EndSize = New Rectangle(lrFactTypeInstance.X,
-                                                                  lrFactTypeInstance.Y,
-                                                                  lrFactTypeInstance.Shape.Bounds.Width,
-                                                                  lrFactTypeInstance.Shape.Bounds.Height)
-                    Else
-                        Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
-                    End If
-                ElseIf IsSomething(lrEntityTypeInstance) Then
-                    Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
-                    If lrEntityTypeInstance.Shape IsNot Nothing Then
-                        Me.MorphVector(0).EndSize = New Rectangle(lrEntityTypeInstance.X,
-                                                                  lrEntityTypeInstance.Y,
-                                                                  lrEntityTypeInstance.Shape.Bounds.Width,
-                                                                  lrEntityTypeInstance.Shape.Bounds.Height)
-                    Else
-                        Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
-                    End If
-                End If
-            End If
-
-            'Start size
-            Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
-
-            '-------------------------------------------------------------------------------------
-            'Populate the MorphVector with each relevant ModelObjectInstance on the current Page
-            '  that is also on the destination Page.
-            '----------------------------------------------------------------------
-#Region "Additional MorphVectors"
-            Dim lrAdditionalShapeNode As ShapeNode = Nothing
-            Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
-
-            For Each lrAdditionalObject As PGS.Node In Me.zrPage.ERDiagram.Entity
-                If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
-                    '---------------------------------------------------------------------------------------------
-                    'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
-                    '---------------------------------------------------------------------------------------------
+                If lrRelation.IsPGSRelationNode Then
+                    lrNode = New PGS.Node(Me.zrPage, lrRelation.ActualPGSNode.Id)
                 Else
-                    If lrAdditionalObject.NodeType <> pcenumPGSEntityType.Relationship And lrAdditionalObject.PGSRelation Is Nothing Then
-                        Dim larORMObjectList = From ModelObject In lrPage.GetAllPageObjects
-                                               Where ModelObject.Id = lrAdditionalObject.Name
-                                               Select ModelObject
+                    lrNode = New PGS.Node(Me.zrPage, lrRelation.RelationFactType.Id)
+                End If
 
-                        For Each lrModelObject As Object In larORMObjectList
-                            'Will only be one, but saves coding if...then...
-                            Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.Shape.Bounds.X, lrAdditionalObject.Shape.Bounds.Y, lrModelObject.X, lrModelObject.Y, 40))
+                lrNode.X = lrRelation.Link.Link.Bounds.X
+                lrNode.Y = lrRelation.Link.Link.Bounds.Y
 
-                            Dim lrAdditionalPageObject As FBM.PageObject = lrAdditionalObject.ClonePageObject
-                            lrAdditionalShapeNode = lrAdditionalPageObject.Shape.Clone(True)
-                            lrAdditionalShapeNode = New ShapeNode(lrAdditionalPageObject.Shape)
-                            lrAdditionalShapeNode.Text = lrAdditionalObject.Name
-                            lrAdditionalShapeNode.Visible = True
-                            lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
-                            lrAdditionalShapeNode.Shape = Shapes.Ellipse
+                lrNode.shape.SetRect(New RectangleF(lrRelation.Link.Link.Bounds.X,
+                                     lrRelation.Link.Link.Bounds.Y,
+                                     lrRelation.Link.Link.Bounds.Width,
+                                     lrRelation.Link.Link.Bounds.Height),
+                                     False)
 
-                            Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
-                            Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name
-                            Me.MorphVector(Me.MorphVector.Count - 1).Shape = lrAdditionalShapeNode
-                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.Font = Me.zrPage.Diagram.Font
-                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
-                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.Alignment = StringAlignment.Center
-                            Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.LineAlignment = StringAlignment.Center
-                        Next
+                loDiagrammingShape = Shapes.RoundRect
+            End If
 
+            Dim lrShapeNode As MindFusion.Diagramming.ShapeNode
+            'lrShapeNode = lrPageObject.Shape.Clone(False)
+            lrShapeNode = New MindFusion.Diagramming.ShapeNode(lrNode.shape)
+            lrShapeNode.Shape = loDiagrammingShape
+            lrShapeNode.HandlesStyle = HandlesStyle.InvisibleMove
+            lrShapeNode.SetRect(lrNode.shape.Bounds, False)
+            lrShapeNode.Font = New System.Drawing.Font("Arial", 10) 'lrShapeNode.Font = Me.zrPage.Diagram.Font
+            lrShapeNode.TextFormat.Alignment = StringAlignment.Center
+            lrShapeNode.Text = lrNode.Data
+            lrShapeNode.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+            lrShapeNode.TextFormat.Alignment = StringAlignment.Center
+            lrShapeNode.TextFormat.LineAlignment = StringAlignment.Center
+            Me.MorphVector(0).Shape = lrShapeNode
+
+
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag
+                prApplication.WorkingPage = lrEnterpriseView.Tag
+
+                '------------------------------------------------------
+                'Get the X,Y co-ordinates of the Entity being morphed
+                '------------------------------------------------------
+                Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+                lrPage = lrEnterpriseView.Tag
+
+                Dim lrEntityTypeInstance As New FBM.EntityTypeInstance(lrPage.Model, pcenumLanguage.ORMModel, lrNode.Data, True, 0, 0)
+                Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrPage.Model, lrPage, pcenumLanguage.ORMModel, lrNode.Data, True, 0, 0)
+
+                lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
+
+                If lrPage.Loaded Then
+                    If IsSomething(lrFactTypeInstance) Then
+                        Me.MorphVector(0).EndPoint = New Point(lrFactTypeInstance.X, lrFactTypeInstance.Y)
+                        If lrFactTypeInstance.Shape IsNot Nothing Then
+                            Me.MorphVector(0).EndSize = New Rectangle(lrFactTypeInstance.X,
+                                                                      lrFactTypeInstance.Y,
+                                                                      lrFactTypeInstance.Shape.Bounds.Width,
+                                                                      lrFactTypeInstance.Shape.Bounds.Height)
+                        Else
+                            Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
+                        End If
+                    ElseIf IsSomething(lrEntityTypeInstance) Then
+                        Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+                        If lrEntityTypeInstance.Shape IsNot Nothing Then
+                            Me.MorphVector(0).EndSize = New Rectangle(lrEntityTypeInstance.X,
+                                                                      lrEntityTypeInstance.Y,
+                                                                      lrEntityTypeInstance.Shape.Bounds.Width,
+                                                                      lrEntityTypeInstance.Shape.Bounds.Height)
+                        Else
+                            Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
+                        End If
                     End If
                 End If
-            Next
+
+                'Start size
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
+
+                '-------------------------------------------------------------------------------------
+                'Populate the MorphVector with each relevant ModelObjectInstance on the current Page
+                '  that is also on the destination Page.
+                '----------------------------------------------------------------------
+#Region "Additional MorphVectors"
+                Dim lrAdditionalShapeNode As ShapeNode = Nothing
+                Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+                For Each lrAdditionalObject As PGS.Node In Me.zrPage.ERDiagram.Entity
+                    If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
+                        '---------------------------------------------------------------------------------------------
+                        'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
+                        '---------------------------------------------------------------------------------------------
+                    Else
+                        If lrAdditionalObject.NodeType <> pcenumPGSEntityType.Relationship And lrAdditionalObject.PGSRelation Is Nothing Then
+                            Dim larORMObjectList = From ModelObject In lrPage.GetAllPageObjects
+                                                   Where ModelObject.Id = lrAdditionalObject.Name
+                                                   Select ModelObject
+
+                            For Each lrModelObject As Object In larORMObjectList
+                                'Will only be one, but saves coding if...then...
+                                Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.Shape.Bounds.X, lrAdditionalObject.Shape.Bounds.Y, lrModelObject.X, lrModelObject.Y, 40))
+
+                                Dim lrAdditionalPageObject As FBM.PageObject = lrAdditionalObject.ClonePageObject
+                                lrAdditionalShapeNode = lrAdditionalPageObject.Shape.Clone(True)
+                                lrAdditionalShapeNode = New ShapeNode(lrAdditionalPageObject.Shape)
+                                lrAdditionalShapeNode.Text = lrAdditionalObject.Name
+                                lrAdditionalShapeNode.Visible = True
+                                lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
+                                lrAdditionalShapeNode.Shape = Shapes.Ellipse
+
+                                Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
+                                Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name
+                                Me.MorphVector(Me.MorphVector.Count - 1).Shape = lrAdditionalShapeNode
+                                Me.MorphVector(Me.MorphVector.Count - 1).Shape.Font = Me.zrPage.Diagram.Font
+                                Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                                Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.Alignment = StringAlignment.Center
+                                Me.MorphVector(Me.MorphVector.Count - 1).Shape.TextFormat.LineAlignment = StringAlignment.Center
+                            Next
+
+                        End If
+                    End If
+                Next
 #End Region
 
 
-            If lrPage.Loaded Then
-                If IsSomething(lrFactTypeInstance) Then
-                    Me.MorphVector(0).EndPoint = New Point(lrFactTypeInstance.X, lrFactTypeInstance.Y)
-                    If lrFactTypeInstance.Shape IsNot Nothing Then
-                        Me.MorphVector(0).EndSize = New Rectangle(lrFactTypeInstance.X,
-                                                                  lrFactTypeInstance.Y,
-                                                                  lrFactTypeInstance.Shape.Bounds.Width,
-                                                                  lrFactTypeInstance.Shape.Bounds.Height)
-                    Else
-                        Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
-                    End If
-                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactTypeInstance.X - lrNode.X) + Math.Abs(lrFactTypeInstance.Y - lrNode.Y) + 1))
+                If lrPage.Loaded Then
+                    If IsSomething(lrFactTypeInstance) Then
+                        Me.MorphVector(0).EndPoint = New Point(lrFactTypeInstance.X, lrFactTypeInstance.Y)
+                        If lrFactTypeInstance.Shape IsNot Nothing Then
+                            Me.MorphVector(0).EndSize = New Rectangle(lrFactTypeInstance.X,
+                                                                      lrFactTypeInstance.Y,
+                                                                      lrFactTypeInstance.Shape.Bounds.Width,
+                                                                      lrFactTypeInstance.Shape.Bounds.Height)
+                        Else
+                            Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
+                        End If
+                        Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactTypeInstance.X - lrNode.X) + Math.Abs(lrFactTypeInstance.Y - lrNode.Y) + 1))
 
-                ElseIf IsSomething(lrEntityTypeInstance) Then
-                    Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
-                    If lrEntityTypeInstance.Shape IsNot Nothing Then
-                        Me.MorphVector(0).EndSize = New Rectangle(lrEntityTypeInstance.X,
-                                                                  lrEntityTypeInstance.Y,
-                                                                  lrEntityTypeInstance.Shape.Bounds.Width,
-                                                                  lrEntityTypeInstance.Shape.Bounds.Height)
-                    Else
-                        Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
+                    ElseIf IsSomething(lrEntityTypeInstance) Then
+                        Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+                        If lrEntityTypeInstance.Shape IsNot Nothing Then
+                            Me.MorphVector(0).EndSize = New Rectangle(lrEntityTypeInstance.X,
+                                                                      lrEntityTypeInstance.Y,
+                                                                      lrEntityTypeInstance.Shape.Bounds.Width,
+                                                                      lrEntityTypeInstance.Shape.Bounds.Height)
+                        Else
+                            Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
+                        End If
+
+                        Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntityTypeInstance.X - lrNode.X) + Math.Abs(lrEntityTypeInstance.Y - lrNode.Y) + 1))
                     End If
 
-                    Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntityTypeInstance.X - lrNode.X) + Math.Abs(lrEntityTypeInstance.Y - lrNode.Y) + 1))
                 End If
 
+                Me.MorphVector(0).ModelElementId = lrNode.Id
+                Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
+                If lrPage.DiagramView IsNot Nothing Then
+                    Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
+                Else
+                    Me.MorphVector(0).TargetZoomFactor = My.Settings.DefaultPageZoomFactor
+                End If
+
+                Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
+                Me.HiddenDiagram.Invalidate()
+
+                Me.MorphTimer.Enabled = True
+                Me.MorphStepTimer.Enabled = True
+
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+
             End If
 
-            Me.MorphVector(0).ModelElementId = lrNode.Id
-            Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
-            If lrPage.DiagramView IsNot Nothing Then
-                Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
-            Else
-                Me.MorphVector(0).TargetZoomFactor = My.Settings.DefaultPageZoomFactor
-            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
-            Me.HiddenDiagram.Invalidate()
-
-            Me.MorphTimer.Enabled = True
-            Me.MorphStepTimer.Enabled = True
-
-            Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
-            Me.MorphStepTimer.Start()
-            Me.MorphTimer.Start()
-
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -3272,6 +3286,7 @@ Public Class frmDiagramPGS
             Me.ToolStripMenuItemDeleteRelation.Visible = My.Settings.SuperuserMode
             Me.ToolStripMenuItemEditRelation.Visible = My.Settings.SuperuserMode
             Me.ToolStripSeparator8.Visible = My.Settings.SuperuserMode
+            Me.ToolStripMenuItemRelationRemoveFromPage.Visible = lrRelation.IsPGSRelationNode
 
             '=============================================================================================
             'Morphing
@@ -3447,10 +3462,8 @@ Public Class frmDiagramPGS
     Private Sub ToolStripMenuItem_RemoveFromPage_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem_RemoveFromPage.Click
 
         Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
-        Dim lrNode As New PGS.Node
-        Dim lsAttributeId As String = ""
-        Dim lsIdentifierId As String = ""
-        Dim lsSQLQuery As String = ""
+        Dim lsSQLQuery As String
+        Dim lrNode As PGS.Node
 
         Me.Cursor = Cursors.WaitCursor
 
@@ -3607,4 +3620,38 @@ Public Class frmDiagramPGS
         End Try
     End Sub
 
+    Private Sub ToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemRelationRemoveFromPage.Click
+
+        Try
+            Dim lrPGSRelation As ERD.Relation
+            Dim lsSQLQuery As String
+
+            lrPGSRelation = Me.zrPage.SelectedObject(0)
+
+            If lrPGSRelation.IsPGSRelationNode Then
+
+                Me.Diagram.Nodes.Remove(lrPGSRelation.ActualPGSNode.Shape)
+                Me.Diagram.Links.Remove(lrPGSRelation.Link.Link)
+
+                '-------------------------------------------------------------------------
+                'Remove the Entity from the Page
+                '---------------------------------
+                lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & lrPGSRelation.ActualPGSNode.Name & "'"
+
+                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

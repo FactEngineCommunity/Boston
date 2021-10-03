@@ -4425,4 +4425,34 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub UnhideASelectedModelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UnhideASelectedModelToolStripMenuItem.Click
+
+        Try
+            Dim lfrmGenericSelect As New frmGenericSelect
+
+            lfrmGenericSelect.zoGenericSelection.Type = pcenumGenericSelectionType.SelectFromList
+            lfrmGenericSelect.zoGenericSelection.FormTitle = "Model to unhide"
+
+            For Each lrNode As cTreeNode In Me.TreeView.Nodes(0).Nodes
+                If lrNode.Hidden Then
+                    lfrmGenericSelect.zoGenericSelection.TupleList.Add(New tComboboxItem(Nothing, lrNode.Text, lrNode))
+                End If
+            Next
+
+            If lfrmGenericSelect.ShowDialog = DialogResult.OK Then
+                Dim lrNode As cTreeNode = lfrmGenericSelect.zoGenericSelection.SelectedTag
+                lrNode.Hidden(False) = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

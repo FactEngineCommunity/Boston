@@ -79,6 +79,7 @@ Partial Class frmDiagramPGS
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
+        Me.ToolStripMenuItemRelationRemoveFromPage = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -338,9 +339,9 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Relation
         '
-        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation})
+        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemRelationRemoveFromPage, Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(181, 98)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(181, 120)
         '
         'MorphToToolStripMenuItem1
         '
@@ -354,21 +355,21 @@ Partial Class frmDiagramPGS
         '
         Me.PGSDiagramToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.PGS16x16
         Me.PGSDiagramToolStripMenuItem1.Name = "PGSDiagramToolStripMenuItem1"
-        Me.PGSDiagramToolStripMenuItem1.Size = New System.Drawing.Size(149, 22)
+        Me.PGSDiagramToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.PGSDiagramToolStripMenuItem1.Text = "&PGS Diagram"
         '
         'ORMDiagramToolStripMenuItem1
         '
         Me.ORMDiagramToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.ORM16x16
         Me.ORMDiagramToolStripMenuItem1.Name = "ORMDiagramToolStripMenuItem1"
-        Me.ORMDiagramToolStripMenuItem1.Size = New System.Drawing.Size(149, 22)
+        Me.ORMDiagramToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.ORMDiagramToolStripMenuItem1.Text = "&ORM Diagram"
         '
         'ToolStripMenuItemERDDiagram1
         '
         Me.ToolStripMenuItemERDDiagram1.Image = Global.Boston.My.Resources.Resources.ERD16x16
         Me.ToolStripMenuItemERDDiagram1.Name = "ToolStripMenuItemERDDiagram1"
-        Me.ToolStripMenuItemERDDiagram1.Size = New System.Drawing.Size(149, 22)
+        Me.ToolStripMenuItemERDDiagram1.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemERDDiagram1.Text = "&ERD Diagram"
         '
         'ToolStripSeparator8
@@ -462,6 +463,12 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ToolStripMenuItemRelationRemoveFromPage
+        '
+        Me.ToolStripMenuItemRelationRemoveFromPage.Name = "ToolStripMenuItemRelationRemoveFromPage"
+        Me.ToolStripMenuItemRelationRemoveFromPage.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemRelationRemoveFromPage.Text = "&Remove from Page"
+        '
         'frmDiagramPGS
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -536,4 +543,5 @@ Partial Class frmDiagramPGS
     Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemEdgeReadingEditor As ToolStripMenuItem
     Friend WithEvents ViewPropertiesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemRelationRemoveFromPage As ToolStripMenuItem
 End Class
