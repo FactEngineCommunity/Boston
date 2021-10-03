@@ -2428,12 +2428,12 @@ Namespace FBM
 
         ''' <summary>
         ''' Returns the set of Destination Model Objects on LinkFactTypes associated with the FactType.
-        '''   Used to add the FactType's corresponding Table to a Page when all the ModelObjects are on the Page.
+        '''   Used to add the FactType's corresponding Table/Node to a Page when all the ModelObjects are on the Page.
         '''   Used predominantly for PGS Pages, when both joined nodes of a binaryFactType are on the Page, such that the corresponding Relation/Edge link 
         '''   can be added to the Page.
         ''' </summary>
         ''' <returns></returns>
-        Public Function getDesinationModelObjects() As List(Of FBM.ModelObject)
+        Public Function getDestinationModelObjects() As List(Of FBM.ModelObject)
 
             Dim larModelObject As New List(Of FBM.ModelObject)
             For Each lrRole In Me.RoleGroup

@@ -9438,14 +9438,18 @@ Public Class frmDiagramORM
                     Dim lsMessage As String = ""
                     lsMessage = "The selected Fact is not shown on any other Page for the Model."
                     lsMessage &= vbCrLf
-                    lsMessage &= "The Fact will be permanently deleted from the Model and the operation cannot be undone."
+                    lsMessage &= "Click [No] to just remove the Fact from the Page."
                     lsMessage &= vbCrLf & vbCrLf
-                    lsMessage &= "Click [Ok] to proceed or [Cancel] to cancel the deletion of the Fact"
-                    If MsgBox(lsMessage, MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
-                        lrFactTable.TableShape.DeleteRow(lrFactTable.SelectedRow - 1)
-                        lrFactTypeInstance.RemoveFact(lrFactInstance)
-                        lrFactTypeInstance.FactType.RemoveFactById(lrFactInstance.Fact)
-                    End If
+                    lsMessage &= "Click [Yes] to permanently the fact also at the Model level. The operation cannot be undone."
+                    Select Case MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.DefaultButton2)
+                        Case Is = MsgBoxResult.Yes
+                            lrFactTable.TableShape.DeleteRow(lrFactTable.SelectedRow - 1)
+                            lrFactTypeInstance.RemoveFact(lrFactInstance)
+                            lrFactTypeInstance.FactType.RemoveFactById(lrFactInstance.Fact)
+                        Case Is = MsgBoxResult.No
+                            lrFactTable.TableShape.DeleteRow(lrFactTable.SelectedRow - 1)
+                            lrFactTypeInstance.RemoveFact(lrFactInstance)
+                    End Select
                 End If
             End If
         End If

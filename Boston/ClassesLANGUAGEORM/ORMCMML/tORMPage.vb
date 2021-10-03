@@ -265,7 +265,6 @@ Namespace FBM
                 End While
 
                 Call Me.MakeDirty()
-                Call Me.Save()
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -1952,7 +1951,6 @@ Namespace FBM
                 End While
 
                 Call Me.MakeDirty()
-                Call Me.Save()
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2669,7 +2667,8 @@ Namespace FBM
             Dim lrFactInstance As New FBM.FactInstance
 
             Try
-                Dim lasRelationId As New List(Of String) 'List of the Relations loaded onto the Page. Used so that a relation that links an Entity to itself is not loaded twice.
+                'List of the Relations loaded onto the Page. Used so that a relation that links an Node to itself is not loaded twice.
+                Dim lasRelationId As New List(Of String)
 
                 '20180609-VM-ToDo-lrFactInstance is used for a Link (below) but set to nothing in particular (above).
 
@@ -2685,8 +2684,8 @@ Namespace FBM
 
                     lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrOrigingEREntity As PGS.Node
-                    Dim lrDestinationgEREntity As PGS.Node
+                    Dim lrOriginNode As PGS.Node
+                    Dim lrDestinationNode As PGS.Node
                     Dim lsRelationId As String = ""
 
                     While Not lrRecordset.EOF
@@ -2696,10 +2695,10 @@ Namespace FBM
                         lsRelationId = lrRecordset("Relation").Data
 
                         If liInd = 1 Then
-                            lrOrigingEREntity = New PGS.Node
-                            lrDestinationgEREntity = New PGS.Node
-                            lrOrigingEREntity.Symbol = lrRecordset("Entity").Data
-                            lrOrigingEREntity = Me.ERDiagram.Entity.Find(AddressOf lrOrigingEREntity.EqualsBySymbol)
+                            lrOriginNode = New PGS.Node
+                            lrDestinationNode = New PGS.Node
+                            lrOriginNode.Symbol = lrRecordset("Entity").Data
+                            lrOriginNode = Me.ERDiagram.Entity.Find(AddressOf lrOriginNode.EqualsBySymbol)
 
                             '-----------------------------
                             'Find the Destination Entity
@@ -2710,14 +2709,13 @@ Namespace FBM
 
                             lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            lrDestinationgEREntity.Symbol = lrRecordset1("Entity").Data
-
-                            lrDestinationgEREntity = Me.ERDiagram.Entity.Find(AddressOf lrDestinationgEREntity.EqualsBySymbol)
+                            lrDestinationNode.Symbol = lrRecordset1("Entity").Data
+                            lrDestinationNode = Me.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
                         Else '=2
-                            lrOrigingEREntity = New PGS.Node
-                            lrDestinationgEREntity = New PGS.Node
-                            lrDestinationgEREntity.Symbol = lrRecordset("Entity").Data
-                            lrDestinationgEREntity = Me.ERDiagram.Entity.Find(AddressOf lrDestinationgEREntity.EqualsBySymbol)
+                            lrOriginNode = New PGS.Node
+                            lrDestinationNode = New PGS.Node
+                            lrDestinationNode.Symbol = lrRecordset("Entity").Data
+                            lrDestinationNode = Me.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
 
                             '-----------------------------
                             'Find the Destination Entity
@@ -2728,11 +2726,20 @@ Namespace FBM
 
                             lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            lrOrigingEREntity.Symbol = lrRecordset1("Entity").Data
-                            lrOrigingEREntity = Me.ERDiagram.Entity.Find(AddressOf lrOrigingEREntity.EqualsBySymbol)
+                            'CodeSafe
+                            Try
+                                lrOriginNode.Symbol = lrRecordset1("Entity").Data
+                                lrOriginNode = Me.ERDiagram.Entity.Find(AddressOf lrOriginNode.EqualsBySymbol)
+                            Catch ex As Exception
+                                lrOriginNode = Nothing
+                                prApplication.ThrowErrorMessage("Couldn't find Origin Node in CoreRelationIsForEntity for Relation with Id: " & lsRelationId,
+                                                                pcenumErrorType.Warning,
+                                                                ex.StackTrace, True, False, My.Settings.ThrowWarningDebugMessagesToScreen)
+                            End Try
+
                         End If
 
-                        If (lrOrigingEREntity IsNot Nothing) And (lrDestinationgEREntity IsNot Nothing) And Not lasRelationId.Contains(lsRelationId) Then
+                        If (lrOriginNode IsNot Nothing) And (lrDestinationNode IsNot Nothing) And Not lasRelationId.Contains(lsRelationId) Then
 
                             lasRelationId.Add(lsRelationId)
 
@@ -2740,7 +2747,7 @@ Namespace FBM
 
                             Dim lrRelation As ERD.Relation
                             If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lsRelationId).Count = 0 Then
-                                lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOrigingEREntity, lrDestinationgEREntity, False)
+                                lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOriginNode, lrDestinationNode, False)
                                 Me.ERDiagram.Relation.Add(lrRelation)
                             Else
                                 lrRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lsRelationId)
@@ -2749,7 +2756,7 @@ Namespace FBM
                             If abAddToPage Then Me.addRDSRelation(lrRDSRelation)
 
                             Dim lrLink As PGS.Link
-                            lrLink = New PGS.Link(Me, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
+                            lrLink = New PGS.Link(Me, lrFactInstance, lrOriginNode, lrDestinationNode, Nothing, Nothing, lrRelation)
                             lrLink.DisplayAndAssociate()
 
                         End If

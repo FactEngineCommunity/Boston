@@ -1535,8 +1535,6 @@ Namespace FBM
             Try
                 Dim lrDictionaryEntry As FBM.DictionaryEntry
 
-                If {"Person", "person"}.Contains(arValueType.Id) Then Debugger.Break()
-
                 '------------------------------------------------------------------------------------------------
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------

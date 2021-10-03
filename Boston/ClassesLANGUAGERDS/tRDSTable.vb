@@ -93,6 +93,28 @@ Namespace RDS
             End Get
         End Property
 
+        ''' <summary>
+        ''' Used to determine the number of Non ValueType Model Elements joined by a PGSRelation (a table that is a PGSRelation).
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property PGSArity As Integer
+            Get
+                If Me.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
+                    Dim lrFactType As FBM.FactType = CType(Me.FBMModelElement, FBM.FactType)
+                    If lrFactType.Arity < 3 Then
+                        'Because this property is only concerned with those FactTypes that join 3 or more model elements.
+                        Return lrFactType.Arity
+                    Else
+                        Dim liCount = (From Role In lrFactType.RoleGroup
+                                       Where Role.JoinedORMObject.GetType <> GetType(FBM.ValueType)).Count
+                        Return liCount
+                    End If
+                Else
+                    Return 0
+                End If
+            End Get
+        End Property
+
         Public ReadOnly Property isSubtype() As Boolean
             Get
                 Return Me.FBMModelElement.isSubtype

@@ -677,6 +677,18 @@ Namespace My
                 Me("DiagramSpyShowLinkFactTypes") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ThrowWarningDebugMessagesToScreen() As Boolean
+            Get
+                Return CType(Me("ThrowWarningDebugMessagesToScreen"),Boolean)
+            End Get
+            Set
+                Me("ThrowWarningDebugMessagesToScreen") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

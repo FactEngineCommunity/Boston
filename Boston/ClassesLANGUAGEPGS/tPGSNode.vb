@@ -168,34 +168,44 @@ Namespace PGS
             Dim StringSize As New SizeF
             Dim G As Graphics
 
-            G = Me.Page.Form.CreateGraphics
-            StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+            Try
+                G = Me.Page.Form.CreateGraphics
+                StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
 
-            '=====================================================================            
-            'Create a ShapeNode on the Page for the PGS Node
-            '----------------------------------------------            
-            loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 20, 20, Shapes.Ellipse)
-            loDroppedNode.Resize(20, 20)
-            loDroppedNode.HandlesStyle = HandlesStyle.Invisible
-            loDroppedNode.Pen.Width = 0.5
-            loDroppedNode.Pen.Color = Color.DeepSkyBlue
-            loDroppedNode.TextColor = Color.Black
+                '=====================================================================            
+                'Create a ShapeNode on the Page for the PGS Node
+                '----------------------------------------------            
+                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 20, 20, Shapes.Ellipse)
+                loDroppedNode.Resize(20, 20)
+                loDroppedNode.HandlesStyle = HandlesStyle.Invisible
+                loDroppedNode.Pen.Width = 0.5
+                loDroppedNode.Pen.Color = Color.DeepSkyBlue
+                loDroppedNode.TextColor = Color.Black
 
-            loDroppedNode.Brush = New SolidBrush(Color.White)
-            loDroppedNode.ShadowColor = Color.LightGray
-            loDroppedNode.EnableStyledText = True
-            loDroppedNode.Expandable = False
-            loDroppedNode.Obstacle = True
-            loDroppedNode.AllowIncomingLinks = True
-            loDroppedNode.AllowOutgoingLinks = True
-            loDroppedNode.Text = Me.FactDataInstance.Data
+                loDroppedNode.Brush = New SolidBrush(Color.White)
+                loDroppedNode.ShadowColor = Color.LightGray
+                loDroppedNode.EnableStyledText = True
+                loDroppedNode.Expandable = False
+                loDroppedNode.Obstacle = True
+                loDroppedNode.AllowIncomingLinks = True
+                loDroppedNode.AllowOutgoingLinks = True
+                loDroppedNode.Text = Me.FactDataInstance.Data
 
-            loDroppedNode.Tag = Me
+                loDroppedNode.Tag = Me
 
-            Me.Shape = loDroppedNode
-            Me.FactDataInstance.Shape = loDroppedNode
+                Me.Shape = loDroppedNode
+                Me.FactDataInstance.Shape = loDroppedNode
 
-            loDroppedNode.Image = My.Resources.ORMShapes.Blank
+                loDroppedNode.Image = My.Resources.ORMShapes.Blank
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

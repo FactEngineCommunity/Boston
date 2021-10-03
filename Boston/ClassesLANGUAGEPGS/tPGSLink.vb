@@ -244,22 +244,26 @@ Namespace PGS
                             Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
 
                             Dim lrOriginModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id)
-                            Dim lrDestinationModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
-
                             Dim lrOriginNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrOriginModelObject.Id)
-                            Dim lrDesinationNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrDestinationModelObject.Id)
 
-                            If lrOriginNode Is Nothing Or lrDesinationNode Is Nothing Then Exit Sub
+                            Dim lrDestinationNode As PGS.Node = Nothing
+                            If lrFactType.Arity > 1 Then
+                                Dim lrDestinationModelObject = Me.Model.GetModelObjectByName(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id)
+                                lrDestinationNode = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrDestinationModelObject.Id)
+                            End If
+
+
+                            If lrOriginNode Is Nothing Or lrDestinationNode Is Nothing Then Exit Sub
 
                             If Me.OriginModelElement.Name = lrOriginNode.Name Then
-                                Me.Link.BaseShape = ArrowHead.None
-                                Me.Link.HeadShape = ArrowHead.PointerArrow
+                                    Me.Link.BaseShape = ArrowHead.None
+                                    Me.Link.HeadShape = ArrowHead.PointerArrow
+                                Else
+                                    Me.Link.BaseShape = ArrowHead.PointerArrow
+                                    Me.Link.HeadShape = ArrowHead.None
+                                End If
                             Else
-                                Me.Link.BaseShape = ArrowHead.PointerArrow
-                                Me.Link.HeadShape = ArrowHead.None
-                            End If
-                        Else
-                            If lrFactType.HasTotalRoleConstraint Then
+                                If lrFactType.HasTotalRoleConstraint Then
                                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
                             Else
                                 Me.Link.BaseShapeSize = 2

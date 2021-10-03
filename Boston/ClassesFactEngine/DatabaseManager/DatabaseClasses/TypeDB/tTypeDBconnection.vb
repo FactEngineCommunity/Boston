@@ -179,7 +179,7 @@ Namespace FactEngine.TypeDB
                             larColumn.Add(lrColumn)
                             larUsedColumn.Add(lrColumn)
                         Else
-                            Debugger.Break()
+                            'Debugger.Break()
                         End If
                     Next
 
@@ -328,8 +328,6 @@ Namespace FactEngine.TypeDB
                 Dim lrDestinationTable As RDS.Table = Nothing
                 Dim lrOriginColumn As RDS.Column = Nothing
                 Dim lrDestinationColumn As RDS.Column = Nothing
-
-                If arTable.Name = "parentship" Then Debugger.Break()
 
                 Dim Relations = client.getRelations()
                 For Each Relation In Relations

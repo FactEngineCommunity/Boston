@@ -324,7 +324,7 @@ Namespace FBM
                     End If
                 ElseIf lrOriginEntity Is Nothing And Not lrRelation.ResponsibleFactType.IsLinkFactType And Me.Language = pcenumLanguage.PropertyGraphSchema Then
 
-                    Dim larDestinationModelObjects = lrRelation.ResponsibleFactType.getDesinationModelObjects
+                    Dim larDestinationModelObjects = lrRelation.ResponsibleFactType.getDestinationModelObjects
 
                     Dim lbAllFound As Boolean = True
                     For Each lrModelObject In larDestinationModelObjects

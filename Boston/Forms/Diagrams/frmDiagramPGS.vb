@@ -351,9 +351,10 @@ Public Class frmDiagramPGS
             Dim lrDestinationNode As PGS.Node
 
 
-            For Each lrNode As PGS.Node In Me.zrPage.ERDiagram.Entity
+            For Each lrNode As PGS.Node In Me.zrPage.ERDiagram.Entity.ToArray
 
-                If lrNode.RDSTable.isPGSRelation And lrNode.RDSTable.Arity < 3 Then
+                If lrNode.RDSTable.isPGSRelation And
+                    (lrNode.RDSTable.Arity < 3 Or lrNode.RDSTable.PGSArity < 3) Then
                     'Need to load the relation for the joined Nodes, not the PGSRelation.
                     'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
 
@@ -361,15 +362,17 @@ Public Class frmDiagramPGS
 
                     Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
 
-                    Dim larDestinationModelObjects = lrFactType.getDesinationModelObjects
+                    Dim larDestinationModelObjects = lrFactType.getDestinationModelObjects
 
                     Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
-                                                                                      x.DestinationTable.Name = larDestinationModelObjects(1).Id)
+                                                                                      larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
 
                     Dim lbAllFound As Boolean = True
                     For Each lrModelObject In larDestinationModelObjects
-                        If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
-                            lbAllFound = False
+                        If lrModelObject.GetType <> GetType(FBM.ValueType) Then
+                            If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                                lbAllFound = False
+                            End If
                         End If
                     Next
 
@@ -2003,14 +2006,14 @@ Public Class frmDiagramPGS
                     'Need to load the relation for the joined Nodes, not the PGSRelation.
                     'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
 
-                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, True)
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
 
                     Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
 
-                    Dim larDestinationModelObjects = lrFactType.getDesinationModelObjects
+                    Dim larDestinationModelObjects = lrFactType.getDestinationModelObjects
 
                     Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
-                                                                                      x.DestinationTable.Name = larDestinationModelObjects(1).Id)
+                                                                                      larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
 
                     Dim lbAllFound As Boolean = True
                     For Each lrModelObject In larDestinationModelObjects
@@ -2029,8 +2032,8 @@ Public Class frmDiagramPGS
                         End If
                     End If
                 Else
-                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, True)
-                    Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, True)
+                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
+                    Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
                 End If
 
             End If
