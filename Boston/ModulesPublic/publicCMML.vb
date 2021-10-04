@@ -64,9 +64,8 @@ Public Enum pcenumCMMLRelations
         CoreIndexIgnoresNulls
         CoreIndexIsPrimaryKey
         CoreIndexRestrainsToUniqueValues
-        CoreRelationHasOriginEntity
-        CoreRelationHasDestinationEntity
         CoreRelationIsForEntity
+        CoreRelationHasDestinationEntity
         CoreIsMandatory
         CoreIsPGSRelation
         CoreOriginIsMandatory

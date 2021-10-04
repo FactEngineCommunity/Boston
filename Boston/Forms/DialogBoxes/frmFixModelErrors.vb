@@ -97,7 +97,13 @@ Public Class frmFixModelErrors
 
             If MsgBox("Have you backed up the Boston database?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
+                Dim laiFixType As New List(Of pcenumModelFixType)
 
+                For Each loItem In Me.CheckedListBoxFixTypes.CheckedItems
+                    laiFixType.Add(loItem.Tag)
+                Next
+
+                Call Me.mrModel.FixErrors(laiFixType)
 
             End If
 

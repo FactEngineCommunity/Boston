@@ -544,6 +544,54 @@ Namespace FBM
 
             Try
 
+                Dim lsSQLQuery As String
+                Dim lrRecordset As ORMQL.Recordset
+                Dim lrRecordset2 As ORMQL.Recordset
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery.AppendLine(" FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString)
+
+                lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrRecordset.EOF
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery.AppendLine(" FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString)
+                    lsSQLQuery.AppendLine(" WHERE Relation = '" & lrRecordset("Relation").Data & "'")
+
+                    lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordset2.EOF Then
+
+                        lsSQLQuery = "REMOVE INSTANCE '" & lrRecordset("Relation").Data & "' FROM CoreElement"
+                        Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    End If
+
+                    lrRecordset.MoveNext()
+                End While
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery.AppendLine(" FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString)
+
+                lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrRecordset.EOF
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery.AppendLine(" FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString)
+                    lsSQLQuery.AppendLine(" WHERE Relation = '" & lrRecordset("Relation").Data & "'")
+
+                    lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordset2.EOF Then
+
+                        lsSQLQuery = "REMOVE INSTANCE '" & lrRecordset("Relation").Data & "' FROM CoreElement"
+                        Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    End If
+
+                    lrRecordset.MoveNext()
+                End While
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
