@@ -1373,6 +1373,18 @@ Public Class frmMain
 
     End Sub
 
+    Public Sub LoadFixModelErrorsForm(ByRef arModel As FBM.Model)
+
+        Dim child As New frmFixModelErrors
+
+        child.MdiParent = Me
+
+        child.mrModel = arModel
+
+        child.Show(Me.DockPanel)
+
+    End Sub
+
     Public Function loadERDiagramView(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode) As Object
 
         Dim child As New frmDiagramERD

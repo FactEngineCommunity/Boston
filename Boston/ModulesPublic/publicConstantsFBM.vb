@@ -13,7 +13,7 @@
         StateTransitionDiagram = 10
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumJoinPathError
         None
         CircularPathFound
@@ -21,6 +21,24 @@
         RidiculousDepth
         DoubledBackToExistingArgumentRole
         DoubledBackToCoveredRole
+    End Enum
+
+    Public Enum pcenumModelFixType
+        RolesWithoutJoinedORMObject
+        RelationsInvalidActiveRoleOnOriginColumns
+        ColumnsWhereActiveRoleIsNothingTryAndFix
+        ColumnsWhereActiveRoleIsNothingRemoveTheColumn
+        InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect
+        ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
+        RDSTablesWithNoColumnsRemoveThoseTables
+        RDSColumnsThatShouldBeMandatoryMakeMandatory
+        RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
+        RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
+        DuplicateFactsRemoveDuplicates
+        RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations
+        RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations
+        RDSRelationsThatHaveNoOriginColumnsRemoveRelation
+        RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
     End Enum
 
 End Module

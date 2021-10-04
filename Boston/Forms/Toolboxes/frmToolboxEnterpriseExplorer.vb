@@ -4407,14 +4407,14 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lrModel As FBM.Model
 
         Try
-            With New WaitCursor
-                '-----------------------------------------
-                'Get the Model from the selected TreeNode
-                '-----------------------------------------
-                lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
-                Call lrModel.FixErrors()
-            End With
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            Call frmMain.LoadFixModelErrorsForm(lrModel)
+
         Catch ex As Exception
         End Try
     End Sub

@@ -533,6 +533,7 @@
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelSubtypeRelationship.vb" />
     <Compile Include="ClassesLANGUAGEIMPORTEXPORT\v1.7\tXMLModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEORMQL\tORMQLRecordsetDataGridList.vb" />
+    <Compile Include="ClassesLANGUAGEORM\FixModelErrors\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeDerivationText.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
@@ -1263,6 +1264,12 @@
       <DependentUpon>frmDialogSelectValueTypeState.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\DialogBoxes\frmDialogSelectValueTypeState.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmFixModelErrors.Designer.vb">
+      <DependentUpon>frmFixModelErrors.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmFixModelErrors.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FactEngine\frmFactEngine.Designer.vb">
@@ -2027,6 +2034,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmDialogSelectValueTypeState.resx">
       <DependentUpon>frmDialogSelectValueTypeState.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmFixModelErrors.resx">
+      <DependentUpon>frmFixModelErrors.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FactEngine\frmFactEngine.resx">
       <DependentUpon>frmFactEngine.vb</DependentUpon>
