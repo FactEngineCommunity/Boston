@@ -208,30 +208,63 @@ Public Class ODBCDatabaseReverseEngineer
                             Next
                             Call lrFactType.CreateInternalUniquenessConstraint(larRole)
 
-                            '-----------------------------------------------------------------------------------------------
-                            'Create the FactTypeReading
-                            Dim larRoleGroupPermutations As IEnumerable(Of IEnumerable(Of FBM.Role))
+                            'Role Names
+                            Dim lasUsedRoleName As New List(Of String)
+                            Dim lsRoleName As String = ""
+                            For Each lrRole In lrFactType.RoleGroup
+                                Dim larRolePlayed = From Table In Me.TempModel.RDS.Table
+                                                    From RolePlayed In Table.RolesPlayed
+                                                    Where LCase(Table.Name) = LCase(lrRole.JoinedORMObject.Id)
+                                                    Where LCase(RolePlayed.RelationName) = LCase(lrFactType.Id)
+                                                    Where Not lasUsedRoleName.Contains(RolePlayed.RoleName)
+                                                    Select RolePlayed
 
-                            larRoleGroupPermutations = lrFactType.RoleGroup.Permute
+                                If larRolePlayed.Count > 0 Then
 
-                            Dim liInd = 1
-                            For Each larRoleGroup In larRoleGroupPermutations
-                                If liInd <= 3 Then
-                                    Dim lrSentence As New Language.Sentence("random sentence")
-                                    Dim liInd2 = 1
-                                    For Each lrRole In larRoleGroup.ToList
-                                        If liInd2 < larRoleGroup.ToList.Count Then
-                                            lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                                        Else
-                                            lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
-                                        End If
-                                        liInd2 += 1
-                                    Next
-                                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup.ToList, lrSentence)
-                                    lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                                    lsRoleName = larRolePlayed.First.RoleName
+
+                                    Dim larRolePlayed2 = From Table In Me.TempModel.RDS.Table
+                                                         From RolePlayed In Table.RolesPlayed
+                                                         Where LCase(Table.Name) = LCase(lrRole.JoinedORMObject.Id)
+                                                         Where LCase(RolePlayed.RelationName) = LCase(lrFactType.Id)
+                                                         Where Not lasUsedRoleName.Contains(RolePlayed.RoleName)
+                                                         Select RolePlayed
+
+                                    If larRolePlayed2.Count > 0 Then
+                                        lsRoleName = larRolePlayed2.First.RoleName
+                                    End If
+
+                                    lrRole.Name = lsRoleName
+                                    lasUsedRoleName.Add(lsRoleName)
                                 End If
-                                liInd += 1
                             Next
+
+                            '-----------------------------------------------------------------------------------------------
+                            'Create the FactTypeReading                            
+                            If lrFactType.Arity <= 4 Then
+                                Dim larRoleGroupPermutations As IEnumerable(Of IEnumerable(Of FBM.Role))
+
+                                larRoleGroupPermutations = lrFactType.RoleGroup.Permute
+
+                                Dim liInd = 1
+                                For Each larRoleGroup In larRoleGroupPermutations
+                                    If liInd <= 3 Then
+                                        Dim lrSentence As New Language.Sentence("random sentence")
+                                        Dim liInd2 = 1
+                                        For Each lrRole In larRoleGroup.ToList
+                                            If liInd2 < larRoleGroup.ToList.Count Then
+                                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                            Else
+                                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                            End If
+                                            liInd2 += 1
+                                        Next
+                                        Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup.ToList, lrSentence)
+                                        lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                                    End If
+                                    liInd += 1
+                                Next
+                            End If
 
 
                             'Make sure the new Column Names (in Model rather than TempModel) are the same as what they are in the origin database.
@@ -243,30 +276,30 @@ Public Class ODBCDatabaseReverseEngineer
                             '       End If
                             '   Next Column
                             Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTable.Name)
-                            Dim larCoveredColumn As New List(Of RDS.Column)
-                            For Each lrTempColumn In lrTable.getPrimaryKeyColumns
+                                Dim larCoveredColumn As New List(Of RDS.Column)
+                                For Each lrTempColumn In lrTable.getPrimaryKeyColumns
 
-                                If lrTempColumn.hasOutboundRelation Then
-                                    Dim lrTempColumPointsToTable As RDS.Table = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table).DestinationTable
-                                    Dim lrTempRelation As RDS.Relation = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table)
+                                    If lrTempColumn.hasOutboundRelation Then
+                                        Dim lrTempColumPointsToTable As RDS.Table = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table).DestinationTable
+                                        Dim lrTempRelation As RDS.Relation = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table)
 
-                                    Dim larColumn = From Relation In Me.Model.RDS.Relation
-                                                    From Column In Relation.OriginColumns
-                                                    Where Relation.OriginTable.Name = lrTable.Name
-                                                    Where Relation.OriginColumns(0).isPartOfPrimaryKey
-                                                    Where Relation.DestinationTable.Name = lrTempColumPointsToTable.Name
-                                                    Where Not larCoveredColumn.Contains(Column)
-                                                    Select Column
+                                        Dim larColumn = From Relation In Me.Model.RDS.Relation
+                                                        From Column In Relation.OriginColumns
+                                                        Where Relation.OriginTable.Name = lrTable.Name
+                                                        Where Relation.OriginColumns(0).isPartOfPrimaryKey
+                                                        Where Relation.DestinationTable.Name = lrTempColumPointsToTable.Name
+                                                        Where Not larCoveredColumn.Contains(Column)
+                                                        Select Column
 
-                                    Dim lrColumn = larColumn.First
-                                    lrColumn.setName(lrTempColumn.Name)
+                                        Dim lrColumn = larColumn.First
+                                        lrColumn.setName(lrTempColumn.Name)
 
-                                    larCoveredColumn.Add(lrColumn)
-                                End If
-                            Next
+                                        larCoveredColumn.Add(lrColumn)
+                                    End If
+                                Next
 
-                        Else
-                            Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
+                            Else
+                                Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
                             If lrTable.getPrimaryKeyColumns.Count > 0 Then
                                 lsMessage.AppendString(" Can't find Model Elements for the following: ")
                                 For Each lrColumn In lrTable.getPrimaryKeyColumns
@@ -469,7 +502,6 @@ Public Class ODBCDatabaseReverseEngineer
 
                     Dim lrFactType As FBM.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelElement, False, True, , , False, )
                     Me.Model.AddFactType(lrFactType)
-
 
                     'Create the internalUniquenessConstraint.
                     Dim larRole As New List(Of FBM.Role)

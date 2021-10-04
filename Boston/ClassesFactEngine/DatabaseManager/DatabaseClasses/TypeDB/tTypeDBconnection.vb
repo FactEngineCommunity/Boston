@@ -411,11 +411,16 @@ Namespace FactEngine.TypeDB
                         lsTableName = Trim(lrEntity.Label)
                         lrTable = New RDS.Table(Me.FBMModel.RDS, lsTableName, Nothing)
 
-                        Dim larRoleAttributes = client.getPlays(lsTableName)
-                        For Each lrRoleAttribute In larRoleAttributes
-                            Dim lrPlays As New RDS.Plays(lrRoleAttribute.Scope, lrRoleAttribute.Label)
-                            lrTable.RolesPlayed.Add(lrPlays)
-                        Next
+                        Try
+                            Dim larRoleAttributes = client.getPlays(lsTableName)
+                            For Each lrRoleAttribute In larRoleAttributes
+                                Dim lrPlays As New RDS.Plays(lrRoleAttribute.Scope, lrRoleAttribute.Label) 'asRelationName,asRoleName
+                                lrTable.RolesPlayed.Add(lrPlays)
+                            Next
+                        Catch ex As Exception
+                            'Not a Biggie at this stage, but will negate getting Role Names.
+                        End Try
+
 
                         larTable.Add(lrTable)
                     End If
@@ -434,7 +439,7 @@ Namespace FactEngine.TypeDB
 
                         Dim larRoleAttributes = client.getPlays(lsTableName)
                         For Each lrRoleAttribute In larRoleAttributes
-                            Dim lrPlays As New RDS.Plays(lrRoleAttribute.Scope, lrRoleAttribute.Label)
+                            Dim lrPlays As New RDS.Plays(lrRoleAttribute.Scope, lrRoleAttribute.Label) 'asRelationName, asRoleName
                             lrTable.RolesPlayed.Add(lrPlays)
                         Next
 

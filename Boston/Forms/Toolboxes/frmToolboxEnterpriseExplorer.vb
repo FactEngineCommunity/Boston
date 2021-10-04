@@ -1991,10 +1991,13 @@ Public Class frmToolboxEnterpriseExplorer
 
                 If MsgBox(lsMessage, MsgBoxStyle.Critical + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
-                    While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
-                    End While
-
                     Using loWaitCursor As New WaitCursor
+
+                        While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
+                        End While
+
+                        While lrModel.RDSLoading
+                        End While
 
                         'Call lrModel.Save()
 
