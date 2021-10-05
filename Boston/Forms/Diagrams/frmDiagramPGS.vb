@@ -67,32 +67,49 @@ Public Class frmDiagramPGS
 
     Private Sub layoutSelfJoiningLinks()
 
-        For Each lrNode As ShapeNode In Me.Diagram.Nodes
+        Try
 
-            Dim commonLinks As DiagramLinkCollection = getOutgoingLinksWithSameOriginAndDestination(lrNode, lrNode)
+            Dim larShapeNode As New List(Of ShapeNode)
 
-            Dim liDegrees As Double = 10
-            For Each lrLink As DiagramLink In commonLinks
-                Dim lrNewPointF As PointF
-
-                Dim liRadius As Integer = lrNode.Bounds.Width / 2
-                Dim liCircleCentreX, liCircleCentreY As Integer
-                liCircleCentreX = lrNode.Bounds.X + (lrNode.Bounds.Width / 2)
-                liCircleCentreY = lrNode.Bounds.Y + (lrNode.Bounds.Height / 2)
-
-                lrNewPointF = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius, liDegrees)
-
-                lrLink.ControlPoints(0) = lrNewPointF
-                lrLink.ControlPoints(1) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees - 0.3)
-                lrLink.ControlPoints(2) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees + 0.3)
-                lrLink.ControlPoints(lrLink.ControlPoints.Count - 1) = lrNewPointF
-
-                Call lrLink.UpdateFromPoints()
-
-                liDegrees += 20
+            For Each lrShapeNode In Me.Diagram.Nodes
+                If lrShapeNode.GetType = GetType(PGS.Node) Then
+                    larShapeNode.Add(lrShapeNode)
+                End If
             Next
-        Next
 
+            For Each lrNode As ShapeNode In larShapeNode
+
+                Dim commonLinks As DiagramLinkCollection = getOutgoingLinksWithSameOriginAndDestination(lrNode, lrNode)
+
+                Dim liDegrees As Double = 10
+                For Each lrLink As DiagramLink In commonLinks
+                    Dim lrNewPointF As PointF
+
+                    Dim liRadius As Integer = lrNode.Bounds.Width / 2
+                    Dim liCircleCentreX, liCircleCentreY As Integer
+                    liCircleCentreX = lrNode.Bounds.X + (lrNode.Bounds.Width / 2)
+                    liCircleCentreY = lrNode.Bounds.Y + (lrNode.Bounds.Height / 2)
+
+                    lrNewPointF = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius, liDegrees)
+
+                    lrLink.ControlPoints(0) = lrNewPointF
+                    lrLink.ControlPoints(1) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees - 0.3)
+                    lrLink.ControlPoints(2) = Me.getPointOnCircle(liCircleCentreX, liCircleCentreY, liRadius + 15, liDegrees + 0.3)
+                    lrLink.ControlPoints(lrLink.ControlPoints.Count - 1) = lrNewPointF
+
+                    Call lrLink.UpdateFromPoints()
+
+                    liDegrees += 20
+                Next
+            Next
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -2915,19 +2932,30 @@ Public Class frmDiagramPGS
             End If
 
             If Me.PropertyTableNode Is Nothing And (Control.ModifierKeys = Keys.Control Or Control.ModifierKeys = Keys.ControlKey) Then
-                Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y + lrPGSLink.Link.Bounds.Height + 5, 30, 20, 1, 0)
+
+                Dim liX As Integer = Math.Abs(lrPGSLink.Link.Bounds.X + (lrPGSLink.Link.Bounds.Width + 1) / 2)
+                Dim liY As Integer = Math.Abs(lrPGSLink.Link.Bounds.Y + (lrPGSLink.Link.Bounds.Height + 1) / 2)
+
+                Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(liX, liY, 30, 20, 1, 0)
                 Me.PropertyTableNode.EnableStyledText = True
                 Me.PropertyTableNode.Caption = "<B>" & " " & lrPGSLink.Relation.ActualPGSNode.Name & " "
                 Me.PropertyTableNode.Tag = lrPGSLink.Relation.ActualPGSNode
                 Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrPGSLink.Relation.ActualPGSNode.Id)
 
                 For Each lrColumn In lrRDSTable.Column
-                    Me.PropertyTableNode.RowCount += 1
+                    If lrColumn.isForeignKey And My.Settings.PGSShowForeignKeyProperties Then
+                        Me.PropertyTableNode.RowCount += 1
+                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                    ElseIf Not lrColumn.isForeignKey Then
+                        Me.PropertyTableNode.RowCount += 1
+                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                    End If
 
-                    Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
-                    Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
                 Next
                 Me.PropertyTableNode.ResizeToFitText(True)
+                Me.PropertyTableNode.ZTop()
             End If
         End If
 

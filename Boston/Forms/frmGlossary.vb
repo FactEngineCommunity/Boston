@@ -462,6 +462,9 @@ Public Class frmGlossary
         zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
         zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         zrFrmORMDiagramViewer.DiagramView.ZoomToFit()
+        If zrFrmORMDiagramViewer.DiagramView.ZoomFactor > 150 Then
+            zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 150
+        End If
 
     End Sub
 

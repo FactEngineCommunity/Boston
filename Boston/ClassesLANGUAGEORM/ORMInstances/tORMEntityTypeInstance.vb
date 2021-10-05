@@ -2622,7 +2622,9 @@ Namespace FBM
                 '==============================================================================
 
                 Me.isDirty = True
-                Me.Page.IsDirty = True
+                If Me.Page IsNot Nothing Then
+                    Me.Page.IsDirty = True
+                End If
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
