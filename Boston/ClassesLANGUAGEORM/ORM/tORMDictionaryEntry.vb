@@ -657,5 +657,26 @@ Namespace FBM
             Return StrComp(x.Symbol, y.Symbol)
         End Function
 
+        Public Function RealisationsOnlyContainsConceptType(ByVal aiConceptType As pcenumConceptType) As Boolean
+
+            Try
+                Dim laiOtherConceptTypes = From Realisation In Me.Realisations
+                                           Where Realisation <> aiConceptType
+                                           Select Realisation
+
+                Return laiOtherConceptTypes.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+
+        End Function
+
     End Class
 End Namespace

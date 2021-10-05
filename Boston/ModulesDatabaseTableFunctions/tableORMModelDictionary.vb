@@ -391,7 +391,9 @@ Namespace TableModelDictionary
                 lsSQLQuery &= "   ,IsGeneralConcept = " & arModelDictionaryEntry.isGeneralConcept
                 lsSQLQuery &= "   ,StartDate = Now"
                 lsSQLQuery &= "   ,EndDate = #31/12/9999#"
-                lsSQLQuery &= "   ,DBName = '" & Trim(arModelDictionaryEntry.DBName) & "'"
+                If arModelDictionaryEntry.isEntityType Or arModelDictionaryEntry.isValueType Or arModelDictionaryEntry.isFactType Then
+                    lsSQLQuery &= "   ,DBName = '" & Trim(arModelDictionaryEntry.DBName) & "'"
+                End If
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(arModelDictionaryEntry.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND Symbol = '" & Trim(Replace(arModelDictionaryEntry.Symbol, "'", "`")) & "'"
 

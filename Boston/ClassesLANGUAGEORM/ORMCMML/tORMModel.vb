@@ -925,33 +925,41 @@ Namespace FBM
 
                 For Each lrLinkFactType In larLinkFactType
 
-                    For Each lsRelationId In lasRelationId
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                        lsSQLQuery &= " WHERE Entity = '" & lrLinkFactType.LinkFactTypeRole.JoinedORMObject.Id & "'"
-                        lsSQLQuery &= " AND Relation = '" & lsRelationId & "'"
+                    'For Each lsRelationId In lasRelationId.ToArray ''20211005-VM-Removed because step through them below.
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                    lsSQLQuery &= " WHERE Entity = '" & lrLinkFactType.LinkFactTypeRole.JoinedORMObject.GetTopmostNonAbsorbedSupertype.Id & "'"
+                    'lsSQLQuery &= " AND Relation = '" & lsRelationId & "'" '20211005-VM-Removed because couldn't possibly know this.
 
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        If Not lrRecordset1.EOF Then
-                            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                            lsSQLQuery &= " SET FactType = '" & lrLinkFactType.Id & "'"
-                            lsSQLQuery &= " WHERE Relation = '" & lrRecordset1("Relation").Data & "'"
-
-                            '============================================================================
-                            'RDS
-                            Dim lrRDSRelation As RDS.Relation = Me.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
-                            Try
-                                Call lrRDSRelation.changeResponsibleFactType(lrLinkFactType)
-                            Catch ex As Exception
-                                '20200726-VM-Unusual occurence, consider throwing an Exception.
-                                'Debugger.Break()
-                            End Try
-
-
-                            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    While Not lrRecordset1.EOF
+                        If lasRelationId.Contains(lrRecordset1("Relation").Data) Then
+                            lasRelationId.Remove(lrRecordset1("Relation").Data)
+                            Exit While
                         End If
-                    Next
+                        lrRecordset1.MoveNext()
+                    End While
+
+                    If Not lrRecordset1.EOF Then
+                        lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                        lsSQLQuery &= " SET FactType = '" & lrLinkFactType.Id & "'"
+                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset1("Relation").Data & "'"
+
+                        '============================================================================
+                        'RDS
+                        Dim lrRDSRelation As RDS.Relation = Me.RDS.Relation.Find(Function(x) x.Id = lrRecordset1("Relation").Data) 'lsRelationId)
+                        Try
+                            Call lrRDSRelation.changeResponsibleFactType(lrLinkFactType)
+                        Catch ex As Exception
+                            '20200726-VM-Unusual occurence, consider throwing an Exception.
+                            'Debugger.Break()
+                        End Try
+
+                        Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    End If
+
+                    'Next
                 Next
 
             Catch ex As Exception

@@ -1260,6 +1260,31 @@ Public Class frmDiagramPGS
             Call lrToolboxForm.VerbalisePGSNode(lrNode)
         End If
 
+        '---------------------------------------------------------------------------
+        'ORM(FactType) Reading Editor
+        'For if the Node represents a FactType.        
+        '  matches the selected FactType (if a FactType is selected by the user)
+        '---------------------------------------------------------------------------
+        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+        If IsSomething(lrORMReadingEditor) And lrNode.GetType = GetType(PGS.Node) Then
+
+            Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+            Dim lrPGSNode As PGS.Node = CType(lrNode, PGS.Node)
+
+            If lrPGSNode.RDSTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
+                Dim lrFactType As FBM.FactType = lrPGSNode.RDSTable.FBMModelElement
+                lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+
+                lrORMReadingEditor.zrPage = Me.zrPage
+                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+
+                Call lrORMReadingEditor.SetupForm()
+            End If
+
+        End If
+
     End Sub
 
     Public Sub mapSubtypeRelationships()

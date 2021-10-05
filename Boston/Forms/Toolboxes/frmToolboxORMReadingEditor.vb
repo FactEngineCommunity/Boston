@@ -109,6 +109,7 @@ Public Class frmToolboxORMReadingEditor
             Me.DataGrid_Readings.AllowUserToDeleteRows = True
 
             If Me.zrPage Is Nothing Then Exit Sub
+            If Me.zrFactTypeInstance Is Nothing Then Exit Sub
 
             If Me.zrPage.SelectedObject.Count > 0 Then
 
