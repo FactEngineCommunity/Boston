@@ -19,8 +19,8 @@
                 If Me.DatabaseManager.Connection Is Nothing Then
                     Call Me.Model.connectToDatabase()
                 End If
-                Select Case Me.DatabaseManager.Connection.GetType
-                    Case Is = GetType(FactEngine.TypeDB.TypeDBConnection)
+                Select Case Me.Model.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.TypeDB
                         lsSQLQuery = lrQueryGraph.generateTypeQL(Me.WHICHSELECTStatement)
                     Case Else
                         lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)

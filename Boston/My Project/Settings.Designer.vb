@@ -689,6 +689,18 @@ Namespace My
                 Me("ThrowWarningDebugMessagesToScreen") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property AutoLayoutAfterAddingAssociatedFactTypes() As Boolean
+            Get
+                Return CType(Me("AutoLayoutAfterAddingAssociatedFactTypes"),Boolean)
+            End Get
+            Set
+                Me("AutoLayoutAfterAddingAssociatedFactTypes") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -11665,7 +11665,9 @@ Public Class frmDiagramORM
 
             Next
 
-            Call Me.AutoLayout()
+            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
+                Call Me.AutoLayout()
+            End If
 
         Catch ex As Exception
             Dim lsMessage1 As String

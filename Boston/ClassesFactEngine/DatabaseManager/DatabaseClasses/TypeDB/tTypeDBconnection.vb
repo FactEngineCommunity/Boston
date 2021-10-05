@@ -44,7 +44,7 @@ Namespace FactEngine.TypeDB
 
             Select Case aiFEQLComparitor
                 Case Is = FEQL.pcenumFEQLComparitor.Bang
-                    Return " <> "
+                    Return " != "
                 Case Is = FEQL.pcenumFEQLComparitor.Colon,
                           FEQL.pcenumFEQLComparitor.Carret
                     Return " = "
