@@ -545,6 +545,15 @@ Namespace FBM
                         Next
 
                         For Each lrRoleConstraint In Me.InternalUniquenessConstraint
+
+                            If arModel IsNot Me.Model Then
+                                Dim lsUniqueId As String = arModel.CreateUniqueRoleConstraintName(lrRoleConstraint.Id, 0)
+
+                                lrRoleConstraint.Id = lsUniqueId
+                                lrRoleConstraint.Name = lsUniqueId
+                                lrRoleConstraint.Symbol = lsUniqueId
+                            End If
+
                             lrFactType.InternalUniquenessConstraint.Add(lrRoleConstraint.Clone(arModel, abAddToModel))
                         Next
 

@@ -2892,6 +2892,25 @@ Public Class frmMain
                         lrRoleConstraint.Name = lsUniqueId
                         lrRoleConstraint.Symbol = lsUniqueId
                     Next
+
+                    'Make tripply sure we have got all the RoleConstraints
+                    For Each lrFactTypeInstance In lrPage.FactTypeInstance
+
+                        For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
+
+                            Call lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+
+                            Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
+
+                            lrRoleConstraintInstance.Id = lsUniqueId
+                            lrRoleConstraintInstance.Name = lsUniqueId
+                            lrRoleConstraintInstance.Symbol = lsUniqueId
+                            lrRoleConstraintInstance.RoleConstraint.Id = lsUniqueId
+                            lrRoleConstraintInstance.RoleConstraint.Name = lsUniqueId
+                            lrRoleConstraintInstance.RoleConstraint.Symbol = lsUniqueId
+                        Next
+
+                    Next
                 End If
 
 

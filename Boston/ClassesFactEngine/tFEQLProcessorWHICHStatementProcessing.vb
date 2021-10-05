@@ -1032,6 +1032,22 @@
 
             arPreviousTargetNode = arQueryEdge.BaseNode
 
+            If arQueryEdge.FBMFactType IsNot Nothing Then
+                If arQueryEdge.FBMFactType.Arity = 2 Then
+                    If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                        If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id Then
+                                If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
+                                    arQueryEdge.IsReciprocal = True
+                                End If
+                            ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
+                                arQueryEdge.IsReciprocal = True
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+
         End Sub
 
 #End Region

@@ -49,7 +49,15 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
-        Public Shadows Role As New List(Of FBM.RoleInstance)
+        Public Shadows ReadOnly Property Role As List(Of FBM.RoleInstance)
+            Get
+                Dim larRoleInstance As New List(Of FBM.RoleInstance)
+                For Each lrRoleConstraintRole In Me.RoleConstraintRole
+                    larRoleInstance.Add(lrRoleConstraintRole.Role)
+                Next
+                Return larRoleInstance
+            End Get
+        End Property
 
         <XmlIgnore()>
         Public Shadows RoleConstraintRole As New List(Of FBM.RoleConstraintRoleInstance)

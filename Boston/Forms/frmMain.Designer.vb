@@ -329,7 +329,7 @@ Partial Class frmMain
         'MenuItem_ShowEnterpriseTreeView
         '
         Me.MenuItem_ShowEnterpriseTreeView.Name = "MenuItem_ShowEnterpriseTreeView"
-        Me.MenuItem_ShowEnterpriseTreeView.Size = New System.Drawing.Size(180, 22)
+        Me.MenuItem_ShowEnterpriseTreeView.Size = New System.Drawing.Size(157, 22)
         Me.MenuItem_ShowEnterpriseTreeView.Text = "&Model Explorer"
         '
         'CodeGeneratorToolStripMenuItem
@@ -346,51 +346,51 @@ Partial Class frmMain
         Me.ToolStripMenuItemFactEngine.Image = Global.Boston.My.Resources.MenuImagesMain.FactEngine16x16
         Me.ToolStripMenuItemFactEngine.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripMenuItemFactEngine.Name = "ToolStripMenuItemFactEngine"
-        Me.ToolStripMenuItemFactEngine.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemFactEngine.Size = New System.Drawing.Size(157, 22)
         Me.ToolStripMenuItemFactEngine.Text = "Fact Engine"
         '
         'ToolStripSeparator8
         '
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-        Me.ToolStripSeparator8.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator8.Size = New System.Drawing.Size(154, 6)
         '
         'ToolStripMenuItem11
         '
         Me.ToolStripMenuItem11.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StandardToolStripMenuItem})
         Me.ToolStripMenuItem11.Name = "ToolStripMenuItem11"
-        Me.ToolStripMenuItem11.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem11.Size = New System.Drawing.Size(157, 22)
         Me.ToolStripMenuItem11.Text = "Toolbars"
         '
         'StandardToolStripMenuItem
         '
         Me.StandardToolStripMenuItem.Name = "StandardToolStripMenuItem"
-        Me.StandardToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.StandardToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
         Me.StandardToolStripMenuItem.Text = "&Standard"
         '
         'ToolboxesToolStripMenuItem
         '
         Me.ToolboxesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemToolbox, Me.ToolStripMenuItemDiagramOverview, Me.ToolStripMenuItemKLTheoremWriter, Me.TestToolStripMenuItem})
         Me.ToolboxesToolStripMenuItem.Name = "ToolboxesToolStripMenuItem"
-        Me.ToolboxesToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ToolboxesToolStripMenuItem.Size = New System.Drawing.Size(157, 22)
         Me.ToolboxesToolStripMenuItem.Text = "Tool&boxes"
         '
         'ToolStripMenuItemToolbox
         '
         Me.ToolStripMenuItemToolbox.Image = Global.Boston.My.Resources.Resources.Toolbox16x16B_W
         Me.ToolStripMenuItemToolbox.Name = "ToolStripMenuItemToolbox"
-        Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(172, 22)
         Me.ToolStripMenuItemToolbox.Text = "&Toolbox"
         '
         'ToolStripMenuItemDiagramOverview
         '
         Me.ToolStripMenuItemDiagramOverview.Name = "ToolStripMenuItemDiagramOverview"
-        Me.ToolStripMenuItemDiagramOverview.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemDiagramOverview.Size = New System.Drawing.Size(172, 22)
         Me.ToolStripMenuItemDiagramOverview.Text = "Diagram &Overview"
         '
         'ToolStripMenuItemKLTheoremWriter
         '
         Me.ToolStripMenuItemKLTheoremWriter.Name = "ToolStripMenuItemKLTheoremWriter"
-        Me.ToolStripMenuItemKLTheoremWriter.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemKLTheoremWriter.Size = New System.Drawing.Size(172, 22)
         Me.ToolStripMenuItemKLTheoremWriter.Text = "&KL Theorem Writer"
         '
         'TestToolStripMenuItem
@@ -398,25 +398,25 @@ Partial Class frmMain
         Me.TestToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.TestToolStripMenuItem.Name = "TestToolStripMenuItem"
         Me.TestToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.P), System.Windows.Forms.Keys)
-        Me.TestToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.TestToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
         Me.TestToolStripMenuItem.Text = "&Properties"
         '
         'StatusBarToolStripMenuItem
         '
         Me.StatusBarToolStripMenuItem.Name = "StatusBarToolStripMenuItem"
-        Me.StatusBarToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.StatusBarToolStripMenuItem.Size = New System.Drawing.Size(157, 22)
         Me.StatusBarToolStripMenuItem.Text = "&Status Bar"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(154, 6)
         '
         'ToolStripMenuItemDiagramSpy
         '
         Me.ToolStripMenuItemDiagramSpy.Image = Global.Boston.My.Resources.Resources.spyglass_icon
         Me.ToolStripMenuItemDiagramSpy.Name = "ToolStripMenuItemDiagramSpy"
-        Me.ToolStripMenuItemDiagramSpy.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemDiagramSpy.Size = New System.Drawing.Size(157, 22)
         Me.ToolStripMenuItemDiagramSpy.Text = "&Diagram Spy"
         '
         'ToolStripMenuItemBoston
