@@ -70,9 +70,9 @@ Namespace FBM
             StringSize = Me.Page.Diagram.MeasureString(Trim("[" & Me.Name & "]"), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
 
             If Me.Name = "" And (Me.X = 0 And Me.Y = 0) Then
-                loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(arRoleInstance.Shape.Bounds.X, arRoleInstance.Shape.Bounds.Y - (StringSize.Height * 2), StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
+                loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(arRoleInstance.Shape.Bounds.X, arRoleInstance.Shape.Bounds.Y - (StringSize.Height * 2), StringSize.Width, StringSize.Height + 2, MindFusion.Diagramming.Shapes.Rectangle)
             Else
-                loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
+                loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, StringSize.Width, StringSize.Height + 2, MindFusion.Diagramming.Shapes.Rectangle)
             End If
 
             loRoleName.HandlesStyle = HandlesStyle.InvisibleMove
@@ -101,8 +101,8 @@ Namespace FBM
             Me.X = Me.Shape.Bounds.X
             Me.Y = Me.Shape.Bounds.Y
 
-            If Math.Abs(Me.Shape.Bounds.X - arRoleInstance.Shape.Bounds.X) > 20 Or Math.Abs(Me.Shape.Bounds.Y - arRoleInstance.Shape.Bounds.Y) > 20 Then
-                Me.Move(arRoleInstance.Shape.Bounds.X - 2, arRoleInstance.Shape.Bounds.Y - 10, True)
+            If Math.Abs(Me.Shape.Bounds.X - arRoleInstance.Shape.Bounds.X) > 35 Or Math.Abs(Me.Shape.Bounds.Y - arRoleInstance.Shape.Bounds.Y) > 35 Then
+                Me.Move(arRoleInstance.Shape.Bounds.X - 4, arRoleInstance.Shape.Bounds.Y - 15, True)
             End If
 
         End Sub
@@ -173,7 +173,7 @@ Namespace FBM
                 Else
                     Me.Shape.Text = "[" & Trim(Me.RoleInstance.Name) & "]"
                 End If
-                Me.Shape.Resize(StringSize.Width, StringSize.Height)
+                Me.Shape.Resize(StringSize.Width, StringSize.Height + 2)
 
 
                 Me.Shape.TextColor = Color.Blue
@@ -182,15 +182,15 @@ Namespace FBM
                 Me.Shape.ZTop()
 
                 If Me.Y < 0 Then
-                    Me.Y = Me.RoleInstance.Shape.Bounds.Y - 8
+                    Me.Y = Me.RoleInstance.Shape.Bounds.Y - 12
                 End If
 
-                If Math.Abs(Me.X - Me.RoleInstance.X) > (15 + StringSize.Width) Then
-                    Me.X = Me.RoleInstance.X
+                If Math.Abs(Me.X - Me.RoleInstance.X) > (25 + StringSize.Width) Then
+                    Me.X = Me.RoleInstance.X - 4
                 End If
 
-                If Math.Abs(Me.Y - Me.RoleInstance.Y) > 15 Then
-                    Me.Y = Me.RoleInstance.Y - 8
+                If Math.Abs(Me.Y - Me.RoleInstance.Y) > 35 Then
+                    Me.Y = Me.RoleInstance.Y - 12
                 End If
 
                 Me.Shape.AllowOutgoingLinks = False

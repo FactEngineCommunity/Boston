@@ -1922,9 +1922,9 @@ Namespace FBM
                     Me.Page.Diagram.Nodes.Add(Me.FactTypeName.Shape)
                     loFactTypeName.Tag = Me.FactTypeName
 
-                    'CodeSafe-Use Experience
-                    If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 20 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 20 Then
-                        Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 12)
+                    'CodeSafe-User Experience
+                    If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 40 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 40 Then
+                        Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 17)
                     End If
 
                     '---------------------------------------------------------------------------

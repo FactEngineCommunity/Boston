@@ -149,6 +149,27 @@ Namespace RDS
         ''' </summary>
         Public IsDBRelation As Boolean = False
 
+        ''' <summary>
+        ''' Used only in reverse engineering at this stage. TypeDB specific at this stage.
+        ''' </summary>
+        Private _PrimarySupertype As String = Nothing
+        ''' <summary>
+        ''' Used primarily in reverse engineering. TypeDB specific at this stage. The primary supertype of the Table/Entity/Node
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PrimarySupertype As String
+            Get
+                If Me._PrimarySupertype IsNot Nothing Then
+                    Return Me._PrimarySupertype
+                Else
+                    Return Me.FBMModelElement.PrimarySupertypeName
+                End If
+            End Get
+            Set(value As String)
+                Me._PrimarySupertype = value
+            End Set
+        End Property
+
         Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
