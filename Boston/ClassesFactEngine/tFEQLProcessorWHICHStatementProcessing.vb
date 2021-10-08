@@ -1301,6 +1301,16 @@
                 End If
             End If
 
+            If arWHICHCLAUSE.KEYWDNO IsNot Nothing Then
+                arQueryEdge.IsSubQueryLeader = True
+                arQueryEdge.SubQueryAlias = Richmond.RandomString(5)
+            ElseIf arQueryGraph.QueryEdges.Count > 0 Then
+                If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
+                    arQueryEdge.IsPartOfSubQuery = True
+                    arQueryEdge.SubQueryAlias = arQueryGraph.QueryEdges.Last.SubQueryAlias
+                End If
+            End If
+
         End Sub
 #End Region
 
@@ -1559,7 +1569,7 @@
                     If arWhichClauseNode.Nodes(0).Nodes.Count > 0 Then
                         If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                            arWhichClauseNode.Nodes(0).Nodes(0).Token.Type = FEQL.TokenType.KEYWDTHAT And
-                           {FEQL.TokenType.KEYWDWHICH, FEQL.TokenType.KEYWDA, FEQL.TokenType.NODE}.Contains(arWhichClauseNode.Nodes(1).Token.Type) Then
+                           {FEQL.TokenType.KEYWDWHICH, FEQL.TokenType.KEYWDA, FEQL.TokenType.NODE, FEQL.TokenType.KEYWDNO}.Contains(arWhichClauseNode.Nodes(1).Token.Type) Then
                             'E.g. WHICH involves THAT Lecturer
                             Return FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
                         End If

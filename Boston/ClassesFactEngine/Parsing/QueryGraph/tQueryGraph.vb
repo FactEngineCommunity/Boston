@@ -922,7 +922,7 @@
                         If lrProjectColumn.Role.FactType.IsDerived Then
                             If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
                                 'for now
-                                lsSelectClause &= "$" & lrProjectColumn.Name
+                                lsSelectClause &= "$" & lrProjectColumn.Table.DatabaseName & lrProjectColumn.Name
                             Else
                                 lsSelectClause &= "$" & lrProjectColumn.Role.FactType.DBVariableName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                             End If
@@ -1063,6 +1063,7 @@
                 Dim larSubQueryNodes As List(Of FactEngine.QueryNode) = (From Node In larFromNodes
                                                                          Where Node.QueryEdge IsNot Nothing
                                                                          Where (Node.QueryEdge.IsSubQueryLeader Or Node.QueryEdge.IsPartOfSubQuery)
+                                                                         Where Not (Node.QueryEdge.IsSubQueryLeader And Node Is Node.QueryEdge.BaseNode And Me.ProjectionColumn.Select(Function(x) x.Table.Name).Contains(Node.Name))
                                                                          Select Node
                                                                         ).ToList
 
@@ -1709,8 +1710,8 @@
                 If (Not lbAddedAND And lbIntialWhere Is Nothing And
                     (larConditionalQueryEdges.Count > 0 And larWhereEdges.Count > 0)) Or
                     (Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive And larWhereEdges.Count > 0) Then
-                    lsSQLQuery &= "AND "
-                    lbIntialWhere = ""
+                    lsSQLQuery &= "AND " '20211008-VM-Was "AND " and Nothing below.
+                    lbIntialWhere = Nothing
                 End If
 
 #Region "WhereConditionals"
