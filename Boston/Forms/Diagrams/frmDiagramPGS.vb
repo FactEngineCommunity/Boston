@@ -72,7 +72,7 @@ Public Class frmDiagramPGS
             Dim larShapeNode As New List(Of ShapeNode)
 
             For Each lrShapeNode In Me.Diagram.Nodes
-                If lrShapeNode.GetType = GetType(PGS.Node) Then
+                If lrShapeNode.GetType = GetType(ShapeNode) Then
                     larShapeNode.Add(lrShapeNode)
                 End If
             Next

@@ -105,7 +105,7 @@ Public Class frmGlossary
             Me.ListBox1.Items.Add(lrValueType.Name)
         Next
 
-        For Each lrFactType In arModel.FactType.FindAll(Function(x) x.IsObjectified = True And x.IsMDAModelElement = False)
+        For Each lrFactType In arModel.FactType.FindAll(Function(x) (x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable)
             Me.ListBox1.Items.Add(lrFactType.Name)
         Next
 

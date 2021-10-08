@@ -856,70 +856,74 @@ Namespace FBM
                 Dim G As Graphics
                 Dim myFont As New Font(Me.Page.Diagram.Font.FontFamily, Me.Page.Diagram.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
 
-                If (Me.JoinedORMObject IsNot Nothing) Then
-                    If Me.Mandatory And (Me.Shape.OutgoingLinks.Count > 0) Then
-                        Me.Shape.OutgoingLinks(0).BaseShape = ArrowHead.Circle
-                    Else
-                        Me.Shape.OutgoingLinks(0).BaseShape = ArrowHead.None
-                    End If
+                Try
+                    If (Me.JoinedORMObject IsNot Nothing) Then
+                        If Me.Mandatory And (Me.Shape.OutgoingLinks.Count > 0) Then
+                            Me.Shape.OutgoingLinks(0).BaseShape = ArrowHead.Circle
+                        Else
+                            Me.Shape.OutgoingLinks(0).BaseShape = ArrowHead.None
+                        End If
 
-                    If Me.Deontic And (Me.Shape.OutgoingLinks.Count > 0) Then
-                        Me.Shape.OutgoingLinks(0).HeadShape = ArrowHead.Circle
-                    Else
-                        Me.Shape.OutgoingLinks(0).HeadShape = ArrowHead.None
+                        If Me.Deontic And (Me.Shape.OutgoingLinks.Count > 0) Then
+                            Me.Shape.OutgoingLinks(0).HeadShape = ArrowHead.Circle
+                        Else
+                            Me.Shape.OutgoingLinks(0).HeadShape = ArrowHead.None
+                        End If
                     End If
-                End If
+                Catch ex As Exception
+                    'Sometimes has no outgoing links.
+                End Try
 
                 If IsSomething(Me.RoleName) Then
-                    '------------------------------------------------------
-                    'RoleName is already displayed for the RoleInstance
-                    '------------------------------------------------------
-                    If Me.Role.Name <> "" Then
-                        Me.RoleName.Shape.Text = "[" & Me.Role.Name & "]"
-                        Me.RoleName.Shape.Resize(StringSize.Width, StringSize.Height)
-                    End If
-                Else
-                    '-----------------------------------------
-                    'Setup the RoleName for the RoleInstance
-                    '-----------------------------------------
-                    Dim loRoleName As ShapeNode
-
-                    G = Me.Page.Form.CreateGraphics
-
-                    StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Role.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-
-                    loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(Me.Shape.Bounds.X, Me.Shape.Bounds.Y - StringSize.Height, StringSize.Width, StringSize.Height)
-                    loRoleName.Shape = MindFusion.Diagramming.Shapes.Rectangle
-                    loRoleName.HandlesStyle = HandlesStyle.InvisibleMove
-                    If Trim(Me.Role.Name) <> "" Then
-                        loRoleName.Text = "[" & Trim(Me.Role.Name) & "]"
+                        '------------------------------------------------------
+                        'RoleName is already displayed for the RoleInstance
+                        '------------------------------------------------------
+                        If Me.Role.Name <> "" Then
+                            Me.RoleName.Shape.Text = "[" & Me.Role.Name & "]"
+                            Me.RoleName.Shape.Resize(StringSize.Width, StringSize.Height)
+                        End If
                     Else
-                        loRoleName.Text = ""
+                        '-----------------------------------------
+                        'Setup the RoleName for the RoleInstance
+                        '-----------------------------------------
+                        Dim loRoleName As ShapeNode
+
+                        G = Me.Page.Form.CreateGraphics
+
+                        StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Role.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+
+                        loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(Me.Shape.Bounds.X, Me.Shape.Bounds.Y - StringSize.Height, StringSize.Width, StringSize.Height)
+                        loRoleName.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                        loRoleName.HandlesStyle = HandlesStyle.InvisibleMove
+                        If Trim(Me.Role.Name) <> "" Then
+                            loRoleName.Text = "[" & Trim(Me.Role.Name) & "]"
+                        Else
+                            loRoleName.Text = ""
+                        End If
+                        loRoleName.TextColor = Color.Blue
+                        loRoleName.Transparent = True
+
+                        loRoleName.Visible = True
+                        loRoleName.ZTop()
+                        Dim lrRoleName As FBM.RoleName = New FBM.RoleName(Me, Me.Role.Name)
+                        lrRoleName.RoleInstance = Me
+                        loRoleName.Tag = lrRoleName
+                        '---------------------------------------------------------------------------
+                        'Attach the Role.RoleName ShapeNode to the Role ShapeGroup,                                    
+                        '---------------------------------------------------------------------------
+                        loRoleName.AttachTo(Me.Shape, AttachToNode.TopLeft)
+                        lrRoleName.Shape = loRoleName
+                        Me.RoleName = lrRoleName
                     End If
-                    loRoleName.TextColor = Color.Blue
-                    loRoleName.Transparent = True
 
-                    loRoleName.Visible = True
-                    loRoleName.ZTop()
-                    Dim lrRoleName As FBM.RoleName = New FBM.RoleName(Me, Me.Role.Name)
-                    lrRoleName.RoleInstance = Me
-                    loRoleName.Tag = lrRoleName
-                    '---------------------------------------------------------------------------
-                    'Attach the Role.RoleName ShapeNode to the Role ShapeGroup,                                    
-                    '---------------------------------------------------------------------------
-                    loRoleName.AttachTo(Me.Shape, AttachToNode.TopLeft)
-                    lrRoleName.Shape = loRoleName
-                    Me.RoleName = lrRoleName
-                End If
+                    If Me.FactType.IsLinkFactType Then
+                        Me.Shape.Pen.DashPattern = New Single() {4, 3, 4, 3}
+                    End If
 
-                If Me.FactType.IsLinkFactType Then
-                    Me.Shape.Pen.DashPattern = New Single() {4, 3, 4, 3}
-                End If
+                    Me.Page.Diagram.Invalidate()
 
-                Me.Page.Diagram.Invalidate()
-
-            Catch ex As Exception
-                Dim lsMessage As String
+                Catch ex As Exception
+                    Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
