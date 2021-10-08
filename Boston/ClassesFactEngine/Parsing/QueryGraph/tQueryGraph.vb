@@ -261,7 +261,7 @@
                         larUsedPredicatePart.Add(lrPredicatePart)
                         Select Case lrNode.FBMModelObject.GetType
                             Case Is = GetType(FBM.ValueType)
-                                lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrNode.DBVariableName & lrNode.Alias
+                                lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrFactType.getCorrespondingRDSTable.DatabaseName & lrNode.DBVariableName & lrNode.Alias
                             Case Else
                                 lsTDBQuery &= lrPredicatePart.Role.Name & ": $" & lrNode.RDSTable.DatabaseName & lrNode.Alias
                         End Select

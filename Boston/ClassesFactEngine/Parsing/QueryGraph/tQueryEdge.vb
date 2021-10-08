@@ -916,6 +916,63 @@ FinalCleanup:
 
         End Function
 
+        ''' <summary>
+        ''' Only used in last ditch effort to get predicate part when BaseNode, TargetNode and FBMFactType are known.
+        ''' </summary>
+        Public Sub getAndSetPredicatePart()
+
+            Try
+                If Me.BaseNode Is Nothing Or Me.TargetNode Is Nothing Or Me.FBMFactType Is Nothing Then
+                    Throw New Exception("Tried to get PredicatePart when at least one of BaseNode, TargetNode or FBMFactType is nothing.")
+                End If
+
+                Dim larModelElement As New List(Of FBM.ModelObject)
+                larModelElement.Add(Me.BaseNode.FBMModelObject)
+                larModelElement.Add(Me.TargetNode.FBMModelObject)
+
+                If Me.FBMFactTypeReading IsNot Nothing Then
+                    Dim lrPredicatePart As FBM.PredicatePart = Me.FBMFactTypeReading.PredicatePart.Find(Function(x) x.PredicatePartText = Me.Predicate)
+                Else
+                    Dim larRole As New List(Of FBM.Role)
+                    Dim lrFactTypeReading As FBM.FactTypeReading = Me.CreateFBMFactTypeReading(Me.BaseNode, Me.TargetNode, Me.Predicate, larModelElement, larRole)
+                    lrFactTypeReading.PredicatePart(1).PreBoundText = Me.TargetNode.PreboundText
+
+                    '========================================================
+                    Dim lrReturnFactTypeReading As FBM.FactTypeReading = Nothing
+                    Dim lrReturnPredicatePart As FBM.PredicatePart = Nothing
+
+                    Dim lrFactType As FBM.FactType = Me.QueryGraph.Model.getFactTypeByModelObjectsFactTypeReading(larModelElement,
+                                                                                                  lrFactTypeReading, False,
+                                                                                                  lrReturnFactTypeReading,
+                                                                                                  lrReturnPredicatePart)
+
+                    Me.FBMPredicatePart = lrReturnPredicatePart
+
+                    If Me.FBMPredicatePart Is Nothing Then
+
+                        'Likely PartialFactTypeMatch
+                        Dim larPredicatePart = From FactTypeReading In Me.FBMFactType.FactTypeReading
+                                               From PredicatePart In FactTypeReading.PredicatePart
+                                               Where PredicatePart.Role.JoinedORMObject Is larModelElement(0)
+                                               Select PredicatePart
+
+                        Me.FBMPredicatePart = larPredicatePart.First
+                        Me.FBMFactTypeReading = larPredicatePart.First.FactTypeReading
+                    End If
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                Throw New Exception(ex.Message)
+            End Try
+
+        End Sub
+
         Public Function RDSColumn() As RDS.Column
 
             Try

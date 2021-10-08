@@ -320,6 +320,24 @@
                 'Richmond.WriteToStatusBar("Generating SQL", True)                
                 Dim larQueryEdgeTypes = {FactEngine.pcenumWhichClauseType.ISClause, FactEngine.pcenumWhichClauseType.ISNOTClause}
 
+                'Try and fix ambiguities for PartialFactTypeMatch queries.
+                For liInd = lrQueryGraph.QueryEdges.Count - 1 To 0 Step -1
+                    If liInd > 0 Then
+                        Dim lrPreviousQueryEdge As FactEngine.QueryEdge = lrQueryGraph.QueryEdges(liInd).GetPreviousQueryEdge
+                        If lrPreviousQueryEdge.IsPartialFactTypeMatch And lrPreviousQueryEdge.FBMFactType Is lrQueryGraph.QueryEdges(liInd).FBMFactType Then
+                            If lrPreviousQueryEdge.AmbiguousFactTypeMatches.Count > 0 Then
+                                lrPreviousQueryEdge.AmbiguousFactTypeMatches.Clear()
+                                lrPreviousQueryEdge.ErrorMessage = Nothing
+
+                                If lrPreviousQueryEdge.FBMPredicatePart Is Nothing Then
+                                    Call lrPreviousQueryEdge.getAndSetPredicatePart()
+                                End If
+                            End If
+
+                        End If
+                    End If
+                Next
+
                 Dim larErroredQueryEdges = From QueryEdge In lrQueryGraph.QueryEdges
                                            Where QueryEdge.ErrorMessage IsNot Nothing Or (QueryEdge.FBMFactType Is Nothing And Not larQueryEdgeTypes.Contains(QueryEdge.WhichClauseSubType))
                                            Select QueryEdge
