@@ -1434,10 +1434,10 @@
                                                   Where QueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count
                                                   Select QueryEdge
 
-                larWhereEdges.AddRange(larSpecialDerivedQueryEdges.tolist)
+                larWhereEdges.AddRange(larSpecialDerivedQueryEdges.ToList)
 
 
-                    Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
                                                                                               x.TargetNode.MathFunction <> pcenumMathFunction.None))
                 '20210826-VM-Removed
