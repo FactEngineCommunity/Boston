@@ -508,6 +508,14 @@ PartialFactTypeMatch:
                         'Ambiguous, but might be resolved by the next PartialFactType match.
                         Me.FBMFactType = Me.FBMPossibleFactTypes.First
                         Return Nothing
+                    ElseIf Me.GetPreviousQueryEdge.IsPartialFactTypeMatch Then
+
+                        If Me.FBMPossibleFactTypes.Contains(Me.GetPreviousQueryEdge.FBMFactType) Then
+                            Me.FBMFactType = Me.GetPreviousQueryEdge.FBMFactType
+                            Call Me.getAndSetPredicatePart()
+                            Me.ErrorMessage = Nothing
+                            Me.AmbiguousFactTypeMatches.Clear()
+                        End If
                     ElseIf Not Me.GetPreviousQueryEdge.IsPartialFactTypeMatch Then
                         'Ambiguous, but might be resolved by the next PartialFactType match.
                         Me.FBMFactType = Me.FBMPossibleFactTypes.First
@@ -590,6 +598,9 @@ PartialFactTypeMatch:
                     Me.IsPartialFactTypeMatch = True
                     'Set the new BaseNode because the original one was fruitless.
                     lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMPredicatePart.Role.JoinedORMObject.Id, Me.BaseNode)
+                    If lrBaseNode Is Nothing Then
+                        lrBaseNode = Me.QueryGraph.FindPreviousQueryEdgeBaseNodeByModelElementName(Me.FBMFactType.Id, Me.BaseNode)
+                    End If
                     If lrBaseNode IsNot Nothing Then
                         Me.BaseNode = lrBaseNode
                     End If

@@ -781,7 +781,8 @@
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
-                                                  arQueryEdge.Predicate)
+                                                  arQueryEdge.Predicate,
+                                                  arPreviousTargetNode)
 
             If arQueryEdge.FBMFactType IsNot Nothing Then 'May be PartialFactTypeMatch and hasn't found the FactType yet.
                 If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then

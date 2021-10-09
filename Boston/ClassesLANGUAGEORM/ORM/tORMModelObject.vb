@@ -1012,6 +1012,8 @@ Namespace FBM
                 Case Is = GetType(FBM.FactType).ToString
                     If CType(Me, FBM.FactType).IsObjectified Then
                         Return CType(Me, FBM.FactType).getCorrespondingRDSTable
+                    ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
+                        Return CType(Me, FBM.FactType).getCorrespondingRDSTable
                     Else
                         Return Nothing
                     End If
