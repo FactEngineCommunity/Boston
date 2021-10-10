@@ -135,6 +135,7 @@ Namespace RDS
         ''' <summary>
         ''' TypeDB specific. The Roles 'played' by the Table.
         ''' </summary>
+        <NonSerialized()>
         Public RolesPlayed As New List(Of RDS.Plays)
 
         ''' <summary>

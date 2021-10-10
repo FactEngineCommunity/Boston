@@ -3703,7 +3703,9 @@ Public Class frmDiagramORM
             If e.Button = Windows.Forms.MouseButtons.Right Then
                 loSelectedNode = Diagram.GetNodeAt(lo_point)
                 Dim loSelectedLink As DiagramLink = Diagram.GetLinkAt(lo_point, 2)
-                If (loSelectedNode Is Nothing) And (loSelectedLink Is Nothing) Then
+                If Me.Diagram.Selection.Items.Count > 1 Then
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+                ElseIf (loSelectedNode Is Nothing) And (loSelectedLink Is Nothing) Then
                     Me.zrPage.SelectedObject.Clear()
                     Me.Diagram.Selection.Clear()
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
@@ -3726,20 +3728,20 @@ Public Class frmDiagramORM
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
                     '------------------------------------------------------------------------------------
                     loSelectedNode.Selected = True
-                    If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
-                        Me.zrPage.SelectedObject.Clear()
-                        Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
-                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
+                        If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
+                            Me.zrPage.SelectedObject.Clear()
+                            Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
+                            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
+                        End If
                     End If
+
+                    Exit Sub
                 End If
 
-                Exit Sub
-            End If
-
-            '--------------------------------------------------
-            'Just to be sure...set the Boston.WorkingPage
-            '--------------------------------------------------
-            prApplication.WorkingPage = Me.zrPage
+                '--------------------------------------------------
+                'Just to be sure...set the Boston.WorkingPage
+                '--------------------------------------------------
+                prApplication.WorkingPage = Me.zrPage
 
             If IsSomething(Diagram.GetNodeAt(lo_point)) Then
                 '----------------------------
@@ -11545,6 +11547,14 @@ Public Class frmDiagramORM
         Dim lrPage As New FBM.Page
         Dim loForm As Form
 
+        'CodeSafe
+        Me.ToolStripMenuItemCopyMultiple.Enabled = False
+
+        If Me.Diagram.Selection.Items.Count > 0 Then
+            Me.ToolStripMenuItemCopyMultiple.Enabled = True
+        End If
+
+
         Me.ContextMenuStrip_Diagram.ImageScalingSize = New Drawing.Size(16, 16)
 
         loForm = frmMain.DockPanel.ActiveDocument
@@ -11778,6 +11788,21 @@ Public Class frmDiagramORM
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemCopyMultiple_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopyMultiple.Click
+
+        Try
+            Call frmMain.CopySelectedObjectsToClipboard()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

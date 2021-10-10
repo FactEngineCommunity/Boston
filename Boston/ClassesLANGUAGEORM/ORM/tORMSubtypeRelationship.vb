@@ -76,6 +76,7 @@ Namespace FBM
                 lrSubtypeRelationship.EntityType = .EntityType.Clone(arModel, abAddToModel)
                 lrSubtypeRelationship.parentEntityType = .parentEntityType.Clone(arModel, abAddToModel)
                 lrSubtypeRelationship.FactType = .FactType.Clone(arModel, abAddToModel)
+                lrSubtypeRelationship.IsPrimarySubtypeRelationship = .IsPrimarySubtypeRelationship
                 lrSubtypeRelationship.isDirty = True
 
                 If abAddToModel Then

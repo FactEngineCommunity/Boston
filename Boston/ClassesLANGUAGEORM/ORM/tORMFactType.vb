@@ -546,13 +546,14 @@ Namespace FBM
 
                         For Each lrRoleConstraint In Me.InternalUniquenessConstraint
 
-                            If arModel IsNot Me.Model Then
-                                Dim lsUniqueId As String = arModel.CreateUniqueRoleConstraintName(lrRoleConstraint.Id, 0)
-
-                                lrRoleConstraint.Id = lsUniqueId
-                                lrRoleConstraint.Name = lsUniqueId
-                                lrRoleConstraint.Symbol = lsUniqueId
-                            End If
+                            '20211010-VM-Removed, because needs to be on the Paste side, which has been introduced into the Paste function.
+                            '  Remove if a suitable period of times and where definitely not required.
+                            'If arModel IsNot Me.Model Then
+                            '    Dim lsUniqueId As String = arModel.CreateUniqueRoleConstraintName(lrRoleConstraint.Id, 0)
+                            '    lrRoleConstraint.Id = lsUniqueId
+                            '    lrRoleConstraint.Name = lsUniqueId
+                            '    lrRoleConstraint.Symbol = lsUniqueId
+                            'End If
 
                             lrFactType.InternalUniquenessConstraint.Add(lrRoleConstraint.Clone(arModel, abAddToModel))
                         Next
