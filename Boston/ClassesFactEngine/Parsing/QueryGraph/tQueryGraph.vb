@@ -87,6 +87,8 @@
 
                 'Remove UnaryFactTypes from ProjectionColumns, because UnaryFactTypes in TypeDB store the OID rather than a field per se.
                 Me.ProjectionColumn.RemoveAll(Function(x) x.Table.FBMModelElement.isUnaryFactType And x.isPartOfPrimaryKey)
+
+                Me.ProjectionColumn.RemoveAll(Function(x) x.Table.FBMModelElement.GetType = GetType(FBM.FactType) And x.Role.FactType.Id = x.Table.Name)
 #End Region
 
 
@@ -117,7 +119,6 @@
 #End Region
 
 #Region "FromClause"
-
                 Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
 
                 'Circular/Recursive QueryEdges/TargetNodes are treated differently. See Recursive region below.
@@ -139,7 +140,34 @@
 
                 liInd = 0
                 For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not (x.FBMModelObject.IsDerived Or x.FBMModelObject.isUnaryFactType))
-                    lsTDBQuery &= "$" & lrQueryNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & " isa " & lrQueryNode.RDSTable.DatabaseName
+
+                    Select Case lrQueryNode.FBMModelObject.GetType
+                        Case Is = GetType(FBM.FactType)
+
+                            Dim larLinkFactTypeQueryEdge = From QueryEdge In Me.QueryEdges
+                                                           Where QueryEdge.FBMFactType.IsLinkFactType
+                                                           Where QueryEdge.FBMFactType.LinkFactTypeRole.FactType Is lrQueryNode.FBMModelObject
+                                                           Select QueryEdge
+
+                            lsTDBQuery &= "$" & lrQueryNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "")
+                            lsTDBQuery &= " ("
+
+                            Dim liInd2 As Integer = 0
+                            For Each lrLinkFactTypeQueryEdge In larLinkFactTypeQueryEdge
+                                If liInd2 > 0 Then lsTDBQuery &= ", "
+                                Dim lrNodeToUse As FactEngine.QueryNode = lrLinkFactTypeQueryEdge.TargetNode
+                                If lrNodeToUse Is lrQueryNode Then
+                                    lrNodeToUse = lrLinkFactTypeQueryEdge.BaseNode
+                                End If
+                                lsTDBQuery &= lrLinkFactTypeQueryEdge.FBMFactType.LinkFactTypeRole.Name & ": $" & lrNodeToUse.DBVariableName & lrLinkFactTypeQueryEdge.TargetNode.Alias
+                                liInd2 += 1
+                            Next
+
+                            lsTDBQuery &= ") isa " & lrQueryNode.RDSTable.DatabaseName
+
+                        Case Else
+                            lsTDBQuery &= "$" & lrQueryNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryNode.Alias, "") & " isa " & lrQueryNode.RDSTable.DatabaseName
+                    End Select
 
                     '----------------------------------------------------
                     'Return Columns
@@ -380,6 +408,9 @@
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                 x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
                 x.IsRDSTable Or x.IsDerived)
+
+                'Remove Link Fact Types
+                larWhereEdges.RemoveAll(Function(x) x.FBMFactType.IsLinkFactType)
 
                 'Add special DerivedFactType WhereEdges
                 Dim larSpecialDerivedQueryEdges = From QueryEdge In Me.QueryEdges
