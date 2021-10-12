@@ -1076,14 +1076,16 @@ Namespace FBM
                                         lrIndex = larExistingIndex.First
                                     End If
 
-                                    For Each lrColumn In larAddedColumns
-                                        Call lrIndex.addColumn(lrColumn)
-                                    Next
+                                    If lrIndex IsNot Nothing Then
+                                        For Each lrColumn In larAddedColumns
+                                            Call lrIndex.addColumn(lrColumn)
+                                        Next
+                                    End If
                                 End If
 #End Region
 
-                                'Relation
-                                Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
+                                    'Relation
+                                    Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
 
                             ElseIf arRoleConstraint.RoleConstraintRole.Count = 1 _
                                    And arRoleConstraint.RoleConstraintRole(0).Role.FactType.Is1To1BinaryFactType Then
