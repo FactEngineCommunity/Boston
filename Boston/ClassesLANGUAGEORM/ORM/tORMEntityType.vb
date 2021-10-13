@@ -1270,7 +1270,8 @@ Namespace FBM
         End Sub
 
 
-        Public Function CreateSubtypeRelationship(ByVal arParentEntityType As FBM.EntityType) As FBM.tSubtypeRelationship
+        Public Function CreateSubtypeRelationship(ByVal arParentEntityType As FBM.EntityType,
+                                                  Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False) As FBM.tSubtypeRelationship
 
             Try
 
@@ -1279,6 +1280,7 @@ Namespace FBM
                 lrSubtypeRelationship.Model = Me.Model
                 lrSubtypeRelationship.EntityType = Me
                 lrSubtypeRelationship.parentEntityType = arParentEntityType
+                lrSubtypeRelationship.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
 
                 Me.parentModelObjectList.Add(arParentEntityType)
                 arParentEntityType.childModelObjectList.Add(Me)

@@ -167,5 +167,14 @@
     <Setting Name="PGSShowForeignKeyProperties" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="ReverseEngineeringCreateEntityTypesForTablesWithNoColumns" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ReverseEngineeringDefaultReferenceMode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Iid</Value>
+    </Setting>
+    <Setting Name="ReverseEngineeringDefaultPrimaryKeyDataType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OtherObjectID</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

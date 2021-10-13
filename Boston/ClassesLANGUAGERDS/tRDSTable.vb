@@ -132,6 +132,12 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property HasPrimaryKeyIndex As Boolean
+            Get
+                Return Me.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing
+            End Get
+        End Property
+
         ''' <summary>
         ''' TypeDB specific. The Roles 'played' by the Table.
         ''' </summary>
@@ -305,7 +311,6 @@ Namespace RDS
                             Call lrRelation.setDestinationTable(Me)
                         End If
                     Next
-
 
                     Dim lrNewColumn = lrColumn.Clone(Me, Nothing)
                     lrNewColumn.Relation.AddRange(lrColumn.Relation)

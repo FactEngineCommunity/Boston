@@ -421,6 +421,8 @@ Namespace FactEngine.TypeDB
                             'Not a Biggie at this stage, but will negate getting Role Names.
                         End Try
 
+                        Dim lrSupertype = client.getSuperType(lrTable.Name)
+                        lrTable.PrimarySupertype = lrSupertype.Label
 
                         larTable.Add(lrTable)
                     End If
@@ -451,6 +453,9 @@ Namespace FactEngine.TypeDB
                         Next
 
                         lrTable.IsDBRelation = True
+
+                        Dim lrSupertype = client.getSuperType(lrTable.Name)
+                        lrTable.PrimarySupertype = lrSupertype.Label
 
                         larTable.Add(lrTable)
                         'End If

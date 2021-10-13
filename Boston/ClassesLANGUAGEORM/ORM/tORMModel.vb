@@ -873,45 +873,53 @@ Namespace FBM
                                     End If
 
                                     'There may be a case where an Index should have already contained the columns.
-#Region "Check...An Index should have already contained the New Columns.A"
-                                    Dim larExistingIndexRoleConstraint = From RoleConstraint In Me.RoleConstraint
-                                                                         From RoleConsraintRole In RoleConstraint.RoleConstraintRole
-                                                                         Where lrRole.FactType.RoleGroup.Contains(RoleConsraintRole.Role)
-                                                                         Select RoleConstraint
+#Region "Check...An Index should have already contained the New Columns."
 
-                                    If larExistingIndexRoleConstraint.Count > 0 Then
-                                        Dim lrResponsibleRoleConstraint = larExistingIndexRoleConstraint.First
-                                        Dim lrIndex As RDS.Index = Nothing
-                                        Dim larExistingIndex = From Index In Me.RDS.Index
-                                                               From Column In Index.Column
-                                                               Where Index.ResponsibleRoleConstraint Is lrResponsibleRoleConstraint
-                                                               Select Index
+                                    'Restrict to unary FactTypes at this stage.
+                                    If lrRole.FactType.IsUnaryFactType Then
+                                        Dim larExistingIndexRoleConstraint = From RoleConstraint In Me.RoleConstraint
+                                                                             From RoleConsraintRole In RoleConstraint.RoleConstraintRole
+                                                                             Where lrRole.FactType.RoleGroup.Contains(RoleConsraintRole.Role)
+                                                                             Select RoleConstraint
 
-                                        'ResponsibleRoleConstraint not implemented at CMML level, so need other way of finding Index.
-                                        If larExistingIndex.Count = 0 Then
-                                            Dim larRCFactTypes = (From Role In lrResponsibleRoleConstraint.Role
-                                                                  Select Role.FactType).ToList
+                                        If larExistingIndexRoleConstraint.Count > 0 Then
+                                            Dim lrIndex As RDS.Index = Nothing
+                                            Dim lrResponsibleRoleConstraint = larExistingIndexRoleConstraint.First
 
-                                            larExistingIndex = From Index In Me.RDS.Index
-                                                               From Column In Index.Column
-                                                               Where larRCFactTypes.Contains(Column.Role.FactType)
-                                                               Select Index
+                                            Dim larExistingIndex = From Index In Me.RDS.Index
+                                                                   From Column In Index.Column
+                                                                   Where Index.ResponsibleRoleConstraint Is lrResponsibleRoleConstraint
+                                                                   Select Index
 
-                                            If larExistingIndex.Count > 0 Then
-                                                lrIndex = larExistingIndex.First
-                                            Else
-                                                'Not a biggie at this stage, but do need to fix this.
-                                                'CodeSafe: Create the index.
-                                                Dim larIndexColumn As New List(Of RDS.Column)
-                                                larIndexColumn.Add(lrColumn)
+                                            'ResponsibleRoleConstraint not implemented at CMML level, so need other way of finding Index.
+                                            If larExistingIndex.Count = 0 Then
+                                                Dim larRCFactTypes = (From Role In lrResponsibleRoleConstraint.Role
+                                                                      Select Role.FactType).ToList
 
-                                                Dim lsQualifier As String = lrTable.generateUniqueQualifier("PK")
-                                                Dim lbIsPrimaryKey As Boolean = True
-                                                Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
-                                                lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
+                                                larExistingIndex = From Index In Me.RDS.Index
+                                                                   From Column In Index.Column
+                                                                   Where larRCFactTypes.Contains(Column.Role.FactType)
+                                                                   Select Index
 
-                                                'Add the new Index
-                                                lrIndex = New RDS.Index(lrTable,
+                                                If larExistingIndex.Count > 0 Then
+                                                    lrIndex = larExistingIndex.First
+                                                Else
+                                                    lrIndex = lrTable.Index.Find(Function(x) x.IsPrimaryKey)
+
+                                                    If lrIndex Is Nothing Then
+
+                                                        'Not a biggie at this stage, but do need to fix this.
+                                                        'CodeSafe: Create the index.
+                                                        Dim larIndexColumn As New List(Of RDS.Column)
+                                                        larIndexColumn.Add(lrColumn)
+
+                                                        Dim lsQualifier As String = lrTable.generateUniqueQualifier("PK")
+                                                        Dim lbIsPrimaryKey As Boolean = True
+                                                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                                        lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
+
+                                                        'Add the new Index
+                                                        lrIndex = New RDS.Index(lrTable,
                                                                         lsIndexName,
                                                                         lsQualifier,
                                                                         pcenumODBCAscendingOrDescending.Ascending,
@@ -922,22 +930,21 @@ Namespace FBM
                                                                         False,
                                                                         True)
 
-                                                Call lrTable.addIndex(lrIndex)
+                                                        Call lrTable.addIndex(lrIndex)
+                                                    End If
+                                                End If
+                                            Else
+                                                lrIndex = larExistingIndex.First
                                             End If
-                                        Else
-                                            lrIndex = larExistingIndex.First
-                                        End If
 
-                                        If lrIndex IsNot Nothing Then
-                                            Call lrIndex.addColumn(lrColumn)
+                                            If lrIndex IsNot Nothing Then
+                                                Call lrIndex.addColumn(lrColumn)
+                                            End If
                                         End If
-
                                     End If
 #End Region
-
                                     'Relation
                                     If lrRole.FactType.Arity = 1 Then
-
                                         Call Me.generateRelationManyTo1ForUnaryFactType(lrRole)
 
                                     ElseIf lrRole.FactType.Arity = 2 _
@@ -947,54 +954,54 @@ Namespace FBM
                                         Call Me.generateRelationForManyTo1BinaryFactType(lrRole)
 
                                     ElseIf lrRole.FactType.Arity = 2 _
-                                         And lrRole.FactType.InternalUniquenessConstraint.Count = 2 _
-                                         And Not lrRole.FactType.IsPreferredReferenceMode Then
+                                     And lrRole.FactType.InternalUniquenessConstraint.Count = 2 _
+                                     And Not lrRole.FactType.IsPreferredReferenceMode Then
 
                                         Dim larRelation = From Relation In Me.RDS.Relation
-                                                          Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
-                                                          Select Relation
+                                                              Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
+                                                              Select Relation
 
-                                        If larRelation.Count = 0 Then
-                                            'No Relation exists for the 1:1 FactType.
-                                            Call Me.generateRelationFor1To1BinaryFactType(lrRole)
-                                        Else
-                                            Dim lrRelation As RDS.Relation = larRelation.First
+                                            If larRelation.Count = 0 Then
+                                                'No Relation exists for the 1:1 FactType.
+                                                Call Me.generateRelationFor1To1BinaryFactType(lrRole)
+                                            Else
+                                                Dim lrRelation As RDS.Relation = larRelation.First
 
-                                            Call lrRelation.setOriginMultiplicity(pcenumCMMLMultiplicity.One)
-                                            Call lrRelation.setDestinationMultiplicity(pcenumCMMLMultiplicity.One)
-                                            Call lrRelation.establishReverseColumns()
+                                                Call lrRelation.setOriginMultiplicity(pcenumCMMLMultiplicity.One)
+                                                Call lrRelation.setDestinationMultiplicity(pcenumCMMLMultiplicity.One)
+                                                Call lrRelation.establishReverseColumns()
 
-                                            Dim larDestinationColumn As New List(Of RDS.Column)
-                                            larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True) '20210505-VM-Was ContributesToPrimaryKey
+                                                Dim larDestinationColumn As New List(Of RDS.Column)
+                                                larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True) '20210505-VM-Was ContributesToPrimaryKey
 
-                                            For Each lrOriginColumn In larDestinationColumn
-                                                For Each lrColumn In lrRelation.DestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                                                    lrColumn.Relation.AddUnique(lrRelation)
+                                                For Each lrOriginColumn In larDestinationColumn
+                                                    For Each lrColumn In lrRelation.DestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                                                        lrColumn.Relation.AddUnique(lrRelation)
+                                                    Next
                                                 Next
-                                            Next
 
-                                        End If
+                                            End If
 
-                                    End If 'Relation
+                                        End If 'Relation
 
-                                    'Index 
-                                    If arRoleConstraint.FirstRoleConstraintRoleFactType.Is1To1BinaryFactType Then
-                                        Dim larIndexColumn As New List(Of RDS.Column)
-                                        Dim lrFirstRole = arRoleConstraint.FirstRoleConstraintRole
+                                        'Index 
+                                        If arRoleConstraint.FirstRoleConstraintRoleFactType.Is1To1BinaryFactType Then
+                                            Dim larIndexColumn As New List(Of RDS.Column)
+                                            Dim lrFirstRole = arRoleConstraint.FirstRoleConstraintRole
 
-                                        Dim larColumn = From Column In lrTable.Column
-                                                        Where Column.Role.Id = lrFirstRole.Id
-                                                        Select Column
+                                            Dim larColumn = From Column In lrTable.Column
+                                                            Where Column.Role.Id = lrFirstRole.Id
+                                                            Select Column
 
-                                        larIndexColumn.Add(larColumn.First)
+                                            larIndexColumn.Add(larColumn.First)
 
-                                        Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
-                                        Dim lbIsPrimaryKey As Boolean = False
-                                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
-                                        lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
+                                            Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
+                                            Dim lbIsPrimaryKey As Boolean = False
+                                            Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                            lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
 
-                                        'Add the new Index
-                                        Dim lrIndex As New RDS.Index(lrTable,
+                                            'Add the new Index
+                                            Dim lrIndex As New RDS.Index(lrTable,
                                                                  lsIndexName,
                                                                  lsQualifier,
                                                                  pcenumODBCAscendingOrDescending.Ascending,
@@ -1005,12 +1012,12 @@ Namespace FBM
                                                                  False,
                                                                  True)
 
-                                        Call lrTable.addIndex(lrIndex)
+                                            Call lrTable.addIndex(lrIndex)
+                                        End If
+
                                     End If
 
-                                End If
-
-                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
+                                ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
                                arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
                                Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
 

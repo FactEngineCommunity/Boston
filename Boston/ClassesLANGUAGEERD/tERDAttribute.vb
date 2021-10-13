@@ -254,10 +254,18 @@ Namespace ERD
                 Dim lsPartOfPrimaryKey As String = ""
                 Dim lsMandatory As String = ""
 
-                If Me.PartOfPrimaryKey Then
-                    lsPartOfPrimaryKey = "#"
+                If Me.Entity.RDSTable.HasPrimaryKeyIndex Then
+                    If Me.Entity.RDSTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Contains(Me.Column) Then
+                        lsPartOfPrimaryKey = "#"
+                    Else
+                        lsPartOfPrimaryKey = ""
+                    End If
                 Else
-                    lsPartOfPrimaryKey = ""
+                    If Me.Column.isPartOfPrimaryKey Then
+                        lsPartOfPrimaryKey = "#"
+                    Else
+                        lsPartOfPrimaryKey = ""
+                    End If
                 End If
 
                 If Me.Mandatory Then

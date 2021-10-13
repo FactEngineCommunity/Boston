@@ -662,6 +662,7 @@ Public Class frmCRUDModel
             End If
 
             Me.RichTextBoxREMessages.ScrollToCaret()
+            Me.Invalidate()
 
         Catch ex As Exception
 

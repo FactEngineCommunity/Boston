@@ -79,6 +79,7 @@ Public Class ODBCDatabaseReverseEngineer
         ' * Get the Relations for the TempModel Tables
         ' * Order the TempModel Tables by their relations. Those that have no relations first.
         ' * Create EntityTypes for those Tables that have a Single Column PrimaryKey.
+        ' * Create EntityTypes for those Tables that are not subtypes of other tables and have no Columns
         ' * For each Table in TempModel Tables (by their sorted order)
         '     * Create the ValueTypes for Columns that that are ValueTypes (even if they are referenced by a Relation)
         '         Value Types are, in this instance,:
@@ -136,7 +137,13 @@ Public Class ODBCDatabaseReverseEngineer
             '------------------------------------------------------------------------------
             'Create EntityTypes for each Table with a PrimaryKey with one Column.
             Call Me.createTablesForSingleColumnPKTables()
-            Call Me.SetProgressBarValue(60, "Created Tables for Single Primary Key Column Tables.")
+            Call Me.SetProgressBarValue(60, "Created Entit Types/Tables for Single Primary Key Column Tables.")
+
+            'Create EntityTypes for those Tables that are not subtypes of other tables and have no Columns
+            If My.Settings.ReverseEngineeringCreateEntityTypesForTablesWithNoColumns Then
+                Call Me.createEntityTypesForTablesThatAreNotSubtypesOfOtherTablesAndHaveNoColumns
+                Call Me.SetProgressBarValue(65, "Created Entity Types/Tables for those Tables that are not subtypes of other tables and have no Columns")
+            End If
 
             Call Me.SetProgressBarValue(70, "Creating other Value Types. ")
 
@@ -276,30 +283,30 @@ Public Class ODBCDatabaseReverseEngineer
                             '       End If
                             '   Next Column
                             Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTable.Name)
-                                Dim larCoveredColumn As New List(Of RDS.Column)
-                                For Each lrTempColumn In lrTable.getPrimaryKeyColumns
+                            Dim larCoveredColumn As New List(Of RDS.Column)
+                            For Each lrTempColumn In lrTable.getPrimaryKeyColumns
 
-                                    If lrTempColumn.hasOutboundRelation Then
-                                        Dim lrTempColumPointsToTable As RDS.Table = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table).DestinationTable
-                                        Dim lrTempRelation As RDS.Relation = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table)
+                                If lrTempColumn.hasOutboundRelation Then
+                                    Dim lrTempColumPointsToTable As RDS.Table = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table).DestinationTable
+                                    Dim lrTempRelation As RDS.Relation = lrTempColumn.Relation.Find(Function(x) x.OriginTable Is lrTempColumn.Table)
 
-                                        Dim larColumn = From Relation In Me.Model.RDS.Relation
-                                                        From Column In Relation.OriginColumns
-                                                        Where Relation.OriginTable.Name = lrTable.Name
-                                                        Where Relation.OriginColumns(0).isPartOfPrimaryKey
-                                                        Where Relation.DestinationTable.Name = lrTempColumPointsToTable.Name
-                                                        Where Not larCoveredColumn.Contains(Column)
-                                                        Select Column
+                                    Dim larColumn = From Relation In Me.Model.RDS.Relation
+                                                    From Column In Relation.OriginColumns
+                                                    Where Relation.OriginTable.Name = lrTable.Name
+                                                    Where Relation.OriginColumns(0).isPartOfPrimaryKey
+                                                    Where Relation.DestinationTable.Name = lrTempColumPointsToTable.Name
+                                                    Where Not larCoveredColumn.Contains(Column)
+                                                    Select Column
 
-                                        Dim lrColumn = larColumn.First
-                                        lrColumn.setName(lrTempColumn.Name)
+                                    Dim lrColumn = larColumn.First
+                                    lrColumn.setName(lrTempColumn.Name)
 
-                                        larCoveredColumn.Add(lrColumn)
-                                    End If
-                                Next
+                                    larCoveredColumn.Add(lrColumn)
+                                End If
+                            Next
 
-                            Else
-                                Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
+                        Else
+                            Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
                             If lrTable.getPrimaryKeyColumns.Count > 0 Then
                                 lsMessage.AppendString(" Can't find Model Elements for the following: ")
                                 For Each lrColumn In lrTable.getPrimaryKeyColumns
@@ -317,11 +324,15 @@ Public Class ODBCDatabaseReverseEngineer
 #End Region
             Next
 
+            'Create Subtype Relationships
+            Call Me.createSubtypeRelationships
+
             '-----------------------------------------------------------------------------
             'Create Tables for all missing Tables.
             Call Me.SetProgressBarValue(85, "Creating Tables/Objectified Fact Types for remaining Tables/Relations.")
             '20211001-VM-Add code here for instance for Periodic-Event in TypeDB Social Network, where the PrimaryKey is
             'not for what it relates, but rather the Columns, Start-Date and End-Date.
+            Call Me.createTablesForAllMissingTables
 
             '-----------------------------------------------------------------------------
             'Create FactTypes for all other Relations.
@@ -465,6 +476,187 @@ Public Class ODBCDatabaseReverseEngineer
         Return True
 
     End Function
+
+
+    '20211001-VM-Add code here for instance for Periodic-Event in TypeDB Social Network, where the PrimaryKey is
+    'not for what it relates, but rather the Columns, Start-Date and End-Date.
+    Private Sub createTablesForAllMissingTables()
+
+        Try
+            Dim larTablesToCreate = From Table In Me.TempModel.RDS.Table
+                                    Where Table.IsDBRelation
+                                    Where Table.RelatedRoleNames.Count = 0
+                                    Select Table
+
+            For Each lrTable In larTablesToCreate
+
+                'Create an ObjectifiedFactType
+                Dim lrFactType As FBM.FactType
+
+                Dim lrModelElement As FBM.ModelObject = Nothing
+                Dim larModelObject As New List(Of FBM.ModelObject)
+
+                For Each lrColumn In lrTable.Column
+                    If lrColumn.hasOutboundRelation Then
+                        Dim lrRelation = lrColumn.Relation.Find(Function(x) x.OriginTable IsNot Nothing)
+                        Dim lrDestinationTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
+
+                        If lrDestinationTable Is Nothing Then
+                            Throw New Exception($"Creating Objectified Fact Types. For: {lrTable.Name}. Destination Table does not exist: " & lrRelation.DestinationTable.Name)
+                        End If
+
+                        lrModelElement = lrDestinationTable.FBMModelElement
+                        If lrModelElement Is Nothing Then
+                            lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+                        End If
+                    Else
+                        lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+                    End If
+
+                    If lrModelElement.isReferenceModeValueType Then
+                        lrModelElement = Me.Model.getEntityTypeByReferenceModeValueType(lrModelElement)
+                    End If
+                    larModelObject.Add(lrModelElement)
+                Next
+
+                'FactTypes joining FactTypes only have one Role. See TimetableBookings FT in University model.
+                Dim larFTModelElement = (From ModelElement In larModelObject
+                                         Where ModelElement.GetType = GetType(FBM.FactType)
+                                         Select ModelElement Distinct).ToList
+
+                If larFTModelElement.Count > 0 Then
+                    While larModelObject.Contains(larFTModelElement.First) And larModelObject.FindAll(Function(x) x Is larFTModelElement.First).Count > 1
+                        larModelObject.Remove(larFTModelElement.First)
+                    End While
+                End If
+
+                If larModelObject.Count > 0 Then
+
+                    lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
+                    Me.Model.AddFactType(lrFactType)
+                    lrFactType.Objectify(True) 'Add to model first, so LinkFactTypes have something to join to.
+
+                    'Create the internalUniquenessConstraint.
+                    Dim larRole As New List(Of FBM.Role)
+                    For Each lrRole In lrFactType.RoleGroup
+                        larRole.Add(lrRole)
+                    Next
+                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+
+                    '-----------------------------------------------------------------------------------------------
+                    'Create the FactTypeReading                            
+                    If lrFactType.Arity <= 4 Then
+                        Dim larRoleGroupPermutations As IEnumerable(Of IEnumerable(Of FBM.Role))
+
+                        larRoleGroupPermutations = lrFactType.RoleGroup.Permute
+
+                        Dim liInd = 1
+                        For Each larRoleGroup In larRoleGroupPermutations
+                            If liInd <= 3 Then
+                                Dim lrSentence As New Language.Sentence("random sentence")
+                                Dim liInd2 = 1
+                                For Each lrRole In larRoleGroup.ToList
+                                    If liInd2 < larRoleGroup.ToList.Count Then
+                                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                    Else
+                                        lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                    End If
+                                    liInd2 += 1
+                                Next
+                                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRoleGroup.ToList, lrSentence)
+                                lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                            End If
+                            liInd += 1
+                        Next
+                    End If
+
+                Else
+                    Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
+                    If lrTable.Column.Count > 0 Then
+                        lsMessage.AppendString(" Can't find Model Elements for the following: ")
+                        For Each lrColumn In lrTable.Column
+                            lsMessage.AppendLine(lrColumn.Name)
+                        Next
+                    Else
+                        lsMessage.AppendString(" Table has no primary key columns")
+                    End If
+
+                    Call Me.ReportError(lsMessage)
+                End If
+
+            Next
+
+        Catch ex As Exception
+            Me.ReportError(ex.Message & vbCrLf & ex.StackTrace)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' Creates Entity Types For Tables That Are Not Subtypes Of Other Tables And Have No Columns
+    ''' </summary>
+    Private Sub createEntityTypesForTablesThatAreNotSubtypesOfOtherTablesAndHaveNoColumns()
+
+        Try
+            Dim larTablesToCreate = From Table In Me.TempModel.RDS.Table
+                                    Where Table.PrimarySupertype = "Entity"
+                                    Where Table.Column.Count = 0
+
+
+            For Each lrTable In larTablesToCreate
+
+                Dim lrEntityType As FBM.EntityType
+                lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
+                Me.Model.AddEntityType(lrEntityType, True)
+                lrEntityType.SetDBName(lrTable.DatabaseName)
+
+                Dim lsValueTypeName As String
+                Dim lsReferenceMode As String = ""
+                lsValueTypeName = My.Settings.ReverseEngineeringDefaultReferenceMode
+                lsReferenceMode = lsValueTypeName
+
+                Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(My.Settings.ReverseEngineeringDefaultPrimaryKeyDataType)
+
+                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
+                lrEntityType.ReferenceModeValueType.SetDBName(My.Settings.ReverseEngineeringDefaultReferenceMode)
+
+            Next
+
+        Catch ex As Exception
+            Me.ReportError(ex.Message & vbCrLf & ex.StackTrace)
+        End Try
+    End Sub
+
+
+    Private Sub createSubtypeRelationships()
+
+        Try
+            For Each lrTable In Me.TempModel.RDS.Table
+
+                Dim lrBaseModelelement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrTable.Name)
+                Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrTable.PrimarySupertype)
+
+                If lrBaseModelelement IsNot Nothing Then
+                    Select Case lrBaseModelelement.GetType
+                        Case Is = GetType(FBM.EntityType)
+                            If lrModelElement IsNot Nothing Then
+
+                                Select Case lrModelElement.GetType
+                                    Case Is = GetType(FBM.EntityType)
+
+                                        'Create the Subtype Relationship
+                                        Call CType(lrBaseModelelement, FBM.EntityType).CreateSubtypeRelationship(CType(lrModelElement, FBM.EntityType), False)
+                                End Select
+                            End If
+                    End Select
+                End If
+            Next
+
+        Catch ex As Exception
+            Me.ReportError(ex.Message & vbCrLf & ex.StackTrace)
+        End Try
+
+    End Sub
 
     Private Sub createFactTypesForAllOtherRelations()
 
@@ -868,6 +1060,8 @@ Skip: 'Because is not a ValueType
                     lrColumn.DatabaseName = lrColumn.Name
                     lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
                 Next
+
+                lrTable.PrimarySupertype = Viev.Strings.MakeCapCamelCase(lrTable.PrimarySupertype)
             Next
 
 

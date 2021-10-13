@@ -613,6 +613,8 @@ Namespace RDS
 
                     If Not lrTable.IsPartOfPrimarySubtypeRelationshipPath(Me.Table) Then
                         Return False
+                    ElseIf lrTable IsNot Me.Table And lrTable IsNot Me.Table.FBMModelElement.GetTopmostNonAbsorbedSupertype Then
+                        Return False
                     Else
                         Return lrTable.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
                     End If

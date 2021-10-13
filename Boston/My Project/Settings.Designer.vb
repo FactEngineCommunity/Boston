@@ -713,6 +713,42 @@ Namespace My
                 Me("PGSShowForeignKeyProperties") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ReverseEngineeringCreateEntityTypesForTablesWithNoColumns() As Boolean
+            Get
+                Return CType(Me("ReverseEngineeringCreateEntityTypesForTablesWithNoColumns"),Boolean)
+            End Get
+            Set
+                Me("ReverseEngineeringCreateEntityTypesForTablesWithNoColumns") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Iid")>  _
+        Public Property ReverseEngineeringDefaultReferenceMode() As String
+            Get
+                Return CType(Me("ReverseEngineeringDefaultReferenceMode"),String)
+            End Get
+            Set
+                Me("ReverseEngineeringDefaultReferenceMode") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("OtherObjectID")>  _
+        Public Property ReverseEngineeringDefaultPrimaryKeyDataType() As String
+            Get
+                Return CType(Me("ReverseEngineeringDefaultPrimaryKeyDataType"),String)
+            End Get
+            Set
+                Me("ReverseEngineeringDefaultPrimaryKeyDataType") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
