@@ -174,13 +174,13 @@ Namespace Parser.Meta.Database
                             Else
                                 Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.Id = aarSchemaRow(liInd).ColumnId)
                                 lsDestinationColumnName = lrDestinationColumn.Name
-                                Dim lrOriginColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id)
+                                Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id)
                                 If lrOriginColumn Is Nothing Then
                                     Throw New Exception("No destination column found for relationship with originating column:" & lrOriginColumn.Table.Name & "." & lrOriginColumn.Name)
                                 End If
                                 lsOriginColumnName = lrOriginColumn.Name
                                 lsDestinationRoleName = lrDestinationColumn.Role.DerivedRoleName
-                                lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrDestinationColumn.Role.Id).DerivedRoleName
+                                lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
                             End If
 
                             If Me.IncomingRelation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then

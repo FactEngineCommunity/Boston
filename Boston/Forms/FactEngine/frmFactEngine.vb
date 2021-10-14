@@ -71,6 +71,8 @@ Public Class frmFactEngine
         Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
         Me.ToolStripStatusLabelError.Text = ""
 
+        Call Me.SetupForm()
+
     End Sub
 
 
@@ -1447,6 +1449,18 @@ Public Class frmFactEngine
                             Dim lrWHICHSELECTStatement As New FEQL.WHICHSELECTStatement
                             Call Me.FEQLProcessor.GetParseTreeTokensReflection(lrWHICHSELECTStatement, Me.zrTextHighlighter.Tree.Nodes(0))
 
+                            'Set intellisense to predicate if at Predicate token.
+                            If Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.PREDICATE Then
+
+                                Dim lrPredicateClauseParseNode = larModelPredicateClauseParseNode.Last
+                                Dim larPredicateNode = New List(Of FEQL.ParseNode)
+                                Call Me.GetPredicateNodes(lrPredicateClauseParseNode, larPredicateNode)
+                                Dim lasPredicate = (From PredicateNode In larPredicateNode
+                                                    Select Trim(PredicateNode.Token.Text)).ToArray
+
+                                Me.zsIntellisenseBuffer = Trim(Strings.Join(lasPredicate, " "))
+                            End If
+
                             If lrWHICHSELECTStatement.WHICHCLAUSE.Count = 0 Then
                                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrWHICHSELECTStatement.MODELELEMENTNAME(0))
 
@@ -2311,6 +2325,21 @@ Public Class frmFactEngine
         lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
         Me.AutoComplete.Location = PointToScreen(lo_point)
         Me.TextBoxInput.Focus()
+    End Sub
+
+    Private Sub SetupForm()
+
+        Try
+            Me.ToolStripMenuItemAutoCapitalise.Checked = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub TextBoxInput_GotFocus(sender As Object, e As EventArgs) Handles TextBoxInput.GotFocus

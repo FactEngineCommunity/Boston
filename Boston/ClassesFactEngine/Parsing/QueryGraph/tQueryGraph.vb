@@ -88,7 +88,7 @@
                 'Remove UnaryFactTypes from ProjectionColumns, because UnaryFactTypes in TypeDB store the OID rather than a field per se.
                 Me.ProjectionColumn.RemoveAll(Function(x) x.Table.FBMModelElement.isUnaryFactType And x.isPartOfPrimaryKey)
 
-                Me.ProjectionColumn.RemoveAll(Function(x) x.Table.FBMModelElement.GetType = GetType(FBM.FactType) And x.Role.FactType.Id = x.Table.Name)
+                Me.ProjectionColumn.RemoveAll(Function(x) x.Table.FBMModelElement.GetType = GetType(FBM.FactType) And x.Role.FactType.Id = x.Table.Name And x.Role.JoinedORMObject.GetType <> GetType(FBM.ValueType))
 #End Region
 
 

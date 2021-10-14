@@ -1341,7 +1341,7 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
 
                 'Make sure all the Pages for the Model are loaded before adding another page
-                While prApplication.WorkingModel.Page.FindAll(Function(x) x.Loaded).Count <> prApplication.WorkingModel.Page.Count
+                While prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0 And prApplication.WorkingModel.Page.FindAll(Function(x) x.Loaded).Count <> prApplication.WorkingModel.Page.Count
                 End While
 
                 Dim lrPage As FBM.Page
