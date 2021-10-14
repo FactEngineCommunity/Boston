@@ -3703,7 +3703,7 @@ Public Class frmDiagramORM
             If e.Button = Windows.Forms.MouseButtons.Right Then
                 loSelectedNode = Diagram.GetNodeAt(lo_point)
                 Dim loSelectedLink As DiagramLink = Diagram.GetLinkAt(lo_point, 2)
-                If Me.Diagram.Selection.Items.Count > 2 Then
+                If Me.Diagram.Selection.Items.Count > 2 And Not Me.zrPage.AreAllSelectedObjectsRoles Then
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
                 ElseIf (loSelectedNode Is Nothing) And (loSelectedLink Is Nothing) Then
                     Me.zrPage.SelectedObject.Clear()

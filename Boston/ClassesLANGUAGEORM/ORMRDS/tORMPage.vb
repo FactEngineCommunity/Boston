@@ -115,17 +115,25 @@ Namespace FBM
                         lrNode2 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.ResponsibleFactType.RoleGroup(1).JoinedORMObject.Id)
                     End If
 
-                    Dim lrERDRelation As New ERD.Relation(Me.Model,
-                                                                Me,
-                                                                lrRelation.Id,
-                                                                lrNode1,
-                                                                pcenumCMMLMultiplicity.One,
-                                                                False,
-                                                                False,
-                                                                lrNode2,
-                                                                pcenumCMMLMultiplicity.One,
-                                                                False,
-                                                                arOriginatingNode.RDSTable)
+                    Dim lrERDRelation As ERD.Relation
+
+                    lrERDRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lrRelation.Id)
+
+                    If lrERDRelation Is Nothing Then
+                        lrERDRelation = New ERD.Relation(Me.Model,
+                                                     Me,
+                                                     lrRelation.Id,
+                                                     lrNode1,
+                                                     pcenumCMMLMultiplicity.One,
+                                                     False,
+                                                     False,
+                                                     lrNode2,
+                                                     pcenumCMMLMultiplicity.One,
+                                                     False,
+                                                     arOriginatingNode.RDSTable)
+                    Else
+                        lrERDRelation.OriginEntity = lrNode1
+                    End If
 
                     lrERDRelation.IsPGSRelationNode = True
                     Dim lrOriginatingNode = arOriginatingNode
@@ -136,7 +144,6 @@ Namespace FBM
                     Catch ex As Exception
                         Call prApplication.ThrowErrorMessage("Node with name, '" & arOriginatingNode.Name & "', is not on Page, '" & Me.Name & "'", pcenumErrorType.Warning)
                     End Try
-
 
                     'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
                     '  because the relation is actually a PGSRelationNode.                    
@@ -163,7 +170,8 @@ Namespace FBM
                     Call lrLink.setHeadShapes()
                     lrLink.Relation.Link = lrLink
                     lrERDRelation.Link = lrLink
-                    If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lrERDRelation.Id).Count = 0 Then ERDiagram.Relation.AddUnique(lrERDRelation)
+
+                    ERDiagram.Relation.AddUnique(lrERDRelation)
 
                 End If
 

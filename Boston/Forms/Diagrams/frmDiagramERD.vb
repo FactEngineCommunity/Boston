@@ -1616,9 +1616,13 @@ Public Class frmDiagramERD
 
                         If lrRelation IsNot Nothing Then
                             Dim lrPGSLink As PGS.Link = lrRelation.Link
-
                             Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
-                            Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X - lrPage.DiagramView.ScrollX, lrRelation.Link.Link.bounds.Y - lrPage.DiagramView.ScrollY)
+
+                            Dim liLesserX As Integer = Viev.Lesser(lrRelation.OriginEntity.Shape.Bounds.X, lrRelation.DestinationEntity.Shape.Bounds.X) + lrRelation.OriginEntity.Shape.Bounds.Width / 2
+                            Dim liLesserY As Integer = Viev.Lesser(lrRelation.OriginEntity.Shape.Bounds.Y, lrRelation.DestinationEntity.Shape.Bounds.Y) + lrRelation.OriginEntity.Shape.Bounds.Width / 2
+                            Me.MorphVector(0).EndPoint = New Point(liLesserX - lrPage.DiagramView.ScrollX, liLesserY - lrPage.DiagramView.ScrollY)
+                            'Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X - lrPage.DiagramView.ScrollX, lrRelation.Link.Link.bounds.Y - lrPage.DiagramView.ScrollY)
+
                             Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
                         Else
                             Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)

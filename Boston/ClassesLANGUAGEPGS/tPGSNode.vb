@@ -50,10 +50,15 @@ Namespace PGS
         ''' </summary>
         Public PGSRelation As ERD.Relation = Nothing 'If the Node would otherwise be a PGSRelation, is the PGSRelation's Link, else is Nothing.
 
-
         Public PrimaryKey As New List(Of ERD.Attribute)
 
         Public Shadows TableShape As ERD.TableNode
+
+        Public ReadOnly Property IsDisplayedAssociated
+            Get
+                Return Me.Shape IsNot Nothing
+            End Get
+        End Property
 
         Public Shadows Property X As Integer Implements FBM.iPageObject.X
         Public Shadows Property Y As Integer Implements FBM.iPageObject.Y

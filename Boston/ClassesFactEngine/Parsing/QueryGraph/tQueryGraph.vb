@@ -1485,7 +1485,7 @@
                 'Recursive NodePropertyIdentification conditionals are excluded.
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
 
-                larWhereEdges.RemoveAll(Function(x) x.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType) And (x.IdentifierList.Count = 0) And (x.TargetNode.IdentifierList.Count = 0))
+                larWhereEdges.RemoveAll(Function(x) (Not x.IsRDSTable And x.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType)) And (x.IdentifierList.Count = 0) And (x.TargetNode.IdentifierList.Count = 0))
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
                     If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then

@@ -370,7 +370,17 @@ Namespace PGS
 
                     Dim lrRDSTable As RDS.Table
                     If Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id) Is Nothing Then
-                        lrRDSTable = lrFactTypeReading.FactType.getCorrespondingRDSTable
+                        Try
+                            lrRDSTable = lrFactTypeReading.FactType.getCorrespondingRDSTable(Nothing, True)
+                        Catch ex As Exception
+                            lsPredicate = ""
+                            Exit Sub
+                        End Try
+                        If lrRDSTable Is Nothing Then
+                            lsPredicate = ""
+                            Exit Sub
+                        End If
+
                     Else
                         lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
                     End If

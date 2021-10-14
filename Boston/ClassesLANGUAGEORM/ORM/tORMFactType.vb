@@ -2673,7 +2673,15 @@ Namespace FBM
                                          Select FactTypeReading
 
                 If larFactTypeReading.Count = 0 Then
-                    Return Me.FactTypeReading(0)
+                    If Me.IsManyTo1BinaryFactType Then
+                        Dim larFactTypeReading2 = From FactTypeReading In Me.FactTypeReading
+                                                  Where FactTypeReading.PredicatePart(0).Role.HasInternalUniquenessConstraint
+                                                  Select FactTypeReading
+
+                        Return larFactTypeReading2.First
+                    Else
+                        Return Me.FactTypeReading(0)
+                    End If
                 Else
                     Return larFactTypeReading.First
                 End If

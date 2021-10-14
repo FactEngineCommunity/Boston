@@ -259,6 +259,16 @@ Namespace FBM
         <XmlAttribute>
         Public IsDatabaseSynchronised As Boolean = False
 
+        Public ReadOnly Property RequiresDatabaseConnectionString As Boolean
+            Get
+                Select Case Me.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.TypeDB
+                        Return False
+                    Case Else
+                        Return True
+                End Select
+            End Get
+        End Property
 
         '-------------------------------------------------------
         'The Parser and ParseTree are built into the Model

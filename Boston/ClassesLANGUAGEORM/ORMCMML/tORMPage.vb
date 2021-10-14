@@ -2592,7 +2592,7 @@ Namespace FBM
                             lrRecordset.MoveNext()
                         End While
 
-                        If (lrNode1 IsNot Nothing) And (lrNode2 IsNot Nothing) Then
+                        If (lrNode1 IsNot Nothing) And (lrNode2 IsNot Nothing) And (lrNode1 Is arPGSNode Or lrNode2 Is arPGSNode) Then
 
                             Call Me.addRDSTableToPage(lrTable) 'Because we want this Table on this Page going forward.
 

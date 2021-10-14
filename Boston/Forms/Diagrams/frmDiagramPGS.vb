@@ -353,7 +353,9 @@ Public Class frmDiagramPGS
 
                 If lrPGSNode.RDSTable.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
                     If lrPGSNode.RDSTable.CountNonValueTypeColumns > 2 Then
-                        lrPGSNode.DisplayAndAssociate()
+                        If Not lrPGSNode.IsDisplayedAssociated Then
+                            lrPGSNode.DisplayAndAssociate()
+                        End If
                     End If
                 End If
 

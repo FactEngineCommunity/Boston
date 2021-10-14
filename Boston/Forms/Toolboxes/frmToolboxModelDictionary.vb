@@ -570,6 +570,13 @@ Public Class frmToolboxModelDictionary
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
                                     Call LoadPagesForRoleConstraint(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(RDS.Table)
+                                    Dim lrTable As RDS.Table = loModelObject
+                                    Select Case lrTable.FBMModelElement.GetType
+                                        Case Is = GetType(FBM.EntityType)
+                                            Call LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
+                                        Case Is = GetType(FBM.FactType)
+                                            Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
+                                    End Select
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
                                 Case Else
                                     Me.TreeView1.ContextMenuStrip = Nothing
@@ -590,7 +597,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Sub LoadPagesForEntityType(ByVal aoMenuStripItem As ToolStripMenuItem, ByVal asEntityTypeId As String)
+    Sub LoadPagesForEntityType(ByRef aoMenuStripItem As ToolStripMenuItem, ByVal asEntityTypeId As String)
 
         Dim lrModel As FBM.Model
         Dim lrPage As FBM.Page
@@ -605,10 +612,10 @@ Public Class frmToolboxModelDictionary
                 lsWorkingPageId = prApplication.WorkingPage.PageId
             End If
 
-            Dim larPage = From Page In lrModel.Page _
-                          From EntityTypeInstance In Page.EntityTypeInstance _
-                          Where (EntityTypeInstance.Id = asEntityTypeId) _
-                          Select Page Distinct _
+            Dim larPage = From Page In lrModel.Page
+                          From EntityTypeInstance In Page.EntityTypeInstance
+                          Where (EntityTypeInstance.Id = asEntityTypeId)
+                          Select Page Distinct
                           Order By Page.Name
 
             If IsSomething(larPage) Then
@@ -617,10 +624,10 @@ Public Class frmToolboxModelDictionary
                     Dim loToolStripMenuItem As ToolStripMenuItem
                     Dim lr_enterprise_view As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                               lrPage, _
-                                                               lrPage.Model.ModelId, _
-                                                               pcenumLanguage.ORMModel, _
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
                                                                Nothing, lrPage.PageId)
 
 
@@ -635,6 +642,7 @@ Public Class frmToolboxModelDictionary
                         loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
                         loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
                         AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                        aoMenuStripItem.Enabled = True
                     End If
 
                 Next
@@ -917,7 +925,7 @@ Public Class frmToolboxModelDictionary
                 Case Is = GetType(RDS.Table)
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
                     Me.ToolStripMenuItemRemoveFromModel.Enabled = False
-                    Me.ToolStripMenuItemViewOnPage.Enabled = False
+                    Me.ToolStripMenuItemViewOnPage.Enabled = True
                 Case Else
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
 
