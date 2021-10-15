@@ -139,6 +139,16 @@ Namespace RDS
         End Property
 
         ''' <summary>
+        ''' Predominantly used with TypeDB at this stage. Returns the Primary Supertype Name of the FBMModelElement of the Table. Could be 'entity' or 'relation'.
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property PrimarySupertypeName
+            Get
+                Return Me.FBMModelElement.PrimarySupertypeName
+            End Get
+        End Property
+
+        ''' <summary>
         ''' TypeDB specific. The Roles 'played' by the Table.
         ''' </summary>
         <NonSerialized()>

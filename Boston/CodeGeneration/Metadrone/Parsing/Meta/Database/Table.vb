@@ -32,6 +32,7 @@ Namespace Parser.Meta.Database
         Private mIsPGSRelation As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
         Private mIsObjectified As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
         Private mPGSEdgeName As String = ""
+        Private mPrimarySupertypeName As String = "" 'Boston specific. The primary supertype name of the table. Could be 'entity' or 'relation'. TypeDB specific.
 
         Friend Columns As New List(Of IEntity)
 
@@ -71,6 +72,7 @@ Namespace Parser.Meta.Database
                 'Set table value and add first column
                 Me.Value = aarSchemaRow(SchemaRowIdx).Name
                 Me.SchemaRowVal = aarSchemaRow(SchemaRowIdx)
+                Me.mPrimarySupertypeName = aarSchemaRow(SchemaRowIdx).PrimarySupertypeName
 
                 '20200705-VM-Remove if all seems okay. Moved to below, so that the Relations are loaded.
                 'Me.AddCol(Schema(SchemaRowIdx), Connection)
@@ -377,6 +379,10 @@ Namespace Parser.Meta.Database
                 'set value
                 Me.mIsObjectified = value
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME) Then
+                'set value
+                Me.mPrimarySupertypeName = value
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'The set of Relations stemming from the Table. Not at the Column level, but the Table level.
                 'set Relations
                 For Each lrIEntityRelation In value
@@ -505,6 +511,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then 'Boston specific. Not part of original Metadrone.
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.mIsObjectified
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME) Then 'Boston specific. Not part of original Metadrone.
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.mPrimarySupertypeName
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_RELATIONS) Then 'Boston specific. Not part of original Metadrone.
                 'return relation

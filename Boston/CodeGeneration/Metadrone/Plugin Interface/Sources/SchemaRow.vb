@@ -33,6 +33,7 @@
         Private IsPGSRelationField As Boolean
         Private IsObjectifiedField As Boolean
         Private ShortDescriptionField As String
+        Private PrimarySupertypeNameField As String
         Private PredicateField As String
         Private PGSEdgeNameField As String
         Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
@@ -161,6 +162,19 @@
             End Get
             Set(ByVal value As Boolean)
                 Me.IsObjectifiedField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property PrimarySupertypeName() As String
+            Get
+                Return Me.PrimarySupertypeNameField
+            End Get
+            Set(ByVal value As String)
+                Me.PrimarySupertypeNameField = value
             End Set
         End Property
 

@@ -158,7 +158,7 @@ Namespace SourcePlugins.Boston
                             'Boston specific fields
                             sr.ColumnId = lrColumn.Id
                             sr.ShortDescription = lrColumn.ActiveRole.JoinedORMObject.ShortDescription
-
+                            sr.PrimarySupertypeName = lrTable.PrimarySupertypeName
 
                             'Predicate for the Column
                             sr.Predicate = ""
