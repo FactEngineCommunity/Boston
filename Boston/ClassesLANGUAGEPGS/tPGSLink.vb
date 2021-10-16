@@ -91,6 +91,7 @@ Namespace PGS
                 Dim lrPGSLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.shape, Me.DestinationModelElement.shape)
 
                 lrPGSLink.Style = LinkStyle.Bezier
+                lrPGSLink.Pen.Width = 0.4
 
                 lrPGSLink.SnapToNodeBorder = True
                 lrPGSLink.ShadowColor = Color.White
@@ -219,7 +220,7 @@ Namespace PGS
         Public Sub setHeadShapes()
 
             Try
-
+                Me.Link.HeadShapeSize = 1.5
                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
 
                 If Me.RDSRelation IsNot Nothing Then
@@ -266,7 +267,7 @@ Namespace PGS
                                 If lrFactType.HasTotalRoleConstraint Then
                                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
                             Else
-                                Me.Link.BaseShapeSize = 2
+                                Me.Link.BaseShapeSize = 0.5
                             End If
                             Me.Link.BaseShape = ArrowHead.PointerArrow
 
