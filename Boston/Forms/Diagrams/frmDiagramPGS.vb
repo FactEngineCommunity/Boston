@@ -754,7 +754,7 @@ Public Class frmDiagramPGS
 
             '==================================================================
             'Subtype Relationships
-            Call Me.mapSubtypeRelationships
+            Call Me.mapSubtypeRelationships()
 
             If Me.areAllEntitiesAtPoint00() Then
                 Call Me.autoLayout()
@@ -763,7 +763,7 @@ Public Class frmDiagramPGS
             If asSelectModelElementId IsNot Nothing Then
                 Dim lrNode As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Id = asSelectModelElementId)
                 If lrNode IsNot Nothing Then
-                    lrNode.shape.Selected = True
+                    lrNode.Shape.Selected = True
                 End If
             End If
 

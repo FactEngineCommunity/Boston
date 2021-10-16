@@ -91,7 +91,8 @@ Namespace PGS
                 Dim lrPGSLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.shape, Me.DestinationModelElement.shape)
 
                 lrPGSLink.Style = LinkStyle.Bezier
-                lrPGSLink.Pen.Width = 0.4
+                lrPGSLink.Pen.Width = 0.1
+                lrPGSLink.HeadPen.Width = 0.1
 
                 lrPGSLink.SnapToNodeBorder = True
                 lrPGSLink.ShadowColor = Color.White
