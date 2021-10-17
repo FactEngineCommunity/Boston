@@ -26,12 +26,27 @@ Public Class frmToolboxTableData
 
         Dim lsSQLQuery As String
 
+        Call Me.mrModel.connectToDatabase(True)
+
         If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
         Else
             If Me.mrTable Is Nothing Then
             Else
-                lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
-                lsSQLQuery &= " LIMIT 100"
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.TypeDB
+                        lsSQLQuery = "match $table isa " & mrTable.DatabaseName
+                        For Each lrColumn In Me.mrTable.Column
+                            lsSQLQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Name
+                        Next
+                        lsSQLQuery &= ";" & vbCrLf
+                        Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.Select(Function(x) "$" & x.Name))
+
+                        lsSQLQuery &= "get " & lsColumnList & ";"
+                    Case Else
+                        lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+                        lsSQLQuery &= " LIMIT 100"
+                End Select
+
                 Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
                 Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
@@ -267,7 +282,11 @@ Public Class frmToolboxTableData
                     lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
 
                     For liInd = 0 To Me.mrTable.Column.Count - 1
-                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd))
+                        For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                            If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                            End If
+                        Next
                     Next
 
                     Dim lsFilterString As String

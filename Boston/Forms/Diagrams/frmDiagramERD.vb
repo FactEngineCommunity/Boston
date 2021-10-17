@@ -3329,6 +3329,7 @@ Public Class frmDiagramERD
             Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
 
             lfrmToolboxTableData.mrTable = lrEntity.RDSTable
+            lfrmToolboxTableData.mrModel = prApplication.WorkingModel
             Call lfrmToolboxTableData.SetupForm()
 
         Catch ex As Exception

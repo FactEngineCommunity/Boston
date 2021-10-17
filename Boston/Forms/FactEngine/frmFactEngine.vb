@@ -641,6 +641,10 @@ Public Class frmFactEngine
     Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
 
         Try
+            If My.Computer.Keyboard.CtrlKeyDown Then
+                prApplication.WorkingModel.connectToDatabase(True)
+            End If
+
             Call Me.GO()
         Catch ex As Exception
             Dim lsMessage As String

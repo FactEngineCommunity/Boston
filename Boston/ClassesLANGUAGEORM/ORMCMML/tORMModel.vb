@@ -276,10 +276,16 @@ Namespace FBM
         ''' <summary>
         ''' Connects to the database if it is not already connected
         ''' </summary>
-        Public Function connectToDatabase() As Boolean
+        Public Function connectToDatabase(Optional abForceConnection As Boolean = False) As Boolean
 
             Try
-                If Me.DatabaseConnection Is Nothing Then
+                If abForceConnection Then
+                    'Try and establish a connection
+                    Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString)
+                    If Me.DatabaseConnection Is Nothing Then
+                        Throw New Exception("No database connection has been established. Please check the database connection settings for the Model in the Model Configuration Form.")
+                    End If
+                ElseIf Me.DatabaseConnection Is Nothing Then
                     'Try and establish a connection
                     Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString)
                     If Me.DatabaseConnection Is Nothing Then
