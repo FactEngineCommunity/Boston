@@ -1254,10 +1254,10 @@ Public Class frmDiagramORM
                             'Check if there are any EntityTypes within the canvas.
                             '  If there are none, then cannot drop a role onto the canvas.
                             '---------------------------------------------------------------
-                            If Me.zrPage.Model.EntityType.Count = 0 Then
-                                lsMessage = "There are no Entity Types within the current ORM diagram."
+                            If Me.zrPage.Model.EntityType.Count = 0 And Me.zrPage.Model.FactType.FindAll(Function(X) X.IsObjectified).Count = 0 Then
+                                lsMessage = "There are no Entity Types or Objectified Fact Types within the current ORM Model."
                                 lsMessage &= vbCrLf & vbCrLf
-                                lsMessage &= "You must have at least one Entity Type within the current diagram before adding a Role to the drawing."
+                                lsMessage &= "You must have at least one Entity Type or Objectified-Fact Type within the Model before adding a Role to the drawing."
                                 MsgBox(lsMessage)
                                 Exit Sub
                             End If
@@ -1287,13 +1287,6 @@ Public Class frmDiagramORM
                                 End If
                             Else
                                 lrFactType = Me.DropRoleAtPoint(loPt, liDropTarget, Nothing)
-                            End If
-
-                            '===========================================================================
-                            'RDS
-                            'Create a Column (Boolean) for the Role for the corresponding RDS.Table
-                            If lrFactType.RoleGroup.Count = 1 Then
-                                Call Me.zrPage.Model.createColumnForUnaryFactType(lrFactType)
                             End If
 
                             '-------------------------------------------------------------------------------
@@ -1534,6 +1527,13 @@ Public Class frmDiagramORM
 
                 Call Me.zrPage.MakeDirty()
 
+                '===========================================================================
+                'RDS
+                'Create a Column (Boolean) for the Role for the corresponding RDS.Table
+                If lrFactType.RoleGroup.Count = 1 Then
+                    Call Me.zrPage.Model.createColumnForUnaryFactType(lrFactType)
+                End If
+
             Else
                 '----------------------------------------------
                 'User cancelled the addition of the new Role.
@@ -1703,6 +1703,7 @@ Public Class frmDiagramORM
                     '-------------------------
                 Else
                     lrRoleInstance.Shape.Pen = New MindFusion.Drawing.Pen(Color.Black)
+                    lrRoleInstance.Shape.Pen.Width = 0.1
                 End If
             Next
 

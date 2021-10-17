@@ -23,21 +23,21 @@ Partial Class frmCRUDRoleInstance
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCRUDRoleInstance))
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.LabelCreatingNewOrExtending = New System.Windows.Forms.Label
-        Me.TextBox_FactTypeName = New System.Windows.Forms.TextBox
-        Me.LabelPromptFactTypeName = New System.Windows.Forms.Label
-        Me.GroupBox_joins = New System.Windows.Forms.GroupBox
-        Me.PictureBoxBracket = New System.Windows.Forms.PictureBox
-        Me.ComboBox_join_object = New System.Windows.Forms.ComboBox
-        Me.RadioButton_nested_FactType = New System.Windows.Forms.RadioButton
-        Me.RadioButton_value_type = New System.Windows.Forms.RadioButton
-        Me.RadioButton_entity_type = New System.Windows.Forms.RadioButton
-        Me.checkbox_mandatory = New System.Windows.Forms.CheckBox
-        Me.TextBox_RoleName = New System.Windows.Forms.TextBox
-        Me.labelpromptRoleName = New System.Windows.Forms.Label
-        Me.Button_cancel = New System.Windows.Forms.Button
-        Me.button_okay = New System.Windows.Forms.Button
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.LabelCreatingNewOrExtending = New System.Windows.Forms.Label()
+        Me.TextBox_FactTypeName = New System.Windows.Forms.TextBox()
+        Me.LabelPromptFactTypeName = New System.Windows.Forms.Label()
+        Me.GroupBox_joins = New System.Windows.Forms.GroupBox()
+        Me.PictureBoxBracket = New System.Windows.Forms.PictureBox()
+        Me.ComboBox_join_object = New System.Windows.Forms.ComboBox()
+        Me.RadioButton_nested_FactType = New System.Windows.Forms.RadioButton()
+        Me.RadioButton_value_type = New System.Windows.Forms.RadioButton()
+        Me.RadioButton_entity_type = New System.Windows.Forms.RadioButton()
+        Me.checkbox_mandatory = New System.Windows.Forms.CheckBox()
+        Me.TextBox_RoleName = New System.Windows.Forms.TextBox()
+        Me.labelpromptRoleName = New System.Windows.Forms.Label()
+        Me.Button_cancel = New System.Windows.Forms.Button()
+        Me.button_okay = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox_joins.SuspendLayout()
         CType(Me.PictureBoxBracket, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -199,6 +199,7 @@ Partial Class frmCRUDRoleInstance
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoSize = True
         Me.ClientSize = New System.Drawing.Size(561, 250)
         Me.ControlBox = False
         Me.Controls.Add(Me.button_okay)

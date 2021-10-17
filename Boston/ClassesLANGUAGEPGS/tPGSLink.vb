@@ -221,7 +221,7 @@ Namespace PGS
         Public Sub setHeadShapes()
 
             Try
-                Me.Link.HeadShapeSize = 1.5
+                Me.Link.HeadShapeSize = 4
                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
 
                 If Me.RDSRelation IsNot Nothing Then
@@ -268,7 +268,7 @@ Namespace PGS
                                 If lrFactType.HasTotalRoleConstraint Then
                                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
                             Else
-                                Me.Link.BaseShapeSize = 0.5
+                                Me.Link.BaseShapeSize = 1.5
                             End If
                             Me.Link.BaseShape = ArrowHead.PointerArrow
 

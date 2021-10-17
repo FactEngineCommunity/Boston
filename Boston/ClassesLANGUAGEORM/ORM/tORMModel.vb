@@ -3530,9 +3530,11 @@ Namespace FBM
                 For Each lrRole In larRole.ToArray
                     If lrRole.FactType IsNot Nothing Then
                         lrFactType = Me.FactType.Find(Function(x) x.Id = lrRole.FactType.Id)
-                        lrFactType.RemoveRole(lrRole, True, abBroadcastInterfaceEvent)
+                        If lrFactType IsNot Nothing Then
+                            lrFactType.RemoveRole(lrRole, True, abBroadcastInterfaceEvent)
+                        End If
                     End If
-
+                    Me.Role.Remove(lrRole)
                 Next
 
             Catch ex As Exception
