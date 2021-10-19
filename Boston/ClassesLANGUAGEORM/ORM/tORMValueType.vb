@@ -84,13 +84,13 @@ Namespace FBM
         End Property
 
         Private _DataTypeLength As Integer
-        <CategoryAttribute("Value Type"), _
-        Browsable(False), _
-        [ReadOnly](False), _
-        BindableAttribute(True), _
-        DefaultValueAttribute(""), _
-        DesignOnly(False), _
-        DescriptionAttribute("The 'Data Type Length' of the Data Type.")> _
+        <CategoryAttribute("Value Type"),
+        Browsable(False),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DefaultValueAttribute(""),
+        DesignOnly(False),
+        DescriptionAttribute("The 'Data Type Length' of the Data Type.")>
         Public Property DataTypeLength() As Integer
             Get
                 Return Me._DataTypeLength
@@ -98,6 +98,32 @@ Namespace FBM
             Set(ByVal value As Integer)
                 Me._DataTypeLength = value
             End Set
+        End Property
+
+        Public ReadOnly Property DataTypeIsNumeric As Boolean
+            Get
+                Select Case Me.DataType
+                    Case Is = pcenumORMDataType.NumericAutoCounter,
+                              pcenumORMDataType.NumericDecimal,
+                              pcenumORMDataType.NumericFloatCustomPrecision,
+                              pcenumORMDataType.NumericFloatDoublePrecision,
+                              pcenumORMDataType.NumericFloatSinglePrecision,
+                              pcenumORMDataType.NumericMoney,
+                              pcenumORMDataType.NumericSignedBigInteger,
+                              pcenumORMDataType.NumericSignedInteger,
+                              pcenumORMDataType.NumericSignedSmallInteger,
+                              pcenumORMDataType.NumericUnsignedBigInteger,
+                              pcenumORMDataType.NumericUnsignedInteger,
+                              pcenumORMDataType.NumericUnsignedSmallInteger,
+                              pcenumORMDataType.NumericUnsignedTinyInteger
+
+                        Return True
+
+                    Case Else
+                        Return False
+
+                End Select
+            End Get
         End Property
 
         <XmlIgnore()> _

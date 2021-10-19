@@ -86,6 +86,7 @@ Partial Class frmDiagramORM
         Me.PropertyGraphSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EntityRelationshipDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator19Convert = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemCopyMultiple = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPaste = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator34 = New System.Windows.Forms.ToolStripSeparator()
         Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -298,7 +299,6 @@ Partial Class frmDiagramORM
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripMenuItemCopyMultiple = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -517,6 +517,7 @@ Partial Class frmDiagramORM
         Me.Diagram.LinkBrush = New MindFusion.Drawing.SolidBrush("#FF790079")
         Me.Diagram.LinkHeadShape = MindFusion.Diagramming.ArrowHead.None
         Me.Diagram.LinkHeadShapeSize = 2.0!
+        Me.Diagram.LinkPen = New MindFusion.Drawing.Pen("0/#FF000000/0.5/0/0//0/0/10/")
         Me.Diagram.LinksSnapToBorders = True
         Me.Diagram.SelectAfterCreate = False
         Me.Diagram.ShadowColor = System.Drawing.Color.Black
@@ -537,7 +538,7 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator19Convert, Me.ToolStripMenuItemCopyMultiple, Me.ToolStripMenuItemPaste, Me.ToolStripSeparator34, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 198)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 176)
         '
         'ViewToolStripMenuItem1
         '
@@ -733,6 +734,13 @@ Partial Class frmDiagramORM
         '
         Me.ToolStripSeparator19Convert.Name = "ToolStripSeparator19Convert"
         Me.ToolStripSeparator19Convert.Size = New System.Drawing.Size(204, 6)
+        '
+        'ToolStripMenuItemCopyMultiple
+        '
+        Me.ToolStripMenuItemCopyMultiple.Enabled = False
+        Me.ToolStripMenuItemCopyMultiple.Name = "ToolStripMenuItemCopyMultiple"
+        Me.ToolStripMenuItemCopyMultiple.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemCopyMultiple.Text = "&Copy"
         '
         'ToolStripMenuItemPaste
         '
@@ -2126,13 +2134,6 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.Size = New System.Drawing.Size(890, 549)
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ToolStripMenuItemCopyMultiple
-        '
-        Me.ToolStripMenuItemCopyMultiple.Enabled = False
-        Me.ToolStripMenuItemCopyMultiple.Name = "ToolStripMenuItemCopyMultiple"
-        Me.ToolStripMenuItemCopyMultiple.Size = New System.Drawing.Size(207, 22)
-        Me.ToolStripMenuItemCopyMultiple.Text = "&Copy"
         '
         'frmDiagramORM
         '

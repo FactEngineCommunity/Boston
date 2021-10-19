@@ -92,8 +92,11 @@ Namespace RDS
         <XmlAttribute()> _
         Public CharOctetLength As Integer = 0
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public SSDataType As Integer = 0
+
+        <XmlAttribute()>
+        Public IsDerivationParameter As Boolean = False
 
         '<XmlAttribute()> _
         'Public ContributesToPrimaryKey As Boolean = False

@@ -60,6 +60,19 @@ Namespace ERD
             End Set
         End Property
 
+        <CategoryAttribute("Attribute"),
+        [ReadOnly](False),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("True if the Attribute is a Parameter to a Derived Fact Type.")>
+        Public Overridable Property IsDerivationParameter() As Boolean
+            Get
+                Return Me.Column.IsDerivationParameter
+            End Get
+            Set(ByVal value As Boolean)
+                Me.Column.IsDerivationParameter = value
+            End Set
+        End Property
+
         Public _PartOfPrimaryKey As Boolean = False
         Public Overridable Property PartOfPrimaryKey() As Boolean
             Get

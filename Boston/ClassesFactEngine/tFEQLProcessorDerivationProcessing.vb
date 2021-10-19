@@ -144,7 +144,39 @@ Namespace FEQL
                 string_after = "WHICH " & string_after
                 string_after = string_after.Replace(vbCr, "").Replace(vbLf, "")
 
-                Me.Parsetree = Me.Parser.Parse(Trim(string_after))
+                Dim lsDerivationFormula As String = Trim(string_after)
+
+                '==========================================================================
+                'Parameters
+                Dim larParameterNode = (From QueryEdge In aarParameterArray
+                                        Select QueryEdge.BaseNode).Union(
+                                        From QueryEdge In aarParameterArray
+                                        Select QueryEdge.TargetNode)
+
+                For Each lrParameterNode In larParameterNode
+                    If lrParameterNode.IdentifierList.Count > 0 Then
+
+                        Dim lsIdentifierList As String = ""
+                        Dim liInd As Integer = 0
+                        For Each lsIdentifier In lrParameterNode.IdentifierList
+                            If liInd > 0 Then lsIdentifierList &= ","
+                            Select Case lrParameterNode.FBMModelObject.GetType
+                                Case Is = GetType(FBM.ValueType)
+                                    Dim lrValueType As FBM.ValueType = lrParameterNode.FBMModelObject
+                                    lsIdentifierList &= Richmond.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'") & lsIdentifier & Richmond.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'")
+                                Case Else
+                                    For Each lrColumn In lrParameterNode.RDSTable.getFirstUniquenessConstraintColumns
+                                        lsIdentifierList &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsIdentifier & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'")
+                                    Next
+                            End Select
+                            liInd += 1
+                        Next
+                        lsDerivationFormula = lsDerivationFormula.Replace(lrParameterNode.Name, "(" & lrParameterNode.Name & lrParameterNode.ComparitorSymbol & lsIdentifierList & ")")
+                    End If
+                Next
+                '==========================================================================
+
+                Me.Parsetree = Me.Parser.Parse(lsDerivationFormula)
                 Dim lrQueryGraph As FactEngine.QueryGraph
 
                 lrQueryGraph = Me.getQueryGraph()

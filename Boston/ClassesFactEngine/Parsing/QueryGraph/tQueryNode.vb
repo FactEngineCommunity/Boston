@@ -95,6 +95,21 @@ Namespace FactEngine
         ''' </summary>
         Public Comparitor As FEQL.pcenumFEQLComparitor = FEQL.pcenumFEQLComparitor.Colon
 
+        Public ReadOnly Property ComparitorSymbol As String
+            Get
+                Select Case Me.Comparitor
+                    Case Is = FEQL.pcenumFEQLComparitor.Colon
+                        Return ":"
+                    Case Is = FEQL.pcenumFEQLComparitor.Bang
+                        Return "!"
+                    Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
+                        Return "~"
+                    Case Is = FEQL.pcenumFEQLComparitor.Carret
+                        Return "^"
+                End Select
+            End Get
+        End Property
+
         ''' <summary>
         ''' Parameterless New
         ''' </summary>

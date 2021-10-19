@@ -476,6 +476,8 @@ Public Class frmDiagramORM
         Me.DiagramView.InplaceEditAcceptOnEnter = True
         Me.DiagramView.InplaceEditCancelOnEsc = True
 
+        Diagram.Selection.Pen.Width = 0.5
+
         Diagram.UndoManager.UndoEnabled = True
         Diagram.Selection.AllowMultipleSelection = True
 

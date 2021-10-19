@@ -1100,6 +1100,28 @@
 
                 larFromNodes.RemoveAll(Function(x) larSubQueryNodes.Contains(x))
 
+                'Derived Fact Type Parameters
+                'The QueryEdge.FBMFactType is derived, the Column for the QueryNode IsDerivationParameter
+                Dim larDerivationNodes = (From Node In larFromNodes
+                                          Where Node.QueryEdge.FBMFactType.IsDerived
+                                          Select Node).ToList
+
+                Dim larRemovedDerivationNode As New List(Of FactEngine.QueryNode)
+                For Each lrDerivationNode In larDerivationNodes
+                    'Get the Derivation Column
+                    Dim lrDerivationTable As RDS.Table = lrDerivationNode.QueryEdge.FBMFactType.getCorrespondingRDSTable
+                    Dim larDerivationColumn = From Column In lrDerivationTable.Column
+                                              Where Column.Role.JoinedORMObject.Id = lrDerivationNode.Name
+                                              Select Column
+
+                    If larDerivationColumn.Count > 0 Then
+                        If larDerivationColumn.First.IsDerivationParameter Then
+                            larFromNodes.Remove(lrDerivationNode)
+                            larRemovedDerivationNode.Add(lrDerivationNode)
+                        End If
+                    End If
+                Next
+
                 liInd = 0
                 For Each lrQueryNode In larFromNodes.FindAll(Function(x) Not x.FBMModelObject.IsDerived)
                     If liInd > 0 Then lsSQLQuery &= "," & vbCrLf
@@ -1444,7 +1466,6 @@
                     End If
                 Next
 #End Region
-
                 'WHERE
                 Dim larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
                                              Where QueryEdge.TargetNode IsNot Nothing
@@ -1467,6 +1488,10 @@
 
                 larWhereEdges.AddRange(larSpecialDerivedQueryEdges.ToList)
 
+                'Remove DerivationParameter Nodes
+                For Each lrDerivationParameterNode In larRemovedDerivationNode
+                    larWhereEdges.Remove(lrDerivationParameterNode.QueryEdge)
+                Next
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
@@ -1481,6 +1506,10 @@
                 '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
                 '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
+                If Not abIsStraightDerivationClause Then
+                    larConditionalQueryEdges.RemoveAll(Function(x) x.FBMFactType.IsDerived)
+                End If
 
                 'Recursive NodePropertyIdentification conditionals are excluded.
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
@@ -1520,11 +1549,13 @@
                         Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
                         If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
                             For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                                If liInd2 > 0 Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
-                                lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsSQLQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
-                                liInd2 += 1
-                                lbAddedAND = False
+                                If Not lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).IsDerivationParameter Then
+                                    If liInd2 > 0 Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
+                                    lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                    lsSQLQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
+                                    liInd2 += 1
+                                    lbAddedAND = False
+                                End If
                             Next
                         End If
                         If lrQueryEdge.TargetNode.FBMModelObject.GetType <> GetType(FBM.ValueType) Then
@@ -2123,6 +2154,10 @@
                 larQueryEdge.AddUnique(lrQueryEdge.GetNextQueryEdge)
             Next
 
+            '==============================================================================
+            'SubQuery edges - Remove
+            larQueryEdge.RemoveAll(Function(x) x.IsSubQueryLeader Or x.IsPartOfSubQuery)
+
             Return larQueryEdge
 
         End Function
@@ -2164,7 +2199,7 @@
             Dim larColumn As New List(Of RDS.Column)
 
             Try
-
+#Region "Head Node"
                 If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
 
                     For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
@@ -2220,19 +2255,33 @@
                                 '    lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
                                 '    larColumn.Add(lrProjectionColumn)
                                 'Next
+
+                                Dim larSubQueryNodes = (From QueryEdge In Me.QueryEdges
+                                                        Where QueryEdge.IsPartOfSubQuery
+                                                        Select QueryEdge.BaseNode).Union(
+                                                        From QueryEdge In Me.QueryEdges
+                                                        Where QueryEdge.IsSubQueryLeader Or QueryEdge.IsPartOfSubQuery
+                                                        Select QueryEdge.TargetNode)
+
+                                Dim larSubQueryFBMModelElements = (From Node In larSubQueryNodes
+                                                                   Select Node.FBMModelObject).ToList
+
                                 For Each lrRole In lrFactType.RoleGroup
-                                    Select Case lrRole.JoinedORMObject.GetType
-                                        Case Is = GetType(FBM.ValueType)
-                                            Dim lrVTColumn As New RDS.Column(arDerivedModelElement.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
-                                            lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
-                                            larColumn.Add(lrVTColumn)
-                                        Case Else
-                                            For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                                                lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
-                                                lrProjectionColumn.AsName = arDerivedModelElement.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                                larColumn.Add(lrProjectionColumn)
-                                            Next
-                                    End Select
+
+                                    If Not larSubQueryFBMModelElements.Contains(lrRole.JoinedORMObject) Then
+                                        Select Case lrRole.JoinedORMObject.GetType
+                                            Case Is = GetType(FBM.ValueType)
+                                                Dim lrVTColumn As New RDS.Column(arDerivedModelElement.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
+                                                lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
+                                                larColumn.Add(lrVTColumn)
+                                            Case Else
+                                                For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                                    lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
+                                                    lrProjectionColumn.AsName = arDerivedModelElement.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                                    larColumn.Add(lrProjectionColumn)
+                                                Next
+                                        End Select
+                                    End If
                                 Next
                             Else
                                 For Each lrRole In CType(arDerivedModelElement, FBM.FactType).RoleGroup
@@ -2302,7 +2351,7 @@
                     End Select
 
                     larColumn.AddRange(larHeadColumn.ToList)
-
+#End Region
                     Dim liRoleInd As Integer
                     'Edge Column/s
                     Dim lrQueryEdge As FactEngine.QueryEdge
