@@ -3294,9 +3294,14 @@ Public Class frmDiagramORM
                             lrFactType.FactTypeReading.Add(lrFactTypeReading)
 
                             'RDS
-                            Dim lrTable = larModelObject(0).getCorrespondingRDSTable
-                            Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
-                            Call lrTable.addColumn(lrColumn)
+                            Try
+                                Dim lrTable = larModelObject(0).getCorrespondingRDSTable
+                                Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
+                                Call lrTable.addColumn(lrColumn)
+                            Catch ex As Exception
+                                'Warning only. Because could be modifying the Core model, in which case there is no Table for larModelObject(0).
+                                prApplication.ThrowErrorMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
+                            End Try
 
                         End If
 
