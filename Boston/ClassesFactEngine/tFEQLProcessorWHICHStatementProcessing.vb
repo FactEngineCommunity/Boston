@@ -1090,7 +1090,7 @@
                 Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
                 Dim lrBaseFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
                 If lrBaseFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
-                arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject)
+                arQueryEdge.BaseNode = New FactEngine.QueryNode(lrBaseFBMModelObject, arQueryEdge)
                 arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             End If
 
@@ -1125,7 +1125,7 @@
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")
             End If
 
-            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject)
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
             arQueryEdge.TargetNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
             If arQueryEdge.IdentifierList.Count > 0 Then arQueryEdge.TargetNode.HasIdentifier = True
             If arWHICHCLAUSE.NODE.Count > 0 Then

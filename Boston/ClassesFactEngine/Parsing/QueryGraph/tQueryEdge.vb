@@ -965,6 +965,7 @@ FinalCleanup:
                         Dim larPredicatePart = From FactTypeReading In Me.FBMFactType.FactTypeReading
                                                From PredicatePart In FactTypeReading.PredicatePart
                                                Where PredicatePart.Role.JoinedORMObject Is larModelElement(0)
+                                               Where PredicatePart.PredicatePartText = Me.Predicate
                                                Select PredicatePart
 
                         Me.FBMPredicatePart = larPredicatePart.First
