@@ -1,9 +1,9 @@
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmDiagramORM
     Inherits WeifenLuo.WinFormsUI.Docking.DockContent
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class frmDiagramORM
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDiagramORM))
@@ -296,9 +296,7 @@ Partial Class frmDiagramORM
         Me.ContextMenuStripModelNote = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -538,7 +536,7 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator19Convert, Me.ToolStripMenuItemCopyMultiple, Me.ToolStripMenuItemPaste, Me.ToolStripSeparator34, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 176)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 198)
         '
         'ViewToolStripMenuItem1
         '
@@ -2440,8 +2438,6 @@ Partial Class frmDiagramORM
     Friend WithEvents ToolStripSeparator40 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemShowLinkFactType As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAddRole As ToolStripMenuItem
-    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents AddAllAssociatedFactTypesToPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddAllAssociatedFactTypesToPageToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator36 As ToolStripSeparator

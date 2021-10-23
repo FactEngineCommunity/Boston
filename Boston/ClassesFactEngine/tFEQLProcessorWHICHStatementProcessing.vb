@@ -928,6 +928,22 @@
                 End Try
             End Try
 
+            If arQueryEdge.FBMFactType IsNot Nothing Then
+                If arQueryEdge.FBMFactType.Arity = 2 Then
+                    If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                        If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id Then
+                                If arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id <> arQueryEdge.BaseNode.Name Then
+                                    arQueryEdge.IsReciprocal = True
+                                End If
+                            ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
+                                arQueryEdge.IsReciprocal = True
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+
         End Sub
 #End Region
 
@@ -1270,7 +1286,8 @@
             'Get the relevant FBM.FactType
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
-                                                  arQueryEdge.Predicate)
+                                                  arQueryEdge.Predicate,
+                                                  arPreviousTargetNode)
 
             If arQueryGraph.QueryEdges.Count > 0 Then
                 If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
@@ -1576,10 +1593,20 @@
                         End If
                     End If
                 End If
+            ElseIf arWhichClauseNode.Nodes.count = 2 Then
+                If arWhichClauseNode.Nodes(0).Nodes.Count = 2 Then
+                    If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+                   arWhichClauseNode.Nodes(0).Nodes(0).Token.Type = FEQL.TokenType.KEYWDTHAT And
+                   arWhichClauseNode.Nodes(0).Nodes(1).Token.Type = FEQL.TokenType.PREDICATECLAUSE And
+                   arWhichClauseNode.Nodes(1).Nodes(0).Token.Type = FEQL.TokenType.MODELELEMENTNAME Then
+                        'E.g. "THAT is in Cinema" (E.g. As in a Derived Fact Type Rule "IS WHERE Seat is in A Row THAT is in Cinema")
+                        Return FactEngine.Constants.pcenumWhichClauseType.ThatPredicateWhichModelElement
+                    End If
+                End If
             End If
 
-            '13
-            If Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+                '13
+                If Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
                 (Me.WHICHCLAUSE.KEYWDISNOT IsNot Nothing Or
                 Me.WHICHCLAUSE.KEYWDIS IsNot Nothing) Then
 

@@ -22,26 +22,41 @@ Partial Class frmDiagramOverview
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Overview = New MindFusion.Diagramming.WinForms.Overview
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDiagramOverview))
+        Me.Overview = New MindFusion.Diagramming.WinForms.Overview()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Overview
         '
+        Me.Overview.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Overview.DiagramView = Nothing
-        Me.Overview.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Overview.Location = New System.Drawing.Point(0, 0)
+        Me.Overview.Location = New System.Drawing.Point(-1, 28)
         Me.Overview.Name = "Overview"
-        Me.Overview.Size = New System.Drawing.Size(226, 276)
+        Me.Overview.Size = New System.Drawing.Size(356, 432)
         Me.Overview.TabIndex = 0
         Me.Overview.Text = "Overview1"
         '
-        'frm_diagram_overview
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(-1, -1)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 7
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
+        '
+        'frmDiagramOverview
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(226, 276)
+        Me.ClientSize = New System.Drawing.Size(355, 459)
+        Me.Controls.Add(Me.ButtonRefresh)
         Me.Controls.Add(Me.Overview)
-        Me.Name = "frm_diagram_overview"
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmDiagramOverview"
         Me.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockLeft
         Me.TabText = "Diagram Overview"
         Me.Text = "Diagram Overview"
@@ -49,4 +64,5 @@ Partial Class frmDiagramOverview
 
     End Sub
     Friend WithEvents Overview As MindFusion.Diagramming.WinForms.Overview
+    Friend WithEvents ButtonRefresh As Button
 End Class

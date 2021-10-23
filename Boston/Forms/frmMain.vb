@@ -832,6 +832,10 @@ Public Class frmMain
                 'Not a biggie.
             End Try
 
+            For Each lrForm In prApplication.RightToolboxForms.ToArray
+                Call lrForm.Close()
+            Next
+
             Me.Close()
 
             Application.Exit()
@@ -846,14 +850,31 @@ Public Class frmMain
 
     Sub load_diagram_overview_form()
 
-        Dim child As New frmDiagramOverview
+        Try
+
+            Dim child As New frmDiagramOverview
+
+            If prApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
+                Call child.Show()
+            Else
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
+                prApplication.RightToolboxForms.Add(child)
+                zfrm_diagram_overview = child
+            End If
 
 
-        child.MdiParent = Me
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        zfrm_diagram_overview = child
-
-        child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockLeft)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -3167,14 +3188,28 @@ Public Class frmMain
 
     Private Sub ToolStripMenuItemDiagramOverview_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemDiagramOverview.Click
 
-        Call load_diagram_overview_form()
+        Try
 
-        If IsSomething(prApplication.WorkingPage) Then
-            Select Case prApplication.WorkingPage.Language
-                Case Is = pcenumLanguage.ORMModel
-                    Call zfrm_diagram_overview.SetDocument(zrORMModel_view.DiagramView)
-            End Select
-        End If
+            Call load_diagram_overview_form()
+
+            If IsSomething(prApplication.WorkingPage) Then
+                Select Case prApplication.WorkingPage.Language
+                    Case Is = pcenumLanguage.ORMModel,
+                              pcenumLanguage.EntityRelationshipDiagram,
+                              pcenumLanguage.PropertyGraphSchema
+
+                        Call zfrm_diagram_overview.SetDocument(prApplication.WorkingPage.DiagramView)
+                End Select
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

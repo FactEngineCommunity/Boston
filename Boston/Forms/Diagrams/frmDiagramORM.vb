@@ -11814,4 +11814,5 @@ Public Class frmDiagramORM
         End Try
 
     End Sub
+
 End Class

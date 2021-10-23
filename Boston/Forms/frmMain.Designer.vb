@@ -378,19 +378,19 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemToolbox.Image = Global.Boston.My.Resources.Resources.Toolbox16x16B_W
         Me.ToolStripMenuItemToolbox.Name = "ToolStripMenuItemToolbox"
-        Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(172, 22)
+        Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemToolbox.Text = "&Toolbox"
         '
         'ToolStripMenuItemDiagramOverview
         '
         Me.ToolStripMenuItemDiagramOverview.Name = "ToolStripMenuItemDiagramOverview"
-        Me.ToolStripMenuItemDiagramOverview.Size = New System.Drawing.Size(172, 22)
+        Me.ToolStripMenuItemDiagramOverview.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemDiagramOverview.Text = "Diagram &Overview"
         '
         'ToolStripMenuItemKLTheoremWriter
         '
         Me.ToolStripMenuItemKLTheoremWriter.Name = "ToolStripMenuItemKLTheoremWriter"
-        Me.ToolStripMenuItemKLTheoremWriter.Size = New System.Drawing.Size(172, 22)
+        Me.ToolStripMenuItemKLTheoremWriter.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemKLTheoremWriter.Text = "&KL Theorem Writer"
         '
         'TestToolStripMenuItem
@@ -398,7 +398,7 @@ Partial Class frmMain
         Me.TestToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.TestToolStripMenuItem.Name = "TestToolStripMenuItem"
         Me.TestToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.P), System.Windows.Forms.Keys)
-        Me.TestToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
+        Me.TestToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.TestToolStripMenuItem.Text = "&Properties"
         '
         'StatusBarToolStripMenuItem
