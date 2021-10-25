@@ -154,7 +154,7 @@ Namespace FactEngine
 
         End Sub
 
-        Public Function Equals(other As QueryEdge) As Boolean Implements IEquatable(Of QueryEdge).Equals
+        Public Shadows Function Equals(other As QueryEdge) As Boolean Implements IEquatable(Of QueryEdge).Equals
             Return Me.Id = other.Id
         End Function
 

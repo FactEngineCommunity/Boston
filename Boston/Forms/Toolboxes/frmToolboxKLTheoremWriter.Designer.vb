@@ -24,6 +24,7 @@ Partial Class frmToolboxKLTheoremWriter
     Private Sub InitializeComponent()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.ButtonAnalyseCurrentPage = New System.Windows.Forms.Button()
+        Me.LabelPromptPageName = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'TextBox1
@@ -44,11 +45,22 @@ Partial Class frmToolboxKLTheoremWriter
         Me.ButtonAnalyseCurrentPage.Text = "&Analyse current Page"
         Me.ButtonAnalyseCurrentPage.UseVisualStyleBackColor = True
         '
+        'LabelPromptPageName
+        '
+        Me.LabelPromptPageName.AutoSize = True
+        Me.LabelPromptPageName.Location = New System.Drawing.Point(139, 13)
+        Me.LabelPromptPageName.Name = "LabelPromptPageName"
+        Me.LabelPromptPageName.Size = New System.Drawing.Size(119, 13)
+        Me.LabelPromptPageName.TabIndex = 2
+        Me.LabelPromptPageName.Text = "LabelPromptPageName"
+        Me.LabelPromptPageName.Visible = False
+        '
         'frmToolboxKLTheoremWriter
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(460, 498)
+        Me.Controls.Add(Me.LabelPromptPageName)
         Me.Controls.Add(Me.ButtonAnalyseCurrentPage)
         Me.Controls.Add(Me.TextBox1)
         Me.Name = "frmToolboxKLTheoremWriter"
@@ -61,4 +73,5 @@ Partial Class frmToolboxKLTheoremWriter
     End Sub
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents ButtonAnalyseCurrentPage As System.Windows.Forms.Button
+    Friend WithEvents LabelPromptPageName As Label
 End Class
