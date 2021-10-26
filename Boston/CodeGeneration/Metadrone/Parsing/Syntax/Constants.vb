@@ -46,6 +46,7 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_FBMFACTTYPENAME As String = "fbmfacttypename"
         Public Const VARIABLE_ATTRIBUTE_REFERENCINGROLENAME As String = "referencingrolename"
         Public Const VARIABLE_ATTRIBUTE_REFERENCEDROLENAME As String = "referencedrolename"
+        Public Const VARIABLE_ATTRIBUTE_ISLINKFACTTYPE As String = "islinkfacttype"
         Public Const VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT As String = "pkcolumncount"
         Public Const VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT As String = "fkcolumncount"
         Public Const VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT As String = "idcolumncount"
@@ -264,6 +265,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_FBMFACTTYPENAME As String = "The Fact Type responsible for the Relation."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCINGROLENAME As String = "The Role Name of the Referencing Model Element for the Relation."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCEDROLENAME As String = "The Role Name for the Referenced Model Element for the Relation."
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISLINKFACTTYPE As String = "True if the relation is for a Link Fact Type."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT As String = "Number of primary key columns in collection this variable refers to."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT As String = "Number of foreign key columns in collection this variable refers to."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT As String = "Number of identity columns in collection this variable refers to."
@@ -405,6 +407,7 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_FBMFACTTYPENAME) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCINGROLENAME) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCEDROLENAME) Then Return True
+            If StrEq(value, VARIABLE_ATTRIBUTE_ISLINKFACTTYPE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PKCOLUMNCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_FKCOLUMNCOUNT) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_IDCOLUMNCOUNT) Then Return True

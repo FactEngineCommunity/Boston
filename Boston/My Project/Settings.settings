@@ -176,5 +176,8 @@
     <Setting Name="ReverseEngineeringDefaultPrimaryKeyDataType" Type="System.String" Scope="User">
       <Value Profile="(Default)">OtherObjectID</Value>
     </Setting>
+    <Setting Name="CodeGenerationDispellLinkFactTypesIncomingRelations" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

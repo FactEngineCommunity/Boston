@@ -15,6 +15,7 @@ Namespace Parser.Meta.Database
     ''' </summary>
     Friend Class Relation
         Implements IEntity
+        Implements IEquatable(Of Relation)
 
         Private mValue As Object = Nothing
         Private mId As String
@@ -25,6 +26,7 @@ Namespace Parser.Meta.Database
         Private mReferencedColumnName As String
         Private mReferencedRoleName As String = ""
         Private mColumnCount As Integer = 0
+        Private mIsLinkFactType As Boolean = False
         Private mFBMFactTypeName As String = ""
         Private ReplaceAllList As New ReplaceAllList()
 
@@ -39,7 +41,8 @@ Namespace Parser.Meta.Database
                        ByVal aiColumnCount As Integer,
                        ByVal asFBMFactTypeName As String,
                        ByVal asReferencingRoleName As String,
-                       ByVal asReferencedRoleName As String)
+                       ByVal asReferencedRoleName As String,
+                       ByVal abIsLinkFactType As Boolean)
 
             Me.mId = asId
             Me.mReferencingTableName = asReferencingTableName
@@ -50,9 +53,13 @@ Namespace Parser.Meta.Database
             Me.mReferencedRoleName = asReferencedRoleName
             Me.mColumnCount = aiColumnCount
             Me.mFBMFactTypeName = asFBMFactTypeName
-
+            Me.mIsLinkFactType = abIsLinkFactType
 
         End Sub
+
+        Public Overloads Function Equals(other As Relation) As Boolean Implements IEquatable(Of Relation).Equals
+            Return Me.Id = other.Id
+        End Function
 
         Public Sub SetAttributeValue(AttribName As String, value As Object) Implements IEntity.SetAttributeValue
             Throw New NotImplementedException()
@@ -112,6 +119,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCEDROLENAME) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.ReferencedRoleName
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISLINKFACTTYPE) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IsLinkFactType
 
                 'ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISIDENTITY) Then
                 '    'return isidentity
@@ -254,6 +265,7 @@ Namespace Parser.Meta.Database
             Me.mReferencedRoleName = Me.mReferencedRoleName
             Me.mColumnCount = mColumnCount
             Me.mFBMFactTypeName = Me.mFBMFactTypeName
+            Me.mIsLinkFactType = Me.mIsLinkFactType
 
             Return New List(Of IEntity)
         End Function
@@ -272,6 +284,7 @@ Namespace Parser.Meta.Database
                 rel.ReferencedRoleName = .mReferencedRoleName
                 rel.ColumnCount = .mColumnCount
                 rel.FBMFactTypeName = .mFBMFactTypeName
+                rel.IsLinkFactType = .mIsLinkFactType
             End With
             'col.ListCount = Me.ListCount
             'col.ListPos = Me.ListPos
@@ -330,6 +343,15 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As String)
                 Me.mReferencedRoleName = value
+            End Set
+        End Property
+
+        Public Property IsLinkFactType() As Boolean
+            Get
+                Return Me.mIsLinkFactType
+            End Get
+            Set(value As Boolean)
+                Me.mIsLinkFactType = value
             End Set
         End Property
 

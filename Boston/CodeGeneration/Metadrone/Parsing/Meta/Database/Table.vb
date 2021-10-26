@@ -135,16 +135,21 @@ Namespace Parser.Meta.Database
                                 lsResponsibleFactTypeName = lrRelation.ResponsibleFactType.getCorrespondingRDSTable.DatabaseName
                             End If
 
+                            Dim lrOutgoingRelation As New Relation(lrRelation.Id,
+                                                                lrRelation.OriginTable.Name,
+                                                                lsOriginColumnName,
+                                                                lrRelation.DestinationTable.Name,
+                                                                lsDestinationColumnName,
+                                                                lrRelation.OriginColumns.Count,
+                                                                lsResponsibleFactTypeName,
+                                                                lsOriginRoleName,
+                                                                lsDestinationRoleName,
+                                                                lrRelation.ResponsibleFactType.IsLinkFactType)
 
-                            Me.Relations.Add(New Relation(lrRelation.Id,
-                                                          lrRelation.OriginTable.Name,
-                                                          lsOriginColumnName,
-                                                          lrRelation.DestinationTable.Name,
-                                                          lsDestinationColumnName,
-                                                          lrRelation.OriginColumns.Count,
-                                                          lsResponsibleFactTypeName,
-                                                          lsOriginRoleName,
-                                                          lsDestinationRoleName))
+                            If Me.Relations.Find(Function(x) CType(x, Relation).Id = lrOutgoingRelation.Id) Is Nothing Then
+                                Me.Relations.AddUnique(lrOutgoingRelation)
+                            End If
+
                         Catch ex As Exception
                             Throw New Parser.Syntax.ExecException(ex.Message, 0)
                         End Try
@@ -165,12 +170,19 @@ Namespace Parser.Meta.Database
 
                             If lrRelation.DestinationColumns.Count = 1 Then
                                 lsDestinationColumnName = lrRelation.OriginColumns(0).Name
-                                lsDestinationRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
                                 lsOriginColumnName = lrRelation.DestinationColumns(0).Name
-                                If lrRelation.ResponsibleFactType.Arity > 2 Then
+
+                                If My.Settings.CodeGenerationDispellLinkFactTypesIncomingRelations And lrRelation.ResponsibleFactType.IsLinkFactType Then
+                                    lsDestinationRoleName = lrRelation.ResponsibleFactType.LinkFactTypeRole.DerivedRoleName
                                     lsOriginRoleName = lsDestinationRoleName
                                 Else
-                                    lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                    lsDestinationRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
+
+                                    If lrRelation.ResponsibleFactType.Arity > 2 Then
+                                        lsOriginRoleName = lsDestinationRoleName
+                                    Else
+                                        lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                    End If
                                 End If
 
                             Else
@@ -181,28 +193,46 @@ Namespace Parser.Meta.Database
                                     Throw New Exception("No destination column found for relationship with originating column:" & lrOriginColumn.Table.Name & "." & lrOriginColumn.Name)
                                 End If
                                 lsOriginColumnName = lrOriginColumn.Name
-                                lsDestinationRoleName = lrDestinationColumn.Role.DerivedRoleName
-                                lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
+                                If My.Settings.CodeGenerationDispellLinkFactTypesIncomingRelations And lrRelation.ResponsibleFactType.IsLinkFactType Then
+                                    lsDestinationRoleName = lrRelation.ResponsibleFactType.LinkFactTypeRole.DerivedRoleName
+                                    lsOriginRoleName = lsDestinationRoleName
+                                Else
+                                    lsDestinationRoleName = lrDestinationColumn.Role.DerivedRoleName
+                                    lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
+                                End If
+
                             End If
 
                             If Me.IncomingRelation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
                                 Me.IncomingRelation.AddUnique(lrRelation)
                             End If
 
-                            Dim lsResponsibleFactTypeName As String = lrRelation.ResponsibleFactType.Id
+                            Dim lsResponsibleFactTypeName As String
+                            If My.Settings.CodeGenerationDispellLinkFactTypesIncomingRelations And lrRelation.ResponsibleFactType.IsLinkFactType Then
+                                lsResponsibleFactTypeName = lrRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Id
+                            Else
+                                lsResponsibleFactTypeName = lrRelation.ResponsibleFactType.Id
+                            End If
+
                             If lrRelation.ResponsibleFactType.IsObjectified Or (Not lrRelation.ResponsibleFactType.IsObjectified And lrRelation.ResponsibleFactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing) Then
                                 lsResponsibleFactTypeName = lrRelation.ResponsibleFactType.getCorrespondingRDSTable.DatabaseName
                             End If
 
-                            Me.IncomingRelations.Add(New Relation(lrRelation.Id,
-                                                                  lrRelation.OriginTable.Name,
-                                                                  lsOriginColumnName,
-                                                                  lrRelation.DestinationTable.Name,
-                                                                  lsDestinationColumnName,
-                                                                  lrRelation.OriginColumns.Count,
-                                                                  lsResponsibleFactTypeName,
-                                                                  lsOriginRoleName,
-                                                                  lsDestinationRoleName))
+                            Dim lrIncomingRelation As New Relation(lrRelation.Id,
+                                                                   lrRelation.OriginTable.Name,
+                                                                   lsOriginColumnName,
+                                                                   lrRelation.DestinationTable.Name,
+                                                                   lsDestinationColumnName,
+                                                                   lrRelation.OriginColumns.Count,
+                                                                   lsResponsibleFactTypeName,
+                                                                   lsOriginRoleName,
+                                                                   lsDestinationRoleName,
+                                                                   lrRelation.ResponsibleFactType.IsLinkFactType)
+
+                            If Me.IncomingRelations.Find(Function(x) CType(x, Relation).Id = lrIncomingRelation.Id) Is Nothing Then
+                                Me.IncomingRelations.AddUnique(lrIncomingRelation)
+                            End If
+
                         Catch ex As Exception
                             Throw New Parser.Syntax.ExecException(ex.Message, 0)
                         End Try

@@ -749,6 +749,18 @@ Namespace My
                 Me("ReverseEngineeringDefaultPrimaryKeyDataType") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property CodeGenerationDispellLinkFactTypesIncomingRelations() As Boolean
+            Get
+                Return CType(Me("CodeGenerationDispellLinkFactTypesIncomingRelations"),Boolean)
+            End Get
+            Set
+                Me("CodeGenerationDispellLinkFactTypesIncomingRelations") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

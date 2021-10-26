@@ -76,7 +76,8 @@ Namespace Parser.Meta.Database
                                                           lrRelation.OriginColumns.Count,
                                                           lrRelation.ResponsibleFactType.Id,
                                                           lsOriginRoleName,
-                                                          lsDestinationRoleName))
+                                                          lsDestinationRoleName,
+                                                          lrRelation.ResponsibleFactType.IsLinkFactType))
 
                         Next
                     End If
