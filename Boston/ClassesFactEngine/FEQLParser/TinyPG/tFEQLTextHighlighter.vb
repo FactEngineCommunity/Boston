@@ -420,50 +420,46 @@ Namespace FEQL
     Private textChanged As Boolean
     Private currentText As String
 
-        Private Sub AutoHighlightStart()
-            Try
-                Dim _tree As ParseTree
-                Dim _currenttext As String = ""
-                While Not isDisposing
-                    Dim _textchanged As Boolean
-                    SyncLock treelock
-                        _textchanged = textChanged
-                        If textChanged Then
-                            textChanged = False
-                            _currenttext = currentText
-                        End If
-                    End SyncLock
-                    If Not _textchanged Then
-                        Thread.Sleep(200)
-                        Continue While
-                    End If
+    Private Sub AutoHighlightStart()
+        Dim _tree As ParseTree
+        Dim _currenttext As String = ""
+        While Not isDisposing
+            Dim _textchanged As Boolean
+            SyncLock treelock
+                _textchanged = textChanged
+                If textChanged Then
+                    textChanged = False
+                    _currenttext = currentText
+                End If
+            End SyncLock
+            If Not _textchanged Then
+                Thread.Sleep(200)
+                Continue While
+            End If
 
-                    _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
 
-                    SyncLock treelock
-                        If textChanged Then
-                            Continue While
-                        Else
-                            ' assign new tree
-                            Tree = _tree
-                        End If
-                    End SyncLock
-
-
-                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-                End While
-            Catch ex As Exception
-
-            End Try
-        End Sub
+            SyncLock treelock
+                If textChanged Then
+                    Continue While
+                Else
+                    ' assign new tree
+                    Tree = _tree
+                End If
+            End SyncLock
 
 
-        ''' <summary>
-        ''' inserts the RTF codes to highlight text blocks
-        ''' </summary>
-        ''' <param name="node">the node to highlight, will be appended to sb</param>
-        ''' <param name="sb">the final output string</param>
-        Private Sub HightlightNode(ByVal node As ParseNode, ByVal sb As StringBuilder)
+            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
+        End While
+    End Sub
+
+
+    ''' <summary>
+    ''' inserts the RTF codes to highlight text blocks
+    ''' </summary>
+    ''' <param name="node">the node to highlight, will be appended to sb</param>
+    ''' <param name="sb">the final output string</param>
+    Private Sub HightlightNode(ByVal node As ParseNode, ByVal sb As StringBuilder)
         If node.Nodes.Count = 0 Then
             If (node.Token.Skipped IsNot Nothing) Then
                 For Each skiptoken As Token In node.Token.Skipped

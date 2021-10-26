@@ -59,7 +59,7 @@ Public Class frmFactEngine
         Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
 
         If prApplication.WorkingModel IsNot Nothing Then
-            If Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
+            If prApplication.WorkingModel.RequiresConnectionString And Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
                 Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
                 Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
             Else
@@ -585,7 +585,7 @@ Public Class frmFactEngine
         Else
             Me.ToolStripStatusLabelWorkingModelName.ForeColor = Color.Black
             Me.ToolStripStatusLabelWorkingModelName.Text = "Model: " & prApplication.WorkingModel.Name
-            If Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
+            If prApplication.WorkingModel.RequiresConnectionString And Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
                 Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
                 Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
             Else
@@ -952,6 +952,7 @@ Public Class frmFactEngine
                                     lrPGSLink.ShadowColor = Color.White
                                     lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
                                     lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
+                                    lrPGSLink.Pen.Width = 0.2
                                     'lrPGSLink.Text = Me.SentData(0)
                                     lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
                                     lrPGSLink.AutoRoute = False
@@ -1023,7 +1024,9 @@ Public Class frmFactEngine
 
             Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
 
-            If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+            Me.LabelError.Text = ""
+
+            If prApplication.WorkingModel.RequiresConnectionString And prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
                 Me.LabelError.ForeColor = Color.Orange
                 Me.LabelError.Text = "The Model needs a database connection string."
                 Exit Sub
@@ -2846,7 +2849,7 @@ Public Class frmFactEngine
                 'Clear the Graph View because there is not enough information to create a graph.
                 Call Me.clearGraphView()
 
-                If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
+                If prApplication.WorkingModel.RequiresConnectionString And prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
                     Me.LabelError.ForeColor = Color.Orange
                     Me.LabelError.Text = "The Model needs a database connection string."
                     Exit Sub

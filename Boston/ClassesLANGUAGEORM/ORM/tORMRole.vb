@@ -61,7 +61,12 @@ Namespace FBM
                         Return Me.JoinedORMObject.Id & Me.FactType.Id & Me.FactType.RoleGroup.IndexOf(Me)
 
                     Else
-                        Return Me.JoinedORMObject.Id & Me.FactType.Id
+                        If Me.FactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing Then
+                            Return Me.JoinedORMObject.Id & Me.FactType.getCorrespondingRDSTable.DatabaseName
+                        Else
+                            Return Me.JoinedORMObject.Id & Me.FactType.Id
+                        End If
+
                     End If
                 Else
                     Return Me.Name

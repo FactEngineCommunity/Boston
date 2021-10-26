@@ -519,7 +519,7 @@ Partial Class frmFactEngine
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "frmFactEngine"
-        Me.Text = "Fact Engine (Beta)"
+        Me.Text = "Fact Engine"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)

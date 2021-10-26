@@ -183,7 +183,7 @@ Namespace FEQL
                 Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
                 Call Me.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.Parsetree.Nodes(0))
                 lsSQL &= lrQueryGraph.generateSQL(lrWhichSelectStatement, False, True, arModelElement)
-                lsSQL &= ") AS " & arModelElement.Name & vbCrLf
+                lsSQL &= ") AS " & arModelElement.getCorrespondingRDSTable.DatabaseName & vbCrLf
 
                 Return lsSQL
 

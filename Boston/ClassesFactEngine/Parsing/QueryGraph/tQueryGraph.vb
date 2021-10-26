@@ -1422,9 +1422,9 @@
                 'Derived FactTypes
                 lrDerivationProcessor = New FEQL.Processor(prApplication.WorkingModel)
 
-                Dim larDerivedFactType = From QueryEdge In Me.QueryEdges
-                                         Where QueryEdge.FBMFactType.IsDerived
-                                         Select New With {QueryEdge.FBMFactType, QueryEdge.Alias}
+                Dim larDerivedFactType = (From QueryEdge In Me.QueryEdges
+                                          Where QueryEdge.FBMFactType.IsDerived
+                                          Select New With {QueryEdge.FBMFactType, QueryEdge.Alias}).Distinct
 
                 lasAlias = New List(Of String)
                 For Each lrQueryEdge In larDerivedFactType 'Me.QueryEdges.FindAll(Function(x) x.FBMFactType.IsDerived)
