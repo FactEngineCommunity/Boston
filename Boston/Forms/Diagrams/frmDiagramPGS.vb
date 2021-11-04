@@ -1367,6 +1367,7 @@ Public Class frmDiagramPGS
             lrShapeNode = lrPageObject.Shape.Clone(True)
             lrShapeNode = New ShapeNode(lrPageObject.Shape)
             lrShapeNode.Shape = Shapes.Ellipse
+            lrShapeNode.Pen.Width = 0.5
             lrShapeNode.Text = lrPageObject.Name
 
             If Me.zrPage.SelectedObject(0).GetType Is GetType(Boston.ERD.Relation) Then
@@ -1427,7 +1428,7 @@ Public Class frmDiagramPGS
                                 lrAdditionalShapeNode.Visible = True
                                 lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
                                 lrAdditionalShapeNode.Shape = Shapes.Ellipse
-
+                                lrAdditionalShapeNode.Pen.Width = 0.5
 
                                 Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
                                 Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name
@@ -1565,6 +1566,8 @@ Public Class frmDiagramPGS
             lrShapeNode.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
             lrShapeNode.TextFormat.Alignment = StringAlignment.Center
             lrShapeNode.TextFormat.LineAlignment = StringAlignment.Center
+            lrShapeNode.Pen.Width = 0.5
+
             Me.MorphVector(0).Shape = lrShapeNode
 
 
@@ -1642,6 +1645,7 @@ Public Class frmDiagramPGS
                                 lrAdditionalShapeNode.Visible = True
                                 lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
                                 lrAdditionalShapeNode.Shape = Shapes.Ellipse
+                                lrAdditionalShapeNode.Pen.Width = 0.5
 
                                 Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
                                 Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name

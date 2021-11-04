@@ -1058,7 +1058,9 @@ Skip: 'Because is not a ValueType
                 'Columns 
                 For Each lrColumn In lrTable.Column
                     lrColumn.DatabaseName = lrColumn.Name
-                    lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
+                    If Not My.Settings.ReverseEngineeringKeepDatabaseColumnNames Then
+                        lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
+                    End If
                 Next
 
                 lrTable.PrimarySupertype = Viev.Strings.MakeCapCamelCase(lrTable.PrimarySupertype)

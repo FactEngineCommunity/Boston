@@ -1684,6 +1684,12 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
 
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+
                 'Set the CoreModel VersionNr of the Model.
                 lrModel.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
 

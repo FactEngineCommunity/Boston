@@ -4999,7 +4999,7 @@ Namespace FBM
 
 
                 ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
-                    'Nothing to do (at this point), because is the latest version of the Core @ 16/05/2020
+                    'Nothing to do (at this point), because is the latest version of the Core @ 04/11/2021. See also performCoreManagement (below).
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
@@ -5119,6 +5119,21 @@ Namespace FBM
                 Call Me.Save()
             End If
 
+            If Me.CoreVersionNumber = "2.2" Then
+
+                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+                End If
+
+                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+
+                Me.CoreVersionNumber = "2.3"
+                Me.MakeDirty(False, False)
+                Call Me.Save()
+            End If
+
         End Sub
 
         Public Sub AddCoreERDPGSAndSTDModelElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
@@ -5138,21 +5153,24 @@ Namespace FBM
 
             'Now for ERDs/PGSs which have the same basic metamodel
             lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
             If lrCorePage Is Nothing Then
                 Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
             End If
-
             lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
+
+            'Now for CoreDerivations
+            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
+            If lrCorePage Is Nothing Then
+                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+            End If
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.
 
             'Now for StateTransitionDiagrams
             lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
             If lrCorePage Is Nothing Then
                 Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
             End If
-
-            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.
             '==================================================
 
             '----------------------------------------------------------------------------------------

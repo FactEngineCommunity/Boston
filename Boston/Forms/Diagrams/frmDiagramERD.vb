@@ -1271,6 +1271,7 @@ Public Class frmDiagramERD
             lrShapeNode.SetRect(Me.zrPage.SelectedObject(0).TableShape.Bounds, False)
             lrShapeNode.Font = New System.Drawing.Font("Arial", 10)
             lrShapeNode.TextFormat.Alignment = StringAlignment.Center
+            lrShapeNode.Pen.Width = 0.5
 
             lrShapeNode.Text = lr_page_object.Name
 
@@ -1350,6 +1351,7 @@ Public Class frmDiagramERD
         lrShapeNode.SetRect(Me.zrPage.SelectedObject(0).TableShape.Bounds, False)
         lrShapeNode.Font = New System.Drawing.Font("Arial", 10)
         lrShapeNode.TextFormat.Alignment = StringAlignment.Center
+        lrShapeNode.Pen.Width = 0.5
 
         lrShapeNode.Text = lrPageObject.Name
 
@@ -1438,6 +1440,7 @@ Public Class frmDiagramERD
                             lrAdditionalShapeNode.Visible = True
                             lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
                             lrAdditionalShapeNode.Shape = Shapes.RoundRect
+                            lrAdditionalShapeNode.Pen.Width = 0.5
 
                             Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
                             Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrEntity.Name
@@ -1494,7 +1497,7 @@ Public Class frmDiagramERD
             lrShapeNode = New ShapeNode(lrPageObject.Shape)
             lrShapeNode.Shape = Shapes.RoundRect
             lrShapeNode.SetRect(Me.zrPage.SelectedObject(0).TableShape.Bounds, False)
-
+            lrShapeNode.Pen.Width = 0.5
             lrShapeNode.Text = lrPageObject.Name
 
             Me.MorphVector(0).ModelElementId = Me.zrPage.SelectedObject(0).Id
@@ -1551,7 +1554,7 @@ Public Class frmDiagramERD
                             lrAdditionalShapeNode.Visible = True
                             lrAdditionalShapeNode.Move(lrAdditionalPageObject.X, lrAdditionalPageObject.Y)
                             lrAdditionalShapeNode.Shape = Shapes.RoundRect
-
+                            lrAdditionalShapeNode.Pen.Width = 0.5
 
                             Me.HiddenDiagram.Nodes.Add(lrAdditionalShapeNode)
                             Me.MorphVector(Me.MorphVector.Count - 1).ModelElementId = lrNode.Name

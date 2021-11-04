@@ -144,6 +144,7 @@ Public Enum pcenumCMMLRelations
     Enum pcenumCMMLCorePage
         CoreActorEntityTypes
         CoreDataFlowDiagram
+        CoreDerivations
         CoreEntityRelationshipDiagram
         CoreEventTraceDiagram
         CoreFlowchart

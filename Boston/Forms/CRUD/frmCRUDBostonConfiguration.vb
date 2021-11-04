@@ -85,6 +85,9 @@ Public Class frmCRUDBostonConfiguration
 
         Me.CheckBoxAutoCompleteSingleClickSelects.Checked = My.Settings.AutoCompleteSingleClickSelects
 
+        'Reverse Engineering
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked = My.Settings.ReverseEngineeringKeepDatabaseColumnNames
+
     End Sub
 
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -129,6 +132,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
             My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
             My.Settings.AutoCompleteSingleClickSelects = Me.CheckBoxAutoCompleteSingleClickSelects.Checked
+            My.Settings.ReverseEngineeringKeepDatabaseColumnNames = Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked
 
             'Superuser Mode          
             My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked

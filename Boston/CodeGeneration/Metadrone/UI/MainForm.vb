@@ -14,7 +14,7 @@
             Me.Cursor = Cursors.WaitCursor
 
             'Indicate debug switches
-            If Not My.Application.EXEC_ParseInThread Then Me.Text &= "      (parse no thread)"
+            'If Not My.Application.EXEC_ParseInThread Then Me.Text &= "      (parse no thread)"
             If My.Application.EXEC_ErrorSensitivity = My.MyApplication.ErrorSensitivity.Noisy Then Me.Text &= "      (noisy)"
 
             'Initialise

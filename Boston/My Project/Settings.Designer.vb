@@ -320,7 +320,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
         Public Property DisplayCoreMetaModel() As Boolean
             Get
                 Return CType(Me("DisplayCoreMetaModel"),Boolean)
@@ -759,6 +759,18 @@ Namespace My
             End Get
             Set
                 Me("CodeGenerationDispellLinkFactTypesIncomingRelations") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ReverseEngineeringKeepDatabaseColumnNames() As Boolean
+            Get
+                Return CType(Me("ReverseEngineeringKeepDatabaseColumnNames"),Boolean)
+            End Get
+            Set
+                Me("ReverseEngineeringKeepDatabaseColumnNames") = value
             End Set
         End Property
     End Class

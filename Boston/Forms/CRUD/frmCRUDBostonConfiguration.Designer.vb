@@ -26,6 +26,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.Button_Cancel = New System.Windows.Forms.Button()
         Me.button_okay = New System.Windows.Forms.Button()
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
+        Me.GroupBoxAutoComplete = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxAutoCompleteSingleClickSelects = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.LabelConfigurationFileLocation = New System.Windows.Forms.Label()
@@ -71,9 +73,11 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.GroupBoxAutoComplete = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxAutoCompleteSingleClickSelects = New System.Windows.Forms.CheckBox()
+        Me.TabPage6 = New System.Windows.Forms.TabPage()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
+        Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -90,7 +94,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBoxAutoComplete.SuspendLayout()
+        Me.TabPage6.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -123,6 +128,26 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox_main.Size = New System.Drawing.Size(595, 571)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
+        '
+        'GroupBoxAutoComplete
+        '
+        Me.GroupBoxAutoComplete.Controls.Add(Me.CheckBoxAutoCompleteSingleClickSelects)
+        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 484)
+        Me.GroupBoxAutoComplete.Name = "GroupBoxAutoComplete"
+        Me.GroupBoxAutoComplete.Size = New System.Drawing.Size(556, 69)
+        Me.GroupBoxAutoComplete.TabIndex = 15
+        Me.GroupBoxAutoComplete.TabStop = False
+        Me.GroupBoxAutoComplete.Text = "AutoComplete"
+        '
+        'CheckBoxAutoCompleteSingleClickSelects
+        '
+        Me.CheckBoxAutoCompleteSingleClickSelects.AutoSize = True
+        Me.CheckBoxAutoCompleteSingleClickSelects.Location = New System.Drawing.Point(25, 29)
+        Me.CheckBoxAutoCompleteSingleClickSelects.Name = "CheckBoxAutoCompleteSingleClickSelects"
+        Me.CheckBoxAutoCompleteSingleClickSelects.Size = New System.Drawing.Size(218, 17)
+        Me.CheckBoxAutoCompleteSingleClickSelects.TabIndex = 0
+        Me.CheckBoxAutoCompleteSingleClickSelects.Text = "Single click selects item in AutoComplete"
+        Me.CheckBoxAutoCompleteSingleClickSelects.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -327,6 +352,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
+        Me.TabControl1.Controls.Add(Me.TabPage6)
         Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
@@ -351,7 +377,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage2.Size = New System.Drawing.Size(606, 583)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Client/Server"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -405,7 +431,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage3.Controls.Add(Me.GroupBoxFactEngine)
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage3.Size = New System.Drawing.Size(606, 583)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "FactEngine"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -512,7 +538,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage4.Controls.Add(Me.GroupBoxERDiagrams)
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage4.Size = New System.Drawing.Size(606, 583)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "ER Diagrams"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -545,7 +571,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(606, 502)
+        Me.TabPage5.Size = New System.Drawing.Size(606, 583)
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "Boston"
         Me.TabPage5.UseVisualStyleBackColor = True
@@ -580,25 +606,37 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'GroupBoxAutoComplete
+        'TabPage6
         '
-        Me.GroupBoxAutoComplete.Controls.Add(Me.CheckBoxAutoCompleteSingleClickSelects)
-        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 484)
-        Me.GroupBoxAutoComplete.Name = "GroupBoxAutoComplete"
-        Me.GroupBoxAutoComplete.Size = New System.Drawing.Size(556, 69)
-        Me.GroupBoxAutoComplete.TabIndex = 15
-        Me.GroupBoxAutoComplete.TabStop = False
-        Me.GroupBoxAutoComplete.Text = "AutoComplete"
+        Me.TabPage6.Controls.Add(Me.GroupBox5)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage6.Name = "TabPage6"
+        Me.TabPage6.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage6.TabIndex = 5
+        Me.TabPage6.Text = "Reverse Engineering"
+        Me.TabPage6.UseVisualStyleBackColor = True
         '
-        'CheckBoxAutoCompleteSingleClickSelects
+        'GroupBox5
         '
-        Me.CheckBoxAutoCompleteSingleClickSelects.AutoSize = True
-        Me.CheckBoxAutoCompleteSingleClickSelects.Location = New System.Drawing.Point(25, 29)
-        Me.CheckBoxAutoCompleteSingleClickSelects.Name = "CheckBoxAutoCompleteSingleClickSelects"
-        Me.CheckBoxAutoCompleteSingleClickSelects.Size = New System.Drawing.Size(218, 17)
-        Me.CheckBoxAutoCompleteSingleClickSelects.TabIndex = 0
-        Me.CheckBoxAutoCompleteSingleClickSelects.Text = "Single click selects item in AutoComplete"
-        Me.CheckBoxAutoCompleteSingleClickSelects.UseVisualStyleBackColor = True
+        Me.GroupBox5.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox5.Controls.Add(Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames)
+        Me.GroupBox5.Location = New System.Drawing.Point(3, 6)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(600, 574)
+        Me.GroupBox5.TabIndex = 0
+        Me.GroupBox5.TabStop = False
+        '
+        'CheckBoxReverseEngineeringKeepDatabaseColumnNames
+        '
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.AutoSize = True
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Name = "CheckBoxReverseEngineeringKeepDatabaseColumnNames"
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Size = New System.Drawing.Size(222, 17)
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.TabIndex = 0
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Text = "Keep database column names (e.g. case)"
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -613,6 +651,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabText = "Boston Configuration"
         Me.Text = "Boston Configuration"
         Me.GroupBox_main.ResumeLayout(False)
+        Me.GroupBoxAutoComplete.ResumeLayout(False)
+        Me.GroupBoxAutoComplete.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.TableLayoutPanel1.ResumeLayout(False)
@@ -639,8 +679,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBoxAutoComplete.ResumeLayout(False)
-        Me.GroupBoxAutoComplete.PerformLayout()
+        Me.TabPage6.ResumeLayout(False)
+        Me.GroupBox5.ResumeLayout(False)
+        Me.GroupBox5.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -694,4 +735,7 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents LabelPromptFactEngineUserDateFormat As Label
     Friend WithEvents GroupBoxAutoComplete As GroupBox
     Friend WithEvents CheckBoxAutoCompleteSingleClickSelects As CheckBox
+    Friend WithEvents TabPage6 As TabPage
+    Friend WithEvents GroupBox5 As GroupBox
+    Friend WithEvents CheckBoxReverseEngineeringKeepDatabaseColumnNames As CheckBox
 End Class
