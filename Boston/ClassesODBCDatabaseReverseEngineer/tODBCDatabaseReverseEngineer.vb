@@ -465,6 +465,18 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.AppendProgress(".")
             Next
 
+            'Revert Column Names to Column.DatabaseName if necessary
+            If My.Settings.ReverseEngineeringKeepDatabaseColumnNames Then
+                Call Me.SetProgressBarValue(97, "Setting Column/Attribute names to the case in the database.")
+                For Each lrTable In Me.Model.RDS.Table
+                    For Each lrColumn In lrTable.Column
+                        If lrColumn.ActiveRole.JoinedORMObject.DBName <> "" Then
+                            lrColumn.setName(lrColumn.ActiveRole.JoinedORMObject.DBName)
+                        End If
+                    Next
+                Next
+            End If
+
             Call Me.SetProgressBarValue(100)
 
         Catch ex As Exception
@@ -1058,9 +1070,7 @@ Skip: 'Because is not a ValueType
                 'Columns 
                 For Each lrColumn In lrTable.Column
                     lrColumn.DatabaseName = lrColumn.Name
-                    If Not My.Settings.ReverseEngineeringKeepDatabaseColumnNames Then
-                        lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
-                    End If
+                    lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
                 Next
 
                 lrTable.PrimarySupertype = Viev.Strings.MakeCapCamelCase(lrTable.PrimarySupertype)

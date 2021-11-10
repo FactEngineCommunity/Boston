@@ -461,6 +461,7 @@ Namespace ERD
                     lrERAttribute.Mandatory = lrColumn.IsMandatory
                     'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
                     lrERAttribute.PartOfPrimaryKey = lrColumn.isPartOfPrimaryKey
+                    lrERAttribute.IsDerivationParameter = lrColumn.IsDerivationParameter
                     lrERAttribute.Page = Me.Page
 
                     lrERAttribute.Column = lrColumn

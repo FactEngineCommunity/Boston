@@ -236,6 +236,7 @@ Namespace RDS
         Public Event AddedToPrimaryKey()
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
+        Public Event IsDerivationParameterChanged(ByVal abIsDerivationParameter As Boolean)
         Public Event IsMandatoryChanged(ByRef abIsMandatory As Boolean)
         Public Event NameChanged(ByVal asNewName As String)
         Public Event ContributesToPrimaryKeyChanged(ByVal abContributesToPrimaryKey As Boolean)
@@ -719,6 +720,31 @@ Namespace RDS
             Call Me.Model.Model.updateORSetCMMLPropertyActiveRole(Me)
 
             RaiseEvent ActiveRoleChanged()
+
+        End Sub
+
+        Public Sub setIsDerivationParameter(ByVal abIsDerivationParameter As Boolean)
+
+            Try
+                'CMML - Do CMML First
+                If abIsDerivationParameter And Not Me.IsDerivationParameter Then
+                    Call Me.Model.Model.addCMMLIsDerivedFactTypeParameter(Me)
+                ElseIf Not abIsDerivationParameter Then
+                    Call Me.Model.Model.removeCMMLIsDerivedFactTypeParameter(Me)
+                End If
+
+                Me.IsDerivationParameter = abIsDerivationParameter
+
+                RaiseEvent IsDerivationParameterChanged(abIsDerivationParameter)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

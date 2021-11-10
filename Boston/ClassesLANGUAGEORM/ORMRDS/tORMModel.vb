@@ -1940,6 +1940,17 @@ Namespace FBM
                                 lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                                 lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
 
+                                'Is Derived Fact Type Parameter
+                                lsSQLQuery = " SELECT COUNT(*)"
+                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter.ToString
+                                lsSQLQuery &= " WHERE IsDerivedFactTypeParameter = '" & lrColumn.Id & "'"
+
+                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                If lrORMRecordset3(0).Data > 0 Then
+                                    lrColumn.IsDerivationParameter = True
+                                End If
+
                                 lrTable.Column.Add(lrColumn)
                             End If
 

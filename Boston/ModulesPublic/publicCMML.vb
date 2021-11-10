@@ -67,6 +67,7 @@ Public Enum pcenumCMMLRelations
         CoreRelationIsForEntity
         CoreRelationHasDestinationEntity
         CoreIsMandatory
+        CoreAttributeIsDerivedFactTypeParameter
         CoreIsPGSRelation
         CoreOriginIsMandatory
         CoreOriginMultiplicity

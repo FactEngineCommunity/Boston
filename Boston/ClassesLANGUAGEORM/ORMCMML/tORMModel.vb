@@ -108,6 +108,29 @@ Namespace FBM
 
         End Sub
 
+        Public Sub addCMMLIsDerivedFactTypeParameter(ByRef arColumn As RDS.Column)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter.ToString
+                lsSQLQuery &= " (IsDerivedFactTypeParameter)"
+                lsSQLQuery &= " VALUES ('" & arColumn.Id & "')"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         ''' <summary>
         ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.
         ''' </summary>
@@ -1112,6 +1135,28 @@ Namespace FBM
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
         End Sub
+
+        Public Sub removeCMMLIsDerivedFactTypeParameter(ByRef arColumn As RDS.Column)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter.ToString
+                lsSQLQuery &= " WHERE IsDerivedFactTypeParameter = '" & arColumn.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
         Public Sub removeCMMLIsPGSRelation(ByRef arTable As RDS.Table)
 

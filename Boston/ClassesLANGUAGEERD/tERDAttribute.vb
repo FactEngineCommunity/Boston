@@ -60,16 +60,17 @@ Namespace ERD
             End Set
         End Property
 
+        Private _IsDerivationParameter As Boolean = False
         <CategoryAttribute("Attribute"),
         [ReadOnly](False),
         DefaultValueAttribute(GetType(String), ""),
         DescriptionAttribute("True if the Attribute is a Parameter to a Derived Fact Type.")>
         Public Overridable Property IsDerivationParameter() As Boolean
             Get
-                Return Me.Column.IsDerivationParameter
+                Return _IsDerivationParameter
             End Get
             Set(ByVal value As Boolean)
-                Me.Column.IsDerivationParameter = value
+                Me._IsDerivationParameter = value
             End Set
         End Property
 
@@ -356,6 +357,8 @@ Namespace ERD
                                 Me.AttributeName = Me.Column.Name
                                 MsgBox("You can't have a zero length Attribute name.")
                             End If
+                        Case Is = "IsDerivationParameter"
+                            Call Me.Column.setIsDerivationParameter(Me.IsDerivationParameter)
                     End Select
                 End If
 
@@ -553,6 +556,22 @@ Namespace ERD
                     'Column may be moved to a new Table/Entity, so may not exist in Me.Entity.
                     Call Me.Entity.RefreshShape()
                 End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub Column_IsDerivationParameterChanged(abIsDerivationParameter As Boolean) Handles Column.IsDerivationParameterChanged
+
+            Try
+                Me.IsDerivationParameter = abIsDerivationParameter
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

@@ -151,187 +151,201 @@ Public Class frmGlossary
         Dim lrVerbaliser As New FBM.ORMVerbailser
         Call lrVerbaliser.Reset()
 
-        '------------------------------------------------------
-        'Declare that the EntityType(Name) is an EntityType
-        '------------------------------------------------------
-        lrVerbaliser.VerbaliseModelObject(arEntityType)
-        lrVerbaliser.VerbaliseQuantifier(" is an Entity Type.")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
+        Try
 
-        If (arEntityType.ShortDescription <> "") Or (arEntityType.LongDescription <> "") Then
-            lrVerbaliser.VerbaliseQuantifier("Informally: ")
+            '------------------------------------------------------
+            'Declare that the EntityType(Name) is an EntityType
+            '------------------------------------------------------
+            lrVerbaliser.VerbaliseModelObject(arEntityType)
+            lrVerbaliser.VerbaliseQuantifier(" is an Entity Type.")
             lrVerbaliser.HTW.WriteBreak()
-            If arEntityType.ShortDescription <> "" Then
-                lrVerbaliser.VerbaliseQuantifier("(Short Description) ")
-                lrVerbaliser.VerbaliseHeading(arEntityType.ShortDescription)
+            lrVerbaliser.HTW.WriteBreak()
+
+            If (arEntityType.ShortDescription <> "") Or (arEntityType.LongDescription <> "") Then
+                lrVerbaliser.VerbaliseQuantifier("Informally: ")
+                lrVerbaliser.HTW.WriteBreak()
+                If arEntityType.ShortDescription <> "" Then
+                    lrVerbaliser.VerbaliseQuantifier("(Short Description) ")
+                    lrVerbaliser.VerbaliseHeading(arEntityType.ShortDescription)
+                End If
+                If arEntityType.LongDescription <> "" Then
+                    lrVerbaliser.VerbaliseQuantifier("(Long Description) ")
+                    lrVerbaliser.VerbaliseHeading(arEntityType.LongDescription)
+                End If
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
             End If
-            If arEntityType.LongDescription <> "" Then
-                lrVerbaliser.VerbaliseQuantifier("(Long Description) ")
-                lrVerbaliser.VerbaliseHeading(arEntityType.LongDescription)
+
+            '------------------------------
+            'Verbalise the ReferenceScheme
+            '------------------------------                   
+            Dim lrTopmostSupertype As FBM.EntityType
+            Dim lrFactType As FBM.FactType
+            Dim liInd As Integer = 0
+
+            If arEntityType.IsSubtype Then
+                lrTopmostSupertype = arEntityType.GetTopmostSupertype
+            Else 'Is Not Subtype
+                lrTopmostSupertype = arEntityType
             End If
-            lrVerbaliser.HTW.WriteBreak()
-            lrVerbaliser.HTW.WriteBreak()
-        End If
 
-        '------------------------------
-        'Verbalise the ReferenceScheme
-        '------------------------------                   
-        Dim lrTopmostSupertype As FBM.EntityType
-        Dim lrFactType As FBM.FactType
-        Dim liInd As Integer = 0
+            If lrTopmostSupertype.HasSimpleReferenceScheme Then
+                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: " & lrTopmostSupertype.Name & " has ")
+                lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
+                lrVerbaliser.VerbaliseQuantifier(" has ")
 
-        If arEntityType.IsSubtype Then
-            lrTopmostSupertype = arEntityType.GetTopmostSupertype
-        Else 'Is Not Subtype
-            lrTopmostSupertype = arEntityType
-        End If
+                lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype.ReferenceModeValueType)
 
-        If lrTopmostSupertype.HasSimpleReferenceScheme Then
-            lrVerbaliser.VerbaliseQuantifier("Reference Scheme: " & lrTopmostSupertype.Name & " has ")
-            lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
-            lrVerbaliser.VerbaliseQuantifier(" has ")
+                lrVerbaliser.HTW.WriteBreak()
 
-            lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype.ReferenceModeValueType)
-
-            lrVerbaliser.HTW.WriteBreak()
-
-            '----------------------------
-            'Verbalise the ReferenceMode
-            '----------------------------
-            lrVerbaliser.VerbaliseQuantifier("Reference Mode: ")
-            lrVerbaliser.VerbaliseQuantifier(lrTopmostSupertype.ReferenceMode)
-        ElseIf lrTopmostSupertype.HasCompoundReferenceMode Then
-            lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
-            For Each lrRoleConstraintRole In lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole
-                lrFactType = lrRoleConstraintRole.Role.FactType
-                Dim larRole As New List(Of FBM.Role)
-                larRole.Add(lrFactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
-                larRole.Add(lrRoleConstraintRole.Role)
-                Dim lrFactTypeReading As FBM.FactTypeReading
-                lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-                If lrFactTypeReading IsNot Nothing Then
-                    Call lrFactTypeReading.GetReadingText(lrVerbaliser)
-                Else
-                    lrVerbaliser.VerbaliseError("Provide a Fact Type Reading for the Fact Type:")
-                    lrVerbaliser.VerbaliseModelObject(lrFactType)
-                    lrVerbaliser.VerbaliseError(" with  " & lrRoleConstraintRole.Role.JoinedORMObject.Id & " at the last position in the reading.")
-                End If
-                If liInd < lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole.Count - 1 Then
-                    lrVerbaliser.VerbaliseQuantifier(", ")
-                End If
-                liInd += 1
-            Next
-        Else
-            lrVerbaliser.VerbaliseError("Provide a Reference Mode for the Entity Type:")
-            lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
-        End If
-
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-
-        '-------------------------------------------------
-        'FOR EACH IncomingLink (from a Role)
-        '  Verbalise the FactType for the associated Role
-        'LOOP 
-        '-------------------------------------------------
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseHeading("Fact Types:")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-
-        'LINQ
-        Dim FactType = From ft In zrModel.FactType, _
-                            rl In ft.RoleGroup _
-                            Where rl.JoinedORMObject.Id = arEntityType.Id _
-                            Select ft Distinct
-
-        For Each lrFactType In FactType
-
-            lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.class, "FTR")
-            lrVerbaliser.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
-
-            If lrFactType.FactTypeReading.Count = 0 Then
-                lrVerbaliser.VerbaliseModelObject(lrFactType)
-            Else
-                Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReading(arEntityType)
-
-                If lrFactTypeReading Is Nothing Then
-                    Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
-                Else
-                    If lrFactTypeReading.PredicatePart(0).Role.Mandatory Then
-                        lrVerbaliser.VerbaliseQuantifierLight("Each ")
-                    End If
-                    lrFactTypeReading.GetReadingText(lrVerbaliser, True)
-                End If
-
-                lrVerbaliser.VerbaliseTextLightGray(" (")
-                lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
-                lrVerbaliser.VerbaliseTextLightGray(") ")
-                '=======================================================================================
-                If lrFactType.IsBinaryFactType Then
-                    If lrFactType.Is1To1BinaryFactType Then
-                        If lrFactType.FactTypeReading.Count = 1 Then
-                            'No reverse reading is provided for the FactType.
-                            lrVerbaliser.HTW.WriteBreak()
-                            lrVerbaliser.VerbaliseIndent()
-                            Dim lrRole As FBM.Role
-                            lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id).Id)
-                            lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
-                            lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
-                            lrVerbaliser.VerbaliseModelObject(arEntityType)
-                        Else
-                            lrVerbaliser.HTW.WriteBreak()
-                            lrVerbaliser.VerbaliseIndent()
-                            lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
-                        End If
+                '----------------------------
+                'Verbalise the ReferenceMode
+                '----------------------------
+                lrVerbaliser.VerbaliseQuantifier("Reference Mode: ")
+                lrVerbaliser.VerbaliseQuantifier(lrTopmostSupertype.ReferenceMode)
+            ElseIf lrTopmostSupertype.HasCompoundReferenceMode Then
+                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
+                For Each lrRoleConstraintRole In lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole
+                    lrFactType = lrRoleConstraintRole.Role.FactType
+                    Dim larRole As New List(Of FBM.Role)
+                    larRole.Add(lrFactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
+                    larRole.Add(lrRoleConstraintRole.Role)
+                    Dim lrFactTypeReading As FBM.FactTypeReading
+                    lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                    If lrFactTypeReading IsNot Nothing Then
+                        Call lrFactTypeReading.GetReadingText(lrVerbaliser)
                     Else
-                        If lrFactType.FactTypeReading.Count > 1 Then
-                            lrVerbaliser.HTW.WriteBreak()
-                            lrVerbaliser.VerbaliseIndent()
-                            lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
-                        End If
+                        lrVerbaliser.VerbaliseError("Provide a Fact Type Reading for the Fact Type:")
+                        lrVerbaliser.VerbaliseModelObject(lrFactType)
+                        lrVerbaliser.VerbaliseError(" with  " & lrRoleConstraintRole.Role.JoinedORMObject.Id & " at the last position in the reading.")
                     End If
-                End If
-                '=======================================================================================                
+                    If liInd < lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole.Count - 1 Then
+                        lrVerbaliser.VerbaliseQuantifier(", ")
+                    End If
+                    liInd += 1
+                Next
+            Else
+                lrVerbaliser.VerbaliseError("Provide a Reference Mode for the Entity Type:")
+                lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
             End If
 
-            lrVerbaliser.HTW.RenderEndTag()
+            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
-        Next
-
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseQuantifier("Subtypes:")
-        lrVerbaliser.HTW.WriteBreak()
-
-        Dim lrModelObject As FBM.ModelObject
-        If arEntityType.childModelObjectList.Count = 0 Then
-            lrVerbaliser.VerbaliseQuantifierLight("There are no Subtypes of this Entity Type.")
+            '-------------------------------------------------
+            'FOR EACH IncomingLink (from a Role)
+            '  Verbalise the FactType for the associated Role
+            'LOOP 
+            '-------------------------------------------------
             lrVerbaliser.HTW.WriteBreak()
-        Else
+            lrVerbaliser.VerbaliseHeading("Fact Types:")
             lrVerbaliser.HTW.WriteBreak()
-            For Each lrModelObject In arEntityType.childModelObjectList
-                lrVerbaliser.VerbaliseModelObject(lrModelObject)
+            lrVerbaliser.HTW.WriteBreak()
+
+            'LINQ
+            Dim FactType = From ft In zrModel.FactType,
+                                rl In ft.RoleGroup
+                           Where rl.JoinedORMObject.Id = arEntityType.Id
+                           Select ft Distinct
+
+            For Each lrFactType In FactType
+
+                lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.class, "FTR")
+                lrVerbaliser.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
+
+                If lrFactType.FactTypeReading.Count = 0 Then
+                    lrVerbaliser.VerbaliseModelObject(lrFactType)
+                Else
+                    Dim lrFactTypeReading = lrFactType.getOutgoingFactTypeReading(arEntityType)
+
+                    If lrFactTypeReading Is Nothing Then
+                        Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
+                    Else
+                        If lrFactTypeReading.PredicatePart(0).Role.Mandatory Then
+                            lrVerbaliser.VerbaliseQuantifierLight("Each ")
+                        End If
+                        lrFactTypeReading.GetReadingText(lrVerbaliser, True)
+                    End If
+
+                    lrVerbaliser.VerbaliseTextLightGray(" (")
+                    lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
+                    lrVerbaliser.VerbaliseTextLightGray(") ")
+                    '=======================================================================================
+                    If lrFactType.IsBinaryFactType Then
+                        If lrFactType.Is1To1BinaryFactType Then
+                            If lrFactType.FactTypeReading.Count = 1 Then
+                                'No reverse reading is provided for the FactType.
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                Dim lrRole As FBM.Role
+                                lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id).Id)
+                                lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
+                                lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
+                                lrVerbaliser.VerbaliseModelObject(arEntityType)
+                            Else
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
+                            End If
+                        Else
+                            If lrFactType.FactTypeReading.Count > 1 Then
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                Try
+                                    lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
+                                Catch ex As Exception
+                                    'Not a biggie.
+                                End Try
+
+                            End If
+                        End If
+                    End If
+                    '=======================================================================================                
+                End If
+
+                lrVerbaliser.HTW.RenderEndTag()
                 lrVerbaliser.HTW.WriteBreak()
+
             Next
-        End If
 
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseQuantifier("Supertypes:")
-        lrVerbaliser.HTW.WriteBreak()
-
-        If arEntityType.parentModelObjectList.Count = 0 Then
-            lrVerbaliser.VerbaliseQuantifierLight("There are no Supertypes of this Entity Type.")
-        Else
             lrVerbaliser.HTW.WriteBreak()
-            For Each lrModelObject In arEntityType.parentModelObjectList
-                lrVerbaliser.VerbaliseModelObject(lrModelObject)
-                lrVerbaliser.HTW.WriteBreak()
-            Next
-        End If
+            lrVerbaliser.VerbaliseQuantifier("Subtypes:")
+            lrVerbaliser.HTW.WriteBreak()
 
-        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            Dim lrModelObject As FBM.ModelObject
+            If arEntityType.childModelObjectList.Count = 0 Then
+                lrVerbaliser.VerbaliseQuantifierLight("There are no Subtypes of this Entity Type.")
+                lrVerbaliser.HTW.WriteBreak()
+            Else
+                lrVerbaliser.HTW.WriteBreak()
+                For Each lrModelObject In arEntityType.childModelObjectList
+                    lrVerbaliser.VerbaliseModelObject(lrModelObject)
+                    lrVerbaliser.HTW.WriteBreak()
+                Next
+            End If
+
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Supertypes:")
+            lrVerbaliser.HTW.WriteBreak()
+
+            If arEntityType.parentModelObjectList.Count = 0 Then
+                lrVerbaliser.VerbaliseQuantifierLight("There are no Supertypes of this Entity Type.")
+            Else
+                lrVerbaliser.HTW.WriteBreak()
+                For Each lrModelObject In arEntityType.parentModelObjectList
+                    lrVerbaliser.VerbaliseModelObject(lrModelObject)
+                    lrVerbaliser.HTW.WriteBreak()
+                Next
+            End If
+
+        Catch ex As Exception
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseError(ex.Message)
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseError(ex.StackTrace)
+        Finally
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+        End Try
 
     End Sub
 
