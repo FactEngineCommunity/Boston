@@ -4464,4 +4464,51 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub ImportormNORMAFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ImportormNORMAFileToolStripMenuItem.Click
+
+        Try
+
+            Dim lsMessage As String = ""
+            Me.DialogOpenFile.DefaultExt = "orm"
+            Me.DialogOpenFile.Filter = "NORMA Files (*.orm)|*.orm"
+
+            If Me.DialogOpenFile.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+
+                '=========================================================================================
+                'ModelName/Id & Model
+                Dim lsModelName As String = Path.GetFileNameWithoutExtension(Me.DialogOpenFile.FileName)
+
+                Dim lrModel As New FBM.Model(lsModelName, lsModelName)
+
+                If TableModel.ExistsModelById(lrModel.ModelId) Then
+                    lrModel.ModelId = System.Guid.NewGuid.ToString
+                End If
+
+                If TableModel.ExistsModelByName(lrModel.Name) Then
+                    lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
+                End If
+
+                '========================================================================================
+                'XDocument
+                Dim loXDocument As XDocument = XDocument.Load(Me.DialogOpenFile.FileName)
+
+                '========================================================================================
+                'TreeNode
+                Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
+
+                '========================================================================================
+                'Load the NORMA file
+                Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class
