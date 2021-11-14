@@ -65,6 +65,7 @@ Namespace NORMA
 
                     If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
                         lrEntityType.ReferenceModeFactType = lrEntityType.ReferenceModeRoleConstraint.Role(0).FactType
+                        lrEntityType.ReferenceModeFactType.IsPreferredReferenceMode = True
                     End If
                 Next
 
@@ -107,10 +108,10 @@ Namespace NORMA
                                            From FactRoles In ModelInformation.<orm:FactRoles>
                                            From SubtypeMetaRole In FactRoles.<orm:SubtypeMetaRole>
                                            From RolePlayer In SubtypeMetaRole.<orm:RolePlayer>
-                                           Where RolePlayer.Attribute("ref") = lrEntityType.Id
+                                           Where RolePlayer.Attribute("ref") = lrEntityType.NORMAReferenceId
                                            Select ModelInformation
 
-                If IsSomething(loEnumElementQueryResult(0)) Then
+                If loEnumElementQueryResult.Count > 0 Then
                     For Each loElement In loEnumElementQueryResult
 
                         Dim lrSupertypeEntityType As New FBM.EntityType(arModel, pcenumLanguage.ORMModel)
@@ -1609,8 +1610,8 @@ Namespace NORMA
                     '-----------------------
                     lrEntityType = New FBM.EntityType
                     lrEntityType.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
-                                                 Where ModelInformation.Attribute("id") = lrEntityType.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                              Where ModelInformation.Attribute("id") = lrEntityType.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrEntityType.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -1618,6 +1619,7 @@ Namespace NORMA
                     Else
                         lrEntityType = Nothing
                     End If
+
                     '-----------------------
                     'ValueType
                     '-----------------------
@@ -1650,7 +1652,6 @@ Namespace NORMA
                     Else
                         lrFactType = Nothing
                     End If
-
 
                     If IsSomething(lrEntityType) Then
                         lrEntityTypeInstance = New FBM.EntityTypeInstance

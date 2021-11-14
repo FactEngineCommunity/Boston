@@ -1057,70 +1057,88 @@ Namespace FBM
                 loRectangle = New Rectangle(Me.X, Me.Y, Me.EntityTypeNameShape.Bounds.Width + 4, 8)
                 Me.Shape.SetRect(loRectangle, False)
 
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+                If larFactTypeInstance.Count = 0 And Me.EntityType.ReferenceModeFactType IsNot Nothing Then
+
+                    lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(Me.EntityType.ReferenceModeFactType,
+                                                                     New PointF(10, 10),
+                                                                     False,
+                                                                     False,
+                                                                     True,
+                                                                     False)
+
+                ElseIf larFactTypeInstance.Count = 0 Then
+                    Exit Sub
+                Else
+                    lrFactTypeInstance = larFactTypeInstance.First
+                End If
+
                 '----------------------------------------------------------------------------------------
                 'Expand (show) the FactType/ValueType representing the ReferenceMode for the EntityType
                 '----------------------------------------------------------------------------------------
-                For Each lrFactTypeInstance In larFactTypeInstance
-                    If lrFactTypeInstance.IsObjectified Then
-                        lrFactTypeInstance.Shape.Visible = True
-                    End If
-                    lrFactTypeInstance.X = Me.X + (2 * Me.Shape.Bounds.Width) - (lrFactTypeInstance.Shape.Bounds.Width / 2)
-                    lrFactTypeInstance.Y = Me.Y - Me.Shape.Bounds.Height
+
+                If lrFactTypeInstance.IsObjectified Then
                     lrFactTypeInstance.Shape.Visible = True
-                    lrFactTypeInstance.FactTable.TableShape.Visible = False
-                    lrFactTypeInstance.SetAppropriateColour()
+                End If
+                lrFactTypeInstance.X = Me.X + (2 * Me.Shape.Bounds.Width) - (lrFactTypeInstance.Shape.Bounds.Width / 2)
+                lrFactTypeInstance.Y = Me.Y - Me.Shape.Bounds.Height
+                lrFactTypeInstance.Shape.Visible = True
+                lrFactTypeInstance.FactTable.TableShape.Visible = False
+                lrFactTypeInstance.SetAppropriateColour()
 
-                    loRectangle = New Rectangle(lrFactTypeInstance.X - 20, _
-                                                lrFactTypeInstance.Y - 7, _
-                                                lrFactTypeInstance.FactTypeNameShape.Bounds.Width + 4, _
-                                                lrFactTypeInstance.FactTypeNameShape.Bounds.Height)
+                loRectangle = New Rectangle(lrFactTypeInstance.X - 20,
+                                            lrFactTypeInstance.Y - 7,
+                                            lrFactTypeInstance.FactTypeNameShape.Bounds.Width + 4,
+                                            lrFactTypeInstance.FactTypeNameShape.Bounds.Height)
 
-                    If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
-                        lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
-                    End If
-                    Dim lrRoleInstance As FBM.RoleInstance
-                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                    Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-                    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                        lrRoleInstance.Shape.Visible = True
-                        lrRoleInstance.Link.Visible = True
-                        For Each lrRoleConstraintInstance In lrRoleInstance.RoleConstraint
-                            For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                                lrRoleConstraintRoleInstance.Shape.Visible = True
-                            Next
-                        Next
-                        If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
-                            Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
-                            lrValueTypeInstance.X = Me.X + (3 * Me.Shape.Bounds.Width)
-                            lrValueTypeInstance.Y = Me.Y
-
-                            Call Me.getBlankCellCloseBy(lrValueTypeInstance.X, lrValueTypeInstance.Y, 40)
-
-                            lrValueTypeInstance.Shape.Visible = True
-                            lrValueTypeInstance._ValueConstraint.Shape.Visible = True
-
-                            '------------------------------------------------------------------------------------
-                            'Code Safe: If the EntityType/Instance.PreferredIdentifierRCId is not set, then set it
-                            '------------------------------------------------------------------------------------
-                            If Trim(Me.PreferredIdentifierRCId) = "" Then
-                                If lrRoleInstance.RoleConstraint.Count > 0 Then
-                                    Me.PreferredIdentifierRCId = lrRoleInstance.RoleConstraint(0).Id
-                                    Me.EntityType.PreferredIdentifierRCId = lrRoleInstance.RoleConstraint(0).Id
-                                End If
-                            End If
-                        End If
-                    Next
-                    For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
+                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
+                End If
+                Dim lrRoleInstance As FBM.RoleInstance
+                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+                    lrRoleInstance.Shape.Visible = True
+                    lrRoleInstance.Link.Visible = True
+                    For Each lrRoleConstraintInstance In lrRoleInstance.RoleConstraint
                         For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
                             lrRoleConstraintRoleInstance.Shape.Visible = True
                         Next
                     Next
+                    If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
+                        Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
+                        lrValueTypeInstance.X = Me.X + (3 * Me.Shape.Bounds.Width)
+                        lrValueTypeInstance.Y = Me.Y
 
-                    Me.SetAdjoinedFactTypesBetweenModelElements(lrFactTypeInstance)
+                        Call Me.getBlankCellCloseBy(lrValueTypeInstance.X, lrValueTypeInstance.Y, 40)
 
-                    lrFactTypeInstance.SortRoleGroup()
-                    Me.Page.Invalidate()
+                        lrValueTypeInstance.Shape.Visible = True
+                        lrValueTypeInstance._ValueConstraint.Shape.Visible = True
+
+                        '------------------------------------------------------------------------------------
+                        'Code Safe: If the EntityType/Instance.PreferredIdentifierRCId is not set, then set it
+                        '------------------------------------------------------------------------------------
+                        If Trim(Me.PreferredIdentifierRCId) = "" Then
+                            If lrRoleInstance.RoleConstraint.Count > 0 Then
+                                Me.PreferredIdentifierRCId = lrRoleInstance.RoleConstraint(0).Id
+                                Me.EntityType.PreferredIdentifierRCId = lrRoleInstance.RoleConstraint(0).Id
+                            End If
+                        End If
+                    End If
                 Next
+                For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
+                    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
+                        lrRoleConstraintRoleInstance.Shape.Visible = True
+                    Next
+                Next
+
+                Me.SetAdjoinedFactTypesBetweenModelElements(lrFactTypeInstance)
+
+                lrFactTypeInstance.SortRoleGroup()
+                Me.Page.Invalidate()
+
+
 
                 Me.ExpandReferenceMode = True
                 Call Me.RefreshShape()

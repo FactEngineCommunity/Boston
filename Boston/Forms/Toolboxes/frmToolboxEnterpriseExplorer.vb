@@ -2218,7 +2218,6 @@ Public Class frmToolboxEnterpriseExplorer
 
         Dim NORMAXMLDOC As New XDocument
         Dim lrModel As New FBM.Model
-        Dim lrEntityType As FBM.EntityType
         Dim lrValueType As New FBM.ValueType
         Dim lrFactType As New FBM.FactType
         Dim lrRoleConstraint As New FBM.RoleConstraint
@@ -2336,15 +2335,15 @@ Public Class frmToolboxEnterpriseExplorer
         Call lrNORMAFileLoader.GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(arModel)
 
         '-------------------------------------------------------
-        'Get ModelObjectInstances by Page from the nORMa model
-        '-------------------------------------------------------
-        Richmond.WriteToStatusBar("Loading Paeg Model Object Instances")
-        Call lrNORMAFileLoader.LoadPageModelInstances(lrModel, NORMAXMLDOC)
-
-        '-------------------------------------------------------
         'SimpleReferenceSchemes
         '-------------------------------------------------------
         Call lrNORMAFileLoader.SetSimpleReferenceSchemes(lrModel, NORMAXMLDOC)
+
+        '-------------------------------------------------------
+        'Get ModelObjectInstances by Page from the nORMa model
+        '-------------------------------------------------------
+        Richmond.WriteToStatusBar("Loading Page Model Object Instances")
+        Call lrNORMAFileLoader.LoadPageModelInstances(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------------------------------------------------------------------
         'Set the Ids of EntityTypes, ValueTypes, FactTypes, RoleConstraints to the same as the Name of
@@ -4487,8 +4486,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Dim lsModelName As String = Path.GetFileNameWithoutExtension(Me.DialogOpenFile.FileName)
 
                 Dim lrModel As New FBM.Model(lsModelName, lsModelName)
+                Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
 
-                If TableModel.ExistsModelById(lrModel.ModelId) Then
+                If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
                     lrModel.ModelId = System.Guid.NewGuid.ToString
                 End If
 
