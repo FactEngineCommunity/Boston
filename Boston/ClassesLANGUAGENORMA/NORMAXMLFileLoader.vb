@@ -10,7 +10,69 @@ Namespace NORMA
 
     Public Class NORMAXMLFileLoader
 
+        Private FBMModel As FBM.Model = Nothing
+
+        ''' <summary>
+        ''' Key is NORMA reference, Value is data type name.
+        ''' </summary>
+        Private DataTypeDictionary As New Dictionary(Of String, String) 'Key is NORMA reference, Value is data type name.
+
+        ''' <summary>
+        ''' Parameterless constructor.
+        ''' </summary>
         Public Sub New()
+        End Sub
+
+        Public Sub New(ByRef arModel As FBM.Model)
+            Me.FBMModel = arModel
+        End Sub
+
+        Public Function getBostonDataTypeByNORMADataType(ByVal asNORMADataType As String) As pcenumORMDataType
+
+            Try
+                asNORMADataType = Trim(asNORMADataType)
+
+                Dim larDBDataType = From DatabaseDataType In Me.FBMModel.RDS.DatabaseDataType
+                                    Where UCase(DatabaseDataType.DataType) = UCase(asNORMADataType)
+                                    Where "NORMA" = DatabaseDataType.Database.ToString
+                                    Select DatabaseDataType.BostonDataType
+
+                If larDBDataType.Count > 0 Then
+                    Return larDBDataType.First
+                Else
+                    Return pcenumORMDataType.TextVariableLength
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return pcenumORMDataType.TextVariableLength
+            End Try
+
+        End Function
+
+        Public Sub getNORMADataTypes(ByRef arModel As FBM.Model)
+
+            Try
+                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
+
+                Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
+                arModel.RDS.DatabaseDataType = csvReader.GetRecords(Of DatabaseDataType).ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -83,6 +145,17 @@ Namespace NORMA
         Public Sub LoadDataTypes(ByRef arNORMAXMLDOC As XDocument)
 
             Try
+                Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+                Dim loElement As XElement
+
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:DataTypes>
+                                           Select ModelInformation
+
+                For Each loElement In loEnumElementQueryResult.Elements
+
+                    Me.DataTypeDictionary.Add(loElement.Attribute("id").Value, loElement.Name.LocalName)
+
+                Next
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -101,8 +174,8 @@ Namespace NORMA
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
             Dim loElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             '---------------------------------
@@ -153,34 +226,53 @@ Namespace NORMA
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
             Dim loElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
-                                     Select ModelInformation _
-                                      Order By ModelInformation.Attribute("Name").Value
+            Try
 
-            '---------------------------------
-            'Add the ValueTypes to the Model
-            '---------------------------------            
-            For Each loElement In loEnumElementQueryResult
-                lrValueType = New FBM.ValueType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value)
-                lrValueType.NORMAReferenceId = loElement.Attribute("id").Value
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
+                                           Select ModelInformation
+                                           Order By ModelInformation.Attribute("Name").Value
 
-                If Not arModel.ValueType.Exists(AddressOf lrValueType.EqualsByName) Then
-                    arModel.AddValueType(lrValueType, False, False, Nothing, True)
-                End If
+                '---------------------------------
+                'Add the ValueTypes to the Model
+                '---------------------------------            
+                For Each loElement In loEnumElementQueryResult
+                    lrValueType = New FBM.ValueType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value)
+                    lrValueType.NORMAReferenceId = loElement.Attribute("id").Value
 
-                Dim loIsNORMAUnaryFactTypeValueType As IEnumerable(Of XElement)
-                loIsNORMAUnaryFactTypeValueType = From ValueRange In loElement.<orm:ValueRestriction>.<orm:ValueConstraint>.<orm:ValueRanges>.<orm:ValueRange> _
-                                                  Select ValueRange
+                    If Not arModel.ValueType.Exists(AddressOf lrValueType.EqualsByName) Then
+                        arModel.AddValueType(lrValueType, False, False, Nothing, True)
+                    End If
 
-                Dim loValueRange As XElement
+                    Dim loIsNORMAUnaryFactTypeValueType As IEnumerable(Of XElement)
+                    loIsNORMAUnaryFactTypeValueType = From ValueRange In loElement.<orm:ValueRestriction>.<orm:ValueConstraint>.<orm:ValueRanges>.<orm:ValueRange>
+                                                      Select ValueRange
 
-                For Each loValueRange In loIsNORMAUnaryFactTypeValueType
-                    If loValueRange.Attribute("MinValue").Value = "True" And _
-                       loValueRange.Attribute("MaxValue").Value = "True" Then
-                        lrValueType.NORMAIsUnaryFactTypeValueType = True
+                    Dim loValueRange As XElement
+
+                    For Each loValueRange In loIsNORMAUnaryFactTypeValueType
+                        If loValueRange.Attribute("MinValue").Value = "True" And
+                           loValueRange.Attribute("MaxValue").Value = "True" Then
+                            lrValueType.NORMAIsUnaryFactTypeValueType = True
+                        End If
+                    Next
+
+                    Dim loDataTypeElement As XElement = loElement.<orm:ConceptualDataType>.AsEnumerable.First
+                    Dim lsNORMADataTypeName As String = ""
+                    If Me.DataTypeDictionary.TryGetValue(loDataTypeElement.Attribute("ref").Value, lsNORMADataTypeName) Then
+
+                        lrValueType.DataType = Me.getBostonDataTypeByNORMADataType(lsNORMADataTypeName)
+
                     End If
                 Next
-            Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -204,9 +296,9 @@ Namespace NORMA
 
             lrFactType = arFactType
 
-            loEnumElementQueryResult = From FactTypeInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
-                                      Where FactTypeInformation.Attribute("id").Value = lrFactType.Id _
-                                     Select FactTypeInformation
+            loEnumElementQueryResult = From FactTypeInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                       Where FactTypeInformation.Attribute("id").Value = lrFactType.Id
+                                       Select FactTypeInformation
 
             For Each loElement In loEnumElementQueryResult
 
@@ -221,9 +313,9 @@ Namespace NORMA
                     '---------------------------------------------
                     'Check to see if the FactType is Objectified
                     '---------------------------------------------
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
-                                             Where ModelInformation.Attribute("Name") = lrFactType.Name _
-                                            Select ModelInformation
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                              Where ModelInformation.Attribute("Name") = lrFactType.Name
+                                              Select ModelInformation
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrFactType.IsObjectified = True
@@ -250,8 +342,8 @@ Namespace NORMA
                         'Check to see if it is an EntityType
                         '-------------------------------------
                         lrJoinedEntityType = New FBM.EntityType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
-                                                   Where ModelInformation.Attribute("id") = lrModelObject.Id
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -264,8 +356,8 @@ Namespace NORMA
                         'Check to see if it is an ValueType
                         '-------------------------------------
                         lrValueType = New FBM.ValueType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
-                               Where ModelInformation.Attribute("id") = lrModelObject.Id
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -277,9 +369,9 @@ Namespace NORMA
                         'Check to see if it is an FactType
                         '-------------------------------------
                         lrJoinedFactType = New FBM.FactType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
-                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
-                                                Select ModelInformation
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                  Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -292,16 +384,16 @@ Namespace NORMA
                         'Check to see if it is an Objectified FactType
                         '-----------------------------------------------
                         lrJoinedFactType = New FBM.FactType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
-                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
-                                                Select ModelInformation
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                  Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
 
                             Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
-                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate> _
-                                                        Select NestedPredicateElement
+                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate>
+                                                          Select NestedPredicateElement
                             lrModelObject.Id = loXMLNestedPredicateElement(0).Attribute("ref").Value
 
                             lrJoinedFactType.Model = lrFactType.Model
@@ -431,9 +523,9 @@ Namespace NORMA
             '      Update the JoinedORMObject to the FactType that was missing on the initial load.
             '--------------------------------------------------------------------------------------------
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
-                                     Select ModelInformation _
-                                     Order By ModelInformation.Attribute("_Name").Value
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                       Select ModelInformation
+                                       Order By ModelInformation.Attribute("_Name").Value
 
             '---------------------------------
             'Add the FactTypes to the Model
@@ -454,9 +546,9 @@ Namespace NORMA
                     '---------------------------------------------
                     'Check to see if the FactType is Objectified
                     '---------------------------------------------
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
-                                             Where ModelInformation.Attribute("Name") = lrFactType.Name _
-                                            Select ModelInformation
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                              Where ModelInformation.Attribute("Name") = lrFactType.Name
+                                              Select ModelInformation
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrFactType.IsObjectified = True
@@ -483,8 +575,8 @@ Namespace NORMA
                         'Check to see if it is an EntityType
                         '-------------------------------------
                         lrJoinedEntityType = New FBM.EntityType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType> _
-                                                   Where ModelInformation.Attribute("id") = lrModelObject.Id
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -497,8 +589,8 @@ Namespace NORMA
                         'Check to see if it is an ValueType
                         '-------------------------------------
                         lrValueType = New FBM.ValueType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
-                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -510,9 +602,9 @@ Namespace NORMA
                         'Check to see if it is an FactType
                         '-------------------------------------
                         lrJoinedFactType = New FBM.FactType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
-                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
-                                                Select ModelInformation
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                  Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -525,9 +617,9 @@ Namespace NORMA
                         'Check to see if it is an Objectified FactType
                         '-----------------------------------------------
                         lrJoinedFactType = New FBM.FactType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType> _
-                                                 Where ModelInformation.Attribute("id") = lrModelObject.Id _
-                                                Select ModelInformation
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                  Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
 
@@ -535,8 +627,8 @@ Namespace NORMA
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
 
                             Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
-                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate> _
-                                                        Select NestedPredicateElement
+                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate>
+                                                          Select NestedPredicateElement
                             lrModelObject.NORMAReferenceId = loXMLNestedPredicateElement(0).Attribute("ref").Value
 
                             lrJoinedFactType.Model = arModel
@@ -639,23 +731,23 @@ Namespace NORMA
                 End If 'FactType exists in Model
             Next 'FactType
 
-            Dim larFaultyFactTypes = From FactType In arModel.FactType _
-                                     From Role In FactType.RoleGroup _
-                                    Where Role.JoinedORMObject Is Nothing _
-                                   Select FactType
+            Dim larFaultyFactTypes = From FactType In arModel.FactType
+                                     From Role In FactType.RoleGroup
+                                     Where Role.JoinedORMObject Is Nothing
+                                     Select FactType
 
             For Each lrFactType In larFaultyFactTypes
 
-                Dim larRole = From Role In lrFactType.RoleGroup _
-                             Where Role.JoinedORMObject Is Nothing _
-                            Select Role
+                Dim larRole = From Role In lrFactType.RoleGroup
+                              Where Role.JoinedORMObject Is Nothing
+                              Select Role
 
                 For Each lrRole In larRole
 
-                    loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
-                                               From Role In FactType.<orm:FactRoles>.<orm:Role> _
-                                              Where Role.Attribute("id").Value = lrRole.Id _
-                                             Select Role
+                    loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                               From Role In FactType.<orm:FactRoles>.<orm:Role>
+                                               Where Role.Attribute("id").Value = lrRole.Id
+                                               Select Role
 
                     For Each lrRoleXElement In loEnumElementQueryResult.<orm:RolePlayer>
                         '------------------------------------------------
@@ -680,8 +772,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -741,8 +833,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -803,8 +895,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -908,8 +1000,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -1015,8 +1107,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -1123,8 +1215,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -1242,8 +1334,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -1350,8 +1442,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -1457,8 +1549,8 @@ Namespace NORMA
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint> _
-                                       Select ModelInformation _
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint>
+                                       Select ModelInformation
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
@@ -1594,8 +1686,8 @@ Namespace NORMA
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<ormDiagram:ORMDiagram> _
-                                     Select ModelInformation
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<ormDiagram:ORMDiagram>
+                                       Select ModelInformation
 
             '---------------------------------------------------------------------------
             'Add the ModelObjects to the Pages.
@@ -1640,8 +1732,8 @@ Namespace NORMA
                     '-----------------------
                     lrValueType = New FBM.ValueType
                     lrValueType.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType> _
-                                                 Where ModelInformation.Attribute("id") = lrValueType.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
+                                              Where ModelInformation.Attribute("id") = lrValueType.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrValueType.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -1658,8 +1750,8 @@ Namespace NORMA
                     '---------------------------------------------------------------------------------------------------------------------
                     lrFactType = New FBM.FactType
                     lrFactType.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
-                                                 Where ModelInformation.Attribute("id") = lrFactType.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                              Where ModelInformation.Attribute("id") = lrFactType.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrFactType.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -1679,8 +1771,8 @@ Namespace NORMA
                             lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
                         End If
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                        lrEntityTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                        lrEntityTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                        lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
                     ElseIf IsSomething(lrValueType) Then
                         Dim lrValueTypeInstance As New FBM.ValueTypeInstance
                         lrValueTypeInstance = lrValueType.CloneInstance(lrPage)
@@ -1692,8 +1784,8 @@ Namespace NORMA
                         End If
                         Dim lsBounds() As String
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                        lrValueTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                        lrValueTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                        lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
                     ElseIf IsSomething(lrFactType) Then
                         lrFactTypeInstance = New FBM.FactTypeInstance
                         lrFactTypeInstance = lrFactType.CloneInstance(lrPage)
@@ -1705,8 +1797,8 @@ Namespace NORMA
                         End If
                         Dim lsBounds() As String
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                        lrFactTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                        lrFactTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                        lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
                     End If
                 Next 'lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
 
@@ -1738,7 +1830,7 @@ Namespace NORMA
                     lrFactType = New FBM.FactType
                     lrFactType.Id = lrObjectTypeXElement.Attribute("ref").Value
 
-                    loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact> _
+                    loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
                                                Where ModelInformation.Attribute("id") = lrFactType.Id
 
                     lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -1753,8 +1845,8 @@ Namespace NORMA
                         lrFactTypeInstance = lrFactType.CloneInstance(lrPage)
                         Richmond.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                        lrFactTypeInstance.x = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                        lrFactTypeInstance.y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                        lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
+                        lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
 
                         '-----------------------------------------------------------------------
                         'If the FactTypeInstance doesn't exist on the Page, add it to the Page
@@ -1791,18 +1883,18 @@ Namespace NORMA
                     End If 'IsSomething(lrFactType)
                 Next 'FactTypeShape in NORMA XML 
 
-                Dim larFaultyFactTypeInstances = From Page In arModel.Page _
-                                                 From FactTypeInstance In Page.FactTypeInstance _
-                                                 From Role In FactTypeInstance.RoleGroup _
-                                                Where Page.PageId = lrPage.PageId _
-                                                  And Role.JoinedORMObject Is Nothing _
-                                               Select FactTypeInstance
+                Dim larFaultyFactTypeInstances = From Page In arModel.Page
+                                                 From FactTypeInstance In Page.FactTypeInstance
+                                                 From Role In FactTypeInstance.RoleGroup
+                                                 Where Page.PageId = lrPage.PageId _
+                                                   And Role.JoinedORMObject Is Nothing
+                                                 Select FactTypeInstance
 
                 For Each lrFactTypeInstance In larFaultyFactTypeInstances
 
-                    Dim larRoleInstance = From RoleInstance In lrFactTypeInstance.RoleGroup _
-                                         Where RoleInstance.JoinedORMObject Is Nothing _
-                                        Select RoleInstance
+                    Dim larRoleInstance = From RoleInstance In lrFactTypeInstance.RoleGroup
+                                          Where RoleInstance.JoinedORMObject Is Nothing
+                                          Select RoleInstance
 
                     For Each lrRoleInstance In larRoleInstance
 
@@ -1868,8 +1960,8 @@ Namespace NORMA
                     '-----------------------
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -1906,8 +1998,8 @@ Namespace NORMA
                     '-----------------------
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -1947,8 +2039,8 @@ Namespace NORMA
                     '--------------------------------
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -1984,8 +2076,8 @@ Namespace NORMA
                     '-----------------------
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -2021,8 +2113,8 @@ Namespace NORMA
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
 
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 0 Then
@@ -2063,16 +2155,16 @@ Namespace NORMA
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
 
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 1 Then
                         If IsSomething(loXMLElementQueryResult(0)) Then
 
                             lrRoleConstraint.Id = loXMLElementQueryResult(0).<orm:ExclusiveOrExclusionConstraint>(0).Attribute("ref").Value
 
-                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
-                                                         Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
+                                                      Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                             lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -2109,8 +2201,8 @@ Namespace NORMA
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
 
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -2147,8 +2239,8 @@ Namespace NORMA
                     lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
 
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint> _
-                                                 Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint>
+                                              Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
 
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -2274,8 +2366,8 @@ Namespace NORMA
 
                     For Each lrFactDataXElement In lrFactXElement.<orm:RoleInstances>.<orm:FactTypeRoleInstance>
 
-                        Dim lrNORMAFactTypeRoleInstance = From RoleInstance In arElement.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:FactTypeRoleInstance> _
-                                                           Where RoleInstance.Attribute("id").Value = lrFactDataXElement.Attribute("ref").Value
+                        Dim lrNORMAFactTypeRoleInstance = From RoleInstance In arElement.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:FactTypeRoleInstance>
+                                                          Where RoleInstance.Attribute("id").Value = lrFactDataXElement.Attribute("ref").Value
 
                         For Each lrFactTypeRoleInstance In lrNORMAFactTypeRoleInstance
                             lrRole = New FBM.Role
@@ -2291,7 +2383,7 @@ Namespace NORMA
 
                             Select Case lrRole.TypeOfJoin
                                 Case Is = pcenumRoleJoinType.ValueType
-                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance> _
+                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance>
                                                      Where ValueType.Attribute("id").Value = lrFactData.Data
 
                                     If lrFactDataData.<orm:Value>.Value = "" Then
@@ -2303,27 +2395,27 @@ Namespace NORMA
                                     lrFact.Data.Add(lrFactData)
                                 Case Is = pcenumRoleJoinType.EntityType
 
-                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>.<orm:Instances>.<orm:EntityTypeInstance> _
-                                                      Where ValueType.Attribute("id").Value = lrFactData.Data
+                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>.<orm:Instances>.<orm:EntityTypeInstance>
+                                                     Where ValueType.Attribute("id").Value = lrFactData.Data
 
                                     If lrFactDataData.Any Then
                                         Dim lrEntityTypeRoleInstanceXAttributeList As IEnumerable(Of XElement)
                                         Dim lrEntityTypeRoleInstanceXAttribute As XElement
-                                        lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
-                                                                            Select EntityTypeRoleInstance
+                                        lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance>
+                                                                                 Select EntityTypeRoleInstance
 
                                         lrEntityTypeRoleInstanceXAttribute = lrEntityTypeRoleInstanceXAttributeList(0)
                                         lrFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
 
-                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
-                                                        Where RoleInstance.Attribute("id").Value = lrFactData.Data _
-                                                       Select RoleInstance
+                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance>
+                                                         Where RoleInstance.Attribute("id").Value = lrFactData.Data
+                                                         Select RoleInstance
 
                                         lrEntityTypeRoleInstanceXAttribute = lrFactDataData(0)
                                         lrFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
 
-                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance> _
-                                                        Where ValueType.Attribute("id").Value = lrFactData.Data
+                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance>
+                                                         Where ValueType.Attribute("id").Value = lrFactData.Data
 
                                         lrFactData.Data = lrFactDataData.<orm:Value>.Value
                                     Else
@@ -2334,13 +2426,13 @@ Namespace NORMA
 
                                 Case Is = pcenumRoleJoinType.FactType
 
-                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>.<orm:Instances>.<orm:EntityTypeInstance> _
-                                                      Where ValueType.Attribute("id").Value = lrFactData.Data
+                                    lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>.<orm:Instances>.<orm:EntityTypeInstance>
+                                                     Where ValueType.Attribute("id").Value = lrFactData.Data
 
                                     Dim lrEntityTypeRoleInstanceXAttributeList As IEnumerable(Of XElement)
                                     Dim lrEntityTypeRoleInstanceXAttribute As XElement
-                                    lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
-                                                                        Select EntityTypeRoleInstance
+                                    lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance>
+                                                                             Select EntityTypeRoleInstance
 
                                     Dim lrObjectifiedObjectTypeFact As New FBM.Fact(lrRole.JoinedORMObject)
                                     Dim lrObjectifiedObjectTypeFactData As FBM.FactData
@@ -2351,31 +2443,31 @@ Namespace NORMA
 
                                         lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstance.Attribute("ref").Value
 
-                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
-                                                        Where RoleInstance.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data _
-                                                       Select RoleInstance
+                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance>
+                                                         Where RoleInstance.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
+                                                         Select RoleInstance
 
                                         lrEntityTypeRoleInstanceXAttribute = lrFactDataData(0)
                                         lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
 
-                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>.<orm:Instances>.<orm:EntityTypeInstance> _
-                                                          Where ValueType.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
+                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>.<orm:Instances>.<orm:EntityTypeInstance>
+                                                         Where ValueType.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
 
-                                        lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
-                                                                            Select EntityTypeRoleInstance
+                                        lrEntityTypeRoleInstanceXAttributeList = From EntityTypeRoleInstance In lrFactDataData.<orm:RoleInstances>.<orm:EntityTypeRoleInstance>
+                                                                                 Select EntityTypeRoleInstance
 
                                         lrEntityTypeRoleInstanceXAttribute = lrEntityTypeRoleInstanceXAttributeList(0)
                                         lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
 
-                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance> _
-                                                        Where RoleInstance.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data _
-                                                       Select RoleInstance
+                                        lrFactDataData = From RoleInstance In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:FactRoles>.<orm:Role>.<orm:RoleInstances>.<orm:EntityTypeRoleInstance>
+                                                         Where RoleInstance.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
+                                                         Select RoleInstance
 
                                         lrEntityTypeRoleInstanceXAttribute = lrFactDataData(0)
                                         lrObjectifiedObjectTypeFactData.Data = lrEntityTypeRoleInstanceXAttribute.Attribute("ref").Value
 
-                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance> _
-                                                        Where ValueType.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
+                                        lrFactDataData = From ValueType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>.<orm:Instances>.<orm:ValueTypeInstance>
+                                                         Where ValueType.Attribute("id").Value = lrObjectifiedObjectTypeFactData.Data
 
                                         lrObjectifiedObjectTypeFactData.Data = lrFactDataData.<orm:Value>.Value
 

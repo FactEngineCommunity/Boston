@@ -2267,7 +2267,9 @@ Public Class frmToolboxEnterpriseExplorer
 
         frmMain.Cursor = Cursors.WaitCursor
 
-        Dim lrNORMAFileLoader As New NORMA.NORMAXMLFileLoader
+        Dim lrNORMAFileLoader As New NORMA.NORMAXMLFileLoader(lrModel)
+
+        Call lrNORMAFileLoader.getNORMADataTypes(lrModel)
 
         '-----------------------------------------
         'Get the DataTypes from the nORMa model
