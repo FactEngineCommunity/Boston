@@ -14,6 +14,71 @@ Namespace NORMA
 
         End Sub
 
+        Public Sub SetSimpleReferenceSchemes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Try
+
+                Dim lrEntityType As New FBM.EntityType
+                Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+                Dim loEnumElementQueryResult2 As IEnumerable(Of XElement)
+                Dim loElement As XElement
+
+                Dim lrModel As FBM.Model = arModel
+
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                           Select ModelInformation
+                                           Order By ModelInformation.Attribute("Name").Value
+
+                '---------------------------------
+                'Add the EntiyTypes to the Model
+                '---------------------------------
+                For Each loElement In loEnumElementQueryResult
+                    lrEntityType = arModel.EntityType.Find(Function(x) x.Id = loElement.Attribute("Name").Value)
+
+                    'Simple Reference Scheme
+                    Dim lsReferenceMode As String = loElement.Attribute("_ReferenceMode").Value
+
+                    loEnumElementQueryResult2 = From PreferredIdentifier In loElement.<orm:PreferredIdentifier>
+                                                Select PreferredIdentifier
+
+                    If loEnumElementQueryResult2.Count > 0 Then
+                        Dim lsPreferredRoleConstraintRoleId As String = loEnumElementQueryResult2.First.Attribute("ref").Value
+
+                        Dim larRoleConstraint = From RoleConstraint In lrModel.RoleConstraint
+                                                Where RoleConstraint.NORMAReferenceId = lsPreferredRoleConstraintRoleId
+                                                Select RoleConstraint
+
+                        If larRoleConstraint.Count > 0 Then
+                            lrEntityType.ReferenceModeRoleConstraint = larRoleConstraint.First
+                            lrEntityType.ReferenceModeRoleConstraint.IsPreferredIdentifier = True
+                        End If
+                    End If
+
+                    If lsReferenceMode <> "" Then
+                        If arModel.GetModelObjectByName(lrEntityType.Id & "_" & lsReferenceMode) IsNot Nothing Then
+                            lrEntityType.SetReferenceMode("." & lsReferenceMode, True, Nothing, False,, True)
+                            lrEntityType.ReferenceModeValueType = arModel.ValueType.Find(Function(x) x.Id = lrEntityType.Id & "_" & lsReferenceMode)
+                        Else
+                            lrEntityType.SetReferenceMode(lsReferenceMode, True, Nothing, False,, True)
+                        End If
+                    End If
+
+                    If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
+                        lrEntityType.ReferenceModeFactType = lrEntityType.ReferenceModeRoleConstraint.Role(0).FactType
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub LoadEntityTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
             Dim lrEntityType As New FBM.EntityType
@@ -30,6 +95,7 @@ Namespace NORMA
             For Each loElement In loEnumElementQueryResult
                 lrEntityType = New FBM.EntityType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value, Nothing)
                 lrEntityType.NORMAReferenceId = loElement.Attribute("id").Value
+
                 arModel.AddEntityType(lrEntityType, False, False, Nothing, True)
             Next
 
@@ -37,12 +103,12 @@ Namespace NORMA
             'Check for Subtype relationships for each EntityType
             '-----------------------------------------------------
             For Each lrEntityType In arModel.EntityType
-                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:SubtypeFact> _
-                                           From FactRoles In ModelInformation.<orm:FactRoles> _
-                                           From SubtypeMetaRole In FactRoles.<orm:SubtypeMetaRole> _
-                                           From RolePlayer In SubtypeMetaRole.<orm:RolePlayer> _
-                                          Where RolePlayer.Attribute("ref") = lrEntityType.Id _
-                                         Select ModelInformation
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:SubtypeFact>
+                                           From FactRoles In ModelInformation.<orm:FactRoles>
+                                           From SubtypeMetaRole In FactRoles.<orm:SubtypeMetaRole>
+                                           From RolePlayer In SubtypeMetaRole.<orm:RolePlayer>
+                                           Where RolePlayer.Attribute("ref") = lrEntityType.Id
+                                           Select ModelInformation
 
                 If IsSomething(loEnumElementQueryResult(0)) Then
                     For Each loElement In loEnumElementQueryResult
@@ -50,9 +116,9 @@ Namespace NORMA
                         Dim lrSupertypeEntityType As New FBM.EntityType(arModel, pcenumLanguage.ORMModel)
 
                         Dim loSuprtypeElement As IEnumerable(Of XElement)
-                        loSuprtypeElement = From FactRoles In loElement.<orm:FactRoles> _
-                                            From SupertypeMetaRole In FactRoles.<orm:SupertypeMetaRole> _
-                                            From RolePlayer In SupertypeMetaRole.<orm:RolePlayer> _
+                        loSuprtypeElement = From FactRoles In loElement.<orm:FactRoles>
+                                            From SupertypeMetaRole In FactRoles.<orm:SupertypeMetaRole>
+                                            From RolePlayer In SupertypeMetaRole.<orm:RolePlayer>
                                             Select RolePlayer
 
                         lrSupertypeEntityType.NORMAReferenceId = loSuprtypeElement(0).Attribute("ref").Value
@@ -641,8 +707,11 @@ Namespace NORMA
                         '---------------------------
                         Dim lrRoleConstraint As FBM.RoleConstraint
                         lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
+                        lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.AddUnique(lrRoleConstraint)
+                        lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
                         lrRoleConstraint.isDirty = True
-                        arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing, True)
+                        lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
+                        arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing)
                     End If
                 End If
             Next

@@ -2270,16 +2270,16 @@ Public Class frmToolboxEnterpriseExplorer
 
         Dim lrNORMAFileLoader As New NORMA.NORMAXMLFileLoader
         '-----------------------------------------
-        'Get the EntityTypes from the nORMa model
-        '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Entity Types")
-        Call lrNORMAFileLoader.LoadEntityTypes(lrModel, NORMAXMLDOC)
-
-        '-----------------------------------------
         'Get the ValueTypes from the nORMa model
         '-----------------------------------------
         Richmond.WriteToStatusBar("Loading Value Types")
         Call lrNORMAFileLoader.LoadValueTypes(lrModel, NORMAXMLDOC)
+
+        '-----------------------------------------
+        'Get the EntityTypes from the nORMa model
+        '-----------------------------------------
+        Richmond.WriteToStatusBar("Loading Entity Types")
+        Call lrNORMAFileLoader.LoadEntityTypes(lrModel, NORMAXMLDOC)
 
         '----------------------------------------
         'Get the FactTypes from the nORMa model
@@ -2340,6 +2340,11 @@ Public Class frmToolboxEnterpriseExplorer
         '-------------------------------------------------------
         Richmond.WriteToStatusBar("Loading Paeg Model Object Instances")
         Call lrNORMAFileLoader.LoadPageModelInstances(lrModel, NORMAXMLDOC)
+
+        '-------------------------------------------------------
+        'SimpleReferenceSchemes
+        '-------------------------------------------------------
+        Call lrNORMAFileLoader.SetSimpleReferenceSchemes(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------------------------------------------------------------------
         'Set the Ids of EntityTypes, ValueTypes, FactTypes, RoleConstraints to the same as the Name of

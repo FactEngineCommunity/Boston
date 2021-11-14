@@ -690,8 +690,7 @@ Namespace FBM
                                      Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                      Optional arConceptInstance As FBM.ConceptInstance = Nothing,
                                      Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
-                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing,
-                                     Optional ByVal abMakeModelDictionaryEntryDirty As Boolean = False)
+                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
@@ -701,12 +700,10 @@ Namespace FBM
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
                 Dim asSymbol As String = arRoleConstraint.Id
-                Dim lbMakeModelDictionaryEntryDirty = abMakeModelDirty Or abMakeModelDictionaryEntryDirty
                 lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me,
                                                                                        arRoleConstraint.Id,
                                                                                        pcenumConceptType.RoleConstraint),
-                                                               , abMakeModelDirty,,,, lbMakeModelDictionaryEntryDirty,)
-
+                                                               , abMakeModelDirty,,,, True,)
                 arRoleConstraint.Concept = lrDictionaryEntry.Concept
                 arRoleConstraint.ShortDescription = lrDictionaryEntry.ShortDescription
                 arRoleConstraint.LongDescription = lrDictionaryEntry.LongDescription
@@ -2784,11 +2781,9 @@ Namespace FBM
                 '--------------------------------------------------------------------
                 'Create the FBM.RoleConstraint to return (with the lsNewUniqueName)
                 '--------------------------------------------------------------------
+                lrRoleConstraint = New FBM.RoleConstraint(Me, lsNewUniqueName, True, aiRoleConstraintType, aarRole, True)
                 If aiRoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                    lrRoleConstraint = New FBM.RoleConstraint(Me, lsNewUniqueName, True, aiRoleConstraintType, aarRole, True)
                     lrRoleConstraint.LevelNr = aiLevelNr
-                Else
-                    lrRoleConstraint = New FBM.RoleConstraint(Me, lsNewUniqueName, True, aiRoleConstraintType, aarRole, True)
                 End If
 
                 '-----------------------------------------
