@@ -2268,6 +2268,12 @@ Public Class frmToolboxEnterpriseExplorer
         frmMain.Cursor = Cursors.WaitCursor
 
         Dim lrNORMAFileLoader As New NORMA.NORMAXMLFileLoader
+
+        '-----------------------------------------
+        'Get the DataTypes from the nORMa model
+        '-----------------------------------------
+        Call lrNORMAFileLoader.LoadDataTypes(NORMAXMLDOC)
+
         '-----------------------------------------
         'Get the ValueTypes from the nORMa model
         '-----------------------------------------

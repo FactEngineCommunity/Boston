@@ -80,6 +80,21 @@ Namespace NORMA
 
         End Sub
 
+        Public Sub LoadDataTypes(ByRef arNORMAXMLDOC As XDocument)
+
+            Try
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub LoadEntityTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
             Dim lrEntityType As New FBM.EntityType
