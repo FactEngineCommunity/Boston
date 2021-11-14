@@ -28,8 +28,9 @@ Namespace NORMA
             'Add the EntiyTypes to the Model
             '---------------------------------
             For Each loElement In loEnumElementQueryResult
-                lrEntityType = New FBM.EntityType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("id").Value, Nothing)
-                arModel.AddEntityType(lrEntityType)
+                lrEntityType = New FBM.EntityType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value, Nothing)
+                lrEntityType.NORMAReferenceId = loElement.Attribute("id").Value
+                arModel.AddEntityType(lrEntityType, False, False, Nothing, True)
             Next
 
             '-----------------------------------------------------
@@ -54,9 +55,9 @@ Namespace NORMA
                                             From RolePlayer In SupertypeMetaRole.<orm:RolePlayer> _
                                             Select RolePlayer
 
-                        lrSupertypeEntityType.Id = loSuprtypeElement(0).Attribute("ref").Value
+                        lrSupertypeEntityType.NORMAReferenceId = loSuprtypeElement(0).Attribute("ref").Value
 
-                        lrSupertypeEntityType = arModel.EntityType.Find(AddressOf lrSupertypeEntityType.Equals)
+                        lrSupertypeEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrSupertypeEntityType.NORMAReferenceId)
                         Call lrEntityType.CreateSubtypeRelationship(lrSupertypeEntityType)
                     Next
                 End If
@@ -78,10 +79,11 @@ Namespace NORMA
             'Add the ValueTypes to the Model
             '---------------------------------            
             For Each loElement In loEnumElementQueryResult
-                lrValueType = New FBM.ValueType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("id").Value)
+                lrValueType = New FBM.ValueType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value)
+                lrValueType.NORMAReferenceId = loElement.Attribute("id").Value
 
                 If Not arModel.ValueType.Exists(AddressOf lrValueType.EqualsByName) Then
-                    arModel.AddValueType(lrValueType)
+                    arModel.AddValueType(lrValueType, False, False, Nothing, True)
                 End If
 
                 Dim loIsNORMAUnaryFactTypeValueType As IEnumerable(Of XElement)
@@ -357,7 +359,8 @@ Namespace NORMA
 
             For Each loElement In loEnumElementQueryResult
 
-                lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("id").Value)
+                lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
+                lrFactType.NORMAReferenceId = loElement.Attribute("id").Value
                 lrFactType.Name = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
 
 
@@ -376,7 +379,6 @@ Namespace NORMA
                     If IsSomething(loXMLElementQueryResult(0)) Then
                         lrFactType.IsObjectified = True
                     End If
-
 
                     '---------------------------
                     'Add the Roles to the Model
@@ -447,12 +449,13 @@ Namespace NORMA
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
 
+                            lrModelObject.Id = loXMLElementQueryResult(0).Attribute("Name")
                             lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
 
                             Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
                             loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate> _
                                                         Select NestedPredicateElement
-                            lrModelObject.Id = loXMLNestedPredicateElement(0).Attribute("ref").Value
+                            lrModelObject.NORMAReferenceId = loXMLNestedPredicateElement(0).Attribute("ref").Value
 
                             lrJoinedFactType.Model = arModel
                             lrJoinedFactType.Id = lrModelObject.Id
@@ -577,8 +580,8 @@ Namespace NORMA
                         'Find the ModelObject within the Richmond Model
                         '------------------------------------------------
                         lrJoinedFactType = New FBM.FactType
-                        lrJoinedFactType.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
-                        lrJoinedFactType = arModel.FactType.Find(AddressOf lrJoinedFactType.Equals)
+                        lrJoinedFactType.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                        lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrJoinedFactType.NORMAReferenceId)
 
                         lrRole.JoinedORMObject = lrJoinedFactType
 
@@ -638,7 +641,8 @@ Namespace NORMA
                         '---------------------------
                         Dim lrRoleConstraint As FBM.RoleConstraint
                         lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
-                        arModel.AddRoleConstraint(lrRoleConstraint)
+                        lrRoleConstraint.isDirty = True
+                        arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing, True)
                     End If
                 End If
             Next
@@ -2099,15 +2103,15 @@ Namespace NORMA
             Dim lrFactTypeReading As FBM.FactTypeReading
             'Dim lsNORMAPredicateList As String                    
             Dim lasPredicateParts() As String
-            Dim lsPredicatePart As String
-            Dim lrPredicatePart As FBM.PredicatePart
+            Dim lrPredicatePart As FBM.PredicatePart = Nothing
             Dim lrRoleHashTable As New Hashtable()
 
             For Each lrFactTypeReadingXElement In arElement.<orm:ReadingOrders>.<orm:ReadingOrder>
                 lrFactTypeReading = New FBM.FactTypeReading(arFactType)
+                lrFactTypeReading.isDirty = True
 
                 For Each lrPredicatePartXElement In lrFactTypeReadingXElement.<orm:Readings>.<orm:Reading>.<orm:Data>
-                    lrPredicatePart = New FBM.PredicatePart(arModel, lrFactTypeReading)
+
                     'MsgBox(lrPredicatePartXElement.Value)
                     Dim lsNORMAPredicateList As New Regex("(\{.*?\})|([a-z][A-Z]\s)")
                     lasPredicateParts = lsNORMAPredicateList.Split(lrPredicatePartXElement.Value).Where(Function(s) Not String.IsNullOrEmpty(s)).ToArray()
@@ -2115,128 +2119,52 @@ Namespace NORMA
                     Dim liRoleSequenceNr As Integer = 0
                     lrRoleHashTable.Clear()
                     For Each lrPredicatePartRoleXElement In lrFactTypeReadingXElement.<orm:RoleSequence>.<orm:Role>
-                        'MsgBox(lrPredicatePartRoleXElement.Attribute("ref").Value)
                         lrRoleHashTable.Add("{" & liRoleSequenceNr.ToString & "}", lrPredicatePartRoleXElement.Attribute("ref").Value)
                         liRoleSequenceNr += 1
                     Next
 
                     '-------------------------------------------------------------------------------------------
-                    '--------------------------------------------------------
                     'Perform Left-2-Right parsing to get the PredicateParts
                     '--------------------------------------------------------
-                    Dim larModelObjectList As New List(Of FBM.ModelObject)
                     Dim liSequenceNr As Integer = 0
                     Dim liPredicatePartSequenceNr As Integer = 0
+                    Dim lsPredicatePartText As String = ""
                     Dim lsPrefix As String = ""
                     Dim lsSuffix As String = ""
-                    Dim larPredicateParts = New List(Of FBM.PredicatePart)
                     Dim lrPredicateRole As FBM.Role
 
-                    For Each lsPredicatePart In lasPredicateParts
+                    For Each lsNORMAPredicatePart In lasPredicateParts
                         '----------------------------------------
                         'Check to see if the word is one of the
                         '  ORM Object Types within the reading
                         '----------------------------------------            
 
                         'If lrHashList.Contains(lsPredicatePart) Then
-                        If lsPredicatePart Like "{#}" Then
-                            '----------------------------------------
-                            'The word is one of the ORM Object Types
-                            '----------------------------------------
-                            lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsPredicatePart), True)
+                        If lsNORMAPredicatePart Like "{#}" Then
+                            '----------------------------
+                            'Create a new PredicatePart
+                            '----------------------------
+                            lrPredicatePart = New FBM.PredicatePart(lrFactTypeReading.Model, lrFactTypeReading)
+                            lrPredicatePart.isDirty = True
+
+                            liPredicatePartSequenceNr += 1
+                            lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
+
+                            lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsNORMAPredicatePart), True)
                             lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
-                            If IsSomething(lrPredicateRole) Then
-                                If IsSomething(lrPredicateRole.JoinedORMObject) Then
-                                    larModelObjectList.Add(New FBM.ModelObject(lrPredicateRole.JoinedORMObject.Name))
-                                Else
-                                    larModelObjectList.Add(New FBM.ModelObject(lsPredicatePart))
-                                End If
-                            Else
-                                larModelObjectList.Add(New FBM.ModelObject(lsPredicatePart))
-                            End If
+                            lrPredicatePart.Role = lrPredicateRole
 
-
-                            liSequenceNr += 1
-                            If liSequenceNr = 1 Then
-                                lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsPredicatePart), True)
-                                lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
-                                If IsSomething(lrPredicateRole) Then
-                                    If IsSomething(lrPredicateRole.JoinedORMObject) Then
-                                        '---------------------------------------------------------
-                                        'No longer supported (v1.13 of the database Model).
-                                        'lrPredicatePart.ObjectType1 = New FBM.ModelObject(lrPredicateRole.JoinedORMObject.Name)
-                                    Else
-                                        '---------------------------------------------------------
-                                        'No longer supported (v1.13 of the database Model).
-                                        'lrPredicatePart.ObjectType1 = New FBM.ModelObject(lsPredicatePart)
-                                    End If
-                                Else
-                                    '----------------------------------------------------------------
-                                    'No longer supported (v1.13 of the database Model).
-                                    'lrPredicatePart.ObjectType1 = New FBM.ModelObject(lsPredicatePart)
-                                End If
-
-                                liPredicatePartSequenceNr += 1
-                                lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
-                            ElseIf (liSequenceNr = 2) Then
-                                lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsPredicatePart), True)
-                                lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
-                                If IsSomething(lrPredicateRole) Then
-                                    If IsSomething(lrPredicateRole.JoinedORMObject) Then
-                                        '-------------------------------------------------------------
-                                        'No longer supported (v1.13 of the database Model).
-                                        'lrPredicatePart.ObjectType2 = New FBM.ModelObject(lrPredicateRole.JoinedORMObject.Name)
-                                    Else
-                                        '-------------------------------------------------------------
-                                        'No longer supported (v1.13 of the database Model).
-                                        'lrPredicatePart.ObjectType2 = New FBM.ModelObject(lsPredicatePart)
-                                    End If
-                                Else
-                                    '-------------------------------------------------------
-                                    'No longer supported (v1.13 of the database Model).
-                                    'lrPredicatePart.ObjectType2 = New FBM.ModelObject(lsPredicatePart)
-                                End If
-                                lrPredicatePart.PredicatePartText = Trim(lsSuffix)
-                                lsPrefix = ""
-                                lsSuffix = ""
-
-                                larPredicateParts.Add(lrPredicatePart)
-                                '----------------------------
-                                'Create a new PredicatePart
-                                '----------------------------
-                                lrPredicatePart = New FBM.PredicatePart(lrFactTypeReading.Model, lrFactTypeReading)
-                                '--------------------------------------------------------------------
-                                'No longer supported (v1.13 of the database Model).
-                                'lrPredicatePart.ObjectType1 = New FBM.ModelObject(larModelObjectList(larModelObjectList.Count - 1).Symbol) 'was New FBM.ModelObject(lsPredicatePart)
-                                liPredicatePartSequenceNr += 1
-                                lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
-                                liSequenceNr = 1
-                            End If
+                            lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
                         Else
-                            If liSequenceNr = 0 Then
-                                lsPrefix &= " " & lsPredicatePart
-                            Else
-                                lsSuffix &= " " & lsPredicatePart
-                                lrPredicatePart.PredicatePartText = Trim(lsSuffix)
-                            End If
+                            lsPredicatePartText = lsNORMAPredicatePart
+                            lrPredicatePart.PredicatePartText = Trim(lsPredicatePartText)
                         End If
                     Next
 
-                    If ((arFactType.Arity = 1) And (lrPredicatePart.SequenceNr = 1)) Then
-                        larPredicateParts.Add(lrPredicatePart)
-                    ElseIf arFactType.Arity = 2 Then
-                        If arFactType.RoleGroup(1).NORMALinksToUnaryFactTypeValueType Then
-                            larPredicateParts.Add(lrPredicatePart)
-                        End If
-                    End If
-
-                    lrFactTypeReading.PredicatePart = larPredicateParts
-                    '------------------------------------------------------------------------------
-                    'No Longer supported (v1.13 of the database Model).
-                    'lrFactTypeReading.ObjectTypeList = larModelObjectList
-                    '-------------------------------------------------------------------------------------------
                 Next 'FactTypeReading.PredicatePart
+
                 arFactType.FactTypeReading.Add(lrFactTypeReading)
+
             Next 'FactTypeReading
 
         End Sub

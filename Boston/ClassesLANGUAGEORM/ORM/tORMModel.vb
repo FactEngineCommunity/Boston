@@ -690,7 +690,8 @@ Namespace FBM
                                      Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                      Optional arConceptInstance As FBM.ConceptInstance = Nothing,
                                      Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
-                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing)
+                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing,
+                                     Optional ByVal abMakeModelDictionaryEntryDirty As Boolean = False)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
@@ -700,7 +701,11 @@ Namespace FBM
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
                 Dim asSymbol As String = arRoleConstraint.Id
-                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arRoleConstraint.Id, pcenumConceptType.RoleConstraint), , abMakeModelDirty)
+                Dim lbMakeModelDictionaryEntryDirty = abMakeModelDirty Or abMakeModelDictionaryEntryDirty
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me,
+                                                                                       arRoleConstraint.Id,
+                                                                                       pcenumConceptType.RoleConstraint),
+                                                               , abMakeModelDirty,,,, lbMakeModelDictionaryEntryDirty,)
 
                 arRoleConstraint.Concept = lrDictionaryEntry.Concept
                 arRoleConstraint.ShortDescription = lrDictionaryEntry.ShortDescription
@@ -968,50 +973,50 @@ Namespace FBM
                                      And Not lrRole.FactType.IsPreferredReferenceMode Then
 
                                         Dim larRelation = From Relation In Me.RDS.Relation
-                                                              Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
-                                                              Select Relation
+                                                          Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
+                                                          Select Relation
 
-                                            If larRelation.Count = 0 Then
-                                                'No Relation exists for the 1:1 FactType.
-                                                Call Me.generateRelationFor1To1BinaryFactType(lrRole)
-                                            Else
-                                                Dim lrRelation As RDS.Relation = larRelation.First
+                                        If larRelation.Count = 0 Then
+                                            'No Relation exists for the 1:1 FactType.
+                                            Call Me.generateRelationFor1To1BinaryFactType(lrRole)
+                                        Else
+                                            Dim lrRelation As RDS.Relation = larRelation.First
 
-                                                Call lrRelation.setOriginMultiplicity(pcenumCMMLMultiplicity.One)
-                                                Call lrRelation.setDestinationMultiplicity(pcenumCMMLMultiplicity.One)
-                                                Call lrRelation.establishReverseColumns()
+                                            Call lrRelation.setOriginMultiplicity(pcenumCMMLMultiplicity.One)
+                                            Call lrRelation.setDestinationMultiplicity(pcenumCMMLMultiplicity.One)
+                                            Call lrRelation.establishReverseColumns()
 
-                                                Dim larDestinationColumn As New List(Of RDS.Column)
-                                                larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True) '20210505-VM-Was ContributesToPrimaryKey
+                                            Dim larDestinationColumn As New List(Of RDS.Column)
+                                            larDestinationColumn = lrRelation.OriginTable.Column.FindAll(Function(x) x.isPartOfPrimaryKey = True) '20210505-VM-Was ContributesToPrimaryKey
 
-                                                For Each lrOriginColumn In larDestinationColumn
-                                                    For Each lrColumn In lrRelation.DestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                                                        lrColumn.Relation.AddUnique(lrRelation)
-                                                    Next
+                                            For Each lrOriginColumn In larDestinationColumn
+                                                For Each lrColumn In lrRelation.DestinationTable.Column.FindAll(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                                                    lrColumn.Relation.AddUnique(lrRelation)
                                                 Next
+                                            Next
 
-                                            End If
+                                        End If
 
-                                        End If 'Relation
+                                    End If 'Relation
 
-                                        'Index 
-                                        If arRoleConstraint.FirstRoleConstraintRoleFactType.Is1To1BinaryFactType Then
-                                            Dim larIndexColumn As New List(Of RDS.Column)
-                                            Dim lrFirstRole = arRoleConstraint.FirstRoleConstraintRole
+                                    'Index 
+                                    If arRoleConstraint.FirstRoleConstraintRoleFactType.Is1To1BinaryFactType Then
+                                        Dim larIndexColumn As New List(Of RDS.Column)
+                                        Dim lrFirstRole = arRoleConstraint.FirstRoleConstraintRole
 
-                                            Dim larColumn = From Column In lrTable.Column
-                                                            Where Column.Role.Id = lrFirstRole.Id
-                                                            Select Column
+                                        Dim larColumn = From Column In lrTable.Column
+                                                        Where Column.Role.Id = lrFirstRole.Id
+                                                        Select Column
 
-                                            larIndexColumn.Add(larColumn.First)
+                                        larIndexColumn.Add(larColumn.First)
 
-                                            Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
-                                            Dim lbIsPrimaryKey As Boolean = False
-                                            Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
-                                            lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
+                                        Dim lsQualifier As String = lrTable.generateUniqueQualifier("UC")
+                                        Dim lbIsPrimaryKey As Boolean = False
+                                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                                        lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
 
-                                            'Add the new Index
-                                            Dim lrIndex As New RDS.Index(lrTable,
+                                        'Add the new Index
+                                        Dim lrIndex As New RDS.Index(lrTable,
                                                                  lsIndexName,
                                                                  lsQualifier,
                                                                  pcenumODBCAscendingOrDescending.Ascending,
@@ -1022,12 +1027,12 @@ Namespace FBM
                                                                  False,
                                                                  True)
 
-                                            Call lrTable.addIndex(lrIndex)
-                                        End If
-
+                                        Call lrTable.addIndex(lrIndex)
                                     End If
 
-                                ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
+                                End If
+
+                            ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
                                arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
                                Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
 
@@ -1101,8 +1106,8 @@ Namespace FBM
                                 End If
 #End Region
 
-                                    'Relation
-                                    Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
+                                'Relation
+                                Call Me.generateRelationForManyTo1BinaryFactType(lrRoleConstraintRole)
 
                             ElseIf arRoleConstraint.RoleConstraintRole.Count = 1 _
                                    And arRoleConstraint.RoleConstraintRole(0).Role.FactType.Is1To1BinaryFactType Then

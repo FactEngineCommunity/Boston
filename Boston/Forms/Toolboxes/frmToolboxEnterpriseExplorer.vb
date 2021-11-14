@@ -2237,6 +2237,9 @@ Public Class frmToolboxEnterpriseExplorer
         lrModel.IsDirty = True
         lrModelTreeNode = arModelTreeNode
 
+
+        Call prApplication.setWorkingModel(arModel)
+
         '-------------------------------
         'Get the Pages
         '  Add the Page to the TreeView
@@ -2293,7 +2296,7 @@ Public Class frmToolboxEnterpriseExplorer
         '-----------------------------------------
         'Get the External Uniqueness Constraints
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Internal Uniqueness Constraints")
+        Richmond.WriteToStatusBar("Loading External Uniqueness Constraints")
         Call lrNORMAFileLoader.LoadRoleConstraintExternalUniquenessConstraints(lrModel, NORMAXMLDOC)
 
         '----------------------------
@@ -2345,54 +2348,54 @@ Public Class frmToolboxEnterpriseExplorer
         '-----------------------------------------------------------------------------------------------------
         frmMain.Cursor = Cursors.WaitCursor
 
-        For Each lrEntityType In lrModel.EntityType
-            Richmond.WriteToStatusBar("Updating Ids for EntityType: " & lrEntityType.Name)
-            lrEntityType.SetName(lrEntityType.Name)
-        Next
+        'For Each lrEntityType In lrModel.EntityType
+        '    Richmond.WriteToStatusBar("Updating Ids for EntityType: " & lrEntityType.Name)
+        '    lrEntityType.SetName(lrEntityType.Name)
+        'Next
 
-        For Each lrValueType In lrModel.ValueType
-            Richmond.WriteToStatusBar("Updating Ids for ValueType: " & lrValueType.Name)
-            lrValueType.SetName(lrValueType.Name)
-        Next
+        'For Each lrValueType In lrModel.ValueType
+        '    Richmond.WriteToStatusBar("Updating Ids for ValueType: " & lrValueType.Name)
+        '    lrValueType.SetName(lrValueType.Name)
+        'Next
 
-        For Each lrFactType In lrModel.FactType
-            Richmond.WriteToStatusBar("Updating Ids for FactType: " & lrFactType.Name)
-            lrFactType.SetName(lrFactType.Name)
-        Next
+        'For Each lrFactType In lrModel.FactType
+        '    Richmond.WriteToStatusBar("Updating Ids for FactType: " & lrFactType.Name)
+        '    lrFactType.SetName(lrFactType.Name)
+        'Next
 
-        For Each lrRoleConstraint In lrModel.RoleConstraint
-            Richmond.WriteToStatusBar("Updating Ids for RoleConstraint: " & lrFactType.Name)
-            lrRoleConstraint.SetName(lrRoleConstraint.Name)
-        Next
+        'For Each lrRoleConstraint In lrModel.RoleConstraint
+        '    Richmond.WriteToStatusBar("Updating Ids for RoleConstraint: " & lrFactType.Name)
+        '    lrRoleConstraint.SetName(lrRoleConstraint.Name)
+        'Next
 
-        For Each lrPage In lrModel.Page
+        'For Each lrPage In lrModel.Page
 
-            For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
-                Richmond.WriteToStatusBar("Updating Ids for EntityTypeInstances: " & lrEntityTypeInstance.Name)
-                lrEntityTypeInstance.SetName(lrEntityTypeInstance.Name)
-            Next
+        '    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
+        '        Richmond.WriteToStatusBar("Updating Ids for EntityTypeInstances: " & lrEntityTypeInstance.Name)
+        '        lrEntityTypeInstance.SetName(lrEntityTypeInstance.Name)
+        '    Next
 
-            For Each lrValueTypeInstance In lrPage.ValueTypeInstance
-                Richmond.WriteToStatusBar("Updating Ids for ValueTypeInstances: " & lrValueTypeInstance.Name)
-                lrValueTypeInstance.SetName(lrValueTypeInstance.Name)
-            Next
+        '    For Each lrValueTypeInstance In lrPage.ValueTypeInstance
+        '        Richmond.WriteToStatusBar("Updating Ids for ValueTypeInstances: " & lrValueTypeInstance.Name)
+        '        lrValueTypeInstance.SetName(lrValueTypeInstance.Name)
+        '    Next
 
-            For Each lrFactTypeInstance In lrPage.FactTypeInstance
-                Richmond.WriteToStatusBar("Updating Ids for FactTypeInstances: " & lrFactTypeInstance.Name)
-                lrFactTypeInstance.SetName(lrFactTypeInstance.Name)
-            Next
+        '    For Each lrFactTypeInstance In lrPage.FactTypeInstance
+        '        Richmond.WriteToStatusBar("Updating Ids for FactTypeInstances: " & lrFactTypeInstance.Name)
+        '        lrFactTypeInstance.SetName(lrFactTypeInstance.Name)
+        '    Next
 
-            For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
-                lrRoleConstraintInstance.Id = lrRoleConstraintInstance.Name
-                lrRoleConstraintInstance.Symbol = lrRoleConstraintInstance.Name
-            Next
-        Next
+        '    For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+        '        lrRoleConstraintInstance.Id = lrRoleConstraintInstance.Name
+        '        lrRoleConstraintInstance.Symbol = lrRoleConstraintInstance.Name
+        '    Next
+        'Next
 
         lrModel.Loaded = True
         frmMain.Cursor = Cursors.Default
 
         Richmond.WriteToStatusBar("")
-        MsgBox("Your NORMA Model has been successfully loaded into Richmond")
+        MsgBox("Your NORMA Model has been successfully loaded into Boston")
 
         frmMain.Cursor = Cursors.Default
         Me.Cursor = Cursors.Default

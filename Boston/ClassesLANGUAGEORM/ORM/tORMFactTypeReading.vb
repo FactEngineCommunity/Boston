@@ -776,9 +776,10 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arVerbaliser"></param>
         ''' <remarks></remarks>
-        Public Sub GetReadingText(ByRef arVerbaliser As FBM.ORMVerbailser, _
-                                  Optional ByVal abIncludeRoleConstraintInformation As Boolean = False, _
-                                  Optional ByVal abIncludeSubscriptModelObjectNumbers As Boolean = False)
+        Public Sub GetReadingText(ByRef arVerbaliser As FBM.ORMVerbailser,
+                                  Optional ByVal abIncludeRoleConstraintInformation As Boolean = False,
+                                  Optional ByVal abIncludeSubscriptModelObjectNumbers As Boolean = False,
+                                  Optional ByVal abThrowErrorToVerbaliser As Boolean = True)
 
             Try
                 '----------------------------------------------------
@@ -814,13 +815,13 @@ Namespace FBM
                     End If
 
                     If Me.FactType.IsLinkFactType Then
-                        Dim larRole = From Role In Me.FactType.LinkFactTypeRole.FactType.RoleGroup _
-                                      Where Role.JoinedORMObject.Id = lrPredicatePart.Role.JoinedORMObject.Id _
+                        Dim larRole = From Role In Me.FactType.LinkFactTypeRole.FactType.RoleGroup
+                                      Where Role.JoinedORMObject.Id = lrPredicatePart.Role.JoinedORMObject.Id
                                       Select Role
 
                         If larRole.Count > 0 Then
                             If Me.FactType.LinkFactTypeRole.FactType.FactTypeReading.Count > 0 Then
-                                lrPredicatePart.ModelObjectSubscriptNumber = _
+                                lrPredicatePart.ModelObjectSubscriptNumber =
                                     Me.FactType.LinkFactTypeRole.FactType.FactTypeReading(0).PredicatePart.Find(Function(x) x.Role.Id = lrPredicatePart.Role.FactType.LinkFactTypeRole.Id).ModelObjectSubscriptNumber
                             End If
                         End If
@@ -899,7 +900,13 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                If abThrowErrorToVerbaliser Then
+                    arVerbaliser.VerbaliseError(lsMessage)
+                Else
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End If
+
             End Try
 
         End Sub

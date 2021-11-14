@@ -375,8 +375,14 @@ Namespace FBM
         ''' Only used (at this stage) for generating CQL Temporarily populated.
         ''' </summary>
         ''' <remarks></remarks>
-        <NonSerialized()> _
+        <NonSerialized()>
         Public PostboundReadingText As String = ""
+
+
+        ''' <summary>
+        ''' Used for Reverse Engineering NORMA files.
+        ''' </summary>
+        Public NORMAReferenceId As String = ""
 
         Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)
         Public Event DBNameChanged(ByVal asDBName As String)
