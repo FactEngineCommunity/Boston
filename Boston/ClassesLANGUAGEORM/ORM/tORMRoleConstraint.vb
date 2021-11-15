@@ -1344,6 +1344,11 @@ Namespace FBM
                         lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
                         lrRoleConstraintRoleInstance.IsEntry = lrRoleConstraintRole.IsEntry
                         lrRoleConstraintRoleInstance.IsExit = lrRoleConstraintRole.IsExit
+
+                        If lrRoleInstance.Role.FactType.IsSubtypeRelationshipFactType Then
+                            lrRoleConstraintRoleInstance.SubtypeConstraintInstance = arPage.SubtypeRelationship.Find(Function(x) x.SubtypeRelationship.FactType.Id = lrRoleInstance.Role.FactType.Id)
+                        End If
+
                         lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
                     Next
 

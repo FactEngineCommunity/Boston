@@ -857,7 +857,16 @@ Namespace FBM
                     '-----------------------------------------------------------------------------------
                     'Set the Rectangle for the whole EntityType and the ReferenceModeShape (if needed)
                     '-----------------------------------------------------------------------------------
-                    If Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype Then
+                    Dim lbIsVariedReferenceSchemeSubtype As Boolean = False
+
+                    If Me.HasSimpleReferenceScheme And Me.EntityType.IsSubtype And Me.EntityType.ReferenceModeValueType IsNot Nothing Then
+                        Dim lrSupertypeEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
+                        If Me.EntityType.ReferenceModeValueType IsNot lrSupertypeEntityType.ReferenceModeValueType Then
+                            lbIsVariedReferenceSchemeSubtype = True
+                        End If
+                    End If
+
+                    If (Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype Then
                         loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
                         Me.Shape.SetRect(loRectangle, False)
                         loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)

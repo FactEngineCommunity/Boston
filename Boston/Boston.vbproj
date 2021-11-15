@@ -703,7 +703,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMDiagramSpyPage\tORMDiagramSpyPage.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMDiagrammingShapeNode.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMFactTypeDerivationText.vb" />
-    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tRoleConstraintLink.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintLink.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMIndependence.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMMDAObject.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInterfaces\iORMModelObject.vb" />

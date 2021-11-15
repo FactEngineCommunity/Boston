@@ -154,6 +154,11 @@ Namespace FBM
                 '--------------------------------------------------------        
                 Dim loNode As MindFusion.Diagramming.ShapeNode
 
+                'CodeSafe
+                If Me.EntityType Is Nothing Then
+                    Me.EntityType = Me.Page.getModelElementById(Me.SubtypeRelationship.EntityType.Id)
+                End If
+
                 If Me.parentEntityType Is Nothing Then
                     Me.parentEntityType = Me.Page.getModelElementById(Me.SubtypeRelationship.parentEntityType.Id)
                 End If

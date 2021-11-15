@@ -764,9 +764,7 @@ Namespace FBM
                             '  joins to, unless is joined to a SubtypeConstraint Link
                             '-------------------------------------------------------------                                   
                             If lrRoleInstance.FactType.IsSubtypeRelationshipFactType Then
-                                '20150803-Remove the following commented-out code if the new RoleInstanceLink code works
-                                '  for Constraints that link Subtyping Constraints. No longer need link-to-link.
-                                'Me.Page.CreateLinkToLink(Me.Shape, lrRoleInstance.FactType.SubtypeConstraintInstance.Link)
+                                'See tORMRoleConstraintLink for Draw method for the link.
                                 lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrRoleInstance.FactType.SubtypeConstraintInstance
                             Else
                                 Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, lrRoleInstance.Shape)
