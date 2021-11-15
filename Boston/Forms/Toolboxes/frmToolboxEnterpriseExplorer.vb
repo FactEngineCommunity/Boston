@@ -2288,6 +2288,11 @@ Public Class frmToolboxEnterpriseExplorer
         Richmond.WriteToStatusBar("Loading Entity Types")
         Call lrNORMAFileLoader.LoadEntityTypes(lrModel, NORMAXMLDOC)
 
+        '-------------------------------------------------------
+        'SimpleReferenceSchemes
+        '-------------------------------------------------------
+        Call lrNORMAFileLoader.SetSimpleReferenceSchemes(lrModel, NORMAXMLDOC)
+
         '----------------------------------------
         'Get the FactTypes from the nORMa model
         '----------------------------------------
@@ -2341,11 +2346,6 @@ Public Class frmToolboxEnterpriseExplorer
         '----------------------------------------------------------------------------------------------------------
         Richmond.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes")
         Call lrNORMAFileLoader.GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(arModel)
-
-        '-------------------------------------------------------
-        'SimpleReferenceSchemes
-        '-------------------------------------------------------
-        Call lrNORMAFileLoader.SetSimpleReferenceSchemes(lrModel, NORMAXMLDOC)
 
         '-------------------------------------------------------
         'Get ModelObjectInstances by Page from the nORMa model

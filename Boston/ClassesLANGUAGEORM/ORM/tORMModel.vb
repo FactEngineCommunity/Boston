@@ -1298,7 +1298,7 @@ Namespace FBM
                                     If lrFactType.IsObjectified Then
                                         Dim larLinkFactTypeRole = From FactType In Me.FactType
                                                                   Where FactType.IsLinkFactType = True _
-                                                             And FactType.LinkFactTypeRole Is lrRole
+                                                                        And FactType.LinkFactTypeRole Is lrRole
                                                                   Select FactType.RoleGroup(0)
 
                                         If larLinkFactTypeRole.Count > 0 Then

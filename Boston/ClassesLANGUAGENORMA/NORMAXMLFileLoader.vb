@@ -92,7 +92,7 @@ Namespace NORMA
                                            Order By ModelInformation.Attribute("Name").Value
 
                 '---------------------------------
-                'Add the EntiyTypes to the Model
+                'Step through the EntityTypes
                 '---------------------------------
                 For Each loElement In loEnumElementQueryResult
                     lrEntityType = arModel.EntityType.Find(Function(x) x.Id = loElement.Attribute("Name").Value)
@@ -112,7 +112,7 @@ Namespace NORMA
 
                         If larRoleConstraint.Count > 0 Then
                             lrEntityType.ReferenceModeRoleConstraint = larRoleConstraint.First
-                            lrEntityType.ReferenceModeRoleConstraint.IsPreferredIdentifier = True
+                            lrEntityType.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(True)
                         End If
                     End If
 
@@ -186,6 +186,33 @@ Namespace NORMA
                 lrEntityType.NORMAReferenceId = loElement.Attribute("id").Value
 
                 arModel.AddEntityType(lrEntityType, False, False, Nothing, True)
+
+                Dim lsReferenceMode As String = loElement.Attribute("_ReferenceMode").Value
+
+                If lsReferenceMode <> "" Then
+                    Dim lsPreferredIdentifierId = loElement.<orm:PreferredIdentifier>.AsEnumerable.First.Attribute("ref").Value
+
+                    Dim larUniquenessConstraintRole = From Constraint In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
+                                                      From RoleSequence In Constraint.<orm:RoleSequence>
+                                                      From Role In RoleSequence.<orm:Role>
+                                                      Where Constraint.Attribute("id") = lsPreferredIdentifierId
+                                                      Select Role
+
+                    Dim lsRoleId = larUniquenessConstraintRole.First.Attribute("ref").Value
+
+                    Dim larFactType = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                      From Role In FactType.<orm:FactRoles>.<orm:Role>
+                                      Where Role.Attribute("id") = lsRoleId
+                                      Select FactType
+
+
+                    Dim lrFactType As New FBM.FactType(Me.FBMModel, "DummyFactType", True)
+                    lrFactType.NORMAReferenceId = larFactType.First.Attribute("id").Value
+
+                    Call Me.LoadFactType(lrFactType, arNORMAXMLDOC)
+
+                End If
+
             Next
 
             '-----------------------------------------------------
@@ -306,7 +333,7 @@ Namespace NORMA
             lrFactType = arFactType
 
             loEnumElementQueryResult = From FactTypeInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                       Where FactTypeInformation.Attribute("id").Value = lrFactType.Id
+                                       Where FactTypeInformation.Attribute("id").Value = lrFactType.NORMAReferenceId
                                        Select FactTypeInformation
 
             For Each loElement In loEnumElementQueryResult
@@ -383,7 +410,7 @@ Namespace NORMA
                                                   Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name").Value
                             lrJoinedFactType = lrFactType.Model.FactType.Find(AddressOf lrModelObject.EqualsByName)
                         Else
                             lrJoinedFactType = Nothing
@@ -398,16 +425,19 @@ Namespace NORMA
                                                   Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name").Value
 
                             Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
                             loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate>
                                                           Select NestedPredicateElement
-                            lrModelObject.Id = loXMLNestedPredicateElement(0).Attribute("ref").Value
+
+                            lrModelObject.NORMAReferenceId = loXMLNestedPredicateElement(0).Attribute("ref").Value
 
                             lrJoinedFactType.Model = lrFactType.Model
-                            lrJoinedFactType.Id = lrModelObject.Id
+                            lrJoinedFactType.Id = lrModelObject.Name
                             lrJoinedFactType.Name = lrModelObject.Name
+                            lrJoinedEntityType.NORMAReferenceId = lrModelObject.NORMAReferenceId
+
                             If lrFactType.Model.FactType.Exists(AddressOf lrModelObject.Equals) Then
                                 '------------------------------
                                 'All okay, found the FactType
@@ -532,245 +562,261 @@ Namespace NORMA
             '      Update the JoinedORMObject to the FactType that was missing on the initial load.
             '--------------------------------------------------------------------------------------------
 
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                       Select ModelInformation
-                                       Order By ModelInformation.Attribute("_Name").Value
 
-            '---------------------------------
-            'Add the FactTypes to the Model
-            '---------------------------------     
+            Try
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                           Select ModelInformation
+                                           Order By ModelInformation.Attribute("_Name").Value
 
-            For Each loElement In loEnumElementQueryResult
+                '---------------------------------
+                'Add the FactTypes to the Model
+                '---------------------------------     
 
-                lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
-                lrFactType.NORMAReferenceId = loElement.Attribute("id").Value
-                lrFactType.Name = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
+                For Each loElement In loEnumElementQueryResult
+
+                    lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
+                    lrFactType.NORMAReferenceId = loElement.Attribute("id").Value
+                    lrFactType.Name = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
 
 
-                If arModel.FactType.Exists(AddressOf lrFactType.Equals) Then
-                    lrFactType = arModel.FactType.Find(AddressOf lrFactType.EqualsByName)
-                Else
-                    arModel.AddFactType(lrFactType) 'Don't use Model.CreateFactType because need to keep NORMA's FactType.Id for now.
+                    If arModel.FactType.Exists(AddressOf lrFactType.Equals) Then
+                        lrFactType = arModel.FactType.Find(AddressOf lrFactType.EqualsByName)
+                    Else
+                        arModel.AddFactType(lrFactType) 'Don't use Model.CreateFactType because need to keep NORMA's FactType.Id for now.
 
-                    '---------------------------------------------
-                    'Check to see if the FactType is Objectified
-                    '---------------------------------------------
-                    loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                              Where ModelInformation.Attribute("Name") = lrFactType.Name
-                                              Select ModelInformation
-
-                    If IsSomething(loXMLElementQueryResult(0)) Then
-                        lrFactType.IsObjectified = True
-                    End If
-
-                    '---------------------------
-                    'Add the Roles to the Model
-                    '---------------------------
-                    For Each lrRoleXElement In loElement.<orm:FactRoles>.<orm:Role>
-
-                        Dim lsNORMARoleId As String = lrRoleXElement.Attribute("id").Value
-
-                        lrRole = New FBM.Role(lrFactType, lsNORMARoleId, True)
-                        lrRole.Name = lrRoleXElement.Attribute("Name").Value
-
-                        '----------------------------------------------
-                        'Find the ModelObject within the NORMA Model
-                        '----------------------------------------------
-                        Dim lrModelObject As New FBM.ModelObject
-
-                        lrModelObject.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
-
-                        '-------------------------------------
-                        'Check to see if it is an EntityType
-                        '-------------------------------------
-                        lrJoinedEntityType = New FBM.EntityType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
-                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
-
-                        If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrJoinedEntityType = arModel.EntityType.Find(AddressOf lrModelObject.EqualsByName)
-                        Else
-                            lrJoinedEntityType = Nothing
-                        End If
-
-                        '-------------------------------------
-                        'Check to see if it is an ValueType
-                        '-------------------------------------
-                        lrValueType = New FBM.ValueType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
-                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
-
-                        If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrValueType = arModel.ValueType.Find(AddressOf lrModelObject.EqualsByName)
-                        Else
-                            lrValueType = Nothing
-                        End If
-                        '-------------------------------------
-                        'Check to see if it is an FactType
-                        '-------------------------------------
-                        lrJoinedFactType = New FBM.FactType
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
-                                                  Select ModelInformation
-
-                        If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject.EqualsByName)
-                        Else
-                            lrJoinedFactType = Nothing
-                        End If
-
-                        '-----------------------------------------------
-                        'Check to see if it is an Objectified FactType
-                        '-----------------------------------------------
-                        lrJoinedFactType = New FBM.FactType
+                        '---------------------------------------------
+                        'Check to see if the FactType is Objectified
+                        '---------------------------------------------
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                                  Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                  Where ModelInformation.Attribute("Name") = lrFactType.Name
                                                   Select ModelInformation
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
-
-                            lrModelObject.Id = loXMLElementQueryResult(0).Attribute("Name")
-                            lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
-
-                            Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
-                            loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate>
-                                                          Select NestedPredicateElement
-                            lrModelObject.NORMAReferenceId = loXMLNestedPredicateElement(0).Attribute("ref").Value
-
-                            lrJoinedFactType.Model = arModel
-                            lrJoinedFactType.Id = lrModelObject.Id
-                            lrJoinedFactType.Name = lrModelObject.Name
-                            If arModel.FactType.Exists(AddressOf lrModelObject.Equals) Then
-                                '------------------------------
-                                'All okay, found the FactType
-                                '------------------------------
-                                lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject.Equals)
-                            Else
-                                Call Me.LoadFactType(lrJoinedFactType, arNORMAXMLDOC)
-                            End If
-                        Else
-                            lrJoinedFactType = Nothing
+                            lrFactType.IsObjectified = True
                         End If
 
-                        If IsSomething(lrJoinedEntityType) Then
-                            '---------------------------------------------------------
-                            'Check to see if the Role already exists in the FactType
-                            '---------------------------------------------------------
-                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
-                                '--------------------------------
-                                'Update the JoinedORMObject etc
-                                '--------------------------------
-                                lrRole = New FBM.Role
-                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.JoinedORMObject = lrJoinedEntityType
+                        '---------------------------
+                        'Add the Roles to the Model
+                        '---------------------------
+                        For Each lrRoleXElement In loElement.<orm:FactRoles>.<orm:Role>
+
+                            Dim lsNORMARoleId As String = lrRoleXElement.Attribute("id").Value
+
+                            lrRole = New FBM.Role(lrFactType, lsNORMARoleId, True)
+                            lrRole.Name = lrRoleXElement.Attribute("Name").Value
+
+                            '----------------------------------------------
+                            'Find the ModelObject within the NORMA Model
+                            '----------------------------------------------
+                            Dim lrModelObject As New FBM.ModelObject
+
+                            lrModelObject.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+
+                            '-------------------------------------
+                            'Check to see if it is an EntityType
+                            '-------------------------------------
+                            lrJoinedEntityType = New FBM.EntityType
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+
+                            If IsSomething(loXMLElementQueryResult(0)) Then
+                                lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                                lrJoinedEntityType = arModel.EntityType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
-                                lrRole = New FBM.Role
-                                lrRole = lrFactType.CreateRole(lrJoinedEntityType)
-                                lrRole.Id = lsNORMARoleId
-                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                                lrJoinedEntityType = Nothing
                             End If
-                        ElseIf IsSomething(lrValueType) Then
-                            '---------------------------------------------------------
-                            'Check to see if the Role already exists in the FactType
-                            '---------------------------------------------------------
-                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
-                                '--------------------------------
-                                'Update the JoinedORMObject etc
-                                '--------------------------------
-                                lrRole = New FBM.Role
-                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.JoinedORMObject = lrValueType
+
+                            '-------------------------------------
+                            'Check to see if it is an ValueType
+                            '-------------------------------------
+                            lrValueType = New FBM.ValueType
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+
+                            If IsSomething(loXMLElementQueryResult(0)) Then
+                                lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                                lrValueType = arModel.ValueType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
-                                lrRole = New FBM.Role
-                                lrRole = lrFactType.CreateRole(lrValueType)
-                                lrRole.Id = lsNORMARoleId
-                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
-                                If lrValueType.NORMAIsUnaryFactTypeValueType Then
-                                    lrRole.NORMALinksToUnaryFactTypeValueType = True
+                                lrValueType = Nothing
+                            End If
+
+                            '-------------------------------------
+                            'Check to see if it is an FactType
+                            '-------------------------------------
+                            lrJoinedFactType = New FBM.FactType
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Select ModelInformation
+
+                            If IsSomething(loXMLElementQueryResult(0)) Then
+                                lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
+                                lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject.EqualsByName)
+                            Else
+                                lrJoinedFactType = Nothing
+                            End If
+
+                            '-----------------------------------------------
+                            'Check to see if it is an Objectified FactType
+                            '-----------------------------------------------
+                            lrJoinedFactType = New FBM.FactType
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Select ModelInformation
+
+                            If IsSomething(loXMLElementQueryResult(0)) Then
+
+                                Dim lrModelObject2 As New FBM.ModelObject
+                                lrModelObject2.Id = loXMLElementQueryResult(0).Attribute("Name").Value
+                                lrModelObject2.Name = lrModelObject.Id
+
+                                Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
+                                loXMLNestedPredicateElement = From NestedPredicateElement In loXMLElementQueryResult(0).<orm:NestedPredicate>
+                                                              Select NestedPredicateElement
+
+                                lrModelObject2.NORMAReferenceId = loXMLNestedPredicateElement(0).Attribute("ref").Value
+
+                                lrJoinedFactType.Model = arModel
+                                lrJoinedFactType.Id = lrModelObject2.Id
+                                lrJoinedFactType.Name = lrModelObject2.Name
+                                lrJoinedFactType.NORMAReferenceId = lrModelObject2.NORMAReferenceId
+
+                                If arModel.FactType.Exists(AddressOf lrModelObject2.Equals) Then
+                                    '------------------------------
+                                    'All okay, found the FactType
+                                    '------------------------------
+                                    lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject2.Equals)
+                                Else
+                                    Call Me.LoadFactType(lrJoinedFactType, arNORMAXMLDOC)
+                                End If
+                            Else
+                                lrJoinedFactType = Nothing
+                            End If
+
+                            If IsSomething(lrJoinedEntityType) Then
+                                '---------------------------------------------------------
+                                'Check to see if the Role already exists in the FactType
+                                '---------------------------------------------------------
+                                If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                    '--------------------------------
+                                    'Update the JoinedORMObject etc
+                                    '--------------------------------
+                                    lrRole = New FBM.Role
+                                    lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                    lrRole.JoinedORMObject = lrJoinedEntityType
+                                Else
+                                    lrRole = New FBM.Role
+                                    lrRole = lrFactType.CreateRole(lrJoinedEntityType)
+                                    lrRole.Id = lsNORMARoleId
+                                    lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                    lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                                End If
+                            ElseIf IsSomething(lrValueType) Then
+                                '---------------------------------------------------------
+                                'Check to see if the Role already exists in the FactType
+                                '---------------------------------------------------------
+                                If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                    '--------------------------------
+                                    'Update the JoinedORMObject etc
+                                    '--------------------------------
+                                    lrRole = New FBM.Role
+                                    lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                    lrRole.JoinedORMObject = lrValueType
+                                Else
+                                    lrRole = New FBM.Role
+                                    lrRole = lrFactType.CreateRole(lrValueType)
+                                    lrRole.Id = lsNORMARoleId
+                                    lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                    lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
+                                    If lrValueType.NORMAIsUnaryFactTypeValueType Then
+                                        lrRole.NORMALinksToUnaryFactTypeValueType = True
+                                    End If
+                                End If
+                            ElseIf IsSomething(lrJoinedFactType) Then
+                                '---------------------------------------------------------
+                                'Check to see if the Role already exists in the FactType
+                                '---------------------------------------------------------
+                                If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
+                                    '--------------------------------
+                                    'Update the JoinedORMObject etc
+                                    '--------------------------------
+                                    lrRole = New FBM.Role
+                                    lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                                    lrRole.JoinedORMObject = lrJoinedFactType
+                                Else
+                                    lrRole = New FBM.Role
+                                    lrRole = lrFactType.CreateRole(lrJoinedFactType)
+                                    lrRole.Id = lsNORMARoleId
+                                    lrRole.Name = lrRoleXElement.Attribute("Name").Value
+                                    lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                                 End If
                             End If
-                        ElseIf IsSomething(lrJoinedFactType) Then
-                            '---------------------------------------------------------
-                            'Check to see if the Role already exists in the FactType
-                            '---------------------------------------------------------
-                            If lrFactType.RoleGroup.Exists(AddressOf lrRole.Equals) Then
-                                '--------------------------------
-                                'Update the JoinedORMObject etc
-                                '--------------------------------
-                                lrRole = New FBM.Role
-                                lrRole = lrFactType.RoleGroup.Find(AddressOf lrRole.Equals)
-                                lrRole.JoinedORMObject = lrJoinedFactType
-                            Else
-                                lrRole = New FBM.Role
-                                lrRole = lrFactType.CreateRole(lrJoinedFactType)
-                                lrRole.Id = lsNORMARoleId
-                                lrRole.Name = lrRoleXElement.Attribute("Name").Value
-                                lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
-                            End If
-                        End If
 
-                        'If lrRole.JoinedORMObject Is Nothing Then
-                        '    '----------------------------------------------------------------------------
-                        '    'Don't add the Role to the FactType.RoleGroup because it references nothing
-                        '    '----------------------------------------------------------------------------
-                        '    lrFactType.RoleGroup.Remove(lrRole)
-                        '    arModel.Role.Remove(lrRole)
-                        '    Dim lsMessage As String = ""
-                        '    lsMessage = "Warning: Error loading NORMA XML (.orm) file"
-                        '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
-                        '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
-                        'End If
+                            'If lrRole.JoinedORMObject Is Nothing Then
+                            '    '----------------------------------------------------------------------------
+                            '    'Don't add the Role to the FactType.RoleGroup because it references nothing
+                            '    '----------------------------------------------------------------------------
+                            '    lrFactType.RoleGroup.Remove(lrRole)
+                            '    arModel.Role.Remove(lrRole)
+                            '    Dim lsMessage As String = ""
+                            '    lsMessage = "Warning: Error loading NORMA XML (.orm) file"
+                            '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
+                            '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            'End If
+                        Next 'Role
+
+                        '--------------------------------------------
+                        'Load the FactTypeReadings for the FactType
+                        '--------------------------------------------
+                        Call Me.LoadFactTypeReadings(arModel, lrFactType, loElement)
+
+                        '---------------------------------
+                        'Load the Facts for the FactType
+                        '---------------------------------
+                        Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
+
+                    End If 'FactType exists in Model
+                Next 'FactType
+
+                Dim larFaultyFactTypes = From FactType In arModel.FactType
+                                         From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject Is Nothing
+                                         Select FactType
+
+                For Each lrFactType In larFaultyFactTypes
+
+                    Dim larRole = From Role In lrFactType.RoleGroup
+                                  Where Role.JoinedORMObject Is Nothing
+                                  Select Role
+
+                    For Each lrRole In larRole
+
+                        loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                                   From Role In FactType.<orm:FactRoles>.<orm:Role>
+                                                   Where Role.Attribute("id").Value = lrRole.Id
+                                                   Select Role
+
+                        For Each lrRoleXElement In loEnumElementQueryResult.<orm:RolePlayer>
+                            '------------------------------------------------
+                            'Find the ModelObject within the Richmond Model
+                            '------------------------------------------------
+                            lrJoinedFactType = New FBM.FactType
+                            lrJoinedFactType.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                            lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrJoinedFactType.NORMAReferenceId)
+
+                            lrRole.JoinedORMObject = lrJoinedFactType
+
+                        Next 'Seach in NORMAXMLDOC
                     Next 'Role
+                Next 'FaultyFactType
 
-                    '--------------------------------------------
-                    'Load the FactTypeReadings for the FactType
-                    '--------------------------------------------
-                    Call Me.LoadFactTypeReadings(arModel, lrFactType, loElement)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                    '---------------------------------
-                    'Load the Facts for the FactType
-                    '---------------------------------
-                    Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
-
-                End If 'FactType exists in Model
-            Next 'FactType
-
-            Dim larFaultyFactTypes = From FactType In arModel.FactType
-                                     From Role In FactType.RoleGroup
-                                     Where Role.JoinedORMObject Is Nothing
-                                     Select FactType
-
-            For Each lrFactType In larFaultyFactTypes
-
-                Dim larRole = From Role In lrFactType.RoleGroup
-                              Where Role.JoinedORMObject Is Nothing
-                              Select Role
-
-                For Each lrRole In larRole
-
-                    loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                               From Role In FactType.<orm:FactRoles>.<orm:Role>
-                                               Where Role.Attribute("id").Value = lrRole.Id
-                                               Select Role
-
-                    For Each lrRoleXElement In loEnumElementQueryResult.<orm:RolePlayer>
-                        '------------------------------------------------
-                        'Find the ModelObject within the Richmond Model
-                        '------------------------------------------------
-                        lrJoinedFactType = New FBM.FactType
-                        lrJoinedFactType.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
-                        lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrJoinedFactType.NORMAReferenceId)
-
-                        lrRole.JoinedORMObject = lrJoinedFactType
-
-                    Next 'Seach in NORMAXMLDOC
-                Next 'Role
-            Next 'FaultyFactType
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
