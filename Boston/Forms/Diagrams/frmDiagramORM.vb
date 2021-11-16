@@ -5023,7 +5023,7 @@ Public Class frmDiagramORM
             '----------------------------------------------
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             For Each lrEntityTypeInstance In arPage.EntityTypeInstance
-                lrEntityTypeInstance.ExpandReferenceMode = False
+                'lrEntityTypeInstance.ExpandReferenceMode = False
                 Call lrEntityTypeInstance.DisplayAndAssociate()
             Next
 
@@ -5058,6 +5058,13 @@ Public Class frmDiagramORM
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
+            Next
+
+            '--------------------------------
+            'ExpandedReferenceScheme
+            '--------------------------------
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.ExpandReferenceMode)
+                Call lrEntityTypeInstance.ExpandTheReferenceScheme()
             Next
 
             '-----------------------------

@@ -1747,7 +1747,7 @@ Namespace FBM
             'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arFactType.Id
-            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType,,,,, arFactType.DBName), , abMakeModelDirty)
+            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType,,,,, arFactType.DBName), , abMakeModelDirty,,,, True,)
 
             arFactType.Concept = lrDictionaryEntry.Concept
             arFactType.ShortDescription = lrDictionaryEntry.ShortDescription
