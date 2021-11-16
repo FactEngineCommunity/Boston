@@ -1313,7 +1313,9 @@ Namespace FBM
                 lrRoleConstraintInstance.X = aoPoint.X
                 lrRoleConstraintInstance.Y = aoPoint.Y
 
-                Call lrRoleConstraintInstance.DisplayAndAssociate()
+                If Me.DiagramView IsNot Nothing Then
+                    Call lrRoleConstraintInstance.DisplayAndAssociate()
+                End If
 
                 Call Me.MakeDirty()
 
