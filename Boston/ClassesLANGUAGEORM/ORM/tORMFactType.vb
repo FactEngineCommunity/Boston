@@ -4301,7 +4301,8 @@ Namespace FBM
                 Dim larRoles = From FactType In Me.Model.FactType
                                From Role In FactType.RoleGroup
                                Where Role.TypeOfJoin = pcenumRoleJoinType.FactType _
-                                 And Role.JoinsFactType Is Me
+                                 And Role.JoinsFactType Is Me _
+                                 And Not FactType.IsLinkFactType
                                Select Role
 
                 Return larRoles.Count = 0

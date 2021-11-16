@@ -1031,7 +1031,8 @@ Namespace FBM
 
                             ElseIf arRoleConstraint.Role(0).FactType.IsManyTo1BinaryFactType And
                                arRoleConstraint.Role(0).HasInternalUniquenessConstraint And
-                               Not arRoleConstraint.Role(0).FactType.IsLinkFactType Then
+                               Not arRoleConstraint.Role(0).FactType.IsLinkFactType And
+                               Not arRoleConstraint.Role(0).TypeOfJoin = pcenumRoleJoinType.ValueType Then
 
                                 Dim lrRoleConstraintRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
