@@ -2307,7 +2307,7 @@ Public Class frmToolboxEnterpriseExplorer
         'Get the Internal Uniqueness Constraints
         '-----------------------------------------
         Richmond.WriteToStatusBar("Loading Internal Uniqueness Constraints")
-        Call lrNORMAFileLoader.LoadRoleConstraintInternalUniquenessConstraints(lrModel, NORMAXMLDOC)
+        Call lrNORMAFileLoader.LoadRoleConstraintInternalUniquenessConstraints(lrModel, NORMAXMLDOC, True)
 
         '-----------------------------------------
         'Get the External Uniqueness Constraints

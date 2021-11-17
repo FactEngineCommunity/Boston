@@ -991,7 +991,9 @@ Namespace NORMA
 
         End Function
 
-        Public Sub LoadRoleConstraintInternalUniquenessConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+        Public Sub LoadRoleConstraintInternalUniquenessConstraints(ByRef arModel As FBM.Model,
+                                                                   ByRef arNORMAXMLDOC As XDocument,
+                                                                   Optional ByVal abSuppressLinkFactTypeIUCs As Boolean = False)
 
             Dim lrRole As New FBM.Role
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
@@ -1051,9 +1053,14 @@ Namespace NORMA
                             lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
                             lrRoleConstraint.isDirty = True
                             lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
-                            arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing)
+
+                            If abSuppressLinkFactTypeIUCs And lrRoleConstraint.Role(0).FactType.IsLinkFactType Then
+                                'Ignore
+                            Else
+                                arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing)
+                            End If
                         End If
-                    End If
+                        End If
                 End If
             Next
 

@@ -1529,6 +1529,12 @@ Namespace FBM
                 lrRoleToBeRemoved = arRole
 
                 lrPredicatePart = Me.PredicatePart.Find(Function(x) x.Role.Id = lrRoleToBeRemoved.Id)
+
+                If lrPredicatePart Is Nothing Then
+                    'Nothing to remove
+                    Exit Sub
+                End If
+
                 Dim liSequenceNrBeingRemoved As Integer = lrPredicatePart.SequenceNr
 
                 '--------------------------------------------------------------

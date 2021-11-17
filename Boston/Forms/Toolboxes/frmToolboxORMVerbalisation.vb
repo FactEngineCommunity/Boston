@@ -393,113 +393,159 @@ Public Class frmToolboxORMVerbalisation
     Public Sub VerbaliseRoleConstraintUniquenessConstraint(ByVal arRoleConstraint As FBM.RoleConstraint)
 
         Dim lrFactType As FBM.FactType
-
         Dim lrVerbaliser As New FBM.ORMVerbailser
         Call lrVerbaliser.Reset()
 
-        If arRoleConstraint.RoleConstraintRole.Count = 0 Then
-            lrVerbaliser.VerbaliseError("<Provide links to Roles for Role Constraint, '" & arRoleConstraint.Name & "', to complete this verbalisation>")
+        Try
+
+
+            If arRoleConstraint.RoleConstraintRole.Count = 0 Then
+                lrVerbaliser.VerbaliseError("<Provide links to Roles for Role Constraint, '" & arRoleConstraint.Name & "', to complete this verbalisation>")
+                lrVerbaliser.HTW.WriteBreak()
+                Exit Sub
+            End If
+
+            '------------------------------------------------------------
+            'Declare that the RoleConstraint(Name) is an RoleConstraint
+            '------------------------------------------------------------
+            lrVerbaliser.VerbaliseModelObject(arRoleConstraint)
+            lrVerbaliser.VerbaliseQuantifier(" is a Role Constraint")
+            lrVerbaliser.VerbaliseQuantifier(" (of type, 'Uniqueness Constraint')")
             lrVerbaliser.HTW.WriteBreak()
-            Exit Sub
-        End If
-
-        '------------------------------------------------------------
-        'Declare that the RoleConstraint(Name) is an RoleConstraint
-        '------------------------------------------------------------
-        lrVerbaliser.VerbaliseModelObject(arRoleConstraint)
-        lrVerbaliser.VerbaliseQuantifier(" is a Role Constraint")
-        lrVerbaliser.VerbaliseQuantifier(" (of type, 'Uniqueness Constraint')")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
 
 
-        Dim liInd As Integer = 0        
-        Dim lrModelObject As FBM.ModelObject
-        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+            Dim liInd As Integer = 0
+            Dim lrModelObject As FBM.ModelObject
+            Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
-        lrVerbaliser.VerbaliseQuantifier("For each ")
+            lrVerbaliser.VerbaliseQuantifier("For each ")
 
-        Dim larModelObject = From RoleConstraintRole In arRoleConstraint.RoleConstraintRole _
-                             Select RoleConstraintRole.Role.JoinedORMObject
+            Dim larModelObject = From RoleConstraintRole In arRoleConstraint.RoleConstraintRole
+                                 Select RoleConstraintRole.Role.JoinedORMObject
 
-        Dim lsPreboundReadingText As String = ""
-        For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
-            lrFactType = lrRoleConstraintRole.Role.FactType
-            lrModelObject = lrRoleConstraintRole.Role.JoinedORMObject
-            If lrFactType.FactTypeReading.Count > 0 Then
-                lsPreboundReadingText = lrFactType.GetPreboundReadingTextForModelElementAtPosition(lrModelObject, 0)
-            End If
-            lrVerbaliser.VerbalisePredicateText(lsPreboundReadingText)
-            lrVerbaliser.VerbaliseModelObject(lrModelObject)
+            Dim lsPreboundReadingText As String = ""
+            For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
+                lrFactType = lrRoleConstraintRole.Role.FactType
+                lrModelObject = lrRoleConstraintRole.Role.JoinedORMObject
+                If lrFactType.FactTypeReading.Count > 0 Then
+                    lsPreboundReadingText = lrFactType.GetPreboundReadingTextForModelElementAtPosition(lrModelObject, 0)
+                End If
+                lrVerbaliser.VerbalisePredicateText(lsPreboundReadingText)
+                lrVerbaliser.VerbaliseModelObject(lrModelObject)
 
-            If liInd < larModelObject.Count - 1 Then
-                lrVerbaliser.VerbaliseQuantifier(" and ")
-            End If
-            liInd += 1
-        Next
+                If liInd < larModelObject.Count - 1 Then
+                    lrVerbaliser.VerbaliseQuantifier(" and ")
+                End If
+                liInd += 1
+            Next
 
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseQuantifier(" at most one ")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier(" at most one ")
 
-        Dim larListedFactType As New List(Of FBM.FactType)
-        Dim lbSkippedFactType As Boolean = False
+            Dim larListedFactType As New List(Of FBM.FactType)
+            Dim lbSkippedFactType As Boolean = False
 
-        liInd = 0
+            liInd = 0
 
-        Dim lrCommonModelObject As FBM.ModelObject
-        Dim lbFoundCommonModelObject As Boolean = False
-        Dim larArgumentCommonModelObjects As New List(Of FBM.ModelObject)
+            Dim lrCommonModelObject As FBM.ModelObject
+            Dim lbFoundCommonModelObject As Boolean = False
+            Dim larArgumentCommonModelObjects As New List(Of FBM.ModelObject)
 
-        If arRoleConstraint.IsEachRoleFactTypeBinary Then
-            If arRoleConstraint.DoesEachRoleFactTypeOppositeRoleJoinSameModelObject Then
-                lrFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
-                lrCommonModelObject = lrFactType.GetOtherRoleOfBinaryFactType(arRoleConstraint.RoleConstraintRole(0).Role.Id).JoinedORMObject
+            If arRoleConstraint.IsEachRoleFactTypeBinary Then
+                If arRoleConstraint.DoesEachRoleFactTypeOppositeRoleJoinSameModelObject Then
+                    lrFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
+                    lrCommonModelObject = lrFactType.GetOtherRoleOfBinaryFactType(arRoleConstraint.RoleConstraintRole(0).Role.Id).JoinedORMObject
 
-                larArgumentCommonModelObjects.Add(lrCommonModelObject)
+                    larArgumentCommonModelObjects.Add(lrCommonModelObject)
 
-                lbFoundCommonModelObject = True
-            End If
-        End If
-
-        'FactTypeReading(0).GetReadingTextThatOrSome(Me.JoinPath.RolePath, arVerbaliser, larArgumentCommonModelObjects, larVerbalisedModelObject)
-        Dim lrFactTypeReading As FBM.FactTypeReading
-        Dim larRole As New List(Of FBM.Role)
-        For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
-
-            lrFactType = lrRoleConstraintRole.Role.FactType
-
-            larRole.Clear()
-            larRole.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
-            larRole.Add(lrRoleConstraintRole.Role)
-            lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
-
-            lbSkippedFactType = False
-
-            If (liInd >= 1) And Not larListedFactType.Exists(AddressOf lrFactType.Equals) Then
-                lrVerbaliser.VerbaliseQuantifier(" and ")
-            End If
-
-            If lrFactTypeReading IsNot Nothing Then
-                lrFactTypeReading.GetReadingTextThatOrSome(larRole,
-                                                           lrVerbaliser,
-                                                           larArgumentCommonModelObjects,
-                                                           New List(Of FBM.ModelObject),
-                                                           liInd > 0,
-                                                           Nothing,
-                                                           True)
+                    lbFoundCommonModelObject = True
+                End If
             Else
-                lrVerbaliser.VerbaliseError("Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation")
-                lrVerbaliser.HTW.WriteBreak()
+                For Each lrRole In arRoleConstraint.Role
+                    If lrRole.FactType.IsBinaryFactType Then
+                        lrCommonModelObject = lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).JoinedORMObject
+                        larArgumentCommonModelObjects.Add(lrCommonModelObject)
+                    ElseIf lrRole.FactType.IsObjectified Then
+                        larArgumentCommonModelObjects.Add(lrRole.FactType)
+                    End If
+                Next
+
+                If larArgumentCommonModelObjects.Count = 2 Then
+                    Dim lasModelObjectId = From ModelObject In larArgumentCommonModelObjects
+                                           Select ModelObject.Id Distinct
+
+                    If lasModelObjectId.Count = 1 Then
+                        lbFoundCommonModelObject = True
+                        lrCommonModelObject = larArgumentCommonModelObjects(0)
+                    End If
+                End If
             End If
 
-            If Not lbSkippedFactType Then
-                lrVerbaliser.HTW.WriteBreak()
-            End If
+            'FactTypeReading(0).GetReadingTextThatOrSome(Me.JoinPath.RolePath, arVerbaliser, larArgumentCommonModelObjects, larVerbalisedModelObject)
+            Dim lrFactTypeReading As FBM.FactTypeReading
+            Dim larRole As New List(Of FBM.Role)
+            For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
 
-            liInd += 1
-        Next
+                Dim lrRCRole As FBM.Role = lrRoleConstraintRole.Role
+                larRole.Clear()
 
-        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+                If lrRoleConstraintRole.Role.FactType.IsObjectified Then
+
+                    Dim lrLinkFactType = (From LinkFactType In arRoleConstraint.Model.FactType.FindAll(Function(x) x.IsLinkFactType)
+                                          Where LinkFactType.LinkFactTypeRole Is lrRoleConstraintRole.Role
+                                          Select LinkFactType).First
+                    lrFactType = lrLinkFactType
+
+                    Dim lrFirstRole As FBM.Role = lrLinkFactType.RoleGroup.Find(Function(x) x.JoinedORMObject Is lrRoleConstraintRole.Role.FactType)
+                    larRole.Add(lrFirstRole)
+                    larRole.Add(lrLinkFactType.GetOtherRoleOfBinaryFactType(lrFirstRole.Id))
+                Else
+                    lrFactType = lrRoleConstraintRole.Role.FactType
+                    larRole.Add(lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
+                    larRole.Add(lrRoleConstraintRole.Role)
+                End If
+
+
+                lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+
+                lbSkippedFactType = False
+
+                If (liInd >= 1) And Not larListedFactType.Exists(AddressOf lrFactType.Equals) Then
+                    lrVerbaliser.VerbaliseQuantifier(" and ")
+                End If
+
+                If lrFactTypeReading IsNot Nothing Then
+                    lrFactTypeReading.GetReadingTextThatOrSome(larRole,
+                                                               lrVerbaliser,
+                                                               larArgumentCommonModelObjects,
+                                                               New List(Of FBM.ModelObject),
+                                                               liInd > 0,
+                                                               Nothing,
+                                                               True)
+                Else
+                    lrVerbaliser.VerbaliseError("Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation")
+                    lrVerbaliser.HTW.WriteBreak()
+                End If
+
+                If Not lbSkippedFactType Then
+                    lrVerbaliser.HTW.WriteBreak()
+                End If
+
+                liInd += 1
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+
+            lrVerbaliser.VerbaliseError(lsMessage)
+        Finally
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+        End Try
 
     End Sub
 
