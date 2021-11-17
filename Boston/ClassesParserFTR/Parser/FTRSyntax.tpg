@@ -6,7 +6,7 @@
 EOF           -> @"^$";
 [Color(0, 191, 255)] FOLLOWINGREADINGTEXT -> @"([a-z]+[\s]?)+$";
 [Color(0, 191, 255)] FRONTREADINGTEXT -> @"(?>[a-z]+)[^\-]";
-[Color(76, 153, 0)]	MODELELEMENTNAME -> @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+"; // @"(([A-Z][a-z]+)+[\s]?)+"; //([A-Z][a-z]*)+";
+[Color(76, 153, 0)]	MODELELEMENTNAME -> @"(([A-Z0-9]+[_a-zA-Z0-9]*[ |_]*)+[_|\s]?)+";// @"(([A-Z][a-z]+)+[\s]?)+"; //([A-Z][a-z]*)+";
 [Color(153, 0, 153)]	PREDICATEPART	-> @"(?!([a-z]+\-))(?!([a-z\s]+$))([a-z]+[^\-])"; //(?>[a-z|\s]+ )(?<!$)"; //(?>[a-z]+)([^\-])(?<!$)
 PREDICATESPACE -> @"[\s]+";
 [Color(153, 76, 0)] PREBOUNDREADINGTEXT -> @"[a-z]+\-";

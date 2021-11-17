@@ -1604,6 +1604,7 @@ Namespace NORMA
                                                     Select FactType.RoleGroup(0)).First
 
                     lrLinkFTRole.Id = loLinkFTRoleXElement.Attribute("id").Value
+                    lrLinkFTRole.FactType.NORMAReferenceId = loElement.Attribute("id").Value
                 Next
 
             Catch ex As Exception
@@ -1868,7 +1869,7 @@ Namespace NORMA
                 '---------------------------
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.SubsetConstraint, Nothing, loElement.Attribute("Name").Value)
-                lrRoleConstraint.Id = loElement.Attribute("id").Value
+                lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
 
                 Dim lrRoleSequencesXElement As XElement
                 Dim lrRoleSequenceXElement As XElement
@@ -1951,6 +1952,7 @@ Namespace NORMA
 
                         End If
 
+                        Call lrRoleConstraint.CurrentArgument.JoinPath.ConstructFactTypePath()
                         liRoleSequenceNr += 1
                         lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
                     Next 'Role Sequence                    
@@ -1968,19 +1970,13 @@ Namespace NORMA
             Dim lrRole As FBM.Role
 
             Dim liFactTypeInd As Integer = 0
-            For liFactTypeInd = 1 To arModel.FactType.Count
-                If liFactTypeInd <= arModel.FactType.Count Then
-                    lrFactType= arModel.FactType(liFactTypeInd - 1)
 
-                    For liInd = 1 To lrFactType.RoleGroup.Count
-                        lrRole = lrFactType.RoleGroup(liInd - 1)
-                        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
-                            Call lrRole.FactType.RemoveRole(lrRole, False, True)
-                            liFactTypeInd = 1
-                            Exit For
-                        End If
-                    Next
-                End If
+            For Each lrFactType In arModel.FactType.ToArray
+                For Each lrRole In lrFactType.RoleGroup.ToArray
+                    If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                        Call lrRole.FactType.RemoveRole(lrRole, False, True)
+                    End If
+                Next
             Next
 
         End Sub
@@ -2407,38 +2403,49 @@ Namespace NORMA
                     '------------------
                     'Subset Constraints
                     '------------------
-                    For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
-                        lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+                    Try
 
-                        Dim loXMLElementQueryResult As IEnumerable(Of XElement)
-                        '-----------------------
-                        'Subset Constraint
-                        '-----------------------
-                        lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
-                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                        For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ExternalConstraintShape>
+                            lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                            Dim loXMLElementQueryResult As IEnumerable(Of XElement)
+                            '-----------------------
+                            'Subset Constraint
+                            '-----------------------
+                            lrRoleConstraint = New FBM.RoleConstraint
+                            lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
 
-                            Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.SubsetConstraint)
-                            lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                            Dim lsBounds() As String
-                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
-                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint>
+                                                      Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
+
+                            If IsSomething(loXMLElementQueryResult(0)) Then
+
+                                lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
+
+                                Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.SubsetConstraint)
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                                Dim lsBounds() As String
+                                If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                                    lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                                Else
+                                    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                    lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                                End If
+                                lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                                lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                             Else
-                                Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
-                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                                lrRoleConstraint = Nothing
                             End If
-                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
-                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
-                        Else
-                            lrRoleConstraint = Nothing
-                        End If
-                    Next
+                        Next
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    End Try
 
                     '------------------
                     'InclusiveOR Constraints
@@ -2899,7 +2906,7 @@ Namespace NORMA
                     '---------------------------------------------------------------------------------------------------
                     'Is either an incorrectly formatted FactTypeReading, or is not a FactTypeReading Statement at all.
                     '---------------------------------------------------------------------------------------------------
-                    lsMessage = "That's not a well formatted Fact Type Reading."
+                    lsMessage = "That's not a well formatted Fact Type Reading: '" & asReading & "'"
                     lsMessage &= vbCrLf
                     lsMessage.AppendLine("The correct format to use is:")
                     lsMessage.AppendLine("Object Types, words start with a capital. E.g. Person")
