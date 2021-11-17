@@ -1579,6 +1579,47 @@ Namespace NORMA
 
         End Sub
 
+        Public Sub SetRoleIdsForLinkFactTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Try
+                Dim lrRole As FBM.Role
+                Dim loElement As XElement
+
+
+                Dim loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:ImpliedFact>
+                                               Select ModelInformation
+
+                For Each loElement In loEnumElementQueryResult
+
+                    Dim loRoleProxyXElement As XElement = loElement.<orm:FactRoles>.<orm:RoleProxy>.<orm:Role>.First
+                    lrRole = New FBM.Role
+                    lrRole.Id = loRoleProxyXElement.Attribute("ref").Value
+                    lrRole = arModel.Role.Find(Function(x) x.Id = lrRole.Id)
+
+                    Dim loLinkFTRoleXElement As XElement = loElement.<orm:FactRoles>.<orm:Role>.First
+
+                    Dim lrLinkFTRole As FBM.Role = (From FactType In Me.FBMModel.FactType
+                                                    Where FactType.IsLinkFactType
+                                                    Where FactType.LinkFactTypeRole.Id = lrRole.Id
+                                                    Select FactType.RoleGroup(0)).First
+
+                    lrLinkFTRole.Id = loLinkFTRoleXElement.Attribute("id").Value
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+
+
         Public Sub LoadRoleConstraintInclusiveOrConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
             Dim lrRole As New FBM.Role
@@ -1833,8 +1874,11 @@ Namespace NORMA
                 Dim lrRoleSequenceXElement As XElement
 
                 For Each lrRoleSequencesXElement In loElement.<orm:RoleSequences>
-                    Dim liRoleSequenceNr As Integer = 1
+
                     For Each lrRoleSequenceXElement In lrRoleSequencesXElement.<orm:RoleSequence>
+
+                        lrRoleConstraint.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraint, lrRoleConstraint.GetNextArgumentSequenceNr)
+                        Dim liRoleSequenceNr As Integer = 1
 
                         Dim lbRolesFound As Boolean = True
                         Dim larRoleList As New List(Of FBM.Role)
@@ -1869,41 +1913,46 @@ Namespace NORMA
                         If lbRolesFound Then
                             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
                             For Each lrRole In larRoleList
-                                If liRoleSequenceNr = 1 Then
-                                    '----------
-                                    'Is Entry
-                                    '----------
-                                    '------------------------------------------------------------------------
-                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
-                                    '------------------------------------------------------------------------
-                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
-                                Else
-                                    '--------
-                                    'Is Exit
-                                    '--------
-                                    '------------------------------------------------------------------------
-                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
-                                    '------------------------------------------------------------------------
-                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
-                                End If
-
-                                '------------------------------------
-                                'Add the Role to the RoleConstraint
-                                '------------------------------------
-                                lrRoleConstraint.Role.Add(lrRole)
-
-                                '------------------------------------------
-                                'Attach the RoleConstraintRole to the Role
-                                '------------------------------------------
-                                lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
-
-                                '----------------------------------------------------
-                                'Attach the RoleConstraintRole to the RoleConstraint
-                                '----------------------------------------------------
-                                lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                lrRoleConstraint.CurrentArgument.ManuallyCreatedJoinPath = True
+                                lrRoleConstraintRole = lrRoleConstraint.CreateRoleConstraintRole(lrRole,
+                                                                                                 lrRoleConstraint.CurrentArgument,
+                                                                                                 Nothing)
                             Next 'Role
                         End If
+
+
+                        If lrRoleSequenceXElement.<orm:JoinRule>.Count > 0 Then
+
+                            lrRoleConstraint.CurrentArgument.JoinPath.RolePath.Clear()
+
+                            For Each loPathedRoleXElement In lrRoleSequenceXElement.<orm:JoinRule>.<orm:JoinPath>.<orm:PathComponents>.<orm:RolePath>.<orm:PathedRoles>.<orm:PathedRole>
+
+                                lrRole = New FBM.Role
+                                lrRole.Id = loPathedRoleXElement.Attribute("ref").Value
+                                lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+
+                                If lrRole IsNot Nothing Then
+                                    If Not lrRole.FactType.IsObjectified Then
+                                        lrRoleConstraint.CurrentArgument.JoinPath.RolePath.AddUnique(lrRole)
+
+                                        If lrRole.FactType.IsBinaryFactType Then
+                                            Dim lrOtherRole As FBM.Role = lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                                            lrRoleConstraint.CurrentArgument.JoinPath.RolePath.AddUnique(lrOtherRole)
+                                        End If
+                                    End If
+                                Else
+                                    Dim lsMessage As String = ""
+                                    lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                    lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                                    lsMessage &= vbCrLf & " Role.Id: " & loPathedRoleXElement.Attribute("ref").Value
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                End If
+                            Next
+
+                        End If
+
                         liRoleSequenceNr += 1
+                        lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
                     Next 'Role Sequence                    
                 Next 'Role Sequences
                 arModel.AddRoleConstraint(lrRoleConstraint)
@@ -1948,6 +1997,8 @@ Namespace NORMA
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            Dim ldblScalar As Double = 30.5
 
 
             Try
@@ -2043,8 +2094,8 @@ Namespace NORMA
                                 lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
                             lrEntityTypeInstance.ExpandReferenceMode = lbExpandReferenceScheme
 
@@ -2059,8 +2110,8 @@ Namespace NORMA
                             End If
                             Dim lsBounds() As String
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                         ElseIf IsSomething(lrFactType) Then
                             lrFactTypeInstance = New FBM.FactTypeInstance
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage)
@@ -2072,8 +2123,8 @@ Namespace NORMA
                             End If
                             Dim lsBounds() As String
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                         End If
                     Next 'lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
 
@@ -2125,8 +2176,8 @@ Namespace NORMA
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage, False)
                             Richmond.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
                             '-----------------------------------------------------------------------
                             'If the FactTypeInstance doesn't exist on the Page, add it to the Page
@@ -2258,10 +2309,10 @@ Namespace NORMA
                             '    lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             'End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            'lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            'lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            'lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            'lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
-                            Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * 25.4), Int(CSng(Trim(lsBounds(1))) * 25.4))
+                            Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * ldblScalar), Int(CSng(Trim(lsBounds(1))) * ldblScalar))
                             Call lrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPointF, False)
 
                         Else
@@ -2303,8 +2354,8 @@ Namespace NORMA
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                         Else
                             lrRoleConstraint = Nothing
                         End If
@@ -2340,13 +2391,13 @@ Namespace NORMA
                             '    lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             'End If
                             'lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            'lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            'lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            'lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            'lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
                             Dim lsBounds() As String
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
 
-                            Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * 25.4), Int(CSng(Trim(lsBounds(1))) * 25.4))
+                            Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * ldblScalar), Int(CSng(Trim(lsBounds(1))) * ldblScalar))
                             Call lrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPointF, False)
                         Else
                             lrRoleConstraint = Nothing
@@ -2382,8 +2433,8 @@ Namespace NORMA
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                         Else
                             lrRoleConstraint = Nothing
                         End If
@@ -2420,8 +2471,8 @@ Namespace NORMA
                                     lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                                 End If
                                 lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                                lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                                lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                                lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                             Else
                                 lrRoleConstraint = Nothing
                             End If
@@ -2478,8 +2529,8 @@ Namespace NORMA
                                     lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                                 End If
                                 lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                                lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                                lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                                lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                             Else
                                 lrRoleConstraint = Nothing
                             End If
@@ -2516,8 +2567,8 @@ Namespace NORMA
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
                         Else
                             lrRoleConstraint = Nothing
@@ -2554,8 +2605,8 @@ Namespace NORMA
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * 25.4)
-                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * 25.4)
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
                         Else
                             lrRoleConstraint = Nothing

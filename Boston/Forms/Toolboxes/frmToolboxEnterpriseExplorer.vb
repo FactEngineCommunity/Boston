@@ -2297,6 +2297,12 @@ Public Class frmToolboxEnterpriseExplorer
         Richmond.WriteToStatusBar("Loading Fact Types")
         Call lrNORMAFileLoader.LoadFactTypes(lrModel, NORMAXMLDOC)
 
+        '----------------------------------------
+        'Set Role.Ids for LinkFactTypes
+        '----------------------------------------
+        Richmond.WriteToStatusBar("Loading Fact Types")
+        Call lrNORMAFileLoader.SetRoleIdsForLinkFactTypes(lrModel, NORMAXMLDOC)
+
         '-----------------------------------------
         'Get the Internal Uniqueness Constraints
         '-----------------------------------------
