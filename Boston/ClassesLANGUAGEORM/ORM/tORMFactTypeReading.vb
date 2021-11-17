@@ -719,6 +719,8 @@ Namespace FBM
                     GetReadingText &= " " & Me.FollowingText
                 End If
 
+                GetReadingText = Trim(GetReadingText)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

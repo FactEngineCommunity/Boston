@@ -477,6 +477,9 @@ Public Class ODBCDatabaseReverseEngineer
                 Next
             End If
 
+            'CodeSafe-IsDirty Everything
+            Call Me.IsDirtyEverything
+
             Call Me.SetProgressBarValue(100)
 
         Catch ex As Exception
@@ -486,6 +489,33 @@ Public Class ODBCDatabaseReverseEngineer
         End Try
 
         Return True
+
+    End Function
+
+    Private Function IsDirtyEverything()
+
+        Try
+            For Each lrValueType In Me.Model.ValueType
+                lrValueType.isDirty = True
+            Next
+            For Each lrEntityType In Me.Model.EntityType
+                lrEntityType.isDirty = True
+            Next
+            For Each lrFactType In Me.Model.FactType
+                lrFactType.isDirty = True
+            Next
+            For Each lrRoleConstraint In Me.Model.RoleConstraint
+                lrRoleConstraint.isDirty = True
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Function
 

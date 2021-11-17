@@ -427,8 +427,7 @@ Public Class frmToolboxORMVerbalisation
             lrFactType = lrRoleConstraintRole.Role.FactType
             lrModelObject = lrRoleConstraintRole.Role.JoinedORMObject
             If lrFactType.FactTypeReading.Count > 0 Then
-                lsPreboundReadingText = lrFactType.GetPreboundReadingTextForModelElementAtPosition(lrModelObject,
-                                                                                                   0)
+                lsPreboundReadingText = lrFactType.GetPreboundReadingTextForModelElementAtPosition(lrModelObject, 0)
             End If
             lrVerbaliser.VerbalisePredicateText(lsPreboundReadingText)
             lrVerbaliser.VerbaliseModelObject(lrModelObject)

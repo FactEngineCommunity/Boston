@@ -12,6 +12,13 @@ Namespace NORMA
 
         Private FBMModel As FBM.Model = Nothing
 
+
+        'FactTypeReading Processing
+        Private FTRScanner As FTR.Scanner
+        Private FTRProcessor As New FTR.Processor 'Used for parsing FTR texts as input by the user. 
+        Private FTRParser As New FTR.Parser(New FTR.Scanner)
+        Private FTRParseTree As New FTR.ParseTree
+
         ''' <summary>
         ''' Key is NORMA reference, Value is data type name.
         ''' </summary>
@@ -123,6 +130,11 @@ Namespace NORMA
                         Else
                             lrEntityType.SetReferenceMode(lsReferenceMode, True, Nothing, False,, True)
                             lrEntityType.ReferenceModeValueType = arModel.ValueType.Find(Function(x) x.Id = lsReferenceMode)
+                            If lrEntityType.ReferenceModeValueType Is Nothing Then
+                                If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
+                                    lrEntityType.ReferenceModeValueType = lrEntityType.ReferenceModeRoleConstraint.Role(0).JoinsValueType
+                                End If
+                            End If
                         End If
                     End If
 
@@ -1074,6 +1086,7 @@ Namespace NORMA
                     End If
                 Next
 
+                Dim lrRoleConstraint As FBM.RoleConstraint
                 If lbRolesFound Then
                     If arModel.AreRolesWithinTheSameFactType(larRoleList) Then
                         '----------------------------------------------------------
@@ -1083,10 +1096,22 @@ Namespace NORMA
                         '---------------------------
                         'Create the RoleConstraint
                         '---------------------------
-                        Dim lrRoleConstraint As FBM.RoleConstraint
                         lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
                         lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id")
                         arModel.AddRoleConstraint(lrRoleConstraint)
+
+                        Try
+                            Dim lsPreferredIdentifierForModelElementId = (From PreferredIdentiferFor In loElement.<orm:PreferredIdentifierFor>
+                                                                          Select PreferredIdentiferFor).First.Attribute("ref").Value
+
+                            Dim lrEntityType As FBM.EntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lsPreferredIdentifierForModelElementId)
+                            lrEntityType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
+                            Call lrRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
+
+                        Catch ex As Exception
+                            'Not a concern if it doesn't exist.
+                        End Try
+
                     End If
                 End If
             Next
@@ -2622,6 +2647,16 @@ Namespace NORMA
 
                 Next 'FactTypeReading.PredicatePart
 
+                'Get PreBoundReadingTexts etc
+                Dim larRoleOrder As New List(Of FBM.Role)
+                For Each lrPredicatePart In lrFactTypeReading.PredicatePart
+                    larRoleOrder.Add(lrPredicatePart.Role)
+                Next
+
+                Dim lsFactTypeReading = lrFactTypeReading.GetReadingText
+                lrFactTypeReading.PredicatePart.Clear()
+                Call Me.GetPredicatePartsFromReadingUsingParser(lsFactTypeReading, lrFactTypeReading, larRoleOrder)
+
                 arFactType.FactTypeReading.Add(lrFactTypeReading)
 
             Next 'FactTypeReading
@@ -2793,6 +2828,145 @@ Namespace NORMA
             End Try
 
         End Sub
+
+        Private Function GetPredicatePartsFromReadingUsingParser(ByVal asReading As String,
+                                                                 ByRef arFactTypeReading As FBM.FactTypeReading,
+                                                                 Optional ByRef aarRoleOrder As List(Of FBM.Role) = Nothing) As Boolean
+
+            Dim lsMessage As String
+            Dim lrPredicatePart As FBM.PredicatePart
+
+            Try
+                ''Testing
+                Me.FTRProcessor.ProcessFTR(asReading, Me.FTRParseTree)
+
+                'OR
+
+                Me.FTRParseTree = Me.FTRParser.Parse(asReading)
+
+                If Me.FTRParseTree.Errors.Count > 0 Then
+                    '---------------------------------------------------------------------------------------------------
+                    'Is either an incorrectly formatted FactTypeReading, or is not a FactTypeReading Statement at all.
+                    '---------------------------------------------------------------------------------------------------
+                    lsMessage = "That's not a well formatted Fact Type Reading."
+                    lsMessage &= vbCrLf
+                    lsMessage.AppendLine("The correct format to use is:")
+                    lsMessage.AppendLine("Object Types, words start with a capital. E.g. Person")
+                    lsMessage.AppendLine("Predicates are all lowercase. E.g. is married")
+                    MsgBox(lsMessage)
+                    Return False
+                Else
+                    Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = New List(Of String)
+                    Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT = New List(Of Object)
+                    Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE = New List(Of Object)
+                    Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
+                    Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
+                    Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree.Nodes(0))
+
+                    Dim lsFrontReadingTextWord As String = ""
+                    arFactTypeReading.FrontText = ""
+                    For Each lsFrontReadingTextWord In Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT
+                        arFactTypeReading.FrontText &= lsFrontReadingTextWord
+                    Next
+                    arFactTypeReading.FrontText = Trim(arFactTypeReading.FrontText)
+
+                    Dim lrModelElementNode As FTR.ParseNode
+                    Dim lrPredicateClauseNode As FTR.ParseNode
+                    Dim liInd As Integer = 0
+                    Dim lasModelObjectId As New List(Of String)
+
+                    For liInd = 1 To Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count
+
+                        lrPredicatePart = New FBM.PredicatePart(arFactTypeReading.Model, arFactTypeReading)
+                        lrPredicatePart.SequenceNr = liInd
+
+                        lrModelElementNode = Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT(liInd - 1)
+                        Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
+                        Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
+                        Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
+                        Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
+
+                        '------------------------------------------------------------------------------------------------------
+                        'Check to see whether the MODELELEMENTNAME is an Object Type that is actually linked by the FactType.
+                        '------------------------------------------------------------------------------------------------------
+                        Dim lsModelElementName As String = Trim(Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME)
+                        If arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName) Is Nothing Then
+                            MsgBox(lsModelElementName & " is not the name of an Object Type linkd by the Fact Type.")
+                            Return False
+                        End If
+
+                        lrPredicatePart.PreBoundText = Trim(Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
+                        lrPredicatePart.PostBoundText = Trim(Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
+
+                        Dim lrRole As New FBM.Role(arFactTypeReading.FactType, "TEMP", False, New FBM.ModelObject(lsModelElementName))
+                        If arFactTypeReading.FactType.RoleGroup.FindAll(AddressOf lrRole.EqualsByJoinedModelObjectId).Count = 0 Then
+                            Return False
+                        End If
+
+                        lasModelObjectId.Add(lsModelElementName)
+                        Dim lsModelObjectId As String = lsModelElementName
+                        Dim lsTempInd As Integer = lasModelObjectId.FindAll(AddressOf lsModelObjectId.Equals).Count
+
+                        If aarRoleOrder Is Nothing Then
+                            lrPredicatePart.Role = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName,
+                                                                                                          lsTempInd)
+                        ElseIf aarRoleOrder(liInd - 1).JoinedORMObject.Id = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName,
+                                                                                                                                   lsTempInd).JoinedORMObject.Id Then
+                            lrPredicatePart.Role = aarRoleOrder(liInd - 1)
+                        Else
+                            lrPredicatePart.Role = arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName,
+                                                                                                          lsTempInd)
+                        End If
+
+                        arFactTypeReading.RoleList.Add(lrPredicatePart.Role)
+                        Dim lsPredicatePartText As String = ""
+
+                        If Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = "" Then
+                            '----------------------------------------
+                            'FactType is binary or greater in arity
+                            '----------------------------------------
+                            If liInd < Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count Then
+                                lrPredicateClauseNode = Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE(liInd - 1)
+                                Me.FTRProcessor.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
+                                Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.PREDICATEPARTClause, lrPredicateClauseNode)
+
+                                For Each lsPredicatePartText In Me.FTRProcessor.PREDICATEPARTClause.PREDICATEPART
+                                    lrPredicatePart.PredicatePartText &= lsPredicatePartText
+                                Next
+                            End If
+
+                            lrPredicatePart.PredicatePartText = Trim(lrPredicatePart.PredicatePartText)
+                        Else
+                            '------------------------------
+                            'FactType is a unary FactType
+                            '------------------------------
+                            lrPredicatePart.PredicatePartText = Trim(Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART)
+                        End If
+
+                        lrPredicatePart.makeDirty()
+                        arFactTypeReading.PredicatePart.Add(lrPredicatePart)
+                    Next
+
+                    '-----------------------------------------------
+                    'Get the FollowingReadingText if there is one.
+                    '-----------------------------------------------
+                    arFactTypeReading.FollowingText = Trim(Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT)
+
+                    Return True
+
+                End If
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
 
     End Class
 

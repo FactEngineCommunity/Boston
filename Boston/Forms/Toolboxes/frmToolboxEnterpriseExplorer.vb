@@ -2024,8 +2024,6 @@ Public Class frmToolboxEnterpriseExplorer
                                                                        lrPage.Language,
                                                                        Nothing, lrPage.PageId)
 
-
-
                             If IsSomething(prPageNodes.Find(AddressOf lr_enterprise_view.Equals)) Then
 
                                 loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
@@ -2035,14 +2033,14 @@ Public Class frmToolboxEnterpriseExplorer
                                 End If
 
                                 If IsSomething(lrPage.Form) Then
+                                    lrPage.IsDirty = False
                                     Call lrPage.Form.Close()
                                 End If
 
                                 loTreeNode.Remove()
 
                             End If
-
-                            lrPage.RemoveFromModel()
+                            'lrPage.RemoveFromModel()
                         Next
 
                         Application.DoEvents()

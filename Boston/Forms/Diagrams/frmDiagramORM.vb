@@ -2948,24 +2948,34 @@ Public Class frmDiagramORM
     ''' <remarks></remarks>
     Private Sub DiagramView_EnterInplaceEditMode(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.EnterInplaceEditMode
 
-        Dim graphics As Graphics = Me.DiagramView.CreateGraphics()
-        Dim liStringWidth, liStringHeight As Integer
+        Try
+
+            Dim graphics As Graphics = Me.DiagramView.CreateGraphics()
+            Dim liStringWidth, liStringHeight As Integer
 
 
-        If e.EditControl.Text = Trim("") Then
-            liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMMMMMMMMMMMMM", e.EditControl.Font).Width
-            liStringHeight = graphics.MeasureString("M", e.EditControl.Font).Height + 5
-        Else
-            liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMM", e.EditControl.Font).Width
-            liStringHeight = graphics.MeasureString(e.EditControl.Text, e.EditControl.Font).Height + 5
-        End If
+            If e.EditControl.Text = Trim("") Then
+                liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMMMMMMMMMMMMM", e.EditControl.Font).Width
+                liStringHeight = graphics.MeasureString("M", e.EditControl.Font).Height + 5
+            Else
+                liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMM", e.EditControl.Font).Width
+                liStringHeight = graphics.MeasureString(e.EditControl.Text, e.EditControl.Font).Height + 5
+            End If
 
-        Dim loDiagramView As DiagramView = e.EditControl.Parent
-        Dim loRectangle As New Rectangle(e.Node.Bounds.X, e.Node.Bounds.Y, e.Node.Bounds.Width, e.Node.Bounds.Height)
+            Dim loDiagramView As DiagramView = e.EditControl.Parent
+            Dim loRectangle As New Rectangle(e.Node.Bounds.X, e.Node.Bounds.Y, e.Node.Bounds.Width, e.Node.Bounds.Height)
 
-        e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
-        e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
+            e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
+            e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
