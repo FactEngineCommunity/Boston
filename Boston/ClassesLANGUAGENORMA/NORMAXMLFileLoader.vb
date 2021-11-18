@@ -404,14 +404,14 @@ Namespace NORMA
                             '----------------------------------------------
                             Dim lrModelObject As New FBM.ModelObject
 
-                            lrModelObject.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                            lrModelObject.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
 
                             '-------------------------------------
                             'Check to see if it is an EntityType
                             '-------------------------------------
                             lrJoinedEntityType = New FBM.EntityType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -425,7 +425,7 @@ Namespace NORMA
                             '-------------------------------------
                             lrValueType = New FBM.ValueType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -438,7 +438,7 @@ Namespace NORMA
                             '-------------------------------------
                             lrJoinedFactType = New FBM.FactType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
@@ -453,7 +453,7 @@ Namespace NORMA
                             '-----------------------------------------------
                             lrJoinedFactType = New FBM.FactType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
@@ -664,14 +664,14 @@ Namespace NORMA
                             '----------------------------------------------
                             Dim lrModelObject As New FBM.ModelObject
 
-                            lrModelObject.Id = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                            lrModelObject.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
 
                             '-------------------------------------
                             'Check to see if it is an EntityType
                             '-------------------------------------
                             lrJoinedEntityType = New FBM.EntityType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -685,7 +685,7 @@ Namespace NORMA
                             '-------------------------------------
                             lrValueType = New FBM.ValueType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -699,7 +699,7 @@ Namespace NORMA
                             '-------------------------------------
                             lrJoinedFactType = New FBM.FactType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
@@ -714,7 +714,7 @@ Namespace NORMA
                             '-----------------------------------------------
                             lrJoinedFactType = New FBM.FactType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                                      Where ModelInformation.Attribute("id") = lrModelObject.Id
+                                                      Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
@@ -1176,7 +1176,7 @@ Namespace NORMA
                 '---------------------------
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.EqualityConstraint, Nothing, loElement.Attribute("Name").Value)
-                lrRoleConstraint.Id = loElement.Attribute("id").Value
+                lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
 
                 Dim lrRoleSequencesXElement As XElement
                 Dim lrRoleSequenceXElement As XElement
@@ -1187,6 +1187,8 @@ Namespace NORMA
 
                         Dim lbRolesFound As Boolean = True
                         Dim larRoleList As New List(Of FBM.Role)
+
+                        lrRoleConstraint.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraint, lrRoleConstraint.GetNextArgumentSequenceNr)
 
                         For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
                             lrRole = New FBM.Role
@@ -1218,41 +1220,48 @@ Namespace NORMA
                         If lbRolesFound Then
                             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
                             For Each lrRole In larRoleList
-                                If liRoleSequenceNr = 1 Then
-                                    '----------
-                                    'Is Entry
-                                    '----------
-                                    '------------------------------------------------------------------------
-                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
-                                    '------------------------------------------------------------------------
-                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
-                                Else
-                                    '--------
-                                    'Is Exit
-                                    '--------
-                                    '------------------------------------------------------------------------
-                                    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
-                                    '------------------------------------------------------------------------
-                                    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
-                                End If
 
-                                '------------------------------------
-                                'Add the Role to the RoleConstraint
-                                '------------------------------------
-                                lrRoleConstraint.Role.Add(lrRole)
+                                lrRoleConstraint.CurrentArgument.ManuallyCreatedJoinPath = True
+                                lrRoleConstraintRole = lrRoleConstraint.CreateRoleConstraintRole(lrRole,
+                                                                                                 lrRoleConstraint.CurrentArgument,
+                                                                                                 Nothing)
 
-                                '------------------------------------------
-                                'Attach the RoleConstraintRole to the Role
-                                '------------------------------------------
-                                lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                'If liRoleSequenceNr = 1 Then
+                                '    '----------
+                                '    'Is Entry
+                                '    '----------
+                                '    '------------------------------------------------------------------------
+                                '    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                '    '------------------------------------------------------------------------
+                                '    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, True, False, liRoleSequenceNr)
+                                'Else
+                                '    '--------
+                                '    'Is Exit
+                                '    '--------
+                                '    '------------------------------------------------------------------------
+                                '    'Create a new RoleConstraintRole for the RoleConstraint/Role combination
+                                '    '------------------------------------------------------------------------
+                                '    lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint, False, True, liRoleSequenceNr)
+                                'End If
 
-                                '----------------------------------------------------
-                                'Attach the RoleConstraintRole to the RoleConstraint
-                                '----------------------------------------------------
-                                lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                ''------------------------------------
+                                ''Add the Role to the RoleConstraint
+                                ''------------------------------------
+                                'lrRoleConstraint.Role.Add(lrRole)
+
+                                ''------------------------------------------
+                                ''Attach the RoleConstraintRole to the Role
+                                ''------------------------------------------
+                                'lrRole.RoleConstraintRole.Add(lrRoleConstraintRole)
+
+                                ''----------------------------------------------------
+                                ''Attach the RoleConstraintRole to the RoleConstraint
+                                ''----------------------------------------------------
+                                'lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
                             Next 'Role
                         End If
                         liRoleSequenceNr += 1
+                        lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
                     Next 'Role Sequence                    
                 Next 'Role Sequences
                 arModel.AddRoleConstraint(lrRoleConstraint)
@@ -1282,7 +1291,7 @@ Namespace NORMA
                     '---------------------------
                     Dim lrRoleConstraint As FBM.RoleConstraint
                     lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExclusiveORConstraint, Nothing, loElement.Attribute("Name").Value)
-                    lrRoleConstraint.Id = loElement.Attribute("id").Value
+                    lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
 
                     Dim lrRoleSequencesXElement As XElement
                     Dim lrRoleSequenceXElement As XElement
@@ -1399,7 +1408,7 @@ Namespace NORMA
                     '---------------------------
                     Dim lrRoleConstraint As FBM.RoleConstraint
                     lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExclusionConstraint, Nothing, loElement.Attribute("Name").Value)
-                    lrRoleConstraint.Id = loElement.Attribute("id").Value
+                    lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
 
                     Dim lrRoleSequencesXElement As XElement
                     Dim lrRoleSequenceXElement As XElement
@@ -1518,7 +1527,7 @@ Namespace NORMA
                 '---------------------------
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.FrequencyConstraint, Nothing, loElement.Attribute("Name").Value)
-                lrRoleConstraint.Id = loElement.Attribute("id").Value
+                lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
                 lrRoleConstraint.MaximumFrequencyCount = loElement.Attribute("MaxFrequency").Value
                 lrRoleConstraint.MinimumFrequencyCount = loElement.Attribute("MinFrequency").Value
 
@@ -1680,7 +1689,7 @@ Namespace NORMA
                         '---------------------------
                         Dim lrRoleConstraint As FBM.RoleConstraint
                         lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InclusiveORConstraint, Nothing, loElement.Attribute("Name").Value)
-                        lrRoleConstraint.Id = loElement.Attribute("id").Value
+                        lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
 
 
                         Dim lrRoleSequenceXElement As XElement
@@ -2072,7 +2081,7 @@ Namespace NORMA
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrEntityType.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrEntityType = arModel.EntityType.Find(AddressOf lrEntityType.EqualsByName)
+                            lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrEntityType.NORMAReferenceId)
 
                             Try
                                 lbExpandReferenceScheme = CBool(lrObjectTypeShapeXElement.Attribute("ExpandRefMode").Value)
@@ -2093,7 +2102,7 @@ Namespace NORMA
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrValueType.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrValueType = arModel.ValueType.Find(AddressOf lrValueType.EqualsByName)
+                            lrValueType = arModel.ValueType.Find(Function(x) x.NORMAReferenceId = lrValueType.NORMAReferenceId)
                         Else
                             lrValueType = Nothing
                         End If
@@ -2324,13 +2333,13 @@ Namespace NORMA
                         'Ring Constraint
                         '-----------------------
                         lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.EqualsByName)
+                            lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                             'Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.RingConstraint)
                             'lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage, False)
@@ -2366,13 +2375,13 @@ Namespace NORMA
                         'Frequency Constraint
                         '-----------------------
                         lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                            lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
                             lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
@@ -2527,15 +2536,15 @@ Namespace NORMA
                         'EntityType
                         '-----------------------
                         lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
 
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 0 Then
                                 lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                                lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                                lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.InclusiveORConstraint)
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
@@ -2569,21 +2578,20 @@ Namespace NORMA
                         'ExclusiveOR
                         '-----------------------
                         lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
 
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 1 Then
                             If IsSomething(loXMLElementQueryResult(0)) Then
 
-                                lrRoleConstraint.Id = loXMLElementQueryResult(0).<orm:ExclusiveOrExclusionConstraint>(0).Attribute("ref").Value
+                                lrRoleConstraint.NORMAReferenceId = loXMLElementQueryResult(0).<orm:ExclusiveOrExclusionConstraint>(0).Attribute("ref").Value
 
                                 loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
-                                                          Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                          Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                                lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
-                                lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                                lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                                 '------------------------------------------------------------------------------------------------------------
                                 'CodeSafe
@@ -2624,14 +2632,14 @@ Namespace NORMA
                         Dim loXMLElementQueryResult As IEnumerable(Of XElement)
 
                         lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
 
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                            lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusionConstraint)
                             lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
@@ -2662,14 +2670,14 @@ Namespace NORMA
                         'EntityType
                         '-----------------------
                         lrRoleConstraint = New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrObjectTypeXElement.Attribute("ref").Value
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
 
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint>
-                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.Id
+                                                  Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                            lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.EqualityConstraint)
                             lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
