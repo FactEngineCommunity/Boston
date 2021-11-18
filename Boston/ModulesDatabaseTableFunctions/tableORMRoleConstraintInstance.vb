@@ -126,6 +126,8 @@
                             lrRoleConstraintInstance.IsPreferredIdentifier = lREcordset("IsPreferredUniqueness").Value
                             lrRoleConstraintInstance.IsDeontic = lREcordset("IsDeontic").Value
                             lrRoleConstraintInstance.Cardinality = lREcordset("Cardinality").Value
+                            lrRoleConstraintInstance.MaximumValue = Trim(Viev.NullVal(lREcordset("MaximumValue").Value, ""))
+                            lrRoleConstraintInstance.MinimumValue = Trim(Viev.NullVal(lREcordset("MinimumValue").Value, ""))
                             lrRoleConstraintInstance.MaximumFrequencyCount = lREcordset("MaximumFrequencyCount").Value
                             lrRoleConstraintInstance.MinimumFrequencyCount = lREcordset("MinimumFrequencyCount").Value
                             Select Case lREcordset("CardinalityRangeType").Value

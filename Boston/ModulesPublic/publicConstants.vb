@@ -295,6 +295,7 @@ Public Module publicConstants
         InternalUniquenessConstraint
         RingConstraint
         SubsetConstraint
+        ValueConstraint
     End Enum
 
     <Serializable()> _

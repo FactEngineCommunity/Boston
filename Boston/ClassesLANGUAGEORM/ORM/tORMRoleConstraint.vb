@@ -123,9 +123,9 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _MaximumFrequencyCount As Integer = 0
-        <XmlAttribute()> _
-        <Browsable(False), _
-        [ReadOnly](True)> _
+        <XmlAttribute()>
+        <Browsable(False),
+        [ReadOnly](True)>
         Public Overridable Property MaximumFrequencyCount() As Integer
             Get
                 Return _MaximumFrequencyCount
@@ -134,6 +134,45 @@ Namespace FBM
                 _MaximumFrequencyCount = value
             End Set
         End Property
+
+        ''' <summary>
+        ''' Used on 'ValueConstraints'.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _MinimumValue As String = ""
+        <XmlAttribute()>
+        <Browsable(False),
+        [ReadOnly](True)>
+        Public Overridable Property MinimumValue As String
+            Get
+                Return _MinimumValue
+            End Get
+            Set(ByVal value As String)
+                _MinimumValue = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Used on 'ValueConstraints'.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _MaximumValue As String = ""
+        <XmlAttribute()>
+        <Browsable(False),
+        [ReadOnly](True)>
+        Public Overridable Property MaximumValue As String
+            Get
+                Return _MaximumValue
+            End Get
+            Set(ByVal value As String)
+                _MaximumValue = value
+            End Set
+        End Property
+
 
         <XmlAttribute()> _
         Public IsDeontic As Boolean
@@ -224,8 +263,10 @@ Namespace FBM
         Public Event RingConstraintTypeChanged(ByVal aiNewRingConstraintType As pcenumRingConstraintType)
         Public Event LevelNrChanged(ByVal aiNewLevelNr As Integer)
         Public Event CardinalityRangeTypeChanged(ByVal aiNewCardinalityRangeType As pcenumCardinalityRangeType)
-        Public Event MinimumFrequencyCountChanged(ByVal aiNewMinimumFrequencyCount As Integer)
         Public Event MaximumFrequencyCountChanged(ByVal aiNewMaximumFrequencyCount As Integer)
+        Public Event MaximumValueChanged(ByVal aiMaximumValue As String)
+        Public Event MinimumFrequencyCountChanged(ByVal aiNewMinimumFrequencyCount As Integer)
+        Public Event MinimumValueChanged(ByVal aiMaximumValue As String)
         Public Event IsDeonticChanged(ByVal abNewIsDeontic As Boolean)
         Public Event IsPreferredIdentifierChanged(ByVal abNewIsPreferredIdentifier As Boolean)
         Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
@@ -239,6 +280,11 @@ Namespace FBM
             Id = System.Guid.NewGuid.ToString
             Me.ConceptType = pcenumConceptType.RoleConstraint
 
+        End Sub
+
+        Public Sub New(ByRef arModel As FBM.Model)
+            Me.New()
+            Me.Model = arModel
         End Sub
 
         Public Sub New(ByRef arModel As FBM.Model,
@@ -1317,6 +1363,8 @@ Namespace FBM
                     lrRoleConstraintInstance.LevelNr = .LevelNr
                     lrRoleConstraintInstance.MinimumFrequencyCount = .MinimumFrequencyCount
                     lrRoleConstraintInstance.MaximumFrequencyCount = .MaximumFrequencyCount
+                    lrRoleConstraintInstance.MinimumValue = .MinimumValue
+                    lrRoleConstraintInstance.MaximumValue = .MaximumValue
                     lrRoleConstraintInstance.IsDeontic = .IsDeontic
                     lrRoleConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
                     lrRoleConstraintInstance.Cardinality = .Cardinality
@@ -2047,6 +2095,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub SetMaximumFrequencyCount(ByVal aiMaximumFrequencyCount As Integer)
+
+            Me.MaximumFrequencyCount = aiMaximumFrequencyCount
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty(False, True)
+
+            RaiseEvent MaximumFrequencyCountChanged(aiMaximumFrequencyCount)
+
+        End Sub
+
+        Public Sub SetMaximumValue(ByVal aiMaximumValue As String)
+
+            Me.MaximumValue = aiMaximumValue
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty(False, True)
+
+            RaiseEvent MaximumValueChanged(aiMaximumValue)
+
+        End Sub
+
         Public Sub SetMinimumFrequencyCount(ByVal aiMinimumFrequencyCount As Integer)
 
             Me.MinimumFrequencyCount = aiMinimumFrequencyCount
@@ -2058,14 +2128,14 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetMaximumFrequencyCount(ByVal aiMaximumFrequencyCount As Integer)
+        Public Sub SetMinimumValue(ByVal aiMinimumValue As String)
 
-            Me.MaximumFrequencyCount = aiMaximumFrequencyCount
+            Me.MinimumValue = aiMinimumValue
 
             Call Me.makeDirty()
             Call Me.Model.MakeDirty(False, True)
 
-            RaiseEvent MaximumFrequencyCountChanged(aiMaximumFrequencyCount)
+            RaiseEvent MinimumValueChanged(aiMinimumValue)
 
         End Sub
 

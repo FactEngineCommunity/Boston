@@ -308,6 +308,60 @@ Namespace FBM
 
         End Function
 
+        Public Overloads Function CloneValueConstraintInstance(ByRef arPage As FBM.Page) As FBM.ValueConstraint
+
+            Dim lrValueConstraintInstance As New FBM.ValueConstraint
+            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+            Dim lrClonedRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+
+            Try
+                With Me
+                    lrValueConstraintInstance.Model = arPage.Model
+                    lrValueConstraintInstance.Page = arPage
+                    lrValueConstraintInstance.Symbol = .Symbol
+                    lrValueConstraintInstance.Id = .Id
+                    lrValueConstraintInstance.ConceptType = .ConceptType
+                    lrValueConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.ValueConstraint
+                    lrValueConstraintInstance.RoleConstraint = New FBM.RoleConstraint
+                    lrValueConstraintInstance.RoleConstraint = arPage.Model.RoleConstraint.Find(AddressOf .RoleConstraint.Equals)
+                    lrValueConstraintInstance.Name = .Name
+                    lrValueConstraintInstance.IsDeontic = .IsDeontic
+                    lrValueConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
+                    lrValueConstraintInstance.Cardinality = .Cardinality
+                    lrValueConstraintInstance.CardinalityRangeType = .CardinalityRangeType
+                    lrValueConstraintInstance.LevelNr = .LevelNr
+                    lrValueConstraintInstance.ShortDescription = .ShortDescription
+                    lrValueConstraintInstance.LongDescription = .LongDescription
+                    lrValueConstraintInstance.MaximumFrequencyCount = .MaximumFrequencyCount
+                    lrValueConstraintInstance.MinimumFrequencyCount = .MinimumFrequencyCount
+                    lrValueConstraintInstance.MinimumValue = .MinimumValue
+                    lrValueConstraintInstance.MaximumValue = .MaximumValue
+                    lrValueConstraintInstance.X = .X
+                    lrValueConstraintInstance.Y = .Y
+
+                    For Each lrRoleConstraintRoleInstance In .RoleConstraintRole
+                        lrClonedRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance
+                        lrClonedRoleConstraintRoleInstance = lrRoleConstraintRoleInstance.Clone(arPage)
+                        lrClonedRoleConstraintRoleInstance.RoleConstraint = lrValueConstraintInstance
+                        lrValueConstraintInstance.RoleConstraintRole.Add(lrClonedRoleConstraintRoleInstance)
+                        lrValueConstraintInstance.Role.Add(lrClonedRoleConstraintRoleInstance.Role)
+                    Next
+
+                End With
+
+                Return lrValueConstraintInstance
+
+            Catch ex As Exception
+
+                Dim lsMessage As String
+                lsMessage = "Error: tRoleConstraintInstance.CloneFrequencyConstraintInstance"
+                lsMessage &= vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrValueConstraintInstance
+            End Try
+        End Function
+
         Public Overloads Function CloneRingConstraintInstance(ByRef arPage As FBM.Page) As RingConstraint
 
             Dim lrRingConstraintInstance As New RingConstraint
@@ -559,6 +613,7 @@ Namespace FBM
                             Throw New Exception(lsMessage)
                         End If
                     Case Is = pcenumRoleConstraintType.FrequencyConstraint
+#Region "Frequency Constraint"
                         '---------------------
                         'FrequencyConstraint
                         '---------------------
@@ -644,6 +699,88 @@ Namespace FBM
                         lo_link.Pen.DashPattern(3) = 2
 
                         lrRoleInstance.Shape.Parent.Links.Add(lo_link)
+#End Region
+                    Case Is = pcenumRoleConstraintType.ValueConstraint
+#Region "Value Constraint"
+                        '---------------------
+                        'Value Constraint
+                        '---------------------
+                        Dim lrRoleInstance As New FBM.RoleInstance
+                        Dim lsValueConstraintText As String = ""
+
+                        lsValueConstraintText = "{" & Me.MinimumValue & "..." & Me.MaximumValue & "}"
+
+                        '------------------------------------------
+                        'Must be associated with a Role
+                        '------------------------------------------
+                        If Me.RoleConstraintRole.Count = 0 Then
+                            Throw New Exception("Cannot display and associate a FrequencyConstraint without first populating the RoleConstraintRole group.")
+                        End If
+
+                        lrRoleInstance = Me.RoleConstraintRole(0).Role
+
+                        Dim myFont As New Font(lrRoleInstance.Shape.Parent.Font.FontFamily, lrRoleInstance.Shape.Parent.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
+                        G = frmDiagramORM.CreateGraphics
+                        StringSize = lrRoleInstance.Shape.Parent.MeasureString(lsValueConstraintText, lrRoleInstance.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+
+                        Dim liX, liY As Integer
+                        liX = lrRoleInstance.Shape.Bounds.X
+                        liY = lrRoleInstance.Shape.Bounds.Y - (StringSize.Height * 2)
+
+                        loDroppedNode = New FBM.RoleConstraintShape(Me.Page.Diagram, Me)
+                        loDroppedNode.Move(liX, liY)
+                        loDroppedNode.Shape = MindFusion.Diagramming.Shapes.RoundRect
+                        loDroppedNode.Resize(StringSize.Width + 2, StringSize.Height)
+
+                        'Dim loShapeNode As ShapeNode = Me.Page.Diagram.Factory.CreateShapeNode(liX, liY, StringSize.Width + 2, StringSize.Height, Shapes.Rectangle)
+
+                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                        loDroppedNode.EnabledHandles = AdjustmentHandles.Move
+                        loDroppedNode.Transparent = True 'False has faint ring around external constraints, looks ugly.
+
+                        loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
+                        loDroppedNode.Text = lsValueConstraintText
+                        'loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
+                        loDroppedNode.ShadowColor = Color.White
+                        loDroppedNode.ShadowOffsetX = 0
+                        loDroppedNode.ShadowOffsetY = 0
+                        loDroppedNode.TextColor = Color.Black
+                        'loDroppedNode.Transparent = False
+                        loDroppedNode.Visible = True
+                        loDroppedNode.ZTop()
+
+                        Me.Page.Diagram.Nodes.Add(loDroppedNode)
+
+                        '--------------------------------------------------------------------------------------
+                        'Attach the FrequencyConstraint.Shape to the RoleInstance.Shape to which it joins.
+                        '  This is so that if an 'AutoArrange' of the Shapes on the Page is called by
+                        '  the user, then the FrequencyConstraint will stay next to its associated Role.
+                        '--------------------------------------------------------------------------------------
+                        loDroppedNode.AttachTo(lrRoleInstance.Shape, AttachToNode.TopCenter)
+
+                        loDroppedNode.Tag = Me
+
+                        '---------------------------------------------------------------------------
+                        'Attach the Role.FrequencyConstraint ShapeNode to the Role ShapeGroup,                                    
+                        '---------------------------------------------------------------------------
+                        loDroppedNode.AttachTo(lrRoleInstance.Shape, AttachToNode.TopLeft)
+                        Me.Shape = loDroppedNode
+
+                        '--------------------------------------------------------------------------------
+                        'Create the link between the FrequencyConstraint and the Role that it joins to.
+                        '--------------------------------------------------------------------------------
+                        Dim lo_link As DiagramLink = New DiagramLink(lrRoleInstance.Shape.Parent, lrRoleInstance.Shape, loDroppedNode)
+                        lo_link.BaseShape = ArrowHead.None
+                        lo_link.HeadShape = ArrowHead.None
+                        lo_link.Pen.DashStyle = Drawing2D.DashStyle.Custom
+                        ReDim lo_link.Pen.DashPattern(3)
+                        lo_link.Pen.DashPattern(0) = 1
+                        lo_link.Pen.DashPattern(1) = 2
+                        lo_link.Pen.DashPattern(2) = 1
+                        lo_link.Pen.DashPattern(3) = 2
+
+                        lrRoleInstance.Shape.Parent.Links.Add(lo_link)
+#End Region
                     Case Else
                         '------------------------------------------------
                         'ExternalRoleConstraints with links on the Page

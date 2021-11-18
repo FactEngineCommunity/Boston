@@ -34,6 +34,8 @@ Namespace TableRoleConstraint
                 lsSQLQuery &= " ,'" & arRoleConstraint.ValueRangeType.ToString & "'"
                 lsSQLQuery &= " ," & arRoleConstraint.IsMDAModelElement
                 lsSQLQuery &= " ,'" & arRoleConstraint.GUID & "'"
+                lsSQLQuery &= " ,'" & Trim(arRoleConstraint.MinimumValue) & "'"
+                lsSQLQuery &= " ,'" & Trim(arRoleConstraint.MaximumValue) & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -176,6 +178,8 @@ Namespace TableRoleConstraint
                         lrRoleConstraint.LongDescription = lREcordset("LongDescription").Value
                         lrRoleConstraint.ShortDescription = lREcordset("ShortDescription").Value
                         lrRoleConstraint.GUID = lREcordset("GUID").Value
+                        lrRoleConstraint.MinimumValue = Trim(Viev.NullVal(lREcordset("MinimumValue").Value, ""))
+                        lrRoleConstraint.MaximumValue = Trim(Viev.NullVal(lREcordset("MaximumValue").Value, ""))
                         lrRoleConstraint.isDirty = False
 
                         '------------------------------------------------
@@ -327,6 +331,8 @@ Namespace TableRoleConstraint
                 lsSQLQuery &= "       ,ValueRangeType = '" & arRoleConstraint.ValueRangeType.ToString & "'"
                 lsSQLQuery &= "       ,IsMDAModelElement = " & arRoleConstraint.IsMDAModelElement
                 lsSQLQuery &= "       ,[GUID] = '" & arRoleConstraint.GUID & "'"
+                lsSQLQuery &= "       ,MinimumValue = '" & Trim(arRoleConstraint.MinimumValue) & "'"
+                lsSQLQuery &= "       ,MaximumValue = '" & Trim(arRoleConstraint.MaximumValue) & "'"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(arRoleConstraint.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND RoleConstraintId = '" & Trim(arRoleConstraint.Id) & "'"
 
