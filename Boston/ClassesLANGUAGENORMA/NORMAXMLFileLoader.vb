@@ -1449,10 +1449,12 @@ Namespace NORMA
 
                             If lbRolesFound Then
                                 Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-                                For Each lrRole In larRoleList
 
-                                    lrRoleConstraint.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraint,
-                                                                                                      lrRoleConstraint.GetNextArgumentSequenceNr)
+                                lrRoleConstraint.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraint,
+                                                                                                  lrRoleConstraint.GetNextArgumentSequenceNr)
+
+
+                                For Each lrRole In larRoleList
 
                                     lrRoleConstraintRole = lrRoleConstraint.CreateRoleConstraintRole(lrRole,
                                                                                                      lrRoleConstraint.CurrentArgument,
@@ -1493,10 +1495,11 @@ Namespace NORMA
                                 Next 'Role
                             End If
                             liRoleSequenceNr += 1
+                            lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
                         Next 'Role Sequence                    
                     Next 'Role Sequences
 
-                    lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
+
 
                     arModel.AddRoleConstraint(lrRoleConstraint)
 
@@ -2059,9 +2062,9 @@ Namespace NORMA
                     '-------------
                     'Get the Page
                     '-------------
-                    lrPage = New FBM.Page
-                    lrPage.PageId = lrPageXElement.Attribute("id").Value
-                    lrPage = arModel.Page.Find(AddressOf lrPage.Equals)
+                    lrPage = New FBM.Page(arModel, lrPageXElement.Attribute("id").Value, lrPageXElement.Attribute("Name").Value, pcenumLanguage.ORMModel)
+                    lrPage = arModel.Page.Find(AddressOf lrPage.Equals) 'Because already loaded as empty shells.
+                    If TablePage.ExistsPageById(lrPage.PageId) Then lrPage.PageId = System.Guid.NewGuid.ToString
 
                     '---------------------------------------------
                     'Load the ModelObjectInstances onto the Page
@@ -2720,81 +2723,112 @@ Namespace NORMA
             Dim lrPredicatePartXElement As XElement
             Dim lrPredicatePartRoleXElement As XElement
             Dim lrFactTypeReading As FBM.FactTypeReading
-            'Dim lsNORMAPredicateList As String                    
             Dim lasPredicateParts() As String
             Dim lrPredicatePart As FBM.PredicatePart = Nothing
             Dim lrRoleHashTable As New Hashtable()
 
-            For Each lrFactTypeReadingXElement In arElement.<orm:ReadingOrders>.<orm:ReadingOrder>
-                lrFactTypeReading = New FBM.FactTypeReading(arFactType)
-                lrFactTypeReading.isDirty = True
+            Try
+                For Each lrFactTypeReadingXElement In arElement.<orm:ReadingOrders>.<orm:ReadingOrder>
+                    lrFactTypeReading = New FBM.FactTypeReading(arFactType)
+                    lrFactTypeReading.isDirty = True
 
-                For Each lrPredicatePartXElement In lrFactTypeReadingXElement.<orm:Readings>.<orm:Reading>.<orm:Data>
+                    For Each lrPredicatePartXElement In lrFactTypeReadingXElement.<orm:Readings>.<orm:Reading>.<orm:Data>
 
-                    'MsgBox(lrPredicatePartXElement.Value)
-                    Dim lsNORMAPredicateList As New Regex("(\{.*?\})|([a-z][A-Z]\s)")
-                    lasPredicateParts = lsNORMAPredicateList.Split(lrPredicatePartXElement.Value).Where(Function(s) Not String.IsNullOrEmpty(s)).ToArray()
+                        'MsgBox(lrPredicatePartXElement.Value)
+                        Dim lsNORMAPredicateList As New Regex("(\{.*?\})|([a-z][A-Z]\s)")
+                        lasPredicateParts = lsNORMAPredicateList.Split(lrPredicatePartXElement.Value).Where(Function(s) Not String.IsNullOrEmpty(s)).ToArray()
 
-                    Dim liRoleSequenceNr As Integer = 0
-                    lrRoleHashTable.Clear()
-                    For Each lrPredicatePartRoleXElement In lrFactTypeReadingXElement.<orm:RoleSequence>.<orm:Role>
-                        lrRoleHashTable.Add("{" & liRoleSequenceNr.ToString & "}", lrPredicatePartRoleXElement.Attribute("ref").Value)
-                        liRoleSequenceNr += 1
-                    Next
+                        Dim liRoleSequenceNr As Integer = 0
+                        lrRoleHashTable.Clear()
+                        For Each lrPredicatePartRoleXElement In lrFactTypeReadingXElement.<orm:RoleSequence>.<orm:Role>
+                            lrRoleHashTable.Add("{" & liRoleSequenceNr.ToString & "}", lrPredicatePartRoleXElement.Attribute("ref").Value)
+                            liRoleSequenceNr += 1
+                        Next
 
-                    '-------------------------------------------------------------------------------------------
-                    'Perform Left-2-Right parsing to get the PredicateParts
-                    '--------------------------------------------------------
-                    Dim liSequenceNr As Integer = 0
-                    Dim liPredicatePartSequenceNr As Integer = 0
-                    Dim lsPredicatePartText As String = ""
-                    Dim lsPrefix As String = ""
-                    Dim lsSuffix As String = ""
-                    Dim lrPredicateRole As FBM.Role
+                        '-------------------------------------------------------------------------------------------
+                        'Perform Left-2-Right parsing to get the PredicateParts
+                        '--------------------------------------------------------
+                        Dim liSequenceNr As Integer = 0
+                        Dim liPredicatePartSequenceNr As Integer = 1
+                        Dim lsPredicatePartText As String = ""
+                        Dim lsPrefix As String = ""
+                        Dim lsSuffix As String = ""
+                        Dim lrPredicateRole As FBM.Role
 
-                    For Each lsNORMAPredicatePart In lasPredicateParts
-                        '----------------------------------------
-                        'Check to see if the word is one of the
-                        '  ORM Object Types within the reading
-                        '----------------------------------------            
+                        For Each lsNORMAPredicatePart In lasPredicateParts
+                            '----------------------------------------
+                            'Check to see if the word is one of the
+                            '  ORM Object Types within the reading
+                            '----------------------------------------      
+                            Dim liCharPosition As Integer = 0
+                            Dim lsNORMAPredicatePart2 As String = ""
 
-                        'If lrHashList.Contains(lsPredicatePart) Then
-                        If lsNORMAPredicatePart Like "{#}" Then
-                            '----------------------------
-                            'Create a new PredicatePart
-                            '----------------------------
-                            lrPredicatePart = New FBM.PredicatePart(lrFactTypeReading.Model, lrFactTypeReading)
-                            lrPredicatePart.isDirty = True
+                            For Each lsChar In Trim(lsNORMAPredicatePart)
+                                If liCharPosition > 0 And liCharPosition < Trim(lsNORMAPredicatePart).Length - 1 Then
+                                    If lsChar <> "-" Then
+                                        lsNORMAPredicatePart2 &= lsChar
+                                    End If
+                                Else
+                                    lsNORMAPredicatePart2 &= lsChar
+                                End If
+                                liCharPosition += 1
+                            Next
 
+                            'If lrHashList.Contains(lsPredicatePart) Then
+                            If lsNORMAPredicatePart2 Like "{#}" Then
+                                '----------------------------
+                                'Create a new PredicatePart
+                                '----------------------------
+                                lrPredicatePart = New FBM.PredicatePart(lrFactTypeReading.Model, lrFactTypeReading)
+                                lrPredicatePart.isDirty = True
+
+                                liPredicatePartSequenceNr += 1
+                                lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
+
+                                lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsNORMAPredicatePart2), True)
+                                lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
+                                lrPredicatePart.Role = lrPredicateRole
+
+                                lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
+                            Else
+                                If lrPredicatePart Is Nothing Then
+                                    If liPredicatePartSequenceNr = 1 Then
+                                        lrFactTypeReading.FrontText = Trim(lsNORMAPredicatePart2)
+                                    Else
+                                        lrFactTypeReading.FollowingText = Trim(lsNORMAPredicatePart2)
+                                    End If
+                                Else
+                                    lsPredicatePartText = lsNORMAPredicatePart2
+                                    lrPredicatePart.PredicatePartText = Trim(lsPredicatePartText)
+                                End If
+                            End If
                             liPredicatePartSequenceNr += 1
-                            lrPredicatePart.SequenceNr = liPredicatePartSequenceNr
+                        Next
 
-                            lrPredicateRole = New FBM.Role(arFactType, lrRoleHashTable(lsNORMAPredicatePart), True)
-                            lrPredicateRole = arModel.Role.Find(AddressOf lrPredicateRole.Equals)
-                            lrPredicatePart.Role = lrPredicateRole
+                    Next 'FactTypeReading.PredicatePart
 
-                            lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
-                        Else
-                            lsPredicatePartText = lsNORMAPredicatePart
-                            lrPredicatePart.PredicatePartText = Trim(lsPredicatePartText)
-                        End If
+                    'Get PreBoundReadingTexts etc
+                    Dim larRoleOrder As New List(Of FBM.Role)
+                    For Each lrPredicatePart In lrFactTypeReading.PredicatePart
+                        larRoleOrder.Add(lrPredicatePart.Role)
                     Next
 
-                Next 'FactTypeReading.PredicatePart
+                    Dim lsFactTypeReading = lrFactTypeReading.GetReadingText
+                    lrFactTypeReading.PredicatePart.Clear()
+                    Call Me.GetPredicatePartsFromReadingUsingParser(lsFactTypeReading, lrFactTypeReading, larRoleOrder)
 
-                'Get PreBoundReadingTexts etc
-                Dim larRoleOrder As New List(Of FBM.Role)
-                For Each lrPredicatePart In lrFactTypeReading.PredicatePart
-                    larRoleOrder.Add(lrPredicatePart.Role)
-                Next
+                    arFactType.FactTypeReading.Add(lrFactTypeReading)
 
-                Dim lsFactTypeReading = lrFactTypeReading.GetReadingText
-                lrFactTypeReading.PredicatePart.Clear()
-                Call Me.GetPredicatePartsFromReadingUsingParser(lsFactTypeReading, lrFactTypeReading, larRoleOrder)
+                Next 'FactTypeReading
 
-                arFactType.FactTypeReading.Add(lrFactTypeReading)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Next 'FactTypeReading
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

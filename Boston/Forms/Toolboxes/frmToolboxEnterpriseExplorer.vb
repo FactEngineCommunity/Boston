@@ -1437,7 +1437,8 @@ Public Class frmToolboxEnterpriseExplorer
                                    Optional ByRef arPage As FBM.Page = Nothing,
                                    Optional ByVal abLoadPage As Boolean = False,
                                    Optional ByVal abToolTipNewPage As Boolean = False,
-                                   Optional ByVal abMakeVisible As Boolean = False) As tEnterpriseEnterpriseView
+                                   Optional ByVal abMakeVisible As Boolean = False,
+                                   Optional ByVal abSuppressModelSave As Boolean = False) As tEnterpriseEnterpriseView
 
         Try
             Dim loNode As cTreeNode = Nothing
@@ -1489,9 +1490,11 @@ Public Class frmToolboxEnterpriseExplorer
 
                 prApplication.WorkingPage = lrPage
 
-                Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
-                lrModel.Save()
-                Richmond.WriteToStatusBar("Model saved.")
+                If Not abSuppressModelSave Then
+                    Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                    lrModel.Save()
+                    Richmond.WriteToStatusBar("Model saved.")
+                End If
 
                 '------------------------------------
                 'Add a new TreeNode to the TreeView
@@ -2227,15 +2230,15 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lrPage As New FBM.Page
         Dim liInd As Integer = 0
         Dim lrModelTreeNode As New TreeNode
-        Dim loElement As XElement
 
         NORMAXMLDOC = arNORMAXMLDOC
         lrModel = arModel
         lrModel.IsDirty = True
         lrModelTreeNode = arModelTreeNode
 
-
         Call prApplication.setWorkingModel(arModel)
+
+        frmMain.Cursor = Cursors.WaitCursor
 
         '-------------------------------
         'Get the Pages
@@ -2243,12 +2246,13 @@ Public Class frmToolboxEnterpriseExplorer
         '-------------------------------
         Richmond.WriteToStatusBar("Loading Pages")
         Dim loEnumElementQueryResult As IEnumerable(Of XElement)
-        loEnumElementQueryResult = From ModelInformation In NORMAXMLDOC.Elements.<ormDiagram:ORMDiagram> _
-                                   Select ModelInformation _
+        loEnumElementQueryResult = From ModelInformation In NORMAXMLDOC.Elements.<ormDiagram:ORMDiagram>
+                                   Select ModelInformation
                                    Order By ModelInformation.Attribute("Name").Value
 
         For Each loElement In loEnumElementQueryResult
             lrPage = New FBM.Page(lrModel, loElement.Attribute("id").Value, loElement.Attribute("Name").Value, pcenumLanguage.ORMModel)
+
             If lrModel.Page.Exists(AddressOf lrPage.Equals) Then
                 lrPage = lrModel.Page.Find(AddressOf lrPage.Equals)
             Else
@@ -2256,14 +2260,12 @@ Public Class frmToolboxEnterpriseExplorer
                 lrPage.IsDirty = True
                 Dim lr_enterprise_view As tEnterpriseEnterpriseView
 
-                lr_enterprise_view = Me.AddPageToModel(lrModelTreeNode, lrPage, False)
+                lr_enterprise_view = Me.AddPageToModel(lrModelTreeNode, lrPage, False, False, False, True)
 
                 prPageNodes.Add(lr_enterprise_view)
 
             End If
         Next
-
-        frmMain.Cursor = Cursors.WaitCursor
 
         Dim lrNORMAFileLoader As New NORMA.NORMAXMLFileLoader(lrModel)
 

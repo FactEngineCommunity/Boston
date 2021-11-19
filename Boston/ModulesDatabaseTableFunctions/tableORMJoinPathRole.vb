@@ -105,7 +105,7 @@ Namespace TableJoinPathRole
                         Throw New Exception(lsMessage)
                     End If
 
-                    lrJoinPath.RolePath.Add(lrRole)
+                    lrJoinPath.RolePath.AddUnique(lrRole)
                     lREcordset.MoveNext()
                 End While
 

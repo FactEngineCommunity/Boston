@@ -161,7 +161,7 @@ Namespace DuplexServiceClient
                 Dim lrRole As FBM.Role
                 For Each lrInterfaceRoleReference In lrInterfaceRCArgument.JoinPath.RolePath
                     lrRole = arModel.Role.Find(Function(x) x.Id = lrInterfaceRoleReference.RoleId)
-                    lrRCArgument.JoinPath.RolePath.Add(lrRole)
+                    lrRCArgument.JoinPath.RolePath.AddUnique(lrRole)
                 Next
 
                 lrRCArgument.JoinPath.JoinPathError.GetByDescription(lrInterfaceRCArgument.JoinPath.JoinPathError.ToString)

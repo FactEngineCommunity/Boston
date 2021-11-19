@@ -67,7 +67,7 @@ Namespace TablePage
         End Sub
 
 
-        Public Function ExistsPageById(ByVal as_PageId As String) As Boolean
+        Public Function ExistsPageById(ByVal asPageId As String) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -82,8 +82,7 @@ Namespace TablePage
 
             lsSQLQuery = "SELECT COUNT(*)"
             lsSQLQuery &= "  FROM ModelPage"
-            lsSQLQuery &= " WHERE PageId = '" & Trim(as_PageId) & "'"
-
+            lsSQLQuery &= " WHERE PageId = '" & Trim(asPageId) & "'"
 
             lREcordset.Open(lsSQLQuery)
 

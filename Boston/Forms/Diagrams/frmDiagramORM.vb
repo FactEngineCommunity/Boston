@@ -2578,11 +2578,11 @@ Public Class frmDiagramORM
                             'Manually creating the JoinPath for the RoleConstraint/Argument
                             If lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count = 0 Then
                                 If lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count > 0 Then
-                                    lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Add(lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole(0).Role)
+                                    lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.AddUnique(lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole(0).Role)
                                 End If
                             End If
                             lrRoleConstraintInstance.CurrentArgument.ManuallyCreatedJoinPath = True
-                            lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Add(lrRoleInstance.Role)
+                            lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.AddUnique(lrRoleInstance.Role)
                             Call lrRoleConstraintInstance.RefreshRoleConstraintRoleTexts()
                             Exit Sub
                         End If

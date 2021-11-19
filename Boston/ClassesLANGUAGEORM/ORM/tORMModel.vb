@@ -3952,7 +3952,7 @@ Namespace FBM
                 Dim lrJoinPath As New FBM.JoinPath
                 Dim lrRole As FBM.Role
 
-                lrJoinPath.RolePath.Add(arFirstRole)
+                lrJoinPath.RolePath.AddUnique(arFirstRole)
                 abSuccessfull = False
 
                 'Dim larFactType = From Role In aarPathCovered
@@ -3994,7 +3994,7 @@ Namespace FBM
                     '--------------------------------------------------------------------------------
                     'Have found a Path to the lrSecondRole within the same FactType as arFirstRole.
                     '--------------------------------------------------------------------------------
-                    lrJoinPath.RolePath.Add(arSecondRole)
+                    lrJoinPath.RolePath.AddUnique(arSecondRole)
                     abSuccessfull = True
                 Else
 
@@ -4004,7 +4004,7 @@ Namespace FBM
                         '  of the Role.
                         '--------------------------------------------------------------------------------------------------------
                         Dim lrTraversedRole As FBM.Role
-                        lrJoinPath.RolePath.Add(lrRole)
+                        lrJoinPath.RolePath.AddUnique(lrRole)
                         aarPathCovered.Add(lrRole)
                         Dim larSuccessfulJoinPathContinuation As New List(Of FBM.JoinPath)
 
@@ -4024,10 +4024,10 @@ Namespace FBM
                                             '-----------------------------------------------------------------------------------------------------------
                                             'Have found a Path to the lrSecondRole
                                             If lrAdjoinedRole.Id <> arSecondRole.Id Then
-                                                lrJoinPath.RolePath.Add(lrAdjoinedRole)
+                                                lrJoinPath.RolePath.AddUnique(lrAdjoinedRole)
                                                 aarUniqueRolesCovered.AddUnique(lrAdjoinedRole)
                                             End If
-                                            lrJoinPath.RolePath.Add(arSecondRole)
+                                            lrJoinPath.RolePath.AddUnique(arSecondRole)
                                             aarUniqueRolesCovered.AddUnique(arSecondRole)
                                             abSuccessfull = True
                                             Return lrJoinPath
@@ -4041,11 +4041,11 @@ Namespace FBM
                                             'Have found the JoinPath, so return.
                                             '-------------------------------------------------------------------------------------------
                                             If arSecondRole.Id <> lrTraversedRole.Id Then
-                                                lrJoinPath.RolePath.Add(lrTraversedRole)
+                                                lrJoinPath.RolePath.AddUnique(lrTraversedRole)
                                                 aarUniqueRolesCovered.AddUnique(lrTraversedRole)
                                             End If
                                             Dim lrSuccessfulJoinPath As New FBM.JoinPath
-                                            lrSuccessfulJoinPath.RolePath.Add(arSecondRole)
+                                            lrSuccessfulJoinPath.RolePath.AddUnique(arSecondRole)
                                             larSuccessfulJoinPathContinuation.Add(lrSuccessfulJoinPath)
                                             aarUniqueRolesCovered.AddUnique(arSecondRole)
                                             Exit For
@@ -4119,7 +4119,7 @@ Namespace FBM
                                     End If
                             End Select
 
-                            lrJoinPath.RolePath.Add(arSecondRole)
+                            lrJoinPath.RolePath.AddUnique(arSecondRole)
 
                         End If
                         aarUniqueRolesCovered.AddUnique(lrRole)

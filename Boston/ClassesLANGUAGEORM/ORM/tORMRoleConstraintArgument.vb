@@ -226,7 +226,7 @@ Namespace FBM
                     Me.JoinPath.RolePath = New List(Of FBM.Role)
 
                     For Each lrRoleConstraintRole In Me.RoleConstraintRole
-                        Me.JoinPath.RolePath.Add(lrRoleConstraintRole.Role)
+                        Me.JoinPath.RolePath.AddUnique(lrRoleConstraintRole.Role)
                     Next
                 Else
                     '----------------------------------------------------------------------------------------

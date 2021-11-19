@@ -126,17 +126,17 @@ Namespace FTR
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.UNARYPREDICATEPART, TokenType.PREDICATEPART) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
-                Case TokenType.UNARYPREDICATEPART
-                    ParseUNARYPREDICATECLAUSE(node) ' NonTerminal Rule: UNARYPREDICATECLAUSE
+                Case TokenType.PREDICATEPART
+                    ParseBINARYPREDICATECLAUSE(node) ' NonTerminal Rule: BINARYPREDICATECLAUSE
             If m_tree.Errors.Count > 0 Then
                                 parent.Token.UpdateRange(node.Token)
                                 Exit Sub
             End If
-                Case TokenType.PREDICATEPART
-                    ParseBINARYPREDICATECLAUSE(node) ' NonTerminal Rule: BINARYPREDICATECLAUSE
+                Case TokenType.UNARYPREDICATEPART
+                    ParseUNARYPREDICATECLAUSE(node) ' NonTerminal Rule: UNARYPREDICATECLAUSE
             If m_tree.Errors.Count > 0 Then
                                 parent.Token.UpdateRange(node.Token)
                                 Exit Sub
@@ -144,8 +144,8 @@ Namespace FTR
                 Case Else
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.UNARYPREDICATEPART.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "UNARYPREDICATEPART"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.UNARYPREDICATEPART.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATEPART"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATEPART.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATEPART"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.PREDICATEPART.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "UNARYPREDICATEPART"))
                 End If
                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                     Exit Select

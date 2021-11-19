@@ -187,7 +187,7 @@ Namespace DuplexServiceClient
                                 lrInterfaceRoleReference = New Viev.FBM.Interface.RoleReference
                                 lrInterfaceRoleReference.RoleId = lrRole.Id
 
-                                lrInterfaceArgument.JoinPath.RolePath.Add(lrInterfaceRoleReference)
+                                lrInterfaceArgument.JoinPath.RolePath.AddUnique(lrInterfaceRoleReference)
                             Next
 
                             lrInterfaceArgument.JoinPath.JoinPathError.GetByDescription(lrRCArgument.JoinPath.JoinPathError.ToString)
