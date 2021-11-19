@@ -145,6 +145,8 @@ Public Class frmToolbox
                                 loShape.Image = My.Resources.ORMShapes.subset
                             Case Is = "Frequency Constraint"
                                 loShape.Image = My.Resources.ORMShapes.frequency_ge
+                            Case Is = "Value Comparison Constraint"
+                                loShape.Image = My.Resources.ORMShapes.value_comparison
                             Case Is = "Model Note"
                                 loShape.ImageRectangle = New RectangleF(0, 0, 75, 120)
                                 loShape.Image = My.Resources.ORMShapes.ModelNote

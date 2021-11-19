@@ -142,6 +142,7 @@
                             End Select
                             lrRoleConstraintInstance.LongDescription = lrRoleConstraintInstance.RoleConstraint.LongDescription
                             lrRoleConstraintInstance.ShortDescription = lrRoleConstraintInstance.RoleConstraint.ShortDescription
+                            lrRoleConstraintInstance.ValueRangeType = CType([Enum].Parse(GetType(pcenumValueRangeType), lREcordset("ValueRangeType").Value), pcenumValueRangeType)
                             lrRoleConstraintInstance.X = lREcordset("x").Value
                             lrRoleConstraintInstance.Y = lREcordset("y").Value
 

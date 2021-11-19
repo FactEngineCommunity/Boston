@@ -272,6 +272,7 @@ Namespace FBM
         Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
         Public Event RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As FBM.RoleConstraintRole)
         Public Event ArgumentRemoved(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument)
+        Public Event ValueRangeTypeChanged(ByVal aiNewValueRangeType As pcenumValueRangeType)
 
         Sub New()
             '------------------------------------------
@@ -1299,6 +1300,7 @@ Namespace FBM
                         lrRoleConstraint.LongDescription = .LongDescription
                         lrRoleConstraint.MaximumFrequencyCount = .MaximumFrequencyCount
                         lrRoleConstraint.MinimumFrequencyCount = .MinimumFrequencyCount
+                        lrRoleConstraint.ValueRangeType = .ValueRangeType
 
                         For Each lrRole In .Role
                             lrRoleConstraint.Role.Add(lrRole.Clone(arModel, abAddToModel))
@@ -1369,6 +1371,7 @@ Namespace FBM
                     lrRoleConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
                     lrRoleConstraintInstance.Cardinality = .Cardinality
                     lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
+                    lrRoleConstraintInstance.ValueRangeType = .ValueRangeType
 
                     If abAddToPage And Not arPage.RoleConstraintInstance.Contains(lrRoleConstraintInstance) Then
                         arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
@@ -2287,6 +2290,25 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Public Sub SetValueRangeType(ByVal aiValueRangeType As pcenumValueRangeType)
+
+            Try
+                Me.ValueRangeType = aiValueRangeType
+
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(False, False)
+
+                RaiseEvent ValueRangeTypeChanged(aiValueRangeType)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 

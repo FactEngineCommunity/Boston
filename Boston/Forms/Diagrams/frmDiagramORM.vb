@@ -1303,6 +1303,11 @@ Public Class frmDiagramORM
                             Call Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                             Me.zrPage.Save()
                             '-------------------------------------------------------------------------------
+                        Case Is = "Value Comparison Constraint"
+                            Dim lrRoleConstraint As FBM.RoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ValueComparisonConstraint, , , , , False)
+                            Call Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                            Me.zrPage.Save()
+                            '-------------------------------------------------------------------------------
                         Case Is = "Equality Constraint"
                             Dim lrRoleConstraint As FBM.RoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.EqualityConstraint, , , , , False)
                             Call Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
@@ -2254,7 +2259,8 @@ Public Class frmDiagramORM
                                 Case Is = pcenumRoleConstraintType.EqualityConstraint,
                                           pcenumRoleConstraintType.ExclusionConstraint,
                                           pcenumRoleConstraintType.InclusiveORConstraint,
-                                          pcenumRoleConstraintType.ExclusiveORConstraint
+                                          pcenumRoleConstraintType.ExclusiveORConstraint,
+                                          pcenumRoleConstraintType.ValueComparisonConstraint
 
                                     Dim lrRoleInstance As FBM.RoleInstance = lrTargetModelObject
                                     Dim lrRole As FBM.Role = lrRoleInstance.Role
@@ -2407,7 +2413,8 @@ Public Class frmDiagramORM
                                   pcenumRoleConstraintType.ExclusionConstraint,
                                   pcenumRoleConstraintType.ExclusiveORConstraint,
                                   pcenumRoleConstraintType.InclusiveORConstraint,
-                                  pcenumRoleConstraintType.SubsetConstraint
+                                  pcenumRoleConstraintType.SubsetConstraint,
+                                  pcenumRoleConstraintType.ValueComparisonConstraint
                             e.Link.Tag = lrModelObject
                             e.Link.BaseShape = ArrowHead.None
                             e.Link.HeadShape = ArrowHead.None
@@ -7460,6 +7467,8 @@ Public Class frmDiagramORM
                             lo_shape.Image = My.Resources.ORMShapes.subset
                         Case Is = "Frequency Constraint"
                             lo_shape.Image = My.Resources.ORMShapes.frequency_ge
+                        Case Is = "Value Comparison Constraint"
+                            lo_shape.Image = My.Resources.ORMShapes.value_comparison
                         Case Is = "Model Note"
                             lo_shape.ImageRectangle = New RectangleF(0, 0, 75, 120)
                             lo_shape.Image = My.Resources.ORMShapes.ModelNote

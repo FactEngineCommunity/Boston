@@ -747,6 +747,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend Shared ReadOnly Property value_comparison() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("value_comparison", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend Shared ReadOnly Property value_comparison_greater() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("value_comparison_greater", resourceCulture)
@@ -767,9 +777,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property value_comparrison_less() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property value_comparison_less_than() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("value_comparrison_less", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("value_comparison_less_than", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -777,9 +787,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property value_comparrison_less_than() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property value_comparison_less_than_equal() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("value_comparrison_less_than", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("value_comparison_less_than_equal", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

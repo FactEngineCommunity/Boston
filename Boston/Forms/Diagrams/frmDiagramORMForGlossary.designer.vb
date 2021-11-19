@@ -1038,14 +1038,14 @@ Partial Class frmDiagramORMForGlossary
         '
         'LessThanToolStripMenuItem
         '
-        Me.LessThanToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparrison_less
+        Me.LessThanToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparison_less_than_equal
         Me.LessThanToolStripMenuItem.Name = "LessThanToolStripMenuItem"
         Me.LessThanToolStripMenuItem.Size = New System.Drawing.Size(381, 34)
         Me.LessThanToolStripMenuItem.Text = "&Less Than"
         '
         'LessThanOREqualToToolStripMenuItem
         '
-        Me.LessThanOREqualToToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparrison_less_than
+        Me.LessThanOREqualToToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparison_less_than
         Me.LessThanOREqualToToolStripMenuItem.Name = "LessThanOREqualToToolStripMenuItem"
         Me.LessThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(381, 34)
         Me.LessThanOREqualToToolStripMenuItem.Text = "Less Than OR Equal To"

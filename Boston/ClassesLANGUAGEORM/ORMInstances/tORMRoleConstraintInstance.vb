@@ -15,7 +15,6 @@ Namespace FBM
         <XmlIgnore()>
         Public WithEvents RoleConstraint As FBM.RoleConstraint
 
-
         <CategoryAttribute("Constraint Type"),
         Browsable(True),
         [ReadOnly](True),
@@ -45,6 +44,23 @@ Namespace FBM
             End Get
             Set(ByVal value As Boolean)
                 Me._IsDeontic = value
+            End Set
+        End Property
+
+        Private _ValueRangeType As pcenumValueRangeType = pcenumValueRangeType.None
+        <CategoryAttribute("Comparitor"),
+        Browsable(True),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DefaultValueAttribute("None"),
+        DesignOnly(False),
+        DescriptionAttribute("The Value Comparitor for this Role Constraint")>
+        Public Shadows Property ValueRangeType As pcenumValueRangeType
+            Get
+                Return Me._ValueRangeType
+            End Get
+            Set(ByVal value As pcenumValueRangeType)
+                Me._ValueRangeType = value
             End Set
         End Property
 
@@ -876,6 +892,21 @@ Namespace FBM
                             Case Is = pcenumRoleConstraintType.SubsetConstraint
                                 loDroppedNode.Image = My.Resources.ORMShapes.subset
                                 loDroppedNode.ToolTip = "Subset Constraint"
+                            Case Is = pcenumRoleConstraintType.ValueComparisonConstraint
+                                loDroppedNode.Image = My.Resources.ORMShapes.value_comparison
+                                Select Case Me.RoleConstraint.ValueRangeType
+                                    Case Is = pcenumValueRangeType.None
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison
+                                    Case Is = pcenumValueRangeType.GreaterThan
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_greater
+                                    Case Is = pcenumValueRangeType.GreaterThanOREqual
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_greater_equal
+                                    Case Is = pcenumValueRangeType.LessThan
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_less_than
+                                    Case Is = pcenumValueRangeType.LessThanOREqual
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_less_than_equal
+                                End Select
+                                loDroppedNode.ToolTip = "Value Comparison Constraint"
                         End Select
 
 
@@ -1258,6 +1289,8 @@ Namespace FBM
                             End If
 
                             Call Me.RoleConstraint.SetIsPreferredIdentifier(Me.IsPreferredIdentifier)
+                        Case Is = "ValueRangeType"
+                            Call Me.RoleConstraint.SetValueRangeType(Me.ValueRangeType)
                         Case Is = "IsDeontic"
                             Me.RoleConstraint.IsDeontic = Me.IsDeontic
                             If Me.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RingConstraint Then
@@ -1330,6 +1363,19 @@ Namespace FBM
                 'Shape drawing
                 '=====================================================================
                 Select Case Me.RoleConstraintType
+                    Case Is = pcenumRoleConstraintType.ValueComparisonConstraint
+                        Select Case Me.ValueRangeType
+                            Case Is = pcenumValueRangeType.None
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison
+                            Case Is = pcenumValueRangeType.GreaterThan
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison_greater
+                            Case Is = pcenumValueRangeType.GreaterThanOREqual
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison_greater_equal
+                            Case Is = pcenumValueRangeType.LessThan
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison_less_than
+                            Case Is = pcenumValueRangeType.LessThanOREqual
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison_less_than_equal
+                        End Select
                     Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
                         If (Me.IsDeontic = False) And (Me.IsPreferredIdentifier = False) Then
                             Me.Shape.Image = My.Resources.ORMShapes.externalUniqueness
@@ -1906,6 +1952,22 @@ Namespace FBM
                 Catch ex As Exception
                 End Try
             End If
+        End Sub
+
+        Private Sub RoleConstraint_ValueRangeTypeChanged(aiNewValueRangeType As pcenumValueRangeType) Handles RoleConstraint.ValueRangeTypeChanged
+
+            Try
+                Me._ValueRangeType = aiNewValueRangeType
+
+                Call Me.RefreshShape()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
     End Class
 
