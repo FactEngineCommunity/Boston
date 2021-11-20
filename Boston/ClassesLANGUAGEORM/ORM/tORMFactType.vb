@@ -3520,12 +3520,6 @@ Namespace FBM
                 'RDS
                 If Me.IsManyTo1BinaryFactType Then
 
-                    '--------------------------------------------------------
-                    'Special case. Need to remove the existing RDS.Relation
-                    '  and create a RDS.Table that is a PGSRelationNode
-                    Dim lrRelation As RDS.Relation = Me.Model.RDS.getRelationByResponsibleFactType(Me)
-                    Call Me.Model.RDS.removeRelation(lrRelation)
-
                     Dim lrTable As New RDS.Table(Me.Model.RDS, Me.Name, Me)
 
                     Dim larColumn As New List(Of RDS.Column)
@@ -3534,7 +3528,15 @@ Namespace FBM
                         Call larColumn.AddRange(lrRole.getColumns(lrTable, lrRole))
                     Next
 
-                    lrTable.setIsPGSRelation(True)
+                    '--------------------------------------------------------
+                    'Special case. Need to remove the existing RDS.Relation
+                    '  and create a RDS.Table that is a PGSRelationNode
+                    If Me.RoleGroup.Find(Function(x) x.JoinsValueType IsNot Nothing) Is Nothing Then
+                        Dim lrRelation As RDS.Relation = Me.Model.RDS.getRelationByResponsibleFactType(Me)
+                        Call Me.Model.RDS.removeRelation(lrRelation)
+
+                        lrTable.setIsPGSRelation(True) 'In here because is catch-all if..then
+                    End If
 
                     Call Me.Model.RDS.addTable(lrTable)
 
@@ -3548,7 +3550,7 @@ Namespace FBM
 
                         Dim larLinkFactTypeRole = From FactType In Me.Model.FactType
                                                   Where FactType.IsLinkFactType = True _
-                                                  And FactType.LinkFactTypeRole Is lrRole
+                                                And FactType.LinkFactTypeRole Is lrRole
                                                   Select FactType.RoleGroup(0)
 
                         For Each lrLinkFactTypeRole In larLinkFactTypeRole
@@ -3563,8 +3565,9 @@ Namespace FBM
                     Call lrOriginalTable.removeColumn(lrColumn)
 
 
+
                 Else
-                    Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                        Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
                     If lrTable IsNot Nothing Then
 

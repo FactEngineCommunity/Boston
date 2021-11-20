@@ -859,9 +859,14 @@ Namespace FBM
 
                                         lsTableName = lrRole.BelongsToTable
 
-                                        Dim lrModelObject = Me.GetModelObjectByName(lsTableName).GetTopmostNonAbsorbedSupertype
+                                        Dim lrModelObject As FBM.ModelObject = Nothing
 
-                                        lrTable = Me.RDS.getTableByName(lrModelObject.Id)
+                                        Try
+                                            lrModelObject = Me.GetModelObjectByName(lsTableName).GetTopmostNonAbsorbedSupertype
+                                            lrTable = Me.RDS.getTableByName(lrModelObject.Id)
+                                        Catch
+                                            Throw New Exception("No Model Element found for (possibly new) Table Name:" & lsTableName)
+                                        End Try
 
                                         If lrTable Is Nothing Then
                                             'Table not created yet
@@ -869,6 +874,7 @@ Namespace FBM
                                                 Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName)
                                                 lrTable = New RDS.Table(Me.RDS, lsTableName, lrModelElement)
                                                 Me.RDS.Table.AddUnique(lrTable)
+
                                             Else
                                                 lrTable = New RDS.Table(Me.RDS, lrModelObject.Id, lrModelObject)
                                                 Me.RDS.Table.AddUnique(lrTable)

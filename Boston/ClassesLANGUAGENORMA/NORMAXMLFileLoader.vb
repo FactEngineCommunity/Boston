@@ -571,10 +571,6 @@ Namespace NORMA
                                                   Where ModelInformation.Attribute("Name") = lrFactType.Name
                                                   Select ModelInformation
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrFactType.Objectify(True)
-                        End If
-
                         '--------------------------------------------
                         'Load the FactTypeReadings for the FactType
                         '--------------------------------------------
@@ -585,10 +581,18 @@ Namespace NORMA
                         '---------------------------------
                         Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
 
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            'Need to remove NORMAUnaryFactTypeValueTypes before Objectifying.
+                            For Each lrRole In lrFactType.RoleGroup.ToArray
+                                If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                    Call lrRole.FactType.RemoveRole(lrRole, False, True)
+                                End If
+                            Next
+
+                            lrFactType.Objectify(True)
+                        End If
 
                     End If 'Adding new FactType to the Model.
-
-
                 Next
 
                 Return lrFactType
@@ -833,51 +837,59 @@ Namespace NORMA
                         Next 'Role
 
 
-            '---------------------------------------------
-            'Load the Internal Uniqueness Constraints
-            '---------------------------------------------
-            Dim laoXMLUniquenessConstraints = From UniquenessConstraint In loElement.<orm:InternalConstraints>.<orm:UniquenessConstraint>
-                                              Select UniquenessConstraint
+                        '---------------------------------------------
+                        'Load the Internal Uniqueness Constraints
+                        '---------------------------------------------
+                        Dim laoXMLUniquenessConstraints = From UniquenessConstraint In loElement.<orm:InternalConstraints>.<orm:UniquenessConstraint>
+                                                          Select UniquenessConstraint
 
-            For Each loXMLUniquenessConstraint In laoXMLUniquenessConstraints
+                        For Each loXMLUniquenessConstraint In laoXMLUniquenessConstraints
 
-                Dim lrRoleConstraint As FBM.RoleConstraint
-                lrRoleConstraint = Me.LoadRoleConstraintInternalUniquenessConstraint(Me.FBMModel, arNORMAXMLDOC, loXMLUniquenessConstraint.Attribute("ref").Value)
+                            Dim lrRoleConstraint As FBM.RoleConstraint
+                            lrRoleConstraint = Me.LoadRoleConstraintInternalUniquenessConstraint(Me.FBMModel, arNORMAXMLDOC, loXMLUniquenessConstraint.Attribute("ref").Value)
 
-                Dim laoXMLIsPreferredUniqueness = From PreferredIdentifier In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>.<orm:PreferredIdentifier>
-                                                  Where PreferredIdentifier.Attribute("ref").Value = loXMLUniquenessConstraint.Attribute("ref").Value
-                                                  Select PreferredIdentifier
+                            Dim laoXMLIsPreferredUniqueness = From PreferredIdentifier In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>.<orm:PreferredIdentifier>
+                                                              Where PreferredIdentifier.Attribute("ref").Value = loXMLUniquenessConstraint.Attribute("ref").Value
+                                                              Select PreferredIdentifier
 
-                If laoXMLIsPreferredUniqueness.Count > 0 Then
-                    Call lrRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
-                End If
-            Next
+                            If laoXMLIsPreferredUniqueness.Count > 0 Then
+                                Call lrRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
+                            End If
+                        Next
 
-            '---------------------------------------------
-            'Check to see if the FactType is Objectified
-            '---------------------------------------------
-            loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                      Where ModelInformation.Attribute("Name") = lrFactType.Name
-                                      Select ModelInformation
+                        '---------------------------------------------
+                        'Check to see if the FactType is Objectified
+                        '---------------------------------------------
+                        loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                                  Where ModelInformation.Attribute("Name") = lrFactType.Name
+                                                  Select ModelInformation
 
-            If IsSomething(loXMLElementQueryResult(0)) Then
-                lrFactType.Objectify(True)
-            End If
+                        '--------------------------------------------
+                        'Load the FactTypeReadings for the FactType
+                        '--------------------------------------------
+                        Call Me.LoadFactTypeReadings(arModel, lrFactType, loElement)
 
-            '--------------------------------------------
-            'Load the FactTypeReadings for the FactType
-            '--------------------------------------------
-            Call Me.LoadFactTypeReadings(arModel, lrFactType, loElement)
+                        '---------------------------------
+                        'Load the Facts for the FactType
+                        '---------------------------------
+                        Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
 
-            '---------------------------------
-            'Load the Facts for the FactType
-            '---------------------------------
-            Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
+                        If IsSomething(loXMLElementQueryResult(0)) Then
+                            'Need to remove NORMAUnaryFactTypeValueTypes before Objectifying.
+                            For Each lrRole In lrFactType.RoleGroup.ToArray
+                                If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                    Call lrRole.FactType.RemoveRole(lrRole, False, True)
+                                End If
+                            Next
 
-            End If 'FactType exists in Model
-            Next 'FactType
+                            lrFactType.Objectify(True)
+                        End If
 
-            Dim larFaultyFactTypes = From FactType In arModel.FactType
+
+                    End If 'FactType exists in Model
+                Next 'FactType
+
+                Dim larFaultyFactTypes = From FactType In arModel.FactType
                                      From Role In FactType.RoleGroup
                                      Where Role.JoinedORMObject Is Nothing
                                      Select FactType
@@ -1752,20 +1764,39 @@ Namespace NORMA
 
                 For Each loElement In loEnumElementQueryResult
 
-                    Dim loRoleProxyXElement As XElement = loElement.<orm:FactRoles>.<orm:RoleProxy>.<orm:Role>.First
-                    lrRole = New FBM.Role
-                    lrRole.Id = loRoleProxyXElement.Attribute("ref").Value
-                    lrRole = arModel.Role.Find(Function(x) x.Id = lrRole.Id)
+                    Try
+                        Dim loRoleProxyXElement As XElement
 
-                    Dim loLinkFTRoleXElement As XElement = loElement.<orm:FactRoles>.<orm:Role>.First
+                        Try
+                            loRoleProxyXElement = loElement.<orm:FactRoles>.<orm:RoleProxy>.<orm:Role>.First
+                        Catch ex As Exception
+                            loRoleProxyXElement = loElement.<orm:FactRoles>.<orm:ObjectifiedUnaryRole>.<orm:UnaryRole>.First
+                        End Try
 
-                    Dim lrLinkFTRole As FBM.Role = (From FactType In Me.FBMModel.FactType
-                                                    Where FactType.IsLinkFactType
-                                                    Where FactType.LinkFactTypeRole.Id = lrRole.Id
-                                                    Select FactType.RoleGroup(0)).First
 
-                    lrLinkFTRole.Id = loLinkFTRoleXElement.Attribute("id").Value
-                    lrLinkFTRole.FactType.NORMAReferenceId = loElement.Attribute("id").Value
+                        lrRole = New FBM.Role
+                        lrRole.Id = loRoleProxyXElement.Attribute("ref").Value
+                        lrRole = arModel.Role.Find(Function(x) x.Id = lrRole.Id)
+
+                        Dim loLinkFTRoleXElement As XElement = loElement.<orm:FactRoles>.<orm:Role>.First
+
+                        Dim lrLinkFTRole As FBM.Role = (From FactType In Me.FBMModel.FactType
+                                                        Where FactType.IsLinkFactType
+                                                        Where FactType.LinkFactTypeRole.Id = lrRole.Id
+                                                        Select FactType.RoleGroup(0)).First
+
+                        lrLinkFTRole.Id = loLinkFTRoleXElement.Attribute("id").Value
+                        lrLinkFTRole.FactType.NORMAReferenceId = loElement.Attribute("id").Value
+
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & "Error trying to set RoleId for Link Fact Type for Fact Type: " & loElement.Attribute("_Name").Value
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    End Try
                 Next
 
             Catch ex As Exception

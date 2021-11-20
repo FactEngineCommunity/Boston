@@ -631,7 +631,7 @@ Namespace FBM
                                 Exit Function
                             ElseIf Me.FactType.TypeOfBinaryFactType = 2 Then
                                 'Part 2 of Rule 4
-                                BelongsToTable = "Dummy" 'role_record(role_id).role_name
+                                BelongsToTable = Me.JoinedORMObject.Id ' "Dummy" 'role_record(role_id).role_name
                                 Exit Function
                             End If
                         Else
