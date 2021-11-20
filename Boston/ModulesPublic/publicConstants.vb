@@ -123,13 +123,13 @@ Public Module publicConstants
 
     <Serializable()>
     Public Enum pcenumValueRangeType
-        Equal
-        None
-        NotEqual
-        LessThan
-        LessThanOrEqual
-        GreaterThanOrEqual
-        GreaterThan
+        <Description("is equal to")> Equal
+        <Description("none")> None
+        <Description("is not equal to")> NotEqual
+        <Description("is less than")> LessThan
+        <Description("is less than or equal to")> LessThanOrEqual
+        <Description("is greater than or equal to")> GreaterThanOrEqual
+        <Description("is greater than")> GreaterThan
     End Enum
 
     <Serializable()> _

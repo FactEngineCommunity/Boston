@@ -777,11 +777,15 @@ Namespace FBM
         ''' Adds the FactTypeReading text of the FactTypeReading to the Verbaliser.
         ''' </summary>
         ''' <param name="arVerbaliser"></param>
+        ''' <param name="arSubscriptPredicateRole">The Role to provide a Subcript number for. See parameter aiPredicateSubscriptNumber</param>
+        ''' <param name="aiPredicateSubscriptNumber">The subscript number for the arSubscriptPredicateRole parameter</param>
         ''' <remarks></remarks>
         Public Sub GetReadingText(ByRef arVerbaliser As FBM.ORMVerbailser,
                                   Optional ByVal abIncludeRoleConstraintInformation As Boolean = False,
                                   Optional ByVal abIncludeSubscriptModelObjectNumbers As Boolean = False,
-                                  Optional ByVal abThrowErrorToVerbaliser As Boolean = True)
+                                  Optional ByVal abThrowErrorToVerbaliser As Boolean = True,
+                                  Optional ByVal arSubscriptPredicateRole As FBM.Role = Nothing,
+                                  Optional ByVal aiPredicateSubscriptNumber As Integer = 0)
 
             Try
                 '----------------------------------------------------
@@ -829,9 +833,16 @@ Namespace FBM
                         End If
                     End If
 
-                    If lrPredicatePart.ModelObjectSubscriptNumber > 0 Then
-                        arVerbaliser.VerbaliseSubscript(lrPredicatePart.ModelObjectSubscriptNumber)
+                    If arSubscriptPredicateRole IsNot Nothing Then
+                        If arSubscriptPredicateRole Is lrPredicatePart.Role Then
+                            arVerbaliser.VerbaliseSubscript(aiPredicateSubscriptNumber.ToString)
+                        End If
+                    Else
+                        If lrPredicatePart.ModelObjectSubscriptNumber > 0 Then
+                            arVerbaliser.VerbaliseSubscript(lrPredicatePart.ModelObjectSubscriptNumber)
+                        End If
                     End If
+
 
                     arVerbaliser.VerbalisePredicateText(lrPredicatePart.PostBoundText)
                     If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then

@@ -80,7 +80,7 @@ Namespace FBM
                     Case Is = pcenumCardinalityRangeType.GreaterThanOREqual
                         lsFrequencyConstraintText = ">=" & Me.Cardinality
                     Case Is = pcenumCardinalityRangeType.Between
-                        lsFrequencyConstraintText = "{" & Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString & "}"
+                        lsFrequencyConstraintText = Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString
                 End Select
 
                 '------------------------------------------
@@ -212,7 +212,7 @@ Namespace FBM
                     Me.Cardinality = Me.MaximumFrequencyCount
                 ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount > 0) Then
                     Me.CardinalityRangeType = pcenumCardinalityRangeType.Between
-                    Me.Shape.Text = "{" & Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString & "}"
+                    Me.Shape.Text = Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString
                     Me.Cardinality = 0
                 End If
 
@@ -265,7 +265,7 @@ Namespace FBM
                     Case Is = pcenumCardinalityRangeType.GreaterThanOREqual
                         lsFrequencyConstraintText = ">=" & Me.Cardinality
                     Case Is = pcenumCardinalityRangeType.Between
-                        lsFrequencyConstraintText = "{" & Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString & "}"
+                        lsFrequencyConstraintText = Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString
                 End Select
 
                 Me.Shape.Text = lsFrequencyConstraintText

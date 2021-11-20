@@ -2062,6 +2062,8 @@ Public Class frmDiagramORM
                                 Call lrToolboxForm.VerbaliseRoleConstraintFrequencyConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.RingConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.ValueComparisonConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintValueComparisonConstraint(lrRoleConstraintInstance.RoleConstraint)
                         End Select
                 End Select
             End If

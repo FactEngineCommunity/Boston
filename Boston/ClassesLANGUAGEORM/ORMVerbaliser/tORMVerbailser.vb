@@ -40,6 +40,7 @@ Namespace FBM
                        ".definition { color: Black; font-style: italic; font-weight: normal; }" & vbCrLf &
                        ".notAvailable { font-style: italic; }" & vbCrLf &
                        ".instance { color: Brown; font-weight: normal; }" & vbCrLf &
+                       ".value { color: Purple; font-weight: normal; margin-bottom: 16px;}" & vbCrLf &
                        "</style>" & vbCrLf &
                        "</head>"
 
@@ -164,6 +165,15 @@ Namespace FBM
             Me.HTW.AddAttribute(HtmlTextWriterAttribute.Style, "font-size:smaller;")
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Sub)
             Me.HTW.Write(asSubscriptText)
+            Me.HTW.RenderEndTag()
+
+        End Sub
+
+        Public Sub VerbaliseValue(ByVal asText As String)
+
+            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "value")
+            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
+            Me.HTW.Write(asText)
             Me.HTW.RenderEndTag()
 
         End Sub

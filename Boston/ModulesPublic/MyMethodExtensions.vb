@@ -1,5 +1,7 @@
-﻿Imports System.Runtime.CompilerServices
+﻿Imports System.Reflection
+Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic
+Imports System.ComponentModel
 
 Module MyMethodExtensions
 
@@ -141,6 +143,19 @@ Module MyMethodExtensions
         Return aiEnum
 
     End Function
+
+    <Extension()>
+    Public Function DescriptionAttr(Of T)(ByVal source As T) As String
+        Dim fi As FieldInfo = source.[GetType]().GetField(source.ToString())
+        Dim attributes As DescriptionAttribute() = CType(fi.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())
+
+        If attributes IsNot Nothing AndAlso attributes.Length > 0 Then
+            Return attributes(0).Description
+        Else
+            Return source.ToString()
+        End If
+    End Function
+
 
     <Extension()>
     Public Function isBetween(ByRef asglNumber As Single, ByVal aiLowerVal As Integer, ByVal aiUpperVal As Integer) As Boolean
