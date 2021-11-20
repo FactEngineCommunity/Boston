@@ -38,12 +38,12 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemMakeNewPageForThisModelElement = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelPromptRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -159,12 +159,13 @@ Partial Class frmToolboxModelDictionary
         Me.ImageList.Images.SetKeyName(20, "PreferredExternalUniqueness")
         Me.ImageList.Images.SetKeyName(21, "PGSNode.png")
         Me.ImageList.Images.SetKeyName(22, "PGSRelation.png")
+        Me.ImageList.Images.SetKeyName(23, "value_comparison.png")
         '
         'ContextMenuStrip1
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 136)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 114)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -191,6 +192,13 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripMenuItemMakeNewPageForThisModelElement.Name = "ToolStripMenuItemMakeNewPageForThisModelElement"
         Me.ToolStripMenuItemMakeNewPageForThisModelElement.Size = New System.Drawing.Size(280, 22)
         Me.ToolStripMenuItemMakeNewPageForThisModelElement.Text = "&Make new Page for this model element"
+        '
+        'PropertiesToolStripMenuItem1
+        '
+        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(280, 22)
+        Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'StatusStrip1
         '
@@ -224,13 +232,6 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Name = "ToolStripStatusLabelModelElementTypeCount"
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
-        '
-        'PropertiesToolStripMenuItem1
-        '
-        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
-        Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(280, 22)
-        Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'frmToolboxModelDictionary
         '

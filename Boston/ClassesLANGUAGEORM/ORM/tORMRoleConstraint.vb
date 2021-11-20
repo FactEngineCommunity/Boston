@@ -77,7 +77,7 @@ Namespace FBM
         ''' Used in ValueComparisonConstraints
         ''' </summary>
         ''' <remarks></remarks>
-        Public ValueRangeType As pcenumValueRangeType = pcenumValueRangeType.LessThanOREqual
+        Public ValueRangeType As pcenumValueRangeType = pcenumValueRangeType.LessThanOrEqual
 
         ''' <summary>
         ''' Only used on FrequencyConstraints.

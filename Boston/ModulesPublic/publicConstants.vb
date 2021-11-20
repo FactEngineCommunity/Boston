@@ -121,20 +121,22 @@ Public Module publicConstants
         TheSame
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumValueRangeType
+        Equal
         None
+        NotEqual
         LessThan
-        LessThanOREqual
-        GreaterThanOREqual
+        LessThanOrEqual
+        GreaterThanOrEqual
         GreaterThan
     End Enum
 
     <Serializable()> _
     Public Enum pcenumCardinalityRangeType
-        LessThanOREqual
+        LessThanOrEqual
         Equal
-        GreaterThanOREqual
+        GreaterThanOrEqual
         Between
     End Enum
 

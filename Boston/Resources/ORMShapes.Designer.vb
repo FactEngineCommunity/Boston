@@ -757,6 +757,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend Shared ReadOnly Property value_comparison_equal() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("value_comparison_equal", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend Shared ReadOnly Property value_comparison_greater() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("value_comparison_greater", resourceCulture)
@@ -790,6 +800,16 @@ Namespace My.Resources
         Friend Shared ReadOnly Property value_comparison_less_than_equal() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("value_comparison_less_than_equal", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend Shared ReadOnly Property value_comparison_not_equal() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("value_comparison_not_equal", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

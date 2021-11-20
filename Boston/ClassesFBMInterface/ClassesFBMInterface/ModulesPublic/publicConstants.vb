@@ -204,12 +204,21 @@ Public Module publicConstants
         DeonticPurelyReflexive
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumCardinalityRangeType
-        LessThanOREqual
+        LessThanOrEqual
         Equal
-        GreaterThanOREqual
+        GreaterThanOrEqual
         Between
+    End Enum
+
+    <Serializable()>
+    Public Enum pcenumValueRangeType
+        None
+        LessThan
+        LessThanOrEqual
+        GreaterThanOrEqual
+        GreaterThan
     End Enum
 
 End Module

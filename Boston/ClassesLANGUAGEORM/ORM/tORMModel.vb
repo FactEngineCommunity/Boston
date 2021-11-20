@@ -738,6 +738,7 @@ Namespace FBM
                     lrInterfaceRoleConstraint.IsDeontic = arRoleConstraint.IsDeontic
                     lrInterfaceRoleConstraint.Cardinality = arRoleConstraint.Cardinality
                     lrInterfaceRoleConstraint.CardinalityRangeType.GetByDescription(arRoleConstraint.CardinalityRangeType.ToString)
+                    lrInterfaceRoleConstraint.ValueRangeType.GetByDescription(arRoleConstraint.ValueRangeType.ToString)
 
                     For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
 

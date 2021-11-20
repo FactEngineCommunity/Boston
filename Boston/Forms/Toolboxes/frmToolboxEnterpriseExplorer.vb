@@ -1667,7 +1667,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '---------------------------------------------------------------------
                 'Abort if a Model is not created.
                 'e.g. The Student version only allows 3 Modelsin the Model Explorer.
-                If lrModel Is Nothing Then Exit Function
+                If lrModel Is Nothing Then Return Nothing
 
                 '==================================================
                 'RDS - Create a CMML Page and then dispose of it.            
@@ -2344,6 +2344,10 @@ Public Class frmToolboxEnterpriseExplorer
 
         Richmond.WriteToStatusBar("Loading Frequency Constraints")
         Call lrNORMAFileLoader.LoadRoleConstraintFrequencyConstraints(lrModel, NORMAXMLDOC)
+
+        Richmond.WriteToStatusBar("Value Comparison Constraints")
+        Call lrNORMAFileLoader.LoadRoleConstraintValueComparisonConstraints(lrModel, NORMAXMLDOC)
+
         '----------------------------------------------------------------------------------------------------------
         'Get rid of the Roles in FactTypes that refer to NORMA UnaryFactType ValueTypes.
         '  NORMA has a ValueType for each UnaryFactType with a corresponding Role attached to the Unary Role of

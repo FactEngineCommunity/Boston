@@ -903,8 +903,12 @@ Namespace FBM
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_greater_equal
                                     Case Is = pcenumValueRangeType.LessThan
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_less_than
-                                    Case Is = pcenumValueRangeType.LessThanOREqual
+                                    Case Is = pcenumValueRangeType.LessThanOrEqual
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_less_than_equal
+                                    Case Is = pcenumValueRangeType.Equal
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_equal
+                                    Case Is = pcenumValueRangeType.NotEqual
+                                        loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_not_equal
                                 End Select
                                 loDroppedNode.ToolTip = "Value Comparison Constraint"
                         End Select
@@ -1373,8 +1377,12 @@ Namespace FBM
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_greater_equal
                             Case Is = pcenumValueRangeType.LessThan
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_less_than
-                            Case Is = pcenumValueRangeType.LessThanOREqual
+                            Case Is = pcenumValueRangeType.LessThanOrEqual
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_less_than_equal
+                            Case Is = pcenumValueRangeType.Equal
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison_equal
+                            Case Is = pcenumValueRangeType.NotEqual
+                                Me.Shape.Image = My.Resources.ORMShapes.value_comparison_not_equal
                         End Select
                     Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
                         If (Me.IsDeontic = False) And (Me.IsPreferredIdentifier = False) Then

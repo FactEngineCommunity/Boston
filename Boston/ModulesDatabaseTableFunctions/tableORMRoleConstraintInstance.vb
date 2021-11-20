@@ -23,7 +23,6 @@
             Dim lREcordset As New ADODB.Recordset
 
             Try
-
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
 

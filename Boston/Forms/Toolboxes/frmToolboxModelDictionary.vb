@@ -278,6 +278,8 @@ Public Class frmToolboxModelDictionary
                         Else
                             liImageIndex = 11
                         End If
+                    Case Is = pcenumRoleConstraintType.ValueComparisonConstraint
+                        liImageIndex = 23
                     Case Else
                         liImageIndex = 2
                 End Select

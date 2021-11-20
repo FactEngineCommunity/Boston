@@ -152,14 +152,27 @@ Public Property Name() As String
 
     <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
     Private _CardinalityRangeType As pcenumCardinalityRangeType
-    <DataMember()> _
-    <XmlAttribute()> _
+    <DataMember()>
+    <XmlAttribute()>
     Public Property CardinalityRangeType As pcenumCardinalityRangeType
         Get
             Return Me._CardinalityRangeType
         End Get
         Set(ByVal value As pcenumCardinalityRangeType)
             Me._CardinalityRangeType = value
+        End Set
+    End Property
+
+    <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+    Private _ValueRangeType As pcenumValueRangeType
+    <DataMember()>
+    <XmlAttribute()>
+    Public Property ValueRangeType As pcenumValueRangeType
+        Get
+            Return Me._ValueRangeType
+        End Get
+        Set(ByVal value As pcenumValueRangeType)
+            Me._ValueRangeType = value
         End Set
     End Property
 
