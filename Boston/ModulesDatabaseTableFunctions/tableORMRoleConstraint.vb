@@ -14,7 +14,6 @@ Namespace TableRoleConstraint
             Dim lsSQLQuery As String = ""
 
             Try
-
                 lsSQLQuery = "INSERT INTO MetaModelRoleConstraint"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " #" & Now & "#"
@@ -152,8 +151,6 @@ Namespace TableRoleConstraint
                         lrRoleConstraint.Id = Trim(lREcordset("RoleConstraintId").Value)
                         lrRoleConstraint.Model = arModel
                         lrRoleConstraint.Name = Trim(Viev.NullVal(lREcordset("RoleConstraintName").Value, ""))
-                        'lrRoleConstraint.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
-                        'lrRoleConstraint.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
                         lrRoleConstraint.ConceptType = pcenumConceptType.RoleConstraint
                         lrRoleConstraint.RoleConstraintType = CType([Enum].Parse(GetType(pcenumRoleConstraintType), lREcordset("RoleConstraintType").Value), pcenumRoleConstraintType)
                         lrRoleConstraint.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), lREcordset("RingConstraintType").Value), pcenumRingConstraintType)
@@ -221,6 +218,13 @@ Namespace TableRoleConstraint
                                     Call lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
                             End Select
                         End If
+
+                        '----------------------------------------
+                        'ValueConstraints
+                        If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint Then
+                            Call TableRoleValueConstraint.GetValueConstraintsByRoleConstraint(lrRoleConstraint)
+                        End If
+
 
                         GetRoleConstraintsByModel.Add(lrRoleConstraint)
                         lREcordset.MoveNext()

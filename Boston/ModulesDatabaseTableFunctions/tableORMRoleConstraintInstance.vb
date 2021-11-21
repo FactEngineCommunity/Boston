@@ -85,11 +85,12 @@
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
                         Select Case CType([Enum].Parse(GetType(pcenumRoleConstraintType), lREcordset("RoleConstraintType").Value), pcenumRoleConstraintType)
-                            Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint, _
+                            Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint,
                                       pcenumRoleConstraintType.ExternalUniquenessConstraint
                                 lrRoleConstraintInstance = New FBM.tUniquenessConstraint
                             Case Else
                                 lrRoleConstraintInstance = New FBM.RoleConstraintInstance
+                                'See also Cloning below.
                         End Select
                         lrRoleConstraintInstance.Id = lREcordset("RoleConstraintId").Value
 
@@ -109,6 +110,8 @@
                             Select Case lrRoleConstraintInstance.RoleConstraintType
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                     lrRoleConstraintInstance = lrRoleConstraintInstance.CloneFrequencyConstraintInstance(arPage)
+                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                    lrRoleConstraintInstance = lrRoleConstraintInstance.CloneRoleValueConstraintInstance(arPage)
                                 Case Is = pcenumRoleConstraintType.RingConstraint
                                     lrRoleConstraintInstance = lrRoleConstraintInstance.CloneRingConstraintInstance(arPage)
                             End Select
@@ -119,8 +122,6 @@
                             End If
 
                             lrRoleConstraintInstance.Name = lREcordset("RoleConstraintName").Value
-                            'lrRoleConstraintInstance.ShortDescription = Trim(lREcordset("ShortDescription").Value)
-                            'lrRoleConstraintInstance.LongDescription = Trim(lREcordset("LongDescription").Value)                        
                             lrRoleConstraintInstance.LevelNr = lREcordset("LevelNr").Value
                             lrRoleConstraintInstance.IsPreferredIdentifier = lREcordset("IsPreferredUniqueness").Value
                             lrRoleConstraintInstance.IsDeontic = lREcordset("IsDeontic").Value

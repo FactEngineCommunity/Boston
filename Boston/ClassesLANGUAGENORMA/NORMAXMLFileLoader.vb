@@ -2614,8 +2614,14 @@ Namespace NORMA
                         lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
                         Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
-                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                        lrRoleConstraintInstance = lrRoleConstraintInstance.CloneValueConstraintInstance(lrPage)
+                        Select Case lrRoleConstraint.RoleConstraintType
+                            Case Is = pcenumRoleConstraintType.ValueConstraint
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                                lrRoleConstraintInstance = lrRoleConstraintInstance.CloneValueConstraintInstance(lrPage)
+                            Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+                        End Select
+
 
                         Dim lsBounds() As String
                         If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
@@ -2629,16 +2635,45 @@ Namespace NORMA
                         lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                     Next
 
-                    '------------------------
-                    'Role Value Constraints
-                    '------------------------
+                    '--------------------------
+                    'Role Value Constraints 1
+                    '--------------------------
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>.<ormDiagram:RelativeShapes>.<ormDiagram:ValueConstraintShape>
 
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
-                        '-----------------------
-                        'Frequency Constraint
-                        '-----------------------
+                        '----------------------
+                        'Role Value Constraint
+                        '----------------------
+                        lrRoleConstraint = New FBM.RoleConstraint
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
+
+                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
+
+                        If lrRoleConstraint IsNot Nothing Then
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+
+                            Dim lsBounds() As String
+                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                            Else
+                                Richmond.WriteToStatusBar("Loading Role Value Constraint Instance")
+                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            End If
+                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                        End If
+                    Next
+
+                    '--------------------------
+                    'Role Value Constraints 2
+                    '--------------------------
+                    For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:FactTypeShape>.<ormDiagram:RelativeShapes>.<ormDiagram:ValueConstraintShape>
+
+                        lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
                         lrRoleConstraint = New FBM.RoleConstraint
                         lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
 

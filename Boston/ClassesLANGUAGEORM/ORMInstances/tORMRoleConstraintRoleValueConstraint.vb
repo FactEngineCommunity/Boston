@@ -74,7 +74,7 @@ Namespace FBM
 
                 Dim loDiagramShape As Object = Nothing
 
-                If lrRoleInstance IsNot Nothing Then
+                If lrRoleInstance IsNot Nothing And lrRoleInstance.Shape.Visible = True Then
                     Dim myFont As New Font(lrRoleInstance.Shape.Parent.Font.FontFamily, lrRoleInstance.Shape.Parent.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
                     StringSize = lrRoleInstance.Shape.Parent.MeasureString(lsRoleValueConstraintText, lrRoleInstance.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     loDiagramShape = lrRoleInstance

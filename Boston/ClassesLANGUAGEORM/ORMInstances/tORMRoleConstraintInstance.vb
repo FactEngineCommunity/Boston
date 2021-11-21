@@ -264,6 +264,62 @@ Namespace FBM
             End Try
         End Function
 
+        Public Overloads Function CloneRoleValueConstraintInstance(ByRef arPage As FBM.Page) As FBM.RoleValueConstraint
+
+            Dim lrRoleValueConstraintInstance As New FBM.RoleValueConstraint
+            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+            Dim lrClonedRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+
+            Try
+                With Me
+                    lrRoleValueConstraintInstance.Model = arPage.Model
+                    lrRoleValueConstraintInstance.Page = arPage
+                    lrRoleValueConstraintInstance.Symbol = .Symbol
+                    lrRoleValueConstraintInstance.Id = .Id
+                    lrRoleValueConstraintInstance.ConceptType = .ConceptType
+                    lrRoleValueConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint
+                    lrRoleValueConstraintInstance.RoleConstraint = New FBM.RoleConstraint
+                    lrRoleValueConstraintInstance.RoleConstraint = arPage.Model.RoleConstraint.Find(AddressOf .RoleConstraint.Equals)
+                    lrRoleValueConstraintInstance.Name = .Name
+                    lrRoleValueConstraintInstance.IsDeontic = .IsDeontic
+                    lrRoleValueConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
+                    lrRoleValueConstraintInstance.Cardinality = .Cardinality
+                    lrRoleValueConstraintInstance.CardinalityRangeType = .CardinalityRangeType
+                    lrRoleValueConstraintInstance.LevelNr = .LevelNr
+                    lrRoleValueConstraintInstance.ShortDescription = .ShortDescription
+                    lrRoleValueConstraintInstance.LongDescription = .LongDescription
+                    lrRoleValueConstraintInstance.MaximumFrequencyCount = .MaximumFrequencyCount
+                    lrRoleValueConstraintInstance.MinimumFrequencyCount = .MinimumFrequencyCount
+                    lrRoleValueConstraintInstance.X = .X
+                    lrRoleValueConstraintInstance.Y = .Y
+
+                    For Each lrRoleConstraintRoleInstance In .RoleConstraintRole
+                        lrClonedRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance
+                        lrClonedRoleConstraintRoleInstance = lrRoleConstraintRoleInstance.Clone(arPage)
+                        lrClonedRoleConstraintRoleInstance.RoleConstraint = lrRoleValueConstraintInstance
+                        lrRoleValueConstraintInstance.RoleConstraintRole.Add(lrClonedRoleConstraintRoleInstance)
+                        lrRoleValueConstraintInstance.Role.Add(lrClonedRoleConstraintRoleInstance.Role)
+                    Next
+
+                    For Each lsValueConstraint In .RoleConstraint.ValueConstraint
+                        lrRoleValueConstraintInstance.ValueConstraint.Add(lsValueConstraint)
+                    Next
+
+                End With
+
+                Return lrRoleValueConstraintInstance
+
+            Catch ex As Exception
+
+                Dim lsMessage As String
+                lsMessage = "Error: tRoleConstraintInstance.CloneFrequencyConstraintInstance"
+                lsMessage &= vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrRoleValueConstraintInstance
+            End Try
+        End Function
+
         Public Overloads Function CloneUniquenessConstraintInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As tUniquenessConstraint
 
             Dim lrRoleConstraintInstance As New tUniquenessConstraint
@@ -621,6 +677,7 @@ Namespace FBM
                         '------------------------------
                         'InternalUniquenessConstraint
                         '------------------------------
+#Region "Internal Uniqueness Constraint"
                         If Me.Role.Count > 0 Then
                             Call Me.DisplayAndAssociateAsInternalUniquenessConstraint()
                         Else
@@ -628,6 +685,7 @@ Namespace FBM
                             lsMessage &= vbCrLf & "RoleConstraint.Id: " & Me.Id
                             Throw New Exception(lsMessage)
                         End If
+#End Region
                     Case Is = pcenumRoleConstraintType.FrequencyConstraint
 #Region "Frequency Constraint"
                         '---------------------
@@ -798,6 +856,7 @@ Namespace FBM
                         lrRoleInstance.Shape.Parent.Links.Add(lo_link)
 #End Region
                     Case Else
+#Region "Case Else - All others"
                         '------------------------------------------------
                         'ExternalRoleConstraints with links on the Page
                         '------------------------------------------------
@@ -968,7 +1027,7 @@ Namespace FBM
 
                             Me.Page.Diagram.Invalidate()
                         Next
-
+#End Region
                 End Select
             Catch ex As Exception
                 Dim lsMessage1 As String

@@ -5097,20 +5097,22 @@ Public Class frmDiagramORM
                 '-------------------------
                 'Load the RoleConstraint
                 '-------------------------
-                Select Case lrRoleConstraintInstance.RoleConstraintType
-                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                        'Dim lrUniquenessConstraintInstance As New tUniquenessConstraint
-                        'lrUniquenessConstraintInstance = lrRoleConstraintInstance.CloneUniquenessConstraintInstance(lrRoleConstraintInstance.Page)
-                        'lrUniquenessConstraintInstance.DisplayAndAssociate()
-                        Call lrRoleConstraintInstance.DisplayAndAssociate()
-                    Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                        'Dim lrFrequencyConstraintInstance As New FBM.tFrequencyConstraint
-                        'lrFrequencyConstraintInstance = lrRoleConstraintInstance.CloneFrequencyConstraintInstance(lrRoleConstraintInstance.Page)
-                        'lrFrequencyConstraintInstance.DisplayAndAssociate()
-                        Call lrRoleConstraintInstance.DisplayAndAssociate()
-                    Case Else
-                        Call lrRoleConstraintInstance.DisplayAndAssociate()
-                End Select
+                Call lrRoleConstraintInstance.DisplayAndAssociate()
+                'Select Case lrRoleConstraintInstance.RoleConstraintType
+                '    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                '        '20211122-VM-Delete if all is well. All variants use RoleConstraintInstance.DisplayAndAssociate.
+                '        '    'Dim lrUniquenessConstraintInstance As New tUniquenessConstraint
+                '        '    'lrUniquenessConstraintInstance = lrRoleConstraintInstance.CloneUniquenessConstraintInstance(lrRoleConstraintInstance.Page)
+                '        '    'lrUniquenessConstraintInstance.DisplayAndAssociate()
+                '        '    Call lrRoleConstraintInstance.DisplayAndAssociate()
+                '        'Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                '        '    'Dim lrFrequencyConstraintInstance As New FBM.tFrequencyConstraint
+                '        '    'lrFrequencyConstraintInstance = lrRoleConstraintInstance.CloneFrequencyConstraintInstance(lrRoleConstraintInstance.Page)
+                '        '    'lrFrequencyConstraintInstance.DisplayAndAssociate()
+                '        '    Call lrRoleConstraintInstance.DisplayAndAssociate()
+                '        'Case Else
+                '        Call lrRoleConstraintInstance.DisplayAndAssociate()
+                'End Select
 
             Next
 
