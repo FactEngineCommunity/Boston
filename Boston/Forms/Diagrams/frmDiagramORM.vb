@@ -11234,7 +11234,7 @@ Public Class frmDiagramORM
                 Exit Sub
             Else
                 Call lrEntityTypeInstance.ExpandTheReferenceScheme()
-                lrEntityTypeInstance.ExpandReferenceMode = True
+                lrEntityTypeInstance.SetExpandReferenceMode(True)
                 Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = False
                 Me.HideTheReferenceSchemeToolStripMenuItem.Visible = True
             End If
@@ -11264,7 +11264,7 @@ Public Class frmDiagramORM
                 Exit Sub
             Else
                 Call lrEntityTypeInstance.HideTheReferenceScheme()
-                lrEntityTypeInstance.ExpandReferenceMode = False
+                lrEntityTypeInstance.SetExpandReferenceMode(False)
                 Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = True
                 Me.HideTheReferenceSchemeToolStripMenuItem.Visible = False
             End If

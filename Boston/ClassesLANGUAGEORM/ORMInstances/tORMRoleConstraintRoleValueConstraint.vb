@@ -24,6 +24,12 @@ Namespace FBM
             End Set
         End Property
 
+        ''' <summary>
+        ''' If Role is on ReferenceModeFactType, then the EntityTypeInstance for which the FactType exists.
+        '''   Used for when the ReferenceScheme (FactType) is shown/hidden. See event, ExpandReferenceModeChanged.
+        ''' </summary>
+        Private WithEvents EntityTypeInstance As FBM.EntityTypeInstance
+
         Sub New()
 
             MyBase.ConceptType = pcenumConceptType.RoleConstraint

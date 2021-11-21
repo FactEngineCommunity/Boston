@@ -302,9 +302,11 @@ Namespace FBM
         XmlIgnore()> _
         Public OutgoingLink As New List(Of DiagramLink) 'For when the EntityType is an Actor in a UseCaseDiagram etc
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public IncomingLink As New List(Of DiagramLink) 'For when the EntityType is a Process in a UseCaseDiagram etc
+
+        Public Event ExpandReferenceModeChanged(ByVal abExpandReferenceMode As Boolean)
 
         Sub New()
 
@@ -2652,6 +2654,23 @@ Namespace FBM
                 If Me.Page IsNot Nothing Then
                     Me.Page.IsDirty = True
                 End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetExpandReferenceMode(ByVal abExpandReferenceMode)
+
+            Try
+                Me.ExpandReferenceMode = abExpandReferenceMode
+
+                RaiseEvent ExpandReferenceModeChanged(abExpandReferenceMode)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
