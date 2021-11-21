@@ -255,6 +255,59 @@ Namespace FBM
             End Set
         End Property
 
+#Region "Value Constraint"
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _ValueConstraint As New List(Of FBM.Concept)
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _ValueConstraintList As New Viev.Strings.StringCollection
+        '<XmlIgnore()> _
+        <CategoryAttribute("Value Type"),
+         Browsable(True),
+         [ReadOnly](False),
+         DescriptionAttribute("The List of Values that Objects of this Value Type may take."),
+         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Property ValueConstraint() As Viev.Strings.StringCollection 'StringCollection 
+            '   DefaultValueAttribute(""), _
+            '   BindableAttribute(True), _
+            '   DesignOnly(False), _
+            Get
+                Return Me._ValueConstraintList
+            End Get
+            Set(ByVal Value As Viev.Strings.StringCollection)
+                Me._ValueConstraintList = Value
+                '----------------------------------------------------
+                'Update the set of Concepts/Symbols/Values
+                '  within the 'value_constraint' for this ValueType.
+                '----------------------------------------------------
+                Dim lsString As String
+                For Each lsString In Me._ValueConstraintList
+                    Dim lrConcept As New FBM.Concept(lsString)
+                    If Me._ValueConstraint.Contains(lrConcept) Then
+                        '-------------------------------------------------
+                        'Nothing to do, because the Concept/Symbol/Value
+                        '  already exists for the 'value_constraint'
+                        '  for this ValueType.
+                        '-------------------------------------------------
+                    Else
+                        '-------------------------------------------
+                        'Add the Concept/Symbol/Value to the Model
+                        '-----------------------------------------
+                        Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.Value)
+                        Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry)
+                        '-----------------------------------------
+                        'Add the Concept/Symbol/Value to the
+                        '  'value_constraint' for this ValueType
+                        '-----------------------------------------
+                        Me._ValueConstraint.Add(lrConcept)
+                    End If
+                Next
+            End Set
+        End Property
+#End Region
+
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
 
         Public Event CardinalityChanged(ByVal aiNewCardinality As Integer)
@@ -272,7 +325,11 @@ Namespace FBM
         Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
         Public Event RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As FBM.RoleConstraintRole)
         Public Event ArgumentRemoved(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument)
+        Public Event ValueConstraintAdded(ByVal asNewValueConstraint As String)
+        Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
+        Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
         Public Event ValueRangeTypeChanged(ByVal aiNewValueRangeType As pcenumValueRangeType)
+
 
         Sub New()
             '------------------------------------------
@@ -682,6 +739,15 @@ Namespace FBM
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Public Sub AddValueConstraint(ByVal asValueConstraint As String)
+
+            Me.ValueConstraint.Add(asValueConstraint)
+            Call Me.makeDirty()
+
+            RaiseEvent ValueConstraintAdded(asValueConstraint)
 
         End Sub
 
@@ -1904,6 +1970,16 @@ Namespace FBM
                 Me.Argument.Remove(lrArgument)
                 RaiseEvent ArgumentRemoved(lrArgument)
             Next
+
+        End Sub
+
+        Public Sub RemoveValueConstraint(ByVal asValueConstraint As String)
+
+            Me.ValueConstraint.Remove(asValueConstraint)
+
+            Call TableRoleValueConstraint.DeleteValueConstraint(Me, asValueConstraint)
+
+            RaiseEvent ValueConstraintRemoved(asValueConstraint)
 
         End Sub
 

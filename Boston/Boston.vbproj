@@ -536,6 +536,7 @@
     <Compile Include="ClassesLANGUAGEORM\FixModelErrors\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeDerivationText.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintRoleValueConstraint.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintValueConstraint.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
@@ -1390,6 +1391,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeReadingRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMJoinPathRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintArgument.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleValueConstraint.vb" />
     <Compile Include="ModulesPublic\ClassDummyToolStripItem.vb">
       <SubType>Component</SubType>
     </Compile>

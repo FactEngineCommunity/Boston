@@ -93,6 +93,22 @@ Namespace FBM
             End Set
         End Property
 
+
+        <XmlIgnore()>
+        <CategoryAttribute("Role Constraint"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The list of Values that Objects that play this Role may take."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property ValueConstraint() As Viev.Strings.StringCollection  'NB This is what is edited in the PropertyGrid
+            Get
+                Return Me._ValueConstraintList
+            End Get
+            Set(ByVal Value As Viev.Strings.StringCollection)
+                Me._ValueConstraintList = Value
+            End Set
+        End Property
+
         <NonSerialized()> _
         <XmlIgnore()> _
         Public Shape As New ShapeNode

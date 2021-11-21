@@ -172,6 +172,7 @@ Public Module publicConstants
         InclusiveORConstraint
         InternalUniquenessConstraint
         RingConstraint
+        RoleValueConstraint
         SubsetConstraint
         ValueConstraint
         ValueComparisonConstraint

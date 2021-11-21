@@ -1398,6 +1398,86 @@ Namespace NORMA
 
         End Sub
 
+        Public Sub LoadRoleConstraintRoleValueConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrRole As New FBM.Role
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+            Dim lrRoleXElement As XElement
+
+            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:Role>.<orm:ValueRestriction>.<orm:RoleValueConstraint>
+                                       Select ModelInformation
+                                       Order By ModelInformation.Attribute("Name").Value
+
+            For Each loElement In loEnumElementQueryResult
+
+                'Not Implemented.
+
+                ''---------------------------
+                ''Create the RoleConstraint
+                ''---------------------------
+                'Dim lrRoleConstraint As FBM.RoleConstraint
+                'lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ValueComparisonConstraint, Nothing, loElement.Attribute("Name").Value)
+                'lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
+
+                'Dim lrRoleSequenceXElement As XElement
+
+                'For Each lrRoleSequenceXElement In loElement.<orm:RoleSequence>
+
+                '    Dim lbRolesFound As Boolean = True
+                '    Dim larRoleList As New List(Of FBM.Role)
+
+                '    lrRoleConstraint.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraint, lrRoleConstraint.GetNextArgumentSequenceNr)
+
+                '    lrRoleConstraint.ValueRangeType = CType([Enum].Parse(GetType(pcenumValueRangeType), loElement.Attribute("Operator").Value), pcenumValueRangeType)
+
+                '    For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
+                '        lrRole = New FBM.Role
+                '        '--------------------------------
+                '        'Find the Role within the Model
+                '        '--------------------------------
+                '        lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                '        lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                '        If IsSomething(lrRole) Then
+                '            If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                '                '------------------------------------------
+                '                'Don't add the Role to the RoleConstraint
+                '                '------------------------------------------
+                '            Else
+                '                larRoleList.Add(lrRole)
+                '            End If
+                '        Else
+                '            lbRolesFound = False
+
+                '            Dim lsMessage As String = ""
+                '            lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                '            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
+                '            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                '            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                '        End If
+
+                '    Next
+
+                '    If lbRolesFound Then
+                '        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                '        For Each lrRole In larRoleList
+
+                '            lrRoleConstraintRole = lrRoleConstraint.CreateRoleConstraintRole(lrRole,
+                '                                                                             lrRoleConstraint.CurrentArgument,
+                '                                                                             Nothing)
+                '        Next 'Role
+                '    End If
+                '    lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
+                'Next 'Role Sequence                    
+
+                'arModel.AddRoleConstraint(lrRoleConstraint)
+
+            Next 'Value Comparison Constraint
+
+        End Sub
+
+
+
         Public Sub LoadRoleConstraintValueComparisonConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
             Dim lrRole As New FBM.Role
