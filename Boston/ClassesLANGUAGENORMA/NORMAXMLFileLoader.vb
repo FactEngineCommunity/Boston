@@ -552,6 +552,36 @@ Namespace NORMA
                             '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
                             '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
                             'End If
+
+                            If lrRoleXElement.<orm:ValueRestriction>.Count > 0 Then
+
+                                Dim loValueConstraintXElement As XElement = lrRoleXElement.<orm:ValueRestriction>.<orm:RoleValueConstraint>.First
+
+                                Dim lsMinimumValue, lsMaximumValue As String
+                                lsMinimumValue = loValueConstraintXElement.<orm:ValueRanges>.First.<orm:ValueRange>.First.Attribute("MinValue").Value
+                                lsMaximumValue = loValueConstraintXElement.<orm:ValueRanges>.First.<orm:ValueRange>.First.Attribute("MaxValue").Value
+
+                                Dim larRole As New List(Of FBM.Role)
+                                larRole.Add(lrRole)
+
+                                Dim lrRoleConstraint As FBM.RoleConstraint
+                                If loValueConstraintXElement.<orm:ValueRanges>.<orm:ValueRange>.Count = 1 And lsMinimumValue.IsNumeric And lsMaximumValue.IsNumeric Then
+                                    lrRoleConstraint = New FBM.RoleConstraint(Me.FBMModel, loValueConstraintXElement.Attribute("Name").Value, True, pcenumRoleConstraintType.ValueConstraint, larRole, True)
+                                    lrRoleConstraint.MinimumValue = lsMinimumValue
+                                    lrRoleConstraint.MaximumValue = lsMaximumValue
+                                    lrRoleConstraint.NORMAReferenceId = loValueConstraintXElement.Attribute("id").Value
+                                Else
+                                    lrRoleConstraint = New FBM.RoleConstraint(Me.FBMModel, loValueConstraintXElement.Attribute("Name").Value, True, pcenumRoleConstraintType.RoleValueConstraint, larRole, True)
+                                    lrRoleConstraint.NORMAReferenceId = loValueConstraintXElement.Attribute("id").Value
+
+                                    For Each loValueRangeXElement In loValueConstraintXElement.<orm:ValueRanges>.<orm:ValueRange>
+                                        lrRoleConstraint.AddValueConstraint(loValueRangeXElement.Attribute("MinValue").Value)
+                                    Next
+                                End If
+
+
+                                Call Me.FBMModel.AddRoleConstraint(lrRoleConstraint, True)
+                            End If
                         Next 'Role
 
                         '---------------------------------------------
@@ -685,7 +715,7 @@ Namespace NORMA
                             End If
 
                             '-------------------------------------
-                            'Check to see if it is an ValueType
+                            'Check to see if it is a ValueType
                             '-------------------------------------
                             lrValueType = New FBM.ValueType
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
@@ -825,12 +855,28 @@ Namespace NORMA
 
                                 Dim loValueConstraintXElement As XElement = lrRoleXElement.<orm:ValueRestriction>.<orm:RoleValueConstraint>.First
 
+                                Dim lsMinimumValue, lsMaximumValue As String
+                                lsMinimumValue = loValueConstraintXElement.<orm:ValueRanges>.First.<orm:ValueRange>.First.Attribute("MinValue").Value
+                                lsMaximumValue = loValueConstraintXElement.<orm:ValueRanges>.First.<orm:ValueRange>.First.Attribute("MaxValue").Value
+
                                 Dim larRole As New List(Of FBM.Role)
                                 larRole.Add(lrRole)
-                                Dim lrRoleConstraint As New FBM.RoleConstraint(arModel, lovalueconstraintxelement.attribute("Name").value, True, pcenumRoleConstraintType.ValueConstraint, larrole, True)
-                                lrRoleConstraint.MinimumValue = loValueConstraintXElement.<orm:ValueRanges>.First.<orm:ValueRange>.First.Attribute("MinValue").Value
-                                lrRoleConstraint.MaximumValue = loValueConstraintXElement.<orm:ValueRanges>.First.<orm:ValueRange>.First.Attribute("MaxValue").Value
-                                lrRoleConstraint.NORMAReferenceId = loValueConstraintXElement.Attribute("id").Value
+
+                                Dim lrRoleConstraint As FBM.RoleConstraint
+                                If loValueConstraintXElement.<orm:ValueRanges>.<orm:ValueRange>.Count = 1 And lsMinimumValue.IsNumeric And lsMaximumValue.IsNumeric Then
+                                    lrRoleConstraint = New FBM.RoleConstraint(arModel, loValueConstraintXElement.Attribute("Name").Value, True, pcenumRoleConstraintType.ValueConstraint, larRole, True)
+                                    lrRoleConstraint.MinimumValue = lsMinimumValue
+                                    lrRoleConstraint.MaximumValue = lsMaximumValue
+                                    lrRoleConstraint.NORMAReferenceId = loValueConstraintXElement.Attribute("id").Value
+                                Else
+                                    lrRoleConstraint = New FBM.RoleConstraint(arModel, loValueConstraintXElement.Attribute("Name").Value, True, pcenumRoleConstraintType.RoleValueConstraint, larRole, True)
+                                    lrRoleConstraint.NORMAReferenceId = loValueConstraintXElement.Attribute("id").Value
+
+                                    For Each loValueRangeXElement In loValueConstraintXElement.<orm:ValueRanges>.<orm:ValueRange>
+                                        lrRoleConstraint.AddValueConstraint(loValueRangeXElement.Attribute("MinValue").Value)
+                                    Next
+                                End If
+
 
                                 Call arModel.AddRoleConstraint(lrRoleConstraint, True)
                             End If
@@ -1397,85 +1443,6 @@ Namespace NORMA
             Next 'Exclusive OR Constraint
 
         End Sub
-
-        Public Sub LoadRoleConstraintRoleValueConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
-
-            Dim lrRole As New FBM.Role
-            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
-            Dim loElement As XElement
-            Dim lrRoleXElement As XElement
-
-            loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>.<orm:Role>.<orm:ValueRestriction>.<orm:RoleValueConstraint>
-                                       Select ModelInformation
-                                       Order By ModelInformation.Attribute("Name").Value
-
-            For Each loElement In loEnumElementQueryResult
-
-                'Not Implemented.
-
-                ''---------------------------
-                ''Create the RoleConstraint
-                ''---------------------------
-                'Dim lrRoleConstraint As FBM.RoleConstraint
-                'lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ValueComparisonConstraint, Nothing, loElement.Attribute("Name").Value)
-                'lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
-
-                'Dim lrRoleSequenceXElement As XElement
-
-                'For Each lrRoleSequenceXElement In loElement.<orm:RoleSequence>
-
-                '    Dim lbRolesFound As Boolean = True
-                '    Dim larRoleList As New List(Of FBM.Role)
-
-                '    lrRoleConstraint.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraint, lrRoleConstraint.GetNextArgumentSequenceNr)
-
-                '    lrRoleConstraint.ValueRangeType = CType([Enum].Parse(GetType(pcenumValueRangeType), loElement.Attribute("Operator").Value), pcenumValueRangeType)
-
-                '    For Each lrRoleXElement In lrRoleSequenceXElement.<orm:Role>
-                '        lrRole = New FBM.Role
-                '        '--------------------------------
-                '        'Find the Role within the Model
-                '        '--------------------------------
-                '        lrRole.Id = lrRoleXElement.Attribute("ref").Value
-                '        lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                '        If IsSomething(lrRole) Then
-                '            If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
-                '                '------------------------------------------
-                '                'Don't add the Role to the RoleConstraint
-                '                '------------------------------------------
-                '            Else
-                '                larRoleList.Add(lrRole)
-                '            End If
-                '        Else
-                '            lbRolesFound = False
-
-                '            Dim lsMessage As String = ""
-                '            lsMessage = "Warning: Loading NORMA XML (.orm) file"
-                '            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
-                '            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                '            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
-                '        End If
-
-                '    Next
-
-                '    If lbRolesFound Then
-                '        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-                '        For Each lrRole In larRoleList
-
-                '            lrRoleConstraintRole = lrRoleConstraint.CreateRoleConstraintRole(lrRole,
-                '                                                                             lrRoleConstraint.CurrentArgument,
-                '                                                                             Nothing)
-                '        Next 'Role
-                '    End If
-                '    lrRoleConstraint.Argument.Add(lrRoleConstraint.CurrentArgument)
-                'Next 'Role Sequence                    
-
-                'arModel.AddRoleConstraint(lrRoleConstraint)
-
-            Next 'Value Comparison Constraint
-
-        End Sub
-
 
 
         Public Sub LoadRoleConstraintValueComparisonConstraints(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
@@ -2662,6 +2629,38 @@ Namespace NORMA
                         lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                     Next
 
+                    '------------------------
+                    'Role Value Constraints
+                    '------------------------
+                    For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>.<ormDiagram:RelativeShapes>.<ormDiagram:ValueConstraintShape>
+
+                        lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                        '-----------------------
+                        'Frequency Constraint
+                        '-----------------------
+                        lrRoleConstraint = New FBM.RoleConstraint
+                        lrRoleConstraint.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
+
+                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
+
+                        If lrRoleConstraint IsNot Nothing Then
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+
+                            Dim lsBounds() As String
+                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                            Else
+                                Richmond.WriteToStatusBar("Loading Role Value Constraint Instance")
+                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            End If
+                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                        End If
+                    Next
+
                     '---------------------------------
                     'External Uniqueness Constraints
                     '---------------------------------
@@ -2945,7 +2944,7 @@ Namespace NORMA
                             End If
                         Next
 
-                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusiveORConstraint)
+                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ValueComparisonConstraint)
                         lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
                         Dim lsBounds() As String
                         If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then

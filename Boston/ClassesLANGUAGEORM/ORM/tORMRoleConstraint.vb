@@ -1469,6 +1469,10 @@ Namespace FBM
                         lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
                     Next
 
+                    For Each lsValueConstraint In Me.ValueConstraint
+                        lrRoleConstraintInstance.ValueConstraint.Add(lsValueConstraint)
+                    Next
+
                 End With
 
                 Return lrRoleConstraintInstance
@@ -1529,6 +1533,61 @@ Namespace FBM
                     lrRoleConstraintRole = Me.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.Equals)
                     lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
                     lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                Next
+
+            End With
+
+            Return lrRoleConstraintInstance
+
+        End Function
+
+        Public Function CloneRoleValueConstraintInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.RoleValueConstraint
+
+            Dim lrRoleConstraintInstance As New FBM.RoleValueConstraint
+
+            With Me
+                lrRoleConstraintInstance.Model = .Model
+                lrRoleConstraintInstance.Page = arPage
+                lrRoleConstraintInstance.RoleConstraint = Me
+                lrRoleConstraintInstance.Id = .Id
+                lrRoleConstraintInstance.Name = .Name
+                lrRoleConstraintInstance.ConceptType = .ConceptType
+                lrRoleConstraintInstance.RoleConstraintType = .RoleConstraintType
+                lrRoleConstraintInstance.LevelNr = .LevelNr
+                lrRoleConstraintInstance.MinimumFrequencyCount = .MinimumFrequencyCount
+                lrRoleConstraintInstance.MaximumFrequencyCount = .MaximumFrequencyCount
+                lrRoleConstraintInstance.IsDeontic = .IsDeontic
+                lrRoleConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
+                lrRoleConstraintInstance.Cardinality = .Cardinality
+                lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
+
+                If abAddToPage Then
+                    arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                End If
+
+                '-------------------------------------------------------------------------
+                'Associate the RoleInstances to which the RoleConstraintInstance relates
+                '-------------------------------------------------------------------------
+                Dim lrRole As FBM.Role
+                Dim lrRoleInstance As FBM.RoleInstance
+                Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                For Each lrRole In Me.Role
+                    lrRoleInstance = New FBM.RoleInstance(.Model, arPage)
+                    lrRoleInstance.Id = lrRole.Id
+                    lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                    lrRoleConstraintInstance.Role.Add(lrRoleInstance)
+
+                    '--------------------------------------------------------------------
+                    'Create a RoleConstraintRoleInstance for the RoleConstraintInstance
+                    '--------------------------------------------------------------------
+                    Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, Me)
+                    lrRoleConstraintRole = Me.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.Equals)
+                    lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
+                    lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                Next
+
+                For Each lsValueConstraint In Me.ValueConstraint
+                    lrRoleConstraintInstance.ValueConstraint.Add(lsValueConstraint)
                 Next
 
             End With
@@ -2032,6 +2091,33 @@ Namespace FBM
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
                     lrRoleConstraintRole.Save(abRapidSave)
                 Next
+
+#Region "Role Value Constraint values"
+                '-----------------------------------------------------
+                'Save the ValueConstraints (if any) for the ValueType
+                '-----------------------------------------------------
+                Dim lrValue As String
+
+                For Each lrValue In Me._ValueConstraintList
+
+                    If abRapidSave Then
+                        Dim lrConcept As New FBM.Concept(lrValue)
+                        Call TableRoleValueConstraint.AddRoleValueConstraint(Me, lrConcept)
+                    Else
+                        Dim lrConcept As New FBM.Concept(lrValue)
+                        If TableRoleValueConstraint.ExistsRoleValueConstraint(Me, lrConcept) Then
+                            '----------------------------------------------------------------------------
+                            'ValueConstraintValue already exists for this ValueType within the database
+                            '----------------------------------------------------------------------------
+                        Else
+                            Call TableRoleValueConstraint.AddRoleValueConstraint(Me, lrConcept)
+                        End If
+                    End If
+                Next
+
+                'Removes ValueConstraintValues (from the database) that are no longer associated with this ValueType
+                Call TableRoleValueConstraint.remove_unneeded_value_constraints(Me)
+#End Region
 
             Catch ex As Exception
                 Dim lsMessage1 As String

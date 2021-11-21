@@ -10,7 +10,7 @@ Namespace TableRoleValueConstraint
 
             Try
 
-                lsSQLQuery = "INSERT INTO MetaModelValueTypeValueConstraint"
+                lsSQLQuery = "INSERT INTO MetaModelRoleValueConstraint"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " #" & Now & "#"
                 lsSQLQuery &= " ,#" & Now & "#"
@@ -23,7 +23,7 @@ Namespace TableRoleValueConstraint
 
             Catch ex As Exception
                 Dim lsMessage As String
-                lsMessage = "Error: TableValueTypeValueConstraint.AddValueTypeValueConstraint"
+                lsMessage = "Error: TableRoleValueConstraint.AddValueTypeValueConstraint"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try

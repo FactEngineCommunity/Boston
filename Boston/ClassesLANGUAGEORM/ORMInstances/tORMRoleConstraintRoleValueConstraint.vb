@@ -61,19 +61,56 @@ Namespace FBM
 
                 lrRoleInstance = Me.RoleConstraintRole(0).Role
 
-                Dim myFont As New Font(lrRoleInstance.Shape.Parent.Font.FontFamily, lrRoleInstance.Shape.Parent.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
+                lsRoleValueConstraintText = "{"
+                Dim liInd As Integer = 0
+                For Each lsConstrainedValue In Me.ValueConstraint
+                    If liInd > 0 Then lsRoleValueConstraintText &= ","
+                    lsRoleValueConstraintText &= lsConstrainedValue
+                    liInd += 1
+                Next
+                lsRoleValueConstraintText &= "}"
+
                 G = frmDiagramORM.CreateGraphics
-                StringSize = lrRoleInstance.Shape.Parent.MeasureString(lsRoleValueConstraintText, lrRoleInstance.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+
+                Dim loDiagramShape As Object = Nothing
+
+                If lrRoleInstance IsNot Nothing Then
+                    Dim myFont As New Font(lrRoleInstance.Shape.Parent.Font.FontFamily, lrRoleInstance.Shape.Parent.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
+                    StringSize = lrRoleInstance.Shape.Parent.MeasureString(lsRoleValueConstraintText, lrRoleInstance.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    loDiagramShape = lrRoleInstance
+                Else
+                    If Me.RoleConstraint.RoleConstraintRole(0).Role.FactType.IsPreferredReferenceMode Then
+                        Dim larEntityType = From EntityType In Me.Model.EntityType
+                                            Where EntityType.ReferenceModeFactType Is Me.RoleConstraint.RoleConstraintRole(0).Role.FactType
+                                            Select EntityType
+
+                        If larEntityType.Count > 0 Then
+                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = larEntityType.First.Id)
+
+                            If lrEntityTypeInstance IsNot Nothing Then
+                                loDiagramShape = lrEntityTypeInstance
+                            Else
+                                'Can't really recover from here.
+                                Exit Sub
+                            End If
+                        End If
+                    Else
+                        'Can't really recover from here.
+                        Exit Sub
+                    End If
+                    StringSize = Me.Page.Diagram.MeasureString(lsRoleValueConstraintText, loDiagramShape.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                End If
+
 
                 loDroppedNode = New FBM.RoleConstraintShape(Me.Page.Diagram, Me)
-                loDroppedNode.Move(lrRoleInstance.Shape.Bounds.X, lrRoleInstance.Shape.Bounds.Y - (StringSize.Height * 3))
+                loDroppedNode.Move(loDiagramShape.Shape.Bounds.X, loDiagramShape.Shape.Bounds.Y - (StringSize.Height * 3))
                 Me.Page.Diagram.Nodes.Add(loDroppedNode)
                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
                 'loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.HandlesStyle = HandlesStyle.HatchHandles
                 loDroppedNode.Text = lsRoleValueConstraintText
-
-                'loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
+                loDroppedNode.Resize(StringSize.Width, StringSize.Height)
+                loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
                 loDroppedNode.TextColor = Color.Black
                 loDroppedNode.Transparent = True
                 loDroppedNode.Visible = True
@@ -84,7 +121,7 @@ Namespace FBM
                 '  This is so that if an 'AutoArrange' of the Shapes on the Page is called by
                 '  the user, then the FrequencyConstraint will stay next to its associated Role.
                 '--------------------------------------------------------------------------------------
-                loDroppedNode.AttachTo(lrRoleInstance.Shape, AttachToNode.TopCenter)
+                loDroppedNode.AttachTo(loDiagramShape.Shape, AttachToNode.TopCenter)
 
                 '---------------------------------------------------------------------------
                 'Attach the Role.FrequencyConstraint ShapeNode to the Role ShapeGroup,                                    
@@ -95,29 +132,31 @@ Namespace FBM
                 '--------------------------------------------------------------------------------
                 'Create the link between the FrequencyConstraint and the Role that it joins to.
                 '--------------------------------------------------------------------------------
-                lo_link = New DiagramLink(lrRoleInstance.Shape.Parent, lrRoleInstance.Shape, loDroppedNode)
-                lo_link.BaseShape = ArrowHead.None
-                lo_link.HeadShape = ArrowHead.None
-                lo_link.Pen.DashStyle = Drawing2D.DashStyle.Custom
-                lo_link.Pen.DashPattern = New Single() {2, 1, 2, 1}
-                'ReDim lo_link.Pen.DashPattern(3)
-                'lo_link.Pen.DashPattern(0) = 1
-                'lo_link.Pen.DashPattern(1) = 2
-                'lo_link.Pen.DashPattern(2) = 1
-                'lo_link.Pen.DashPattern(3) = 2
-                Dim lrRoleConstraintRoleInstance As New FBM.RoleConstraintRoleInstance
-                lrRoleConstraintRoleInstance.RoleConstraint = Me
-                lo_link.Tag = lrRoleConstraintRoleInstance
+                If loDiagramShape.GetType = GetType(FBM.RoleInstance) Then
+                    lo_link = New DiagramLink(lrRoleInstance.Shape.Parent, lrRoleInstance.Shape, loDroppedNode)
+                    lo_link.BaseShape = ArrowHead.None
+                    lo_link.HeadShape = ArrowHead.None
+                    lo_link.Pen.DashStyle = Drawing2D.DashStyle.Custom
+                    lo_link.Pen.DashPattern = New Single() {2, 1, 2, 1}
+                    'ReDim lo_link.Pen.DashPattern(3)
+                    'lo_link.Pen.DashPattern(0) = 1
+                    'lo_link.Pen.DashPattern(1) = 2
+                    'lo_link.Pen.DashPattern(2) = 1
+                    'lo_link.Pen.DashPattern(3) = 2
+                    Dim lrRoleConstraintRoleInstance As New FBM.RoleConstraintRoleInstance
+                    lrRoleConstraintRoleInstance.RoleConstraint = Me
+                    lo_link.Tag = lrRoleConstraintRoleInstance
 
+                    Me.Page.Diagram.Links.Add(lo_link)
+                End If
 
-                Me.Page.Diagram.Links.Add(lo_link)
                 Me.Page.Diagram.Invalidate()
 
                 Using graphics As System.Drawing.Graphics = System.Drawing.Graphics.FromImage(New Bitmap(1, 1))
-                    Dim lrTextSize As SizeF = graphics.MeasureString(loDroppedNode.Text, New Font(loDroppedNode.Font.ToString, 11, FontStyle.Regular, GraphicsUnit.Point))
+                    Dim lrTextSize As SizeF = graphics.MeasureString(loDroppedNode.Text, New Font(loDroppedNode.Font.ToString, 9, FontStyle.Regular, GraphicsUnit.Point))
                     'loDroppedNode.Resize(lrTextSize.Width, 5)
                     'loDroppedNode.Resize(TextRenderer.MeasureText(loDroppedNode.Text, loDroppedNode.Font).Width, 5)
-                    loDroppedNode.Resize(loDroppedNode.Text.Length + 5, 5)
+                    'loDroppedNode.Resize(loDroppedNode.Text.Length + 5, 5)
                 End Using
 
                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)

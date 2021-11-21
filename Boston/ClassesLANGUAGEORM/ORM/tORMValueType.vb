@@ -849,7 +849,6 @@ Namespace FBM
 
                 End If
 
-
                 '-----------------------------------------------------
                 'Save the ValueConstraints (if any) for the ValueType
                 '-----------------------------------------------------
