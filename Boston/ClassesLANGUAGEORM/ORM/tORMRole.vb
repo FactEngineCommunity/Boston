@@ -92,6 +92,13 @@ Namespace FBM
 
 
 #Region "Value Constraints"
+
+        ''' <summary>
+        ''' If the Role has RoleValueConstraint the RoleConstraint that is that RoleValueConstraint.
+        ''' </summary>
+        <XmlIgnore()>
+        Public RoleConstraintRoleValueConstraint As FBM.RoleConstraint = Nothing
+
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueConstraint As New List(Of FBM.Concept)
@@ -227,6 +234,9 @@ Namespace FBM
         Public Event RoleJoinModified(ByRef arModelObject As FBM.ModelObject)
         Public Event RoleNameChanged(ByVal asNewRoleName As String)
         Public Event ValueRangeChanged(ByVal asNewValueRange As String)
+        Public Event ValueConstraintAdded(ByVal asValueConstraint As String)
+        Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
+        Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
 
         Sub New()
 
@@ -591,6 +601,10 @@ Namespace FBM
                             End If
                     End Select
 
+                    If Me.RoleConstraintRoleValueConstraint IsNot Nothing Then
+                        lrRoleInstance.RoleConstraintRoleValueConstraint = Me.RoleConstraintRoleValueConstraint.CloneRoleValueConstraintInstance(arPage, False)
+                    End If
+
                     If abAddToPage Then
                         arPage.RoleInstance.AddUnique(lrRoleInstance)
                     End If
@@ -610,6 +624,36 @@ Namespace FBM
             End Try
 
         End Function
+
+        Public Sub AddValueConstraint(ByVal asValueConstraint As String)
+
+            Dim lsMessage As String
+
+            Try
+                Me.ValueConstraint.Add(asValueConstraint)
+                Try
+                    Call Me.RoleConstraintRoleValueConstraint.AddValueConstraint(asValueConstraint)
+                Catch ex As Exception
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End Try
+
+                Call Me.makeDirty()
+
+                RaiseEvent ValueConstraintAdded(asValueConstraint)
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         ''' <summary>
         ''' Used when adding a new Role to a FactType. If the Role is a RDSForeignKeyRole, then must add the related Column (for the new Role) to the Relation, and the Relation to the Column.
@@ -1918,6 +1962,62 @@ Namespace FBM
             Me.isDirty = True
         End Sub
 
+        Public Sub ModifyValueConstraint(ByVal asOldValueConstraint As String, asNewValueConstraint As String)
+
+            Try
+
+                '-------------------------------------------------------------
+                'Update ValueConstraintValue of the particular
+                '  Concept/Symbol/Value within the 'value_constraint'
+                '  for the ValueType of this ValueTypeInstance
+                '-------------------------------------------------------------
+                If Me._ValueConstraintList.IndexOf(asOldValueConstraint) >= 0 Then
+
+                    Me.ValueConstraint.Item(Me.ValueConstraint.IndexOf(asOldValueConstraint)) = asNewValueConstraint
+
+                    'VM-20180401-Not sure what this does.
+                    'Dim lrConcept As New FBM.Concept(aoChangedPropertyItem.OldValue)
+                    'lrConcept = Me.ValueType._ValueConstraint.Find(AddressOf lrConcept.Equals)
+                    'If IsSomething(lrConcept) Then
+                    '    lrConcept.Symbol = aoChangedPropertyItem.ChangedItem.Value.ToString
+                    'End If
+
+                    RaiseEvent ValueConstraintModified(asOldValueConstraint, asNewValueConstraint)
+
+                ElseIf Not Me.ValueConstraint.Contains(asNewValueConstraint) Then
+                    Me.AddValueConstraint(asNewValueConstraint)
+                End If
+
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+                '=============================================================================================================================================================
+                '20180401-VM-Can probably reimplement the below with more sophisticated code. Take code from populating a cell in a FactTable when VT has a ValueConstraint.
+                '20170126-VM-Commented out the below.
+                'The "Instance" piece can probably disappear altogether. That doesn't look good. Especially if a Value constraint looks like "1..12" rather than "1", "2" etc
+                '  Need to remove this (ValueTypeInstance) setting of Me.ValueType.ValueConstraint from within the ValueConstraint property,
+                '  but rather have a SetValueConstraint method, which will call the lower ValueType method....which will trigger an event
+                '  that will update all related ValueTypeInstances....etc.
+                ' Basically, this whole section needs an overhall. 
+                'Me.ValueConstraint.Clear()
+                'Me.ValueConstraint = lasStringCollection
+                'Me.ValueType.Instance.Clear()
+                'For Each lsValueConstraint In lasStringCollection
+                '    Me.ValueType.Instance.Add(lsValueConstraint)
+                'Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
 
         ''' <summary>
         ''' Reassigns the joined ModelObject of the Role.
@@ -2448,6 +2548,36 @@ Namespace FBM
 
         End Function
 
+        Public Sub RemoveValueConstraint(ByVal asValueConstraint As String)
+
+            Dim lsMessage As String
+            Try
+                Me.ValueConstraint.Remove(asValueConstraint)
+
+                Call TableRoleValueConstraint.DeleteValueConstraint(Me.RoleConstraintRoleValueConstraint, asValueConstraint)
+
+                Try
+                    Call Me.RoleConstraintRoleValueConstraint.RemoveValueConstraint(asValueConstraint)
+                Catch ex As Exception
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End Try
+
+                RaiseEvent ValueConstraintRemoved(asValueConstraint)
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Overrides Sub Save(Optional ByVal abRapidSave As Boolean = False)
 
             Try
@@ -2634,5 +2764,6 @@ Namespace FBM
         '    End If
 
         'End Sub
+
     End Class
 End Namespace

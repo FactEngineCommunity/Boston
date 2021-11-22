@@ -93,6 +93,10 @@ Namespace FBM
             End Set
         End Property
 
+#Region "Role Value Constraint"
+
+        <XmlIgnore()>
+        Public Shadows RoleConstraintRoleValueConstraint As FBM.RoleValueConstraint = Nothing
 
         <XmlIgnore()>
         <CategoryAttribute("Role Constraint"),
@@ -108,6 +112,7 @@ Namespace FBM
                 Me._ValueConstraintList = Value
             End Set
         End Property
+#End Region
 
         <NonSerialized()> _
         <XmlIgnore()> _
@@ -963,8 +968,26 @@ Namespace FBM
                             Call Me.Role.setName(Me.Name, True)
                         Case Is = "ValueRange"
                             Call Me.Role.SetValueRange(Me.ValueRange)
+                        Case Is = "Value"
+                            With New WaitCursor
+                                Call Me.Role.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                            End With
                     End Select
                 End If
+
+                '-------------------------------------------------------------------------------------------------------------------------------
+                'Removing an item using the UITypeEditor does not trigger a return of aoChangedPropertyItem (As PropertyValueChangedEventArgs).
+                '  So we must check each time (back here) whether there is an item to remove from the ValueConstraint list for the ValueType/Instance.
+                Dim lasValueConstraint(Me.Role.ValueConstraint.Count) As String
+                Me.Role.ValueConstraint.CopyTo(lasValueConstraint, 0)
+
+                For Each lsValueConstraint In lasValueConstraint
+                    If lsValueConstraint IsNot Nothing Then
+                        If Not Me.ValueConstraint.Contains(lsValueConstraint) Then
+                            Call Me.Role.RemoveValueConstraint(lsValueConstraint)
+                        End If
+                    End If
+                Next
 
                 If IsSomething(Me.RoleName) Then
                     Me.RoleName.RefreshShape()
@@ -976,7 +999,9 @@ Namespace FBM
 
                 Call Me.refresh_role_instance()
 
-                frmDiagramORM.Diagram.Invalidate()
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Invalidate()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1397,6 +1422,54 @@ Namespace FBM
                 Catch ex As Exception
                 End Try
             End If
+        End Sub
+
+        Private Sub Role_ValueConstraintAdded(ByVal asValueConstraint As String) Handles Role.ValueConstraintAdded
+
+            Try
+                If Not Me.ValueConstraint.Contains(asValueConstraint) Then
+                    Me.ValueConstraint.Add(asValueConstraint)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub Role_ValueConstraintModified(asOldValue As String, asNewValue As String) Handles Role.ValueConstraintModified
+            Try
+                Me.ValueConstraint.Item(Me.ValueConstraint.IndexOf(asOldValue)) = asNewValue
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Private Sub Role_ValueConstraintRemoved(asRemovedValueConstraint As String) Handles Role.ValueConstraintRemoved
+
+            Try
+                Me.ValueConstraint.Remove(asRemovedValueConstraint)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
     End Class
 

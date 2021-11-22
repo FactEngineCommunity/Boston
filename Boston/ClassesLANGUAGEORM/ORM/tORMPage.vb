@@ -2532,7 +2532,7 @@ Namespace FBM
                     larOverlappingFactTypeInstances.AddRange(larOverlappingFactTypeInstance)
                 Next
 
-                For Each lrFactTypeInstance In larOverlappingFactTypeInstances
+                For Each lrFactTypeInstance In larOverlappingFactTypeInstances.ToArray
                     Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(5, True)
                 Next
 

@@ -744,10 +744,21 @@ Namespace FBM
 
         Public Sub AddValueConstraint(ByVal asValueConstraint As String)
 
-            Me.ValueConstraint.Add(asValueConstraint)
-            Call Me.makeDirty()
+            Try
 
-            RaiseEvent ValueConstraintAdded(asValueConstraint)
+                Me.ValueConstraint.Add(asValueConstraint)
+                Call Me.makeDirty()
+
+                RaiseEvent ValueConstraintAdded(asValueConstraint)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -2034,11 +2045,21 @@ Namespace FBM
 
         Public Sub RemoveValueConstraint(ByVal asValueConstraint As String)
 
-            Me.ValueConstraint.Remove(asValueConstraint)
+            Try
+                Me.ValueConstraint.Remove(asValueConstraint)
 
-            Call TableRoleValueConstraint.DeleteValueConstraint(Me, asValueConstraint)
+                Call TableRoleValueConstraint.DeleteValueConstraint(Me, asValueConstraint)
 
-            RaiseEvent ValueConstraintRemoved(asValueConstraint)
+                RaiseEvent ValueConstraintRemoved(asValueConstraint)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -782,11 +782,21 @@ Namespace FBM
 
         Public Sub RemoveValueConstraint(ByVal asValueConstraint As String)
 
-            Me.ValueConstraint.Remove(asValueConstraint)
+            Try
 
-            Call TableValueTypeValueConstraint.DeleteValueConstraint(Me, asValueConstraint)
+                Me.ValueConstraint.Remove(asValueConstraint)
 
-            RaiseEvent ValueConstraintRemoved(asValueConstraint)
+                Call TableValueTypeValueConstraint.DeleteValueConstraint(Me, asValueConstraint)
+
+                RaiseEvent ValueConstraintRemoved(asValueConstraint)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

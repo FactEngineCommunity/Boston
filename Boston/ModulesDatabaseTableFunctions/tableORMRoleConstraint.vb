@@ -222,7 +222,19 @@ Namespace TableRoleConstraint
                         '----------------------------------------
                         'ValueConstraints
                         If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint Then
+                            Try
+                                'Allocate the RoleConstraint to the Role it belongs to.
+                                lrRoleConstraint.RoleConstraintRole(0).Role.RoleConstraintRoleValueConstraint = lrRoleConstraint
+                            Catch ex As Exception
+                                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                            End Try
+
                             Call TableRoleValueConstraint.GetValueConstraintsByRoleConstraint(lrRoleConstraint)
+
                         End If
 
 

@@ -24,6 +24,8 @@ Namespace FBM
             End Set
         End Property
 
+        Public Shadows WithEvents RoleConstraint As FBM.RoleConstraint
+
         ''' <summary>
         ''' If Role is on ReferenceModeFactType, then the EntityTypeInstance for which the FactType exists.
         '''   Used for when the ReferenceScheme (FactType) is shown/hidden. See event, ExpandReferenceModeChanged.
@@ -259,6 +261,58 @@ Namespace FBM
 
         End Sub
 
+        Private Sub RoleConstraint_ValueConstraintAdded(asNewValueConstraint As String) Handles RoleConstraint.ValueConstraintAdded
+            Try
+                If Not Me.ValueConstraint.Contains(asNewValueConstraint) Then
+                    Me.ValueConstraint.Add(asNewValueConstraint)
+                End If
+
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Private Sub RoleConstraint_ValueConstraintModified(asOldValue As String, asNewValue As String) Handles RoleConstraint.ValueConstraintModified
+
+            Try
+                Me.ValueConstraint.Item(Me.ValueConstraint.IndexOf(asOldValue)) = asNewValue
+
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Private Sub RoleConstraint_ValueConstraintRemoved(asRemovedValueConstraint As String) Handles RoleConstraint.ValueConstraintRemoved
+
+            Try
+                Me.ValueConstraint.Remove(asRemovedValueConstraint)
+
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

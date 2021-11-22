@@ -1212,11 +1212,21 @@ Namespace FBM
 
         Private Sub _ValueType_ValueConstraintAdded(asNewValueConstraint As String) Handles _ValueType.ValueConstraintAdded
 
-            If Not Me.ValueConstraint.Contains(asNewValueConstraint) Then
-                Me.ValueConstraint.Add(asNewValueConstraint)
-            End If
+            Try
+                If Not Me.ValueConstraint.Contains(asNewValueConstraint) Then
+                    Me.ValueConstraint.Add(asNewValueConstraint)
+                End If
 
-            Call Me._ValueConstraint.RefreshShape()
+                Call Me._ValueConstraint.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -1240,9 +1250,19 @@ Namespace FBM
 
         Private Sub _ValueType_ValueConstraintRemoved(ByVal asRemovedValueConstraint As String) Handles _ValueType.ValueConstraintRemoved
 
-            Me.ValueConstraint.Remove(asRemovedValueConstraint)
+            Try
+                Me.ValueConstraint.Remove(asRemovedValueConstraint)
 
-            Call Me._ValueConstraint.RefreshShape()
+                Call Me._ValueConstraint.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
