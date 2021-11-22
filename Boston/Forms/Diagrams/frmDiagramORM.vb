@@ -4126,14 +4126,25 @@ Public Class frmDiagramORM
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+
+                            lrPropertyGridForm.zrSelectedObject = lrModelObject
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+
                             Select Case lrRoleConstraintInstance.RoleConstraintType
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                     Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
                                     lrFrequencyConstraintInstance = lrModelObject
                                     lrPropertyGridForm.PropertyGrid.SelectedObject = lrFrequencyConstraintInstance
+                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                    Dim lrRoleValueConstraintInstance As FBM.RoleValueConstraint
+                                    lrRoleValueConstraintInstance = lrModelObject
+                                    lrPropertyGridForm.zrSelectedObject = lrRoleValueConstraintInstance
+                                    lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleValueConstraintInstance
                                 Case Else
                                     lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
                             End Select
+
 
                         Case Is = pcenumConceptType.FactType
                             Dim lrFactTypeInstance = CType(lrModelObject, FBM.FactTypeInstance)

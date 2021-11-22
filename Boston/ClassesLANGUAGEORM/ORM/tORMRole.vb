@@ -603,6 +603,10 @@ Namespace FBM
 
                     If Me.RoleConstraintRoleValueConstraint IsNot Nothing Then
                         lrRoleInstance.RoleConstraintRoleValueConstraint = Me.RoleConstraintRoleValueConstraint.CloneRoleValueConstraintInstance(arPage, False)
+
+                        For Each lsConstraintValue In lrRoleInstance.RoleConstraintRoleValueConstraint.ValueConstraint
+                            lrRoleInstance.ValueConstraint.Add(lsConstraintValue)
+                        Next
                     End If
 
                     If abAddToPage Then

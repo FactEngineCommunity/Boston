@@ -563,11 +563,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.RoleConstraint) As Boolean Implements System.IEquatable(Of FBM.RoleConstraint).Equals
 
-            If Me.Id = other.Id Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.Id = other.Id
 
         End Function
 
@@ -1813,6 +1809,62 @@ Namespace FBM
             End Try
 
         End Sub
+
+        Public Sub ModifyValueConstraint(ByVal asOldValueConstraint As String, asNewValueConstraint As String)
+
+            Try
+
+                '-------------------------------------------------------------
+                'Update ValueConstraintValue of the particular
+                '  Concept/Symbol/Value within the 'value_constraint'
+                '  for the ValueType of this ValueTypeInstance
+                '-------------------------------------------------------------
+                If Me._ValueConstraintList.IndexOf(asOldValueConstraint) >= 0 Then
+
+                    Me.ValueConstraint.Item(Me.ValueConstraint.IndexOf(asOldValueConstraint)) = asNewValueConstraint
+
+                    'VM-20180401-Not sure what this does.
+                    'Dim lrConcept As New FBM.Concept(aoChangedPropertyItem.OldValue)
+                    'lrConcept = Me.ValueType._ValueConstraint.Find(AddressOf lrConcept.Equals)
+                    'If IsSomething(lrConcept) Then
+                    '    lrConcept.Symbol = aoChangedPropertyItem.ChangedItem.Value.ToString
+                    'End If
+
+                    RaiseEvent ValueConstraintModified(asOldValueConstraint, asNewValueConstraint)
+
+                ElseIf Not Me.ValueConstraint.Contains(asNewValueConstraint) Then
+                    Me.AddValueConstraint(asNewValueConstraint)
+                End If
+
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+                '=============================================================================================================================================================
+                '20180401-VM-Can probably reimplement the below with more sophisticated code. Take code from populating a cell in a FactTable when VT has a ValueConstraint.
+                '20170126-VM-Commented out the below.
+                'The "Instance" piece can probably disappear altogether. That doesn't look good. Especially if a Value constraint looks like "1..12" rather than "1", "2" etc
+                '  Need to remove this (ValueTypeInstance) setting of Me.ValueType.ValueConstraint from within the ValueConstraint property,
+                '  but rather have a SetValueConstraint method, which will call the lower ValueType method....which will trigger an event
+                '  that will update all related ValueTypeInstances....etc.
+                ' Basically, this whole section needs an overhall. 
+                'Me.ValueConstraint.Clear()
+                'Me.ValueConstraint = lasStringCollection
+                'Me.ValueType.Instance.Clear()
+                'For Each lsValueConstraint In lasStringCollection
+                '    Me.ValueType.Instance.Add(lsValueConstraint)
+                'Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
         Public Sub RemoveArgument(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument)
 

@@ -103,7 +103,7 @@
                         Else
                             lrRoleConstraintInstance.Model = arPage.Model
                             lrRoleConstraintInstance.Page = arPage
-                            lrRoleConstraintInstance.RoleConstraint = arPage.Model.RoleConstraint.Find(AddressOf lrRoleConstraintInstance.Equals)
+                            lrRoleConstraintInstance.RoleConstraint = arPage.Model.RoleConstraint.Find(Function(x) x.Id = lrRoleConstraintInstance.Id)
                             lrRoleConstraintInstance.RoleConstraintType = CType([Enum].Parse(GetType(pcenumRoleConstraintType), lREcordset("RoleConstraintType").Value), pcenumRoleConstraintType)
                             lrRoleConstraintInstance.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), lREcordset("RingConstraintType").Value), pcenumRingConstraintType)
 

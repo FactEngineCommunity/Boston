@@ -13,7 +13,15 @@ Namespace FBM
         Implements IEquatable(Of FBM.RoleConstraintInstance)
 
         <XmlIgnore()>
-        Public WithEvents RoleConstraint As FBM.RoleConstraint
+        Private WithEvents _RoleConstraint As FBM.RoleConstraint
+        Public Overridable Property RoleConstraint As FBM.RoleConstraint
+            Get
+                Return Me._RoleConstraint
+            End Get
+            Set(value As FBM.RoleConstraint)
+                Me._RoleConstraint = value
+            End Set
+        End Property
 
         <CategoryAttribute("Constraint Type"),
         Browsable(True),
@@ -278,8 +286,7 @@ Namespace FBM
                     lrRoleValueConstraintInstance.Id = .Id
                     lrRoleValueConstraintInstance.ConceptType = .ConceptType
                     lrRoleValueConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint
-                    lrRoleValueConstraintInstance.RoleConstraint = New FBM.RoleConstraint
-                    lrRoleValueConstraintInstance.RoleConstraint = arPage.Model.RoleConstraint.Find(AddressOf .RoleConstraint.Equals)
+                    lrRoleValueConstraintInstance.RoleConstraint = .RoleConstraint
                     lrRoleValueConstraintInstance.Name = .Name
                     lrRoleValueConstraintInstance.IsDeontic = .IsDeontic
                     lrRoleValueConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
@@ -1219,8 +1226,8 @@ Namespace FBM
 
         End Function
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
-                                Optional ByVal asSelectedGridItemLabel As String = "")
+        Public Overridable Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                            Optional ByVal asSelectedGridItemLabel As String = "")
 
 
             Try
@@ -1432,7 +1439,7 @@ Namespace FBM
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison
                             Case Is = pcenumValueRangeType.GreaterThan
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_greater
-                            Case Is = pcenumValueRangeType.GreaterThanOREqual
+                            Case Is = pcenumValueRangeType.GreaterThanOrEqual
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_greater_equal
                             Case Is = pcenumValueRangeType.LessThan
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_less_than
@@ -1745,28 +1752,28 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_CardinalityChanged(ByVal aiNewCardinality As Integer) Handles RoleConstraint.CardinalityChanged
+        Private Sub RoleConstraint_CardinalityChanged(ByVal aiNewCardinality As Integer) Handles _RoleConstraint.CardinalityChanged
 
             Me.Cardinality = aiNewCardinality
             Call Me.RefreshShape()
 
         End Sub
 
-        Private Sub RoleConstraint_CardinalityRangeTypeChanged(ByVal aiNewCardinalityRangeType As publicConstants.pcenumCardinalityRangeType) Handles RoleConstraint.CardinalityRangeTypeChanged
+        Private Sub RoleConstraint_CardinalityRangeTypeChanged(ByVal aiNewCardinalityRangeType As publicConstants.pcenumCardinalityRangeType) Handles _RoleConstraint.CardinalityRangeTypeChanged
 
             Me.CardinalityRangeType = aiNewCardinalityRangeType
             Call Me.RefreshShape()
 
         End Sub
 
-        Private Sub RoleConstraint_IsDeonticChanged(ByVal abNewIsDeontic As Boolean) Handles RoleConstraint.IsDeonticChanged
+        Private Sub RoleConstraint_IsDeonticChanged(ByVal abNewIsDeontic As Boolean) Handles _RoleConstraint.IsDeonticChanged
 
             Me.IsDeontic = abNewIsDeontic
             Call Me.RefreshShape()
 
         End Sub
 
-        Private Sub RoleConstraint_IsPreferredIdentifierChanged(ByVal abNewIsPreferredIdentifier As Boolean) Handles RoleConstraint.IsPreferredIdentifierChanged
+        Private Sub RoleConstraint_IsPreferredIdentifierChanged(ByVal abNewIsPreferredIdentifier As Boolean) Handles _RoleConstraint.IsPreferredIdentifierChanged
 
             Try
                 Me.IsPreferredIdentifier = abNewIsPreferredIdentifier
@@ -1786,34 +1793,34 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_LevelNrChanged(ByVal aiNewLevelNr As Integer) Handles RoleConstraint.LevelNrChanged
+        Private Sub RoleConstraint_LevelNrChanged(ByVal aiNewLevelNr As Integer) Handles _RoleConstraint.LevelNrChanged
 
             Me.LevelNr = aiNewLevelNr
             Call Me.RefreshShape()
 
         End Sub
 
-        Private Sub RoleConstraint_LongDescriptionChanged(asLongDescription As String) Handles RoleConstraint.LongDescriptionChanged
+        Private Sub RoleConstraint_LongDescriptionChanged(asLongDescription As String) Handles _RoleConstraint.LongDescriptionChanged
 
             Me.LongDescription = asLongDescription
 
         End Sub
 
-        Private Sub RoleConstraint_MaximumFrequencyCountChanged(ByVal aiNewMaximumFrequencyCount As Integer) Handles RoleConstraint.MaximumFrequencyCountChanged
+        Private Sub RoleConstraint_MaximumFrequencyCountChanged(ByVal aiNewMaximumFrequencyCount As Integer) Handles _RoleConstraint.MaximumFrequencyCountChanged
 
             Me.MaximumFrequencyCount = aiNewMaximumFrequencyCount
             Call Me.RefreshShape()
 
         End Sub
 
-        Private Sub RoleConstraint_MinimumFrequencyCountChanged(ByVal aiNewMinimumFrequencyCount As Integer) Handles RoleConstraint.MinimumFrequencyCountChanged
+        Private Sub RoleConstraint_MinimumFrequencyCountChanged(ByVal aiNewMinimumFrequencyCount As Integer) Handles _RoleConstraint.MinimumFrequencyCountChanged
 
             Me.MinimumFrequencyCount = aiNewMinimumFrequencyCount
             Call Me.RefreshShape()
 
         End Sub
 
-        Private Sub RoleConstraint_NameChanged() Handles RoleConstraint.NameChanged
+        Private Sub RoleConstraint_NameChanged() Handles _RoleConstraint.NameChanged
 
             Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.RoleConstraint.Id, pcenumConceptType.RoleConstraint)
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
@@ -1826,7 +1833,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean) Handles RoleConstraint.RemovedFromModel
+        Private Sub RoleConstraint_RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean) Handles _RoleConstraint.RemovedFromModel
 
             Call Me.RemoveFromPage(abBroadcastInterfaceEvent)
 
@@ -1840,7 +1847,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_RingConstraintTypeChanged(ByVal aiNewRingConstraintType As publicConstants.pcenumRingConstraintType) Handles RoleConstraint.RingConstraintTypeChanged
+        Private Sub RoleConstraint_RingConstraintTypeChanged(ByVal aiNewRingConstraintType As publicConstants.pcenumRingConstraintType) Handles _RoleConstraint.RingConstraintTypeChanged
 
             Me.RingConstraintType = aiNewRingConstraintType
             Call Me.RefreshShape()
@@ -1848,7 +1855,7 @@ Namespace FBM
         End Sub
 
         Private Sub RoleConstraint_RoleConstraintRoleAdded(ByRef arRoleConstraintRole As RoleConstraintRole,
-                                                           ByRef arSubtypeRelationship As FBM.tSubtypeRelationship) Handles RoleConstraint.RoleConstraintRoleAdded
+                                                           ByRef arSubtypeRelationship As FBM.tSubtypeRelationship) Handles _RoleConstraint.RoleConstraintRoleAdded
 
             Try
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
@@ -1919,7 +1926,7 @@ Namespace FBM
         End Sub
 
 
-        Private Sub RoleConstraint_RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As RoleConstraintRole) Handles RoleConstraint.RoleConstraintRoleRemoved
+        Private Sub RoleConstraint_RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As RoleConstraintRole) Handles _RoleConstraint.RoleConstraintRoleRemoved
 
             Dim lrRoleConstraintRoleInstanceToRemove As FBM.RoleConstraintRoleInstance
 
@@ -1963,7 +1970,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_RoleConstraintTypeChanged(ByVal aiNewRoleConstraintType As publicConstants.pcenumRoleConstraintType) Handles RoleConstraint.RoleConstraintTypeChanged
+        Private Sub RoleConstraint_RoleConstraintTypeChanged(ByVal aiNewRoleConstraintType As publicConstants.pcenumRoleConstraintType) Handles _RoleConstraint.RoleConstraintTypeChanged
 
             Me.RoleConstraintType = aiNewRoleConstraintType
 
@@ -1998,7 +2005,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_ShortDescriptionChanged(asShortDescription As String) Handles RoleConstraint.ShortDescriptionChanged
+        Private Sub RoleConstraint_ShortDescriptionChanged(asShortDescription As String) Handles _RoleConstraint.ShortDescriptionChanged
 
             Me.ShortDescription = asShortDescription
 
@@ -2021,7 +2028,7 @@ Namespace FBM
             End If
         End Sub
 
-        Private Sub RoleConstraint_ValueRangeTypeChanged(aiNewValueRangeType As pcenumValueRangeType) Handles RoleConstraint.ValueRangeTypeChanged
+        Private Sub RoleConstraint_ValueRangeTypeChanged(aiNewValueRangeType As pcenumValueRangeType) Handles _RoleConstraint.ValueRangeTypeChanged
 
             Try
                 Me._ValueRangeType = aiNewValueRangeType

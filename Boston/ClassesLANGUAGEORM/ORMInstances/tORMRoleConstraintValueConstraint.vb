@@ -9,6 +9,16 @@ Namespace FBM
     Public Class ValueConstraint
         Inherits FBM.RoleConstraintInstance
 
+        Private WithEvents _RoleConstraint As FBM.RoleConstraint
+        Public Overrides Property RoleConstraint As FBM.RoleConstraint
+            Get
+                Return Me._RoleConstraint
+            End Get
+            Set(value As FBM.RoleConstraint)
+                Me._RoleConstraint = value
+            End Set
+        End Property
+
         '<DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         <CategoryAttribute("Role Constraint Detail"),
              Browsable(True),
@@ -222,7 +232,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_MaximumValueChanged() Handles RoleConstraint.MaximumValueChanged
+        Private Sub RoleConstraint_MaximumValueChanged() Handles _RoleConstraint.MaximumValueChanged
 
             Try
                 Dim lsValueConstraintText As String = ""
@@ -245,7 +255,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_MinimumValueChanged() Handles RoleConstraint.MinimumValueChanged
+        Private Sub RoleConstraint_MinimumValueChanged() Handles _RoleConstraint.MinimumValueChanged
 
             Try
                 Dim lsValueConstraintText As String = ""

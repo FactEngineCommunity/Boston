@@ -34,7 +34,7 @@ Namespace TableRoleValueConstraint
 
             Dim lsSQLQuery As String = ""
 
-            lsSQLQuery = "DELETE FROM MetaModelRoleConstraintValueConstraint"
+            lsSQLQuery = "DELETE FROM MetaModelRoleValueConstraint"
             lsSQLQuery &= " WHERE ModelId = '" & Replace(arRoleConstraint.Model.ModelId, "'", "`") & "'"
             lsSQLQuery &= "   AND RoleConstraintId = '" & Replace(arRoleConstraint.Id, "'", "`") & "'"
             lsSQLQuery &= "   AND Symbol = '" & asValueConstraint & "'"

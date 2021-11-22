@@ -24,7 +24,15 @@ Namespace FBM
             End Set
         End Property
 
-        Public Shadows WithEvents RoleConstraint As FBM.RoleConstraint
+        Private WithEvents _RoleConstraint As FBM.RoleConstraint
+        Public Overrides Property RoleConstraint As FBM.RoleConstraint
+            Get
+                Return Me._RoleConstraint
+            End Get
+            Set(value As FBM.RoleConstraint)
+                Me._RoleConstraint = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' If Role is on ReferenceModeFactType, then the EntityTypeInstance for which the FactType exists.
@@ -187,8 +195,8 @@ Namespace FBM
 
         End Sub
 
-        Public Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
-
+        Public Overrides Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                            Optional ByVal asSelectedGridItemLabel As String = "")
 
             Try
 
@@ -207,12 +215,40 @@ Namespace FBM
                                 Me.Id = Me.Name
                                 Me.Symbol = Me.Name
                             End If
+                        Case Is = "Value"
+                            With New WaitCursor
+                                Call Me.RoleConstraint.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                            End With
                     End Select
                 End If
 
+                '-------------------------------------------------------------------------------------------------------------------------------
+                'Removing an item using the UITypeEditor does not trigger a return of aoChangedPropertyItem (As PropertyValueChangedEventArgs).
+                '  So we must check each time (back here) whether there is an item to remove from the ValueConstraint list for the ValueType/Instance.
+                Dim lasValueConstraint(Me.RoleConstraint.ValueConstraint.Count) As String
+                Me.RoleConstraint.ValueConstraint.CopyTo(lasValueConstraint, 0)
 
-                Dim StringSize As New SizeF
+                For Each lsValueConstraint In lasValueConstraint
+                    If lsValueConstraint IsNot Nothing Then
+                        If Not Me.ValueConstraint.Contains(lsValueConstraint) Then
+                            Call Me.RoleConstraint.RemoveValueConstraint(lsValueConstraint)
+                        End If
+                    End If
+                Next
 
+                Dim lsRoleValueConstraintText As String
+                lsRoleValueConstraintText = "{"
+                Dim liInd As Integer = 0
+                For Each lsConstrainedValue In Me.ValueConstraint
+                    If liInd > 0 Then lsRoleValueConstraintText &= ","
+                    lsRoleValueConstraintText &= lsConstrainedValue
+                    liInd += 1
+                Next
+                lsRoleValueConstraintText &= "}"
+
+                Me.Shape.Text = lsRoleValueConstraintText
+
+                Dim StringSize As SizeF
                 StringSize = Me.Page.Diagram.MeasureString(Me.Shape.Text, Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
 
                 Me.Shape.Resize(StringSize.Width, StringSize.Height)
@@ -261,7 +297,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_ValueConstraintAdded(asNewValueConstraint As String) Handles RoleConstraint.ValueConstraintAdded
+        Private Sub RoleConstraint_ValueConstraintAdded(asNewValueConstraint As String) Handles _RoleConstraint.ValueConstraintAdded
             Try
                 If Not Me.ValueConstraint.Contains(asNewValueConstraint) Then
                     Me.ValueConstraint.Add(asNewValueConstraint)
@@ -279,7 +315,7 @@ Namespace FBM
             End Try
         End Sub
 
-        Private Sub RoleConstraint_ValueConstraintModified(asOldValue As String, asNewValue As String) Handles RoleConstraint.ValueConstraintModified
+        Private Sub RoleConstraint_ValueConstraintModified(asOldValue As String, asNewValue As String) Handles _RoleConstraint.ValueConstraintModified
 
             Try
                 Me.ValueConstraint.Item(Me.ValueConstraint.IndexOf(asOldValue)) = asNewValue
@@ -296,7 +332,7 @@ Namespace FBM
             End Try
         End Sub
 
-        Private Sub RoleConstraint_ValueConstraintRemoved(asRemovedValueConstraint As String) Handles RoleConstraint.ValueConstraintRemoved
+        Private Sub RoleConstraint_ValueConstraintRemoved(asRemovedValueConstraint As String) Handles _RoleConstraint.ValueConstraintRemoved
 
             Try
                 Me.ValueConstraint.Remove(asRemovedValueConstraint)

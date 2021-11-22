@@ -9,6 +9,16 @@ Namespace FBM
     Public Class FrequencyConstraint
         Inherits FBM.RoleConstraintInstance
 
+        Private WithEvents _RoleConstraint As FBM.RoleConstraint
+        Public Overrides Property RoleConstraint As FBM.RoleConstraint
+            Get
+                Return Me._RoleConstraint
+            End Get
+            Set(value As FBM.RoleConstraint)
+                Me._RoleConstraint = value
+            End Set
+        End Property
+
         '<DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         <CategoryAttribute("Role Constraint Detail"), _
              Browsable(True), _
@@ -247,7 +257,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub RoleConstraint_CardinalityChanged() Handles RoleConstraint.CardinalityChanged
+        Private Sub RoleConstraint_CardinalityChanged() Handles _RoleConstraint.CardinalityChanged
 
             Try
                 Dim lsFrequencyConstraintText As String = ""
@@ -258,11 +268,11 @@ Namespace FBM
                 Me.MaximumFrequencyCount = Me.RoleConstraint.MaximumFrequencyCount
 
                 Select Case Me.CardinalityRangeType
-                    Case Is = pcenumCardinalityRangeType.LessThanOREqual
+                    Case Is = pcenumCardinalityRangeType.LessThanOrEqual
                         lsFrequencyConstraintText = "<=" & Me.Cardinality
                     Case Is = pcenumCardinalityRangeType.Equal
                         lsFrequencyConstraintText = Me.Cardinality
-                    Case Is = pcenumCardinalityRangeType.GreaterThanOREqual
+                    Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual
                         lsFrequencyConstraintText = ">=" & Me.Cardinality
                     Case Is = pcenumCardinalityRangeType.Between
                         lsFrequencyConstraintText = Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString
