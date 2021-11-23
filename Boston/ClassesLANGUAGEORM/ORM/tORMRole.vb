@@ -636,6 +636,10 @@ Namespace FBM
             Try
                 Me.ValueConstraint.Add(asValueConstraint)
                 Try
+                    If Me.RoleConstraintRoleValueConstraint Is Nothing Then
+                        Call Me.CreateOwnRoleValueConstraint
+                    End If
+
                     Call Me.RoleConstraintRoleValueConstraint.AddValueConstraint(asValueConstraint)
                 Catch ex As Exception
                     Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -650,6 +654,32 @@ Namespace FBM
                 RaiseEvent ValueConstraintAdded(asValueConstraint)
 
             Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub CreateOwnRoleValueConstraint()
+
+            Try
+                Dim larRole As New List(Of FBM.Role)
+                Dim lrRoleConstraint As New FBM.RoleConstraint(Me.Model,
+                                                               pcenumRoleConstraintType.RoleValueConstraint,
+                                                               Nothing, False, 0, True)
+
+                lrRoleConstraint.RoleConstraintRole.Add(New FBM.RoleConstraintRole(Me, lrRoleConstraint,,,, True))
+                lrRoleConstraint.makeDirty()
+
+                Me.Model.AddRoleConstraint(lrRoleConstraint)
+
+                Me.RoleConstraintRoleValueConstraint = lrRoleConstraint
+
+            Catch ex As Exception
+                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

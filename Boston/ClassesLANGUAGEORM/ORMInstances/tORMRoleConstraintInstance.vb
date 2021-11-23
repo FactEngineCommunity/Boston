@@ -306,6 +306,7 @@ Namespace FBM
                         lrClonedRoleConstraintRoleInstance.RoleConstraint = lrRoleValueConstraintInstance
                         lrRoleValueConstraintInstance.RoleConstraintRole.Add(lrClonedRoleConstraintRoleInstance)
                         lrRoleValueConstraintInstance.Role.Add(lrClonedRoleConstraintRoleInstance.Role)
+                        lrClonedRoleConstraintRoleInstance.Role.RoleConstraintRoleValueConstraint = lrRoleValueConstraintInstance
                     Next
 
                     For Each lsValueConstraint In .RoleConstraint.ValueConstraint

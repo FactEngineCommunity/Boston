@@ -971,6 +971,11 @@ Namespace FBM
                         Case Is = "Value"
                             With New WaitCursor
                                 Call Me.Role.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+
+                                If Me.RoleConstraintRoleValueConstraint Is Nothing Then
+                                    Me.RoleConstraintRoleValueConstraint = Me.Role.RoleConstraintRoleValueConstraint.CloneRoleValueConstraintInstance(Me.Page, True)
+                                    Call Me.RoleConstraintRoleValueConstraint.DisplayAndAssociate()
+                                End If
                             End With
                     End Select
                 End If

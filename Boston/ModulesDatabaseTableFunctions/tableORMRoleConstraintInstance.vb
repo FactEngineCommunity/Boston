@@ -194,6 +194,10 @@
                             For Each lrRoleConstraintRole In lrRoleConstraintInstance.RoleConstraint.RoleConstraintRole
                                 lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(arPage)
                                 lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+
+                                If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint Then
+                                    lrRoleConstraintRoleInstance.Role.RoleConstraintRoleValueConstraint = lrRoleConstraintInstance
+                                End If
                             Next
 
                             GetRoleConstraintInstancesByPage.Add(lrRoleConstraintInstance)
