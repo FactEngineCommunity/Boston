@@ -1595,7 +1595,7 @@ Namespace FBM
                                     Case Is = pcenumConceptType.EntityType
 
                                         If lrRole.JoinsEntityType.HasSimpleReferenceScheme Then
-                                            lrActiveRole = lrRole.JoinsEntityType.ReferenceModeFactType.RoleGroup(1)
+                                            lrActiveRole = CType(lrRole.JoinsEntityType.GetTopmostSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1)
                                             lsColumnName = lrActiveRole.JoinedORMObject.Name
                                         End If
                                     Case Else

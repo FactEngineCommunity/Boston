@@ -3056,6 +3056,7 @@ Namespace NORMA
                             Dim liCharPosition As Integer = 0
                             Dim lsNORMAPredicatePart2 As String = ""
 
+                            'Get rid of - characters inside the predicate
                             For Each lsChar In Trim(lsNORMAPredicatePart)
                                 If liCharPosition > 0 And liCharPosition < Trim(lsNORMAPredicatePart).Length - 1 Then
                                     If lsChar <> "-" Then
@@ -3066,6 +3067,8 @@ Namespace NORMA
                                 End If
                                 liCharPosition += 1
                             Next
+
+                            lsNORMAPredicatePart2 = LCase(lsNORMAPredicatePart2)
 
                             'If lrHashList.Contains(lsPredicatePart) Then
                             If lsNORMAPredicatePart2 Like "{#}" Then

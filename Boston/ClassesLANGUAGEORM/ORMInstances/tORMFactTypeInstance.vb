@@ -3267,12 +3267,10 @@ Namespace FBM
             Try
                 '----------------------------------
                 'CodeSafe:
-                If aiDepth > 25 Then
+                aiDepth += 1
+                If aiDepth > 10 Then
                     Exit Sub
-                Else
-                    aiDepth += 1
                 End If
-
 
                 Dim larPageObject = From PageObject In Me.Page.GetAllPageObjects _
                                             Where PageObject.Id <> Me.Id _
