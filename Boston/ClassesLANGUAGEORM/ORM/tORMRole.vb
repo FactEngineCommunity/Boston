@@ -1992,23 +1992,10 @@ Namespace FBM
                     Me.AddValueConstraint(asNewValueConstraint)
                 End If
 
+                Call Me.RoleConstraintRoleValueConstraint.ModifyValueConstraint(asOldValueConstraint, asNewValueConstraint)
+
                 Me.isDirty = True
                 Me.Model.MakeDirty(False, False)
-
-                '=============================================================================================================================================================
-                '20180401-VM-Can probably reimplement the below with more sophisticated code. Take code from populating a cell in a FactTable when VT has a ValueConstraint.
-                '20170126-VM-Commented out the below.
-                'The "Instance" piece can probably disappear altogether. That doesn't look good. Especially if a Value constraint looks like "1..12" rather than "1", "2" etc
-                '  Need to remove this (ValueTypeInstance) setting of Me.ValueType.ValueConstraint from within the ValueConstraint property,
-                '  but rather have a SetValueConstraint method, which will call the lower ValueType method....which will trigger an event
-                '  that will update all related ValueTypeInstances....etc.
-                ' Basically, this whole section needs an overhall. 
-                'Me.ValueConstraint.Clear()
-                'Me.ValueConstraint = lasStringCollection
-                'Me.ValueType.Instance.Clear()
-                'For Each lsValueConstraint In lasStringCollection
-                '    Me.ValueType.Instance.Add(lsValueConstraint)
-                'Next
 
             Catch ex As Exception
                 Dim lsMessage As String

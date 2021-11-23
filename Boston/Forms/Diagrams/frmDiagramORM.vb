@@ -4157,6 +4157,15 @@ Public Class frmDiagramORM
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
 
+                        Case pcenumConceptType.Role
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+                            Dim lrRoleInstance As FBM.RoleInstance = lrModelObject
+                            lrPropertyGridForm.zrSelectedObject = lrRoleInstance
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleInstance
+
                         Case Else
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
