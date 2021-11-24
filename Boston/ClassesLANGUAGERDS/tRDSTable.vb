@@ -191,6 +191,7 @@ Namespace RDS
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
         Public Event IndexModified(ByRef arIndex As RDS.Index)
+        Public Event IndexColumnAdded(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
         Public Event IsPGSRelationChanged(ByVal abNewValue As Boolean)
         Public Event NameChanged(ByVal asNewName As String)
@@ -339,9 +340,9 @@ Namespace RDS
         ''' </summary>
         ''' <param name="arColumn"></param>
         ''' <param name="abAddToDatabase">True if the column is to be added to the connected database.</param>
-        Public Sub addColumn(ByRef arColumn As RDS.Column,
-                             Optional abAddToDatabase As Boolean = False,
-                             Optional abProcessCMML As Boolean = True)
+        Public Function addColumn(ByRef arColumn As RDS.Column,
+                                  Optional abAddToDatabase As Boolean = False,
+                                  Optional abProcessCMML As Boolean = True) As Boolean
 
             Try
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
@@ -349,7 +350,7 @@ Namespace RDS
 
                 'CodeSafe: Don't add the Column if it already exists.
                 If Me.Column.Contains(arColumn) Then
-                    Exit Sub
+                    Return False
                 End If
 
                 Me.Column.AddUnique(arColumn)
@@ -405,6 +406,8 @@ Namespace RDS
 
                 RaiseEvent ColumnAdded(arColumn)
 
+                Return True
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -412,9 +415,11 @@ Namespace RDS
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         Public Sub addIndex(ByRef arIndex As RDS.Index, Optional ByRef arRoleConstraint As FBM.RoleConstraint = Nothing)
 
@@ -1759,6 +1764,14 @@ Namespace RDS
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub triggerIndexColumnAdded(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
+            RaiseEvent IndexColumnAdded(arIndex, arColumn)
+        End Sub
+
+        Public Sub triggerIndexModified(ByRef arIndex As RDS.Index)
+            RaiseEvent IndexModified(arIndex)
         End Sub
 
         Public Sub triggerSubtypeRelationshipAdded()

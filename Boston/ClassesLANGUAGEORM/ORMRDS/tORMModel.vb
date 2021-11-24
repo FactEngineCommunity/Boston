@@ -2470,7 +2470,7 @@ Namespace FBM
 
                             While lrDictionary.ContainsKey(lrRecordset2("OrdinalPosition").Data)
                                 lrRecordset2("OrdinalPosition").Data += 1
-                                lrRecordset("OrdinalPosition").makeDirty()
+                                lrRecordset2("OrdinalPosition").makeDirty()
                             End While
 
                             lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)

@@ -466,7 +466,7 @@ Namespace ERD
 
                     lrERAttribute.Column = lrColumn
 
-                    Me.Attribute.Add(lrERAttribute)
+                    Me.Attribute.AddUnique(lrERAttribute)
 
                     If abAddToPage Then
                         Me.Page.ERDiagram.Attribute.Add(lrERAttribute)

@@ -191,6 +191,9 @@ Namespace RDS
                 Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
             End If
 
+            Call Me.Table.triggerIndexModified(Me)
+            Call Me.Table.triggerIndexColumnAdded(Me, arColumn)
+
         End Sub
 
         Public Function getResponsibleRoleConstraintFromORMModel() As FBM.RoleConstraint

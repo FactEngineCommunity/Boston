@@ -604,7 +604,6 @@ Namespace FBM
 
                 '============================================================================================================================================
                 'Bring in Attributes from the Model level that are not at the Page level                
-
                 aoBackgroundWorker.ReportProgress(50)
 
                 Dim lrORMRecordset2 As ORMQL.Recordset
@@ -648,90 +647,102 @@ Namespace FBM
                             '--------------------------------------------------------------------------------------------------
                             'The Attribute is not on the Page.
 
-                            lsSQLQuery = "ADD FACT '" & lrORMRecordset.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            '======================================================================================================================
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
-                            lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
-
-                            lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM CorePropertyIsForFactType" '(Property, FactType)"
-                            lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
-
-                            lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString 'CorePropertyHasPropertyName.ToString
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM CorePropertyIsForRole" '(Property, Role)
-                            lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
-
-                            lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM CorePropertyHasActiveRole" '(Property, Role)
-                            lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
-
-                            lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString '(Attribute, Position)
-                            lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
-
-                            lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
-
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            '--------------------------------------------
-                            'Check to see if the Attribute is Mandatory
-                            '--------------------------------------------
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString '(Attribute, Position)
-                            lsSQLQuery &= " WHERE IsMandatory = '" & lsPropertyInstanceId & "'"
-
-                            lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            If Not lrORMRecordset2.EOF Then
-                                lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
-                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                            Try
+                                lsSQLQuery = "ADD FACT '" & lrORMRecordset.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
                                 lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
 
                                 Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                            End If
-                            '======================================================================================================================
+
+                                '======================================================================================================================
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
+                                lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
+
+                                lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                                lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM CorePropertyIsForFactType" '(Property, FactType)"
+                                lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
+
+                                lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString 'CorePropertyHasPropertyName.ToString
+                                lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM CorePropertyIsForRole" '(Property, Role)
+                                lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
+
+                                lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                                lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM CorePropertyHasActiveRole" '(Property, Role)
+                                lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
+
+                                lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
+                                lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString '(Attribute, Position)
+                                lsSQLQuery &= " WHERE Property = '" & lsPropertyInstanceId & "'"
+
+                                lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
+                                lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                                lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                '--------------------------------------------
+                                'Check to see if the Attribute is Mandatory
+                                '--------------------------------------------
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString '(Attribute, Position)
+                                lsSQLQuery &= " WHERE IsMandatory = '" & lsPropertyInstanceId & "'"
+
+                                lrORMRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                If Not lrORMRecordset2.EOF Then
+                                    lsSQLQuery = "ADD FACT '" & lrORMRecordset2.CurrentFact.Id & "'"
+                                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                                    lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                                    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                                End If
+                                '======================================================================================================================
+                            Catch ex As Exception
+                                'Not a biggie because Boston no longer uses the Page to set/get Attributes/Columns for Entities/Tables, but rather tha model level (RDS) itself.
+                                Dim lsMessage As String
+                                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                lsMessage &= vbCrLf & vbCrLf & "For Table/Entity: " & lsEntityName
+                                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
+                            End Try
+
                         End If
                         lrORMRecordset.MoveNext()
                     End While

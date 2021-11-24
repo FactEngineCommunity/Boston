@@ -505,6 +505,121 @@ Namespace RDS
                                 Next
                                 Call Me.OriginTable.removeColumn(lrOriginalColumn)
                             End If
+
+                            Dim lbColumnsArePartOfPrimaryKey As Boolean = False
+                            Dim lrIndex As RDS.Index = arIndex
+                            If Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).Count > 0 Then
+                                Dim lrPrimaryKeyIndex As RDS.Index = Nothing
+                                lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+                                For Each lrColumn In Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).ToArray
+                                    If lrColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
+                                    Me.OriginColumns.Remove(lrColumn)
+                                    Me.OriginTable.removeColumn(lrColumn)
+                                    If lrPrimaryKeyIndex IsNot Nothing Then
+                                        lrPrimaryKeyIndex.removeColumn(lrColumn)
+                                    End If
+                                Next
+
+                                'If lbColumnsArePartOfPrimaryKey Then
+                                '    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+                                'End If
+
+                                'For Each lrColumn In arIndex.Column
+
+                                '    Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
+                                '    lrNewColumn.Relation.AddUnique(Me)
+
+                                '    If Me.OriginTable.addColumn(lrNewColumn) Then
+                                '        Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                                '        Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
+
+                                '        If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
+                                '            lrPrimaryKeyIndex.addColumn(lrNewColumn)
+                                '        End If
+                                '    End If
+                                'Next
+                            End If
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub DestinationTable_IndexAdded(ByRef arIndex As Index) Handles DestinationTable.IndexAdded
+
+            Try
+                If arIndex.IsPrimaryKey Then
+                    Dim lbColumnsArePartOfPrimaryKey As Boolean = False
+                    Dim lrIndex As RDS.Index = arIndex
+                    Dim lrPrimaryKeyIndex As RDS.Index = Nothing
+
+                    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+                    For Each lrColumn In Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinedORMObject.Id = lrIndex.Table.Name And x.ActiveRole.JoinsEntityType IsNot Nothing).ToArray
+                        If lrColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
+                        If lrPrimaryKeyIndex IsNot Nothing Then
+                            lrPrimaryKeyIndex.removeColumn(lrColumn)
+                        End If
+                        Me.OriginColumns.Remove(lrColumn)
+                        Me.OriginTable.removeColumn(lrColumn)
+                    Next
+
+                    If lbColumnsArePartOfPrimaryKey Then
+                        lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+                    End If
+
+                    For Each lrColumn In arIndex.Column
+
+                        Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
+                        lrNewColumn.Relation.AddUnique(Me)
+
+                        Me.OriginTable.addColumn(lrNewColumn)
+
+                        Me.OriginColumns.Add(lrNewColumn)
+                        Me.DestinationColumns.Add(lrColumn)
+
+                        If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
+                            lrPrimaryKeyIndex.addColumn(lrNewColumn)
+                        End If
+                    Next
+                End If
+
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
+
+        Private Sub DestinationTable_IndexColumnAdded(ByRef arIndex As Index, ByRef arColumn As Column) Handles DestinationTable.IndexColumnAdded
+
+            Try
+                If arIndex.IsPrimaryKey Then
+                    Dim lrNewColumn = arColumn.Clone(Me.OriginTable, Me)
+                    lrNewColumn.Relation.AddUnique(Me)
+
+                    Dim lbColumnsArePartOfPrimaryKey As Boolean = False
+                    Try
+                        lbColumnsArePartOfPrimaryKey = Me.OriginColumns(0).isPartOfPrimaryKey
+                    Catch ex As Exception
+                        'Not a biggie. lbColumnsArePartOfPrimaryKey set to false when declared.
+                    End Try
+                    Dim lrPrimaryKeyIndex As RDS.Index = Nothing
+                    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+
+                    If Me.OriginTable.addColumn(lrNewColumn) Then
+                        Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                        Me.AddDestinationColumn(arColumn, Me.DestinationColumns.Count)
+
+                        If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
+                            lrPrimaryKeyIndex.addColumn(lrNewColumn)
                         End If
                     End If
                 End If
