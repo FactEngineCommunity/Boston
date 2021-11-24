@@ -4491,9 +4491,9 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ImportormNORMAFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ImportormNORMAFileToolStripMenuItem.Click
 
-        Try
+        Dim lsMessage As String = ""
 
-            Dim lsMessage As String = ""
+        Try
             Me.DialogOpenFile.DefaultExt = "orm"
             Me.DialogOpenFile.Filter = "NORMA Files (*.orm)|*.orm"
 
@@ -4525,10 +4525,17 @@ Public Class frmToolboxEnterpriseExplorer
                 '========================================================================================
                 'Load the NORMA file
                 Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
+
+                Call lrNewTreeNode.EnsureVisible()
+
+                'Me.zrToolTip.IsBalloon = True
+                lsMessage = "New Model added: " & lrModel.Name
+                Me.zrToolTip.IsBalloon = True
+                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
             End If
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
