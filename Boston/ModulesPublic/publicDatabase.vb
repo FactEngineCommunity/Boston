@@ -192,7 +192,12 @@ Namespace Database
                                 '  must be executed to fulfill a release...then it must be
                                 '  hard-coded, and may as well be referenced from right here.
                                 '-------------------------------------------------------------
-                                Call transaction.Commit()
+                                Try
+                                    Call transaction.Commit()
+                                Catch ex As Exception
+                                    'Not a biggie. transaction reset below.
+                                End Try
+
                                 If Not Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute) Then
                                     GoTo error_handler
                                 End If
@@ -219,8 +224,6 @@ Namespace Database
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                PerformNextRequiredDatabaseUpgrade = False
-
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf
                 lsMessage &= "The following step in the upgrade failed:"
@@ -240,6 +243,8 @@ Namespace Database
 
                 pdbConnection.RollbackTrans()
 
+                Return False
+
             End Try
 
 error_handler:
@@ -251,7 +256,7 @@ error_handler:
             lsMessage &= "Error Message: " & lsErrorMessage
             MsgBox(lsMessage)
 
-            PerformNextRequiredDatabaseUpgrade = False
+            Return False
 
         End Function
 

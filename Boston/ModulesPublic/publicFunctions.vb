@@ -480,16 +480,26 @@ Namespace Richmond
 
         Public Sub UpdateDatabaseVersion(ByVal asDatabaseVersionNr As String)
 
-            Dim lrReferenceFieldValue As New tReferenceFieldValue()
-            lrReferenceFieldValue.ReferenceTableId = 1
-            lrReferenceFieldValue.ReferenceFieldId = 1
-            lrReferenceFieldValue.Data = asDatabaseVersionNr
-            lrReferenceFieldValue.RowId = "1"
+            Try
+                Dim lrReferenceFieldValue As New tReferenceFieldValue()
+                lrReferenceFieldValue.ReferenceTableId = 1
+                lrReferenceFieldValue.ReferenceFieldId = 1
+                lrReferenceFieldValue.Data = asDatabaseVersionNr
+                lrReferenceFieldValue.RowId = "1"
 
-            Call TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
+                Call TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
 
-            My.Settings.DatabaseVersionNumber = asDatabaseVersionNr
-            My.Settings.Save()
+                My.Settings.DatabaseVersionNumber = asDatabaseVersionNr
+                My.Settings.Save()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
