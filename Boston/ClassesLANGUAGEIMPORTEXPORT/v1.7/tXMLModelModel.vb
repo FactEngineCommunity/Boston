@@ -1056,7 +1056,7 @@ Namespace XMLModel
 
                     Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
 
-                    For Each lrFactType In larSubtypeRelationshipFactTypes
+                    For Each lrFactType In larSubtypeRelationshipFactTypes.ToArray
                         lrEntityTypeInstance = New FBM.EntityTypeInstance
                         lrEntityTypeInstance.Id = lrFactType.RoleGroup(0).JoinedORMObject.Id
                         lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)

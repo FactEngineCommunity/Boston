@@ -3667,7 +3667,7 @@ Namespace FBM
         ''' </summary>
         ''' <param name="abRapidSave"></param>        
         ''' <remarks></remarks>
-        Sub Save(Optional ByVal abRapidSave As Boolean = False)
+        Sub Save(Optional ByVal abRapidSave As Boolean = False, Optional abModelDictionaryRapidSave As Boolean = True)
 
             '-------------------------------------------------------
             'Saves the currently loaded ORM model to the database
@@ -3712,7 +3712,7 @@ Namespace FBM
                 'Save the DictionaryEntries within the ORM Model.
                 '  NB Also maintains the MetaModelConcept table.
                 '--------------------------------------------------
-                Call Me.SaveModelDictionary(abRapidSave)
+                Call Me.SaveModelDictionary(abModelDictionaryRapidSave)
 
                 '----------------------------------------------
                 ' Save the set of Entities within the ORM Model

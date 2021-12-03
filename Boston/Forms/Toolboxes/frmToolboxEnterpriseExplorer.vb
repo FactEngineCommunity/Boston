@@ -2958,7 +2958,7 @@ Public Class frmToolboxEnterpriseExplorer
             lfrmFlashCard.Show(frmMain)
 
             Me.Focus()
-            Call lrModel.Save(True)
+            Call lrModel.Save(True, False)
 
             '================================================================================================================
             'RDS
