@@ -3667,7 +3667,7 @@ Namespace FBM
         ''' </summary>
         ''' <param name="abRapidSave"></param>        
         ''' <remarks></remarks>
-        Sub Save(Optional ByVal abRapidSave As Boolean = False, Optional abModelDictionaryRapidSave As Boolean = True)
+        Sub Save(Optional ByVal abRapidSave As Boolean = False, Optional abModelDictionaryRapidSave As Boolean = False)
 
             '-------------------------------------------------------
             'Saves the currently loaded ORM model to the database
