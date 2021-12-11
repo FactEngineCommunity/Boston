@@ -145,6 +145,9 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.SetProgressBarValue(65, "Created Entity Types/Tables for those Tables that are not subtypes of other tables and have no Columns")
             End If
 
+            'Create Subtype Relationships
+            Call Me.createSubtypeRelationships()
+
             Call Me.SetProgressBarValue(70, "Creating other Value Types. ")
 
             For Each lrTable In Me.TempModel.RDS.Table
@@ -324,9 +327,6 @@ Public Class ODBCDatabaseReverseEngineer
 #End Region
             Next
 
-            'Create Subtype Relationships
-            Call Me.createSubtypeRelationships
-
             '-----------------------------------------------------------------------------
             'Create Tables for all missing Tables.
             Call Me.SetProgressBarValue(85, "Creating Tables/Objectified Fact Types for remaining Tables/Relations.")
@@ -492,7 +492,7 @@ Public Class ODBCDatabaseReverseEngineer
 
     End Function
 
-    Private Function IsDirtyEverything()
+    Private Sub IsDirtyEverything()
 
         Try
             For Each lrValueType In Me.Model.ValueType
@@ -517,7 +517,7 @@ Public Class ODBCDatabaseReverseEngineer
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
-    End Function
+    End Sub
 
 
     '20211001-VM-Add code here for instance for Periodic-Event in TypeDB Social Network, where the PrimaryKey is
@@ -966,8 +966,11 @@ Skip: 'Because is not a ValueType
                     lsValueTypeName = lrEntityType.Id & "_" & lsValueTypeName
                 End If
 
-                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
-                lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
+                Select Case lrTable.PrimarySupertype
+                    Case Is = "Entity"
+                        lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
+                        lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
+                End Select
 
             End If
             Call Me.AppendProgress(".")

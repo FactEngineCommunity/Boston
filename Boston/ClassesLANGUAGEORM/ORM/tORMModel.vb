@@ -5049,11 +5049,45 @@ Namespace FBM
         End Sub
 
 
-        Private Sub performCoreManagement()
+        Public Sub performCoreManagement()
 
             Dim lsSQLQuery As String
 
-            If Me.CoreVersionNumber = "2.0" Then
+            If Me.CoreVersionNumber = "" Then
+
+                'Entity Relationship Diagrams / Property Graph Schema
+                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                End If
+
+                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+
+                'StateTransitions
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
+                Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+
+                'CoreDerivations
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+
+                Me.CoreVersionNumber = "2.3"
+                Me.MakeDirty(False, False)
+                Call Me.Save()
+
+            ElseIf Me.CoreVersionNumber = "2.0" Then
                 'NB Tightly coupled to the v5.5 release of Boston.
                 'NB Must upgrade to v2.1 Core, at least nominally, because new model elements are created/copied when the user creates a STD Page.
                 '  No need to create/modify the model elements here...just need to remove the old ones.

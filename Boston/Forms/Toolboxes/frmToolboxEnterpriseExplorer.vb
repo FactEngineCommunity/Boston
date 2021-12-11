@@ -2963,6 +2963,7 @@ Public Class frmToolboxEnterpriseExplorer
             '================================================================================================================
             'RDS
             If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
+                Call lrModel.performCoreManagement()
                 Call lrModel.PopulateRDSStructureFromCoreMDAElements()
                 lrModel.RDSCreated = True
             ElseIf (lrModel.ModelId <> "Core") Then
@@ -2987,6 +2988,15 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
 
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the StateTransitionDiagram into the metamodel
+
+                'Derivations
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the CoreDerivations into the metamodel
                 '==================================================
 
                 Call lrModel.createEntityRelationshipArtifacts()

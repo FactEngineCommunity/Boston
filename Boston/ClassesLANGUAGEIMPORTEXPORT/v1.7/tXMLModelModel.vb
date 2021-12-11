@@ -299,6 +299,11 @@ Namespace XMLModel
                         lrXMLRoleConstraint.Argument.Add(lrXMLRoleConstraintArgument)
                     Next
 
+
+                    For Each lsValueConstraintValue In lrRoleConstraint.ValueConstraint
+                        lrXMLRoleConstraint.ValueConstraint.Add(lsValueConstraintValue)
+                    Next
+
                     Me.ORMModel.RoleConstraints.Add(lrXMLRoleConstraint)
                 Next
 
@@ -803,6 +808,10 @@ Namespace XMLModel
                     If lrRoleConstraint.Role.Count > 0 Then
                         lrModel.RoleConstraint.Add(lrRoleConstraint)
                     End If
+
+                    For Each lsValueTypeConstraintValue In lrXMLRoleConstraint.ValueConstraint
+                        lrRoleConstraint.ValueConstraint.Add(lsValueTypeConstraintValue)
+                    Next
                 Next
 
                 '-----------------------------------------------------------------------------
@@ -1117,6 +1126,8 @@ Namespace XMLModel
                             Select Case lrRoleConstraint.RoleConstraintType
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                     lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
+                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                    lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
                                 Case Else
                                     lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
                             End Select
