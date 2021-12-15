@@ -751,7 +751,11 @@ Namespace FBM
                     'Then role joins to entity
                     If Not Me.FactType.Is1To1BinaryFactType Then
                         If Me.HasInternalUniquenessConstraint Then
-                            BelongsToTable = Me.JoinsEntityType.Name
+                            If Me.JoinsEntityType.IsObjectifyingEntityType Then
+                                BelongsToTable = Me.JoinsEntityType.ObjectifiedFactType.Id
+                            Else
+                                BelongsToTable = Me.JoinsEntityType.Name
+                            End If
                             Exit Function
                         End If
                     Else 'is 1:1 binary fact type
@@ -1192,7 +1196,15 @@ Namespace FBM
                 ElseIf lasTableName.ToList.Contains(Me.JoinedORMObject.Id) Then
                     Return Me.JoinedORMObject.getCorrespondingRDSTable()
                 Else
-                    Return Me.JoinedORMObject.getCorrespondingRDSTable()
+                    If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                        If Me.JoinsEntityType.IsObjectifyingEntityType Then
+                            Return Me.JoinsEntityType.ObjectifiedFactType.getCorrespondingRDSTable()
+                        Else
+                            Return Me.JoinedORMObject.getCorrespondingRDSTable()
+                        End If
+                    Else
+                        Return Me.JoinedORMObject.getCorrespondingRDSTable()
+                    End If
                 End If
 
             Catch ex As Exception

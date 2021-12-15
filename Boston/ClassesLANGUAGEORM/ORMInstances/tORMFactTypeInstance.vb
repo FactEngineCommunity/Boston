@@ -214,6 +214,142 @@ Namespace FBM
 
         Public IsDisplayedAssociated As Boolean = False
 
+        ''' <summary>
+        ''' The EntityType for the FactType if the FactType is objectified.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <XmlIgnore()>
+        Public Shadows ObjectifyingEntityType As FBM.EntityTypeInstance
+
+        <XmlIgnore()>
+        Public _DataType As pcenumORMDataType
+        <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+         Browsable(False),
+         [ReadOnly](False),
+         BindableAttribute(True),
+         DefaultValueAttribute(""),
+         DesignOnly(False),
+         DescriptionAttribute("The 'Data Type' of the Reference Scheme for Instances of this Objectified Fact Type."),
+         TypeConverter(GetType(Enumeration.EnumDescConverter))>
+        Public Property DataType() As pcenumORMDataType
+            Get
+                If Me.IsObjectified Then
+                    If Me.ObjectifyingEntityType.HasSimpleReferenceScheme Then
+                        Try
+                            Dim lrTopmostEntityType As FBM.EntityType = Me.ObjectifyingEntityType.EntityType.GetTopmostSupertype
+                            Return lrTopmostEntityType.ReferenceModeValueType.DataType
+                        Catch ex As Exception
+                            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical)
+                        End Try
+                    Else
+                        Return pcenumORMDataType.DataTypeNotSet
+                    End If
+                Else
+                    Return pcenumORMDataType.DataTypeNotSet
+                End If
+            End Get
+            Set(value As pcenumORMDataType)
+                Me._DataType = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Private _DataTypePrecision As Integer
+        <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+         Browsable(True),
+         [ReadOnly](False),
+         BindableAttribute(True),
+         DefaultValueAttribute(""),
+         DesignOnly(False),
+         DescriptionAttribute("The 'Data Type Precision' of the Data Type for this Objectified Fact Type.")>
+        Public Property DataTypePrecision() As Integer
+            Get
+                If Me.IsObjectified Then
+                    If Me.ObjectifyingEntityType.HasSimpleReferenceScheme Then
+                        Dim lrTopmostEntityType As FBM.EntityType = Me.ObjectifyingEntityType.GetTopmostSupertype
+                        Return lrTopmostEntityType.ReferenceModeValueType.DataTypePrecision
+                    Else
+                        Return 0
+                    End If
+                Else
+                    Return 0
+                End If
+            End Get
+            Set(value As Integer)
+                Me._DataTypePrecision = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Private _DataTypeLength As Integer
+        <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+         Browsable(True),
+         [ReadOnly](False),
+         BindableAttribute(True),
+         DefaultValueAttribute(""),
+         DesignOnly(False),
+         DescriptionAttribute("The 'Data Type Length' of the Data Type of this Objectified Fact Type.")>
+        Public Property DataTypeLength() As Integer
+            Get
+                If Me.IsObjectified Then
+                    If Me.ObjectifyingEntityType.HasSimpleReferenceScheme Then
+                        Dim lrTopmostEntityType As FBM.EntityType = Me.ObjectifyingEntityType.GetTopmostSupertype
+                        Return lrTopmostEntityType.ReferenceModeValueType.DataTypeLength
+                    Else
+                        Return 0
+                    End If
+                Else
+                    Return 0
+                End If
+            End Get
+            Set(value As Integer)
+                Me._DataTypeLength = value
+            End Set
+        End Property
+
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public Shadows _ReferenceMode As String
+        <XmlAttribute()>
+        <CategoryAttribute("Fact Type"),
+         DescriptionAttribute("The 'Reference Mode' for the Fact Type"),
+         TypeConverter(GetType(tMyConverter))>
+        Public Shadows Property ReferenceMode() As String
+            Get
+                Dim TempString As String = ""
+                'Holds our selected option for return
+
+                If Me.IsObjectified Then
+                    If Me.ObjectifyingEntityType.ReferenceMode = Nothing Then
+                        'If an option has not already been selected
+                        If tGlobalForTypeConverter.OptionStringArray.GetUpperBound(0) > 0 Then
+                            'If there is more than 1 option
+                            'Sort them alphabetically
+                            Array.Sort(tGlobalForTypeConverter.OptionStringArray)
+                        End If
+                        TempString = tGlobalForTypeConverter.OptionStringArray(0)
+                        'Choose the first option (or the empty one)
+                    Else 'Otherwise, if the option is already selected
+                        'Choose the already selected value                    
+                        TempString = Me.ObjectifyingEntityType.ReferenceMode
+                    End If
+                Else
+                    TempString = ""
+                End If
+                Return TempString
+
+            End Get
+            Set(ByVal Value As String)
+                'Used in Me.RefreshShape
+                Me._ReferenceMode = Value
+            End Set
+        End Property
+
+
         Public Sub New()
             '---------------------------
             'Parameterless Constructor
@@ -2200,7 +2336,41 @@ Namespace FBM
                                 End If
 
                             End If
-
+                        Case Is = "DataType"
+                            Select Case Me._DataType
+                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                          pcenumORMDataType.NumericDecimal,
+                                          pcenumORMDataType.NumericMoney
+                                    Call Me.SetPropertyAttributes(Me, "DataTypePrecision", True)
+                                    Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                Case Is = pcenumORMDataType.RawDataFixedLength,
+                                          pcenumORMDataType.RawDataLargeLength,
+                                          pcenumORMDataType.RawDataVariableLength,
+                                          pcenumORMDataType.TextFixedLength,
+                                          pcenumORMDataType.TextLargeLength,
+                                          pcenumORMDataType.TextVariableLength
+                                    Call Me.SetPropertyAttributes(Me, "DataTypeLength", True)
+                                    Call Me.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                Case Else
+                                    Call Me.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                    Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
+                            End Select
+                            If Me.ObjectifyingEntityType.EntityType.HasSimpleReferenceScheme Then
+                                Me.ObjectifyingEntityType.EntityType.ReferenceModeValueType.SetDataType(Me._DataType)
+                            End If
+                        Case Is = "ReferenceMode"
+                            If Me.IsObjectified Then
+                                Try
+                                    Me.FactType.ObjectifyingEntityType.SetReferenceMode(Me._ReferenceMode)
+                                    If Me._ReferenceMode = " " Then
+                                        Call Me.SetPropertyAttributes(Me, "DataType", False)
+                                    End If
+                                Catch ex As Exception
+                                    Throw New Exception("Error trying to set the Reference Mode for an Objectified Fact Type.")
+                                End Try
+                            Else
+                                MsgBox("The Fact Type must be objectified to have a Reference Mode.")
+                            End If
                         Case Is = "ShowFactTypeName"
                             Call Me.FactType.SetShowFactTypeName(Me.ShowFactTypeName)
                         Case Is = "IsDerived"

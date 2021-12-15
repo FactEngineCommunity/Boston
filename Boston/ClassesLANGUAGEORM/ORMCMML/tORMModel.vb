@@ -424,7 +424,13 @@ Namespace FBM
 
 
                 '====================================================================================================
-                If (asEntityName = arColumn.Role.JoinedORMObject.Id Or asEntityName = arColumn.Role.FactType.Id) And lrRecordsetCount("Count").Data = 0 Then
+                Dim lbForceStorePropertyInformation As Boolean = False
+                If arColumn.Role.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                    If arColumn.Role.JoinsEntityType.IsObjectifyingEntityType Then
+                        lbForceStorePropertyInformation = True
+                    End If
+                End If
+                If lbForceStorePropertyInformation Or (asEntityName = arColumn.Role.JoinedORMObject.Id Or asEntityName = arColumn.Role.FactType.Id) And lrRecordsetCount("Count").Data = 0 Then
                     'Columns can be reused on Subtype Entities, and don't need their definition twice,
                     '  just their relationship with the ERD Entity (above).
 

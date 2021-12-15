@@ -4148,6 +4148,37 @@ Public Class frmDiagramORM
 
                         Case Is = pcenumConceptType.FactType
                             Dim lrFactTypeInstance = CType(lrModelObject, FBM.FactTypeInstance)
+
+                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "ReferenceMode", lrFactTypeInstance.IsObjectified)
+                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", lrFactTypeInstance.IsObjectified)
+                            If lrFactTypeInstance.IsObjectified Then
+                                If lrFactTypeInstance.ObjectifyingEntityType.EntityType.HasSimpleReferenceScheme Then
+                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", True)
+                                    Select Case lrFactTypeInstance.ObjectifyingEntityType.DataType
+                                        Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
+                                              pcenumORMDataType.NumericMoney
+                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
+                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                        Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
+                                              pcenumORMDataType.TextVariableLength
+                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
+                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                        Case Else
+                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                    End Select
+                                Else
+                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", False)
+                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                End If
+                            End If
+
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                             Call lrFactTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)

@@ -1123,14 +1123,23 @@ Namespace FBM
 
                                     Dim lrFactType = arRoleConstraint.FirstRoleConstraintRoleFactType
                                     Dim lrOtherRole = lrFactType.GetOtherRoleOfBinaryFactType(arRoleConstraint.FirstRoleConstraintRole.Id)
+
                                     lrTable = lrOtherRole.JoinedORMObject.getCorrespondingRDSTable
+
+                                    If lrOtherRole.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                                        If lrOtherRole.JoinsEntityType.IsObjectifyingEntityType Then
+                                            lrTable = lrOtherRole.JoinsEntityType.ObjectifiedFactType.getCorrespondingRDSTable
+                                        End If
+                                    End If
 
                                     'Index 
                                     Dim larIndexColumn As New List(Of RDS.Column)
 
+
                                     Dim larColumn = From Column In lrTable.Column
                                                     Where Column.Role.Id = lrOtherRole.Id
                                                     Select Column
+
 
                                     larIndexColumn.Add(larColumn.First)
 
@@ -1149,15 +1158,15 @@ Namespace FBM
 
                                     'Add the new Index
                                     Dim lrIndex As New RDS.Index(lrTable,
-                                                                 lsIndexName,
-                                                                 lsQualifier,
-                                                                 pcenumODBCAscendingOrDescending.Ascending,
-                                                                 lbIsPrimaryKey,
-                                                                 True,
-                                                                 False,
-                                                                 larIndexColumn,
-                                                                 False,
-                                                                 True)
+                                                             lsIndexName,
+                                                             lsQualifier,
+                                                             pcenumODBCAscendingOrDescending.Ascending,
+                                                             lbIsPrimaryKey,
+                                                             True,
+                                                             False,
+                                                             larIndexColumn,
+                                                             False,
+                                                             True)
 
                                     Call lrTable.addIndex(lrIndex)
 
