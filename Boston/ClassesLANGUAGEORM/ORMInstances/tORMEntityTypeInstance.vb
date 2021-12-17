@@ -2089,7 +2089,7 @@ Namespace FBM
                 ElseIf abSimpleAssignment Then
                     Me.ReferenceMode = asNewReferenceMode
                     Call Me.SetReferenceMode()
-                Else
+                ElseIf Trim(Me.ReferenceMode) <> "" Then
                     Call Me.SetReferenceMode()
                 End If
 

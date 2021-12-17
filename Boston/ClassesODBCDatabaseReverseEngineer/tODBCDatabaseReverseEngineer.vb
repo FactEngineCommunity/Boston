@@ -654,8 +654,8 @@ Public Class ODBCDatabaseReverseEngineer
 
                 Dim lsValueTypeName As String
                 Dim lsReferenceMode As String = ""
-                lsValueTypeName = My.Settings.ReverseEngineeringDefaultReferenceMode
-                lsReferenceMode = lsValueTypeName
+                lsValueTypeName = lrTable.Name & "_" & My.Settings.ReverseEngineeringDefaultReferenceMode
+                lsReferenceMode = "." & My.Settings.ReverseEngineeringDefaultReferenceMode
 
                 Dim liBostonDataType As pcenumORMDataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(My.Settings.ReverseEngineeringDefaultPrimaryKeyDataType)
 
@@ -677,6 +677,13 @@ Public Class ODBCDatabaseReverseEngineer
 
                 Dim lrBaseModelelement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrTable.Name)
                 Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrTable.PrimarySupertype)
+
+                If lrModelElement IsNot Nothing And lrBaseModelelement Is Nothing Then
+                    Select Case lrModelElement.GetType
+                        Case = GetType(FBM.EntityType)
+                            lrBaseModelelement = Me.Model.CreateEntityType(lrTable.Name, True)
+                    End Select
+                End If
 
                 If lrBaseModelelement IsNot Nothing Then
                     Select Case lrBaseModelelement.GetType
