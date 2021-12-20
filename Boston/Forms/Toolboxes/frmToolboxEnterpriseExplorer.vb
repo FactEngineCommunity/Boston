@@ -2317,6 +2317,11 @@ Public Class frmToolboxEnterpriseExplorer
         Richmond.WriteToStatusBar("Loading External Uniqueness Constraints")
         Call lrNORMAFileLoader.LoadRoleConstraintExternalUniquenessConstraints(lrModel, NORMAXMLDOC)
 
+        '-------------------------------------------------------
+        'SimpleReferenceSchemes for ObjectifyingEntityTypes
+        '-------------------------------------------------------
+        Call lrNORMAFileLoader.SetSimpleReferenceSchemesObjectifyingEntityTypes(lrModel, NORMAXMLDOC)
+
         '----------------------------
         'Get the Subset Constraints
         '----------------------------

@@ -155,6 +155,72 @@ Namespace NORMA
 
         End Sub
 
+        Public Sub SetSimpleReferenceSchemesObjectifyingEntityTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Try
+
+                Dim lrEntityType As New FBM.EntityType
+                Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+                Dim loEnumElementQueryResult2 As IEnumerable(Of XElement)
+                Dim loElement As XElement
+
+                Dim lrModel As FBM.Model = arModel
+
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                           Select ModelInformation
+                                           Order By ModelInformation.Attribute("Name").Value
+
+                '---------------------------------
+                'Step through the EntityTypes
+                '---------------------------------
+                For Each loElement In loEnumElementQueryResult
+                    lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = loElement.Attribute("id").Value)
+
+                    'Simple Reference Scheme
+                    Dim lsReferenceMode As String = loElement.Attribute("_ReferenceMode").Value
+
+                    If Trim(lsReferenceMode) <> "" Then
+                        loEnumElementQueryResult2 = From PreferredIdentifier In loElement.<orm:PreferredIdentifier>
+                                                    Select PreferredIdentifier
+
+                        If loEnumElementQueryResult2.Count > 0 Then
+                            Dim lsPreferredRoleConstraintRoleId As String = loEnumElementQueryResult2.First.Attribute("ref").Value
+
+                            Dim larRoleConstraint = From RoleConstraint In lrModel.RoleConstraint
+                                                    Where RoleConstraint.NORMAReferenceId = lsPreferredRoleConstraintRoleId
+                                                    Select RoleConstraint
+
+                            If larRoleConstraint.Count > 0 Then
+                                lrEntityType.ReferenceModeRoleConstraint = larRoleConstraint.First
+                                lrEntityType.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(True)
+                            End If
+                        End If
+
+                        If lsReferenceMode <> "" Then
+                            lrEntityType.ReferenceModeValueType = lrEntityType.ReferenceModeRoleConstraint.Role(0).JoinsValueType
+                            lrEntityType.ObjectifiedFactType.InternalUniquenessConstraint(0).IsPreferredIdentifier = False
+                        End If
+
+                        If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
+                            lrEntityType.ReferenceModeFactType = lrEntityType.ReferenceModeRoleConstraint.Role(0).FactType
+                            lrEntityType.ReferenceModeFactType.IsPreferredReferenceMode = True
+                        End If
+
+
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub LoadDataTypes(ByRef arNORMAXMLDOC As XDocument)
 
             Try
@@ -929,6 +995,10 @@ Namespace NORMA
                             Next
 
                             lrFactType.Objectify(True)
+
+                            Dim lsReferenceMode As String = "." & loXMLElementQueryResult(0).Attribute("_ReferenceMode").Value
+                            lrFactType.ObjectifyingEntityType.SetReferenceMode(lsReferenceMode, True,, False,, True, True)
+                            lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
                         End If
 
 

@@ -2370,7 +2370,8 @@ Namespace FBM
                                     Optional ByVal asValueTypeName As String = Nothing,
                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                     Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
-                                    Optional ByVal abSuppressModelSave As Boolean = False)
+                                    Optional ByVal abSuppressModelSave As Boolean = False,
+                                    Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False)
 
             Try
                 If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then
@@ -2413,11 +2414,13 @@ Namespace FBM
 
                     If asReferenceMode <> "" Then
                         Me.ReferenceMode = asReferenceMode
-                        Me.ReferenceModeFactType = lrRoleConstraint.RoleConstraintRole(0).Role.FactType
-                        Me.ReferenceModeValueType = lrRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject
+                        If Not abSuppressSettingReferenceModeFTVT Then
+                            Me.ReferenceModeFactType = lrRoleConstraint.RoleConstraintRole(0).Role.FactType
+                            Me.ReferenceModeValueType = lrRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject
+                        End If
                     End If
 
-                ElseIf Trim(asReferenceMode) = "" Then
+                    ElseIf Trim(asReferenceMode) = "" Then
                     '--------------------------------------------------------------------------------------------
                     'Tried to set null ReferenceMode to an EntityType without a ReferenceMode.
                     '  Simply ignore the request.

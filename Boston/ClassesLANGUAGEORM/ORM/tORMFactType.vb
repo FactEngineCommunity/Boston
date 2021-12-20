@@ -870,19 +870,20 @@ Namespace FBM
                         lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = .LinkFactTypeRole.Id)
                     End If
 
+                    If abAddToPage Then
+                        If arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                            lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                        Else
+                            arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
+                        End If
+                    End If
+
                     If .ObjectifyingEntityType IsNot Nothing Then
                         lrFactTypeInstance.ObjectifyingEntityType = arPage.EntityTypeInstance.Find(Function(x) x.Id = .ObjectifyingEntityType.Id)
                         If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
                             lrFactTypeInstance.ObjectifyingEntityType = .ObjectifyingEntityType.CloneInstance(arPage, True)
                         End If
                         lrFactTypeInstance.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                    End If
-
-
-                    If abAddToPage Then
-                        If Not arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                            arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
-                        End If
                     End If
 
                     Dim lrRole As FBM.Role
@@ -898,7 +899,7 @@ Namespace FBM
                         lrRoleInstance = New FBM.RoleInstance
                         lrRoleInstance = lrRole.CloneInstance(arPage, abAddToPage)
                         lrRoleInstance.FactType = lrFactTypeInstance
-                        lrFactTypeInstance.RoleGroup.Add(lrRoleInstance)
+                        lrFactTypeInstance.RoleGroup.AddUnique(lrRoleInstance)
                     Next
 
                     '----------------------------------------------------------------------------------------------------------------
@@ -928,7 +929,7 @@ Namespace FBM
 
                         lrRoleConstraintInstance = lrRoleConstraint.CloneUniquenessConstraintInstance(arPage, abAddToPage)
 
-                        lrFactTypeInstance.InternalUniquenessConstraint.Add(lrRoleConstraintInstance)
+                        lrFactTypeInstance.InternalUniquenessConstraint.AddUnique(lrRoleConstraintInstance)
                     Next
 
                 End With
@@ -3506,6 +3507,7 @@ Namespace FBM
             Try
                 Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Nothing, False)
                 Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                Me.ObjectifyingEntityType.ObjectifiedFactType = Me
                 Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
 
                 Call Me.CreateLinkFactTypes(True)
