@@ -224,7 +224,7 @@ Namespace FBM
         <XmlIgnore()>
         Public _DataType As pcenumORMDataType
         <XmlIgnore()>
-        <CategoryAttribute("Fact Type"),
+        <CategoryAttribute("Objectifying Entity Type"),
          Browsable(False),
          [ReadOnly](False),
          BindableAttribute(True),
@@ -257,7 +257,7 @@ Namespace FBM
         <XmlIgnore()>
         Private _DataTypePrecision As Integer
         <XmlIgnore()>
-        <CategoryAttribute("Fact Type"),
+        <CategoryAttribute("Objectifying Entity Type"),
          Browsable(True),
          [ReadOnly](False),
          BindableAttribute(True),
@@ -285,7 +285,7 @@ Namespace FBM
         <XmlIgnore()>
         Private _DataTypeLength As Integer
         <XmlIgnore()>
-        <CategoryAttribute("Fact Type"),
+        <CategoryAttribute("Objectifying Entity Type"),
          Browsable(True),
          [ReadOnly](False),
          BindableAttribute(True),
@@ -315,8 +315,8 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public Shadows _ReferenceMode As String
         <XmlAttribute()>
-        <CategoryAttribute("Fact Type"),
-         DescriptionAttribute("The 'Reference Mode' for the Fact Type"),
+        <CategoryAttribute("Objectifying Entity Type"),
+         DescriptionAttribute("The 'Reference Mode' for the Objectifying Entity Type for the Fact Type"),
          TypeConverter(GetType(tMyConverter))>
         Public Shadows Property ReferenceMode() As String
             Get
