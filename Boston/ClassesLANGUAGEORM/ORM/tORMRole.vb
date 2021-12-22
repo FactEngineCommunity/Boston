@@ -97,7 +97,7 @@ Namespace FBM
         ''' If the Role has RoleValueConstraint the RoleConstraint that is that RoleValueConstraint.
         ''' </summary>
         <XmlIgnore()>
-        Public RoleConstraintRoleValueConstraint As FBM.RoleConstraint = Nothing
+        Public WithEvents RoleConstraintRoleValueConstraint As FBM.RoleConstraint = Nothing
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -667,9 +667,10 @@ Namespace FBM
 
             Try
                 Dim larRole As New List(Of FBM.Role)
-                Dim lrRoleConstraint As New FBM.RoleConstraint(Me.Model,
-                                                               pcenumRoleConstraintType.RoleValueConstraint,
-                                                               Nothing, False, 0, True)
+                Dim lsRoleConstraintName As String = Me.Model.CreateUniqueRoleConstraintName(pcenumRoleConstraintType.RoleValueConstraint.ToString, 0)
+                Dim lrRoleConstraint As New FBM.RoleConstraint(Me.Model, lsRoleConstraintName, True,
+                                                               pcenumRoleConstraintType.RoleValueConstraint, Nothing, True)
+
 
                 lrRoleConstraint.RoleConstraintRole.Add(New FBM.RoleConstraintRole(Me, lrRoleConstraint,,,, True))
                 lrRoleConstraint.makeDirty()
@@ -2769,6 +2770,21 @@ Namespace FBM
             Call Me.Model.MakeDirty(False, True)
 
             RaiseEvent ValueRangeChanged(asNewValueRange)
+
+        End Sub
+
+        Private Sub RoleConstraintRoleValueConstraint_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles RoleConstraintRoleValueConstraint.RemovedFromModel
+
+            Try
+                Me.RoleConstraintRoleValueConstraint = Nothing
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

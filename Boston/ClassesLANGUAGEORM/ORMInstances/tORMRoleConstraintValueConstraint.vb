@@ -298,6 +298,21 @@ Namespace FBM
 
         End Sub
 
+        Private Sub _RoleConstraint_ValueConstraintCleared() Handles _RoleConstraint.ValueConstraintCleared
+
+            Try
+                Me._ValueConstraintList.Clear()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

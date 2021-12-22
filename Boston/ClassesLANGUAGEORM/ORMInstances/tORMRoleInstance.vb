@@ -96,7 +96,7 @@ Namespace FBM
 #Region "Role Value Constraint"
 
         <XmlIgnore()>
-        Public Shadows RoleConstraintRoleValueConstraint As FBM.RoleValueConstraint = Nothing
+        Public Shadows WithEvents RoleConstraintRoleValueConstraint As FBM.RoleValueConstraint = Nothing
 
         <XmlIgnore()>
         <CategoryAttribute("Role Constraint"),
@@ -1475,6 +1475,19 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Private Sub RoleConstraintRoleValueConstraint_RemovedFromModel() Handles RoleConstraintRoleValueConstraint.RemovedFromModel
+            Try
+                Me.RoleConstraintRoleValueConstraint = Nothing
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
     End Class
 

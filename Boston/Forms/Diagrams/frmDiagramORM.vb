@@ -3737,19 +3737,6 @@ Public Class frmDiagramORM
                     Me.Diagram.Selection.Clear()
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
                 ElseIf IsSomething(loSelectedNode) Then
-                    '--------------------------------------------------------------------------------------------------------------------------
-                    'VM-20160122-Commented out this code. Not sure what it is for and caused problems when Right-Clicking on a
-                    '  multi-role InternalUniquenessConstraint. Cleared the selection, when the selection needed to be there to (optionally)
-                    '  remove the InternalUniquenessConstraint.
-                    '
-                    '  If after some time things are going well and this code is not missed, then remove this commented-out code completely.
-                    'If IsSomething(loSelectedNode) Then
-                    '    Me.zrPage.SelectedObject.Clear()
-                    '    Dim loDiagramNode As DiagramNode
-                    '    loDiagramNode = loSelectedNode
-                    '    loDiagramNode.Selected = True
-                    'End If
-                    '--------------------------------------------------------------------------------------------------------------------------
                     '------------------------------------------------------------------------------------
                     'Special handling for FactTypes.
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
@@ -4769,7 +4756,8 @@ Public Class frmDiagramORM
                                   pcenumRoleConstraintType.EqualityConstraint,
                                   pcenumRoleConstraintType.SubsetConstraint,
                                   pcenumRoleConstraintType.ExclusiveORConstraint,
-                                  pcenumRoleConstraintType.InclusiveORConstraint
+                                  pcenumRoleConstraintType.InclusiveORConstraint,
+                                  pcenumRoleConstraintType.RoleValueConstraint
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ExternalRoleConstraint
                     End Select
                     Call lrRoleConstraintInstance.NodeSelected()

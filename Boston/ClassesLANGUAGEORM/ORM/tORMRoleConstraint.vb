@@ -326,6 +326,7 @@ Namespace FBM
         Public Event RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As FBM.RoleConstraintRole)
         Public Event ArgumentRemoved(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument)
         Public Event ValueConstraintAdded(ByVal asNewValueConstraint As String)
+        Public Event ValueConstraintCleared()
         Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
         Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
         Public Event ValueRangeTypeChanged(ByVal aiNewValueRangeType As pcenumValueRangeType)
@@ -416,7 +417,8 @@ Namespace FBM
                 Optional ByRef aarRole As List(Of FBM.Role) = Nothing,
                 Optional ByVal abAddToModel As Boolean = Nothing,
                 Optional ByVal aiLevelNr As Integer = Nothing,
-                Optional ByVal abMakeDirty As Boolean = False)
+                Optional ByVal abMakeDirty As Boolean = False,
+                Optional ByVal abIdEqualsName As Boolean = False)
 
             Call Me.New()
 
@@ -431,6 +433,7 @@ Namespace FBM
             Me.Model = arModel
             Me.RoleConstraintType = aiRoleConstraintType
             Me.Name = Me.RoleConstraintType.ToString
+            If abIdEqualsName Then Me.Id = Me.Name
             Me.isDirty = abMakeDirty
 
             Select Case aiRoleConstraintType
@@ -455,7 +458,7 @@ Namespace FBM
                 '  'Entry' and 'Exit' information.
                 '-------------------------------------------------------------------
                 Select Case aiRoleConstraintType
-                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint, _
+                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint,
                               pcenumRoleConstraintType.ExternalUniquenessConstraint
                         '---------------------------------
                         'Is OK, is Uniqueness Constraint
@@ -2013,6 +2016,12 @@ Namespace FBM
                         If Me.RoleConstraintRole.Count > 0 Then
                             Me.RoleConstraintRole(0).Role.FactType.RemoveInternalUniquenessConstraint(Me, False, False)
                         End If
+                    Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                        Me._ValueConstraint.Clear()
+                        Me._ValueConstraintList.Clear()
+                        Me.RoleConstraintRole(0).Role._ValueConstraint.Clear()
+                        Me.RoleConstraintRole(0).Role._ValueConstraintList.Clear()
+                        RaiseEvent ValueConstraintCleared()
                 End Select
 
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole

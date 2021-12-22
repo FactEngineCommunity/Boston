@@ -40,6 +40,8 @@ Namespace FBM
         ''' </summary>
         Private WithEvents EntityTypeInstance As FBM.EntityTypeInstance
 
+        Public Shadows Event RemovedFromModel()
+
         Sub New()
 
             MyBase.ConceptType = pcenumConceptType.RoleConstraint
@@ -349,6 +351,40 @@ Namespace FBM
             End Try
 
         End Sub
+
+        Private Sub _RoleConstraint_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles _RoleConstraint.RemovedFromModel
+
+            Try
+                Call Me.RemoveFromPage(abBroadcastInterfaceEvent)
+                RaiseEvent RemovedFromModel()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub _RoleConstraint_ValueConstraintCleared() Handles _RoleConstraint.ValueConstraintCleared
+
+            Try
+                Me._ValueConstraintList.Clear()
+                Me.RoleConstraintRole(0).Role._ValueConstraint.Clear()
+                Me.RoleConstraintRole(0).Role._ValueConstraintList.Clear()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace
