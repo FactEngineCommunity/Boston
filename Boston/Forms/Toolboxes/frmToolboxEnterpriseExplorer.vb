@@ -729,6 +729,14 @@ Public Class frmToolboxEnterpriseExplorer
                                   pcenumMenuType.pageERD,
                                   pcenumMenuType.pagePGSDiagram,
                                   pcenumMenuType.pageSTD
+
+                            Dim lrModel As FBM.Model = loObject.Tag.Model
+                            If lrModel.Page.Find(Function(x) x.Name = e.Label) IsNot Nothing Then
+                                MsgBox("That Page name already exists in the Model.")
+                                e.CancelEdit = True
+                                Exit Sub
+                            End If
+
                             Dim lr_page As New FBM.Page(loObject.tag.Model)
                             lr_page = loObject.tag
                             lr_page.IsDirty = True

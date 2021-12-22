@@ -708,7 +708,9 @@ Namespace FBM
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.ValueType.Id, pcenumConceptType.ValueType)
                 lrConceptInstance.X = Me.X
                 lrConceptInstance.Y = Me.Y
-                Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+                If Not TableConceptInstance.ExistsConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance) Then
+                    Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+                End If
 
                 Me.Id = Me.ValueType.Id
                 Me.Symbol = Me.ValueType.Id

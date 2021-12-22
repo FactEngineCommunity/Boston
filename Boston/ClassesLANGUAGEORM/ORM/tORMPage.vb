@@ -2291,6 +2291,12 @@ Namespace FBM
                     Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeReadingShape.Shape)
                     Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTable.TableShape)
                     Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeNameShape)
+                    'Derivation Text
+                    If arFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                        If arFactTypeInstance.FactTypeDerivationText.Shape IsNot Nothing Then
+                            Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeDerivationText.Shape)
+                        End If
+                    End If
                 End If
 
                 'The FactTypeName is a separate Shape with its own ConceptInstance in the database.

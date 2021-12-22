@@ -1411,6 +1411,12 @@ Public Class frmDiagramORM
             If IsSomething(aoDropTargetNode) Then
                 lrFactType = aoDropTargetNode.Tag.FactType
                 lrFactType = Me.zrPage.Model.FactType.Find(Function(x) x.Id = lrFactType.Id)
+
+                If lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject Is Nothing) IsNot Nothing Then
+                    MsgBox("Link the Roles of the Fact Type to model elements on the Page before adding a new Role to the Fact Type.")
+                    Return Nothing
+                End If
+
                 '--------------------------------
                 'Create a Role for the FactType
                 '--------------------------------
