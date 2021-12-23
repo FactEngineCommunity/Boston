@@ -348,6 +348,8 @@ Namespace RDS
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
                 arColumn.Table = Me 'CodeSafe
 
+                If Me.Name = "Stakeholder" Then Debugger.Break()
+
                 'CodeSafe: Don't add the Column if it already exists.
                 If Me.Column.Contains(arColumn) Then
                     Return False
@@ -1678,8 +1680,8 @@ Namespace RDS
                         lrNewColumn.IsMandatory = True 'To be on the safe side                    
                         lrNewColumn.OrdinalPosition = lrTable.Column.Count + 1
 
-                        If lrTable.Column.Contains(lrNewColumn) Then
-                            lrNewColumn = lrTable.Column.Find(AddressOf lrNewColumn.Equals)
+                        If lrTable.Column.Find(AddressOf lrNewColumn.EqualsByRoleActiveRole) IsNot Nothing Then
+                            lrNewColumn = lrTable.Column.Find(AddressOf lrNewColumn.EqualsByRoleActiveRole)
                         Else
                             lrTable.addColumn(lrNewColumn)
                         End If
