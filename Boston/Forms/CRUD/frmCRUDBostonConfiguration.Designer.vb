@@ -69,13 +69,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.GroupBoxERDiagrams = New System.Windows.Forms.GroupBox()
         Me.CheckBoxHideUnknownPredicates = New System.Windows.Forms.CheckBox()
+        Me.TabPage6 = New System.Windows.Forms.TabPage()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode = New System.Windows.Forms.Label()
+        Me.TextBoxReverseEngineeringDefaultReferenceMode = New System.Windows.Forms.TextBox()
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.TabPage6 = New System.Windows.Forms.TabPage()
-        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -91,11 +94,11 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.SuspendLayout()
         Me.TabPage4.SuspendLayout()
         Me.GroupBoxERDiagrams.SuspendLayout()
+        Me.TabPage6.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
         Me.TabPage5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabPage6.SuspendLayout()
-        Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -565,6 +568,57 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxHideUnknownPredicates.Text = "Hide Unknown Predicates"
         Me.CheckBoxHideUnknownPredicates.UseVisualStyleBackColor = True
         '
+        'TabPage6
+        '
+        Me.TabPage6.Controls.Add(Me.GroupBox5)
+        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage6.Name = "TabPage6"
+        Me.TabPage6.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage6.TabIndex = 5
+        Me.TabPage6.Text = "Reverse Engineering"
+        Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'GroupBox5
+        '
+        Me.GroupBox5.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox5.Controls.Add(Me.LabelPromptReverseEngineeringDefaultReferenceMode)
+        Me.GroupBox5.Controls.Add(Me.TextBoxReverseEngineeringDefaultReferenceMode)
+        Me.GroupBox5.Controls.Add(Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames)
+        Me.GroupBox5.Location = New System.Drawing.Point(3, 6)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(600, 574)
+        Me.GroupBox5.TabIndex = 0
+        Me.GroupBox5.TabStop = False
+        '
+        'LabelPromptReverseEngineeringDefaultReferenceMode
+        '
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode.AutoSize = True
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode.Location = New System.Drawing.Point(9, 52)
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode.Name = "LabelPromptReverseEngineeringDefaultReferenceMode"
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode.Size = New System.Drawing.Size(127, 13)
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode.TabIndex = 2
+        Me.LabelPromptReverseEngineeringDefaultReferenceMode.Text = "Default Reference Mode:"
+        '
+        'TextBoxReverseEngineeringDefaultReferenceMode
+        '
+        Me.TextBoxReverseEngineeringDefaultReferenceMode.Location = New System.Drawing.Point(142, 49)
+        Me.TextBoxReverseEngineeringDefaultReferenceMode.MaxLength = 10
+        Me.TextBoxReverseEngineeringDefaultReferenceMode.Name = "TextBoxReverseEngineeringDefaultReferenceMode"
+        Me.TextBoxReverseEngineeringDefaultReferenceMode.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxReverseEngineeringDefaultReferenceMode.TabIndex = 1
+        '
+        'CheckBoxReverseEngineeringKeepDatabaseColumnNames
+        '
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.AutoSize = True
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Location = New System.Drawing.Point(9, 26)
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Name = "CheckBoxReverseEngineeringKeepDatabaseColumnNames"
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Size = New System.Drawing.Size(222, 17)
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.TabIndex = 0
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Text = "Keep database column names (e.g. case)"
+        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.UseVisualStyleBackColor = True
+        '
         'TabPage5
         '
         Me.TabPage5.Controls.Add(Me.GroupBox4)
@@ -582,6 +636,7 @@ Partial Class frmCRUDBostonConfiguration
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.AutoSize = True
+        Me.GroupBox4.Controls.Add(Me.CheckBoxDiagramSpyShowLinkFactTypes)
         Me.GroupBox4.Controls.Add(Me.CheckBoxSuperuserMode)
         Me.GroupBox4.Location = New System.Drawing.Point(10, 9)
         Me.GroupBox4.Margin = New System.Windows.Forms.Padding(2)
@@ -606,37 +661,15 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'TabPage6
+        'CheckBoxDiagramSpyShowLinkFactTypes
         '
-        Me.TabPage6.Controls.Add(Me.GroupBox5)
-        Me.TabPage6.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(606, 583)
-        Me.TabPage6.TabIndex = 5
-        Me.TabPage6.Text = "Reverse Engineering"
-        Me.TabPage6.UseVisualStyleBackColor = True
-        '
-        'GroupBox5
-        '
-        Me.GroupBox5.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox5.Controls.Add(Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames)
-        Me.GroupBox5.Location = New System.Drawing.Point(3, 6)
-        Me.GroupBox5.Name = "GroupBox5"
-        Me.GroupBox5.Size = New System.Drawing.Size(600, 574)
-        Me.GroupBox5.TabIndex = 0
-        Me.GroupBox5.TabStop = False
-        '
-        'CheckBoxReverseEngineeringKeepDatabaseColumnNames
-        '
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.AutoSize = True
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Location = New System.Drawing.Point(6, 19)
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Name = "CheckBoxReverseEngineeringKeepDatabaseColumnNames"
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Size = New System.Drawing.Size(222, 17)
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.TabIndex = 0
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Text = "Keep database column names (e.g. case)"
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.UseVisualStyleBackColor = True
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.AutoSize = True
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 55)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Name = "CheckBoxDiagramSpyShowLinkFactTypes"
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Size = New System.Drawing.Size(201, 17)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.TabIndex = 1
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Text = "Diagram Spy - Show Link Fact Types"
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -674,14 +707,14 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage4.ResumeLayout(False)
         Me.GroupBoxERDiagrams.ResumeLayout(False)
         Me.GroupBoxERDiagrams.PerformLayout()
+        Me.TabPage6.ResumeLayout(False)
+        Me.GroupBox5.ResumeLayout(False)
+        Me.GroupBox5.PerformLayout()
         Me.TabPage5.ResumeLayout(False)
         Me.TabPage5.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabPage6.ResumeLayout(False)
-        Me.GroupBox5.ResumeLayout(False)
-        Me.GroupBox5.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -738,4 +771,7 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents TabPage6 As TabPage
     Friend WithEvents GroupBox5 As GroupBox
     Friend WithEvents CheckBoxReverseEngineeringKeepDatabaseColumnNames As CheckBox
+    Friend WithEvents LabelPromptReverseEngineeringDefaultReferenceMode As Label
+    Friend WithEvents TextBoxReverseEngineeringDefaultReferenceMode As TextBox
+    Friend WithEvents CheckBoxDiagramSpyShowLinkFactTypes As CheckBox
 End Class

@@ -125,7 +125,7 @@ Namespace FEQL
             Patterns.Add(TokenType.MODELNAME, regex)
             Tokens.Add(TokenType.MODELNAME)
 
-            regex = new Regex("(([A-Z0-9][_a-z0-9]+)+[_|\s]?)+", RegexOptions.Compiled)
+            regex = new Regex("(([A-Z0-9]+[_a-z0-9]+[ |_]*)+[_|\s]?)+", RegexOptions.Compiled)
             Patterns.Add(TokenType.MODELELEMENTNAME, regex)
             Tokens.Add(TokenType.MODELELEMENTNAME)
 

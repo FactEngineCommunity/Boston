@@ -78,6 +78,9 @@ Public Class frmCRUDBostonConfiguration
         'ER Diagrams
         Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
 
+        'Diagrams General
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked = My.Settings.DiagramSpyShowLinkFactTypes
+
         'Superuser Mode
         RemoveHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
         Me.CheckBoxSuperuserMode.Checked = My.Settings.SuperuserMode
@@ -87,6 +90,7 @@ Public Class frmCRUDBostonConfiguration
 
         'Reverse Engineering
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked = My.Settings.ReverseEngineeringKeepDatabaseColumnNames
+        Me.TextBoxReverseEngineeringDefaultReferenceMode.Text = Trim(My.Settings.ReverseEngineeringDefaultReferenceMode)
 
     End Sub
 
@@ -133,6 +137,8 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
             My.Settings.AutoCompleteSingleClickSelects = Me.CheckBoxAutoCompleteSingleClickSelects.Checked
             My.Settings.ReverseEngineeringKeepDatabaseColumnNames = Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked
+            My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
+            My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
 
             'Superuser Mode          
             My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked
