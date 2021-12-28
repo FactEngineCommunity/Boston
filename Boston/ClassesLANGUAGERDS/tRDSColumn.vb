@@ -98,6 +98,11 @@ Namespace RDS
         <XmlAttribute()>
         Public IsDerivationParameter As Boolean = False
 
+        ''' <summary>
+        ''' Is the Column from the Supertype Table that is represented by this Column, if this Column is inherited from a Supertype table.
+        ''' </summary>
+        Public WithEvents SupertypeColumn As RDS.Column = Nothing
+
         '<XmlAttribute()> _
         'Public ContributesToPrimaryKey As Boolean = False
 
@@ -272,7 +277,8 @@ Namespace RDS
         ''' <param name="arRelation">Populate if cloning for a Relation</param>
         ''' <returns></returns>
         Public Function Clone(Optional ByRef arOriginTable As RDS.Table = Nothing,
-                              Optional ByRef arRelation As RDS.Relation = Nothing) As RDS.Column
+                              Optional ByRef arRelation As RDS.Relation = Nothing,
+                              Optional ByVal abSetSupertypeColumnAsMe As Boolean = False) As RDS.Column
 
             Dim lrColumn As New RDS.Column
 
@@ -313,6 +319,11 @@ Namespace RDS
                 lrColumn.QueryEdge = .QueryEdge
                 lrColumn.TemporaryAlias = .TemporaryAlias
                 lrColumn.ProjectionOrdinalPosition = .ProjectionOrdinalPosition
+
+                'SupertypeColumn
+                If abSetSupertypeColumnAsMe Then
+                    lrColumn.SupertypeColumn = Me
+                End If
 
             End With
 
@@ -867,6 +878,20 @@ Namespace RDS
             End Try
         End Sub
 
+        Private Sub SupertypeColumn_OrdinalPositionChanged(aiNewOrdinalPosition As Integer) Handles SupertypeColumn.OrdinalPositionChanged
+
+            Try
+                Me.OrdinalPosition = Me.SupertypeColumn.OrdinalPosition
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

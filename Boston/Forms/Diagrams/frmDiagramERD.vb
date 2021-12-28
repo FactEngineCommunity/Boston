@@ -3257,6 +3257,9 @@ Public Class frmDiagramERD
             Me.ToolStripMenuItemMoveUp.Enabled = Not lrAttribute.Entity.RDSTable.isSubtype
             Me.ToolStripMenuItemMoveDown.Enabled = Not lrAttribute.Entity.RDSTable.isSubtype
 
+            'Can't delete an Attribute unless Boston is in Superuser mode.
+            Me.ToolStripMenuItemDeleteAttribute.Enabled = My.Settings.SuperuserMode
+
             '--------------------------------------------------------------------
             'ModelErrors - Add menu items for the ModelErrors for the EntityType
             '--------------------------------------------------------------------
@@ -3277,9 +3280,6 @@ Public Class frmDiagramERD
 
         Catch ex As Exception
         End Try
-
-
-
 
     End Sub
 

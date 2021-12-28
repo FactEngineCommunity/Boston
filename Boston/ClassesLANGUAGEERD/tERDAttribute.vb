@@ -141,6 +141,11 @@ Namespace ERD
         Public WithEvents ActiveRole As FBM.Role
 
         ''' <summary>
+        ''' Is the Column from the Supertype Table that is represented by this Attribute/Column, if this Attribute/Column is inherited from a Supertype table.
+        ''' </summary>
+        Public WithEvents SupertypeColumn As RDS.Column
+
+        ''' <summary>
         ''' The RDS Column that the Attribute relates to.
         ''' </summary>
         ''' <remarks></remarks>
@@ -555,6 +560,17 @@ Namespace ERD
                 If Me.Entity.Name = Me.Column.Table.Name Then
                     'Column may be moved to a new Table/Entity, so may not exist in Me.Entity.
                     Call Me.Entity.RefreshShape()
+                Else
+                    Try
+                        Call Me.Entity.RefreshShape()
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    End Try
                 End If
             Catch ex As Exception
                 Dim lsMessage As String
@@ -583,6 +599,36 @@ Namespace ERD
 
         End Sub
 
+        Private Sub SupertypeColumn_OrdinalPositionChanged(aiNewOrdinalPosition As Integer) Handles SupertypeColumn.OrdinalPositionChanged
+
+            Try
+                'Me.OrdinalPosition = aiNewOrdinalPosition '20210422-VM-Removed because made ReadOnly Property returning Attribute.Column.OrdinalPosition
+
+                If Me.Entity.Name = Me.Column.Table.Name Then
+                    'Column may be moved to a new Table/Entity, so may not exist in Me.Entity.
+                    Call Me.Entity.RefreshShape()
+                Else
+                    Try
+                        Call Me.Entity.RefreshShape()
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    End Try
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

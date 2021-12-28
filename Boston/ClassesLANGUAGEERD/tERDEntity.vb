@@ -465,6 +465,7 @@ Namespace ERD
                     lrERAttribute.Page = Me.Page
 
                     lrERAttribute.Column = lrColumn
+                    lrERAttribute.SupertypeColumn = lrColumn.SupertypeColumn
 
                     Me.Attribute.AddUnique(lrERAttribute)
 
