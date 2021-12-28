@@ -2032,7 +2032,13 @@ Namespace FBM
                     '----------------------------------------                    
                     Dim StringSize As New SizeF
                     Dim G As Graphics
-                    Dim lsFactTypeName As String = Chr(34) & Me.Name & Chr(34)
+                    Dim lsFactTypeName As String = ""
+                    If Trim(Me.ReferenceMode) = "" Then
+                        lsFactTypeName = Chr(34) & Me.Name & Chr(34)
+                    Else
+                        lsFactTypeName &= Chr(34) & Me.Name & " (" & Trim(Me.ReferenceMode) & ")" & Chr(34)
+                    End If
+
                     G = Me.Page.Form.CreateGraphics
                     StringSize = Me.Page.Diagram.MeasureString(Trim(lsFactTypeName), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     StringSize.Height += 5
