@@ -156,6 +156,29 @@ Public Module tableDatabaseUpgrade
 
     End Function
 
+    Public Sub MarkAllPreviousDatabaseUpgradesSuccessful(ByVal aiLastSuccessfulUpgrade As Integer)
+
+
+        Dim lsSQLQuery As String = ""
+
+        Try
+            lsSQLQuery = "UPDATE DatabaseUpgrade"
+            lsSQLQuery &= " SET SuccessfulImplementation = TRUE"
+            lsSQLQuery &= " WHERE UpgradeId < " & aiLastSuccessfulUpgrade.ToString
+
+            Call pdbConnection.Execute(lsSQLQuery)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 
 
     Public Function GetNextRequiredUpgrade(ByRef ar_upgrade As DatabaseUpgrade.Upgrade, Optional ByVal abSilent As Boolean = False) As DatabaseUpgrade.Upgrade
@@ -168,13 +191,22 @@ Public Module tableDatabaseUpgrade
 
         lsSQLQuery = "SELECT *"
         lsSQLQuery &= " FROM DatabaseUpgrade"
-        lsSQLQuery &= " WHERE ToVersion = ("
-        lsSQLQuery &= "                     SELECT MIN(upg2.ToVersion)"
+        lsSQLQuery &= " WHERE (ToVersion = ("
+        lsSQLQuery &= "                     SELECT MAX(upg2.ToVersion)"
         lsSQLQuery &= "                       FROM DatabaseUpgrade upg2"
-        lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yey
-        lsSQLQuery &= "                        AND csng(ToVersion) > " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+        lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
+        lsSQLQuery &= "                        AND csng(ToVersion) <= " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
         lsSQLQuery &= "                     )"
-        lsSQLQuery &= "   AND SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yey
+        lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet
+        lsSQLQuery &= "   OR"
+        lsSQLQuery &= " (ToVersion = ("
+        lsSQLQuery &= "                     SELECT MIN(upg3.ToVersion)"
+        lsSQLQuery &= "                       FROM DatabaseUpgrade upg3"
+        lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
+        lsSQLQuery &= "                        AND csng(upg3.ToVersion) >= " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+        lsSQLQuery &= "                     )"
+        lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet\
+        lsSQLQuery &= " ORDER BY ToVersion DESC"
 
 
         lrRecordset.Open(lsSQLQuery, , , pc_cmd_table)
@@ -193,6 +225,8 @@ Public Module tableDatabaseUpgrade
         End If
 
     End Function
+
+
 
     Function GetRequiredUpgradeCount() As Integer
 

@@ -221,8 +221,16 @@ Public Class frmDatabaseUpgrade
                             '  must be executed to fulfill a release...then it must be
                             '  hard-coded, and may as well be referenced from right here.
                             '-------------------------------------------------------------
-                            Call transaction.Commit()
-                            If Not Database.Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute) Then
+                            Try
+                                Call transaction.Commit()
+                            Catch ex As Exception
+                                'Not a biggie
+                            End Try
+
+
+                            Dim lbIsLastRequiredUpgrade As Boolean = Database.IsLastRequiredUpgradeById(CInt(aiUpgradeId))
+
+                            If Not Database.Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute, lbIsLastRequiredUpgrade) Then
                                 GoTo error_handler
                             End If
                             transaction = pdb_OLEDB_connection.BeginTransaction()

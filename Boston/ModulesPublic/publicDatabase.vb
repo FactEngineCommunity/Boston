@@ -24,12 +24,48 @@ Namespace Database
 
         End Function
 
+        Public Function IsLastRequiredUpgradeById(ByVal aiUpgradeId As Integer) As Boolean
+
+            Try
+                Dim lsSQLQuery As String
+                Dim lrRecordset As New ADODB.Recordset
+
+                lrRecordset.ActiveConnection = pdbDatabaseUpgradeConnection
+                lrRecordset.CursorType = pcOpenStatic
+
+                '-----------------------------------------------------------------
+                'Get the set of SQLStatements that need to be performed.
+                '-----------------------------------------------------------------
+                lsSQLQuery = "SELECT MAX(UpgradeId) AS MaxUpgradeId"
+                lsSQLQuery &= "  FROM Upgrade"
+
+                lrRecordset.Open(lsSQLQuery)
+
+                If aiUpgradeId >= CInt(lrRecordset("MaxUpgradeId").Value) Then
+                    Return True
+                End If
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Returns the wildcard operator for a database type. I.e. e.g. * or %
         ''' </summary>
         ''' <param name="aiDatabaseType"></param>
         ''' <returns></returns>
-        Public Function gerLikeWildcardOperator(ByVal aiDatabaseType As pcenumDatabaseType) As String
+        Public Function getLikeWildcardOperator(ByVal aiDatabaseType As pcenumDatabaseType) As String
 
             Select Case aiDatabaseType
                 Case Is = pcenumDatabaseType.MSJet
@@ -198,7 +234,9 @@ Namespace Database
                                     'Not a biggie. transaction reset below.
                                 End Try
 
-                                If Not Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute) Then
+                                Dim lbIsLastRequiredUpgrade As Boolean = Database.IsLastRequiredUpgradeById(CInt(aiUpgradeId))
+
+                                If Not Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute, lbIsLastRequiredUpgrade) Then
                                     GoTo error_handler
                                 End If
                                 transaction = pdb_OLEDB_connection.BeginTransaction()
@@ -264,9 +302,11 @@ error_handler:
         ''' Used when the Upgrade requires Boston to run code in Boston.
         ''' </summary>
         ''' <param name="asUpgradeCodeName"></param>
+        ''' <param name="abIsLastRequiredUpgrade">Used to determine whether to run the code or not.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Function ExecuteUpgradeCode(ByVal asUpgradeCodeName As String) As Boolean
+        Function ExecuteUpgradeCode(ByVal asUpgradeCodeName As String,
+                                    ByVal abIsLastRequiredUpgrade As Boolean) As Boolean
 
             ExecuteUpgradeCode = True
 
@@ -287,7 +327,12 @@ error_handler:
                 Case Is = "AddRoleConstraintGUIDs"
                     Call DatabaseUpgradeFunctions.AddRoleConstraintGUIDs()
                 Case Is = "ReplaceCoreModel"
-                    Call DatabaseUpgradeFunctions.ReplaceCoreModel()
+                    If abIsLastRequiredUpgrade Then
+                        'Only replace the Core metamodel if lbIsLastRequiredUpgrade, because otherwise the Model. Save might fail if the Model data structure has changed.
+                        '  This basically requires that the last thing that is done each release is to update the Core metamodel, so that 
+                        '  customers who delay doing an upgrade have the Core metamodel updated as and when required.
+                        Call DatabaseUpgradeFunctions.ReplaceCoreModel()
+                    End If
                 Case Is = "ReplaceUniversityModel"
                     Call DatabaseUpgradeFunctions.ReplaceUniversityModel()
                 Case Else

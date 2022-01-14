@@ -155,6 +155,11 @@ Namespace RDS
         Public RolesPlayed As New List(Of RDS.Plays)
 
         ''' <summary>
+        ''' TypeDB Specific. Is populated if Table is both a TypeDB Relation and has a Rule.
+        ''' </summary>
+        Public DerivationRule As String = Nothing
+
+        ''' <summary>
         ''' TypeDB specific. The Roles 'related' by the Table.
         '''   I.e. e.g. If the Table is a 'relation' in TypeDB...then the set of RoleNames that the Table/Relation relates.
         '''   i.e. e.g. As in an ObjectifiedFactType, is the set of RoleNames related by the Table.

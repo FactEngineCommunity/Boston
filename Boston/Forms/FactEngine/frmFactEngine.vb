@@ -1829,7 +1829,7 @@ Public Class frmFactEngine
 
                                 If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Then 'Or laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER)
                                     Try
-                                        Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                                        Dim lsDatabaseWildcardOperator = Database.getLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
 
                                         Dim lsFEQLQueryAddition As String = ""
                                         lsFEQLQuery &= " " & lrQueryEdge.Predicate
@@ -1882,7 +1882,7 @@ Public Class frmFactEngine
                             Try
                                 If lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.Count > 0 Then
                                     Dim lsCurrentTokenText As String = Me.zrTextHighlighter.GetCurrentContext.Token.Text
-                                    Dim lsDatabaseWildcardOperator = Database.gerLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
+                                    Dim lsDatabaseWildcardOperator = Database.getLikeWildcardOperator(prApplication.WorkingModel.TargetDatabaseType)
                                     Dim lsCurrentToken As String = Trim(lsCurrentTokenText)
                                     lsSQLQuery &= vbCrLf & "WHERE " & lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns(0).Name & " LIKE '" & lsCurrentToken & lsDatabaseWildcardOperator & "'"
 

@@ -429,6 +429,7 @@ Namespace FactEngine.TypeDB
                 Next
 
                 Dim Relations = client.getRelations()
+                Dim Rules = client.getRules.ToList()
 
                 For Each lrRelation In Relations
 
@@ -453,6 +454,13 @@ Namespace FactEngine.TypeDB
                         Next
 
                         lrTable.IsDBRelation = True
+
+                        'DerivedFactType                        
+                        Dim Rule = Rules.Find(Function(x) x.Then.Trim.EndsWith($"isa {lrRelation.Label}", StringComparison.InvariantCultureIgnoreCase))
+                        If Rule IsNot Nothing Then
+                            lrTable.DerivationRule = $"When: {Rule.When}"
+                            lrTable.DerivationRule &= vbCrLf & $"Then: {Rule.Then}"
+                        End If
 
                         Dim lrSupertype = client.getSuperType(lrTable.Name)
                         lrTable.PrimarySupertype = lrSupertype.Label

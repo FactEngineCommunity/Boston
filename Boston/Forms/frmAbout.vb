@@ -20,7 +20,7 @@ Public Class frmAbout
 
         Me.LabelCategory.Text = prApplication.SoftwareCategory.ToString
 
-        ls_message = "Written by Viev Pty Ltd and Victor Morgante."
+        ls_message = "Written by FactEngine and Victor Morgante."
         ls_message &= vbCrLf & "Copyright 2017-2021. All rights reserved."
 
         label_details.Text = ls_message

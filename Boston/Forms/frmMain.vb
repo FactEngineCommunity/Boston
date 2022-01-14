@@ -3306,6 +3306,9 @@ Public Class frmMain
                                 '------------------------------------------------
                                 Call Richmond.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
                                 Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaseUpgrade.UpgradeId)
+
+                                'CodeSafe
+                                Call tableDatabaseUpgrade.MarkAllPreviousDatabaseUpgradesSuccessful(lrDatabaseUpgrade.UpgradeId)
                             Else
                                 Throw New Exception("Failed Database Upgrade: From version: " & lrDatabaseUpgrade.FromVersionNr & " to version: " & lrDatabaseUpgrade.ToVersionNr)
                             End If

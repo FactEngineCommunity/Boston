@@ -66,7 +66,7 @@ Namespace FactEngine
         Public Overrides Sub addIndex(ByRef arIndex As RDS.Index)
 
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)
