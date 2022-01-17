@@ -446,7 +446,7 @@ Namespace FBM
 
             Dim lrFactDataInstance As FBM.FactDataInstance
             Dim lrConceptInstance As New FBM.ConceptInstance
-
+            Dim lrConcept As FBM.Concept
             Try
                 lrConceptInstance.ModelId = Me.FactType.Model.ModelId
                 lrConceptInstance.PageId = Me.Page.PageId
@@ -456,6 +456,10 @@ Namespace FBM
                 lrConceptInstance.ConceptType = pcenumConceptType.Fact
 
                 If abRapidSave Then
+
+                    lrConcept = New FBM.Concept(lrConceptInstance.Symbol, True)
+                    Call lrConcept.Save()
+
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
 
 
@@ -474,7 +478,7 @@ Namespace FBM
                         If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
                             Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                         Else
-                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data)
+                            lrConcept = New FBM.Concept(lrFactDataInstance.Data)
                             lrConcept.Save()
                             Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                         End If
@@ -484,7 +488,7 @@ Namespace FBM
                     If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
                         Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                     Else
-                        Dim lrConcept As New FBM.Concept(lrConceptInstance.Symbol, True)
+                        lrConcept = New FBM.Concept(lrConceptInstance.Symbol, True)
                         lrConcept.Save()
                         Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                     End If
@@ -504,7 +508,7 @@ Namespace FBM
                         If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                             Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                         Else
-                            Dim lrConcept As New FBM.Concept(lrFactDataInstance.Data, True)
+                            lrConcept = New FBM.Concept(lrFactDataInstance.Data, True)
                             lrConcept.Save()
                             Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                         End If

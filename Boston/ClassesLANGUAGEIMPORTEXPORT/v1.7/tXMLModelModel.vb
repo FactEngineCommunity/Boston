@@ -666,7 +666,7 @@ Namespace XMLModel
                     lrParentEntityType.childModelObjectList.Add(lrEntityType)
 
                     Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
-                    lrEntityType.SubtypeRelationship.Add(lrSubtypeConstraint)
+                    lrEntityType.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
                 Next
 
 
