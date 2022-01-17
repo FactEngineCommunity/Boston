@@ -572,6 +572,7 @@ Namespace XMLModel
                     'lrEntityType.LongDescription = 
                     lrEntityType.IsObjectifyingEntityType = lrXMLEntityType.IsObjectifyingEntityType
                     lrEntityType.IsMDAModelElement = lrXMLEntityType.IsMDAModelElement
+                    lrEntityType.IsAbsorbed = lrXMLEntityType.IsAbsorbed
                     lrEntityType.DBName = lrXMLEntityType.DBName
 
                     If lrXMLEntityType.ReferenceModeValueTypeId = "" Then
@@ -1377,7 +1378,7 @@ Namespace XMLModel
                                                              True,
                                                              arFactType.DBName)
 
-            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True)
+            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True) '20220117-VM-Was this. DBName wasn't working.
 
             arFactType.Concept = lrDictionaryEntry.Concept
 

@@ -1946,6 +1946,9 @@ Namespace FBM
                         'CodeSafe - Only allow multiple Value realisations.
                         lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
                     End If
+                    If lrDictionaryEntry.isFactType And arDictionaryEntry.DBName <> "" Then
+                        lrDictionaryEntry.DBName = arDictionaryEntry.DBName
+                    End If
                 Else
                     '----------------------------------------------
                     'Add a the new Concept to the ModelDictionary
