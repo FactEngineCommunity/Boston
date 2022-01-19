@@ -458,8 +458,9 @@ Namespace FactEngine.TypeDB
                         'DerivedFactType                        
                         Dim Rule = Rules.Find(Function(x) x.Then.Trim.EndsWith($"isa {lrRelation.Label}", StringComparison.InvariantCultureIgnoreCase))
                         If Rule IsNot Nothing Then
-                            lrTable.DerivationRule = $"When: {Rule.When}"
-                            lrTable.DerivationRule &= vbCrLf & $"Then: {Rule.Then}"
+                            lrTable.DerivationRule = "rule " & Rule.Label & ":" & vbCrLf
+                            lrTable.DerivationRule &= $"when {Rule.When}"
+                            lrTable.DerivationRule &= vbCrLf & $"then {{ {Rule.Then} }};"
                         End If
 
                         Dim lrSupertype = client.getSuperType(lrTable.Name)

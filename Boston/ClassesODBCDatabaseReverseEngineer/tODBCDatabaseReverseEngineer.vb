@@ -157,7 +157,7 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.createValueTypesByTable(lrTable)
 
 #Region "Create ObjectifiedFactTypes"
-
+                Dim lsMessage As String = ""
                 Call Me.AppendProgress(".")
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
@@ -210,6 +210,11 @@ Public Class ODBCDatabaseReverseEngineer
                             lrFactType = Me.Model.CreateFactType(lrTable.Name, larModelObject, False, True, , , False, )
                             Me.Model.AddFactType(lrFactType)
                             lrFactType.Objectify(True) 'Add to model first, so LinkFactTypes have something to join to.
+
+                            If lrTable.DerivationRule IsNot Nothing Then
+                                lrFactType.IsDerived = True
+                                lrFactType.DerivationText = lrTable.DerivationRule
+                            End If
 
                             'Create the internalUniquenessConstraint.
                             Dim larRole As New List(Of FBM.Role)
@@ -287,6 +292,7 @@ Public Class ODBCDatabaseReverseEngineer
                             '   Next Column
                             Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTable.Name)
                             Dim larCoveredColumn As New List(Of RDS.Column)
+                            Dim lrColumn As RDS.Column
                             For Each lrTempColumn In lrTable.getPrimaryKeyColumns
 
                                 If lrTempColumn.hasOutboundRelation Then
@@ -301,15 +307,22 @@ Public Class ODBCDatabaseReverseEngineer
                                                     Where Not larCoveredColumn.Contains(Column)
                                                     Select Column
 
-                                    Dim lrColumn = larColumn.First
-                                    lrColumn.setName(lrTempColumn.Name)
+                                    Try
+                                        lrColumn = larColumn.First
+                                        lrColumn.setName(lrTempColumn.Name)
 
-                                    larCoveredColumn.Add(lrColumn)
+                                        larCoveredColumn.Add(lrColumn)
+                                    Catch
+                                        lsMessage = "Error: Table: " & lrTable.Name & ". Trying to find Origin Column for releation from " & lrTable.Name & " to " & lrTempColumPointsToTable.Name & "."
+                                        Call Me.ReportError(lsMessage)
+                                    End Try
+
+
                                 End If
                             Next
 
                         Else
-                            Dim lsMessage As String = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
+                            lsMessage = "Error: Creating Objectified Fact Types: For Table, " & lrTable.Name & "."
                             If lrTable.getPrimaryKeyColumns.Count > 0 Then
                                 lsMessage.AppendString(" Can't find Model Elements for the following: ")
                                 For Each lrColumn In lrTable.getPrimaryKeyColumns

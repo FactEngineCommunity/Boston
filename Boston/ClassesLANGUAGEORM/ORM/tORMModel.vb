@@ -3002,6 +3002,12 @@ Namespace FBM
 
             Me.ModelDictionary.Clear()
 
+            '----------------------------------------------------------------------
+            'Reinstate the Core Model
+            '----------------------------------------------------------------------
+            Me.CoreVersionNumber = ""
+            Call Me.performCoreManagement()
+
         End Sub
 
         ''' <summary>
