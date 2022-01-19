@@ -1385,7 +1385,7 @@ Namespace FBM
 
                         If Not Me.JoinsFactType.IsMDAModelElement Then
 
-                            Dim lrTable As RDS.Table = Me.JoinsFactType.getCorrespondingRDSTable
+                            'Dim lrTable As RDS.Table = Me.JoinsFactType.getCorrespondingRDSTable
 
                             'larReturnColumns.Add(lrTable.Column.Find(Function(x) x.Role Is Me))
 

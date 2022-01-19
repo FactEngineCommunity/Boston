@@ -2941,6 +2941,7 @@ Namespace FBM
             '----------------------------------------------------------------------------------------------------------
             Dim larEntityType = From EntityType In Me.EntityType
                                 Where EntityType.HasSimpleReferenceScheme
+                                Where EntityType.ReferenceMode <> ""
                                 Select EntityType
 
             For Each lrEntityType In larEntityType
@@ -3223,14 +3224,16 @@ Namespace FBM
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
 
                     If lrDictionaryEntry Is Nothing Then
-                        Throw New Exception("No dictionary entry exists for the FactType with FactType.Id: '" & arFactType.Id & "'")
+                        'Throw New Exception("No dictionary entry exists for the FactType with FactType.Id: '" & arFactType.Id & "'")
+                        'Not a biggie, were possibly going to remove it anyway.
+                    Else
+                        If lrDictionaryEntry.Realisations.Count <= 1 Then
+                            Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
+                        Else
+                            lrDictionaryEntry.removeConceptType(pcenumConceptType.FactType)
+                        End If
                     End If
 
-                    If lrDictionaryEntry.Realisations.Count <= 1 Then
-                        Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
-                    Else
-                        lrDictionaryEntry.removeConceptType(pcenumConceptType.FactType)
-                    End If
                 End If
 
                 '==========================================================================================================

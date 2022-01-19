@@ -2178,43 +2178,47 @@ Public Class frmToolboxEnterpriseExplorer
             While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
             End While
 
-            '------------------------------------------------------------------------------------------------------------
-            'Remove all the Pages for the Model.
-            '  NB Do this processing here because it is easier to remove the TreeNodes from the TreeView on this form.
-            '------------------------------------------------------------------------------------------------------------
-            Dim liPageCount As Integer = lrModel.Page.Count
+            With New WaitCursor
 
-            For liInd = liPageCount To 1 Step -1
-                lrPage = lrModel.Page(liInd - 1)
+                '------------------------------------------------------------------------------------------------------------
+                'Remove all the Pages for the Model.
+                '  NB Do this processing here because it is easier to remove the TreeNodes from the TreeView on this form.
+                '------------------------------------------------------------------------------------------------------------
+                Dim liPageCount As Integer = lrModel.Page.Count
 
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                loTreeNode = New TreeNode
-                lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                           lrPage, _
-                                                           lrPage.Model.ModelId, _
-                                                           lrPage.Language, _
-                                                           Nothing, lrPage.PageId)
+                For liInd = liPageCount To 1 Step -1
+                    lrPage = lrModel.Page(liInd - 1)
 
-                loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
+                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    loTreeNode = New TreeNode
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               lrPage.Language,
+                                                               Nothing, lrPage.PageId)
 
-                If IsSomething(lrPage.Form) Then
-                    Call lrPage.Form.Close()
-                End If
+                    loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
 
-                If IsSomething(loTreeNode) Then
-                    loTreeNode.Remove()
-                    lrPage.RemoveFromModel()
-                    prPageNodes.Remove(prPageNodes.Find(AddressOf lr_enterprise_view.Equals))
-                Else
-                    Throw New System.Exception("Cannot find TreeNode for Page")
-                End If
-            Next
+                    If IsSomething(lrPage.Form) Then
+                        Call lrPage.Form.Close()
+                    End If
 
-            Me.TreeView.Refresh()
+                    If IsSomething(loTreeNode) Then
+                        loTreeNode.Remove()
+                        lrPage.RemoveFromModel()
+                        prPageNodes.Remove(prPageNodes.Find(AddressOf lr_enterprise_view.Equals))
+                    Else
+                        Throw New System.Exception("Cannot find TreeNode for Page")
+                    End If
+                Next
 
-            Call prApplication.UndoLog.Clear()
+                Me.TreeView.Refresh()
 
-            Call lrModel.EmptyModel()
+                Call prApplication.UndoLog.Clear()
+
+                Call lrModel.EmptyModel()
+
+            End With
         End If
 
     End Sub

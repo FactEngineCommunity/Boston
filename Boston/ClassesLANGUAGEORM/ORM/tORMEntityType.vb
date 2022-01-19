@@ -2133,17 +2133,22 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
+                If Me.HasSimpleReferenceScheme And Me.ReferenceModeFactType Is Nothing Then
+                    'Likely not a Supertype. I.e. Is likely a subtype with no actual ReferenceMode but inherited.
+                    Exit Sub
+                End If
+
                 If Me.HasSimpleReferenceScheme Or Me.ReferenceModeFactType IsNot Nothing Then
 
 
                     '================================================================================================
                     'RDS - Do RDS Processing first.
-                    Dim larColumn = From Table In Me.Model.RDS.Table _
-                                    From Column In Table.Column _
-                                    Where Column.ActiveRole Is Me.ReferenceModeFactType.RoleGroup(1) _
+                    Dim larColumn = From Table In Me.Model.RDS.Table
+                                    From Column In Table.Column
+                                    Where Column.ActiveRole Is Me.ReferenceModeFactType.RoleGroup(1)
                                     Select Column
 
-                    For Each lrColumn In larColumn
+                    For Each lrColumn In larColumn.ToArray
 
                         Dim larCoveredRoles As New List(Of FBM.Role) 'So a recurring loop doesn't happen.
 
@@ -2152,7 +2157,7 @@ Namespace FBM
                                              Select Role Distinct).ToList
 
                         If larDownstreamRole.Count = 1 Then
-                                'Great, this is simple
+                            'Great, this is simple
                             lrColumn.setActiveRole(larDownstreamRole(0))
                         Else
                             For Each lrRole In larDownstreamRole
