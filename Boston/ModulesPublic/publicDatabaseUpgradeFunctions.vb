@@ -386,6 +386,28 @@ Namespace DatabaseUpgradeFunctions
         End Sub
 
         ''' <summary>
+        ''' Used when an earlier release upgrade step has a function that needs to be changed to DoNothingDummyFunction. E.g. When replacing the Core metamodel, should only do that after all the changes have been made to MetaModelModel and related tables.
+        ''' </summary>
+        Public Sub DoNothingDummyFunction()
+
+        End Sub
+
+        Public Sub CommitTransaction(ByVal abReinstateTransaction As Boolean)
+
+            Try
+                pdbConnection.CommitTrans()
+                If abReinstateTransaction Then pdbConnection.BeginTrans()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        ''' <summary>
         ''' For Boston v4.1; replaces the existing Core model with a Core model distributed as a .fbm (XML) model.
         ''' </summary>
         ''' <remarks></remarks>

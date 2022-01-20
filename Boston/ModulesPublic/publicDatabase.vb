@@ -158,11 +158,10 @@ Namespace Database
                                 For Each lsCommand In lsUpgradeSQLCommands
                                     If Trim(lsCommand) <> "" Then
                                         Try
-                                            'Call pdbConnection.Execute(lsCommand)
-                                            Dim command As New OleDb.OleDbCommand(lsCommand)
-                                            command.Connection = pdb_OLEDB_connection
-                                            'command.Transaction = transaction
-                                            Call command.ExecuteNonQuery()
+                                            Call pdbConnection.Execute(lsCommand)
+                                            'Dim command As New OleDb.OleDbCommand(lsCommand)
+                                            'command.Connection = pdb_OLEDB_connection
+                                            'Call command.ExecuteNonQuery()
                                         Catch ex As Exception
                                             If lrDatabaseUpgradeSQL.AllowFail Then
                                                 'Nothing to do here. E.g. An INSERT need not fail if the data already exists.
@@ -312,8 +311,12 @@ error_handler:
 
             Select Case Trim(asUpgradeCodeName)
             '----------------------------------
-            'Put calls to code execution here
-            '----------------------------------
+                'Put calls to code execution here
+                '----------------------------------
+                Case Is = "CommitTransaction"
+                    Call DatabaseUpgradeFunctions.CommitTransaction(True)
+                Case Is = "DoNothingDummyFunction"
+                    Call DatabaseUpgradeFunctions.DoNothingDummyFunction()
                 Case Is = "SetInitialFactTypeReadingTypedPredicateIds"
                     Call DatabaseUpgradeFunctions.SetInitialFactTypeReadingTypedPredicateIds()
                 Case Is = "UpgradePredicatePartRoleIds"
