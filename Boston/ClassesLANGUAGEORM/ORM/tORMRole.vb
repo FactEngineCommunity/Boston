@@ -996,7 +996,15 @@ Namespace FBM
                             End If
 
                         ElseIf Me.FactType.IsUnaryFactType Then
-                            lrActiveRole = Me
+
+                            If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                                If Me.JoinsEntityType.HasSimpleReferenceScheme Then
+                                    lrActiveRole = Me.JoinsEntityType.ReferenceModeRoleConstraint.Role(0)
+                                End If
+                            Else
+                                lrActiveRole = Me
+                            End If
+
                             If arTable.FBMModelElement Is Me.FactType Then
                                 Select Case Me.JoinedORMObject.GetType
                                     Case Is = GetType(FBM.EntityType)
@@ -1008,7 +1016,15 @@ Namespace FBM
                                             lsColumnName = Me.JoinedORMObject.Id
                                         End If
                                     Case Is = GetType(FBM.FactType)
-                                        Throw New Exception("Called for Role that joins a Fact Type.")
+                                        Try
+                                            If Me.JoinsFactType.getCorrespondingRDSTable.getPrimaryKeyColumns.Count = 1 Then
+                                                lsColumnName = Me.JoinsFactType.getCorrespondingRDSTable.getPrimaryKeyColumns(0).Name
+                                            Else
+                                                Throw New Exception("Called for Role that joins a Fact Type with more than one Primary Key Column.")
+                                            End If
+                                        Catch ex As Exception
+                                            Throw New Exception("Called for Role that joins a Fact Type.")
+                                        End Try
                                 End Select
                             ElseIf Me.FactType.FactTypeReading.Count > 0 Then
                                 lsColumnName = Viev.Strings.RemoveWhiteSpace(Viev.Strings.MakeCapCamelCase(Me.FactType.FactTypeReading(0).PredicatePart(0).PredicatePartText))

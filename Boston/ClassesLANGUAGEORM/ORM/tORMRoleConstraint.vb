@@ -1017,7 +1017,20 @@ Namespace FBM
                                 Case Is = pcenumRoleJoinType.FactType
                                     'ObjectifiedFactType
                                     If lrRole.FactType.Arity = 1 Then
-                                        Return True
+                                        If lrRole.FactType.IsObjectified Then
+                                            Try
+                                                If lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns.Count = 1 Then
+                                                    Return True
+                                                Else
+                                                    Return False
+                                                End If
+                                            Catch ex As Exception
+                                                Return True
+                                            End Try
+                                        Else
+                                            Return True
+                                        End If
+
                                     ElseIf (lrRole.FactType.HasTotalRoleConstraint And lrRole.FactType.Arity > 1) _
                                         Or lrRole.FactType.Arity = Me.RoleConstraintRole.Count Then
                                         Return False

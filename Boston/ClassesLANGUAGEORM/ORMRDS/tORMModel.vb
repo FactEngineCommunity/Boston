@@ -1198,13 +1198,34 @@ Namespace FBM
                     Case Is = pcenumConceptType.EntityType,
                               pcenumConceptType.FactType
 
-                        Dim larTable = From Table In Me.RDS.Table
-                                       From Column In Table.Column
-                                       Where Column.Role Is lrRole
-                                       Where Column.ActiveRole Is lrRole
-                                       Where Column.Role.JoinedORMObject.Id <> Table.Name
-                                       Where Table.FBMModelElement Is lrRole.FactType
-                                       Select Table
+                        Dim larTable As List(Of RDS.Table)
+                        If lrRole.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                            If lrRole.JoinsEntityType.HasSimpleReferenceScheme Then
+                                larTable = (From Table In Me.RDS.Table
+                                            From Column In Table.Column
+                                            Where Column.Role Is lrRole
+                                            Where Column.ActiveRole Is lrRole.JoinsEntityType.ReferenceModeRoleConstraint.Role(0)
+                                            Where Column.Role.JoinedORMObject.Id <> Table.Name
+                                            Where Table.FBMModelElement Is lrRole.FactType
+                                            Select Table).ToList
+                            Else
+                                larTable = (From Table In Me.RDS.Table
+                                            From Column In Table.Column
+                                            Where Column.Role Is lrRole
+                                            Where Column.ActiveRole Is lrRole
+                                            Where Column.Role.JoinedORMObject.Id <> Table.Name
+                                            Where Table.FBMModelElement Is lrRole.FactType
+                                            Select Table).ToList
+                            End If
+                        Else
+                            larTable = (From Table In Me.RDS.Table
+                                        From Column In Table.Column
+                                        Where Column.Role Is lrRole
+                                        Where Column.ActiveRole Is lrRole
+                                        Where Column.Role.JoinedORMObject.Id <> Table.Name
+                                        Where Table.FBMModelElement Is lrRole.FactType
+                                        Select Table).ToList
+                        End If
 
                         lrOriginTable = larTable.First
                         lrDestinationTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.JoinedORMObject.GetTopmostNonAbsorbedSupertype.Id)

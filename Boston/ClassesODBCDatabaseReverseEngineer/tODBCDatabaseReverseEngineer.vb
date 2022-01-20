@@ -161,7 +161,8 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.AppendProgress(".")
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
-                    If lrTable.getPrimaryKeyColumns.Count = 1 Then
+                    If LCase(lrTable.Name) = "birth" Then Debugger.Break()
+                    If lrTable.getPrimaryKeyColumns.Count = 1 And lrTable.PrimarySupertype = "Entity" Then
                         'Is an EntityType, and should already be a ModelElement in the Model.
                         Call Me.ReportError($"Error: Creating Objectified Fact Types: {lrTable.Name} should already be a Model Element/Entity Type in the Model because it has a Single Column Primary Key.")
                     Else
@@ -945,7 +946,7 @@ Skip: 'Because is not a ValueType
 
         For Each lrTable In Me.TempModel.RDS.Table
 
-            If lrTable.hasSingleColumnPrimaryKey Then
+            If lrTable.hasSingleColumnPrimaryKey And lrTable.PrimarySupertype = "Entity" Then
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
                 Me.Model.AddEntityType(lrEntityType, True)
@@ -986,11 +987,12 @@ Skip: 'Because is not a ValueType
                     lsValueTypeName = lrEntityType.Id & "_" & lsValueTypeName
                 End If
 
-                Select Case lrTable.PrimarySupertype
-                    Case Is = "Entity"
-                        lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
+                '20220121-VM-Was. Moved test to top of If..then. If all fine, then remove this.
+                'Select Case lrTable.PrimarySupertype
+                'Case Is = "Entity"
+                lrEntityType.SetReferenceMode(lsReferenceMode, False, lsValueTypeName, False, liBostonDataType, True)
                         lrEntityType.ReferenceModeValueType.SetDBName(lrPrimaryKeyColumn.DatabaseName)
-                End Select
+                'End Select
 
             End If
             Call Me.AppendProgress(".")
