@@ -1426,12 +1426,14 @@ Namespace FBM
                 If Me.HasSimpleReferenceScheme And Me.EntityType.ReferenceModeFactType IsNot Nothing Then
                     liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
                                                    From Role In FactType.RoleGroup
+                                                  Where Role.JoinedORMObject IsNot Nothing
                                                   Where Role.JoinedORMObject.Id = Me.Id _
                                                     And FactType.Id <> Me.EntityType.ReferenceModeFactType.Id
                                                    Into Count()
                 Else
                     liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
                                                    From Role In FactType.RoleGroup
+                                                  Where Role.JoinedORMObject IsNot Nothing
                                                   Where Role.JoinedORMObject.Id = Me.Id
                                                    Into Count()
                 End If

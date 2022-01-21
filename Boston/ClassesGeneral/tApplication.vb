@@ -48,7 +48,7 @@ Public Class tApplication
     ''' Pages that are currently being displayed.
     ''' </summary>
     ''' <remarks></remarks>
-    Public ActivePages As List(Of WeifenLuo.WinFormsUI.Docking.DockContent)
+    Public ActivePages As New List(Of WeifenLuo.WinFormsUI.Docking.DockContent)
 
     Public Brain As New tBrain
 

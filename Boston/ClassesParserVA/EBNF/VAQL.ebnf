@@ -1,0 +1,27 @@
+BROpen = "(".
+BRClose = ")".
+CapitalLetter = ( "'A'" | "'B'" | "'C'" | "'D'" | "'E'" | "'F'" | "'G'" | "'H'" | "'I'" | "'J'" | "'K'" | "'L'" | "'M'" | "'N'" |
+                  "'O'" | "'P'" | "'Q'" | "'R'" | "'S'" | "'T'" | "'U'" | "'V'" | "'W'" | "'X'" | "'Y'" | "'Z'").
+DataType = ("'LogicalTrueFalse'" | "'LogicalYesNo'" | "'AutoCounter'" | "'FloatDoublePrecision'" | "'FloatSinglePrecision'" |
+                          "'SignedBigInteger'" | "'SignedInteger'" | "'SignedSmallInteger'" | "'UnsignedBigInteger'" | "'UnsignedInteger'" |
+                          "'UnsignedSmallInteger'" | "'UnsignedTinyInteger'" | "'ObjectId'" | "'RowId'" | "'RawDataOLEObject'" |
+                          "'RawData'" | "'AutoTimeStamp'" | "'Date'" | "'DateTime'" | "'Time'").
+DataTypeWithLength = ("'RawDataFixedLength'" | "'RawDataLargeLength'" | "'RawDataVariableLength'" |
+                          "'StringFixedLength'" | "'StringLargeLength'" | "'StringVariableLength'") BROpen Number BRClose.
+DataTypeWithPrecision = ("'FloatCustomPrecision'" | "'Decimal'" | "'Money'") BROpen Number BRClose.
+Digit = ("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ).
+FactTypeProduction = ModelElementName {PredicatePart ModelElementName}.
+LowercaseLetter = ( "'a'" | "'b'" | "'c'" | "'d'" | "'e'" | "'f'" | "'g'" | "'h'" | "'i'" | "'j'" | "'k'" | "'l'" | "'m'" | "'n'" |
+                  "'o'" | "'p'" | "'q'" | "'r'" | "'s'" | "'t'" | "'u'" | "'v'" | "'w'" | "'x'" | "'y'" | "'z'").
+LowerORUppercaseLetter = ( "'A'" | "'B'" | "'C'" | "'D'" | "'E'" | "'F'" | "'G'" | "'H'" | "'I'" | "'J'" | "'K'" | "'L'" | "'M'" | "'N'" |
+                  "'O'" | "'P'" | "'Q'" | "'R'" | "'S'" | "'T'" | "'U'" | "'V'" | "'W'" | "'X'" | "'Y'" | "'Z'" |
+                  "'a'" | "'b'" | "'c'" | "'d'" | "'e'" | "'f'" | "'g'" | "'h'" | "'i'" | "'j'" | "'k'" | "'l'" | "'m'" | "'n'" |
+                  "'o'" | "'p'" | "'q'" | "'r'" | "'s'" | "'t'" | "'u'" | "'v'" | "'w'" | "'x'" | "'y'" | "'z'").
+MandatoryManyToOneProduction = begin ModelElementName PredicatePart "'ONE'" ModelElementName end.
+Number = {Digit}.
+OptionalManyToOneProduction = begin ModelElementName PredicatePart "'AT MOST ONE'" ModelElementName end.
+ModelElementName = CapitalLetter {LowerORUppercaseLetter}.
+PredicatePart = PredicatePartWord {Space PredicatePartWord}.
+PredicatePartWord = LowercaseLetter {LowercaseLetter}.
+ValueTypeIsWrittenAsProduction = begin ModelElementName "'IS WRITTEN AS'" (DataType | DataTypeWithLength | DataTypeWithPrecision) end.
+VAQLStatement = [FactTypeProduction | MandatoryManyToOneProduction | OptionalManyToOneProduction | ValueTypeIsWrittenAsProduction].
