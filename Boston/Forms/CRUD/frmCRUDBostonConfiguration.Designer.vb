@@ -76,9 +76,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -646,9 +646,20 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.TabIndex = 0
         Me.GroupBox4.TabStop = False
         '
+        'CheckBoxDiagramSpyShowLinkFactTypes
+        '
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.AutoSize = True
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 55)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Name = "CheckBoxDiagramSpyShowLinkFactTypes"
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Size = New System.Drawing.Size(201, 17)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.TabIndex = 1
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Text = "Diagram Spy - Show Link Fact Types"
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.UseVisualStyleBackColor = True
+        '
         'CheckBoxSuperuserMode
         '
         Me.CheckBoxSuperuserMode.AutoSize = True
+        Me.CheckBoxSuperuserMode.Enabled = False
         Me.CheckBoxSuperuserMode.Location = New System.Drawing.Point(12, 16)
         Me.CheckBoxSuperuserMode.Margin = New System.Windows.Forms.Padding(2)
         Me.CheckBoxSuperuserMode.Name = "CheckBoxSuperuserMode"
@@ -660,16 +671,6 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
-        '
-        'CheckBoxDiagramSpyShowLinkFactTypes
-        '
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.AutoSize = True
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 55)
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Name = "CheckBoxDiagramSpyShowLinkFactTypes"
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Size = New System.Drawing.Size(201, 17)
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.TabIndex = 1
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Text = "Diagram Spy - Show Link Fact Types"
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '

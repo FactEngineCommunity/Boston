@@ -975,7 +975,7 @@ Public Class frmToolboxEnterpriseExplorer
                     pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                     Richmond.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                 End If
-                Call arModel.Load(True, True, Me.BackgroundWorkerModelLoader)
+                Call arModel.Load(True, False, Me.BackgroundWorkerModelLoader)
                 Me.CircularProgressBar.Value = 0
                 Me.CircularProgressBar.Text = "0%"
                 Me.CircularProgressBar.Invalidate()

@@ -1894,7 +1894,7 @@ Namespace FBM
 
 
                 If Me.IsSubtype Then
-                    Dim lrTopmostSupertype As FBM.EntityType = Me.GetTopmostSupertype
+                    Dim lrTopmostSupertype As FBM.EntityType = Me.GetTopmostSupertype(True)
 
                     If Trim(lrTopmostSupertype.ReferenceMode) = "" Then
                         Return False
@@ -2662,7 +2662,8 @@ Namespace FBM
 
             Try
                 If Me.HasSimpleReferenceScheme Then
-                    lsMessage = "Tried to set a CompoundReferenceMode for an EntityType that already has a SimpleReferenceScheme."
+                    lsMessage = "Entity Type: " & Me.Id & vbCrLf
+                    lsMessage &= "Tried to set a CompoundReferenceMode for an EntityType that already has a SimpleReferenceScheme." & vbCrLf
                     lsMessage &= "This process requires that the SimpleReferenceScheme for an EntityType has been removed before assigning the RoleConstraint for a CompoundReferenceScheme"
                     Throw New Exception(lsMessage)
                 Else

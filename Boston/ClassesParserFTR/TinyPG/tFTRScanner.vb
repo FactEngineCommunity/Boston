@@ -45,7 +45,7 @@ Namespace FTR
             Patterns.Add(TokenType.FRONTREADINGTEXT, regex)
             Tokens.Add(TokenType.FRONTREADINGTEXT)
 
-            regex = new Regex("(([A-Z0-9]+[_a-zA-Z0-9]*[ |_]*)+[_|\s]?)+", RegexOptions.Compiled)
+            regex = new Regex("(([A-Z0-9]+[_a-zA-Z0-9#]*[ |_]*)+[_|\s]?)+", RegexOptions.Compiled)
             Patterns.Add(TokenType.MODELELEMENTNAME, regex)
             Tokens.Add(TokenType.MODELELEMENTNAME)
 
@@ -69,7 +69,7 @@ Namespace FTR
             Patterns.Add(TokenType.SUBSCRIPT, regex)
             Tokens.Add(TokenType.SUBSCRIPT)
 
-            regex = new Regex("((?>[a-z])+[\s]?)+$", RegexOptions.Compiled)
+            regex = new Regex("((?>[a-z])+[\s]*)+$", RegexOptions.Compiled)
             Patterns.Add(TokenType.UNARYPREDICATEPART, regex)
             Tokens.Add(TokenType.UNARYPREDICATEPART)
 

@@ -161,7 +161,6 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.AppendProgress(".")
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
-                    If LCase(lrTable.Name) = "birth" Then Debugger.Break()
                     If lrTable.getPrimaryKeyColumns.Count = 1 And lrTable.PrimarySupertype = "Entity" Then
                         'Is an EntityType, and should already be a ModelElement in the Model.
                         Call Me.ReportError($"Error: Creating Objectified Fact Types: {lrTable.Name} should already be a Model Element/Entity Type in the Model because it has a Single Column Primary Key.")

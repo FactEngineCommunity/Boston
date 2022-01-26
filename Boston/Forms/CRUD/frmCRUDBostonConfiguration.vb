@@ -7,6 +7,8 @@ Imports System.ComponentModel
 
 Public Class frmCRUDBostonConfiguration
 
+    Dim mbSuperUserModeClicks As Integer = 0
+
     Sub LoadDebugModes()
 
         Dim loWorkingClass As New Object
@@ -82,6 +84,7 @@ Public Class frmCRUDBostonConfiguration
         Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked = My.Settings.DiagramSpyShowLinkFactTypes
 
         'Superuser Mode
+        Me.CheckBoxSuperuserMode.Enabled = My.Settings.SuperuserMode
         RemoveHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
         Me.CheckBoxSuperuserMode.Checked = My.Settings.SuperuserMode
         AddHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
@@ -403,6 +406,26 @@ Public Class frmCRUDBostonConfiguration
             lsMessage &= vbCrLf & vbCrLf & "Please contact support if you have any questions."
             MsgBox(lsMessage, MsgBoxStyle.Exclamation)
         End If
+
+    End Sub
+
+    Private Sub GroupBox4_Click(sender As Object, e As EventArgs) Handles GroupBox4.Click
+
+        Try
+            mbSuperUserModeClicks += 1
+
+            If mbSuperUserModeClicks = 7 Then
+                mbSuperUserModeClicks = 0
+                Me.CheckBoxSuperuserMode.Enabled = True
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

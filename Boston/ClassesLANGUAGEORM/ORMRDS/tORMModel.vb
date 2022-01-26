@@ -1541,9 +1541,16 @@ Namespace FBM
                         If lrRelation.OriginColumns.Count = 0 Then
                             'CodeSafe. Destination Table has no PrimaryKey most likely,
                             '  but can get Origin Column from the arRole
-                            Dim lrColumn = arRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
-                            lrColumn.Relation.Add(lrRelation)
-                            lrRelation.OriginColumns.Add(lrColumn)
+                            Try
+                                Dim lrColumn = arRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
+                                If lrColumn IsNot Nothing Then
+                                    lrColumn.Relation.Add(lrRelation)
+                                    lrRelation.OriginColumns.Add(lrColumn)
+                                End If
+                            Catch ex As Exception
+                                'Not a good place to be. Can only create the OriginColumns once the PrimaryKey is created for the DestinationTable.
+                            End Try
+
                         End If
 
                         Me.RDS.addRelation(lrRelation)

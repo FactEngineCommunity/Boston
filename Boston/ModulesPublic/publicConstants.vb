@@ -315,6 +315,7 @@ Public Module publicConstants
         Symmetric
         SymmetricIrreflexive
         SymmetricIntransitive
+        SymmetricTransitive
         PurelyReflexive
         Transitive
         DeonticIrreflexive

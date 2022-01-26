@@ -166,7 +166,10 @@ Namespace FBM
             Me.JoinedORMObject = New FBM.ModelObject
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, Optional ByRef arPage As FBM.Page = Nothing, Optional ByVal aiX As Object = Nothing, Optional ByVal aiY As Object = Nothing)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       Optional ByRef arPage As FBM.Page = Nothing,
+                       Optional ByVal aiX As Object = Nothing,
+                       Optional ByVal aiY As Object = Nothing)
 
             If IsSomething(arModel) Then Me.Role.Model = arModel
 
@@ -182,7 +185,9 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, ByRef arPage As FBM.Page, ByRef arRole As FBM.Role)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       ByRef arPage As FBM.Page,
+                       ByRef arRole As FBM.Role)
 
             Me.Role.Model = arModel
             Me.Page = arPage
@@ -194,7 +199,9 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arFactTypeInstance As FBM.FactTypeInstance, ByRef ar_joined_object As Object, ByRef arRole As FBM.Role)
+        Public Sub New(ByRef arFactTypeInstance As FBM.FactTypeInstance,
+                       ByRef ar_joined_object As Object,
+                       ByRef arRole As FBM.Role)
 
             '----------------------------------------------------------------------------------------------------
             'PRECONDITIONS:

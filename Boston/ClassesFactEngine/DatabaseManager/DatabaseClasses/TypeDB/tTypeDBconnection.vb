@@ -553,12 +553,9 @@ Namespace FactEngine.TypeDB
                                         'Dim loObject As Object = GrpcServer.Transaction.
                                         Try
                                             Dim loEncoding As String = loValue.Type.Encoding.ToString
-                                            Dim loValueType As String = loValue.Type.ValueType.ToString
-                                            If Not (loEncoding.StartsWith("Attribute") Or loEncoding.StartsWith("Relation")) Then
-                                                'Debugger.Break()
-                                            End If
+                                        Dim loValueType As String = loValue.Type.ValueType.ToString
 
-                                        Catch ex As Exception
+                                    Catch ex As Exception
                                             'Not a biggie at this stage.
                                         End Try
                                     Case Else

@@ -520,10 +520,6 @@ Namespace FBM
             '------------------------------------------------------------------------------------------------
             Dim asSymbol As String = arEntityType.Id
 
-            If LCase(arEntityType.Id).StartsWith("romantic") Then
-                Debugger.Break()
-            End If
-
             lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arEntityType.Id, pcenumConceptType.EntityType,,, abMakeModelDirty, abMakeModelDirty, arEntityType.DBName))
 
             If abMakeDictionaryEntryDirty Then

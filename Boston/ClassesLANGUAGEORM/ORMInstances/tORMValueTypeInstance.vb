@@ -148,7 +148,13 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, ByRef arPage As FBM.Page, ByVal aiLanguageId As pcenumLanguage, Optional ByVal as_entity_type_name As String = Nothing, Optional ByVal ab_use_name_as_id As Boolean = False, Optional ByVal aiX As Integer = 0, Optional ByVal aiY As Integer = 0)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       ByRef arPage As FBM.Page,
+                       ByVal aiLanguageId As pcenumLanguage,
+                       Optional ByVal as_entity_type_name As String = Nothing,
+                       Optional ByVal ab_use_name_as_id As Boolean = False,
+                       Optional ByVal aiX As Integer = 0,
+                       Optional ByVal aiY As Integer = 0)
 
             Call Me.New()
 

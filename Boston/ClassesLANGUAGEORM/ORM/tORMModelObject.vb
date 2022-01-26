@@ -641,7 +641,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Function GetTopmostNonAbsorbedSupertype() As FBM.ModelObject
 
-            If Me.parentModelObjectList.Count = 0 Then
+            If Me.SubtypeRelationship.Count = 0 Then
                 Return Me
             ElseIf Me.IsAbsorbed = False Then
                 Return Me
@@ -668,13 +668,23 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetTopmostSupertype() As FBM.ModelObject
+        Public Function GetTopmostSupertype(Optional abPrimarySubtypeRelationshipOnly As Boolean = False) As FBM.ModelObject
 
             If Me.parentModelObjectList.Count = 0 Then
                 Return Me
             End If
 
-            Return Me.parentModelObjectList(0).GetTopmostSupertype()
+            If abPrimarySubtypeRelationshipOnly Then
+                Dim lrPrimarySubtypeRelationship As FBM.tSubtypeRelationship = Nothing
+                lrPrimarySubtypeRelationship = Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship)
+                If lrPrimarySubtypeRelationship Is Nothing Then
+                    Return Me
+                Else
+                    Return lrPrimarySubtypeRelationship.parentEntityType.GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
+                End If
+            Else
+                Return Me.parentModelObjectList(0).GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
+            End If
 
         End Function
 

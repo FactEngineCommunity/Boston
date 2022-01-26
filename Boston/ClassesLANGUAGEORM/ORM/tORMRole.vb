@@ -1523,10 +1523,27 @@ Namespace FBM
 
                             If lrOtherRoleInFactType.JoinsEntityType.HasSimpleReferenceScheme Then
 
-                                aarCoveredRoles.AddUnique(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
-                                aarCoveredRoles.AddUnique(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                                If lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType Is Nothing Then
+                                    Dim lrSupertypeEntityType = CType(lrOtherRoleInFactType.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType)
 
-                                larRolesToReturn.Add(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                                    If lrSupertypeEntityType.ReferenceModeFactType Is Nothing Then
+                                        lrSupertypeEntityType = CType(lrSupertypeEntityType.GetTopmostSupertype, FBM.EntityType)
+                                        aarCoveredRoles.AddUnique(lrSupertypeEntityType.ReferenceModeFactType.RoleGroup(0))
+                                        aarCoveredRoles.AddUnique(lrSupertypeEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                                        larRolesToReturn.Add(lrSupertypeEntityType.ReferenceModeFactType.RoleGroup(1))
+                                    Else
+                                        aarCoveredRoles.AddUnique(lrSupertypeEntityType.ReferenceModeFactType.RoleGroup(0))
+                                        aarCoveredRoles.AddUnique(lrSupertypeEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                                        larRolesToReturn.Add(lrSupertypeEntityType.ReferenceModeFactType.RoleGroup(1))
+                                    End If
+                                Else
+                                    aarCoveredRoles.AddUnique(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
+                                    aarCoveredRoles.AddUnique(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+
+                                    larRolesToReturn.Add(lrOtherRoleInFactType.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
+                                End If
 
                             ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
                                 '20210824-VM-Was me.JoinsEntityType, which is wrong...want what is checked in Select above.
@@ -1557,10 +1574,20 @@ Namespace FBM
                                 Else
                                     If Me.JoinsEntityType.SubtypeRelationship.Count > 0 Then
                                         lrSupertype = Me.JoinsEntityType.SubtypeRelationship.First.parentEntityType
-                                        aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
-                                        aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
 
-                                        larRolesToReturn.Add(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                        If CType(lrSupertype, FBM.EntityType).ReferenceModeFactType Is Nothing Then
+                                            lrSupertype = lrSupertype.GetTopmostSupertype
+                                            aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
+                                            aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+
+                                            larRolesToReturn.Add(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                        Else
+                                            aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(0))
+                                            aarCoveredRoles.AddUnique(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+
+                                            larRolesToReturn.Add(CType(lrSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
+                                        End If
+
                                     Else
                                         aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(0))
                                         aarCoveredRoles.AddUnique(Me.JoinsEntityType.ReferenceModeFactType.RoleGroup(1))
@@ -1677,8 +1704,13 @@ Namespace FBM
                         Dim lrEntityType As FBM.EntityType = Me.JoinsEntityType
                         If lrEntityType.HasSimpleReferenceScheme Then
                             larColumn.Add(Me.GetCorrespondingFactTypeColumn(arTable, arResponsibleRole))
-                        Else
+                        ElseIf lrEntityType.HasCompoundReferenceMode Then
                             Call lrEntityType.getCompoundReferenceSchemeColumns(arTable, Me, larColumn)
+                        Else
+                            'Ideally do not want to be here, but need a Column that can later be replaced when the ReferenceScheme for the EntityType has been created.
+                            lsColumnName = lrEntityType.Id
+                            Dim lrColumn As RDS.Column = New RDS.Column(arTable, lsColumnName, arResponsibleRole, arResponsibleRole, True)
+                            larColumn.Add(lrColumn)
                         End If
                     Else
                         larColumn.Add(Me.GetCorrespondingUnaryOrBinaryFactTypeColumn(arTable))
