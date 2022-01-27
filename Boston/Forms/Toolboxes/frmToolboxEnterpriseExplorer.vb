@@ -2434,7 +2434,6 @@ Public Class frmToolboxEnterpriseExplorer
         frmMain.Cursor = Cursors.Default
 
         Richmond.WriteToStatusBar("")
-        MsgBox("Your NORMA Model has been successfully loaded into Boston")
 
         frmMain.Cursor = Cursors.Default
         Me.Cursor = Cursors.Default
@@ -4553,16 +4552,22 @@ Public Class frmToolboxEnterpriseExplorer
                 'Load the NORMA file
                 Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
 
-                Call lrModel.Save(True, False)
+                lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
+                lsMessage = "Save the model now? (Recommended)"
+                If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                    With New WaitCursor
+                        Call lrModel.Save(True, False)
+                    End With
+                End If
 
                 Call lrNewTreeNode.EnsureVisible()
 
-                'Me.zrToolTip.IsBalloon = True
-                lsMessage = "New Model added: " & lrModel.Name
-                Me.zrToolTip.IsBalloon = True
-                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
-            End If
+                    'Me.zrToolTip.IsBalloon = True
+                    lsMessage = "New Model added: " & lrModel.Name
+                    Me.zrToolTip.IsBalloon = True
+                    Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                    Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
+                End If
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

@@ -2296,7 +2296,21 @@ Namespace NORMA
             For Each lrFactType In arModel.FactType.ToArray
                 For Each lrRole In lrFactType.RoleGroup.ToArray
                     If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+
+                        Dim larJoinPath = From RoleConstraint In arModel.RoleConstraint
+                                          From Argument In RoleConstraint.Argument
+                                          From Role In Argument.JoinPath.RolePath
+                                          Where Role.Id = lrRole.Id
+                                          Select Argument.JoinPath
+
                         Call lrRole.FactType.RemoveRole(lrRole, False, True)
+
+                        For Each lrJoinPath In larJoinPath.ToArray
+                            Dim liIndex As Integer = lrJoinPath.RolePath.IndexOf(lrRole)
+                            lrJoinPath.RolePath.RemoveAt(liIndex)
+                            lrJoinPath.RolePath.Insert(liIndex, lrRole.FactType.RoleGroup(0))
+                        Next
+
                         Call arModel.RemoveValueType(lrRole.JoinsValueType, False)
                     End If
                 Next
