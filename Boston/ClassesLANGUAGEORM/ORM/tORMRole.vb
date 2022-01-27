@@ -919,7 +919,7 @@ Namespace FBM
         End Function
 
         ''' <summary>
-        ''' PRECONDITIONS: The Role represents only one Column, not many (as when a Role of an ObjectifiedFactType references another ObjectifiedFactType).
+        ''' PRECONDITIONS: The Role represents only one Column, not many (E.g. Many as when a Role of an ObjectifiedFactType references another ObjectifiedFactType).
         ''' The Role is within a BinaryFactType or UnaryFactType, and the other Role (if Binary) does not join an ObjectifiedFactType.
         ''' </summary>
         ''' <param name="arTable"></param>
@@ -933,15 +933,23 @@ Namespace FBM
             Dim lrActiveRole As FBM.Role = Me 'Likely to change (as below is processed).
             Dim lrModelElement As FBM.ModelObject
             Dim lbIsMandatory As Boolean = False
+            Dim lsMessage As String = ""
 
             Try
                 'CodeSafe:
-                If Me.FactType.Arity > 2 Then Throw New Exception("Function called for a Role within a FactType that has an Arity > 2.")
+                If Me.FactType.Arity > 2 Then
+                    lsMessage = "FactType: " & Me.FactType.Id & vbCrLf & vbCrLf
+                    lsMessage &= "Function called for a Role within a FactType that has an Arity > 2."
+                    Throw New Exception(lsMessage)
+                End If
                 If Me.FactType.Arity = 2 Then
                     If Me.FactType.GetOtherRoleOfBinaryFactType(Me.Id).JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
-                        Throw New Exception("Function called for a BinaryFactType where the other Role joins an ObjectifiedFactType.")
+                        lsMessage = "FactType: " & Me.FactType.Id & vbCrLf & vbCrLf
+                        lsMessage &= "Function called for a BinaryFactType where the other Role joins an ObjectifiedFactType."
+                        Throw New Exception(lsMessage)
                     End If
                 End If
+
                 If (Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint) And Me.FactType.Arity > 1 Then
                     Throw New Exception("Function called for a Role within a FactType that has a TotalRoleConstraint or has a PartialButMultiRoleConstriant.")
                 End If
@@ -1032,7 +1040,7 @@ Namespace FBM
                                 lsColumnName = "ErrorNeedFactTypeReadingForUnaryFactType"
                             End If
                         Else
-                                Throw New Exception("Not caterd for. Contact www.viev.com")
+                            Throw New Exception("Not caterd for. Contact www.viev.com")
                         End If
 
                     Case Is = pcenumConceptType.ValueType
@@ -1049,7 +1057,7 @@ Namespace FBM
                 Else
                     If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
 
-                        Dim larRoleConstraint = From RoleConstraint In Me.FactType.InternalUniquenessConstraint _
+                        Dim larRoleConstraint = From RoleConstraint In Me.FactType.InternalUniquenessConstraint
                                                 Where RoleConstraint.Role.Contains(Me)
                                                 Select RoleConstraint
 
@@ -1062,7 +1070,6 @@ Namespace FBM
                 Return New RDS.Column(arTable, lsColumnName, Me, lrActiveRole, lbIsMandatory)
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

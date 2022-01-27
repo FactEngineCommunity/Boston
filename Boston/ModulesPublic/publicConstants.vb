@@ -305,6 +305,7 @@ Public Module publicConstants
     <Serializable()> _
     Public Enum pcenumRingConstraintType
         None
+        AcyclicStronglyIntransitive
         Irreflexive
         Asymmetric
         Intransitive

@@ -3448,6 +3448,10 @@ Namespace FBM
                     Exit Sub
                 End If
 
+                If Me.Visible = False Then
+                    Exit Sub
+                End If
+
                 Dim larPageObject = From PageObject In Me.Page.GetAllPageObjects _
                                             Where PageObject.Id <> Me.Id _
                                             And (Math.Abs(Me.X - PageObject.X) < liRepellDistance _

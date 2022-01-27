@@ -12,7 +12,6 @@ Namespace NORMA
 
         Private FBMModel As FBM.Model = Nothing
 
-
         'FactTypeReading Processing
         Private FTRScanner As FTR.Scanner
         Private FTRProcessor As New FTR.Processor 'Used for parsing FTR texts as input by the user. 
@@ -2310,6 +2309,8 @@ Namespace NORMA
             Dim lrValueType As FBM.ValueType
             Dim lrFactType As FBM.FactType
             Dim lrFact As FBM.Fact
+            Dim lrRoleConstraint As FBM.RoleConstraint
+            Dim lrRoleConstraintRole As FBM.RoleConstraintRole
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrRoleInstance As FBM.RoleInstance
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
@@ -2487,7 +2488,8 @@ Namespace NORMA
                             '------------------------------------
                             'Clone an Instance of the FactType
                             '------------------------------------
-                            lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel)
+                            '20220127-VM-Commented out below. Remove if all okay.
+                            'lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel)
                             Dim lsBounds() As String
 
                             lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel, lrFactType.Id, True) ' lrFactType.CloneInstance(lrPage, False)
@@ -2564,39 +2566,40 @@ Namespace NORMA
                         Next 'Role
                     Next 'FaultyFactTypeInstance
 
-
                     '---------------------------------------------------------------------
                     'Load the UniquenessConstraint RoleConstraintInstances for the Page.
                     '---------------------------------------------------------------------
-                    Dim lrRoleConstraint As FBM.RoleConstraint
-                    Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-                    Dim lbCanAddRoleConstraintToPage As Boolean = True
+#Region "Internal Uniqueness Constraints"
+                    '20220127-VM-Commented out. Remove if all okay.
 
-                    For Each lrRoleConstraint In arModel.RoleConstraint
-                        If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                            '--------------------------------------------------------------------------------------------
-                            'If all of the Roles in the RoleConstraintRole group for the RoleConstraint
-                            '  are on the Page, then add the RoleConstraint to the Page as a new RoleConstraintInstance
-                            '--------------------------------------------------------------------------------------------
-                            lbCanAddRoleConstraintToPage = True
-                            For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
-                                lrRoleInstance = New FBM.RoleInstance(arModel, lrPage, lrRoleConstraintRole.Role)
-                                lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-                                If IsSomething(lrRoleInstance) Then
-                                    '---------------------------------------
-                                    'Okay, the RoleInstance is on the Page
-                                    '---------------------------------------
-                                    'MsgBox("Found something at least")
-                                Else
-                                    lbCanAddRoleConstraintToPage = False
-                                End If
-                            Next
-                            If lbCanAddRoleConstraintToPage Then
-                                lrPage.RoleConstraintInstance.Add(lrRoleConstraint.CloneInstance(lrPage))
-                                'MsgBox("Adding")
-                            End If
-                        End If
-                    Next
+                    'Dim lbCanAddRoleConstraintToPage As Boolean = True
+
+                    'For Each lrRoleConstraint In arModel.RoleConstraint
+                    '    If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                    '        '--------------------------------------------------------------------------------------------
+                    '        'If all of the Roles in the RoleConstraintRole group for the RoleConstraint
+                    '        '  are on the Page, then add the RoleConstraint to the Page as a new RoleConstraintInstance
+                    '        '--------------------------------------------------------------------------------------------
+                    '        lbCanAddRoleConstraintToPage = True
+                    '        For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
+                    '            lrRoleInstance = New FBM.RoleInstance(arModel, lrPage, lrRoleConstraintRole.Role)
+                    '            lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                    '            If IsSomething(lrRoleInstance) Then
+                    '                '---------------------------------------
+                    '                'Okay, the RoleInstance is on the Page
+                    '                '---------------------------------------
+                    '                'MsgBox("Found something at least")
+                    '            Else
+                    '                lbCanAddRoleConstraintToPage = False
+                    '            End If
+                    '        Next
+                    '        If lbCanAddRoleConstraintToPage Then
+                    '            lrPage.RoleConstraintInstance.Add(lrRoleConstraint.CloneInstance(lrPage))
+                    '            'MsgBox("Adding")
+                    '        End If
+                    '    End If
+                    'Next
+#End Region
 
                     '------------------
                     'Ring Constraints
@@ -3075,6 +3078,9 @@ Namespace NORMA
                         lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                         lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                     Next
+
+                    'GoTo SkipToArea
+                    'SkipToArea:
 
                     lrPage.IsDirty = True
                 Next 'Page in NORMA XML

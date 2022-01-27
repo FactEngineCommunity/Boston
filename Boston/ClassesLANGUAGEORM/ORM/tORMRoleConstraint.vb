@@ -1037,7 +1037,34 @@ Namespace FBM
                                     ElseIf lrRole.FactType.IsObjectified Then
                                         Return False
                                     ElseIf lrRole.FactType.IsBinaryFactType Then
-                                        Return True
+                                        Dim lrModelElement As FBM.ModelObject = lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).JoinedORMObject
+                                        Select Case lrModelElement.ConceptType
+                                            Case Is = pcenumConceptType.ValueType
+                                                Return True
+                                            Case Is = pcenumConceptType.EntityType
+                                                Dim lrEntityType As FBM.EntityType = lrModelElement
+                                                If lrEntityType.ConceptType = pcenumConceptType.EntityType _
+                                                    And lrEntityType.HasCompoundReferenceMode Then
+                                                    Return False 'Because implies more than one Column
+                                                Else
+                                                    Return True
+                                                End If
+                                            Case Is = pcenumConceptType.FactType
+                                                Try
+                                                    Select Case lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns.Count
+                                                        Case Is = 0
+                                                            Throw New Exception("Other Role reference Fact Type with corresponding RDS table with no Primary Key Columns.")
+                                                        Case Is = 1
+                                                            Return True
+                                                        Case > 1
+                                                            Return False
+                                                    End Select
+                                                Catch ex As Exception
+                                                    Return False 'Because likely implies more than one Column
+                                                End Try
+                                            Case Else
+                                                Throw New Exception("Role doesn't reference an EntityType, ValueType or FactType.")
+                                        End Select
                                     End If
                             End Select
 
