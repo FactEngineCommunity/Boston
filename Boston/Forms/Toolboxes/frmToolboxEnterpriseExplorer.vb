@@ -4553,6 +4553,8 @@ Public Class frmToolboxEnterpriseExplorer
                 'Load the NORMA file
                 Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
 
+                Call lrModel.Save(True, False)
+
                 Call lrNewTreeNode.EnsureVisible()
 
                 'Me.zrToolTip.IsBalloon = True

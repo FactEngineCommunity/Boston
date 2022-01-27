@@ -382,6 +382,7 @@ Namespace FBM
         ''' <summary>
         ''' Used for Reverse Engineering NORMA files.
         ''' </summary>
+        Public NORMAName As String = "" 'The Original NORMA name for the ModelObject. Used because Boston limits Concept/Symbol lengths to 100, whereas NORMA names are boundless.
         Public NORMAReferenceId As String = ""
 
         Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)

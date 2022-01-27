@@ -450,6 +450,7 @@ Namespace NORMA
                 For Each loElement In loEnumElementQueryResult
 
                     lrFactType = New FBM.FactType(lrFactType.Model, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
+                    lrFactType.Name = lrFactType.Name.Truncate(99)
                     lrFactType.Id = lrFactType.Model.CreateUniqueFactTypeName(lrFactType.Name, 0)
                     lrFactType.Name = lrFactType.Id
                     lrFactType.NORMAReferenceId = arFactType.NORMAReferenceId
@@ -744,6 +745,8 @@ Namespace NORMA
                 For Each loElement In loEnumElementQueryResult
 
                     lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
+                    lrFactType.NORMAName = lrFactType.Name
+                    lrFactType.Name = lrFactType.Name.Truncate(99)
                     lrFactType.NORMAReferenceId = loElement.Attribute("id").Value
                     lrFactType.Id = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
                     lrFactType.Name = lrFactType.Id
@@ -808,7 +811,7 @@ Namespace NORMA
 
                             If IsSomething(loXMLElementQueryResult(0)) Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
-                                lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject.EqualsByName)
+                                lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrModelObject.NORMAReferenceId) '20220127-VM-was AddressOf lrModelObject.EqualsByName)
                             Else
                                 lrJoinedFactType = Nothing
                             End If
@@ -838,11 +841,11 @@ Namespace NORMA
                                 lrJoinedFactType.Name = lrModelObject2.Name
                                 lrJoinedFactType.NORMAReferenceId = lrModelObject2.NORMAReferenceId
 
-                                If arModel.FactType.Exists(AddressOf lrModelObject2.Equals) Then
+                                If arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrModelObject2.NORMAReferenceId) IsNot Nothing Then '20220127-VM-Was 'Exists(AddressOf lrModelObject2.Equals) Then
                                     '------------------------------
                                     'All okay, found the FactType
                                     '------------------------------
-                                    lrJoinedFactType = arModel.FactType.Find(AddressOf lrModelObject2.Equals)
+                                    lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrModelObject2.NORMAReferenceId) 'AddressOf lrModelObject2.Equals)
                                 Else
                                     lrJoinedFactType = Me.LoadFactType(lrJoinedFactType, arNORMAXMLDOC)
                                 End If
@@ -977,7 +980,7 @@ Namespace NORMA
                         'Check to see if the FactType is Objectified
                         '---------------------------------------------
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                                  Where ModelInformation.Attribute("Name") = lrFactType.Name
+                                                  Where ModelInformation.Attribute("Name") = lrFactType.NORMAName
                                                   Select ModelInformation
 
                         '--------------------------------------------
@@ -1004,7 +1007,6 @@ Namespace NORMA
                             lrFactType.ObjectifyingEntityType.SetReferenceMode(lsReferenceMode, True,, False,, True, True)
                             lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
                         End If
-
 
                     End If 'FactType exists in Model
                 Next 'FactType

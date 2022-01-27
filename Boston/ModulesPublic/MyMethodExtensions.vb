@@ -5,6 +5,12 @@ Imports System.ComponentModel
 
 Module MyMethodExtensions
 
+    <Extension()>
+    Public Function Truncate(ByVal value As String, ByVal maxLength As Integer) As String
+        If String.IsNullOrEmpty(value) Then Return value
+        Return If(value.Length <= maxLength, value, value.Substring(0, maxLength))
+    End Function
+
     ''' <summary>
     ''' For the ErrorProvider. Determines if there is an invalid control...a control with a validation error
     ''' </summary>

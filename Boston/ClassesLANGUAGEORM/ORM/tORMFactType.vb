@@ -2062,7 +2062,11 @@ Namespace FBM
                     larModelObject.Add(Me)
                     larModelObject.Add(lrRole.JoinedORMObject)
 
-                    lrFactType = Me.Model.CreateFactType(lrRole.JoinedORMObject.Id & Me.Id,
+                    Dim lsFactTypeName As String = lrRole.JoinedORMObject.Id & Me.Id
+                    lsFactTypeName = lsFactTypeName.Truncate(98)
+                    lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0, False)
+
+                    lrFactType = Me.Model.CreateFactType(lsFactTypeName,
                                                          larModelObject,
                                                          False,
                                                          abMakeModelDirty,

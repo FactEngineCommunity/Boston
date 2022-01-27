@@ -16,7 +16,7 @@ Namespace TableFactData
                 lsSQLQuery &= ",'" & arFactData.FactType.Id & "'"
                 lsSQLQuery &= ",'" & arFactData.Fact.Symbol & "'"
                 lsSQLQuery &= ",'" & arFactData.Role.Id & "'"
-                lsSQLQuery &= ",'" & arFactData.Data & "'"
+                lsSQLQuery &= ",'" & arFactData.Data.Truncate(100) & "'"
                 lsSQLQuery &= " )"
 
                 pdbConnection.BeginTrans()

@@ -561,7 +561,13 @@ Namespace FBM
                 Dim lrConcept As New FBM.Concept(Me.Symbol, True)
                 lrConcept.Save()
                 Call TableModelDictionary.AddModelDictionaryEntry(Me)
+                Me.isDirty = False
             ElseIf Me.isDirty Then
+
+                'CodeSafe: If is only Value, then limit to 100 characters.
+                If Me.Realisations.FindAll(Function(x) x <> pcenumConceptType.Value).Count = 0 Then
+                    Me.Symbol = Me.Symbol.Truncate(100)
+                End If
 
                 If TableModelDictionary.ExistsModelDictionaryEntry(Me) Then
                     Call TableModelDictionary.UpdateModelDictionaryEntry(Me)

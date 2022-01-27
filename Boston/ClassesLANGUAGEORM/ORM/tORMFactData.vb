@@ -508,9 +508,9 @@ Namespace FBM
                     '------------------------------------------------------
                     'CodeSafe: If no dictionary entry exists, create one.
                     '------------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Data, pcenumConceptType.Value)
-                    lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False)
-                    Call lrDictionaryEntry.Save()
+                    'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Data, pcenumConceptType.Value)
+                    'lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False)
+                    'Call lrDictionaryEntry.Save()
 
                     TableFactData.AddFactData(Me)
 

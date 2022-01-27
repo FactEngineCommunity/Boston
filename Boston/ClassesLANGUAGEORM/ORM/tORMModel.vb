@@ -3804,6 +3804,12 @@ Namespace FBM
                 'CodeSafe: Only save DictionaryEntries with Realisations
                 '---------------------------------------------------------
                 If (lrModelDictionaryEntry.Realisations.Count >= 1) Or lrModelDictionaryEntry.isGeneralConcept Then
+                    '-------------------------------------------------------------------------
+                    'CodeSafe:If Value only, make sure is limited to 100 characters
+                    If lrModelDictionaryEntry.Realisations.FindAll(Function(x) x <> pcenumConceptType.Value).Count = 0 Then
+                        lrModelDictionaryEntry.Symbol = lrModelDictionaryEntry.Symbol.Truncate(100)
+                    End If
+
                     lrConcept = New FBM.Concept(lrModelDictionaryEntry.Symbol, True)
                     lrConcept.Save(abRapidSave)
                     Call lrModelDictionaryEntry.Save(abRapidSave)
