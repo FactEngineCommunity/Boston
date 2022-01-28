@@ -531,7 +531,7 @@ Namespace FBM
                     '-----------
                     'Fact
                     Call TableFact.AddFact(Me)
-
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
                     '-----------
                     'Fact                

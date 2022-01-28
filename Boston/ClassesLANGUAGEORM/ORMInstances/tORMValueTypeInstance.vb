@@ -965,7 +965,7 @@ Namespace FBM
                 End If
 
                 If Me.Model IsNot Nothing Then
-                    Call Me.Model.MakeDirty(True)
+                    Call Me.Model.MakeDirty(True, False)
                 End If
 
                 If Me.Page.Form IsNot Nothing Then

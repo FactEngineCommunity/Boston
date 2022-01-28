@@ -2672,7 +2672,7 @@ Namespace FBM
             Try
                 If abRapidSave Then
                     Call TableRole.AddRole(Me)
-
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If TableRole.ExistsRole(Me) Then

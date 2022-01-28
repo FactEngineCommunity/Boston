@@ -2187,14 +2187,14 @@ Namespace FBM
             Try
                 Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
                 lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                lrDictionaryEntry.isRoleConstraint = True
-
-                Call lrDictionaryEntry.Save()
-
+                If Not lrDictionaryEntry.isRoleConstraint Then
+                    lrDictionaryEntry.isRoleConstraint = True
+                    Call lrDictionaryEntry.Save()
+                End If
 
                 If abRapidSave Then
                     Call TableRoleConstraint.AddRoleConstraint(Me)
-
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If TableRoleConstraint.ExistsRoleConstraint(Me) Then

@@ -587,6 +587,7 @@ Namespace FBM
             Try
                 If abRapidSave Then
                     Call TableRoleConstraintArgument.AddRoleConstraintArgument(Me)
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If TableRoleConstraintArgument.ExistsRoleConstraintArgument(Me) Then

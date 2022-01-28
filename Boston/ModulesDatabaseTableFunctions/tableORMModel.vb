@@ -61,9 +61,9 @@ Namespace TableModel
             lsSQLQuery = "DELETE FROM MetaModelModel"
             lsSQLQuery &= " WHERE ModelId = '" & arModel.ModelId & "'"
 
-            pdbConnection.BeginTrans()
+            'pdbConnection.BeginTrans()
             pdbConnection.Execute(lsSQLQuery)
-            pdbConnection.CommitTrans()
+            'pdbConnection.CommitTrans()
 
         End Sub
 

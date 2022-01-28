@@ -513,6 +513,7 @@ Namespace FBM
                     'Call lrDictionaryEntry.Save()
 
                     TableFactData.AddFactData(Me)
+                    Me.isDirty = False
 
                 ElseIf Me.isDirty Then
                     If TableFactData.ExistsFactData(Me) Then

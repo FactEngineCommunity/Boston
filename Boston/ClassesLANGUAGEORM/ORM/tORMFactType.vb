@@ -3871,14 +3871,14 @@ Namespace FBM
 
             Try
                 Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
-                lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry)
+                lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
                 lrDictionaryEntry.isFactType = True
 
                 If abRapidSave Then
                     pdbConnection.BeginTrans()
                     Call TableFactType.AddFactType(Me)
                     pdbConnection.CommitTrans()
-
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If TableFactType.ExistsFactTypeByModel(Me) Then

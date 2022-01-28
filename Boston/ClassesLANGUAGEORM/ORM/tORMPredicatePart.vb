@@ -139,6 +139,7 @@ Namespace FBM
 
                 If abRapidSave Then
                     Call tableORMPredicatePart.AddPredicatePart(Me)
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If tableORMPredicatePart.ExistsPredicatePart(Me) Then

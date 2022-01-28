@@ -1,4 +1,6 @@
-﻿Module tableORMFactInstance
+﻿Imports System.Reflection
+
+Module tableORMFactInstance
     '-----------------------------------------------------------------------
     'FactInstances are stored in the ConceptInstance table in this version
     '  of Richmond, but it is expedient to have this module seperate
@@ -7,23 +9,11 @@
 
     Public Sub GetFactsForFactTypeInstance(ByRef arFactTypeInstance As FBM.FactTypeInstance)
 
-        Dim liInd As Integer = 0
-        Dim ls_Symbol_list As String = ""
-        Dim ls_tuple_field_name As String = ""
-        Dim ls_FactSymbol As String = Nothing 'The unique identifier for a Tuple (like an ORACLE 'RowId')
-        Dim lrFactInstance As New FBM.FactInstance(arFactTypeInstance)
-        Dim lrRoleInstance As FBM.RoleInstance
-        Dim lsFactId As String = ""
-
         Dim lsSQLQuery As String = ""
         Dim lRecordset As New ADODB.Recordset
 
-        Dim lrFact As FBM.Fact
-
         lRecordset.ActiveConnection = pdbConnection
         lRecordset.CursorType = pcOpenStatic
-
-        '        GetFactsForFactTypeInstance = New List(Of FBM.FactInstance)
 
         Try
 
@@ -35,14 +25,14 @@
             lsSQLQuery &= "  WHERE f.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
             lsSQLQuery &= "    AND f.FactTypeId = '" & Trim(CStr(arFactTypeInstance.Id)) & "'"
             lsSQLQuery &= "    AND fd.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
-            lsSQLQuery &= "    AND f.Symbol = fd.FactSymbol"
-            lsSQLQuery &= "    AND fci.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
+            lsSQLQuery &= "    AND fd.FactSymbol = f.Symbol"
             lsSQLQuery &= "    AND fd.FactSymbol = fci.Symbol"
+            lsSQLQuery &= "    AND fci.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
             lsSQLQuery &= "    AND fci.PageId = '" & arFactTypeInstance.Page.PageId & "'"
+            lsSQLQuery &= "    AND fci.ConceptType = '" & pcenumConceptType.Fact.ToString & "'"
             lsSQLQuery &= "    AND fdci.ModelId = '" & Trim(arFactTypeInstance.Model.ModelId) & "'"
             lsSQLQuery &= "    AND fdci.PageId = '" & arFactTypeInstance.Page.PageId & "'"
-            lsSQLQuery &= "    AND fci.ConceptType = '" & pcenumConceptType.Fact.ToString & "'"
-            lsSQLQuery &= "    AND fd.ValueSymbol = fdci.Symbol"
+            lsSQLQuery &= "    AND fdci.Symbol = fd.ValueSymbol"
             lsSQLQuery &= "    AND fdci.ConceptType = '" & pcenumConceptType.Value.ToString & "'"
             lsSQLQuery &= "    AND fdci.RoleId = fd.RoleId"
             lsSQLQuery &= "  ORDER BY f.Symbol, fd.RoleId" 'Symbol equates to FactId
@@ -51,6 +41,16 @@
 
             Dim lsSuccessFactId As String = ""
             If Not lRecordset.EOF Then
+
+                Dim liInd As Integer = 0
+                Dim ls_Symbol_list As String = ""
+                Dim ls_tuple_field_name As String = ""
+                Dim ls_FactSymbol As String = Nothing 'The unique identifier for a Tuple (like an ORACLE 'RowId')
+                Dim lrFactInstance As FBM.FactInstance
+                Dim lrRoleInstance As FBM.RoleInstance
+                Dim lsFactId As String = ""
+                Dim lrFact As FBM.Fact
+
                 lRecordset.MoveFirst()
                 While Not lRecordset.EOF
 
@@ -201,10 +201,14 @@
             lRecordset.Close()
 
         Catch ex As Exception
+
             Dim lsMessage As String
-            lsMessage = "Error: GetFactsForFactTypeInstance:"
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id & vbCrLf & ", FactId:" & lsFactId
+            lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id
+
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             lRecordset.Close()

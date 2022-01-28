@@ -837,7 +837,7 @@ Namespace FBM
 
                 If abRapidSave Then
                     Call TableValueType.AddValueType(Me)
-
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If TableValueType.ExistsValueType(Me) Then

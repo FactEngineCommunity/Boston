@@ -147,15 +147,16 @@ Namespace TableFactTypeInstance
                         lrFactTypeInstance.Page = arPage
                         lrFactTypeInstance.X = lREcordset("x").Value
                         lrFactTypeInstance.Y = lREcordset("y").Value
-                        lrFactTypeInstance.IsDerived = CBool(lREcordset("IsDerived").Value)
-                        lrFactTypeInstance.IsStored = CBool(lREcordset("IsStored").Value)
-                        lrFactTypeInstance.IsIndependent = CBool(lREcordset("IsIndependent").Value)
-                        lrFactTypeInstance.IsSubtypeStateControlling = CBool(lREcordset("IsSubtypeStateControlling").Value)
-                        lrFactTypeInstance.DerivationText = Trim(NullVal(lREcordset("DerivationText").Value, ""))
-                        lrFactTypeInstance.IsLinkFactType = CBool(lREcordset("IsLinkFactType").Value)
-                        If lrFactTypeInstance.IsLinkFactType Then
-                            lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
-                        End If
+                        '2022-01-28-VM-Moved to below...now get from FactType.
+                        'lrFactTypeInstance.IsDerived = CBool(lREcordset("IsDerived").Value)
+                        'lrFactTypeInstance.IsStored = CBool(lREcordset("IsStored").Value)
+                        'lrFactTypeInstance.IsIndependent = CBool(lREcordset("IsIndependent").Value)
+                        'lrFactTypeInstance.IsSubtypeStateControlling = CBool(lREcordset("IsSubtypeStateControlling").Value)
+                        'lrFactTypeInstance.DerivationText = Trim(NullVal(lREcordset("DerivationText").Value, ""))
+                        'lrFactTypeInstance.IsLinkFactType = CBool(lREcordset("IsLinkFactType").Value)
+                        'If lrFactTypeInstance.IsLinkFactType Then
+                        '    lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
+                        'End If
 
                         If arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
                             '-------------------------------------------------------------------------------------------------------
@@ -173,14 +174,21 @@ Namespace TableFactTypeInstance
 
                             Return lrExistingFactTypeInstance
                         Else
-
-                            'prApplication.ThrowErrorMessage("Loading Page:'" & arPage.Name & "' AND FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "'", pcenumErrorType.Information)
-
                             lrFactTypeInstance.FactType = arPage.Model.FactType.Find(Function(x) x.Id = lrFactTypeInstance.Id)
 
                             lrFactTypeInstance.ShortDescription = lrFactTypeInstance.FactType.ShortDescription
                             lrFactTypeInstance.LongDescription = lrFactTypeInstance.FactType.LongDescription
                             lrFactTypeInstance.DBName = lrFactTypeInstance.FactType.DBName
+
+                            lrFactTypeInstance.IsDerived = lrFactTypeInstance.FactType.IsDerived
+                            lrFactTypeInstance.IsStored = lrFactTypeInstance.FactType.IsStored
+                            lrFactTypeInstance.IsIndependent = lrFactTypeInstance.FactType.IsIndependent
+                            lrFactTypeInstance.IsSubtypeStateControlling = lrFactTypeInstance.FactType.IsSubtypeStateControlling
+                            lrFactTypeInstance.DerivationText = lrFactTypeInstance.FactType.DerivationText
+                            lrFactTypeInstance.IsLinkFactType = lrFactTypeInstance.FactType.IsLinkFactType
+                            If lrFactTypeInstance.IsLinkFactType Then
+                                lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
+                            End If
 
                             If lrFactTypeInstance.FactType Is Nothing Then
                                 Throw New Exception("Cannot find FactType for FactTypeInstance with FactTypeId: " & lrFactTypeInstance.Id)
@@ -188,9 +196,7 @@ Namespace TableFactTypeInstance
 
 
                             lrFactTypeInstance.IsObjectified = lrFactTypeInstance.FactType.IsObjectified
-                            If lrFactTypeInstance.IsObjectified Then
-                                lrFactTypeInstance.ShowFactTypeName = True
-                            End If
+                            lrFactTypeInstance.ShowFactTypeName = lrFactTypeInstance.IsObjectified
 
                             If lrFactTypeInstance.IsObjectified Then
                                 Dim lrObjectifyingEntityTypeInstance As FBM.EntityTypeInstance
@@ -214,8 +220,6 @@ Namespace TableFactTypeInstance
                                 End If
                             End If
 
-
-
                             lrFactTypeInstance.isPreferredReferenceMode = lrFactTypeInstance.FactType.IsPreferredReferenceMode
                             lrFactTypeInstance.IsSubtypeRelationshipFactType = lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType
 
@@ -223,8 +227,8 @@ Namespace TableFactTypeInstance
                             'Setup the FactTypeName for the FactType
                             '-----------------------------------------
                             lrFactTypeInstance.FactTypeName = New FBM.FactTypeName(arPage.Model, arPage, lrFactTypeInstance, lrFactTypeInstance.Name)
-                            lrFactTypeInstance.FactTypeName.FactTypeInstance = lrFactTypeInstance
 
+                            '==============================================================================================================
                             Call TableFactTypeName.GetFactTypeNameDetails(lrFactTypeInstance.FactTypeName)
 
                             If lrFactTypeInstance.DerivationText <> "" Then
@@ -301,16 +305,9 @@ Namespace TableFactTypeInstance
                                 '----------------------------------------------------
                                 'Add the RoleInstance to the Page.RoleInstance group
                                 '----------------------------------------------------
-                                If arPage.RoleInstance.Exists(AddressOf lrRoleInstance.Equals) Then
-                                    '---------------------------------------------------------------------------------------------------
-                                    'The RoleInstance has already been added to the Page by the recursive loading of FactTypeInstances
-                                    '  NB Should already be on the Page by 'CloneInstance' (above).
-                                    '---------------------------------------------------------------------------------------------------
-                                Else
-                                    'SyncLock arPage.RoleInstance                                    
-                                    arPage.RoleInstance.AddUnique(lrRoleInstance)
-                                    'End SyncLock
-                                End If
+                                'SyncLock arPage.RoleInstance                                    
+                                arPage.RoleInstance.AddUnique(lrRoleInstance)
+                                'End SyncLock
 
                                 'prApplication.ThrowErrorMessage("Successfully loaded Page:'" & lrFactTypeInstance.Page.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
                             Next
@@ -336,20 +333,19 @@ Namespace TableFactTypeInstance
                             '----------------------------------------------
                             'Get the Facts (FactTypeData) for the FactType
                             '----------------------------------------------
-                            'prApplication.ThrowErrorMessage("Loading Facts for FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "'", pcenumErrorType.Information)
-                            'lrFactTypeInstance.Fact = GetFactsForFactTypeInstance(lrFactTypeInstance)
+                            If lrFactTypeInstance.FactType.Fact.Count > 0 Then
+                                'Only get FactInstances if the FactTypeInstance's FactType has Facts.
+                                Call tableORMFactInstance.GetFactsForFactTypeInstance(lrFactTypeInstance)
+                            End If
                             'new threading below
-                            Dim loFactInstanceThread As New System.Threading.Thread(AddressOf lrFactTypeInstance.GetFactInstancesFromDatabase)
-                            loFactInstanceThread.Start()
-
-                            'prApplication.ThrowErrorMessage("Successfully Loaded Facts for FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "'", pcenumErrorType.Information)
+                            'Dim loFactInstanceThread As New System.Threading.Thread(AddressOf lrFactTypeInstance.GetFactInstancesFromDatabase)
+                            'loFactInstanceThread.Start()
 
                             'SyncLock arPage.FactTypeInstance
                             arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
                             'End SyncLock
                         End If
 
-                        'prApplication.ThrowErrorMessage("Successfully Loaded Page:'" & arPage.Name & "' AND FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "'", pcenumErrorType.Information)
                         lREcordset.MoveNext()
                     End While
 
@@ -391,7 +387,6 @@ Namespace TableFactTypeInstance
             lsSQLQuery &= "   AND ci.ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
             lsSQLQuery &= "   AND ft.ModelId = '" & Trim(arPage.Model.ModelId) & "'"
             lsSQLQuery &= " ORDER BY FT.IsObjectified ASC"
-
 
             lREcordset.Open(lsSQLQuery)
 

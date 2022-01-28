@@ -160,6 +160,7 @@ Namespace FBM
                     pdbConnection.BeginTrans()
                     Call TableModelNote.AddModelNote(Me)
                     pdbConnection.CommitTrans()
+                    Me.isDirty = False
                 ElseIf Me.isDirty Then
 
                     If TableModelNote.ExistsModelNote(Me) Then

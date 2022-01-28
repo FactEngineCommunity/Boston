@@ -1918,7 +1918,7 @@ Namespace FBM
                             Me.ReferenceModeRoleConstraint = Nothing
                             Me.ReferenceModeFactType = Nothing
                             Me.ReferenceModeValueType = Nothing
-                            Me.Model.Save()
+                            Me.Save()
 
                             Dim lsMessage As String = ""
                             lsMessage = "Entity Type, '" & Me.Id & "', had a Reference Mode but no associated Value Type or Fact Type."
@@ -2308,13 +2308,12 @@ Namespace FBM
                         pdbConnection.BeginTrans()
                         Call lrDictionaryEntry.Save()
                         Call TableEntityType.AddEntityType(Me)
-
                         pdbConnection.CommitTrans()
+                        Me.isDirty = False
                     Catch ar_err As Exception
                         pdbConnection.RollbackTrans()
                         Throw New ApplicationException("Error: EntityType.Save: " & ar_err.Message)
                     End Try
-
                 ElseIf Me.isDirty Then
 
                     If TableEntityType.ExistsEntityTypeByModel(Me) Then

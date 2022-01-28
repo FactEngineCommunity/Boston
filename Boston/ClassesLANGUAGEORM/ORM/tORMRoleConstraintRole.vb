@@ -198,7 +198,7 @@ Namespace FBM
 
             If abRapidSave Then
                 TableRoleConstraintRole.AddRoleConstraintRole(Me)
-
+                Me.isDirty = False
             ElseIf Me.isDirty Then
 
                 If TableRoleConstraintRole.ExistsRoleConstraintRole(Me) Then
@@ -206,9 +206,8 @@ Namespace FBM
                 Else
                     TableRoleConstraintRole.AddRoleConstraintRole(Me)
                 End If
-
-                Me.isDirty = False
             End If
+            Me.isDirty = False
 
         End Sub
 

@@ -3733,11 +3733,13 @@ Namespace FBM
                 'Save the DictionaryEntries within the ORM Model.
                 '  NB Also maintains the MetaModelConcept table.
                 '--------------------------------------------------
+                Richmond.WriteToStatusBar("Saving Model Dictionary",, 0)
                 Call Me.SaveModelDictionary(abModelDictionaryRapidSave)
 
                 '----------------------------------------------
                 ' Save the set of Entities within the ORM Model
                 '----------------------------------------------
+                Richmond.WriteToStatusBar("Saving Entity Types",, 10)
                 For Each lrEntityType In Me.EntityType.OrderBy(Function(x) x.SubtypeRelationship.Count)
                     Call lrEntityType.Save(abRapidSave)
                 Next
@@ -3745,6 +3747,7 @@ Namespace FBM
                 '-------------------------------------------------
                 ' Save the set of Value Types within the ORM Model
                 '-------------------------------------------------
+                Richmond.WriteToStatusBar("Saving Value Types",, 20)
                 For Each lrValueType In Me.ValueType.FindAll(Function(x) x.isDirty)
                     Call lrValueType.Save(abRapidSave)
                 Next
@@ -3752,11 +3755,12 @@ Namespace FBM
                 '-------------------------------------------------
                 ' Save the set of Fact Types within the ORM Model
                 '-------------------------------------------------
+                Richmond.WriteToStatusBar("Saving Fact Types",, 30)
                 For Each lrFactType In Me.FactType
                     Call lrFactType.Save(abRapidSave)
                 Next
 
-
+                Richmond.WriteToStatusBar("Saving Role Constraints",, 40)
                 For Each lrRoleConstraint In Me.RoleConstraint
                     Call lrRoleConstraint.Save(abRapidSave)
                 Next
@@ -3764,6 +3768,7 @@ Namespace FBM
                 '----------------------------
                 'Save the ModelNote objects
                 '----------------------------
+                Richmond.WriteToStatusBar("Saving Model Notes",, 50)
                 For Each lrModelNote In Me.ModelNote
                     lrModelNote.Save(abRapidSave)
                 Next
@@ -3774,6 +3779,7 @@ Namespace FBM
 
                 Dim lrPage As FBM.Page
 
+                Richmond.WriteToStatusBar("Saving Pages",, 60)
                 For Each lrPage In Me.Page
                     If lrPage.IsDirty Then
                         lrPage.Save(abRapidSave)
@@ -3795,11 +3801,12 @@ Namespace FBM
 
             Dim lrConcept As New FBM.Concept
             Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+            Dim larDictionaryEntriesToRemove As New List(Of FBM.DictionaryEntry)
 
             '---------------------------------------------------
             'Save the DictionaryEntries in the ModelDictionary
             '---------------------------------------------------
-            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty Or abRapidSave).ToArray
+            For Each lrModelDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) x.isDirty Or abRapidSave)
                 '---------------------------------------------------------
                 'CodeSafe: Only save DictionaryEntries with Realisations
                 '---------------------------------------------------------
@@ -3817,8 +3824,12 @@ Namespace FBM
                     '---------------------------------------------------------------------
                     'Remove unnused DictionaryEntries from the ModelDictionary/database.
                     '---------------------------------------------------------------------
-                    Me.RemoveDictionaryEntry(lrModelDictionaryEntry, True)
+                    larDictionaryEntriesToRemove.Add(lrModelDictionaryEntry)
                 End If
+            Next
+
+            For Each lrModelDictionaryEntry In larDictionaryEntriesToRemove
+                Me.RemoveDictionaryEntry(lrModelDictionaryEntry, True)
             Next
 
         End Sub
@@ -4969,9 +4980,9 @@ Namespace FBM
 
             If abLoadPages Then
                 If abUseThreading And TablePage.GetPageCountByModel(Me.ModelId) < 30 Then
-                    Call TablePage.GetPagesByModel(Me, True, True, aoBackgroundWorker)
+                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
                 Else
-                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, True)
+                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
                 End If
             Else
                 Call TablePage.GetPagesByModel(Me, False)

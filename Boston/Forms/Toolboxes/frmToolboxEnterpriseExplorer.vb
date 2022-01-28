@@ -2052,11 +2052,29 @@ Public Class frmToolboxEnterpriseExplorer
 
                             End If
                             'lrPage.RemoveFromModel()
+                            lrModel.Page.RemoveAt(liInd - 1)
                         Next
 
                         Application.DoEvents()
-                        Call lrModel.RemoveFromDatabase()
 
+                        Try
+                            Call lrModel.RemoveFromDatabase()
+                        Catch ex As Exception
+                            If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                                lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+                                Dim lsDatabaseLocation As String = lrSQLConnectionStringBuilder("Data Source")
+                                Dim dbe As New DAO.DBEngine
+                                Dim db As DAO.Database
+                                db = dbe.OpenDatabase(lsDatabaseLocation)
+                                dbe.SetOption(DAO.SetOptionEnum.dbMaxLocksPerFile, 200000)
+                                db.Execute("DELETE FROM MetaModelModel WHERE ModelId = '" & lrModel.ModelId & "'")
+                            End If
+                        End Try
+
+                        prApplication.Models.Remove(lrModel)
 
                         '=================================
                         'Remove then readd handler. Stops the previous Model from being loaded unintentionally.
@@ -2291,13 +2309,13 @@ Public Class frmToolboxEnterpriseExplorer
         '-----------------------------------------
         'Get the ValueTypes from the nORMa model
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Value Types")
+        Richmond.WriteToStatusBar("Loading Value Types",, 10)
         Call lrNORMAFileLoader.LoadValueTypes(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------
         'Get the EntityTypes from the nORMa model
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Entity Types")
+        Richmond.WriteToStatusBar("Loading Entity Types",, 20)
         Call lrNORMAFileLoader.LoadEntityTypes(lrModel, NORMAXMLDOC)
 
         '-------------------------------------------------------
@@ -2308,25 +2326,25 @@ Public Class frmToolboxEnterpriseExplorer
         '----------------------------------------
         'Get the FactTypes from the nORMa model
         '----------------------------------------
-        Richmond.WriteToStatusBar("Loading Fact Types")
+        Richmond.WriteToStatusBar("Loading Fact Types",, 30)
         Call lrNORMAFileLoader.LoadFactTypes(lrModel, NORMAXMLDOC)
 
         '----------------------------------------
         'Set Role.Ids for LinkFactTypes
         '----------------------------------------
-        Richmond.WriteToStatusBar("Loading Fact Types")
+        Richmond.WriteToStatusBar("Loading Fact Types",, 35)
         Call lrNORMAFileLoader.SetRoleIdsForLinkFactTypes(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------
         'Get the Internal Uniqueness Constraints
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Internal Uniqueness Constraints")
+        Richmond.WriteToStatusBar("Loading Internal Uniqueness Constraints",, 40)
         Call lrNORMAFileLoader.LoadRoleConstraintInternalUniquenessConstraints(lrModel, NORMAXMLDOC, True)
 
         '-----------------------------------------
         'Get the External Uniqueness Constraints
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading External Uniqueness Constraints")
+        Richmond.WriteToStatusBar("Loading External Uniqueness Constraints",, 50)
         Call lrNORMAFileLoader.LoadRoleConstraintExternalUniquenessConstraints(lrModel, NORMAXMLDOC)
 
         '-------------------------------------------------------
@@ -2337,32 +2355,32 @@ Public Class frmToolboxEnterpriseExplorer
         '----------------------------
         'Get the Subset Constraints
         '----------------------------
-        Richmond.WriteToStatusBar("Loading Subset Constraints")
+        Richmond.WriteToStatusBar("Loading Subset Constraints",, 60)
         Call lrNORMAFileLoader.LoadRoleConstraintSubsetConstraints(lrModel, NORMAXMLDOC)
 
         '--------------------------
         'Get the Ring Constraints
         '--------------------------
-        Richmond.WriteToStatusBar("Loading Ring Constraints")
+        Richmond.WriteToStatusBar("Loading Ring Constraints",, 65)
         Call lrNORMAFileLoader.LoadRoleConstraintRingConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Exclusion Constraints")
+        Richmond.WriteToStatusBar("Loading Exclusion Constraints",, 70)
         Call lrNORMAFileLoader.LoadRoleConstraintExclusionConstraints(lrModel, NORMAXMLDOC)
 
 
-        Richmond.WriteToStatusBar("Loading Inclusive Or Constraints")
+        Richmond.WriteToStatusBar("Loading Inclusive Or Constraints",, 75)
         Call lrNORMAFileLoader.LoadRoleConstraintInclusiveOrConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Exclusive Or Constraints")
+        Richmond.WriteToStatusBar("Loading Exclusive Or Constraints",, 80)
         Call lrNORMAFileLoader.LoadRoleConstraintExclusiveOrConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Equality Constraints")
+        Richmond.WriteToStatusBar("Loading Equality Constraints",, 85)
         Call lrNORMAFileLoader.LoadRoleConstraintEqualityConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Frequency Constraints")
+        Richmond.WriteToStatusBar("Loading Frequency Constraints",, 90)
         Call lrNORMAFileLoader.LoadRoleConstraintFrequencyConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Value Comparison Constraints")
+        Richmond.WriteToStatusBar("Value Comparison Constraints",, 95)
         Call lrNORMAFileLoader.LoadRoleConstraintValueComparisonConstraints(lrModel, NORMAXMLDOC)
 
         '----------------------------------------------------------------------------------------------------------
@@ -2371,13 +2389,13 @@ Public Class frmToolboxEnterpriseExplorer
         '  the FactType. In essense, NORMA has a Binary FactType refering to the Value Type and in Richmond
         '  only the Unary FactType (and singular Role) is required.
         '----------------------------------------------------------------------------------------------------------
-        Richmond.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes")
+        Richmond.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes", True)
         Call lrNORMAFileLoader.GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(arModel)
 
         '-------------------------------------------------------
         'Get ModelObjectInstances by Page from the nORMa model
         '-------------------------------------------------------
-        Richmond.WriteToStatusBar("Loading Page Model Object Instances")
+        Richmond.WriteToStatusBar("Loading Page Model Object Instances", True)
         Call lrNORMAFileLoader.LoadPageModelInstances(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------------------------------------------------------------------
@@ -2433,7 +2451,7 @@ Public Class frmToolboxEnterpriseExplorer
         lrModel.Loaded = True
         frmMain.Cursor = Cursors.Default
 
-        Richmond.WriteToStatusBar("")
+        Richmond.WriteToStatusBar("", True, 100)
 
         frmMain.Cursor = Cursors.Default
         Me.Cursor = Cursors.Default
@@ -4553,10 +4571,12 @@ Public Class frmToolboxEnterpriseExplorer
                 Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
 
                 lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
-                lsMessage = "Save the model now? (Recommended)"
+                lsMessage &= "Save the model now? (Recommended)"
                 If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
                     With New WaitCursor
+                        Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
                         Call lrModel.Save(True, False)
+                        Richmond.WriteToStatusBar("Model Saved")
                     End With
                 End If
 

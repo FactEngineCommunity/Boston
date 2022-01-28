@@ -189,12 +189,14 @@ Namespace FBM
 
             If abRapidSave Then
                 Call TableSubtypeRelationship.add_parentEntityType(Me)
+                Me.isDirty = False
             Else
                 If TableSubtypeRelationship.exists_parentEntityType(Me) Then
                     Call TableSubtypeRelationship.update_parentEntityType(Me)
                 Else
                     Call TableSubtypeRelationship.add_parentEntityType(Me)
                 End If
+                Me.isDirty = False
             End If
 
         End Sub
