@@ -336,7 +336,11 @@ Namespace ERD
                     For Each lrSupertypeTable In larSupertypeTable
                         For Each lrAttrubute In Me.Attribute.FindAll(Function(x) x.Column.Role.JoinedORMObject.Id = lrSupertypeTable.Name)
                             Me.Attribute.Remove(lrAttrubute)
-                            Me.Attribute.Insert(liInd, lrAttrubute)
+                            Try
+                                Me.Attribute.Insert(liInd, lrAttrubute)
+                            Catch ex As Exception
+                                Me.Attribute.Add(lrAttrubute)
+                            End Try
                             liInd += 1
                         Next
                     Next
@@ -483,7 +487,11 @@ Namespace ERD
                     For Each lrSupertypeTable In larSupertypeTable
                         For Each lrAttrubute In Me.Attribute.FindAll(Function(x) x.Column.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
                             Me.Attribute.Remove(lrAttrubute)
-                            Me.Attribute.Insert(liInd, lrAttrubute)
+                            Try
+                                Me.Attribute.Insert(liInd, lrAttrubute)
+                            Catch ex As Exception
+                                Me.Attribute.Add(lrAttrubute)
+                            End Try
                             liInd += 1
                         Next
                     Next

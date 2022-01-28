@@ -1983,30 +1983,35 @@ Namespace FBM
                             End If
 
                         Catch ex As Exception
-                            Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
-                            lsErrorMessage &= vbCrLf & vbCrLf & "Skipping loading of the Column from the ORM model (only) as a precaution."
-                            If Me.IsDatabaseSynchronised Then
-                                lsErrorMessage &= " Contact support for instructions how to fix this problem."
-                            End If
-                            lsErrorMessage.AppendDoubleLineBreak("Optionally you can delete the Column from the database altogether. Click [Yes] to delete the Column, or [No] to keep the Column.")
-                            lsErrorMessage.AppendString(" You should only delete the Column if you know what you are doing or as advised by support. Backup your database before deleting core elements.")
 
-                            'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
-                            'Me.IsDatabaseSynchronised = False
-                            'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
-                            'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
-
-                            lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
-                            If prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Information,
-                                                               ex.StackTrace,
-                                                               False,
-                                                               False,
-                                                               True,
-                                                               MessageBoxButtons.YesNo) = DialogResult.Yes Then
-                                '20210813-VM-If this gets out of hand, remove this functionality.
+                            If My.Settings.AutomaticallyDeleteTroublesomeColumns Then
                                 Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                            Else
+
+                                Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
+                                lsErrorMessage &= vbCrLf & vbCrLf & "Skipping loading of the Column from the ORM model (only) as a precaution."
+                                If Me.IsDatabaseSynchronised Then
+                                    lsErrorMessage &= " Contact support for instructions how to fix this problem."
+                                End If
+                                lsErrorMessage.AppendDoubleLineBreak("Optionally you can delete the Column from the database altogether. Click [Yes] to delete the Column, or [No] to keep the Column.")
+                                lsErrorMessage.AppendString(" You should only delete the Column if you know what you are doing or as advised by support. Backup your database before deleting core elements.")
+
+                                'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
+                                'Me.IsDatabaseSynchronised = False
+                                'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                                'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
+
+                                lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
+                                If prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Information,
+                                                                   ex.StackTrace,
+                                                                   False,
+                                                                   False,
+                                                                   True,
+                                                                   MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                    '20210813-VM-If this gets out of hand, remove this functionality.
+                                    Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                                End If
                             End If
-                            'Throw New Exception(lsErrorMessage)
                         End Try
 
                         lrORMRecordset2.MoveNext()

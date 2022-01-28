@@ -948,14 +948,13 @@ Namespace FBM
                     End If
 
                     If abAddToPage Then
-                        If Not arPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
-                            arPage.EntityTypeInstance.Add(lrEntityTypeInstance)
-                        End If
+                        arPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
                     End If
 
                     If IsSomething(.ReferenceModeValueType) Then
                         lrEntityTypeInstance.ReferenceModeValueType = .ReferenceModeValueType.CloneInstance(arPage, abAddToPage)
                     End If
+
                     If IsSomething(.ReferenceModeFactType) Then
                         lrEntityTypeInstance.ReferenceModeFactType = .ReferenceModeFactType.CloneInstance(arPage, abAddToPage)
                     End If
