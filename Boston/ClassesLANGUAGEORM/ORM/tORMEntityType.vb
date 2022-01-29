@@ -2285,28 +2285,29 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
+                '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                'Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id) And x.isEntityType)
 
-                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id) And x.isEntityType)
+                ''--------------------------------------------------------------------------------
+                ''CodeSafe: If there is no dictionary entry for the EntityType, then create one.
+                ''--------------------------------------------------------------------------------
+                'If lrDictionaryEntry Is Nothing Then
+                '    lsMessage = "Tried to save an EntityType with no corresponding DictionaryEntry."
+                '    lsMessage &= vbCrLf & vbCrLf & "Creating a DictionaryEntry for the EntityType"
 
-                '--------------------------------------------------------------------------------
-                'CodeSafe: If there is no dictionary entry for the EntityType, then create one.
-                '--------------------------------------------------------------------------------
-                If lrDictionaryEntry Is Nothing Then
-                    lsMessage = "Tried to save an EntityType with no corresponding DictionaryEntry."
-                    lsMessage &= vbCrLf & vbCrLf & "Creating a DictionaryEntry for the EntityType"
+                '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
 
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                '    lrDictionaryEntry = New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.EntityType, Me.ShortDescription, Me.LongDescription)
+                '    lrDictionaryEntry.isDirty = True
+                'End If
 
-                    lrDictionaryEntry = New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.EntityType, Me.ShortDescription, Me.LongDescription)
-                    lrDictionaryEntry.isDirty = True
-                End If
-
-                lrDictionaryEntry.isEntityType = True
+                'lrDictionaryEntry.isEntityType = True
 
                 If abRapidSave Then
                     Try
                         pdbConnection.BeginTrans()
-                        Call lrDictionaryEntry.Save()
+                        '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                        'Call lrDictionaryEntry.Save()
                         Call TableEntityType.AddEntityType(Me)
                         pdbConnection.CommitTrans()
                         Me.isDirty = False
@@ -2318,11 +2319,13 @@ Namespace FBM
 
                     If TableEntityType.ExistsEntityTypeByModel(Me) Then
                         Call TableEntityType.UpdateEntityType(Me)
-                        Call lrDictionaryEntry.Save()
+                        '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                        'Call lrDictionaryEntry.Save()
                     Else
                         Try
                             pdbConnection.BeginTrans()
-                            Call lrDictionaryEntry.Save()
+                            '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                            'Call lrDictionaryEntry.Save()
                             If TableEntityType.ExistsEntityType(Me) Then
                                 '----------------------------------------------------------------
                                 'Entity Type already exists in Richmond DB, so no need to add.

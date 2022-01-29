@@ -2185,12 +2185,13 @@ Namespace FBM
             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
             Try
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
-                lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                If Not lrDictionaryEntry.isRoleConstraint Then
-                    lrDictionaryEntry.isRoleConstraint = True
-                    Call lrDictionaryEntry.Save()
-                End If
+                '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
+                'lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+                'If Not lrDictionaryEntry.isRoleConstraint Then
+                'lrDictionaryEntry.isRoleConstraint = True
+                ' Call lrDictionaryEntry.Save()
+                'End If
 
                 If abRapidSave Then
                     Call TableRoleConstraint.AddRoleConstraint(Me)

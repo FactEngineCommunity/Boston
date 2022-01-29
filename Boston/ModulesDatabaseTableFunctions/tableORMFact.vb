@@ -93,15 +93,8 @@ Namespace TableFact
 
         Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType) 'As List(Of FBM.Fact)
 
-            Dim lrDictionaryEntry As FBM.DictionaryEntry
-            Dim lrFactDictionaryEntry As FBM.DictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, "DummyFactId", pcenumConceptType.Fact)
-            Dim lrFact As FBM.Fact
-            Dim liInd As Integer
-            Dim lrRole As FBM.Role
             Dim lsSQLQuery As String
             Dim lRecordset As New ADODB.Recordset
-            Dim lrModel As FBM.Model = arFactType.Model 'For time savings
-            Dim larRoleGroup As List(Of FBM.Role) = arFactType.RoleGroup
 
             Try
 
@@ -125,6 +118,14 @@ Namespace TableFact
                 Next
 
                 If Not lRecordset.EOF Then
+
+                    Dim lrDictionaryEntry As FBM.DictionaryEntry
+                    Dim lrFactDictionaryEntry As FBM.DictionaryEntry '20220129-VM-Removed. = New FBM.DictionaryEntry(arFactType.Model, "DummyFactId", pcenumConceptType.Fact)
+                    Dim lrFact As FBM.Fact
+                    Dim liInd As Integer
+                    Dim lrRole As FBM.Role
+                    Dim larRoleGroup As List(Of FBM.Role) = arFactType.RoleGroup
+
                     While Not lRecordset.EOF
                         lrFact = New FBM.Fact(lRecordset("Symbol").Value, arFactType, False)
                         For liInd = 1 To arFactType.Arity
@@ -134,8 +135,8 @@ Namespace TableFact
                             '--------------------------------------------------------------------------------------------------
                             'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
                             '--------------------------------------------------------------------------------------------------
-                            lrDictionaryEntry = lrModel.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value),
-                                                                                , False,,, True, True)
+                            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, lRecordset("ValueSymbol").Value, pcenumConceptType.Value),
+                                                                                         , False,,, True, True)
 
                             Dim lrFactData As New FBM.FactData(lrRole, lrDictionaryEntry.Concept, lrFact, False)
                             '-----------------------------

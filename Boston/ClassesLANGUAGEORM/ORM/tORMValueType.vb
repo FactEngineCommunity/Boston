@@ -829,11 +829,11 @@ Namespace FBM
             '-------------------------------------
 
             Try
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType, Me.ShortDescription, Me.LongDescription)
-                lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, True)
-                lrDictionaryEntry.isValueType = True
-
-                Call lrDictionaryEntry.Save()
+                '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType, Me.ShortDescription, Me.LongDescription)
+                'lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, True)
+                'lrDictionaryEntry.isValueType = True
+                'Call lrDictionaryEntry.Save()
 
                 If abRapidSave Then
                     Call TableValueType.AddValueType(Me)

@@ -450,7 +450,7 @@ Namespace NORMA
                 For Each loElement In loEnumElementQueryResult
 
                     lrFactType = New FBM.FactType(lrFactType.Model, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
-                    lrFactType.Name = lrFactType.Name.Truncate(99)
+                    lrFactType.Name = Strings.Left(lrFactType.Name, 99)
                     lrFactType.Id = lrFactType.Model.CreateUniqueFactTypeName(lrFactType.Name, 0)
                     lrFactType.Name = lrFactType.Id
                     lrFactType.NORMAReferenceId = arFactType.NORMAReferenceId
@@ -746,7 +746,7 @@ Namespace NORMA
 
                     lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
                     lrFactType.NORMAName = lrFactType.Name
-                    lrFactType.Name = lrFactType.Name.Truncate(99)
+                    lrFactType.Name = Strings.Left(lrFactType.Name, 99)
                     lrFactType.NORMAReferenceId = loElement.Attribute("id").Value
                     lrFactType.Id = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
                     lrFactType.Name = lrFactType.Id
@@ -955,7 +955,6 @@ Namespace NORMA
                             End If
                         Next 'Role
 
-
                         '---------------------------------------------
                         'Load the Internal Uniqueness Constraints
                         '---------------------------------------------
@@ -1012,11 +1011,11 @@ Namespace NORMA
                 Next 'FactType
 
                 Dim larFaultyFactTypes = From FactType In arModel.FactType
-                                     From Role In FactType.RoleGroup
-                                     Where Role.JoinedORMObject Is Nothing
-                                     Select FactType
+                                         From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject Is Nothing
+                                         Select FactType
 
-            For Each lrFactType In larFaultyFactTypes
+                For Each lrFactType In larFaultyFactTypes
 
                 Dim larRole = From Role In lrFactType.RoleGroup
                               Where Role.JoinedORMObject Is Nothing
@@ -2293,28 +2292,36 @@ Namespace NORMA
 
             Dim liFactTypeInd As Integer = 0
 
-            For Each lrFactType In arModel.FactType.ToArray
-                For Each lrRole In lrFactType.RoleGroup.ToArray
-                    If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+            Dim larRole = From FactType In arModel.FactType
+                          From Role In FactType.RoleGroup
+                          Where Role.NORMALinksToUnaryFactTypeValueType
+                          Select Role
 
-                        Dim larJoinPath = From RoleConstraint In arModel.RoleConstraint
-                                          From Argument In RoleConstraint.Argument
-                                          From Role In Argument.JoinPath.RolePath
-                                          Where Role.Id = lrRole.Id
-                                          Select Argument.JoinPath
+            'For Each lrFactType In arModel.FactType.ToArray
+            '    For Each lrRole In lrFactType.RoleGroup.ToArray
+            '        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
 
-                        Call lrRole.FactType.RemoveRole(lrRole, False, True)
+            For Each lrRole In larRole.ToArray
+                Dim larJoinPath = From RoleConstraint In arModel.RoleConstraint
+                                  From Argument In RoleConstraint.Argument
+                                  From Role In Argument.JoinPath.RolePath
+                                  Where Role.Id = lrRole.Id
+                                  Select Argument.JoinPath
 
-                        For Each lrJoinPath In larJoinPath.ToArray
-                            Dim liIndex As Integer = lrJoinPath.RolePath.IndexOf(lrRole)
-                            lrJoinPath.RolePath.RemoveAt(liIndex)
-                            lrJoinPath.RolePath.Insert(liIndex, lrRole.FactType.RoleGroup(0))
-                        Next
+                Call lrRole.FactType.RemoveRole(lrRole, False, True)
 
-                        Call arModel.RemoveValueType(lrRole.JoinsValueType, False)
-                    End If
+                For Each lrJoinPath In larJoinPath.ToArray
+                    Dim liIndex As Integer = lrJoinPath.RolePath.IndexOf(lrRole)
+                    lrJoinPath.RolePath.RemoveAt(liIndex)
+                    lrJoinPath.RolePath.Insert(liIndex, lrRole.FactType.RoleGroup(0))
                 Next
+
+                Call arModel.RemoveValueType(lrRole.JoinsValueType, False)
             Next
+
+            '        End If
+            '    Next
+            'Next
 
         End Sub
 

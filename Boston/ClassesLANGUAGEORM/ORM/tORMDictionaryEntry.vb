@@ -566,7 +566,7 @@ Namespace FBM
 
                 'CodeSafe: If is only Value, then limit to 100 characters.
                 If Me.Realisations.FindAll(Function(x) x <> pcenumConceptType.Value).Count = 0 Then
-                    Me.Symbol = Me.Symbol.Truncate(100)
+                    Me.Symbol = Strings.Left(Me.Symbol, 100)
                 End If
 
                 If TableModelDictionary.ExistsModelDictionaryEntry(Me) Then

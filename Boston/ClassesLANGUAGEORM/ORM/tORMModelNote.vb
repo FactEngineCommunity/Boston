@@ -151,10 +151,10 @@ Namespace FBM
         Public Overridable Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False)
 
             Try
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ModelNote, Me.ShortDescription, Me.LongDescription)
-                lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
-                Call lrDictionaryEntry.Save()
-
+                '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ModelNote, Me.ShortDescription, Me.LongDescription)
+                'lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
+                'Call lrDictionaryEntry.Save()
 
                 If abRapidSave Then
                     pdbConnection.BeginTrans()

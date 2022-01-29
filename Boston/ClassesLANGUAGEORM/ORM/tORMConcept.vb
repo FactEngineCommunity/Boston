@@ -44,7 +44,7 @@ Namespace FBM
 
         Public Sub New(ByVal asSymbol As String, Optional ByVal abMakeDirty As Boolean = False)
 
-            Me.Symbol = asSymbol.Truncate(100)
+            Me.Symbol = Strings.Left(asSymbol, 100)
             Me.isDirty = abMakeDirty
 
         End Sub

@@ -1942,10 +1942,11 @@ Namespace FBM
                     ' Make sure the DictionaryEntry contains the ConceptType of the DictionaryEntry attempted to be added.
                     '-------------------------------------------------------------------------------------------------------                    
                     lrDictionaryEntry.AddConceptType(arDictionaryEntry.GetConceptType)
-                    If abAppendRealisations Then
-                        'CodeSafe - Only allow multiple Value realisations.
-                        lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
-                    End If
+                    '20220129-VM-Commented out below. AddConceptType above adds a realisation.
+                    'If abAppendRealisations Then
+                    '    'CodeSafe - Only allow multiple Value realisations.
+                    '    lrDictionaryEntry.AddRealisation(arDictionaryEntry.ConceptType, arDictionaryEntry.ConceptType <> pcenumConceptType.Value)
+                    'End If
                     If lrDictionaryEntry.isFactType And arDictionaryEntry.DBName <> "" Then
                         lrDictionaryEntry.DBName = arDictionaryEntry.DBName
                     End If
@@ -3814,7 +3815,7 @@ Namespace FBM
                     '-------------------------------------------------------------------------
                     'CodeSafe:If Value only, make sure is limited to 100 characters
                     If lrModelDictionaryEntry.Realisations.FindAll(Function(x) x <> pcenumConceptType.Value).Count = 0 Then
-                        lrModelDictionaryEntry.Symbol = lrModelDictionaryEntry.Symbol.Truncate(100)
+                        lrModelDictionaryEntry.Symbol = Strings.Left(lrModelDictionaryEntry.Symbol, 100)
                     End If
 
                     lrConcept = New FBM.Concept(lrModelDictionaryEntry.Symbol, True)
@@ -4925,8 +4926,7 @@ Namespace FBM
             '------------------------------------
             'Get FactTypes
             '------------------------------------
-            'Richmond.WriteToStatusBar("Loading the Fact Types")
-            prApplication.ThrowErrorMessage("Loading FactTypes", pcenumErrorType.Information)
+            Richmond.WriteToStatusBar("Loading the Fact Types")
             TableFactType.GetFactTypesByModel(Me, True)
 
             If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
@@ -4962,7 +4962,6 @@ Namespace FBM
             '-----------------------------------
             'Load the ModelNotes for the Model
             '-----------------------------------
-            prApplication.ThrowErrorMessage("Loading ModelNotes", pcenumErrorType.Information)
             If TableModelNote.getModelNoteCountByModel(Me) > 0 Then
                 '-----------------------------------------------
                 'There are RoleConstraints within the ORMModel
@@ -4975,7 +4974,7 @@ Namespace FBM
             '------------------------------------
             'Load the Pages for the Model
             '------------------------------------
-            Richmond.WriteToStatusBar("Loading the Pages")
+            Richmond.WriteToStatusBar("Loading the Pages", True)
             prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
 
             If abLoadPages Then
@@ -5056,9 +5055,10 @@ Namespace FBM
 
                 '==============================================
                 'Populate the RDS,STM data structure.
-                Dim loRDSThread As System.Threading.Thread
-                loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
-                loRDSThread.Start()
+                'Dim loRDSThread As System.Threading.Thread
+                'loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
+                'loRDSThread.Start()
+                Me.PopulateRDSStructureFromCoreMDAElements()
 
                 '20200113-VM-Can't have more han one thread on the ORMQL parser, call from within PopulateRDSStructureFromCoreMDAElements
                 'Dim loSTMThread As System.Threading.Thread

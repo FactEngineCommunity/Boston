@@ -2063,7 +2063,7 @@ Namespace FBM
                     larModelObject.Add(lrRole.JoinedORMObject)
 
                     Dim lsFactTypeName As String = lrRole.JoinedORMObject.Id & Me.Id
-                    lsFactTypeName = lsFactTypeName.Truncate(98)
+                    lsFactTypeName = Strings.Left(lsFactTypeName, 98)
                     lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0, False)
 
                     lrFactType = Me.Model.CreateFactType(lsFactTypeName,
@@ -3870,9 +3870,10 @@ Namespace FBM
 
 
             Try
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
-                lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                lrDictionaryEntry.isFactType = True
+                '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
+                'lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+                'lrDictionaryEntry.isFactType = True
 
                 If abRapidSave Then
                     pdbConnection.BeginTrans()
@@ -3883,11 +3884,13 @@ Namespace FBM
 
                     If TableFactType.ExistsFactTypeByModel(Me) Then
                         Call TableFactType.UpdateFactType(Me)
-                        Call lrDictionaryEntry.Save()
+                        '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                        'Call lrDictionaryEntry.Save()
                     Else
                         Try
                             pdbConnection.BeginTrans()
-                            Call lrDictionaryEntry.Save()
+                            '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
+                            'Call lrDictionaryEntry.Save()
                             If TableFactType.ExistsFactType(Me) Then
                                 Call TableFactType.UpdateFactType(Me)
                             Else

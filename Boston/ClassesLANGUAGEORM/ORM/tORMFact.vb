@@ -502,23 +502,33 @@ Namespace FBM
             Dim lrFactType As New FBM.FactType
             Dim larFactData As New System.Collections.Generic.List(Of FBM.FactData)
 
-            For Each lrFactData In Me.Data
-                larFactData.Add(lrFactData)
-            Next
+            Try
 
-            lrFactType = Me.FactType
-            lrFactType.Fact.Remove(Me)
+                For Each lrFactData In Me.Data
+                    larFactData.Add(lrFactData)
+                Next
 
-            If abDoDatabaseProcessing Then
-                Call TableFact.DeleteFact(Me)
-            End If
+                lrFactType = Me.FactType
+                lrFactType.Fact.Remove(Me)
 
-            For Each lrFactData In larFactData
-                Call lrFactData.RemoveFromModel(False, False,, abDeleteAll)
-            Next
+                If abDoDatabaseProcessing Then
+                    Call TableFact.DeleteFact(Me)
+                End If
 
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Symbol, pcenumConceptType.Fact)
-            Me.Model.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
+                For Each lrFactData In larFactData
+                    Call lrFactData.RemoveFromModel(False, False,, abDeleteAll)
+                Next
+
+                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Symbol, pcenumConceptType.Fact)
+                Me.Model.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Function
 

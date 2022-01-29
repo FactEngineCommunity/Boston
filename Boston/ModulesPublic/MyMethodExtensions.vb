@@ -5,6 +5,13 @@ Imports System.ComponentModel
 
 Module MyMethodExtensions
 
+    ''' <summary>
+    ''' Truncates a string to a max number of characters.
+    ''' NB Can also use Strings.Left(str,int)
+    ''' </summary>
+    ''' <param name="value">The String to truncate</param>
+    ''' <param name="maxLength">The maximum length of the string from the left.</param>
+    ''' <returns></returns>
     <Extension()>
     Public Function Truncate(ByVal value As String, ByVal maxLength As Integer) As String
         If String.IsNullOrEmpty(value) Then Return value

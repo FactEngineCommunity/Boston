@@ -2326,7 +2326,7 @@ Public Class frmToolboxEnterpriseExplorer
         '----------------------------------------
         'Get the FactTypes from the nORMa model
         '----------------------------------------
-        Richmond.WriteToStatusBar("Loading Fact Types",, 30)
+        Richmond.WriteToStatusBar("Loading Fact Types", True, 30)
         Call lrNORMAFileLoader.LoadFactTypes(lrModel, NORMAXMLDOC)
 
         '----------------------------------------
