@@ -4202,6 +4202,7 @@ Namespace FBM
                     lrDictionaryEntry.Save()
                     Call TableFactType.ModifyKey(Me, asNewName)
 
+
                     If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                         Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
                     End If

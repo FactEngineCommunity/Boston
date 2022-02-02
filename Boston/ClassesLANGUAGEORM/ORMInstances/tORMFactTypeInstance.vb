@@ -192,9 +192,14 @@ Namespace FBM
         XmlIgnore()> _
         Public FactTable As New FBM.FactTable
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public FactTypeNameShape As New ShapeNode
+
+        <NonSerialized(),
+        XmlIgnore()>
+        Public FactTypeReadingPoint As Point
+
 
         <NonSerialized(), _
         XmlIgnore()> _
@@ -956,7 +961,7 @@ Namespace FBM
                 End If
 
                 If Me.FactTypeReadingShape.Shape IsNot Nothing Then
-                    Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                    'Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
                 End If
 
                 For Each lrRoleInstance In Me.RoleGroup
@@ -1296,9 +1301,15 @@ Namespace FBM
                     End If
                 End If
 
+                If Me.FactTypeReadingShape IsNot Nothing Then
+                    If Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
+                        Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
+                    End If
+
+                End If
+
                 If Me.Shape IsNot Nothing Then
                     Me.Shape.ZBottom()
-
                     Me.Page.Diagram.Invalidate()
                 End If
 
@@ -1545,6 +1556,10 @@ Namespace FBM
             '  as a ModelConceptInstance tuple.
             '--------------------------------------------------------------------------
             Call Me.FactTypeName.Save(abRapidSave)
+
+            If Me.FactTypeReadingShape IsNot Nothing Then
+                Call Me.FactTypeReadingShape.Save(abRapidSave)
+            End If
 
             If Me.FactType.IsDerived And Me.FactTypeDerivationText IsNot Nothing Then
                 Call Me.FactTypeDerivationText.Save(abRapidSave)
@@ -2451,49 +2466,6 @@ Namespace FBM
 
         End Sub
 
-
-        'Public Shadows Sub SetName(ByVal asNewName As String)
-
-        '    Try
-        '        Me.FactTypeName.Name = asNewName
-        '        '-----------------------------------------------------------
-        '        'The surrogate key for the FactType is about
-        '        '  to change (to match the name of the FactType)
-        '        '  so update the ModelDictionary entry for the 
-        '        '  Concept/Symbol (the nominalistic idenity of the FactType
-        '        '-----------------------------------------------------------
-        '        Me.Symbol = asNewName
-
-        '        If StrComp(Me.Id, asNewName) <> 0 Then
-        '            ''------------------------------------------------------------------------------------------
-        '            ''Update the Model(database) immediately. There is no choice. The reason that you do this,
-        '            ''  is because the (in-memory) key is changing, so if the database is not updated to 
-        '            ''  reflect the new key, it is not possible to Update an existing FactType.
-        '            ''------------------------------------------------------------------------------------------
-        '            Call TableFactTypeInstance.ModifyKey(Me, asNewName)
-
-        '            Dim lrFactTable As New FBM.FactTable(Me.Page, Me)
-        '            Call TableFactTableInstance.ModifyKey(lrFactTable, asNewName)
-
-        '            Dim lrFactTypeName As New FBM.FactTypeName(Me.Model, Me.Page, Me, asNewName)
-        '            lrFactTypeName.FactTypeInstance = Me
-        '            Call TableFactTypeName.ModifyKey(lrFactTypeName, asNewName)
-
-        '            Me.Id = asNewName
-        '            Me.Page.IsDirty = True
-        '        End If
-
-        '    Catch ex As Exception
-        '        Dim lsMessage As String
-        '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-        '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-        '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        '    End Try
-
-        'End Sub
-
         Private Sub _FactType_DerivationTextChanged(asDerivationText As String) Handles _FactType.DerivationTextChanged
 
             Me.DerivationText = asDerivationText
@@ -2545,55 +2517,6 @@ Namespace FBM
 
                 Call Me.SetAppropriateColour()
 
-                '-------------------------------------------------------------------------------------------------------
-                'VM-20180403-Old code, can remove
-                'Dim lrFactTypeReadingInstance As FBM.FactTypeReadingInstance = arFactTypeReading.CloneInstance(Me.Page)
-                'Dim lrSuitableFactTypeReadingInstance As FBM.FactTypeReadingInstance
-
-                ''---------------------------------------------------------------------------
-                ''The reading may not be suitable for the current RoleGroup sequence/layout
-                ''  so check to see if it is. If it is not, then the reading should not
-                ''  be displayed on the Page.
-                ''---------------------------------------------------------------------------
-                'Dim larRoles As New List(Of FBM.Role)
-                'For Each lrRole In Me.FactType.RoleGroup
-                '    larRoles.Add(lrRole)
-                'Next
-                
-                'Dim lrSuitableFactTypeReading As FBM.FactTypeReading
-                'lrSuitableFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRoles)
-
-                'If Me.FactTypeReadingShape Is Nothing Then
-                '    Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance(Me, Nothing)
-                'End If
-                'If Me.FactTypeReadingShape.Page Is Nothing Then
-                '    Me.FactTypeReadingShape.Page = Me.Page
-                'End If
-
-                'If Me.FactTypeReadingShape.Page.Form IsNot Nothing Then
-                '    If IsSomething(lrSuitableFactTypeReading) Then
-                '        lrSuitableFactTypeReadingInstance = lrSuitableFactTypeReading.CloneInstance(Me.Page)
-                '        If lrSuitableFactTypeReadingInstance.Equals(lrFactTypeReadingInstance) Then
-                '            If IsSomething(Me.FactTypeReadingShape.Shape) Then
-                '                lrFactTypeReadingInstance.Shape = Me.FactTypeReadingShape.Shape
-                '                Me.FactTypeReadingShape = lrFactTypeReadingInstance
-                '                Me.FactTypeReadingShape.RefreshShape()
-                '            Else
-                '                Call lrFactTypeReadingInstance.DisplayAndAssociate()
-                '                Me.FactTypeReadingShape = lrFactTypeReadingInstance
-                '            End If
-                '        Else
-                '            If IsSomething(Me.FactTypeReadingShape.Shape) Then
-                '                Me.FactTypeReadingShape.RefreshShape()
-                '            End If
-                '        End If
-                '    Else
-                '        If IsSomething(Me.FactTypeReadingShape.Shape) Then
-                '            Me.FactTypeReadingShape.Shape.Text = ""
-                '        End If
-                '    End If
-                'End If
-
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2638,29 +2561,6 @@ Namespace FBM
                 Call Me.FindSuitableFactTypeReading()
 
                 Call Me.SetAppropriateColour()
-
-                'VM-20180328-Remove this below if all seems fine. FactTypeInstances don't store FactTypeReadings
-                'lrFactTypeReadingInstance = arFactTypeReading.CloneInstance(Me.Page)
-
-                'lrFactTypeReadingInstance = Me.FactTypeReading.Find(AddressOf lrFactTypeReadingInstance.Equals)
-
-                'If IsSomething(lrFactTypeReadingInstance) Then
-                '    If Me.FactTypeReadingShape.Shape.Tag Is lrFactTypeReadingInstance Then
-                '        '------------------------------------------------------------------------------------------------------------------------------------
-                '        'Remove the text from the FactTypeReadingInstance/FactTypeReadingShape
-                '        '  Don't remove the actual object (FactTypeReadingShape) because it is a static object
-                '        '  that gets set to the most appropriate FactTypeReading/Instance when either:
-                '        '    a) The FactTypeInstance is Displayed/Associated
-                '        '    b) The user moves ModelElements on a Page which changes the Role order of a FactType, changing the appropriate FactTypeReading
-                '        '    c) A new FactTypeReading is created using the FactTypeReading editor.
-                '        '
-                '        'FactTypeReadingInstances are not saved to the database and are ostensibly part of the FactType/Instance.
-                '        'In this manner, only the most appropriate FactTypeReading need be displayed to the user at any one time,
-                '        ' and the FactTypeReadings need only be managed at the FactType/Model level (not that Page/Instance level).
-                '        '------------------------------------------------------------------------------------------------------------------------------------
-                '        Me.FactTypeReadingShape.Shape.Text = ""
-                '    End If
-                'End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2812,6 +2712,9 @@ Namespace FBM
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeName)
+            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+
+            lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeReading)
             Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model,

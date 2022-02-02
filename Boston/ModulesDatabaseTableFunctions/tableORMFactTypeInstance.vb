@@ -230,6 +230,10 @@ Namespace TableFactTypeInstance
 
                             '==============================================================================================================
                             Call TableFactTypeName.GetFactTypeNameDetails(lrFactTypeInstance.FactTypeName)
+                            'FactTypeReadingPoint
+                            Dim lrFTRConceptInstance As New FBM.ConceptInstance(lrFactTypeInstance.Model, lrFactTypeInstance.Page, lrFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
+                            Call TableConceptInstance.ExistsConceptInstance(lrFTRConceptInstance)
+                            lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFTRConceptInstance.X, lrFTRConceptInstance.Y)
 
                             If lrFactTypeInstance.DerivationText <> "" Then
                                 lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(arPage.Model,

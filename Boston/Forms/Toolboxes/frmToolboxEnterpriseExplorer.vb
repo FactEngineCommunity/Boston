@@ -384,6 +384,8 @@ Public Class frmToolboxEnterpriseExplorer
                 Next
 
                 prApplication.ActivePages.Clear()
+                prPageNodes.Clear()
+                prApplication.Brain = New tBrain
 
                 frmMain.zfrmModelExplorer = Nothing
 
@@ -2985,14 +2987,15 @@ Public Class frmToolboxEnterpriseExplorer
             lrNewTreeNode.Expand()
             Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
 
-            Richmond.WriteToStatusBar("Saving model.", True)
+            'Richmond.WriteToStatusBar("Saving model.", True)
             Dim lfrmFlashCard As New frmFlashCard
-            lfrmFlashCard.ziIntervalMilliseconds = 1500
-            lfrmFlashCard.zsText = "Saving model."
-            lfrmFlashCard.Show(frmMain)
+            '20220129-VM-Commented out.
+            'lfrmFlashCard.ziIntervalMilliseconds = 1500
+            'lfrmFlashCard.zsText = "Saving model."
+            'lfrmFlashCard.Show(frmMain)
+            'Me.Focus()
 
-            Me.Focus()
-            Call lrModel.Save(True, False)
+            'Call lrModel.Save(True, False)
 
             '================================================================================================================
             'RDS
@@ -3037,12 +3040,13 @@ Public Class frmToolboxEnterpriseExplorer
                 Call lrModel.PopulateRDSStructureFromCoreMDAElements()
                 lrModel.RDSCreated = True
 
-                lfrmFlashCard = New frmFlashCard
-                lfrmFlashCard.ziIntervalMilliseconds = 3500
-                lfrmFlashCard.zsText = "Saving model."
-                lfrmFlashCard.Show(Me)
-                Richmond.WriteToStatusBar("Saving model.", True)
-                Call lrModel.Save()
+                '20220129-VM-Commented out.
+                'lfrmFlashCard = New frmFlashCard
+                'lfrmFlashCard.ziIntervalMilliseconds = 3500
+                'lfrmFlashCard.zsText = "Saving model."
+                'lfrmFlashCard.Show(Me)
+                'Richmond.WriteToStatusBar("Saving model.", True)
+                'Call lrModel.Save()
             End If
 
             frmMain.Cursor = Cursors.Default
@@ -3057,6 +3061,17 @@ Public Class frmToolboxEnterpriseExplorer
             Me.zrToolTip.AutoPopDelay = 3000 'how Long it will stay before vanishing
             Me.zrToolTip.InitialDelay = 0 'how Long you need To keep your mouse cursor still before it reacts                
             Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + 20 + lrNewTreeNode.Bounds.Height, 4000)
+
+
+            lsMessage = "Save the Model? (Recommended)"
+            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                lfrmFlashCard = New frmFlashCard
+                lfrmFlashCard.ziIntervalMilliseconds = 3500
+                lfrmFlashCard.zsText = "Saving model."
+                lfrmFlashCard.Show(Me)
+                Richmond.WriteToStatusBar("Saving model.", True)
+                Call lrModel.Save()
+            End If
 
         Catch ex As Exception
             Dim lsMessage1 As String

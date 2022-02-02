@@ -3931,6 +3931,13 @@ Public Class frmDiagramORM
                                 loNode.Selected = True
                             Case Is = pcenumConceptType.FactTypeName
                                 loNode.Selected = True
+                            Case Is = pcenumConceptType.FactTypeReading
+                                loNode.Selected = True
+                                Dim lrFactTypeReading As FBM.FactTypeReadingInstance = loNode.Tag
+                                lrFactTypeReading.Shape.Detach()
+                                lrFactTypeReading.Shape.AllowOutgoingLinks = False
+                                lrFactTypeReading.Shape.Locked = False
+                                lrFactTypeReading.Shape.EnabledHandles = True
                             Case Is = pcenumConceptType.EntityTypeDerivationText
                                 loNode.Selected = True
                             Case Is = pcenumConceptType.FactTypeDerivationText
@@ -4603,6 +4610,9 @@ Public Class frmDiagramORM
                         lo_role_instance.X = lo_role_instance.Shape.Bounds.X
                         lo_role_instance.Y = lo_role_instance.Shape.Bounds.Y
                     Next
+                Case Is = pcenumConceptType.FactTypeReading
+                    Dim lrFactTypeReading As FBM.FactTypeReadingInstance = e.Node.Tag
+                    lrFactTypeReading.Shape.AttachTo(lrFactTypeReading.FactType.Shape, AttachToNode.MiddleRight)
             End Select
         End If
 

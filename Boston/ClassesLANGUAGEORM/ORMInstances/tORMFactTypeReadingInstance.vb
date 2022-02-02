@@ -280,13 +280,69 @@ Namespace FBM
 
         End Sub
 
+        Public Overrides Sub makeDirty()
+            MyBase.makeDirty()
+            Me.isDirty = True
+            Me.FactType.isDirty = True
+            Me.Page.IsDirty = True
+            Me.Model.IsDirty = True
+        End Sub
+
         Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+
+            Me.X = aiNewX
+            Me.Y = aiNewY
+            Me.FactType.FactTypeReadingPoint = New Point(Me.X, Me.Y)
 
         End Sub
 
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Public Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False)
+
+            '-----------------------------------------
+            'Saves the EntityInstance to the database
+            '-----------------------------------------
+            Dim lrConceptInstance As New FBM.ConceptInstance
+
+            Try
+                lrConceptInstance.ModelId = Me.Model.ModelId
+                lrConceptInstance.PageId = Me.Page.PageId
+                lrConceptInstance.Symbol = Me.FactType.Id
+                lrConceptInstance.X = Me.X
+                lrConceptInstance.Y = Me.Y
+                lrConceptInstance.ConceptType = pcenumConceptType.FactTypeReading
+
+                '--------------------------------------------------
+                'Make sure the new Symbol is in the Concept table
+                '--------------------------------------------------
+                Dim lrConcept As New FBM.Concept(Me.FactType.Id)
+                lrConcept.Save()
+
+                If abRapidSave Then
+                    Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                Else
+                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
+                        Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                    Else
+                        Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
     End Class
 
 End Namespace

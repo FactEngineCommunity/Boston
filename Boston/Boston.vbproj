@@ -1388,6 +1388,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerUser.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerUserRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeDerivationText.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeReadingInstance.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMFactTypeReadingRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMJoinPathRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintArgument.vb" />
