@@ -44,6 +44,8 @@ Public Class frmCRUDModel
         Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
         Me.TextBoxPort.Text = Me.zrModel.Port
 
+        Me.CheckBoxSaveToXML.Checked = Me.zrModel.StoreAsXML
+
     End Sub
 
     Private Sub frmCRUDModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -73,6 +75,7 @@ Public Class frmCRUDModel
             Me.zrModel.Warehouse = Trim(Me.TextBoxWarehouseName.Text)
             Me.zrModel.DatabaseRole = Trim(Me.TextBoxRoleName.Text)
             Me.zrModel.Port = Trim(Me.TextBoxPort.Text)
+            Me.zrModel.StoreAsXML = Me.CheckBoxSaveToXML.Checked
 
             Try
                 If Me.zrModel.TreeNode IsNot Nothing Then
@@ -666,6 +669,25 @@ Public Class frmCRUDModel
 
         Catch ex As Exception
 
+        End Try
+
+    End Sub
+
+    Private Sub CheckBoxSaveToXML_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxSaveToXML.CheckedChanged
+
+        Try
+            If Me.CheckBoxSaveToXML.Checked Then
+                With New WaitCursor
+                    Call Me.zrModel.SaveToXMLDocument()
+                End With
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

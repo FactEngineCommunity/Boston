@@ -374,11 +374,17 @@ Namespace XMLModelv081
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function MapToFBMModel() As FBM.Model
+        Public Function MapToFBMModel(Optional ByRef arModel As FBM.Model = Nothing) As FBM.Model
 
             Dim lsMessage As String = ""
-
-            Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
+            Dim lrModel As New FBM.Model
+            If arModel IsNot Nothing Then
+                lrModel = arModel
+                lrModel.ModelId = Me.ORMModel.ModelId
+                lrModel.Name = Me.ORMModel.Name
+            Else
+                lrModel = New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
+            End If
 
             '==============================
             'Map the ValueTypes
@@ -457,8 +463,8 @@ Namespace XMLModelv081
             Dim lrFactType As FBM.FactType
 
             For Each lrXMLFactType In Me.ORMModel.FactTypes
-                lrFactType = New FBM.FactType(lrModel, _
-                                              lrXMLFactType.Name, _
+                lrFactType = New FBM.FactType(lrModel,
+                                              lrXMLFactType.Name,
                                               lrXMLFactType.Id)
 
                 Call Me.GetFactTypeDetails(lrFactType)
@@ -511,12 +517,12 @@ Namespace XMLModelv081
                 lrRoleConstraint.MaximumFrequencyCount = lrXMLRoleConstraint.MaximumFrequencyCount
                 lrRoleConstraint.MinimumFrequencyCount = lrXMLRoleConstraint.MinimumFrequencyCount
                 Select Case lrXMLRoleConstraint.CardinalityRangeType
-                    Case Is = pcenumCardinalityRangeType.LessThanOREqual.ToString
-                        lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
+                    Case Is = pcenumCardinalityRangeType.LessThanOrEqual.ToString
+                        lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
                     Case Is = pcenumCardinalityRangeType.Equal.ToString
                         lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
-                    Case Is = pcenumCardinalityRangeType.GreaterThanOREqual.ToString
-                        lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOREqual
+                    Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual.ToString
+                        lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
                     Case Is = pcenumCardinalityRangeType.Between.ToString
                         lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
                 End Select

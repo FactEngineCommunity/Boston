@@ -200,14 +200,13 @@ Namespace FBM
         XmlIgnore()>
         Public FactTypeReadingPoint As Point
 
-
         <NonSerialized(), _
         XmlIgnore()> _
         Public FactTypeDerivationText As FBM.FactTypeDerivationText
 
-        <NonSerialized(), _
-        XmlIgnoreAttribute()> _
-        Public FactTypeReadingShape As New FBM.FactTypeReadingInstance(Me) 'Removed 'Shadows FactTypeReading and replaced with FactTypeReadingShape'
+        <NonSerialized(),
+        XmlIgnoreAttribute()>
+        Public FactTypeReadingShape As FBM.FactTypeReadingInstance 'Removed 'Shadows FactTypeReading and replaced with FactTypeReadingShape'
 
         ''' <summary>
         ''' If the FactType represents a SubtypeConstraint, is the SubtypeConstraintInstance that this FactType represents.
@@ -1252,7 +1251,11 @@ Namespace FBM
                     If IsSomething(lrFactTypeReading) Then
 
                         If Me.Page.Diagram IsNot Nothing Then
-                            Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
+                            Try
+                                Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
+                            Catch ex As Exception
+                                'Might not be there/Nothing
+                            End Try
                             Me.FactTypeReadingShape = lrFactTypeReading.CloneInstance(Me.Page)
                             If Me.FactTypeReadingShape.FactType IsNot Nothing Then
                                 Call Me.FactTypeReadingShape.DisplayAndAssociate()

@@ -45,16 +45,14 @@ Namespace FBM
 
             Try
                 Me.Model = arFactTypeInstance.Model
+                Me.Page = arFactTypeInstance.Page
+                Me.FactType = arFactTypeInstance
 
                 If arFactTypeReading Is Nothing Then
                     Me.Id = System.Guid.NewGuid.ToString
                 Else
                     Me.Id = arFactTypeReading.Id
                 End If
-
-                Me.FactType = arFactTypeInstance
-
-                Me.Page = arFactTypeInstance.Page
 
             Catch ex As Exception
                 Dim lsMessage1 As String

@@ -39,6 +39,7 @@ Namespace TableModel
                 lsSQLQuery &= " ,'" & Trim(ar_model.Warehouse) & "'"
                 lsSQLQuery &= " ,'" & Trim(ar_model.DatabaseRole) & "'"
                 lsSQLQuery &= " ,'" & Trim(ar_model.Port) & "'"
+                lsSQLQuery &= " ," & ar_model.StoreAsXML
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -158,6 +159,7 @@ Namespace TableModel
                     arModel.IsPhysicalModel = False
                     arModel.IsNamespace = False
                     arModel.IsEnterpriseModel = True 'By default for this function.
+                    arModel.StoreAsXML = CBool(lREcordset("StoreAsXML").Value)
 
                     Try
                         arModel.TargetDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(lREcordset("TargetDatabaseType").Value, pcenumDatabaseType.None)), pcenumDatabaseType)

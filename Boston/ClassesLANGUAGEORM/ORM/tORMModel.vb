@@ -1,3 +1,4 @@
+Imports System.IO
 Imports DynamicClassLibrary.Factory
 Imports System.Reflection
 Imports System.Xml.Serialization
@@ -41,6 +42,12 @@ Namespace FBM
 
         <XmlIgnore()>
         Public AllowCheckForErrors As Boolean = False
+
+        ''' <summary>
+        ''' True if the Model is saved to XML rather than to the database.
+        ''' </summary>
+        <XmlAttribute>
+        Public StoreAsXML As Boolean = False
 
         <XmlIgnore()>
         <NonSerialized()>
@@ -3730,6 +3737,26 @@ Namespace FBM
                     End If
                 End If
 
+                If Me.StoreAsXML Then
+                    Call Me.SaveToXMLDocument()
+                Else
+                    Call Me.SaveToDatabase(abRapidSave, abModelDictionaryRapidSave)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SaveToDatabase(Optional ByVal abRapidSave As Boolean = False, Optional abModelDictionaryRapidSave As Boolean = False)
+
+            Try
                 '--------------------------------------------------
                 'Save the DictionaryEntries within the ORM Model.
                 '  NB Also maintains the MetaModelConcept table.
@@ -3786,7 +3813,6 @@ Namespace FBM
                         lrPage.Save(abRapidSave)
                     End If
                 Next
-
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -3796,6 +3822,60 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub SaveToXMLDocument()
+
+            Dim lsFolderLocation As String = ""
+            Dim lsFileName As String = ""
+            Dim loStreamWriter As StreamWriter ' Create file by FileStream class
+            Dim loXMLSerialiser As XmlSerializer ' Create binary object
+            Dim lrExportModel As New XMLModel.Model
+
+            Try
+                '-----------------------------------------
+                'Get the Model from the selected TreeNode
+                '-----------------------------------------
+                lrExportModel.ORMModel.ModelId = Me.ModelId
+                lrExportModel.ORMModel.Name = Me.Name
+
+                Call lrExportModel.MapFromFBMModel(Me)
+
+                Dim lsFileLocationName As String = ""
+                If Richmond.IsSerializable(lrExportModel) Then
+
+                    Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+
+                    If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                        lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                    Else
+                        lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                    End If
+                    System.IO.Directory.CreateDirectory(lsFolderLocation)
+                    lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
+                    lsFileLocationName = lsFolderLocation & "\" & lsFileName
+
+                    loStreamWriter = New StreamWriter(lsFileLocationName)
+
+                    loXMLSerialiser = New XmlSerializer(GetType(XMLModel.Model))
+
+                    ' Serialize object to file
+                    loXMLSerialiser.Serialize(loStreamWriter, lrExportModel)
+                    loStreamWriter.Close()
+
+                End If 'IsSerialisable
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Sub SaveModelDictionary(Optional ByVal abRapidSave As Boolean = False)
@@ -4876,201 +4956,12 @@ Namespace FBM
             If Me.Loading Or Me.Loaded Then Exit Sub
 
             Me.Loading = True
-            '-------------------------------------------------------
-            'Loads an ORM model from the database
-            '-------------------------------------------------------
-            Dim liInd As Integer = 0
 
-            Richmond.WriteToStatusBar("Loading the Model level Model Elements.", True)
-
-            '-------------------------------------------------------
-            'Load the ModelDictionary (Concepts for the Model)
-            '-------------------------------------------------------
-            If TableModelDictionary.GetModelDictionaryCountByModel(Me) > 0 Then
-                Call TableModelDictionary.GetDictionaryEntriesByModel(Me)
-            End If
-
-            '------------------------------------
-            'Get ValueTypes
-            '------------------------------------
-            'Richmond.WriteToStatusBar("Loading the Value Types")            
-            If TableValueType.GetValueTypeCountByModel(Me.ModelId) > 0 Then
-                '-----------------------------------------------
-                'There are EntityTypes within the ORMDiagram
-                '-----------------------------------------------
-                '--------------------------------------------------
-                'Get the list of EntityTypes within the ORMDiagram
-                '--------------------------------------------------            
-                Me.ValueType = TableValueType.GetValueTypesByModel(Me)
-            End If
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(10)
-
-            '------------------------------------
-            'Get EntityTypes
-            '------------------------------------
-            'Richmond.WriteToStatusBar("Loading the Entity Types")
-            prApplication.ThrowErrorMessage("Loading EntityTypes", pcenumErrorType.Information)
-            If TableEntityType.GetEntityTypeCountByModel(Me.ModelId) > 0 Then
-                '-----------------------------------------------
-                'There are EntityTypes within the ORMDiagram
-                '-----------------------------------------------
-                '--------------------------------------------------
-                'Get the list of EntityTypes within the ORMDiagram
-                '--------------------------------------------------            
-                Me.EntityType = TableEntityType.getEntityTypesByModel(Me)
-            End If
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(20)
-
-            '------------------------------------
-            'Get FactTypes
-            '------------------------------------
-            Richmond.WriteToStatusBar("Loading the Fact Types")
-            TableFactType.GetFactTypesByModel(Me, True)
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
-
-            Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(40)
-
-            '---------------------------------------------------
-            'Get RoleConstraints 
-            '---------------------------------------------------
-            'Richmond.WriteToStatusBar("Loading the Role Constraints")
-            prApplication.ThrowErrorMessage("Loading RoleConstraints", pcenumErrorType.Information)
-            If TableRoleConstraint.getRoleConstraintCountByModel(Me) > 0 Then
-                '-----------------------------------------------
-                'There are RoleConstraints within the ORMModel
-                '-----------------------------------------------
-                Me.RoleConstraint = TableRoleConstraint.GetRoleConstraintsByModel(Me)
-            End If
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(45)
-
-            '-----------------------------------------------------------------------------
-            'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
-            '-----------------------------------------------------------------------------
-            Dim lrEntityType As FBM.EntityType
-            For Each lrEntityType In Me.EntityType.FindAll(Function(x) x.PreferredIdentifierRCId <> "")
-                Call lrEntityType.SetReferenceModeObjects()
-            Next
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
-
-            '-----------------------------------
-            'Load the ModelNotes for the Model
-            '-----------------------------------
-            If TableModelNote.getModelNoteCountByModel(Me) > 0 Then
-                '-----------------------------------------------
-                'There are RoleConstraints within the ORMModel
-                '-----------------------------------------------
-                Me.ModelNote = TableModelNote.getModelNotesByModel(Me)
-            End If
-
-            If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(55)
-
-            '------------------------------------
-            'Load the Pages for the Model
-            '------------------------------------
-            Richmond.WriteToStatusBar("Loading the Pages", True)
-            prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
-
-            If abLoadPages Then
-                If abUseThreading And TablePage.GetPageCountByModel(Me.ModelId) < 30 Then
-                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
-                Else
-                    Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
-                End If
+            If Me.StoreAsXML Then
+                Call Me.LoadFromXML()
             Else
-                Call TablePage.GetPagesByModel(Me, False)
+                Call Me.LoadFromDatabase(abLoadPages, abUseThreading, aoBackgroundWorker)
             End If
-
-            '--------------------------------------
-            'Flush unused ModelDictionary entries
-            '--------------------------------------
-            For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
-
-                'Dim larDictionaryEntry = From Entry In Me.ModelDictionary
-                '                         Where Entry.Symbol = lrDictionaryEntry.Symbol
-                '                         Select Entry
-
-                Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
-            Next
-
-            'Dim liModelPageCount As Integer = 0
-
-            'liModelPageCount = TablePage.GetPageCountByModel(Me.ModelId, False)
-
-            '-----------------------------------------
-            'Wait for MultiThreaded loading of Pages
-            '-----------------------------------------
-            'While abLoadPages And Me.HasPagesUnloaded
-            '-------------------------------------
-            'Loop until all the Pages are loaded
-            '-------------------------------------
-            'End While
-
-            'Me.AllowCheckForErrors = True
-            'Dim lrValidator As New Validation.ModelValidator(Me)
-            'Call lrValidator.CheckForErrors()
-
-
-            If Not {"English", "Core"}.Contains(Me.ModelId) Then 'No need to modify the English or Core models
-                If Not Me.HasCoreModel Then
-
-                    Call Me.AddCoreERDPGSAndSTDModelElements(aoBackgroundWorker)
-
-                ElseIf Me.CoreVersionNumber = "1.0" Then
-                    '---------------------------------------------------------------------------------------
-                    'Only contains ERD and PGS Model Elements. Need to add State Transition Model Elements
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
-
-                    Call Me.AddCoreSTDModelElements()
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-
-                    Me.CoreVersionNumber = "2.0"
-
-                    Call Me.Save()
-
-                ElseIf Me.CoreVersionNumber = "" Then 'Makes up for anomaly where CoreVersionNumber wasn't added when creating a new model in earlier versions.
-                    'The CMML metamodels should be in all customer's models.
-                    Me.CoreVersionNumber = "2.0"
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
-
-
-                ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
-                    'Nothing to do (at this point), because is the latest version of the Core @ 04/11/2021. See also performCoreManagement (below).
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-                End If
-
-                '============================================================================================
-                'Core Management. E.g. If the Core needs modification for a new release.
-                Call Me.performCoreManagement()
-
-                '==============================================
-                'Populate the RDS,STM data structure.
-                'Dim loRDSThread As System.Threading.Thread
-                'loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
-                'loRDSThread.Start()
-                Me.PopulateRDSStructureFromCoreMDAElements()
-
-                '20200113-VM-Can't have more han one thread on the ORMQL parser, call from within PopulateRDSStructureFromCoreMDAElements
-                'Dim loSTMThread As System.Threading.Thread
-                'loSTMThread = New System.Threading.Thread(AddressOf Me.PopulateSTMStructureFromCoreMDAElements)
-                'loSTMThread.Start()
-
-                'Call Me.PopulateRDSStructureFromCoreMDAElements()
-
-            End If
-
-            Me.AllowCheckForErrors = True
-            Call Me.checkIfCanCheckForErrors()
 
             Me.Loaded = True
 
@@ -5081,10 +4972,366 @@ Namespace FBM
 
             Me.Loading = False
 
-            'Temporary-20210410
-            'Call Me.FixErrors
 
         End Sub
+
+        Public Sub LoadFromDatabase(Optional ByVal abLoadPages As Boolean = False,
+                                    Optional ByVal abUseThreading As Boolean = True,
+                                    Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+
+            Try
+                '-------------------------------------------------------
+                'Loads an ORM model from the database
+                '-------------------------------------------------------
+                Dim liInd As Integer = 0
+
+                Richmond.WriteToStatusBar("Loading the Model level Model Elements.", True)
+
+                '-------------------------------------------------------
+                'Load the ModelDictionary (Concepts for the Model)
+                '-------------------------------------------------------
+                If TableModelDictionary.GetModelDictionaryCountByModel(Me) > 0 Then
+                    Call TableModelDictionary.GetDictionaryEntriesByModel(Me)
+                End If
+
+                '------------------------------------
+                'Get ValueTypes
+                '------------------------------------
+                'Richmond.WriteToStatusBar("Loading the Value Types")            
+                If TableValueType.GetValueTypeCountByModel(Me.ModelId) > 0 Then
+                    '-----------------------------------------------
+                    'There are EntityTypes within the ORMDiagram
+                    '-----------------------------------------------
+                    '--------------------------------------------------
+                    'Get the list of EntityTypes within the ORMDiagram
+                    '--------------------------------------------------            
+                    Me.ValueType = TableValueType.GetValueTypesByModel(Me)
+                End If
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(10)
+
+                '------------------------------------
+                'Get EntityTypes
+                '------------------------------------
+                'Richmond.WriteToStatusBar("Loading the Entity Types")
+                prApplication.ThrowErrorMessage("Loading EntityTypes", pcenumErrorType.Information)
+                If TableEntityType.GetEntityTypeCountByModel(Me.ModelId) > 0 Then
+                    '-----------------------------------------------
+                    'There are EntityTypes within the ORMDiagram
+                    '-----------------------------------------------
+                    '--------------------------------------------------
+                    'Get the list of EntityTypes within the ORMDiagram
+                    '--------------------------------------------------            
+                    Me.EntityType = TableEntityType.getEntityTypesByModel(Me)
+                End If
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(20)
+
+                '------------------------------------
+                'Get FactTypes
+                '------------------------------------
+                Richmond.WriteToStatusBar("Loading the Fact Types")
+                TableFactType.GetFactTypesByModel(Me, True)
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
+
+                Call TableSubtypeRelationship.GetSubtypeRelationshipsByModel(Me)
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(40)
+
+                '---------------------------------------------------
+                'Get RoleConstraints 
+                '---------------------------------------------------
+                'Richmond.WriteToStatusBar("Loading the Role Constraints")
+                prApplication.ThrowErrorMessage("Loading RoleConstraints", pcenumErrorType.Information)
+                If TableRoleConstraint.getRoleConstraintCountByModel(Me) > 0 Then
+                    '-----------------------------------------------
+                    'There are RoleConstraints within the ORMModel
+                    '-----------------------------------------------
+                    Me.RoleConstraint = TableRoleConstraint.GetRoleConstraintsByModel(Me)
+                End If
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(45)
+
+                '-----------------------------------------------------------------------------
+                'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
+                '-----------------------------------------------------------------------------
+                Dim lrEntityType As FBM.EntityType
+                For Each lrEntityType In Me.EntityType.FindAll(Function(x) x.PreferredIdentifierRCId <> "")
+                    Call lrEntityType.SetReferenceModeObjects()
+                Next
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
+
+                '-----------------------------------
+                'Load the ModelNotes for the Model
+                '-----------------------------------
+                If TableModelNote.getModelNoteCountByModel(Me) > 0 Then
+                    '-----------------------------------------------
+                    'There are RoleConstraints within the ORMModel
+                    '-----------------------------------------------
+                    Me.ModelNote = TableModelNote.getModelNotesByModel(Me)
+                End If
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(55)
+
+                '------------------------------------
+                'Load the Pages for the Model
+                '------------------------------------
+                Richmond.WriteToStatusBar("Loading the Pages", True)
+                prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
+
+                If abLoadPages Then
+                    If abUseThreading And TablePage.GetPageCountByModel(Me.ModelId) < 30 Then
+                        Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
+                    Else
+                        Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
+                    End If
+                Else
+                    Call TablePage.GetPagesByModel(Me, False)
+                End If
+
+                '--------------------------------------
+                'Flush unused ModelDictionary entries
+                '--------------------------------------
+                For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
+
+                    'Dim larDictionaryEntry = From Entry In Me.ModelDictionary
+                    '                         Where Entry.Symbol = lrDictionaryEntry.Symbol
+                    '                         Select Entry
+
+                    Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
+                Next
+
+                'Dim liModelPageCount As Integer = 0
+
+                'liModelPageCount = TablePage.GetPageCountByModel(Me.ModelId, False)
+
+                '-----------------------------------------
+                'Wait for MultiThreaded loading of Pages
+                '-----------------------------------------
+                'While abLoadPages And Me.HasPagesUnloaded
+                '-------------------------------------
+                'Loop until all the Pages are loaded
+                '-------------------------------------
+                'End While
+
+                'Me.AllowCheckForErrors = True
+                'Dim lrValidator As New Validation.ModelValidator(Me)
+                'Call lrValidator.CheckForErrors()
+
+
+                If Not {"English", "Core"}.Contains(Me.ModelId) Then 'No need to modify the English or Core models
+                    If Not Me.HasCoreModel Then
+
+                        Call Me.AddCoreERDPGSAndSTDModelElements(aoBackgroundWorker)
+
+                    ElseIf Me.CoreVersionNumber = "1.0" Then
+                        '---------------------------------------------------------------------------------------
+                        'Only contains ERD and PGS Model Elements. Need to add State Transition Model Elements
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+
+                        Call Me.AddCoreSTDModelElements()
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+
+                        Me.CoreVersionNumber = "2.0"
+
+                        Call Me.Save()
+
+                    ElseIf Me.CoreVersionNumber = "" Then 'Makes up for anomaly where CoreVersionNumber wasn't added when creating a new model in earlier versions.
+                        'The CMML metamodels should be in all customer's models.
+                        Me.CoreVersionNumber = "2.0"
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+
+
+                    ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
+                        'Nothing to do (at this point), because is the latest version of the Core @ 04/11/2021. See also performCoreManagement (below).
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                    End If
+
+                    '============================================================================================
+                    'Core Management. E.g. If the Core needs modification for a new release.
+                    Call Me.performCoreManagement()
+
+                    '==============================================
+                    'Populate the RDS,STM data structure.
+                    'Dim loRDSThread As System.Threading.Thread
+                    'loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
+                    'loRDSThread.Start()
+                    Me.PopulateRDSStructureFromCoreMDAElements()
+
+                    '20200113-VM-Can't have more han one thread on the ORMQL parser, call from within PopulateRDSStructureFromCoreMDAElements
+                    'Dim loSTMThread As System.Threading.Thread
+                    'loSTMThread = New System.Threading.Thread(AddressOf Me.PopulateSTMStructureFromCoreMDAElements)
+                    'loSTMThread.Start()
+
+                    'Call Me.PopulateRDSStructureFromCoreMDAElements()
+
+                End If
+
+                Me.AllowCheckForErrors = True
+                Call Me.checkIfCanCheckForErrors()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Public Sub LoadFromXML()
+
+            Dim lsFolderLocation As String
+            Dim lsFileName As String
+            Dim lsFileLocationName As String
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+                    lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                Else
+                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                End If
+
+                lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
+                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+
+                '==================================================================================================
+                Dim xml As XDocument = Nothing
+                Dim lsXSDVersionNr As String = ""
+
+                'Deserialize text file to a new object.
+                Dim objStreamReader As New StreamReader(lsFileLocationName)
+
+                xml = XDocument.Load(lsFileLocationName)
+
+                Richmond.WriteToStatusBar("Loading model.", True)
+
+                lsXSDVersionNr = xml.<Model>.@XSDVersionNr
+                '=====================================================================================================
+                Dim lrSerializer As XmlSerializer = Nothing
+                Select Case lsXSDVersionNr
+                    Case Is = "0.81"
+                        lrSerializer = New XmlSerializer(GetType(XMLModelv081.Model))
+                        Dim lrXMLModel As New XMLModelv081.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
+                        Dim lrXMLModel As New XMLModel1.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.1"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel11.Model))
+                        Dim lrXMLModel As New XMLModel11.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.2"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel12.Model))
+                        Dim lrXMLModel As New XMLModel12.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.3"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel13.Model))
+                        Dim lrXMLModel As New XMLModel13.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.4"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel14.Model))
+                        Dim lrXMLModel As New XMLModel14.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.5"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel15.Model))
+                        Dim lrXMLModel As New XMLModel15.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.6"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel16.Model))
+                        Dim lrXMLModel As New XMLModel16.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                    Case Is = "1.7"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
+                        Dim lrXMLModel As New XMLModel.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrXMLModel.MapToFBMModel(Me)
+                End Select
+
+                '================================================================================================================
+                'RDS
+                If (Me.ModelId <> "Core") And Me.HasCoreModel Then
+                    Call Me.performCoreManagement()
+                    Call Me.PopulateRDSStructureFromCoreMDAElements()
+                    Me.RDSCreated = True
+                ElseIf (Me.ModelId <> "Core") Then
+                    '==================================================
+                    'RDS - Create a CMML Page and then dispose of it.
+                    Dim lrPage As FBM.Page '(lrModel)
+                    Dim lrCorePage As FBM.Page
+
+                    lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                    If lrCorePage Is Nothing Then
+                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                    End If
+
+                    lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+
+                    'StateTransitionDiagrams
+                    lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                    If lrCorePage Is Nothing Then
+                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                    End If
+
+                    lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the StateTransitionDiagram into the metamodel
+
+                    'Derivations
+                    lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                    If lrCorePage Is Nothing Then
+                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+                    End If
+
+                    lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the CoreDerivations into the metamodel
+                    '==================================================
+
+                    Call Me.createEntityRelationshipArtifacts()
+                    Call Me.PopulateRDSStructureFromCoreMDAElements()
+                    Me.RDSCreated = True
+                End If
+                '==================================================================================================
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
 
 
         Public Sub performCoreManagement()

@@ -443,11 +443,17 @@ Namespace XMLModel12
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function MapToFBMModel() As FBM.Model
+        Public Function MapToFBMModel(Optional ByRef arModel As FBM.Model = Nothing) As FBM.Model
 
             Dim lsMessage As String = ""
-
-            Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
+            Dim lrModel As New FBM.Model
+            If arModel IsNot Nothing Then
+                lrModel = arModel
+                lrModel.ModelId = Me.ORMModel.ModelId
+                lrModel.Name = Me.ORMModel.Name
+            Else
+                lrModel = New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
+            End If
 
             '==============================
             'Map the ValueTypes

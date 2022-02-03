@@ -506,12 +506,19 @@ Namespace XMLModel
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function MapToFBMModel() As FBM.Model
+        Public Function MapToFBMModel(Optional ByRef arModel As FBM.Model = Nothing) As FBM.Model
 
             Try
-                Dim lsMessage As String = ""
 
-                Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
+                Dim lsMessage As String = ""
+                Dim lrModel As New FBM.Model
+                If arModel IsNot Nothing Then
+                    lrModel = arModel
+                    lrModel.ModelId = Me.ORMModel.ModelId
+                    lrModel.Name = Me.ORMModel.Name
+                Else
+                    lrModel = New FBM.Model(pcenumLanguage.ORMModel, Me.ORMModel.Name, Me.ORMModel.ModelId)
+                End If
 
                 'So that DictionaryEntries are dirty
                 lrModel.Loaded = True
@@ -603,8 +610,8 @@ Namespace XMLModel
                 Dim lrFactType As FBM.FactType
 
                 For Each lrXMLFactType In Me.ORMModel.FactTypes
-                    lrFactType = New FBM.FactType(lrModel, _
-                                                  lrXMLFactType.Name, _
+                    lrFactType = New FBM.FactType(lrModel,
+                                                  lrXMLFactType.Name,
                                                   lrXMLFactType.Id)
 
                     Call Me.GetFactTypeDetails(lrFactType)
@@ -614,21 +621,21 @@ Namespace XMLModel
                 '===============================================================================================
                 'Populate Roles that are (still) joined to Nothing
                 '===================================================
-                Dim latType = {GetType(FBM.ValueType), _
-                               GetType(FBM.EntityType), _
+                Dim latType = {GetType(FBM.ValueType),
+                               GetType(FBM.EntityType),
                                GetType(FBM.FactType)}
 
-                Dim larRole = From Role In lrModel.Role _
-                               Where Role.JoinedORMObject Is Nothing _
-                               Or Not latType.Contains(Role.JoinedORMObject.GetType)
-                               Select Role
+                Dim larRole = From Role In lrModel.Role
+                              Where Role.JoinedORMObject Is Nothing _
+                              Or Not latType.Contains(Role.JoinedORMObject.GetType)
+                              Select Role
 
                 For Each lrRole In larRole
 
-                    Dim lrXMLRole = From FactType In Me.ORMModel.FactTypes _
-                                From Role In FactType.RoleGroup _
-                                Where Role.Id = lrRole.Id _
-                                Select Role
+                    Dim lrXMLRole = From FactType In Me.ORMModel.FactTypes
+                                    From Role In FactType.RoleGroup
+                                    Where Role.Id = lrRole.Id
+                                    Select Role
 
                     lrRole.JoinedORMObject = New FBM.ModelObject
                     lrRole.JoinedORMObject.Id = lrXMLRole(0).JoinedObjectTypeId
@@ -645,8 +652,8 @@ Namespace XMLModel
                 '==============================
                 'Subtype Relationships
                 '==============================
-                Dim larSubtypeRelationshipFactTypes = From FactType In Me.ORMModel.FactTypes _
-                                                      Where FactType.IsSubtypeRelationshipFactType _
+                Dim larSubtypeRelationshipFactTypes = From FactType In Me.ORMModel.FactTypes
+                                                      Where FactType.IsSubtypeRelationshipFactType
                                                       Select FactType
 
 
@@ -696,12 +703,12 @@ Namespace XMLModel
                     lrRoleConstraint.MaximumFrequencyCount = lrXMLRoleConstraint.MaximumFrequencyCount
                     lrRoleConstraint.MinimumFrequencyCount = lrXMLRoleConstraint.MinimumFrequencyCount
                     Select Case lrXMLRoleConstraint.CardinalityRangeType
-                        Case Is = pcenumCardinalityRangeType.LessThanOREqual.ToString
-                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
+                        Case Is = pcenumCardinalityRangeType.LessThanOrEqual.ToString
+                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
                         Case Is = pcenumCardinalityRangeType.Equal.ToString
                             lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
-                        Case Is = pcenumCardinalityRangeType.GreaterThanOREqual.ToString
-                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOREqual
+                        Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual.ToString
+                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
                         Case Is = pcenumCardinalityRangeType.Between.ToString
                             lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
                     End Select
@@ -902,6 +909,10 @@ Namespace XMLModel
                                           lrXMLPage.Id, _
                                           lrXMLPage.Name, _
                                           lrXMLPage.Language)
+
+                    If arModel.Page.Contains(lrPage) Then
+                        lrPage = arModel.Page.Find(AddressOf lrPage.Equals)
+                    End If
 
                     '=============================
                     'Map the ValueTypeInstances
@@ -1158,7 +1169,7 @@ Namespace XMLModel
 
                     lrPage.Loaded = True
                     lrPage.IsDirty = True
-                    arModel.Page.Add(lrPage)
+                    arModel.Page.AddUnique(lrPage)
 
                 Next 'XMLModel.Page
 

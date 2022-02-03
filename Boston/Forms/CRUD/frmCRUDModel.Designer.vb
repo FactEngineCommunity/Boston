@@ -40,6 +40,7 @@ Partial Class frmCRUDModel
         Me.LabelConnectionString = New System.Windows.Forms.Label()
         Me.LabelDatabaseType = New System.Windows.Forms.Label()
         Me.GroupBoxReverseEngineering = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxReverseEngineeringShowExtraInformation = New System.Windows.Forms.CheckBox()
         Me.GroupBoxREMessages = New System.Windows.Forms.GroupBox()
         Me.RichTextBoxREErrorMessages = New System.Windows.Forms.RichTextBox()
         Me.LabelPromptErrorMessages = New System.Windows.Forms.Label()
@@ -71,7 +72,7 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
-        Me.CheckBoxReverseEngineeringShowExtraInformation = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxSaveToXML = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -267,6 +268,16 @@ Partial Class frmCRUDModel
         Me.GroupBoxReverseEngineering.TabStop = False
         Me.GroupBoxReverseEngineering.Text = "Reverse Engineering"
         '
+        'CheckBoxReverseEngineeringShowExtraInformation
+        '
+        Me.CheckBoxReverseEngineeringShowExtraInformation.AutoSize = True
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Location = New System.Drawing.Point(13, 56)
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Name = "CheckBoxReverseEngineeringShowExtraInformation"
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Size = New System.Drawing.Size(133, 17)
+        Me.CheckBoxReverseEngineeringShowExtraInformation.TabIndex = 7
+        Me.CheckBoxReverseEngineeringShowExtraInformation.Text = "Show extra information"
+        Me.CheckBoxReverseEngineeringShowExtraInformation.UseVisualStyleBackColor = True
+        '
         'GroupBoxREMessages
         '
         Me.GroupBoxREMessages.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -377,20 +388,21 @@ Partial Class frmCRUDModel
         Me.Tab1.Margin = New System.Windows.Forms.Padding(2)
         Me.Tab1.Name = "Tab1"
         Me.Tab1.Padding = New System.Windows.Forms.Padding(2)
-        Me.Tab1.Size = New System.Drawing.Size(621, 419)
+        Me.Tab1.Size = New System.Drawing.Size(621, 498)
         Me.Tab1.TabIndex = 0
         Me.Tab1.Text = "Database"
         Me.Tab1.UseVisualStyleBackColor = True
         '
         'Advanced
         '
+        Me.Advanced.Controls.Add(Me.CheckBoxSaveToXML)
         Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
         Me.Advanced.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
         Me.Advanced.Location = New System.Drawing.Point(4, 22)
         Me.Advanced.Margin = New System.Windows.Forms.Padding(2)
         Me.Advanced.Name = "Advanced"
         Me.Advanced.Padding = New System.Windows.Forms.Padding(2)
-        Me.Advanced.Size = New System.Drawing.Size(621, 419)
+        Me.Advanced.Size = New System.Drawing.Size(621, 498)
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
@@ -422,7 +434,7 @@ Partial Class frmCRUDModel
         Me.TabPageConnection.Controls.Add(Me.GroupBoxConnection)
         Me.TabPageConnection.Location = New System.Drawing.Point(4, 22)
         Me.TabPageConnection.Name = "TabPageConnection"
-        Me.TabPageConnection.Size = New System.Drawing.Size(621, 419)
+        Me.TabPageConnection.Size = New System.Drawing.Size(621, 498)
         Me.TabPageConnection.TabIndex = 3
         Me.TabPageConnection.Text = "Connection"
         Me.TabPageConnection.UseVisualStyleBackColor = True
@@ -567,15 +579,15 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'CheckBoxReverseEngineeringShowExtraInformation
+        'CheckBoxSaveToXML
         '
-        Me.CheckBoxReverseEngineeringShowExtraInformation.AutoSize = True
-        Me.CheckBoxReverseEngineeringShowExtraInformation.Location = New System.Drawing.Point(13, 56)
-        Me.CheckBoxReverseEngineeringShowExtraInformation.Name = "CheckBoxReverseEngineeringShowExtraInformation"
-        Me.CheckBoxReverseEngineeringShowExtraInformation.Size = New System.Drawing.Size(133, 17)
-        Me.CheckBoxReverseEngineeringShowExtraInformation.TabIndex = 7
-        Me.CheckBoxReverseEngineeringShowExtraInformation.Text = "Show extra information"
-        Me.CheckBoxReverseEngineeringShowExtraInformation.UseVisualStyleBackColor = True
+        Me.CheckBoxSaveToXML.AutoSize = True
+        Me.CheckBoxSaveToXML.Location = New System.Drawing.Point(13, 91)
+        Me.CheckBoxSaveToXML.Name = "CheckBoxSaveToXML"
+        Me.CheckBoxSaveToXML.Size = New System.Drawing.Size(138, 17)
+        Me.CheckBoxSaveToXML.TabIndex = 9
+        Me.CheckBoxSaveToXML.Text = "Save to XML document"
+        Me.CheckBoxSaveToXML.UseVisualStyleBackColor = True
         '
         'frmCRUDModel
         '
@@ -659,4 +671,5 @@ Partial Class frmCRUDModel
     Friend WithEvents TextBoxPort As TextBox
     Friend WithEvents LabelPromptPort As Label
     Friend WithEvents CheckBoxReverseEngineeringShowExtraInformation As CheckBox
+    Friend WithEvents CheckBoxSaveToXML As CheckBox
 End Class
