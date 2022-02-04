@@ -5181,7 +5181,7 @@ Public Class frmDiagramORM
             'Display the ModelNotes
             '------------------------
             Dim lrModelNoteInstance As FBM.ModelNoteInstance
-            For Each lrModelNoteInstance In Me.zrPage.ModelNote
+            For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
                 '-------------------------
                 'Load the RoleConstraint
                 '-------------------------
@@ -7196,7 +7196,7 @@ Public Class frmDiagramORM
             End Select
         Next
 
-        For Each lrModelNoteInstance In Me.zrPage.ModelNote
+        For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
             'lrModelNoteInstance.Shape.Selected = True
             Me.zrPage.SelectedObject.Add(lrModelNoteInstance)
         Next

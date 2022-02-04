@@ -84,7 +84,7 @@ Namespace FBM
             End With
 
             If abAddToPage Then
-                arPage.ModelNote.Add(lrModelNoteInstance)
+                arPage.ModelNoteInstance.Add(lrModelNoteInstance)
             End If
 
             Return lrModelNoteInstance

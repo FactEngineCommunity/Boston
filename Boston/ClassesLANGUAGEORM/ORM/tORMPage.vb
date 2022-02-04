@@ -193,12 +193,10 @@ Namespace FBM
         Public FactInstance As New List(Of FBM.FactInstance)
         <NonSerialized()>
         Public ValueInstance As New List(Of FBM.FactDataInstance)
+        <XmlIgnore()>
         Public ModelNoteInstance As New List(Of FBM.ModelNoteInstance)
 
         Public SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
-
-        <XmlIgnore()>
-        Public ModelNote As New List(Of FBM.ModelNoteInstance)
 
         <NonSerialized()>
         <XmlIgnore()>
@@ -403,8 +401,8 @@ Namespace FBM
                     'Clone the ModelNotes
                     '----------------------
                     Call Richmond.WriteToStatusBar("Cloning ModelNotes", True, 80)
-                    For Each lrModelNoteInstance In .ModelNote
-                        lrPage.ModelNote.Add(lrModelNoteInstance.Clone(lrPage))
+                    For Each lrModelNoteInstance In .ModelNoteInstance
+                        lrPage.ModelNoteInstance.Add(lrModelNoteInstance.Clone(lrPage))
                     Next
 
                     '---------------------------------
@@ -1335,6 +1333,51 @@ Namespace FBM
 
         End Function
 
+        Public Function DropModelNoteAtPoint(ByRef arModelNote As FBM.ModelNote, ByVal aoPoint As PointF) As FBM.ModelNoteInstance
+
+            Dim lrModelNoteInstance As FBM.ModelNoteInstance
+
+            Try
+                '----------------------------------------------------------------------------
+                'Add the ModelNote to the Model if it is not already within the Model.
+                '----------------------------------------------------------------------------
+                If Not Me.Model.ModelNote.Exists(AddressOf arModelNote.Equals) Then
+                    Me.Model.ModelNote.Add(arModelNote)
+                End If
+
+                '-----------------------------------
+                'Create the ModelNoteInstance
+                '-----------------------------------
+                lrModelNoteInstance = arModelNote.CloneInstance(Me)
+                lrModelNoteInstance.ModelNote = arModelNote
+                lrModelNoteInstance.X = aoPoint.X
+                lrModelNoteInstance.Y = aoPoint.Y
+
+                If Me.Diagram IsNot Nothing Then
+                    Call lrModelNoteInstance.DisplayAndAssociate()
+                End If
+
+                '---------------------------------------------
+                'Add the ModelNoteInstance to the Page.
+                '---------------------------------------------
+                Me.ModelNoteInstance.Add(lrModelNoteInstance)
+
+                Call Me.MakeDirty()
+
+                Return lrModelNoteInstance
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function DropValueTypeAtPoint(ByRef arValueType As FBM.ValueType,
                                              ByVal ao_pt As PointF,
                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = False) As FBM.ValueTypeInstance
@@ -1529,7 +1572,7 @@ Namespace FBM
                 End If
 
                 If abGetModelNotes Then
-                    For Each lrModelNote In Me.ModelNote
+                    For Each lrModelNote In Me.ModelNoteInstance
                         OutputList.Add(lrModelNote)
                     Next
                 End If
@@ -1568,8 +1611,8 @@ Namespace FBM
                     Return Me.RoleConstraintInstance.Find(Function(x) x.Id = asModelElementId)
                 End If
 
-                If Me.ModelNote.FindAll(Function(x) x.Id = asModelElementId).Count > 0 Then
-                    Return Me.ModelNote.Find(Function(x) x.Id = asModelElementId)
+                If Me.ModelNoteInstance.FindAll(Function(x) x.Id = asModelElementId).Count > 0 Then
+                    Return Me.ModelNoteInstance.Find(Function(x) x.Id = asModelElementId)
                 End If
 
                 'Nothing found, so throw an error
@@ -1756,7 +1799,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub ClearFast(Optional ByVal abClearDiagram As Boolean = False)
 
-            Me.ModelNote.Clear()
+            Me.ModelNoteInstance.Clear()
             Me.RoleConstraintInstance.Clear()
             Me.FactTypeInstance.Clear()
             Me.EntityTypeInstance.Clear()
@@ -2020,7 +2063,7 @@ Namespace FBM
                 'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Model Notes")
                 'prApplication.ThrowErrorMessage("Loading Page.ModelNotes", pcenumErrorType.Information)
                 If TableModelNoteInstance.getModelNoteInstanceCountByPage(Me) > 0 Then
-                    Me.ModelNote = TableModelNoteInstance.getModelNoteInstancesByPage(Me)
+                    Me.ModelNoteInstance = TableModelNoteInstance.getModelNoteInstancesByPage(Me)
                 End If
 
                 'Richmond.WriteToStatusBar(".")

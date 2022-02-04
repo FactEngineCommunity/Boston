@@ -1070,7 +1070,7 @@ Public Class frmDiagramORMForGlossary
         '---------------------------------------------
         'Add the ModelNoteInstance to the Page.
         '---------------------------------------------
-        Me.zrPage.ModelNote.Add(lrModelNoteInstance)
+        Me.zrPage.ModelNoteInstance.Add(lrModelNoteInstance)
 
         Call Me.zrPage.MakeDirty()
 
@@ -3882,7 +3882,7 @@ Public Class frmDiagramORMForGlossary
             'Display the ModelNotes
             '------------------------
             Dim lrModelNoteInstance As FBM.ModelNoteInstance
-            For Each lrModelNoteInstance In Me.zrPage.ModelNote
+            For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
                 '-------------------------
                 'Load the RoleConstraint
                 '-------------------------
@@ -5592,7 +5592,7 @@ Public Class frmDiagramORMForGlossary
             End Select
         Next
 
-        For Each lrModelNoteInstance In Me.zrPage.ModelNote
+        For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
             'lrModelNoteInstance.Shape.Selected = True
             Me.zrPage.SelectedObject.Add(lrModelNoteInstance)
         Next

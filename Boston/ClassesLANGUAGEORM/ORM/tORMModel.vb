@@ -670,7 +670,7 @@ Namespace FBM
                 lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
                 lrDictionaryEntry.AddConceptType(pcenumConceptType.ModelNote)
             Else
-                lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry)
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry,,,,,, True,)
                 Me.MakeDirty()
             End If
 

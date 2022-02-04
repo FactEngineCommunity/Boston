@@ -2966,39 +2966,38 @@ Public Class frmMain
 
 
                 lrPage.FactTypeInstance.Sort(AddressOf FBM.FactType.CompareRolesJoiningFactTypesCount)
-                    For Each lrFactTypeInstance In lrPage.FactTypeInstance
-                        Dim loPt As New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y)
-                        lrFactTypeInstance.FactType.Model = prApplication.WorkingModel
-                        lrFactTypeInstance.Model = prApplication.WorkingModel
-                        If prApplication.WorkingPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                            If prApplication.WorkingPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).IsDisplayedAssociated Then
-                                '---------------------------------------------
-                                'Already on the Page and DisplayedAssociated
-                                '---------------------------------------------
-                            Else
-                                prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
-                            End If
+                For Each lrFactTypeInstance In lrPage.FactTypeInstance
+                    Dim loPt As New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y)
+                    lrFactTypeInstance.FactType.Model = prApplication.WorkingModel
+                    lrFactTypeInstance.Model = prApplication.WorkingModel
+                    If prApplication.WorkingPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                        If prApplication.WorkingPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).IsDisplayedAssociated Then
+                            '---------------------------------------------
+                            'Already on the Page and DisplayedAssociated
+                            '---------------------------------------------
                         Else
                             prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
                         End If
-                    Next
+                    Else
+                        prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
+                    End If
+                Next
 
-                    For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+                For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
 
-                        Dim loPt As New PointF(lrRoleConstraintInstance.X, lrRoleConstraintInstance.Y)
+                    Dim loPt As New PointF(lrRoleConstraintInstance.X, lrRoleConstraintInstance.Y)
 
-                        If Not prApplication.WorkingPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
-                            prApplication.WorkingPage.DropRoleConstraintAtPoint(lrRoleConstraintInstance.RoleConstraint, loPt, True)
-                        End If
-                    Next
+                    If Not prApplication.WorkingPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                        prApplication.WorkingPage.DropRoleConstraintAtPoint(lrRoleConstraintInstance.RoleConstraint, loPt, True)
+                    End If
+                Next
 
+                For Each lrModelNoteInstance In lrPage.ModelNoteInstance
+                    Dim loPt As New PointF(lrModelNoteInstance.X, lrModelNoteInstance.Y)
+                    'prApplication.WorkingPage.DropModelNoteAtPoint(lrModelNoteInstance.ModelNote, loPt)
+                Next
 
-                    For Each lrModelNoteInstance In lrPage.ModelNote
-                        Dim loPt As New PointF(lrModelNoteInstance.X, lrModelNoteInstance.Y)
-                        'prApplication.WorkingPage.DropModelNoteAtPoint(lrModelNoteInstance.ModelNote, loPt)
-                    Next
-
-                End If
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

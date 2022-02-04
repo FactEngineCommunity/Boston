@@ -2385,6 +2385,9 @@ Public Class frmToolboxEnterpriseExplorer
         Richmond.WriteToStatusBar("Value Comparison Constraints",, 95)
         Call lrNORMAFileLoader.LoadRoleConstraintValueComparisonConstraints(lrModel, NORMAXMLDOC)
 
+        Richmond.WriteToStatusBar("Model Notes",, 97)
+        Call lrNORMAFileLoader.LoadModelNotes(lrModel, NORMAXMLDOC)
+
         '----------------------------------------------------------------------------------------------------------
         'Get rid of the Roles in FactTypes that refer to NORMA UnaryFactType ValueTypes.
         '  NORMA has a ValueType for each UnaryFactType with a corresponding Role attached to the Unary Role of

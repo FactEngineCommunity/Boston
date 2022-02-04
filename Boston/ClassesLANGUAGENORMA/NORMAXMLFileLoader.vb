@@ -1001,13 +1001,15 @@ Namespace NORMA
                             Next
 
                             lrFactType.Objectify(True)
-
-                            Dim lsReferenceMode As String = "." & loXMLElementQueryResult(0).Attribute("_ReferenceMode").Value
+                            Dim lsReferenceMode As String = ""
+                            If loXMLElementQueryResult(0).Attribute("_ReferenceMode").Value <> "" Then
+                                lsReferenceMode = "." & loXMLElementQueryResult(0).Attribute("_ReferenceMode").Value
+                            End If
                             lrFactType.ObjectifyingEntityType.SetReferenceMode(lsReferenceMode, True,, False,, True, True)
-                            lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
-                        End If
+                                lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
+                            End If
 
-                    End If 'FactType exists in Model
+                        End If 'FactType exists in Model
                 Next 'FactType
 
                 Dim larFaultyFactTypes = From FactType In arModel.FactType
@@ -1017,38 +1019,90 @@ Namespace NORMA
 
                 For Each lrFactType In larFaultyFactTypes
 
-                Dim larRole = From Role In lrFactType.RoleGroup
-                              Where Role.JoinedORMObject Is Nothing
-                              Select Role
+                    Dim larRole = From Role In lrFactType.RoleGroup
+                                  Where Role.JoinedORMObject Is Nothing
+                                  Select Role
 
-                For Each lrRole In larRole
+                    For Each lrRole In larRole
 
-                    loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
-                                               From Role In FactType.<orm:FactRoles>.<orm:Role>
-                                               Where Role.Attribute("id").Value = lrRole.Id
-                                               Select Role
+                        loEnumElementQueryResult = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                                   From Role In FactType.<orm:FactRoles>.<orm:Role>
+                                                   Where Role.Attribute("id").Value = lrRole.Id
+                                                   Select Role
 
-                    For Each lrRoleXElement In loEnumElementQueryResult.<orm:RolePlayer>
-                        '------------------------------------------------
-                        'Find the ModelObject within the Richmond Model
-                        '------------------------------------------------
-                        lrJoinedFactType = New FBM.FactType
-                        lrJoinedFactType.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
-                        lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrJoinedFactType.NORMAReferenceId)
+                        For Each lrRoleXElement In loEnumElementQueryResult.<orm:RolePlayer>
+                            '------------------------------------------------
+                            'Find the ModelObject within the Richmond Model
+                            '------------------------------------------------
+                            lrJoinedFactType = New FBM.FactType
+                            lrJoinedFactType.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                            lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrJoinedFactType.NORMAReferenceId)
 
-                        lrRole.JoinedORMObject = lrJoinedFactType
+                            lrRole.JoinedORMObject = lrJoinedFactType
 
-                    Next 'Seach in NORMAXMLDOC
-                Next 'Role
-            Next 'FaultyFactType
+                        Next 'Seach in NORMAXMLDOC
+                    Next 'Role
+                Next 'FaultyFactType
 
             Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub LoadModelNotes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrModelNote As New FBM.ModelNote
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+
+            Try
+
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:ModelNotes>.<orm:ModelNote>
+                                           Select ModelInformation
+
+                '---------------------------------
+                'Add the ValueTypes to the Model
+                '---------------------------------            
+                For Each loElement In loEnumElementQueryResult
+                    lrModelNote = New FBM.ModelNote(arModel)
+                    lrModelNote.NORMAReferenceId = loElement.Attribute("id").Value
+                    lrModelNote.Id = lrModelNote.NORMAReferenceId
+
+                    If Not arModel.ModelNote.Exists(AddressOf lrModelNote.Equals) Then
+                        arModel.AddModelNote(lrModelNote, True)
+                    End If
+
+                    lrModelNote.Text = loElement.<orm:Text>(0).Value
+
+                    'Referenced ModelElement
+                    Try
+                        Dim lsModelElementNORMAReference As String
+                        Try
+                            lsModelElementNORMAReference = loElement.<orm:ReferencedBy>(0).<orm:ObjectType>(0).Attribute("ref").Value
+                        Catch
+                            lsModelElementNORMAReference = loElement.<orm:ReferencedBy>(0).<orm:FactType>(0).Attribute("ref").Value
+                        End Try
+
+                        Dim lrModelElement As FBM.ModelObject = arModel.getModelObjects.Find(Function(x) x.NORMAReferenceId = lsModelElementNORMAReference)
+                        lrModelNote.JoinedObjectType = lrModelElement
+                    Catch ex As Exception
+                        'Model Notes do not need to reference a Model Element.
+                    End Try
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -2338,11 +2392,10 @@ Namespace NORMA
             Dim lrRoleInstance As FBM.RoleInstance
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
             Dim lrFactTypeInstance2 As FBM.FactTypeInstance
+            Dim lrModelNote As FBM.ModelNote
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance
-
             Dim ldblScalar As Double = 30.5
-
 
             Try
                 loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<ormDiagram:ORMDiagram>
@@ -2637,6 +2690,23 @@ Namespace NORMA
                     '    End If
                     'Next
 #End Region
+
+                    '------------------
+                    'Model Notes
+                    '------------------
+                    For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ModelNoteShape>
+                        lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
+
+                        lrModelNote = New FBM.ModelNote
+                        lrModelNote.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
+
+                        lrModelNote = arModel.ModelNote.Find(Function(x) x.NORMAReferenceId = lrModelNote.NORMAReferenceId)
+
+                        Dim lsBounds() As String
+                        lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                        Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * ldblScalar), Int(CSng(Trim(lsBounds(1))) * ldblScalar))
+                        Call lrPage.DropModelNoteAtPoint(lrModelNote, loPointF)
+                    Next
 
                     '------------------
                     'Ring Constraints
