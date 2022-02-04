@@ -141,8 +141,8 @@ Namespace FBM
         XmlIgnore()> _
         Public Shape As ShapeNode
 
-        <XmlIgnore()> _
-        Public _X As Integer
+        <XmlIgnore()>
+        Private _X As Integer
         Public Property X As Integer Implements FBM.iPageObject.X
             Get
                 Return Me._X
@@ -196,9 +196,27 @@ Namespace FBM
         XmlIgnore()>
         Public FactTypeNameShape As New ShapeNode
 
-        <NonSerialized(),
-        XmlIgnore()>
-        Public FactTypeReadingPoint As Point
+        <NonSerialized()>
+        Private _FactTypeReadingPoint As Point
+        <XmlIgnore()>
+        Public Property FactTypeReadingPoint As Point
+            Get
+                If Not (Me._FactTypeReadingPoint.X = 0 And Me._FactTypeReadingPoint.Y = 0) Then
+                    Return Me._FactTypeReadingPoint
+                ElseIf Me.FactTypeReadingShape IsNot Nothing Then
+                    If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                        Return New Point(Me.FactTypeReadingShape.Shape.Bounds.X, Me.FactTypeReadingShape.Shape.Bounds.Y)
+                    Else
+                        Return Me._FactTypeReadingPoint
+                    End If
+                Else
+                    Return Me._FactTypeReadingPoint
+                End If
+            End Get
+            Set(value As Point)
+                Me._FactTypeReadingPoint = value
+            End Set
+        End Property
 
         <NonSerialized(), _
         XmlIgnore()> _
@@ -1313,7 +1331,6 @@ Namespace FBM
                     If Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
                         Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
                     End If
-
                 End If
 
                 If Me.Shape IsNot Nothing Then
@@ -1567,6 +1584,11 @@ Namespace FBM
 
             If Me.FactTypeReadingShape IsNot Nothing Then
                 Call Me.FactTypeReadingShape.Save(abRapidSave)
+            ElseIf Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
+                Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance(Me, Nothing)
+                lrFactTypeReadingInstance.X = Me.FactTypeReadingPoint.X
+                lrFactTypeReadingInstance.Y = Me.FactTypeReadingPoint.Y
+                Call lrFactTypeReadingInstance.Save(abRapidSave)
             End If
 
             If Me.FactType.IsDerived And Me.FactTypeDerivationText IsNot Nothing Then

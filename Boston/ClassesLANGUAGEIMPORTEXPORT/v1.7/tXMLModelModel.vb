@@ -427,6 +427,15 @@ Namespace XMLModel
                             lrExportPage.ConceptInstance.Add(lrConceptInstance)
 
                         End If
+
+                        'FactTypeReading
+                        lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                     lrFactTypeInstance.Page,
+                                                                     lrFactTypeInstance.Id,
+                                                                     pcenumConceptType.FactTypeReading)
+                        lrConceptInstance.X = lrFactTypeInstance.FactTypeReadingPoint.X
+                        lrConceptInstance.Y = lrFactTypeInstance.FactTypeReadingPoint.Y
+                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
                     Next
 
                     '--------------------------------------------------------------
@@ -979,6 +988,8 @@ Namespace XMLModel
                     'Map the FactTypeInstances
                     '===========================
                     Dim lrFactTypeInstance As FBM.FactTypeInstance
+                    Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
+                    Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
                     Dim lrFact As FBM.Fact
 
                     For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
@@ -996,7 +1007,6 @@ Namespace XMLModel
                         lrFactTypeInstance.DBName = lrFactType.DBName
 
                         If lrFactType.IsDerived Then
-                            Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
                             lrDerivationTextConceptInstance = lrXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
                             If lrDerivationTextConceptInstance IsNot Nothing Then
                                 lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(lrPage.Model,
@@ -1005,6 +1015,12 @@ Namespace XMLModel
                                 lrFactTypeInstance.FactTypeDerivationText.X = lrDerivationTextConceptInstance.X
                                 lrFactTypeInstance.FactTypeDerivationText.Y = lrDerivationTextConceptInstance.Y
                             End If
+                        End If
+
+                        lrFactTypeReadingConceptInstance = lrXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
+                        If lrFactTypeReadingConceptInstance IsNot Nothing Then
+                            lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeReadingConceptInstance.X,
+                                                                                lrFactTypeReadingConceptInstance.Y)
                         End If
 
                         '----------------------------------------

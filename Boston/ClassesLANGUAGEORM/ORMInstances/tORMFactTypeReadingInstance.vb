@@ -29,12 +29,39 @@ Namespace FBM
         <XmlIgnore()> _
         Public Page As FBM.Page
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        <NonSerialized()>
+        <XmlIgnore()>
         Public Shape As ShapeNode
-        Public Property X As Integer Implements FBM.iPageObject.X
-        Public Property Y As Integer Implements FBM.iPageObject.Y
 
+        <XmlIgnore()>
+        Private _X As Integer
+        Public Property X As Integer Implements FBM.iPageObject.X
+            Get
+                If Me.Shape IsNot Nothing Then
+                    Return Me.Shape.Bounds.X
+                Else
+                    Return Me._X
+                End If
+            End Get
+            Set(value As Integer)
+                Me._X = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Private _Y As Integer
+        Public Property Y As Integer Implements FBM.iPageObject.Y
+            Get
+                If Me.Shape IsNot Nothing Then
+                    Return Me.Shape.Bounds.Y
+                Else
+                    Return Me._Y
+                End If
+            End Get
+            Set(value As Integer)
+                Me._Y = value
+            End Set
+        End Property
 
         Public Sub New()
 

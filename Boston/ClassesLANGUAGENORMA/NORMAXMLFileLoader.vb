@@ -2337,6 +2337,7 @@ Namespace NORMA
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrRoleInstance As FBM.RoleInstance
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim lrFactTypeInstance2 As FBM.FactTypeInstance
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance
 
@@ -2522,6 +2523,19 @@ Namespace NORMA
                             lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
+                            'FactTypeReadingPosition
+                            Try
+                                Dim lrFTRXElement As XElement = (lrObjectTypeShapeXElement.<ormDiagram:RelativeShapes>.<ormDiagram:ReadingShape>)(0)
+                                If lrFTRXElement IsNot Nothing Then
+                                    lsBounds = lrFTRXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                                    lrFactTypeInstance.FactTypeReadingPoint = New Point(Int(CSng(Trim(lsBounds(0))) * ldblScalar),
+                                                                                        Int(CSng(Trim(lsBounds(1))) * ldblScalar))
+                                End If
+                            Catch ex As Exception
+                                'Not a biggie
+                            End Try
+
+
                             '-----------------------------------------------------------------------
                             'If the FactTypeInstance doesn't exist on the Page, add it to the Page
                             '-----------------------------------------------------------------------
@@ -2531,8 +2545,8 @@ Namespace NORMA
                                 'Add the FactTypeInstance to the Page, because Role.CloneInstance
                                 '  automatically looks for and adds the ROleInstance to the FactTypeInstance
                                 '-----------------------------------------------------------------------------
-                                lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
-
+                                lrFactTypeInstance2 = lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
+                                lrFactTypeInstance2.FactTypeReadingPoint = lrFactTypeInstance.FactTypeReadingPoint
                                 ''-----------------------------------------------
                                 ''Create RoleInstances for the FactTypeInstance
                                 ''-----------------------------------------------
@@ -2550,12 +2564,12 @@ Namespace NORMA
                                 'Load the FactInstances to the Page
                                 '------------------------------------
                                 For Each lrFact In lrFactType.Fact
-                                    lrFactTypeInstance.AddFact(lrFact, False)
-                                Next
-                            Else
-                                lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
-                            End If
-                        End If 'IsSomething(lrFactType)
+                                        lrFactTypeInstance.AddFact(lrFact, False)
+                                    Next
+                                Else
+                                    lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
+                                End If
+                            End If 'IsSomething(lrFactType)
                     Next 'FactTypeShape in NORMA XML 
 
                     Dim larFaultyFactTypeInstances = From Page In arModel.Page
