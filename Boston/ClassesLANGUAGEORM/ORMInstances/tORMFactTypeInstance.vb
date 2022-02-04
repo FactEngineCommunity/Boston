@@ -1267,9 +1267,14 @@ Namespace FBM
                     Else
                         If Me.FactType.FactTypeReading.Count > 0 Then
                             If Me.FactType.Arity = 2 Then
-                                If Me.FactTypeReadingShape.Shape IsNot Nothing Then
-                                    Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
-                                End If
+                                Try
+                                    If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                                        Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
+                                    End If
+                                Catch ex As Exception
+                                    'Because Me.FactTypeReadingShape may be nothing. Not a biggie and easier to trap the error.
+                                End Try
+
                                 Me.FactTypeReadingShape = Me.FactType.FactTypeReading(0).CloneInstance(Me.Page)
                                 'CodeSafe: Add the FactTypeIntsance to the FactTypeReadingShape, because the FactTypeInstance may have been removed from the Page
                                 'This happens when deleting an EntityType with a ReferenceMode from the Model/Page.

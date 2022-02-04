@@ -239,6 +239,7 @@ Namespace TableModel
                     lrModel.IsPhysicalModel = False
                     lrModel.IsNamespace = False
                     lrModel.IsEnterpriseModel = True 'By default for this function.
+                    lrModel.StoreAsXML = CBool(lREcordset("StoreAsXML").Value)
 
                     Try
                         lrModel.TargetDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(lREcordset("TargetDatabaseType").Value, pcenumDatabaseType.None)), pcenumDatabaseType)

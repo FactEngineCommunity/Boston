@@ -905,9 +905,9 @@ Namespace XMLModel
             Try
                 For Each lrXMLPage In Me.ORMDiagram
 
-                    lrPage = New FBM.Page(arModel, _
-                                          lrXMLPage.Id, _
-                                          lrXMLPage.Name, _
+                    lrPage = New FBM.Page(arModel,
+                                          lrXMLPage.Id,
+                                          lrXMLPage.Name,
                                           lrXMLPage.Language)
 
                     If arModel.Page.Contains(lrPage) Then
@@ -984,8 +984,8 @@ Namespace XMLModel
                     For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
                         lrFactTypeInstance = New FBM.FactTypeInstance
 
-                        Dim lrFactType As New FBM.FactType(arModel, _
-                                                           lrConceptInstance.Symbol, _
+                        Dim lrFactType As New FBM.FactType(arModel,
+                                                           lrConceptInstance.Symbol,
                                                            True)
 
                         lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -1049,13 +1049,13 @@ Namespace XMLModel
                     '===============================================================================================
                     'Populate RoleInstances that are (still) joined to Nothing
                     '===========================================================
-                    Dim latType = {GetType(FBM.ValueTypeInstance), _
-                                   GetType(FBM.EntityTypeInstance), _
+                    Dim latType = {GetType(FBM.ValueTypeInstance),
+                                   GetType(FBM.EntityTypeInstance),
                                    GetType(FBM.FactTypeInstance)}
 
-                    Dim larRole = From Role In lrPage.RoleInstance _
-                                   Where Role.JoinedORMObject Is Nothing
-                                   Select Role
+                    Dim larRole = From Role In lrPage.RoleInstance
+                                  Where Role.JoinedORMObject Is Nothing
+                                  Select Role
 
                     Dim lrRoleInstance As FBM.RoleInstance
 
@@ -1071,8 +1071,8 @@ Namespace XMLModel
                     'Mat the SubtypeRelationships.
                     '=================================================================================
 
-                    Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance _
-                                                          Where FactType.IsSubtypeRelationshipFactType _
+                    Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance
+                                                          Where FactType.IsSubtypeRelationshipFactType
                                                           Select FactType
 
                     Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance

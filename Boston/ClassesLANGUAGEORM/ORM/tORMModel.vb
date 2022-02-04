@@ -4958,7 +4958,7 @@ Namespace FBM
             Me.Loading = True
 
             If Me.StoreAsXML Then
-                Call Me.LoadFromXML()
+                Call Me.LoadFromXML(aoBackgroundWorker)
             Else
                 Call Me.LoadFromDatabase(abLoadPages, abUseThreading, aoBackgroundWorker)
             End If
@@ -5185,7 +5185,7 @@ Namespace FBM
             End Try
         End Sub
 
-        Public Sub LoadFromXML()
+        Public Sub LoadFromXML(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Dim lsFolderLocation As String
             Dim lsFileName As String
@@ -5215,6 +5215,7 @@ Namespace FBM
                 xml = XDocument.Load(lsFileLocationName)
 
                 Richmond.WriteToStatusBar("Loading model.", True)
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
 
                 lsXSDVersionNr = xml.<Model>.@XSDVersionNr
                 '=====================================================================================================
@@ -5277,6 +5278,8 @@ Namespace FBM
                         lrXMLModel.MapToFBMModel(Me)
                 End Select
 
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70)
+
                 '================================================================================================================
                 'RDS
                 If (Me.ModelId <> "Core") And Me.HasCoreModel Then
@@ -5321,6 +5324,7 @@ Namespace FBM
                     Me.RDSCreated = True
                 End If
                 '==================================================================================================
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(100)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -5332,7 +5336,54 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Sub LoadPagesFromXML()
 
+            Dim lsFolderLocation As String
+            Dim lsFileName As String
+            Dim lsFileLocationName As String
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+                    lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                Else
+                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                End If
+
+
+                lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
+                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+
+                '==================================================================================================
+                Dim xml As XDocument = Nothing
+                Dim lsXSDVersionNr As String = ""
+
+                'Deserialize text file to a new object.
+                Dim objStreamReader As New StreamReader(lsFileLocationName)
+
+                xml = XDocument.Load(lsFileLocationName)
+
+                For Each loPage In xml.<Model>.<ORMDiagram>.<Page>
+                    Dim lrPage As New FBM.Page(Me,
+                                               loPage.Attribute("Id").Value,
+                                               loPage.Attribute("Name").Value,
+                                               Richmond.GetEnumFromDescriptionAttribute(Of pcenumLanguage)(loPage.Attribute("Language").Value)
+                                               )
+                    Me.Page.Add(lrPage)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Sub performCoreManagement()
 
@@ -5570,9 +5621,14 @@ Namespace FBM
             '  This function is used to rapidly load Pages during the establishment of the EnterpriseTree within 
             '  the Enterprise Tree Viewer form.
             '-------------------------------------------------------------------------------------------------------
-            If TablePage.GetPageCountByModel(Me.ModelId) > 0 Then
-                Call TablePage.GetPagesByModel(Me, False)
+            If Me.StoreAsXML Then
+                Call Me.LoadPagesFromXML()
+            Else
+                If TablePage.GetPageCountByModel(Me.ModelId) > 0 Then
+                    Call TablePage.GetPagesByModel(Me, False)
+                End If
             End If
+
 
         End Sub
 

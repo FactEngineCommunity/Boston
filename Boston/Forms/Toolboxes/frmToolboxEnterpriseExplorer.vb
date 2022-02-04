@@ -3464,6 +3464,7 @@ Public Class frmToolboxEnterpriseExplorer
         Me.CircularProgressBar.Value = e.ProgressPercentage
         Me.CircularProgressBar.Text = e.ProgressPercentage & "%"
         Me.CircularProgressBar.Invalidate()
+        Me.Refresh()
 
     End Sub
 
