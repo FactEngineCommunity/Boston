@@ -388,8 +388,11 @@ Public Class frmToolboxEnterpriseExplorer
                 prApplication.Brain = New tBrain
 
                 frmMain.zfrmModelExplorer = Nothing
-
                 Call frmMain.ShowHideMenuOptions()
+
+                Call frmMain.SetGlobalsToNothing()
+               
+                Me.TreeView.Nodes.Clear()
 
             Catch ex As Exception
                 Dim lsMessage1 As String

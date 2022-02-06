@@ -4406,4 +4406,48 @@ Public Class frmMain
 
     End Sub
 
+    Public Sub SetGlobalsToNothing()
+
+        Try
+            Me.zfrmModelExplorer = Nothing
+            Me.zfrm_toolbox = Nothing
+            Me.zfrm_diagram_overview = Nothing
+            Me.zfrm_orm_reading_editor = Nothing
+            Me.zfrm_properties = Nothing
+            Me.zfrm_KL_theorem_writer = Nothing
+            Me.zrORMModel_view = Nothing
+            Me.zfrm_Brain_box = Nothing
+            Me.zfrmFactEngine = Nothing
+            Me.zfrmStartup = Nothing
+            Me.zfrmCRUDAddGroup = Nothing
+            Me.zfrmCRUDAddNamespace = Nothing
+            Me.zfrmCRUDAddProject = Nothing
+            Me.zfrmCRUDAddRole = Nothing
+            Me.zfrmCRUDAddUser = Nothing
+            Me.zfrmCRUDBostonConfiguration = Nothing
+            Me.zfrmCRUDEditGroup = Nothing
+            Me.zfrmCRUDEditNamespace = Nothing
+            Me.zfrmCRUDEditProject = Nothing
+            Me.zfrmCRUDEditRole = Nothing
+            Me.zfrmCRUDEditUser = Nothing
+            Me.zfrm_ER_diagram_view = Nothing
+            Me.zfrm_PGS_diagram_view = Nothing
+            Me.zfrmStateTransitionDiagramView = Nothing
+            Me.zfrmNotifications = Nothing
+            Me.zfrmCodeGenerator = Nothing
+
+            prApplication.DatabaseVersionNr = prApplication.DatabaseVersionNr
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class
