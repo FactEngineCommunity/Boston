@@ -314,6 +314,7 @@ Namespace TableModel
                 lsSQLQuery &= "       ,Warehouse = '" & Trim(ar_model.Warehouse) & "'"
                 lsSQLQuery &= "       ,[Role] = '" & Trim(ar_model.DatabaseRole) & "'"
                 lsSQLQuery &= "       ,Port = '" & Trim(ar_model.Port) & "'"
+                lsSQLQuery &= "       ,StoreAsXML = " & ar_model.StoreAsXML.ToString
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(ar_model.ModelId) & "'"
 
                 pdbConnection.BeginTrans()

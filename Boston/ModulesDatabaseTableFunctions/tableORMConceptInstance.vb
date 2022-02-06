@@ -73,6 +73,29 @@ Namespace TableConceptInstance
 
         End Sub
 
+        Public Sub DeleteConceptInstancesForModel(ByVal arModel As FBM.Model)
+
+            Dim lsSQLQuery As String = ""
+
+            Try
+
+                lsSQLQuery &= "DELETE FROM ModelConceptInstance"
+                lsSQLQuery &= "  WHERE ModelId = '" & Trim(arModel.ModelId) & "'"
+
+                pdbConnection.BeginTrans()
+                pdbConnection.Execute(lsSQLQuery)
+                pdbConnection.CommitTrans()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                lsMessage = "Error: TableconceptInstance.DeleteConceptInstanceForPage"
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                pdbConnection.RollbackTrans()
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub DeleteConceptInstancesForPage(ByVal ar_page As FBM.Page)
 
             Dim lsSQLQuery As String = ""

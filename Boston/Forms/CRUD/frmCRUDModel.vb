@@ -44,7 +44,9 @@ Public Class frmCRUDModel
         Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
         Me.TextBoxPort.Text = Me.zrModel.Port
 
+        RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
         Me.CheckBoxSaveToXML.Checked = Me.zrModel.StoreAsXML
+        AddHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
 
     End Sub
 
@@ -676,10 +678,36 @@ Public Class frmCRUDModel
     Private Sub CheckBoxSaveToXML_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxSaveToXML.CheckedChanged
 
         Try
+            Dim lsMessage As String = ""
             If Me.CheckBoxSaveToXML.Checked Then
-                With New WaitCursor
-                    Call Me.zrModel.SaveToXMLDocument()
-                End With
+                lsMessage = "Are you sure you want to store the Model as an XML file? If the Model is already saved in the database it may take a moment to remove the Model from the database."
+                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                    With New WaitCursor
+                        Call Me.zrModel.RapidEmpty(True)
+                        Call Me.zrModel.SaveToXMLDocument()
+                        Me.zrModel.StoreAsXML = True
+                    End With
+                Else
+                    RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
+                    Me.CheckBoxSaveToXML.Checked = False
+                    AddHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
+                    Me.zrModel.StoreAsXML = False
+                End If
+            Else
+                lsMessage = "Are you sure you want to store the Model within the Boston database?"
+                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                    With New WaitCursor
+                        Me.zrModel.StoreAsXML = False
+                        Call Database.CompactAndRepairDatabase()
+                        Call Me.zrModel.RapidEmpty(True)
+                        Call Me.zrModel.Save(True, True)
+                    End With
+                Else
+                    RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
+                    Me.CheckBoxSaveToXML.Checked = True
+                    RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
+                    Me.zrModel.StoreAsXML = True
+                End If
             End If
         Catch ex As Exception
             Dim lsMessage As String

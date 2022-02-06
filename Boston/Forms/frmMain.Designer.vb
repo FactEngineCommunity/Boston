@@ -430,31 +430,31 @@ Partial Class frmMain
         '
         Me.ConfigurationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ConfigurationToolStripMenuItem.Name = "ConfigurationToolStripMenuItem"
-        Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ConfigurationToolStripMenuItem.Text = "&Configuration"
         '
         'ToolStripSeparator14
         '
         Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
-        Me.ToolStripSeparator14.Size = New System.Drawing.Size(145, 6)
+        Me.ToolStripSeparator14.Size = New System.Drawing.Size(177, 6)
         '
         'PluginViewerToolStripMenuItem
         '
         Me.PluginViewerToolStripMenuItem.Name = "PluginViewerToolStripMenuItem"
-        Me.PluginViewerToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.PluginViewerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.PluginViewerToolStripMenuItem.Text = "&Plugin Viewer"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(145, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(177, 6)
         '
         'DatabaseToolStripMenuItem
         '
         Me.DatabaseToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackupDatabaseToolStripMenuItem, Me.CompactAndRepairToolStripMenuItem, Me.RemoveUnneededConceptsToolStripMenuItem})
         Me.DatabaseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Database16x16
         Me.DatabaseToolStripMenuItem.Name = "DatabaseToolStripMenuItem"
-        Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.DatabaseToolStripMenuItem.Text = "&Database"
         '
         'BackupDatabaseToolStripMenuItem
@@ -480,7 +480,7 @@ Partial Class frmMain
         '
         Me.LogFileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteLogFileToolStripMenuItem})
         Me.LogFileToolStripMenuItem.Name = "LogFileToolStripMenuItem"
-        Me.LogFileToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.LogFileToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.LogFileToolStripMenuItem.Text = "&Log File"
         '
         'DeleteLogFileToolStripMenuItem

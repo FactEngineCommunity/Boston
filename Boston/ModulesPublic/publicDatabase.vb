@@ -4,6 +4,38 @@ Namespace Database
 
     Public Module Database
 
+        Public Sub CompactAndRepairDatabase()
+
+            Try
+
+                pdbConnection.Close()
+                pdb_OLEDB_connection.Close()
+
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+                Dim lsDatabaseLocationName As String = lrSQLConnectionStringBuilder("Data Source")
+                Dim lsCompactedDatabaseLocationName As String
+                lsCompactedDatabaseLocationName = New System.IO.FileInfo(lsDatabaseLocationName).DirectoryName & "\BostonCompacted.vdb"
+
+                Try
+                    Call Richmond.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
+                Catch ex As Exception
+                    prApplication.ThrowErrorMessage("Failed to compact the database. Check to see if any other application has the database open.", pcenumErrorType.Warning)
+                End Try
+
+                Call Richmond.OpenDatabase()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Function MakeStringSafe(ByVal asString As String) As String
 
             Dim lsReturnString As String = ""

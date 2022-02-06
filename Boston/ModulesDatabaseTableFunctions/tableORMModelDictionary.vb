@@ -71,7 +71,8 @@ Namespace TableModelDictionary
 
         End Sub
 
-        Public Sub DeleteModelDictionaryEntriesByModel(ByVal arModel As FBM.Model)
+        Public Sub DeleteModelDictionaryEntriesByModel(ByVal arModel As FBM.Model,
+                                                       Optional abUseTransaction As Boolean = True)
 
             Dim lsSQLQuery As String = ""
 
@@ -79,9 +80,10 @@ Namespace TableModelDictionary
                 lsSQLQuery = "DELETE FROM MetaModelModelDictionary"
                 lsSQLQuery &= " WHERE ModelId = '" & arModel.ModelId & "'"
 
-                pdbConnection.BeginTrans()
+                If abUseTransaction Then pdbConnection.BeginTrans()
+
                 pdbConnection.Execute(lsSQLQuery)
-                pdbConnection.CommitTrans()
+                If abUseTransaction Then pdbConnection.CommitTrans()
 
             Catch ex As Exception
                 Dim lsMessage As String

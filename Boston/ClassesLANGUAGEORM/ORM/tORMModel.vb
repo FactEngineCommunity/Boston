@@ -2908,6 +2908,42 @@ Namespace FBM
 
         End Sub
 
+        Public Sub RapidEmpty(Optional ByVal abDatabaseOnly As Boolean = False)
+
+            Try
+                Call TablePage.DeletePagesByModel(Me)
+
+                '-----------------------------------------------------------------------
+                'CodeSafe: Last resort, delete all the DictionaryEntries for the Model
+                '-----------------------------------------------------------------------
+                Call TableModelDictionary.DeleteModelDictionaryEntriesByModel(Me, False)
+
+                Call TableConceptInstance.DeleteConceptInstancesForModel(Me)
+
+                If Not abDatabaseOnly Then
+                    Me.ModelDictionary.Clear()
+                    Me.ValueType.Clear()
+                    Me.EntityType.Clear()
+                    Me.FactType.Clear()
+                    Me.RoleConstraint.Clear()
+                    Me.ModelNote.Clear()
+                    Me.Role.Clear()
+                    Me.FactTypeReading.Clear()
+                    Me.ModelError.Clear()
+                    Me.Page.Clear()
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         ''' <summary>
         ''' Empties all Model Objects from the Model.
         '''   NB Does not delete the Model from the database.
@@ -3720,21 +3756,16 @@ Namespace FBM
                 '----------------------------------------------
                 'First, check to see if the Model itself exists
                 '  in the database/Save the Model
+                '  NB Forego RapidSave for a Model's details. No real performance gain with RapidSave and 
+                '  may be switching from StoreAsXML to storing in the database, in which case the Model's details are already in the database.
                 '----------------------------------------------
-                If abRapidSave Then
+                If TableModel.ExistsModelById(Me.ModelId) Then
+                    Call TableModel.update_model(Me)
+                Else
                     '------------------------------------------------
                     'Create an instance of the Model in the database
                     '------------------------------------------------
                     Call TableModel.add_model(Me)
-                Else
-                    If TableModel.ExistsModelById(Me.ModelId) Then
-                        Call TableModel.update_model(Me)
-                    Else
-                        '------------------------------------------------
-                        'Create an instance of the Model in the database
-                        '------------------------------------------------
-                        Call TableModel.add_model(Me)
-                    End If
                 End If
 
                 If Me.StoreAsXML Then

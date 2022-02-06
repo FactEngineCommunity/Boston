@@ -2645,6 +2645,7 @@ Namespace FBM
                 '----------------------------------------------
                 If abRapidSave Then
                     Call TablePage.AddPage(Me)
+                    Me.IsDirty = False
                 Else
                     If TablePage.ExistsPageById(Me.PageId) Then
                         Call TablePage.UpdatePage(Me)
