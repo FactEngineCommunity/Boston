@@ -1,7 +1,6 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Reflection
 
-
 Namespace XMLModel
 
     ''' <summary>
@@ -624,7 +623,6 @@ Namespace XMLModel
                                                   lrXMLFactType.Id)
 
                     Call Me.GetFactTypeDetails(lrFactType)
-
                 Next
 
                 '===============================================================================================
@@ -908,285 +906,21 @@ Namespace XMLModel
         Public Sub MapToFBMPages(ByRef arModel As FBM.Model)
 
             Dim lrPage As FBM.Page
-            Dim lrXMLPage As XMLModel.Page
-            Dim lrConceptInstance As FBM.ConceptInstance
-
+            'Dim lrXMLPage As XMLModel.Page            
+            Dim lrModel As FBM.Model = arModel
             Try
                 For Each lrXMLPage In Me.ORMDiagram
 
-                    lrPage = New FBM.Page(arModel,
-                                          lrXMLPage.Id,
-                                          lrXMLPage.Name,
-                                          lrXMLPage.Language)
-
-                    If arModel.Page.Contains(lrPage) Then
-                        lrPage = arModel.Page.Find(AddressOf lrPage.Equals)
+                    lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
+                    If lrPage Is Nothing Then
+                        lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                    Else
+                        Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
                     End If
-
-                    '=============================
-                    'Map the ValueTypeInstances
-                    '=============================
-                    Dim lrValueTypeInstance As FBM.ValueTypeInstance
-
-                    For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
-                        lrValueTypeInstance = New FBM.ValueTypeInstance
-                        lrValueTypeInstance.Model = arModel
-                        lrValueTypeInstance.Page = lrPage
-                        lrValueTypeInstance.Id = lrConceptInstance.Symbol
-                        lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
-                        lrValueTypeInstance.ValueType = arModel.ValueType.Find(AddressOf lrValueTypeInstance.ValueType.Equals)
-                        lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
-                        lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
-                        lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
-
-                        lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
-
-                        lrValueTypeInstance.Name = lrConceptInstance.Symbol
-                        lrValueTypeInstance.X = lrConceptInstance.X
-                        lrValueTypeInstance.Y = lrConceptInstance.Y
-
-                        lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                    Next
-
-                    '=============================
-                    'Map the EntityTypeInstances
-                    '=============================
-                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-
-                    For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
-                        lrEntityTypeInstance = New FBM.EntityTypeInstance
-                        lrEntityTypeInstance.Model = arModel
-                        lrEntityTypeInstance.Page = lrPage
-                        lrEntityTypeInstance.Id = lrConceptInstance.Symbol
-                        lrEntityTypeInstance.EntityType.Id = lrEntityTypeInstance.Id
-                        lrEntityTypeInstance.EntityType = arModel.EntityType.Find(AddressOf lrEntityTypeInstance.EntityType.Equals)
-                        lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
-                        lrEntityTypeInstance.ReferenceMode = lrEntityTypeInstance.EntityType.ReferenceMode
-                        lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityTypeInstance.EntityType.IsObjectifyingEntityType
-                        lrEntityTypeInstance.IsAbsorbed = lrEntityTypeInstance.EntityType.IsAbsorbed
-                        lrEntityTypeInstance.IsDerived = lrEntityTypeInstance.EntityType.IsDerived
-                        lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
-                        lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
-
-                        If lrEntityTypeInstance.EntityType.ReferenceModeValueType Is Nothing Then
-                            lrEntityTypeInstance.ReferenceModeValueType = Nothing
-                        Else
-                            lrEntityTypeInstance.ReferenceModeValueType = New FBM.ValueTypeInstance
-                            lrEntityTypeInstance.ReferenceModeValueType.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id
-                            lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(AddressOf lrEntityTypeInstance.ReferenceModeValueType.Equals)
-                        End If
-
-                        lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityTypeInstance.EntityType.PreferredIdentifierRCId
-
-                        lrEntityTypeInstance.X = lrConceptInstance.X
-                        lrEntityTypeInstance.Y = lrConceptInstance.Y
-
-                        lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
-                    Next
-
-                    '===========================
-                    'Map the FactTypeInstances
-                    '===========================
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance
-                    Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
-                    Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
-                    Dim lrFact As FBM.Fact
-
-                    For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
-                        lrFactTypeInstance = New FBM.FactTypeInstance
-
-                        Dim lrFactType As New FBM.FactType(arModel,
-                                                           lrConceptInstance.Symbol,
-                                                           True)
-
-                        lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
-
-                        lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True)
-                        lrFactTypeInstance.X = lrConceptInstance.X
-                        lrFactTypeInstance.Y = lrConceptInstance.Y
-                        lrFactTypeInstance.DBName = lrFactType.DBName
-
-                        If lrFactType.IsDerived Then
-                            lrDerivationTextConceptInstance = lrXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
-                            If lrDerivationTextConceptInstance IsNot Nothing Then
-                                lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(lrPage.Model,
-                                                                                                           lrPage,
-                                                                                                           lrFactTypeInstance)
-                                lrFactTypeInstance.FactTypeDerivationText.X = lrDerivationTextConceptInstance.X
-                                lrFactTypeInstance.FactTypeDerivationText.Y = lrDerivationTextConceptInstance.Y
-                            End If
-                        End If
-
-                        lrFactTypeReadingConceptInstance = lrXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
-                        If lrFactTypeReadingConceptInstance IsNot Nothing Then
-                            lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeReadingConceptInstance.X,
-                                                                                lrFactTypeReadingConceptInstance.Y)
-                        End If
-
-                        '----------------------------------------
-                        'Get the Facts for the FactTypeInstance
-                        '----------------------------------------
-                        Dim lrFactInstance As FBM.FactInstance
-                        Dim lrFactDataInstance As FBM.FactDataInstance
-                        For Each lrFact In lrFactType.Fact
-
-                            If IsSomething(lrXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)) Then
-                                '----------------------------------
-                                'The Fact is included on the Page
-                                '----------------------------------
-                                lrFactInstance = lrFact.CloneInstance(lrPage)
-                                lrFactInstance.isDirty = True
-                                For Each lrFactDataInstance In lrFactInstance.Data
-                                    lrFactDataInstance.isDirty = True
-                                Next
-                                lrFactTypeInstance.Fact.Add(lrFactInstance)
-                                lrFactTypeInstance.isDirty = True
-
-                                For Each lrFactDataInstance In lrFactInstance.Data
-
-                                    Dim lrFactDataConceptInstance As New FBM.ConceptInstance
-                                    lrFactDataConceptInstance.Symbol = lrFactDataInstance.Data
-                                    lrFactDataConceptInstance.RoleId = lrFactDataInstance.Role.Id
-
-                                    lrFactDataConceptInstance = lrXMLPage.ConceptInstance.Find(AddressOf lrFactDataConceptInstance.EqualsBySymbolRoleId)
-
-                                    If lrFactDataConceptInstance IsNot Nothing Then
-                                        lrFactDataInstance.X = lrFactDataConceptInstance.X
-                                        lrFactDataInstance.Y = lrFactDataConceptInstance.Y
-                                    End If
-
-                                Next
-
-                            End If
-
-                        Next
-                    Next
-
-                    '===============================================================================================
-                    'Populate RoleInstances that are (still) joined to Nothing
-                    '===========================================================
-                    Dim latType = {GetType(FBM.ValueTypeInstance),
-                                   GetType(FBM.EntityTypeInstance),
-                                   GetType(FBM.FactTypeInstance)}
-
-                    Dim larRole = From Role In lrPage.RoleInstance
-                                  Where Role.JoinedORMObject Is Nothing
-                                  Select Role
-
-                    Dim lrRoleInstance As FBM.RoleInstance
-
-                    For Each lrRoleInstance In larRole
-                        Select Case lrRoleInstance.TypeOfJoin
-                            Case Is = pcenumRoleJoinType.FactType
-                                lrRoleInstance.JoinedORMObject = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsFactType.Id)
-                        End Select
-
-                    Next
-
-                    '=================================================================================
-                    'Mat the SubtypeRelationships.
-                    '=================================================================================
-
-                    Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance
-                                                          Where FactType.IsSubtypeRelationshipFactType
-                                                          Select FactType
-
-                    Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
-
-                    For Each lrFactType In larSubtypeRelationshipFactTypes.ToArray
-                        lrEntityTypeInstance = New FBM.EntityTypeInstance
-                        lrEntityTypeInstance.Id = lrFactType.RoleGroup(0).JoinedORMObject.Id
-                        lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
-
-                        lrParentEntityTypeInstance = New FBM.EntityTypeInstance
-                        lrParentEntityTypeInstance.Id = lrFactType.RoleGroup(1).JoinedORMObject.Id
-                        lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals)
-
-                        Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
-                        lrSubtypeConstraint.EntityType = lrEntityTypeInstance.EntityType
-                        lrSubtypeConstraint.parentEntityType = lrParentEntityTypeInstance.EntityType
-
-                        lrSubtypeConstraint = lrSubtypeConstraint.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeConstraint.Equals)
-
-                        Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
-
-                        lrSubtypeConstraintInstance = lrSubtypeConstraint.CloneInstance(lrPage, True)
-
-                        lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeConstraintInstance)
-                    Next
-
-                    '===========================
-                    'Map the RoleNameInstances
-                    '===========================
-                    For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleName)
-
-                        lrRoleInstance = New FBM.RoleInstance
-                        lrRoleInstance.Id = lrConceptInstance.RoleId
-
-                        lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-
-                        lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
-                        lrRoleInstance.RoleName.X = lrConceptInstance.X
-                        lrRoleInstance.RoleName.Y = lrConceptInstance.Y
-                    Next
-
-                    '=================================
-                    'Map the RoleConstraintInstances
-                    '=================================
-                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-
-                    For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
-                        lrRoleConstraintInstance = New FBM.RoleConstraintInstance
-
-                        lrRoleConstraintInstance.Id = lrConceptInstance.Symbol
-
-                        If IsSomething(lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)) Then
-                            '-------------------------------------------------------------------
-                            'The RoleConstraintInstance has already been added to the Page.
-                            '  FactType.CloneInstance adds RoleConstraintInstances to the Page
-                            '-------------------------------------------------------------------
-                        Else
-                            Dim lrRoleConstraint As New FBM.RoleConstraint
-                            lrRoleConstraint.Id = lrRoleConstraintInstance.Id
-
-                            lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
-
-                            Select Case lrRoleConstraint.RoleConstraintType
-                                Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                                    lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
-                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
-                                    lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
-                                Case Else
-                                    lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                            End Select
-
-                            lrRoleConstraintInstance.X = lrConceptInstance.X
-                            lrRoleConstraintInstance.Y = lrConceptInstance.Y
-
-                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
-                        End If
-                    Next
-
-                    '============================
-                    'Map the ModelNoteInstances
-                    '============================
-                    Dim lrModelNoteInstance As FBM.ModelNoteInstance
-
-                    For Each lrConceptInstance In lrXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ModelNote)
-                        lrModelNoteInstance = New FBM.ModelNoteInstance
-
-                        Dim lrModelNote As New FBM.ModelNote
-                        lrModelNote.Id = lrConceptInstance.Symbol
-
-                        lrModelNote = arModel.ModelNote.Find(AddressOf lrModelNote.Equals)
-
-                        lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
-                    Next
 
                     lrPage.Loaded = True
                     lrPage.IsDirty = True
-                    arModel.Page.AddUnique(lrPage)
-
+                    lrModel.Page.AddUnique(lrPage)
                 Next 'XMLModel.Page
 
             Catch ex As Exception
@@ -1200,6 +934,296 @@ Namespace XMLModel
 
         End Sub
 
+        Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
+                                      ByRef arModel As FBM.Model,
+                                      Optional ByRef arPage As FBM.Page = Nothing) As FBM.Page
+
+            Try
+                Dim lrConceptInstance As FBM.ConceptInstance
+                Dim lrPage As FBM.Page
+                If arPage Is Nothing Then
+                    lrPage = New FBM.Page(arModel,
+                                          arXMLPage.Id,
+                                          arXMLPage.Name,
+                                          arXMLPage.Language)
+                Else
+                    lrPage = arPage
+                End If
+
+                '=============================
+                'Map the ValueTypeInstances
+                '=============================
+                Dim lrValueTypeInstance As FBM.ValueTypeInstance
+
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
+                    lrValueTypeInstance = New FBM.ValueTypeInstance
+                    lrValueTypeInstance.Model = arModel
+                    lrValueTypeInstance.Page = lrPage
+                    lrValueTypeInstance.Id = lrConceptInstance.Symbol
+                    lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
+                    lrValueTypeInstance.ValueType = arModel.ValueType.Find(AddressOf lrValueTypeInstance.ValueType.Equals)
+                    lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
+                    lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
+                    lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
+
+                    lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
+
+                    lrValueTypeInstance.Name = lrConceptInstance.Symbol
+                    lrValueTypeInstance.X = lrConceptInstance.X
+                    lrValueTypeInstance.Y = lrConceptInstance.Y
+
+                    lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                Next
+
+                '=============================
+                'Map the EntityTypeInstances
+                '=============================
+                Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
+                    lrEntityTypeInstance = New FBM.EntityTypeInstance
+                    lrEntityTypeInstance.Model = arModel
+                    lrEntityTypeInstance.Page = lrPage
+                    lrEntityTypeInstance.Id = lrConceptInstance.Symbol
+                    lrEntityTypeInstance.EntityType.Id = lrEntityTypeInstance.Id
+                    lrEntityTypeInstance.EntityType = arModel.EntityType.Find(AddressOf lrEntityTypeInstance.EntityType.Equals)
+                    lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
+                    lrEntityTypeInstance.ReferenceMode = lrEntityTypeInstance.EntityType.ReferenceMode
+                    lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityTypeInstance.EntityType.IsObjectifyingEntityType
+                    lrEntityTypeInstance.IsAbsorbed = lrEntityTypeInstance.EntityType.IsAbsorbed
+                    lrEntityTypeInstance.IsDerived = lrEntityTypeInstance.EntityType.IsDerived
+                    lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
+                    lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
+
+                    If lrEntityTypeInstance.EntityType.ReferenceModeValueType Is Nothing Then
+                        lrEntityTypeInstance.ReferenceModeValueType = Nothing
+                    Else
+                        lrEntityTypeInstance.ReferenceModeValueType = New FBM.ValueTypeInstance
+                        lrEntityTypeInstance.ReferenceModeValueType.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id
+                        lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(AddressOf lrEntityTypeInstance.ReferenceModeValueType.Equals)
+                    End If
+
+                    lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityTypeInstance.EntityType.PreferredIdentifierRCId
+
+                    lrEntityTypeInstance.X = lrConceptInstance.X
+                    lrEntityTypeInstance.Y = lrConceptInstance.Y
+
+                    lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+                Next
+
+                '===========================
+                'Map the FactTypeInstances
+                '===========================
+                Dim lrFactTypeInstance As FBM.FactTypeInstance
+                Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
+                Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
+                Dim lrFact As FBM.Fact
+
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
+                    lrFactTypeInstance = New FBM.FactTypeInstance
+
+                    Dim lrFactType As New FBM.FactType(arModel,
+                                                       lrConceptInstance.Symbol,
+                                                       True)
+
+                    lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
+
+                    lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True)
+                    lrFactTypeInstance.X = lrConceptInstance.X
+                    lrFactTypeInstance.Y = lrConceptInstance.Y
+                    lrFactTypeInstance.DBName = lrFactType.DBName
+
+                    If lrFactType.IsDerived Then
+                        lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
+                        If lrDerivationTextConceptInstance IsNot Nothing Then
+                            lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(lrPage.Model,
+                                                                                                           lrPage,
+                                                                                                           lrFactTypeInstance)
+                            lrFactTypeInstance.FactTypeDerivationText.X = lrDerivationTextConceptInstance.X
+                            lrFactTypeInstance.FactTypeDerivationText.Y = lrDerivationTextConceptInstance.Y
+                        End If
+                    End If
+
+                    lrFactTypeReadingConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
+                    If lrFactTypeReadingConceptInstance IsNot Nothing Then
+                        lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeReadingConceptInstance.X,
+                                                                                lrFactTypeReadingConceptInstance.Y)
+                    End If
+
+                    '----------------------------------------
+                    'Get the Facts for the FactTypeInstance
+                    '----------------------------------------
+                    Dim lrFactInstance As FBM.FactInstance
+                    Dim lrFactDataInstance As FBM.FactDataInstance
+                    For Each lrFact In lrFactType.Fact
+
+                        If IsSomething(arXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)) Then
+                            '----------------------------------
+                            'The Fact is included on the Page
+                            '----------------------------------
+                            lrFactInstance = lrFact.CloneInstance(lrPage)
+                            lrFactInstance.isDirty = True
+                            For Each lrFactDataInstance In lrFactInstance.Data
+                                lrFactDataInstance.isDirty = True
+                            Next
+                            lrFactTypeInstance.Fact.Add(lrFactInstance)
+                            lrFactTypeInstance.isDirty = True
+
+                            For Each lrFactDataInstance In lrFactInstance.Data
+
+                                Dim lrFactDataConceptInstance As New FBM.ConceptInstance
+                                lrFactDataConceptInstance.Symbol = lrFactDataInstance.Data
+                                lrFactDataConceptInstance.RoleId = lrFactDataInstance.Role.Id
+
+                                lrFactDataConceptInstance = arXMLPage.ConceptInstance.Find(AddressOf lrFactDataConceptInstance.EqualsBySymbolRoleId)
+
+                                If lrFactDataConceptInstance IsNot Nothing Then
+                                    lrFactDataInstance.X = lrFactDataConceptInstance.X
+                                    lrFactDataInstance.Y = lrFactDataConceptInstance.Y
+                                End If
+
+                            Next
+
+                        End If
+
+                    Next
+                Next
+
+                '===============================================================================================
+                'Populate RoleInstances that are (still) joined to Nothing
+                '===========================================================
+                Dim latType = {GetType(FBM.ValueTypeInstance),
+                                   GetType(FBM.EntityTypeInstance),
+                                   GetType(FBM.FactTypeInstance)}
+
+                Dim larRole = From Role In lrPage.RoleInstance
+                              Where Role.JoinedORMObject Is Nothing
+                              Select Role
+
+                Dim lrRoleInstance As FBM.RoleInstance
+
+                For Each lrRoleInstance In larRole
+                    Select Case lrRoleInstance.TypeOfJoin
+                        Case Is = pcenumRoleJoinType.FactType
+                            lrRoleInstance.JoinedORMObject = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsFactType.Id)
+                    End Select
+
+                Next
+
+                '=================================================================================
+                'Mat the SubtypeRelationships.
+                '=================================================================================
+
+                Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance
+                                                      Where FactType.IsSubtypeRelationshipFactType
+                                                      Select FactType
+
+                Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
+
+                For Each lrFactType In larSubtypeRelationshipFactTypes.ToArray
+                    lrEntityTypeInstance = New FBM.EntityTypeInstance
+                    lrEntityTypeInstance.Id = lrFactType.RoleGroup(0).JoinedORMObject.Id
+                    lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
+
+                    lrParentEntityTypeInstance = New FBM.EntityTypeInstance
+                    lrParentEntityTypeInstance.Id = lrFactType.RoleGroup(1).JoinedORMObject.Id
+                    lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals)
+
+                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
+                    lrSubtypeConstraint.EntityType = lrEntityTypeInstance.EntityType
+                    lrSubtypeConstraint.parentEntityType = lrParentEntityTypeInstance.EntityType
+
+                    lrSubtypeConstraint = lrSubtypeConstraint.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeConstraint.Equals)
+
+                    Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
+
+                    lrSubtypeConstraintInstance = lrSubtypeConstraint.CloneInstance(lrPage, True)
+
+                    lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeConstraintInstance)
+                Next
+
+                '===========================
+                'Map the RoleNameInstances
+                '===========================
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleName)
+
+                    lrRoleInstance = New FBM.RoleInstance
+                    lrRoleInstance.Id = lrConceptInstance.RoleId
+
+                    lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+
+                    lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+                    lrRoleInstance.RoleName.X = lrConceptInstance.X
+                    lrRoleInstance.RoleName.Y = lrConceptInstance.Y
+                Next
+
+                '=================================
+                'Map the RoleConstraintInstances
+                '=================================
+                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
+                    lrRoleConstraintInstance = New FBM.RoleConstraintInstance
+
+                    lrRoleConstraintInstance.Id = lrConceptInstance.Symbol
+
+                    If IsSomething(lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)) Then
+                        '-------------------------------------------------------------------
+                        'The RoleConstraintInstance has already been added to the Page.
+                        '  FactType.CloneInstance adds RoleConstraintInstances to the Page
+                        '-------------------------------------------------------------------
+                    Else
+                        Dim lrRoleConstraint As New FBM.RoleConstraint
+                        lrRoleConstraint.Id = lrRoleConstraintInstance.Id
+
+                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+
+                        Select Case lrRoleConstraint.RoleConstraintType
+                            Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
+                            Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+                            Case Else
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                        End Select
+
+                        lrRoleConstraintInstance.X = lrConceptInstance.X
+                        lrRoleConstraintInstance.Y = lrConceptInstance.Y
+
+                        lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                    End If
+                Next
+
+                '============================
+                'Map the ModelNoteInstances
+                '============================
+                Dim lrModelNoteInstance As FBM.ModelNoteInstance
+
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ModelNote)
+                    lrModelNoteInstance = New FBM.ModelNoteInstance
+
+                    Dim lrModelNote As New FBM.ModelNote
+                    lrModelNote.Id = lrConceptInstance.Symbol
+
+                    lrModelNote = arModel.ModelNote.Find(AddressOf lrModelNote.Equals)
+
+                    lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
+                Next
+
+                Return lrPage
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+        End Function
+
         Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType) 'As List(Of FBM.Fact)
 
             Dim lrDictionaryEntry As New FBM.DictionaryEntry
@@ -1210,22 +1234,22 @@ Namespace XMLModel
 
             Try
 
+                Dim lsFactTypeId As String = arFactType.Id
                 Dim lrXMLFact As XMLModel.Fact
                 Dim lrXMLFactData As XMLModel.FactData
-                Dim lrXMLFactType As New XMLModel.FactType
+                Dim lrXMLFactType As XMLModel.FactType
 
-                lrXMLFactType.Id = arFactType.Id
-                lrXMLFactType = Me.ORMModel.FactTypes.Find(AddressOf lrXMLFactType.Equals)
+                lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
 
                 For Each lrXMLFact In lrXMLFactType.Facts
 
                     lrFact = New FBM.Fact(lrXMLFact.Id, arFactType)
                     lrFact.FactType.isDirty = True
                     lrFact.isDirty = True
-                    lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, _
-                                                                lrFact.Id, _
-                                                                pcenumConceptType.Fact, _
-                                                                , _
+                    lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model,
+                                                                lrFact.Id,
+                                                                pcenumConceptType.Fact,
+                                                                ,
                                                                 , True
                                                                 )
 
@@ -1300,116 +1324,125 @@ Namespace XMLModel
         Public Sub GetFactTypeDetails(ByRef arFactType As FBM.FactType)
 
             Dim lsMessage As String = ""
-            Dim lrXMLRole As XMLModel.Role
-            Dim lrRole As FBM.Role
-            Dim lrXMLFactType As New XMLModel.FactType
 
-            lrXMLFactType.Id = arFactType.Id
-            lrXMLFactType.GUID = arFactType.GUID
-            lrXMLFactType = Me.ORMModel.FactTypes.Find(AddressOf lrXMLFactType.Equals)
+            Try
+                Dim lsFactTypeId As String = arFactType.Id
+                Dim lrXMLRole As XMLModel.Role
+                Dim lrRole As FBM.Role
+                Dim lrXMLFactType As XMLModel.FactType
 
-            'arFactType.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
-            'arFactType.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
-            arFactType.IsObjectified = lrXMLFactType.IsObjectified
-            'arFactType.IsCoreFactType = CBool(lREcordset("IsCoreFactType").Value)
-            arFactType.IsPreferredReferenceMode = lrXMLFactType.IsPreferredReferenceSchemeFT
-            arFactType.IsSubtypeRelationshipFactType = lrXMLFactType.IsSubtypeRelationshipFactType
-            arFactType.IsDerived = lrXMLFactType.IsDerived
-            arFactType.IsStored = lrXMLFactType.IsStored
-            arFactType.DerivationText = lrXMLFactType.DerivationText
-            arFactType.IsLinkFactType = lrXMLFactType.IsLinkFactType
-            arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = lrXMLFactType.LinkFactTypeRoleId)
-            arFactType.IsMDAModelElement = lrXMLFactType.IsMDAModelElement
-            arFactType.IsSubtypeStateControlling = lrXMLFactType.IsSubtypeStateControlling
-            arFactType.StoreFactCoordinates = lrXMLFactType.StoreFactCoordinates
-            arFactType.DBName = lrXMLFactType.DBName
+                lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
 
-            If lrXMLFactType.ObjectifyingEntityTypeId = "" Then
-                arFactType.ObjectifyingEntityType = Nothing
-            Else
-                Dim lsEntityTypeId As String = ""
-                lsEntityTypeId = lrXMLFactType.ObjectifyingEntityTypeId
-                arFactType.ObjectifyingEntityType = New FBM.EntityType(arFactType.Model, pcenumLanguage.ORMModel, lsEntityTypeId, Nothing, True)
-                arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(AddressOf arFactType.ObjectifyingEntityType.Equals)
-                arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
-                arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                'arFactType.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
+                'arFactType.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
+                arFactType.IsObjectified = lrXMLFactType.IsObjectified
+                'arFactType.IsCoreFactType = CBool(lREcordset("IsCoreFactType").Value)
+                arFactType.IsPreferredReferenceMode = lrXMLFactType.IsPreferredReferenceSchemeFT
+                arFactType.IsSubtypeRelationshipFactType = lrXMLFactType.IsSubtypeRelationshipFactType
+                arFactType.IsDerived = lrXMLFactType.IsDerived
+                arFactType.IsStored = lrXMLFactType.IsStored
+                arFactType.DerivationText = lrXMLFactType.DerivationText
+                arFactType.IsLinkFactType = lrXMLFactType.IsLinkFactType
+                arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = lrXMLFactType.LinkFactTypeRoleId)
+                arFactType.IsMDAModelElement = lrXMLFactType.IsMDAModelElement
+                arFactType.IsSubtypeStateControlling = lrXMLFactType.IsSubtypeStateControlling
+                arFactType.StoreFactCoordinates = lrXMLFactType.StoreFactCoordinates
+                arFactType.DBName = lrXMLFactType.DBName
 
-                If IsSomething(arFactType.ObjectifyingEntityType) Then
-                    '---------------------------------------------
-                    'Okay, have found the ObjectifyingEntityType
-                    '---------------------------------------------
+                If lrXMLFactType.ObjectifyingEntityTypeId = "" Then
+                    arFactType.ObjectifyingEntityType = Nothing
                 Else
-                    lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                    lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
-                    lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
-                    lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
-                    Throw New Exception(lsMessage)
-                End If
-            End If
+                    Dim lsEntityTypeId As String = ""
+                    lsEntityTypeId = lrXMLFactType.ObjectifyingEntityTypeId
+                    arFactType.ObjectifyingEntityType = New FBM.EntityType(arFactType.Model, pcenumLanguage.ORMModel, lsEntityTypeId, Nothing, True)
+                    arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(AddressOf arFactType.ObjectifyingEntityType.Equals)
+                    arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                    arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
+                    arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
 
-            '-----------------------------------------------------
-            'Get the Roles within the RoleGroup for the FactType
-            '-----------------------------------------------------
-            For Each lrXMLRole In lrXMLFactType.RoleGroup
-
-                lrRole = New FBM.Role
-                lrRole.Model = arFactType.Model
-                lrRole.FactType = arFactType
-                lrRole.Id = lrXMLRole.Id
-                lrRole.Name = lrXMLRole.Name
-                lrRole.SequenceNr = lrXMLRole.SequenceNr
-                lrRole.Mandatory = lrXMLRole.Mandatory
-                lrRole.JoinedORMObject = New FBM.ModelObject
-                lrRole.JoinedORMObject.Id = lrXMLRole.JoinedObjectTypeId
-
-                If IsSomething(arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                    lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                ElseIf IsSomething(arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                    lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                Else
-                    lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    If lrRole.JoinedORMObject Is Nothing Then
-                        lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
-                        Me.GetFactTypeDetails(lrRole.JoinsFactType)
+                    If IsSomething(arFactType.ObjectifyingEntityType) Then
+                        '---------------------------------------------
+                        'Okay, have found the ObjectifyingEntityType
+                        '---------------------------------------------
+                    Else
+                        lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
+                        lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                        lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
+                        lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+                        Throw New Exception(lsMessage)
                     End If
                 End If
 
-                '--------------------------------------------------
-                'Add the Role to the Model (list of Role) as well
-                '--------------------------------------------------
-                arFactType.Model.Role.Add(lrRole)
+                '-----------------------------------------------------
+                'Get the Roles within the RoleGroup for the FactType
+                '-----------------------------------------------------
+                For Each lrXMLRole In lrXMLFactType.RoleGroup
 
-                arFactType.RoleGroup.Add(lrRole)
-            Next
+                    lrRole = New FBM.Role
+                    lrRole.Model = arFactType.Model
+                    lrRole.FactType = arFactType
+                    lrRole.Id = lrXMLRole.Id
+                    lrRole.Name = lrXMLRole.Name
+                    lrRole.SequenceNr = lrXMLRole.SequenceNr
+                    lrRole.Mandatory = lrXMLRole.Mandatory
+                    lrRole.JoinedORMObject = New FBM.ModelObject
+                    lrRole.JoinedORMObject.Id = lrXMLRole.JoinedObjectTypeId
 
-            '-------------------------------------------
-            'Get the FactTypeReadings for the FactType
-            '-------------------------------------------
-            arFactType.FactTypeReading = Me.GetFactTypeReadingsForFactType(arFactType)
+                    If IsSomething(arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                        lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    ElseIf IsSomething(arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                        lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    Else
+                        lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                        If lrRole.JoinedORMObject Is Nothing Then
+                            lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
+                            Me.GetFactTypeDetails(lrRole.JoinsFactType)
+                        End If
+                    End If
 
-            '-------------------------------------------
-            'Get the Facts (FactData) for the FactType
-            '-------------------------------------------
-            Call Me.GetFactsForFactType(arFactType)
+                    '--------------------------------------------------
+                    'Add the Role to the Model (list of Role) as well
+                    '--------------------------------------------------
+                    arFactType.Model.Role.Add(lrRole)
 
-            '------------------------------------------------
-            'Link to the Concept within the ModelDictionary
-            '------------------------------------------------
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model,
-                                                             arFactType.Id,
-                                                             pcenumConceptType.FactType,
-                                                             arFactType.ShortDescription,
-                                                             arFactType.LongDescription,
-                                                             True,
-                                                             True,
-                                                             arFactType.DBName)
+                    arFactType.RoleGroup.Add(lrRole)
+                Next
 
-            lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True) '20220117-VM-Was this. DBName wasn't working.
+                '-------------------------------------------
+                'Get the FactTypeReadings for the FactType
+                '-------------------------------------------
+                arFactType.FactTypeReading = Me.GetFactTypeReadingsForFactType(arFactType)
 
-            arFactType.Concept = lrDictionaryEntry.Concept
+                '-------------------------------------------
+                'Get the Facts (FactData) for the FactType
+                '-------------------------------------------
+                Call Me.GetFactsForFactType(arFactType)
 
-            Call arFactType.Model.AddFactType(arFactType, False, False, Nothing)
+                '------------------------------------------------
+                'Link to the Concept within the ModelDictionary
+                '------------------------------------------------
+                Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model,
+                                                                 arFactType.Id,
+                                                                 pcenumConceptType.FactType,
+                                                                 arFactType.ShortDescription,
+                                                                 arFactType.LongDescription,
+                                                                 True,
+                                                                 True,
+                                                                 arFactType.DBName)
+
+                lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True) '20220117-VM-Was this. DBName wasn't working.
+
+                arFactType.Concept = lrDictionaryEntry.Concept
+
+                Call arFactType.Model.AddFactType(arFactType, False, False, Nothing)
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

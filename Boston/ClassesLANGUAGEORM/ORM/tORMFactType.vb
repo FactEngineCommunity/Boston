@@ -356,21 +356,31 @@ Namespace FBM
 
         Public Sub New(ByRef arModel As FBM.Model, ByVal asFactTypeName As String, ByVal abUseFactTypeNameAsId As Boolean)
 
-            Me.Model = arModel
-            Me.ConceptType = pcenumConceptType.FactType
-            If abUseFactTypeNameAsId Then
-                Me.Id = Trim(asFactTypeName)
-            Else
-                Me.Id = System.Guid.NewGuid.ToString()
-            End If
+            Try
+                Me.Model = arModel
+                Me.ConceptType = pcenumConceptType.FactType
+                If abUseFactTypeNameAsId Then
+                    Me.Id = Trim(asFactTypeName)
+                Else
+                    Me.Id = System.Guid.NewGuid.ToString()
+                End If
 
-            If IsSomething(asFactTypeName) Then
-                Me.Name = asFactTypeName
-            End If
+                If IsSomething(asFactTypeName) Then
+                    Me.Name = asFactTypeName
+                End If
 
-            Me.Symbol = Me.Id
+                Me.Symbol = Me.Id
 
-            Me.Concept = New FBM.Concept(Me.Symbol)
+                Me.Concept = New FBM.Concept(Me.Symbol)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -378,12 +388,20 @@ Namespace FBM
 
             Call Me.New()
 
-            Me.Model = arModel
-            Me.Id = as_FactTypeId
-            Me.Name = asFactTypeName
+            Try
+                Me.Model = arModel
+                Me.Id = as_FactTypeId
+                Me.Name = asFactTypeName
 
-            Me.Symbol = Me.Id
+                Me.Symbol = Me.Id
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Shadows Function Equals(ByVal other As FBM.FactType) As Boolean Implements System.IEquatable(Of FBM.FactType).Equals

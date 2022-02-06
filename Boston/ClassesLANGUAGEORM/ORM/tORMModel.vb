@@ -1766,124 +1766,134 @@ Namespace FBM
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
-            '------------------------------------------------------------------------------------------------
-            'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
-            '------------------------------------------------------------------------------------------------
-            Dim asSymbol As String = arFactType.Id
-            lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType,,,,, arFactType.DBName), , abMakeModelDirty,,,, True,)
+            Try
+                '------------------------------------------------------------------------------------------------
+                'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
+                '------------------------------------------------------------------------------------------------
+                Dim asSymbol As String = arFactType.Id
+                lrDictionaryEntry = Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arFactType.Id, pcenumConceptType.FactType,,,,, arFactType.DBName), , abMakeModelDirty,,,, True,)
 
-            arFactType.Concept = lrDictionaryEntry.Concept
-            arFactType.ShortDescription = lrDictionaryEntry.ShortDescription
-            arFactType.LongDescription = lrDictionaryEntry.LongDescription
+                arFactType.Concept = lrDictionaryEntry.Concept
+                arFactType.ShortDescription = lrDictionaryEntry.ShortDescription
+                arFactType.LongDescription = lrDictionaryEntry.LongDescription
 
-            '---------------------------------------------------------------------------------------------------------
-            'Add the FactType into the list of FactTypes for the Model if it does not already exist in the list.
-            '---------------------------------------------------------------------------------------------------------
-            If Me.FactType.Exists(AddressOf arFactType.Equals) Then
-                '-------------------------------------------------------------------------
-                'The FactType already exists in the list of FactTypes for the Model.
-                '-------------------------------------------------------------------------
-            Else
-                lrDictionaryEntry.AddConceptType(pcenumConceptType.FactType)
-                'lrDictionaryEntry.isFactType = True
-                'lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.FactType)
+                '---------------------------------------------------------------------------------------------------------
+                'Add the FactType into the list of FactTypes for the Model if it does not already exist in the list.
+                '---------------------------------------------------------------------------------------------------------
+                If Me.FactType.Exists(AddressOf arFactType.Equals) Then
+                    '-------------------------------------------------------------------------
+                    'The FactType already exists in the list of FactTypes for the Model.
+                    '-------------------------------------------------------------------------
+                Else
+                    lrDictionaryEntry.AddConceptType(pcenumConceptType.FactType)
+                    'lrDictionaryEntry.isFactType = True
+                    'lrDictionaryEntry.Realisations.AddUnique(pcenumConceptType.FactType)
 
-                Me.FactType.Add(arFactType)
+                    Me.FactType.Add(arFactType)
 
-                Dim lrRole As FBM.Role
-                For Each lrRole In arFactType.RoleGroup
-                    Me.Role.AddUnique(lrRole)
-                Next
-
-                If abMakeModelDirty Then
-                    Me.MakeDirty()
-                End If
-
-                '=====================================================================================
-                'Add the FactType to the SharedModel
-                Dim lrInterfaceFactType As New Viev.FBM.Interface.FactType
-                lrInterfaceFactType.Id = arFactType.Id
-                lrInterfaceFactType.Name = arFactType.Name
-                lrInterfaceFactType.IsPreferredReferenceSchemeFT = arFactType.IsPreferredReferenceMode
-                lrInterfaceFactType.IsSubtypeRelationshipFactType = arFactType.IsSubtypeRelationshipFactType
-
-                lrInterfaceFactType.ShortDescription = arFactType.ShortDescription
-                lrInterfaceFactType.LongDescription = arFactType.LongDescription
-                lrInterfaceFactType.IsIndependent = arFactType.IsIndependent
-                lrInterfaceFactType.IsObjectified = arFactType.IsObjectified
-                lrInterfaceFactType.IsStored = arFactType.IsStored
-                lrInterfaceFactType.IsSubtypeRelationshipFactType = arFactType.IsSubtypeRelationshipFactType
-                lrInterfaceFactType.DerivationText = arFactType.DerivationText
-                lrInterfaceFactType.IsDerived = arFactType.IsDerived
-                lrInterfaceFactType.IsLinkFactType = arFactType.IsLinkFactType
-                lrInterfaceFactType.IsMDAModelElement = arFactType.IsMDAModelElement
-                lrInterfaceFactType.ShowFactTypeName = arFactType.ShowFactTypeName
-
-                If arFactType.LinkFactTypeRole IsNot Nothing Then
-                    lrInterfaceFactType.LinkFactTypeRoleId = arFactType.LinkFactTypeRole.Id
-                End If
-
-                Dim lrInterfaceRole As Viev.FBM.Interface.Role
-                For Each lrRole In arFactType.RoleGroup
-                    lrInterfaceRole = New Viev.FBM.Interface.Role
-                    lrInterfaceRole.Id = lrRole.Id
-                    lrInterfaceRole.Name = lrRole.Name
-                    If lrRole.JoinedORMObject IsNot Nothing Then
-                        lrInterfaceRole.JoinedObjectTypeId = lrRole.JoinedORMObject.Id
-                    Else
-                        lrInterfaceRole.JoinedObjectTypeId = Nothing
-                    End If
-                    lrInterfaceRole.SequenceNr = lrRole.SequenceNr
-                    lrInterfaceRole.Mandatory = lrRole.Mandatory
-
-                    lrInterfaceFactType.RoleGroup.Add(lrInterfaceRole)
-                Next
-                '-------------------------------------------------------------------------------------
-                'Call the Interface method that adds the FactType to the SharedModel.
-                '  We use a method because it triggers an Event that the Plugin may use.
-                prApplication.PluginInterface.InterfaceAddFactType(lrInterfaceFactType)
-                '=====================================================================================
-                'Broadcast the addition to the DuplexServer
-                If My.Settings.UseClientServer _
-                    And My.Settings.InitialiseClient _
-                    And abBroadcastInterfaceEvent Then
-
-                    Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                    lrInterfaceModel.ModelId = Me.ModelId
-                    lrInterfaceModel.Name = Me.Name
-                    lrInterfaceModel.Namespace = prApplication.WorkingNamespace.Id
-                    lrInterfaceModel.ProjectId = prApplication.WorkingProject.Id
-                    lrInterfaceModel.FactType.Add(lrInterfaceFactType)
-
-                    If arConceptInstance IsNot Nothing Then
-                        Dim lrInterfacePage As New Viev.FBM.Interface.Page
-                        lrInterfacePage.Id = arConceptInstance.PageId
-
-                        Dim lrInterfaceConceptInstance As New Viev.FBM.Interface.ConceptInstance
-                        lrInterfaceConceptInstance.ModelElementId = arFactType.Id
-                        lrInterfaceConceptInstance.X = arConceptInstance.X
-                        lrInterfaceConceptInstance.Y = arConceptInstance.Y
-
-                        lrInterfacePage.ConceptInstance = lrInterfaceConceptInstance
-                        lrInterfaceModel.Page = lrInterfacePage
-                    End If
-
-                    Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                    lrBroadcast.Model = lrInterfaceModel
-                    Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddFactType, lrBroadcast)
-
-                    '------------------------------------------------------------------------------------------------------------------
-                    'If the FactType already has FactTypeReadings, broadcast those as well.
-                    For Each lrFactTypeReading In arFactType.FactTypeReading
-                        Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelAddFactTypeReading,
-                                                                            lrFactTypeReading,
-                                                                            Nothing)
+                    Dim lrRole As FBM.Role
+                    For Each lrRole In arFactType.RoleGroup
+                        Me.Role.AddUnique(lrRole)
                     Next
 
-                End If
-                '=====================================================================================
+                    If abMakeModelDirty Then
+                        Me.MakeDirty()
+                    End If
 
-            End If
+                    '=====================================================================================
+                    'Add the FactType to the SharedModel
+                    Dim lrInterfaceFactType As New Viev.FBM.Interface.FactType
+                    lrInterfaceFactType.Id = arFactType.Id
+                    lrInterfaceFactType.Name = arFactType.Name
+                    lrInterfaceFactType.IsPreferredReferenceSchemeFT = arFactType.IsPreferredReferenceMode
+                    lrInterfaceFactType.IsSubtypeRelationshipFactType = arFactType.IsSubtypeRelationshipFactType
+
+                    lrInterfaceFactType.ShortDescription = arFactType.ShortDescription
+                    lrInterfaceFactType.LongDescription = arFactType.LongDescription
+                    lrInterfaceFactType.IsIndependent = arFactType.IsIndependent
+                    lrInterfaceFactType.IsObjectified = arFactType.IsObjectified
+                    lrInterfaceFactType.IsStored = arFactType.IsStored
+                    lrInterfaceFactType.IsSubtypeRelationshipFactType = arFactType.IsSubtypeRelationshipFactType
+                    lrInterfaceFactType.DerivationText = arFactType.DerivationText
+                    lrInterfaceFactType.IsDerived = arFactType.IsDerived
+                    lrInterfaceFactType.IsLinkFactType = arFactType.IsLinkFactType
+                    lrInterfaceFactType.IsMDAModelElement = arFactType.IsMDAModelElement
+                    lrInterfaceFactType.ShowFactTypeName = arFactType.ShowFactTypeName
+
+                    If arFactType.LinkFactTypeRole IsNot Nothing Then
+                        lrInterfaceFactType.LinkFactTypeRoleId = arFactType.LinkFactTypeRole.Id
+                    End If
+
+                    Dim lrInterfaceRole As Viev.FBM.Interface.Role
+                    For Each lrRole In arFactType.RoleGroup
+                        lrInterfaceRole = New Viev.FBM.Interface.Role
+                        lrInterfaceRole.Id = lrRole.Id
+                        lrInterfaceRole.Name = lrRole.Name
+                        If lrRole.JoinedORMObject IsNot Nothing Then
+                            lrInterfaceRole.JoinedObjectTypeId = lrRole.JoinedORMObject.Id
+                        Else
+                            lrInterfaceRole.JoinedObjectTypeId = Nothing
+                        End If
+                        lrInterfaceRole.SequenceNr = lrRole.SequenceNr
+                        lrInterfaceRole.Mandatory = lrRole.Mandatory
+
+                        lrInterfaceFactType.RoleGroup.Add(lrInterfaceRole)
+                    Next
+                    '-------------------------------------------------------------------------------------
+                    'Call the Interface method that adds the FactType to the SharedModel.
+                    '  We use a method because it triggers an Event that the Plugin may use.
+                    prApplication.PluginInterface.InterfaceAddFactType(lrInterfaceFactType)
+                    '=====================================================================================
+                    'Broadcast the addition to the DuplexServer
+                    If My.Settings.UseClientServer _
+                        And My.Settings.InitialiseClient _
+                        And abBroadcastInterfaceEvent Then
+
+                        Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                        lrInterfaceModel.ModelId = Me.ModelId
+                        lrInterfaceModel.Name = Me.Name
+                        lrInterfaceModel.Namespace = prApplication.WorkingNamespace.Id
+                        lrInterfaceModel.ProjectId = prApplication.WorkingProject.Id
+                        lrInterfaceModel.FactType.Add(lrInterfaceFactType)
+
+                        If arConceptInstance IsNot Nothing Then
+                            Dim lrInterfacePage As New Viev.FBM.Interface.Page
+                            lrInterfacePage.Id = arConceptInstance.PageId
+
+                            Dim lrInterfaceConceptInstance As New Viev.FBM.Interface.ConceptInstance
+                            lrInterfaceConceptInstance.ModelElementId = arFactType.Id
+                            lrInterfaceConceptInstance.X = arConceptInstance.X
+                            lrInterfaceConceptInstance.Y = arConceptInstance.Y
+
+                            lrInterfacePage.ConceptInstance = lrInterfaceConceptInstance
+                            lrInterfaceModel.Page = lrInterfacePage
+                        End If
+
+                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                        lrBroadcast.Model = lrInterfaceModel
+                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddFactType, lrBroadcast)
+
+                        '------------------------------------------------------------------------------------------------------------------
+                        'If the FactType already has FactTypeReadings, broadcast those as well.
+                        For Each lrFactTypeReading In arFactType.FactTypeReading
+                            Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelAddFactTypeReading,
+                                                                                lrFactTypeReading,
+                                                                                Nothing)
+                        Next
+
+                    End If
+                    '=====================================================================================
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         ''' <summary>
@@ -5246,7 +5256,7 @@ Namespace FBM
                 xml = XDocument.Load(lsFileLocationName)
 
                 Richmond.WriteToStatusBar("Loading model.", True)
-                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(60)
 
                 lsXSDVersionNr = xml.<Model>.@XSDVersionNr
                 '=====================================================================================================
@@ -5309,7 +5319,12 @@ Namespace FBM
                         lrXMLModel.MapToFBMModel(Me)
                 End Select
 
-                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70)
+                Me.Page.Select(Function(x)
+                                   x.IsDirty = False
+                                   Return x
+                               End Function).ToList
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
 
                 '================================================================================================================
                 'RDS

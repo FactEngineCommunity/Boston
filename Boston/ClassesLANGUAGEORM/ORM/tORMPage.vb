@@ -47,8 +47,16 @@ Namespace FBM
         <XmlIgnore()>
         Public UserRejectedSave As Boolean = False
 
+        Private _IsDirty As Boolean = False
         <XmlIgnore()>
-        Public IsDirty As Boolean = False
+        Public Property IsDirty As Boolean
+            Get
+                Return Me._IsDirty
+            End Get
+            Set(value As Boolean)
+                Me._IsDirty = value
+            End Set
+        End Property
 
         <XmlIgnore()>
         Public Loaded As Boolean = False
@@ -2639,6 +2647,12 @@ Namespace FBM
 
                 If Me.IsDirty = False Then Exit Sub
 
+                'CMML
+                Call Me.performCMMLPreSaveProcessing()
+
+                'No need for further processing if Model is stored to XML
+                If Me.Model.StoreAsXML Then Exit Sub
+
                 '----------------------------------------------
                 'First, check to see if the Page itself exists
                 '  in the database/Save the Model
@@ -2657,9 +2671,6 @@ Namespace FBM
                     End If
 
                 End If
-
-                'CMML
-                Call Me.performCMMLPreSaveProcessing()
 
                 '------------------------------------
                 'Save EntityTypeInstance objects

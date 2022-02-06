@@ -210,17 +210,26 @@ Namespace FBM
                        Optional ByRef arFact As FBM.Fact = Nothing,
                        Optional ByRef abIsDirty As Boolean = True)
 
-            Me.ConceptType = pcenumConceptType.RoleData
-            Me.Model = arRole.Model
-            Me.Role = arRole
-            Me.Concept = arConcept
-            Me.Symbol = arConcept.Symbol
-            Me.isDirty = abIsDirty
+            Try
+                Me.ConceptType = pcenumConceptType.RoleData
+                Me.Model = arRole.Model
+                Me.Role = arRole
+                Me.Concept = arConcept
+                Me.Symbol = arConcept.Symbol
+                Me.isDirty = abIsDirty
 
-            If arFact IsNot Nothing Then
-                Me.Fact = arFact
-                Me.FactType = arFact.FactType
-            End If
+                If arFact IsNot Nothing Then
+                    Me.Fact = arFact
+                    Me.FactType = arFact.FactType
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
