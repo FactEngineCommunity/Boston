@@ -160,7 +160,6 @@ Public Class frmToolboxEnterpriseExplorer
             larModel = TableModel.GetModels(asCreatedByUserId, asNamespaceId)
             prApplication.Models = larModel
 
-
             Dim lasExcludedModelIds() As String = {}
 
             If Not My.Settings.DisplayLanguageModel Then

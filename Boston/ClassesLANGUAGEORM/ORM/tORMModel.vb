@@ -5422,6 +5422,7 @@ Namespace FBM
                                                loPage.Attribute("Name").Value,
                                                Richmond.GetEnumFromDescriptionAttribute(Of pcenumLanguage)(loPage.Attribute("Language").Value)
                                                )
+                    lrPage.IsDirty = False
                     Me.Page.Add(lrPage)
                 Next
 
