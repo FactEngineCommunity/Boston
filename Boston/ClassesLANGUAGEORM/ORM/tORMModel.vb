@@ -3908,6 +3908,11 @@ Namespace FBM
                     loXMLSerialiser.Serialize(loStreamWriter, lrExportModel)
                     loStreamWriter.Close()
 
+                    Me.Page.Select(Function(x)
+                                       x.IsDirty = False
+                                       Return x
+                                   End Function).ToList
+
                 End If 'IsSerialisable
             Catch ex As Exception
                 Dim lsMessage As String
