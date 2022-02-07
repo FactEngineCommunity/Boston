@@ -977,8 +977,10 @@ Namespace FBM
                     Me.FactTypeName.Shape.Resize(StringSize.Width + 4, StringSize.Height)
                 End If
 
-                If Me.FactTypeReadingShape.Shape IsNot Nothing Then
-                    'Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                If Me.FactTypeReadingShape IsNot Nothing Then
+                    If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                        'Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                    End If
                 End If
 
                 For Each lrRoleInstance In Me.RoleGroup

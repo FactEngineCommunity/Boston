@@ -54,6 +54,7 @@ Partial Class frmCRUDModel
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
+        Me.CheckBoxSaveToXML = New System.Windows.Forms.CheckBox()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
         Me.TabPageReverseEngineering = New System.Windows.Forms.TabPage()
         Me.TabPageConnection = New System.Windows.Forms.TabPage()
@@ -72,7 +73,6 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
-        Me.CheckBoxSaveToXML = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -407,6 +407,16 @@ Partial Class frmCRUDModel
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
         '
+        'CheckBoxSaveToXML
+        '
+        Me.CheckBoxSaveToXML.AutoSize = True
+        Me.CheckBoxSaveToXML.Location = New System.Drawing.Point(13, 91)
+        Me.CheckBoxSaveToXML.Name = "CheckBoxSaveToXML"
+        Me.CheckBoxSaveToXML.Size = New System.Drawing.Size(140, 17)
+        Me.CheckBoxSaveToXML.TabIndex = 9
+        Me.CheckBoxSaveToXML.Text = "Store as XML document"
+        Me.CheckBoxSaveToXML.UseVisualStyleBackColor = True
+        '
         'LabelPromptIsDatabaseSynchronised
         '
         Me.LabelPromptIsDatabaseSynchronised.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -578,16 +588,6 @@ Partial Class frmCRUDModel
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
-        '
-        'CheckBoxSaveToXML
-        '
-        Me.CheckBoxSaveToXML.AutoSize = True
-        Me.CheckBoxSaveToXML.Location = New System.Drawing.Point(13, 91)
-        Me.CheckBoxSaveToXML.Name = "CheckBoxSaveToXML"
-        Me.CheckBoxSaveToXML.Size = New System.Drawing.Size(138, 17)
-        Me.CheckBoxSaveToXML.TabIndex = 9
-        Me.CheckBoxSaveToXML.Text = "Save to XML document"
-        Me.CheckBoxSaveToXML.UseVisualStyleBackColor = True
         '
         'frmCRUDModel
         '

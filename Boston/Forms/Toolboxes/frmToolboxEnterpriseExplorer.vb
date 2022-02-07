@@ -842,7 +842,7 @@ Public Class frmToolboxEnterpriseExplorer
         Dim loObject As New Object
 
         Try
-            If IsSomething(Me.TreeView.SelectedNode) Then
+            If IsSomething(Me.TreeView.SelectedNode) Or e.Button = Windows.Forms.MouseButtons.Right Then
 
                 If e.Button = Windows.Forms.MouseButtons.Right Then
                     '---------------------------------
@@ -2396,13 +2396,13 @@ Public Class frmToolboxEnterpriseExplorer
         '  the FactType. In essense, NORMA has a Binary FactType refering to the Value Type and in Richmond
         '  only the Unary FactType (and singular Role) is required.
         '----------------------------------------------------------------------------------------------------------
-        Richmond.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes", True)
+        Richmond.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes", True, 96)
         Call lrNORMAFileLoader.GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(arModel)
 
         '-------------------------------------------------------
         'Get ModelObjectInstances by Page from the nORMa model
         '-------------------------------------------------------
-        Richmond.WriteToStatusBar("Loading Page Model Object Instances", True)
+        Richmond.WriteToStatusBar("Loading Page Model Object Instances", True, 97)
         Call lrNORMAFileLoader.LoadPageModelInstances(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------------------------------------------------------------------

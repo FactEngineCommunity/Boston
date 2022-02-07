@@ -189,10 +189,11 @@ Namespace FBM
 
             Catch ex As Exception
                 Dim lsMessage As String
-                lsMessage = "Error: FBM.RoleConstraintInstance.DisplayAndAssociate: " & ex.Message
-                lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace)
             End Try
 
         End Sub

@@ -1209,7 +1209,6 @@ Namespace NORMA
                 '-------------------------------------------------------------------------
                 'Create the list of Roles that are to be added to the new RoleConstraint
                 '-------------------------------------------------------------------------
-
                 If arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = loElement.Attribute("id").Value) Is Nothing Then
 
 
@@ -1247,17 +1246,17 @@ Namespace NORMA
                             'Create the RoleConstraint
                             '---------------------------
                             Dim lrRoleConstraint As FBM.RoleConstraint
-                            lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
-                                                                            larRoleList,
-                                                                            loElement.Attribute("Name").Value,,, False)
-                            lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.AddUnique(lrRoleConstraint)
-                            lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
-                            lrRoleConstraint.isDirty = True
-                            lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
-
-                            If abSuppressLinkFactTypeIUCs And lrRoleConstraint.Role(0).FactType.IsLinkFactType Then
+                            If abSuppressLinkFactTypeIUCs And larRoleList(0).FactType.IsLinkFactType Then
                                 'Ignore
                             Else
+                                lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                                                                            larRoleList,
+                                                                            loElement.Attribute("Name").Value,,, False)
+                                lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.AddUnique(lrRoleConstraint)
+                                lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
+                                lrRoleConstraint.isDirty = True
+                                lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id").Value
+
                                 arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing)
                             End If
                         End If

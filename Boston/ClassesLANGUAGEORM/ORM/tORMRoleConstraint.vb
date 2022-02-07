@@ -982,7 +982,35 @@ Namespace FBM
                                                 End Select
                                             End If
                                         Else
-                                            Return True
+                                            Dim lrModelElement As FBM.ModelObject = lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).JoinedORMObject
+                                            Select Case lrModelElement.ConceptType
+                                                Case Is = pcenumConceptType.ValueType
+                                                    Return True
+                                                Case Is = pcenumConceptType.EntityType
+                                                    Dim lrEntityType As FBM.EntityType = lrModelElement
+                                                    If lrEntityType.ConceptType = pcenumConceptType.EntityType _
+                                                        And lrEntityType.HasCompoundReferenceMode Then
+                                                        Return False 'Because implies more than one Column
+                                                    Else
+                                                        Return True
+                                                    End If
+                                                Case Is = pcenumConceptType.FactType
+                                                    Try
+                                                        Select Case lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns.Count
+                                                            Case Is = 0
+                                                                Throw New Exception("Other Role reference Fact Type with corresponding RDS table with no Primary Key Columns.")
+                                                            Case Is = 1
+                                                                Return True
+                                                            Case > 1
+                                                                Return False
+                                                        End Select
+                                                    Catch ex As Exception
+                                                        Throw New Exception("Other Role reference Fact Type with no corresponding Table or Primary Key.")
+                                                    End Try
+                                                Case Else
+                                                    Throw New Exception("Role doesn't reference an EntityType, ValueType or FactType.")
+                                            End Select
+
                                         End If
                                     ElseIf lrRole.FactType.Arity = 1 Then
                                         'Is Unary Role, so must be a Property
@@ -1622,9 +1650,13 @@ Namespace FBM
                 Dim lrRoleInstance As FBM.RoleInstance
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                 For Each lrRole In Me.Role
-                    lrRoleInstance = New FBM.RoleInstance(.Model, arPage)
-                    lrRoleInstance.Id = lrRole.Id
-                    lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                    lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
+                    If lrRoleInstance Is Nothing Then
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance
+                        lrFactTypeInstance = arPage.DropFactTypeAtPoint(lrRole.FactType, New PointF(0, 0), False,, False, False)
+                        lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
+                    End If
+
                     lrRoleConstraintInstance.Role.Add(lrRoleInstance)
 
                     '--------------------------------------------------------------------

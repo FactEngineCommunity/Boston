@@ -2096,7 +2096,7 @@ Namespace FBM
 
                     larRole.Clear()
                     larRole.Add(lrFactType.RoleGroup(0))
-                    lrFactType.CreateInternalUniquenessConstraint(larRole, False, False)
+                    lrFactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
 
                     larRole.Clear()
                     larRole.Add(lrFactType.RoleGroup(0))

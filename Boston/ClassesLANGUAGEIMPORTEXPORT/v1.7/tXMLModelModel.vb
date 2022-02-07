@@ -447,6 +447,7 @@ Namespace XMLModel
                     '  as ConceptInstances.
                     '--------------------------------------------------------------
                     For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+
                         lrConceptInstance = lrRoleConstraintInstance.CloneConceptInstance
                         '-------------------------------------
                         'Add the ConceptInstance to the Page
@@ -1111,6 +1112,7 @@ Namespace XMLModel
                 '===============================================================================================
                 'Populate RoleInstances that are (still) joined to Nothing
                 '===========================================================
+#Region "Populate RoleInstances that are (still) joined to Nothing"
                 Dim latType = {GetType(FBM.ValueTypeInstance),
                                    GetType(FBM.EntityTypeInstance),
                                    GetType(FBM.FactTypeInstance)}
@@ -1128,11 +1130,12 @@ Namespace XMLModel
                     End Select
 
                 Next
+#End Region
 
                 '=================================================================================
                 'Mat the SubtypeRelationships.
                 '=================================================================================
-
+#Region "SubtypeRelationships"
                 Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance
                                                       Where FactType.IsSubtypeRelationshipFactType
                                                       Select FactType
@@ -1151,6 +1154,7 @@ Namespace XMLModel
 
                     lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeConstraintInstance)
                 Next
+#End Region
 
                 '===========================
                 'Map the RoleNameInstances
@@ -1193,6 +1197,7 @@ Namespace XMLModel
                         lrRoleConstraintInstance.Y = lrConceptInstance.Y
 
                         lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+
                     End If
                 Next
 

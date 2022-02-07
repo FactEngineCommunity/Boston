@@ -702,7 +702,6 @@ Namespace FBM
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
             Try
-
                 '------------------------------------------------------------------------------------------------
                 'Add a new DictionaryEntry to the ModelDictionary if the DictionaryEntry doesn't already exist.
                 '------------------------------------------------------------------------------------------------                
