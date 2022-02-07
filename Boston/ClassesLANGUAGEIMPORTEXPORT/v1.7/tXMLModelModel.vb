@@ -1,5 +1,6 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Threading.Tasks
 
 Namespace XMLModel
 
@@ -317,11 +318,13 @@ Namespace XMLModel
                     lrXMLModelNote = New XMLModel.ModelNote
 
                     lrXMLModelNote.Id = lrModelNote.Id
-                    lrXMLModelNote.Note = lrModelNote.LongDescription
+                    lrXMLModelNote.Note = lrModelNote.Text
                     lrXMLModelNote.IsMDAModelElement = lrModelNote.IsMDAModelElement
+                    If lrModelNote.JoinedObjectType IsNot Nothing Then
+                        lrXMLModelNote.JoinedObjectTypeId = lrModelNote.JoinedObjectType.Id
+                    End If
 
                     Me.ORMModel.ModelNotes.Add(lrXMLModelNote)
-
                 Next
 
                 '================================
@@ -346,6 +349,7 @@ Namespace XMLModel
                     '           - RoleConstraint(s)
                     '           - Fact(s)
                     '           - Value(s)
+                    '           - ModelNotes
                     '
                     ' Nothing else is required to draw a ConceptualModel.
                     ' Different types of ConceptualModel require different types of Concepts
@@ -373,6 +377,7 @@ Namespace XMLModel
                     Dim lrFactInstance As FBM.FactInstance
                     Dim lrFactDataInstance As FBM.FactDataInstance
                     Dim lrRoleInstance As FBM.RoleInstance
+                    Dim lrModelNoteInstance As FBM.ModelNoteInstance
 
                     '--------------------------------------------------------------
                     'Establish the set of EntityTypeInstances that are on the Page
@@ -489,6 +494,17 @@ Namespace XMLModel
                         lrConceptInstance.Y = lrRoleInstance.RoleName.Y
                         lrConceptInstance.Visible = True
                         lrConceptInstance.Orientation = 0
+                        '-------------------------------------
+                        'Add the ConceptInstance to the Page
+                        '-------------------------------------
+                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                    Next
+
+                    '-----------------------------------------------
+                    'Model Notes
+                    '-----------------------------------------------
+                    For Each lrModelNoteInstance In lrPage.ModelNoteInstance
+                        lrConceptInstance = lrModelNoteInstance.CloneConceptInstance
                         '-------------------------------------
                         'Add the ConceptInstance to the Page
                         '-------------------------------------
@@ -843,30 +859,23 @@ Namespace XMLModel
                 Dim lrModelNote As FBM.ModelNote
 
                 For Each lrXMLModelNote In Me.ORMModel.ModelNotes
-                    lrModelNote = New FBM.ModelNote
+                    lrModelNote = New FBM.ModelNote(lrModel)
 
-                    lrModelNote.Model = lrModel
                     lrModelNote.Id = lrXMLModelNote.Id
-                    'lrModelNote.ShortDescription = Trim(Viev.NullVal(lRecordset("ShortDescription").Value, ""))
-                    'lrModelNote.LongDescription = Trim(Viev.NullVal(lRecordset("LongDescription").Value, ""))
-                    lrModelNote.ConceptType = pcenumConceptType.ModelNote
                     lrModelNote.Text = lrXMLModelNote.Note
                     lrModelNote.IsMDAModelElement = lrXMLModelNote.IsMDAModelElement
 
                     If lrXMLModelNote.JoinedObjectTypeId = "" Then
                         lrModelNote.JoinedObjectType = Nothing
                     Else
-                        lrModelNote.JoinedObjectType = New FBM.ModelObject
-                        lrModelNote.JoinedObjectType.Id = lrXMLModelNote.JoinedObjectTypeId
-                        If IsSomething(lrModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
-                            lrModelNote.JoinedObjectType = lrModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
-                        ElseIf IsSomething(lrModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
-                            lrModelNote.JoinedObjectType = lrModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
-                        ElseIf IsSomething(lrModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
-                            lrModelNote.JoinedObjectType = lrModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
+                        lrModelNote.JoinedObjectType = lrModel.EntityType.Find(Function(x) x.Id = lrXMLModelNote.JoinedObjectTypeId)
+                        If lrModelNote.JoinedObjectType Is Nothing Then
+                            lrModelNote.JoinedObjectType = lrModel.FactType.Find(Function(x) x.Id = lrXMLModelNote.JoinedObjectTypeId)
+                            If lrModelNote.JoinedObjectType Is Nothing Then
+                                lrModelNote.JoinedObjectType = lrModel.ValueType.Find(Function(x) x.Id = lrXMLModelNote.JoinedObjectTypeId)
+                            End If
                         End If
                     End If
-
                     lrModel.AddModelNote(lrModelNote, False)
                 Next
 
@@ -906,11 +915,10 @@ Namespace XMLModel
         Public Sub MapToFBMPages(ByRef arModel As FBM.Model)
 
             Dim lrPage As FBM.Page
-            'Dim lrXMLPage As XMLModel.Page            
+            'Dim lrXMLPage As XMLModel.Page
             Dim lrModel As FBM.Model = arModel
             Try
                 For Each lrXMLPage In Me.ORMDiagram
-
                     lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
                     If lrPage Is Nothing Then
                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
@@ -922,6 +930,21 @@ Namespace XMLModel
                     lrPage.IsDirty = True
                     lrModel.Page.AddUnique(lrPage)
                 Next 'XMLModel.Page
+
+                'Parallel.ForEach(Me.ORMDiagram,
+                '                 Sub(lrXMLPage As XMLModel.Page)
+                '                     lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
+                '                     If lrPage Is Nothing Then
+                '                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                '                     Else
+                '                         Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
+                '                     End If
+
+                '                     lrPage.Loaded = True
+                '                     lrPage.IsDirty = True
+                '                     lrModel.Page.AddUnique(lrPage)
+
+                '                 End Sub)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -1018,15 +1041,11 @@ Namespace XMLModel
                 Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
                 Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
                 Dim lrFact As FBM.Fact
+                Dim lrFactType As FBM.FactType
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
                     lrFactTypeInstance = New FBM.FactTypeInstance
-
-                    Dim lrFactType As New FBM.FactType(arModel,
-                                                       lrConceptInstance.Symbol,
-                                                       True)
-
-                    lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
+                    lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
                     lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True)
                     lrFactTypeInstance.X = lrConceptInstance.X
@@ -1119,21 +1138,12 @@ Namespace XMLModel
                                                       Select FactType
 
                 Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
+                Dim lrSubtypeConstraint As FBM.tSubtypeRelationship
+                For Each lrFactTypeInstance In larSubtypeRelationshipFactTypes.ToArray
+                    lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.RoleGroup(0).JoinedORMObject.Id)
+                    lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.RoleGroup(1).JoinedORMObject.Id)
 
-                For Each lrFactType In larSubtypeRelationshipFactTypes.ToArray
-                    lrEntityTypeInstance = New FBM.EntityTypeInstance
-                    lrEntityTypeInstance.Id = lrFactType.RoleGroup(0).JoinedORMObject.Id
-                    lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
-
-                    lrParentEntityTypeInstance = New FBM.EntityTypeInstance
-                    lrParentEntityTypeInstance.Id = lrFactType.RoleGroup(1).JoinedORMObject.Id
-                    lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals)
-
-                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
-                    lrSubtypeConstraint.EntityType = lrEntityTypeInstance.EntityType
-                    lrSubtypeConstraint.parentEntityType = lrParentEntityTypeInstance.EntityType
-
-                    lrSubtypeConstraint = lrSubtypeConstraint.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeConstraint.Equals)
+                    lrSubtypeConstraint = lrEntityTypeInstance.EntityType.SubtypeRelationship.Find(Function(x) x.EntityType.Id = lrEntityTypeInstance.EntityType.Id And x.parentEntityType.Id = lrParentEntityTypeInstance.EntityType.Id)
 
                     Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
 
@@ -1146,12 +1156,7 @@ Namespace XMLModel
                 'Map the RoleNameInstances
                 '===========================
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleName)
-
-                    lrRoleInstance = New FBM.RoleInstance
-                    lrRoleInstance.Id = lrConceptInstance.RoleId
-
-                    lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-
+                    lrRoleInstance = lrPage.RoleInstance.Find(Function(x) x.Id = lrConceptInstance.RoleId)
                     lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
                     lrRoleInstance.RoleName.X = lrConceptInstance.X
                     lrRoleInstance.RoleName.Y = lrConceptInstance.Y
@@ -1161,7 +1166,7 @@ Namespace XMLModel
                 'Map the RoleConstraintInstances
                 '=================================
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-
+                Dim lrRoleConstraint As FBM.RoleConstraint
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
                     lrRoleConstraintInstance = New FBM.RoleConstraintInstance
 
@@ -1173,10 +1178,7 @@ Namespace XMLModel
                         '  FactType.CloneInstance adds RoleConstraintInstances to the Page
                         '-------------------------------------------------------------------
                     Else
-                        Dim lrRoleConstraint As New FBM.RoleConstraint
-                        lrRoleConstraint.Id = lrRoleConstraintInstance.Id
-
-                        lrRoleConstraint = arModel.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
+                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrRoleConstraintInstance.Id)
 
                         Select Case lrRoleConstraint.RoleConstraintType
                             Case Is = pcenumRoleConstraintType.FrequencyConstraint
@@ -1198,16 +1200,13 @@ Namespace XMLModel
                 'Map the ModelNoteInstances
                 '============================
                 Dim lrModelNoteInstance As FBM.ModelNoteInstance
-
+                Dim lrModelNote As FBM.ModelNote
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ModelNote)
-                    lrModelNoteInstance = New FBM.ModelNoteInstance
-
-                    Dim lrModelNote As New FBM.ModelNote
-                    lrModelNote.Id = lrConceptInstance.Symbol
-
-                    lrModelNote = arModel.ModelNote.Find(AddressOf lrModelNote.Equals)
+                    lrModelNote = arModel.ModelNote.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
                     lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
+                    lrModelNoteInstance.X = lrConceptInstance.X
+                    lrModelNoteInstance.Y = lrConceptInstance.Y
                 Next
 
                 Return lrPage

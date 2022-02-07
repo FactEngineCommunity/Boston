@@ -62,6 +62,18 @@ Namespace FBM
 
         End Function
 
+        Public Function CloneConceptInstance() As FBM.ConceptInstance
+
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+
+            lrConceptInstance.Symbol = Me.ModelNote.Id
+            lrConceptInstance.X = Me.X
+            lrConceptInstance.Y = Me.Y
+
+            Return lrConceptInstance
+
+        End Function
+
         Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
 
         End Sub

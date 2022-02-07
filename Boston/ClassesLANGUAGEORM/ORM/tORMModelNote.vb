@@ -8,6 +8,8 @@ Namespace FBM
         Implements ICloneable
         Implements iMDAObject
 
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.ModelNote
+
         Public Text As String = "" 'The text of the ModelNote
         Public JoinedObjectType As FBM.ModelObject
 
@@ -34,8 +36,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub New()
 
-            Me.ConceptType = pcenumConceptType.ModelNote
-            Me.Id = System.Guid.NewGuid.ToString
+            '20220207-VM-Was
+            'Me.ConceptType = pcenumConceptType.ModelNote
 
         End Sub
 

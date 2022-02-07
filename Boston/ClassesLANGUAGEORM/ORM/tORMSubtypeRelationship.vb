@@ -140,11 +140,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.tSubtypeRelationship) As Boolean Implements System.IEquatable(Of FBM.tSubtypeRelationship).Equals
 
-            If (Me.EntityType.Id = other.EntityType.Id) And (Me.parentEntityType.Id = other.parentEntityType.Id) Then
-                Return True
-            Else
-                Return False
-            End If
+            Return (Me.EntityType.Id = other.EntityType.Id) And (Me.parentEntityType.Id = other.parentEntityType.Id)
 
         End Function
 

@@ -4438,7 +4438,6 @@ Public Class frmMain
 
             prApplication.DatabaseVersionNr = prApplication.DatabaseVersionNr
 
-
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
