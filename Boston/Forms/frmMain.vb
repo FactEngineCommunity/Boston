@@ -826,17 +826,17 @@ Public Class frmMain
                 End Select
             Next
 
-            Try
-                pdbConnection.Close()
-            Catch ex As Exception
-                'Not a biggie.
-            End Try
-
             For Each lrForm In prApplication.RightToolboxForms.ToArray
                 Call lrForm.Close()
             Next
 
             Me.Close()
+
+            Try
+                pdbConnection.Close()
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
 
             Application.Exit()
             Environment.Exit(0)

@@ -349,6 +349,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub frmToolboxEnterpriseTree_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
+
         Using loWaitCursor As New WaitCursor
 
             Try

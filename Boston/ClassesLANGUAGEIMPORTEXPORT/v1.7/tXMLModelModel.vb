@@ -1087,6 +1087,7 @@ Namespace XMLModel
                                 lrFactDataInstance.isDirty = True
                             Next
                             lrFactTypeInstance.Fact.Add(lrFactInstance)
+                            lrFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
                             lrFactTypeInstance.isDirty = True
 
                             For Each lrFactDataInstance In lrFactInstance.Data
@@ -1101,7 +1102,7 @@ Namespace XMLModel
                                     lrFactDataInstance.X = lrFactDataConceptInstance.X
                                     lrFactDataInstance.Y = lrFactDataConceptInstance.Y
                                 End If
-
+                                lrFactTypeInstance.Page.ValueInstance.AddUnique(lrFactDataInstance)
                             Next
 
                         End If

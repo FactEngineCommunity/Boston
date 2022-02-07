@@ -5373,6 +5373,8 @@ Namespace FBM
                     Call Me.PopulateRDSStructureFromCoreMDAElements()
                     Me.RDSCreated = True
                 End If
+
+                Me.IsDirty = False
                 '==================================================================================================
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(100)
 
