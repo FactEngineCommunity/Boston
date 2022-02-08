@@ -246,6 +246,109 @@ Namespace NORMA
 
         End Sub
 
+        ''' <summary>
+        ''' Gets the concept type of an Object in a NORMA .orm file.
+        ''' </summary>
+        ''' <param name="arNORMAXMLDOC">The NORMA .orm file.</param>
+        ''' <param name="asNORMAReferenceId">The NORMA ReferenceId to check for.</param>
+        ''' <param name="asUltimateNORMAReferenceId">Either the asNORMAReferenceId or the FactType ReferenceId if asNORMAReferenceId is for an ObjectifyingEntityType.</param>
+        ''' <returns></returns>
+        Public Function GetTypeOfObjectFromNORMAFile(ByRef arNORMAXMLDOC As XDocument,
+                                                     ByVal asNORMAReferenceId As String,
+                                                     ByRef asUltimateNORMAReferenceId As String) As pcenumConceptType
+
+            Dim loElement As XElement
+
+            Try
+                loElement = (From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.Elements
+                             Select ModelInformation
+                             Where ModelInformation.Attribute("id").Value = asNORMAReferenceId).First
+
+                Select Case loElement.Name.LocalName
+                    Case Is = "EntityType"
+                        asUltimateNORMAReferenceId = asNORMAReferenceId
+                        Return pcenumConceptType.EntityType
+                    Case Is = "ValueType"
+                        asUltimateNORMAReferenceId = asNORMAReferenceId
+                        Return pcenumConceptType.ValueType
+                    Case Is = "ObjectifiedType"
+                        asUltimateNORMAReferenceId = loElement.<orm:NestedPredicate>(0).Attribute("ref").Value
+                        Return pcenumConceptType.FactType
+                    Case Else
+                        Return pcenumConceptType.Unknown
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return pcenumConceptType.Unknown
+            End Try
+        End Function
+
+        Public Function LoadEntityType(ByRef arModel As FBM.Model,
+                                       ByRef arNORMAXMLDOC As XDocument,
+                                       ByVal asNORMAReferenceId As String) As FBM.EntityType
+
+            Dim lrEntityType As New FBM.EntityType
+            Dim loElement As XElement
+
+            Try
+                loElement = (From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                             Select ModelInformation
+                             Where ModelInformation.Attribute("id").Value = asNORMAReferenceId).First
+
+                lrEntityType = New FBM.EntityType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value, Nothing)
+                lrEntityType.NORMAReferenceId = loElement.Attribute("id").Value
+
+                arModel.AddEntityType(lrEntityType, False, False, Nothing, True)
+
+                Dim lsReferenceMode As String = loElement.Attribute("_ReferenceMode").Value
+
+                If lsReferenceMode <> "" Then
+                    Dim lsPreferredIdentifierId = loElement.<orm:PreferredIdentifier>.AsEnumerable.First.Attribute("ref").Value
+
+                    Dim larUniquenessConstraintRole = From Constraint In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
+                                                      From RoleSequence In Constraint.<orm:RoleSequence>
+                                                      From Role In RoleSequence.<orm:Role>
+                                                      Where Constraint.Attribute("id") = lsPreferredIdentifierId
+                                                      Select Role
+
+                    Dim lsRoleId = larUniquenessConstraintRole.First.Attribute("ref").Value
+
+                    Dim larFactType = From FactType In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
+                                      From Role In FactType.<orm:FactRoles>.<orm:Role>
+                                      Where Role.Attribute("id") = lsRoleId
+                                      Select FactType
+
+
+                    Dim lrFactType As New FBM.FactType(Me.FBMModel, "DummyFactType", True)
+                    lrFactType.NORMAReferenceId = larFactType.First.Attribute("id").Value
+
+                    Call Me.LoadFactType(lrFactType, arNORMAXMLDOC)
+
+
+                End If
+
+                Return lrEntityType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Sub LoadEntityTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
             Dim lrEntityType As New FBM.EntityType
@@ -290,6 +393,7 @@ Namespace NORMA
 
                         Call Me.LoadFactType(lrFactType, arNORMAXMLDOC)
 
+                        '20220209-VM-Remove if not missed over time.
                         'Dim loXMLFactType As XElement = larFactType.First
 
                         'Dim lsFirstRoleId As String = (From Role In loXMLFactType.<orm:FactRoles>.<orm:Role>
@@ -313,7 +417,7 @@ Namespace NORMA
                 '-----------------------------------------------------
                 'Check for Subtype relationships for each EntityType
                 '-----------------------------------------------------
-                For Each lrEntityType In arModel.EntityType
+                For Each lrEntityType In arModel.EntityType.ToArray
                     loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:SubtypeFact>
                                                From FactRoles In ModelInformation.<orm:FactRoles>
                                                From SubtypeMetaRole In FactRoles.<orm:SubtypeMetaRole>
@@ -322,9 +426,10 @@ Namespace NORMA
                                                Select ModelInformation
 
                     If loEnumElementQueryResult.Count > 0 Then
-                        For Each loElement In loEnumElementQueryResult
 
-                            Dim lrSupertypeEntityType As New FBM.EntityType(arModel, pcenumLanguage.ORMModel)
+                        Dim lrSupertypeEntityType As FBM.EntityType
+
+                        For Each loElement In loEnumElementQueryResult
 
                             Dim loSuprtypeElement As IEnumerable(Of XElement)
                             loSuprtypeElement = From FactRoles In loElement.<orm:FactRoles>
@@ -332,9 +437,28 @@ Namespace NORMA
                                                 From RolePlayer In SupertypeMetaRole.<orm:RolePlayer>
                                                 Select RolePlayer
 
-                            lrSupertypeEntityType.NORMAReferenceId = loSuprtypeElement(0).Attribute("ref").Value
+                            lrSupertypeEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = loSuprtypeElement(0).Attribute("ref").Value)
 
-                            lrSupertypeEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrSupertypeEntityType.NORMAReferenceId)
+                            If lrSupertypeEntityType Is Nothing Then
+                                Dim lsUltimateNORMAReferenceId As String = Nothing
+                                Select Case Me.GetTypeOfObjectFromNORMAFile(arNORMAXMLDOC,
+                                                                            loSuprtypeElement(0).Attribute("ref").Value,
+                                                                            lsUltimateNORMAReferenceId)
+                                    Case Is = pcenumConceptType.EntityType
+                                        lrSupertypeEntityType = Me.LoadEntityType(arModel, arNORMAXMLDOC, lsUltimateNORMAReferenceId)
+                                    Case Is = pcenumConceptType.FactType
+                                        Dim lrFactType As New FBM.FactType(arModel, "DummyFactType", True)
+                                        lrFactType.NORMAReferenceId = lsUltimateNORMAReferenceId
+                                        lrFactType = Me.LoadFactType(lrFactType, arNORMAXMLDOC)
+                                        If lrFactType.IsObjectified Then
+                                            lrSupertypeEntityType = lrFactType.ObjectifyingEntityType
+                                        Else
+                                            prApplication.ThrowErrorMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
+                                            GoTo SkippedSubtypeRelationship
+                                        End If
+                                End Select
+
+                            End If
 
                             Dim lsSubtypeRoleId As String = loElement.<orm:FactRoles>.<orm:SubtypeMetaRole>.AsEnumerable.First.Attribute("id").Value
                             Dim lsSupertypeRoleId As String = loElement.<orm:FactRoles>.<orm:SupertypeMetaRole>.AsEnumerable.First.Attribute("id").Value
@@ -349,7 +473,7 @@ Namespace NORMA
                             Catch ex As Exception
                                 lrSubtypeRelationship.IsPrimarySubtypeRelationship = False
                             End Try
-
+SkippedSubtypeRelationship:
                         Next
                     End If
                 Next
@@ -2522,27 +2646,6 @@ Namespace NORMA
                         End If
                     Next 'lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
 
-                    '--------------------
-                    'Parent EntityTypes
-                    '--------------------
-                    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
-                        If lrEntityTypeInstance.EntityType.SubtypeRelationship.Count > 0 Then
-                            For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship
-                                Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
-                                lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.parentEntityType.Id)
-                                If lrParentEntityTypeInstance IsNot Nothing Then
-                                    If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id) Is Nothing Then
-                                        Call lrPage.DropFactTypeAtPoint(lrSubtypeRelationship.FactType, New PointF(10, 10), False, False, False, False)
-                                    End If
-                                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, False)
-                                    'New FBM.SubtypeRelationshipInstance(lrPage, lrEntityTypeInstance, lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals))
-                                    lrEntityTypeInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
-                                    lrPage.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
-                                End If
-                            Next
-                        End If
-                    Next
-
                     '-----------------------------------
                     'Add FactTypeInstances to the Page
                     '-----------------------------------
@@ -2654,6 +2757,27 @@ Namespace NORMA
 
                         Next 'Role
                     Next 'FaultyFactTypeInstance
+
+                    '-----------------------
+                    'Subtype Relationships
+                    '-----------------------
+                    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
+                        If lrEntityTypeInstance.EntityType.SubtypeRelationship.Count > 0 Then
+                            For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship
+                                Dim lrParentModelElement As FBM.ModelObject
+                                lrParentModelElement = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.parentEntityType.Id)
+                                If lrParentModelElement IsNot Nothing Then
+                                    If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id) Is Nothing Then
+                                        Call lrPage.DropFactTypeAtPoint(lrSubtypeRelationship.FactType, New PointF(10, 10), False, False, False, False)
+                                    End If
+                                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, False)
+                                    'New FBM.SubtypeRelationshipInstance(lrPage, lrEntityTypeInstance, lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals))
+                                    lrEntityTypeInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                    lrPage.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                End If
+                            Next
+                        End If
+                    Next
 
                     '---------------------------------------------------------------------
                     'Load the UniquenessConstraint RoleConstraintInstances for the Page.
@@ -3090,22 +3214,35 @@ Namespace NORMA
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If IsSomething(loXMLElementQueryResult(0)) Then
-                            lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
-                            lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
-                            Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusionConstraint)
-                            lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                            Dim lsBounds() As String
-                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
-                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
-                            Else
-                                Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
-                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
-                            End If
-                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
-                            lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                            Try
+                                lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
+                                lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
+                                Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusionConstraint)
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                                Dim lsBounds() As String
+                                If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                                    lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
+                                Else
+                                    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                    lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                                End If
+                                lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                                lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                            Catch ex As Exception
+                                Dim lsMessage As String
+                                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                                lsMessage = "Error loading Exclusion Constraint instance."
+                                lsMessage.AppendLine("Role Constraint Name:" & lrRoleConstraint.Name)
+                                lsMessage.AppendLine("NORMA Reference Id: " & lrRoleConstraint.NORMAReferenceId)
+                                lsMessage.AppendLine("Page Name: " & lrPageXElement.Attribute("Name").Value)
+                                lsMessage.AppendLine("")
+                                lsMessage &= "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
+                            End Try
                         Else
                             lrRoleConstraint = Nothing
                         End If
@@ -3556,7 +3693,11 @@ Namespace NORMA
                         '------------------------------------------------------------------------------------------------------
                         Dim lsModelElementName As String = Trim(Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME)
                         If arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName) Is Nothing Then
-                            MsgBox(lsModelElementName & " is not the name of an Object Type linkd by the Fact Type.")
+                            lsMessage = "Having trouble getting the Predicate Parts for a Fact Type Reading." & vbCrLf & vbCrLf
+                            lsMessage &= lsModelElementName & " is not the name of an Object Type linked by the Fact Type." & vbCrLf & vbCrLf
+                            lsMessage &= "Reading: " & asReading & vbCrLf
+                            lsMessage &= "FactTypeId: " & arFactTypeReading.FactType.Id
+                            MsgBox(lsMessage)
                             Return False
                         End If
 

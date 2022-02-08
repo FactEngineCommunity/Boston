@@ -51,7 +51,9 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arEntityType As FBM.EntityType, ByRef arParentEntityType As FBM.EntityType, ByRef arSubtypingFactType As FBM.FactType)
+        Public Sub New(ByRef arEntityType As FBM.EntityType,
+                       ByRef arParentEntityType As FBM.ModelObject,
+                       ByRef arSubtypingFactType As FBM.FactType)
 
             Me.Model = arEntityType.Model
             Me.EntityType = arEntityType

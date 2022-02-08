@@ -91,8 +91,25 @@ Namespace FBM
         <XmlIgnore()> _
         Public Shadows ReferenceModeRoleConstraint As FBM.RoleConstraintInstance = Nothing
 
-        <XmlIgnore()> _
-        Public Shadows ObjectifiedFactType As FBM.FactTypeInstance = Nothing
+        <XmlIgnore()>
+        Private _ObjectifiedFactType As FBM.FactTypeInstance
+        <XmlIgnore()>
+        Public Shadows Property ObjectifiedFactType As FBM.FactTypeInstance
+            Get
+                Try
+                    If Me._ObjectifiedFactType Is Nothing Then
+                        Return Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.EntityType.ObjectifiedFactType.Id)
+                    Else
+                        Return Me._ObjectifiedFactType
+                    End If
+                Catch ex As Exception
+                    Return Nothing
+                End Try
+            End Get
+            Set(value As FBM.FactTypeInstance)
+                Me._ObjectifiedFactType = value
+            End Set
+        End Property
 
         <XmlIgnore()> _
         Public Shadows SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)

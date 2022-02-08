@@ -1023,10 +1023,10 @@ Namespace FBM
         End Function
         Public Overridable Function getCorrespondingRDSTable() As RDS.Table
 
-            Select Case Me.GetType.ToString
-                Case Is = GetType(FBM.EntityType).ToString
+            Select Case Me.GetType
+                Case Is = GetType(FBM.EntityType)
                     Return CType(Me, FBM.EntityType).getCorrespondingRDSTable
-                Case Is = GetType(FBM.FactType).ToString
+                Case Is = GetType(FBM.FactType)
                     If CType(Me, FBM.FactType).IsObjectified Then
                         Return CType(Me, FBM.FactType).getCorrespondingRDSTable
                     ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
@@ -1037,7 +1037,6 @@ Namespace FBM
                 Case Else
                     Return New RDS.Table
             End Select
-
 
         End Function
 

@@ -747,7 +747,11 @@ Namespace FBM
             Try
                 Dim lrTable As RDS.Table
 
-                lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                If Me.IsObjectifyingEntityType Then
+                    lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.ObjectifiedFactType.Id)
+                Else
+                    lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                End If
 
                 If lrTable Is Nothing And abCreateTableIfNotExists Then
                     lrTable = New RDS.Table(Me.Model.RDS, Me.Id, Me)
@@ -1399,9 +1403,14 @@ Namespace FBM
                 Dim larModelObject As New List(Of FBM.ModelObject)
                 Dim larRole As New List(Of FBM.Role)
 
-                lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentEntityType.Name)
                 larModelObject.Add(Me)
-                larModelObject.Add(arParentEntityType)
+                If arParentEntityType.IsObjectifyingEntityType Then
+                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentEntityType.ObjectifiedFactType.Id)
+                    larModelObject.Add(arParentEntityType.ObjectifiedFactType)
+                Else
+                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentEntityType.Name)
+                    larModelObject.Add(arParentEntityType)
+                End If
 
                 lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
                 lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True

@@ -305,38 +305,47 @@ Namespace RDS
 
             If Me.isAbsorbed Then Exit Sub
 
-            For Each lrTable In Me.getSupertypeTables
-                For Each lrColumn In lrTable.Column
+            Try
+                For Each lrTable In Me.getSupertypeTables
+                    For Each lrColumn In lrTable.Column
 
-                    'Move Origins of relevant Relations.
-                    Dim larRelation = From Relation In lrColumn.OutgoingRelation
+                        'Move Origins of relevant Relations.
+                        Dim larRelation = From Relation In lrColumn.OutgoingRelation
+                                          Select Relation
+
+                        For Each lrRelation In larRelation.ToArray
+                            lrRelation.OriginTable = Me
+                            Call Me.Model.Model.updateRelationOriginTable(lrRelation, Me)
+                        Next
+
+                        'Move Destinations of relevant Relations.
+                        larRelation = From Relation In lrColumn.IncomingRelation
                                       Select Relation
 
-                    For Each lrRelation In larRelation.ToArray
-                        lrRelation.OriginTable = Me
-                        Call Me.Model.Model.updateRelationOriginTable(lrRelation, Me)
-                    Next
+                        For Each lrRelation In larRelation.ToArray
+                            If lrRelation.ResponsibleFactType.PointsToTable.Contains(Me) Then
+                                Call Me.Model.Model.updateRelationDestinationTable(lrRelation, Me)
+                                Call lrRelation.setDestinationTable(Me)
+                            End If
+                        Next
 
-                    'Move Destinations of relevant Relations.
-                    larRelation = From Relation In lrColumn.IncomingRelation
-                                  Select Relation
+                        Dim lrNewColumn = lrColumn.Clone(Me, Nothing)
+                        lrNewColumn.Relation.AddRange(lrColumn.Relation)
 
-                    For Each lrRelation In larRelation.ToArray
-                        If lrRelation.ResponsibleFactType.PointsToTable.Contains(Me) Then
-                            Call Me.Model.Model.updateRelationDestinationTable(lrRelation, Me)
-                            Call lrRelation.setDestinationTable(Me)
+                        Dim lrExistingColumn = Me.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
+                        If lrExistingColumn Is Nothing Then
+                            Call Me.addColumn(lrNewColumn)
                         End If
                     Next
-
-                    Dim lrNewColumn = lrColumn.Clone(Me, Nothing)
-                    lrNewColumn.Relation.AddRange(lrColumn.Relation)
-
-                    Dim lrExistingColumn = Me.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
-                    If lrExistingColumn Is Nothing Then
-                        Call Me.addColumn(lrNewColumn)
-                    End If
                 Next
-            Next
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -785,28 +794,41 @@ Namespace RDS
                                            Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing,
                                            Optional abIsRecursive As Boolean = True) As List(Of RDS.Table)
 
-            Dim larSupertypeTable As New List(Of RDS.Table)
-            Dim larSubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
+            Try
 
-            If arSubtypeRelationship Is Nothing Then
-                larSubtypeRelationship = Me.FBMModelElement.SubtypeRelationship
-            Else
-                larSubtypeRelationship.Add(arSubtypeRelationship)
-            End If
+                Dim larSupertypeTable As New List(Of RDS.Table)
+                Dim larSubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
 
-            For Each lrSubtypeRelationship In larSubtypeRelationship
-                Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
-                larSupertypeTable.AddUnique(lrSupertypeTable)
-                If abIsRecursive Then
-                    Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+                If arSubtypeRelationship Is Nothing Then
+                    larSubtypeRelationship = Me.FBMModelElement.SubtypeRelationship
+                Else
+                    larSubtypeRelationship.Add(arSubtypeRelationship)
                 End If
-            Next
 
-            If aarSupertypeTable IsNot Nothing Then
-                aarSupertypeTable.AddRange(larSupertypeTable)
-            End If
+                For Each lrSubtypeRelationship In larSubtypeRelationship
+                    Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
+                    larSupertypeTable.AddUnique(lrSupertypeTable)
+                    If abIsRecursive Then
+                        Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+                    End If
+                Next
 
-            Return larSupertypeTable
+                If aarSupertypeTable IsNot Nothing Then
+                    aarSupertypeTable.AddRange(larSupertypeTable)
+                End If
+
+                Return larSupertypeTable
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of RDS.Table)
+            End Try
 
         End Function
 
@@ -1233,9 +1255,23 @@ Namespace RDS
                     Return True
                 Else
                     For Each lrSubtypeRelationship In arTable.FBMModelElement.SubtypeRelationship.FindAll(Function(x) x.IsPrimarySubtypeRelationship)
-                        If lrSubtypeRelationship.parentEntityType Is Me.FBMModelElement Then
-                            Return True
-                        End If
+                        Select Case lrSubtypeRelationship.parentEntityType.GetType
+                            Case Is = GetType(FBM.EntityType)
+                                Dim lrEntityType As FBM.EntityType = CType(lrSubtypeRelationship.parentEntityType, FBM.EntityType)
+                                If lrEntityType.IsObjectifyingEntityType Then
+                                    If lrEntityType.ObjectifiedFactType Is Me.FBMModelElement Then
+                                        Return True
+                                    End If
+                                Else
+                                    If lrSubtypeRelationship.parentEntityType Is Me.FBMModelElement Then
+                                        Return True
+                                    End If
+                                End If
+                            Case Else
+                                If lrSubtypeRelationship.parentEntityType Is Me.FBMModelElement Then
+                                    Return True
+                                End If
+                        End Select
                         Return lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable.IsPartOfPrimarySubtypeRelationshipPath(arTable)
                     Next
                 End If

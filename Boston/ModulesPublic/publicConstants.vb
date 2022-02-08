@@ -209,6 +209,7 @@ Public Module publicConstants
         Value
         ValueConstraint
         ValueType
+        Unknown  'E.g. When importing a NORMA file, may need to check what type a "ref" reference is (i.e. e.g. to an EntityType, FactType, or (in error) Unknown).
     End Enum
 
     Public Enum pcenumDiagramType

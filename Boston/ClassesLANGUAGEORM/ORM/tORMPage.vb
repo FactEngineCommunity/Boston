@@ -1172,6 +1172,12 @@ Namespace FBM
                     Me.DiagramView.Cursor = Cursors.Default
                 End If
 
+                '------------------------------------------------------------------------------
+                'Objectified Fact Types and their ObjectifyingEntityType
+                If lrFactType.IsObjectified Then
+                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrFactType.ObjectifyingEntityType.CloneInstance(Me, True)
+                End If
+
                 If abExpandIfReferenceModeFactType Then
                     If lrFactTypeInstance.FactType.IsPreferredReferenceMode And lrFactTypeInstance.FactType.Is1To1BinaryFactType Then
                         Dim lrEntityTypeInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinsEntityType IsNot Nothing).JoinsEntityType

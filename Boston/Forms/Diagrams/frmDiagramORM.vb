@@ -5127,9 +5127,9 @@ Public Class frmDiagramORM
                 Call lrFactTypeInstance.DisplayAndAssociate(Me.ViewFactTablesToolStripMenuItem.Checked, My.Settings.ShowFactTypeNamesOnORMModelLoad)
             Next
 
-            '--------------------------------
-            'Display any Subtype constraints
-            '--------------------------------            
+            '-----------------------------------
+            'Display any Subtype Relationships
+            '-----------------------------------        
             For Each lrEntityTypeInstance In arPage.EntityTypeInstance
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
                     Call lrSubtypeRelationship.DisplayAndAssociate()
