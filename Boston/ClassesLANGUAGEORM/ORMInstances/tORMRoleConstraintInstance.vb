@@ -952,6 +952,8 @@ Namespace FBM
                                         loDroppedNode.Image = My.Resources.ORMShapes.symmetric_intransitive
                                     Case Is = pcenumRingConstraintType.SymmetricIrreflexive
                                         loDroppedNode.Image = My.Resources.ORMShapes.symmetric_irreflexive
+                                    Case Is = pcenumRingConstraintType.SymmetricTransitive
+                                        loDroppedNode.Image = My.Resources.ORMShapes.symmetric_transitive
                                     Case Is = pcenumRingConstraintType.Transitive
                                         loDroppedNode.Image = My.Resources.ORMShapes.transative
                                 End Select
@@ -1538,6 +1540,8 @@ Namespace FBM
                                 Me.Shape.Image = My.Resources.ORMShapes.symmetric_intransitive
                             Case Is = pcenumRingConstraintType.SymmetricIrreflexive
                                 Me.Shape.Image = My.Resources.ORMShapes.symmetric_irreflexive
+                            Case Is = pcenumRingConstraintType.SymmetricTransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.symmetric_transitive
                             Case Is = pcenumRingConstraintType.Transitive
                                 Me.Shape.Image = My.Resources.ORMShapes.transative
                         End Select

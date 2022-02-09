@@ -23,11 +23,10 @@ Namespace FBM
         <XmlIgnore()> _
         Public Link As DiagramLink
 
+        ''' <summary>
+        ''' Parameterless New for cloning
+        ''' </summary>
         Public Sub New()
-            '-------------------------------
-            'Parameterless New for cloning
-            '-------------------------------
-            Me.ModelNote = New FBM.ModelNote
         End Sub
 
         Public Overloads Function Clone(ByRef arPage As FBM.Page) As Object

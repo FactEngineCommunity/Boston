@@ -960,6 +960,8 @@ Namespace XMLModel
                                       ByRef arModel As FBM.Model,
                                       Optional ByRef arPage As FBM.Page = Nothing) As FBM.Page
 
+            Dim lsMessage As String
+
             Try
                 Dim lrConceptInstance As FBM.ConceptInstance
                 Dim lrPage As FBM.Page
@@ -1210,17 +1212,24 @@ Namespace XMLModel
                 Dim lrModelNoteInstance As FBM.ModelNoteInstance
                 Dim lrModelNote As FBM.ModelNote
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ModelNote)
-                    lrModelNote = arModel.ModelNote.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                    Try
+                        lrModelNote = arModel.ModelNote.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
-                    lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
-                    lrModelNoteInstance.X = lrConceptInstance.X
-                    lrModelNoteInstance.Y = lrConceptInstance.Y
+                        lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
+                        lrModelNoteInstance.X = lrConceptInstance.X
+                        lrModelNoteInstance.Y = lrConceptInstance.Y
+                    Catch ex As Exception
+                        lsMessage = "Error loading Model Note with Id: " & lrConceptInstance.Symbol
+                        lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                    End Try
+
                 Next
 
                 Return lrPage
 
             Catch ex As Exception
-                Dim lsMessage As String
+
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

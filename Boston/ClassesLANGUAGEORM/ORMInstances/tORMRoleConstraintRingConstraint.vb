@@ -161,6 +161,8 @@ Namespace FBM
                                 Me.Shape.Image = My.Resources.ORMShapes.symmetric_intransitive
                             Case Is = pcenumRingConstraintType.SymmetricIrreflexive
                                 Me.Shape.Image = My.Resources.ORMShapes.symmetric_irreflexive
+                            Case Is = pcenumRingConstraintType.SymmetricTransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.symmetric_transitive
                         End Select
                 End Select
             End If

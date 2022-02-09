@@ -71,6 +71,7 @@ Namespace FBM
                 lrModelNoteInstance.Model = arPage.Model
                 lrModelNoteInstance.Page = arPage
                 lrModelNoteInstance.Text = .Text
+                lrModelNoteInstance.ModelNote = Me
                 If IsSomething(.JoinedObjectType) Then
                     Select Case Me.JoinedObjectType.ConceptType
                         Case Is = pcenumConceptType.EntityType

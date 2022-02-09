@@ -2966,6 +2966,7 @@
     <None Include="Images\ORMShapes\value_comparison.png" />
     <None Include="Images\ORMShapes\value_comparison_equal.png" />
     <None Include="Images\ORMShapes\value_comparison_not_equal.png" />
+    <None Include="Images\ORMShapes\symmetric_transitive.png" />
     <Content Include="Images\Splash\Splash.png" />
     <Content Include="Images\Splash\Splash.png" />
     <None Include="Images\Viev\VievLogoMedium.jpg" />
