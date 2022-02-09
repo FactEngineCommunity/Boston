@@ -116,7 +116,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub VerbaliseModelObject(ByRef arModelObject As FBM.ModelObject)
+        Public Sub VerbaliseModelObject(ByRef arModelObject As FBM.ModelObject,
+                                        Optional ByVal asSubscriptText As String = Nothing)
 
             If arModelObject IsNot Nothing Then
                 Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "objectType")
@@ -124,6 +125,12 @@ Namespace FBM
                 Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
                 Me.HTW.Write(arModelObject.Id)
                 Me.HTW.RenderEndTag()
+                If asSubscriptText IsNot Nothing Then
+                    Me.HTW.AddAttribute(HtmlTextWriterAttribute.Style, "font-size:smaller;")
+                    Me.HTW.RenderBeginTag(HtmlTextWriterTag.Sub)
+                    Me.HTW.Write(asSubscriptText)
+                    Me.HTW.RenderEndTag()
+                End If
             Else
                 Me.HTW.Write("''")
             End If

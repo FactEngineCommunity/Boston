@@ -1473,6 +1473,9 @@ Public Class frmToolboxORMVerbalisation
             Case Is = pcenumRingConstraintType.AcyclicIntransitive
                 Call Me.VerbaliseRoleConstraintRingConstraintAcyclicIntransitive(arRoleConstraint)
 
+            Case Is = pcenumRingConstraintType.AcyclicStronglyIntransitive
+                Call Me.VerbaliseRoleConstraintRingConstraintAcyclicStronglyIntransitive(arRoleConstraint)
+
             Case Is = pcenumRingConstraintType.Antisymmetric
                 Call Me.VerbaliseRoleConstraintRingConstraintAntisymmetric(arRoleConstraint)
 
@@ -1662,6 +1665,109 @@ Public Class frmToolboxORMVerbalisation
         End If
 
         Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+    End Sub
+
+    Public Sub VerbaliseRoleConstraintRingConstraintAcyclicStronglyIntransitive(ByVal arRoleConstraint As FBM.RoleConstraint, Optional ByVal abDeontic As Boolean = False)
+
+        Dim lrVerbaliser As New FBM.ORMVerbailser
+        Call lrVerbaliser.Reset()
+
+        Try
+
+            If arRoleConstraint.RoleConstraintRole.Count = 0 Then
+                lrVerbaliser.VerbaliseError("<Provide links to Roles for Role Constraint, '" & arRoleConstraint.Name & "', to complete this verbalisation>")
+                lrVerbaliser.HTW.WriteBreak()
+                Exit Sub
+            End If
+
+            '------------------------------------------------------------
+            'Declare that the RoleConstraint(Name) is an RoleConstraint
+            '------------------------------------------------------------
+            lrVerbaliser.VerbaliseModelObject(arRoleConstraint)
+            lrVerbaliser.VerbaliseQuantifier(" is a Role Constraint")
+            lrVerbaliser.VerbaliseQuantifier(" (of type, 'Acyclic Strongly Intransitive Ring Constraint')")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+            If abDeontic Then
+                lrVerbaliser.VerbaliseQuantifier("It is obligatory that no ")
+            Else
+                lrVerbaliser.VerbaliseQuantifier("No ")
+            End If
+
+            lrVerbaliser.VerbaliseModelObject(arRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject)
+            lrVerbaliser.VerbaliseQuantifier(" may cycle back to itself via one or more traversals through ")
+
+            Dim lrFactType As FBM.FactType
+            lrFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
+
+            If lrFactType.FactTypeReading.Count > 0 Then
+                Call Me.VerbaliseFactTypePart(lrVerbaliser, lrFactType, Purple, Green, Nothing, pcenumFollowingThatOrSome.Either, False)
+            Else
+                lrVerbaliser.VerbaliseError("<Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation>")
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("If ")
+            lrFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
+            If lrFactType.FactTypeReading.Count > 0 Then
+                Call Me.VerbaliseFactTypePart(lrVerbaliser, lrFactType, Purple, Green, Nothing, pcenumFollowingThatOrSome.Either, False, 1)
+            Else
+                lrVerbaliser.VerbaliseError("<Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation>")
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
+            'lrVerbaliser.VerbaliseQuantifier(" and ")
+            lrFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
+            'If lrFactType.FactTypeReading.Count > 0 Then
+            '    Call Me.VerbaliseFactTypePart(lrVerbaliser, lrFactType, Purple, Green, "that ", pcenumFollowingThatOrSome.Either, False, 2)
+            'Else
+            '    lrVerbaliser.VerbaliseError("<Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation>")
+            '    lrVerbaliser.HTW.WriteBreak()
+            'End If
+
+            'If Entity Type1 is subtype of Entity Type2 and Entity Type2 is subtype of Entity Type3
+
+            If abDeontic Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseQuantifier(" then it is forbidden that ")
+            Else
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseQuantifier(" then it is not true that ")
+            End If
+
+
+            lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(0).JoinedORMObject, "1")
+            lrVerbaliser.VerbaliseQuantifier(" is indirectly related to ")
+            lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(1).JoinedORMObject, "2")
+            lrVerbaliser.VerbaliseQuantifier(" by repeatedly applying this fact type.")
+
+            'Dim lrSubscriptArray As New List(Of String)
+            'lrSubscriptArray.Add("1")
+            'lrSubscriptArray.Add("3")
+            'lrFactType = arRoleConstraint.RoleConstraintRole(0).Role.FactType
+            'If lrFactType.FactTypeReading.Count > 0 Then
+            '    Call Me.VerbaliseFactTypePart(lrVerbaliser, lrFactType, Purple, Green, "that ", pcenumFollowingThatOrSome.That, False, 1, lrSubscriptArray)
+            'Else
+            '    lrVerbaliser.VerbaliseError("<Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation>")
+            '    lrVerbaliser.HTW.WriteBreak()
+            'End If
+
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseError(lsMessage)
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+        End Try
 
     End Sub
 
@@ -2416,7 +2522,7 @@ Public Class frmToolboxORMVerbalisation
                         lsPredicatePart = lsPredicatePart.Replace(" a ", " ")
                         lsPredicatePart = lsPredicatePart.Replace(" an ", " ")
 
-                        arVerbaliser.VerbalisePredicateText(lsPredicatePart)
+                        arVerbaliser.VerbalisePredicateText(" " & lsPredicatePart)
                     End If
                     liInd += 1
                     If abSubscriptNegativeOrder Then

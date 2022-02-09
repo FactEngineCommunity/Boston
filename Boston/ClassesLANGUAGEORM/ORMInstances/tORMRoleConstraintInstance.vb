@@ -910,6 +910,8 @@ Namespace FBM
                                 Select Case Me.RingConstraintType
                                     Case Is = pcenumRingConstraintType.AcyclicIntransitive
                                         loDroppedNode.Image = My.Resources.ORMShapes.acyclic_intransitive
+                                    Case Is = pcenumRingConstraintType.AcyclicStronglyIntransitive
+                                        loDroppedNode.Image = My.Resources.ORMShapes.acyclic_strongly_intransitive
                                     Case Is = pcenumRingConstraintType.Acyclic
                                         loDroppedNode.Image = My.Resources.ORMShapes.acyclic
                                     Case Is = pcenumRingConstraintType.Antisymmetric
@@ -1498,6 +1500,8 @@ Namespace FBM
                         Select Case Me.RingConstraintType
                             Case Is = pcenumRingConstraintType.AcyclicIntransitive
                                 Me.Shape.Image = My.Resources.ORMShapes.acyclic_intransitive
+                            Case Is = pcenumRingConstraintType.AcyclicStronglyIntransitive
+                                Me.Shape.Image = My.Resources.ORMShapes.acyclic_strongly_intransitive
                             Case Is = pcenumRingConstraintType.Acyclic
                                 Me.Shape.Image = My.Resources.ORMShapes.acyclic
                             Case Is = pcenumRingConstraintType.Antisymmetric
