@@ -628,6 +628,11 @@ Namespace FBM
             Return False
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arModel"></param>
+        ''' <param name="abAddToModel"></param>
         Public Sub changeModel(ByRef arModel As FBM.Model, ByVal abAddToModel As Boolean)
 
             Me.Model = arModel
@@ -638,14 +643,31 @@ Namespace FBM
         ''' Ultimately returns the topmost Supertype that is not Absorbed from within in the upper hierarchy,
         '''   ELSE returns the ModelObject itself.
         ''' </summary>
+        ''' <param name="abRequireLocalSimpleReferenceScheme">If True the ModelElement requires a local Simple Reference Scheme </param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetTopmostNonAbsorbedSupertype() As FBM.ModelObject
+        Public Function GetTopmostNonAbsorbedSupertype(Optional ByVal abRequireLocalSimpleReferenceScheme As Boolean = False) As FBM.ModelObject
 
             If Me.SubtypeRelationship.Count = 0 Then
                 Return Me
             ElseIf Me.IsAbsorbed = False Then
-                Return Me
+                If abRequireLocalSimpleReferenceScheme Then
+                    If Me.GetType = GetType(FBM.EntityType) Then
+                        If CType(Me, FBM.EntityType).ReferenceModeValueType Is Nothing Then
+                            Try
+                                Return Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship).parentEntityType.GetTopmostNonAbsorbedSupertype(abRequireLocalSimpleReferenceScheme)
+                            Catch ex As Exception
+                                Return Me
+                            End Try
+                        Else
+                            Return Me
+                        End If
+                    Else
+                        Return Me
+                    End If
+                Else
+                    Return Me
+                End If
             Else
                 Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
                 'For Each lrSubtypeRelationship In Me.SubtypeRelationship

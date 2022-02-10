@@ -1204,7 +1204,7 @@ Namespace FBM
                                 larTable = (From Table In Me.RDS.Table
                                             From Column In Table.Column
                                             Where Column.Role Is lrRole
-                                            Where Column.ActiveRole Is lrRole.JoinsEntityType.ReferenceModeRoleConstraint.Role(0)
+                                            Where Column.ActiveRole Is CType(lrRole.JoinsEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeRoleConstraint.Role(0)
                                             Where Column.Role.JoinedORMObject.Id <> Table.Name
                                             Where Table.FBMModelElement Is lrRole.FactType
                                             Select Table).ToList

@@ -702,7 +702,13 @@ Namespace FBM
                     liSequenceNr += 1
 
                     GetReadingText &= lrPredicatePart.PreBoundText
-                    GetReadingText &= lrPredicatePart.Role.JoinedORMObject.Id
+                    Try
+                        GetReadingText &= lrPredicatePart.Role.JoinedORMObject.Id
+                    Catch
+                        'Can happen when loading a NORMA file for instance.
+                        GetReadingText &= "[Missing Model Element]"
+                    End Try
+
                     GetReadingText &= lrPredicatePart.PostBoundText
                     If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then
                         GetReadingText &= " "

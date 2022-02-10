@@ -167,18 +167,26 @@ Namespace NORMA
 
                 loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
                                            Select ModelInformation
+                                           Where ModelInformation.Attribute("_ReferenceMode").Value <> ""
                                            Order By ModelInformation.Attribute("Name").Value
 
                 '---------------------------------
                 'Step through the EntityTypes
                 '---------------------------------
+                Dim lsReferenceMode As String
                 For Each loElement In loEnumElementQueryResult
-                    lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = loElement.Attribute("id").Value)
-
                     'Simple Reference Scheme
-                    Dim lsReferenceMode As String = loElement.Attribute("_ReferenceMode").Value
+                    lsReferenceMode = loElement.Attribute("_ReferenceMode").Value
 
+                    '20220210-Can probably dump this IFThen...see XML LINQ query above.
                     If Trim(lsReferenceMode) <> "" Then
+
+                        lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = loElement.Attribute("id").Value)
+                        If lrEntityType Is Nothing Then
+                            Dim lrFactType As FBM.FactType = arModel.FactType.Find(Function(x) x.Id = loElement.Attribute("Name").Value)
+                            lrEntityType = lrFactType.ObjectifyingEntityType
+                        End If
+
                         loEnumElementQueryResult2 = From PreferredIdentifier In loElement.<orm:PreferredIdentifier>
                                                     Select PreferredIdentifier
 
@@ -190,15 +198,19 @@ Namespace NORMA
                                                     Select RoleConstraint
 
                             If larRoleConstraint.Count > 0 Then
-                                lrEntityType.ReferenceModeRoleConstraint = larRoleConstraint.First
-                                lrEntityType.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(True)
+                                Try
+                                    lrEntityType.ReferenceModeRoleConstraint = larRoleConstraint.First
+                                    lrEntityType.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(True)
+                                Catch ex As Exception
+                                    Debugger.Break()
+                                End Try
                             End If
                         End If
 
-                        If lsReferenceMode <> "" Then
-                            lrEntityType.ReferenceModeValueType = lrEntityType.ReferenceModeRoleConstraint.Role(0).JoinsValueType
-                            lrEntityType.ObjectifiedFactType.InternalUniquenessConstraint(0).IsPreferredIdentifier = False
-                        End If
+                        lrEntityType.ReferenceMode = lsReferenceMode
+
+                        lrEntityType.ReferenceModeValueType = lrEntityType.ReferenceModeRoleConstraint.Role(0).JoinsValueType
+                        lrEntityType.ObjectifiedFactType.InternalUniquenessConstraint(0).IsPreferredIdentifier = False
 
                         If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
                             lrEntityType.ReferenceModeFactType = lrEntityType.ReferenceModeRoleConstraint.Role(0).FactType
@@ -846,7 +858,7 @@ SkippedSubtypeRelationship:
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
             Dim loXMLElementQueryResult As IEnumerable(Of XElement)
-
+            Dim lsMessage As String
             '--------------------------------------------------------------------------------------------
             '  PSEUDOCODE
             '  * Load all of the FactTypes regardless of whether the FactType has a Role referencing
@@ -855,7 +867,6 @@ SkippedSubtypeRelationship:
             '      JoinedORMObject = Nothing to FactTypes already loaded in the previous step.
             '      Update the JoinedORMObject to the FactType that was missing on the initial load.
             '--------------------------------------------------------------------------------------------
-
 
             Try
                 loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
@@ -895,7 +906,16 @@ SkippedSubtypeRelationship:
                             '----------------------------------------------
                             Dim lrModelObject As New FBM.ModelObject
 
-                            lrModelObject.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                            Try
+                                lrModelObject.NORMAReferenceId = lrRoleXElement.<orm:RolePlayer>(0).Attribute("ref").Value
+                            Catch ex As Exception
+                                'Can't guarantee that NORMA Roles actually join something and are not in error.
+                                'I.e. e.g. NORMA can have a Role that is in error, and the joinedModelElement is 'Missing'.
+                                'In this case we can't create the Role for the FactType
+                                lsMessage = "The Fact Type, " & lrFactType.Id & ", in the NORMA .orm file is in error and has a Role that is joined to nothing. Please fix the NORMA file and reImport into Boston."
+                                MsgBox(lsMessage)
+                                GoTo SkipRole
+                            End Try
 
                             '-------------------------------------
                             'Check to see if it is an EntityType
@@ -1048,6 +1068,8 @@ SkippedSubtypeRelationship:
                             '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
                             'End If
 
+SkipRole: 'Used when NORMA file has a 'Missing' Role.
+
                             If lrRoleXElement.<orm:ValueRestriction>.Count > 0 Then
 
                                 Dim loValueConstraintXElement As XElement = lrRoleXElement.<orm:ValueRestriction>.<orm:RoleValueConstraint>.First
@@ -1130,10 +1152,10 @@ SkippedSubtypeRelationship:
                                 lsReferenceMode = "." & loXMLElementQueryResult(0).Attribute("_ReferenceMode").Value
                             End If
                             lrFactType.ObjectifyingEntityType.SetReferenceMode(lsReferenceMode, True,, False,, True, True)
-                                lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
-                            End If
+                            lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
+                        End If
 
-                        End If 'FactType exists in Model
+                    End If 'FactType exists in Model
                 Next 'FactType
 
                 Dim larFaultyFactTypes = From FactType In arModel.FactType
@@ -1169,7 +1191,6 @@ SkippedSubtypeRelationship:
                 Next 'FaultyFactType
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -3640,10 +3661,10 @@ SkippedSubtypeRelationship:
 
             Try
                 ''Testing
-                Me.FTRProcessor.ProcessFTR(asReading, Me.FTRParseTree)
+                'Me.FTRProcessor.ProcessFTR(asReading, Me.FTRParseTree)
 
                 'OR
-
+                asReading = Database.MakeStringSafe(asReading)
                 Me.FTRParseTree = Me.FTRParser.Parse(asReading)
 
                 If Me.FTRParseTree.Errors.Count > 0 Then
@@ -3655,6 +3676,7 @@ SkippedSubtypeRelationship:
                     lsMessage.AppendLine("The correct format to use is:")
                     lsMessage.AppendLine("Object Types, words start with a capital. E.g. Person")
                     lsMessage.AppendLine("Predicates are all lowercase. E.g. is married")
+                    lsMessage.AppendDoubleLineBreak("Fact Type: " & arFactTypeReading.FactType.Id)
                     MsgBox(lsMessage)
                     Return False
                 Else

@@ -1007,7 +1007,7 @@ Namespace FBM
 
                             If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
                                 If Me.JoinsEntityType.HasSimpleReferenceScheme Then
-                                    lrActiveRole = Me.JoinsEntityType.ReferenceModeRoleConstraint.Role(0)
+                                    lrActiveRole = CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeRoleConstraint.Role(0)
                                 End If
                             Else
                                 lrActiveRole = Me
@@ -1017,7 +1017,7 @@ Namespace FBM
                                 Select Case Me.JoinedORMObject.GetType
                                     Case Is = GetType(FBM.EntityType)
                                         If Me.JoinsEntityType.HasSimpleReferenceScheme Then
-                                            lsColumnName = CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeValueType.Id
+                                            lsColumnName = CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeValueType.Id
                                         ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
                                             Throw New Exception("Called for Entity Type with Compound Reference Scheme.")
                                         Else
