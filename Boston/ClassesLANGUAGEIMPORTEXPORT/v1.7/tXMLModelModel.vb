@@ -1177,31 +1177,34 @@ Namespace XMLModel
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
-                    lrRoleConstraintInstance = New FBM.RoleConstraintInstance
 
-                    lrRoleConstraintInstance.Id = lrConceptInstance.Symbol
-
-                    If IsSomething(lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)) Then
+                    If IsSomething(lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol)) Then
                         '-------------------------------------------------------------------
                         'The RoleConstraintInstance has already been added to the Page.
                         '  FactType.CloneInstance adds RoleConstraintInstances to the Page
                         '-------------------------------------------------------------------
                     Else
-                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrRoleConstraintInstance.Id)
+                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
-                        Select Case lrRoleConstraint.RoleConstraintType
-                            Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                                lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
-                            Case Is = pcenumRoleConstraintType.RoleValueConstraint
-                                lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
-                            Case Else
-                                lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                        End Select
+                        Try
+                            Select Case lrRoleConstraint.RoleConstraintType
+                                Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                                    lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
+                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                    lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+                                Case Else
+                                    lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                            End Select
 
-                        lrRoleConstraintInstance.X = lrConceptInstance.X
-                        lrRoleConstraintInstance.Y = lrConceptInstance.Y
+                            lrRoleConstraintInstance.X = lrConceptInstance.X
+                            lrRoleConstraintInstance.Y = lrConceptInstance.Y
 
-                        lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                        Catch ex As Exception
+                            lsMessage = "Error loading Role Constraint with Id: " & lrConceptInstance.Symbol
+                            lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                        End Try
 
                     End If
                 Next

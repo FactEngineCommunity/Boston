@@ -2308,18 +2308,14 @@ Namespace FBM
             Try
                 Dim lsSQLQuery As String = ""
                 Dim lrRecordset As ORMQL.Recordset
-                Dim lrRecordset1 As ORMQL.Recordset
-                Dim lrRecordset2 As ORMQL.Recordset
-
                 Dim lrOriginTable As RDS.Table
-                Dim lrDestinationTable As RDS.Table
                 Dim lsRelationId As String = ""
 
                 '=======================================
                 'Map the Relations - Link the Entities 
                 '=======================================
                 lsSQLQuery = "SELECT *"
-                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString                
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
 
                 lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -2331,264 +2327,21 @@ Namespace FBM
 
                     lrOriginTable = New RDS.Table
                     lrOriginTable.Name = lrRecordset("Entity").Data
-
-
                     lsRelationId = lrRecordset("Relation").Data
 
                     lrOriginTable = Me.RDS.Table.Find(AddressOf lrOriginTable.Equals)
 
-                    '-----------------------------
-                    'Find the Destination Entity
-                    '-----------------------------
-                    lrDestinationTable = New RDS.Table 'So the name can be set.
-
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                    lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
-
-                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    Try
-                        lrDestinationTable.Name = lrRecordset1("Entity").Data
-
-                        lrDestinationTable = Me.RDS.Table.Find(AddressOf lrDestinationTable.Equals)
-                    Catch ex As Exception
-                        Dim lsMessage As String
-                        lsMessage = "Relation with Origin Entity, " & lrOriginTable.Name & ", has no Destination Entity"
-                        lsMessage.AppendDoubleLineBreak("Boston will remove this Relation from the Relational View as a precaution. Determine which Relation is missing and try and remake the Relation from the Object-Role Model view.")
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
-                        Dim lrRelation As New RDS.Relation
-                        lrRelation.Id = lsRelationId
-                        Me.RDS.removeRelation(lrRelation)
-                    End Try
-
-
-
-                    If lrDestinationTable IsNot Nothing Then
-
-                        '================================
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM CoreOriginMultiplicity"
-                        lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lsOriginMultiplicity As String = lrRecordset1("Multiplicity").Data
-
-                        Dim liOriginMultiplicity As pcenumCMMLMultiplicity
-                        Select Case lsOriginMultiplicity
-                            Case Is = pcenumCMMLMultiplicity.One.ToString
-                                liOriginMultiplicity = pcenumCMMLMultiplicity.One
-                            Case Is = pcenumCMMLMultiplicity.Many.ToString
-                                liOriginMultiplicity = pcenumCMMLMultiplicity.Many
-                        End Select
-
-                        lsSQLQuery = "SELECT COUNT(*)"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
-                        lsSQLQuery &= " WHERE OriginIsMandatory = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lbRelationOriginIsMandatory As Boolean = False
-                        If CInt(lrRecordset1("Count").Data) > 0 Then
-                            lbRelationOriginIsMandatory = True
-                        End If
-
-                        '================================
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM CoreDestinationMultiplicity"
-                        lsSQLQuery &= " WHERE ERDRelation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lsDestinationMultiplicity As String = lrRecordset1("Multiplicity").Data
-
-                        Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
-                        Select Case lsDestinationMultiplicity
-                            Case Is = pcenumCMMLMultiplicity.One.ToString
-                                liDestinationMultiplicity = pcenumCMMLMultiplicity.One
-                            Case Is = pcenumCMMLMultiplicity.Many.ToString
-                                liDestinationMultiplicity = pcenumCMMLMultiplicity.Many
-                        End Select
-
-                        lsSQLQuery = "SELECT COUNT(*)"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
-                        lsSQLQuery &= " WHERE DestinationIsMandatory = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lbRelationDestinationIsMandatory As Boolean = False
-                        If CInt(lrRecordset1("Count").Data) > 0 Then
-                            lbRelationDestinationIsMandatory = True
-                        End If
-
-                        '-------------------------------------------------------------------------------
-                        'Check to see whether the Relation contributes to the PrimaryKey of the Entity
-                        '-------------------------------------------------------------------------------
-                        lsSQLQuery = "SELECT COUNT(*)"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
-                        lsSQLQuery &= " WHERE " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & " = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lbContributesToPrimaryKey As Boolean = False
-
-                        If CInt(lrRecordset1("Count").Data) > 0 Then
-                            lbContributesToPrimaryKey = True
-                        End If
-
-                        '-----------------------------------
-                        'Get the FactType for the Relation
-                        '-----------------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        Dim lrFactType As New FBM.FactType(Me, lrRecordset1("FactType").Data, True)
-                        lrFactType = Me.FactType.Find(AddressOf lrFactType.Equals)
-
-                        Dim lrRelation As New RDS.Relation(lrRecordset("Relation").Data,
-                                                           lrOriginTable, _
-                                                           liOriginMultiplicity, _
-                                                           lbRelationOriginIsMandatory, _
-                                                           lbContributesToPrimaryKey, _
-                                                           "", _
-                                                           lrDestinationTable, _
-                                                           liDestinationMultiplicity, _
-                                                           lbRelationDestinationIsMandatory, _
-                                                           "", _
-                                                           lrFactType)
-
-                        'Predicates
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString                        
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        If Not lrRecordset1.EOF Then
-                            lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
-                        End If
-
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString                        
-                        lsSQLQuery &= " WHERE Relation = '" & lrRecordset("Relation").Data & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        If Not lrRecordset1.EOF Then
-                            lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
-                        End If
-
-                        '==============================================================
-                        'Get the Columns and their OrdinalPositions for the Relation.
-                        Dim larColumn As New List(Of RDS.Column)
-                        Dim lrColumn As RDS.Column
-                        Dim lrDictionary As New SortedDictionary(Of Integer, String)
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOrigin.ToString
-                        lsSQLQuery &= " WHERE Relation = '" & lrRelation.Id & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        While Not lrRecordset1.EOF
-
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOriginHasOrdinalPosition.ToString
-                            lsSQLQuery &= " WHERE RelationAttribute = '" & lrRecordset1.CurrentFact.Id & "'"
-
-                            lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            While lrDictionary.ContainsKey(lrRecordset2("OrdinalPosition").Data)
-                                lrRecordset2("OrdinalPosition").Data += 1
-                                lrRecordset2("OrdinalPosition").makeDirty()
-                            End While
-
-                            lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
-
-                            lrRecordset1.MoveNext()
-                        End While
-
-                        For Each lrDictionaryEntry In lrDictionary
-
-                            lrColumn = New RDS.Column
-                            Dim larOriginColumn = From Table In Me.RDS.Table
-                                                  From Column In Table.Column
-                                                  Where Column.Table.Name = lrRelation.OriginTable.Name
-                                                  Where Column.Id = lrDictionaryEntry.Value
-                                                  Select Column
-
-                            If larOriginColumn.Count > 0 Then
-                                lrColumn = larOriginColumn.First
-                                lrColumn.Relation.Add(lrRelation)
-                                lrRelation.OriginColumns.Add(lrColumn)
-                            Else
-                                prApplication.ThrowErrorMessage("Relation: " & lrRelation.Id & ", had no origin column with " & lrDictionaryEntry.Value, pcenumErrorType.Warning, Nothing, False, False, False)
-                            End If
-                        Next
-
-                        'DestinationColumns
-                        lrDictionary.Clear()
-
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestination.ToString
-                        lsSQLQuery &= " WHERE Relation = '" & lrRelation.Id & "'"
-
-                        lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        While Not lrRecordset1.EOF
-
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition.ToString
-                            lsSQLQuery &= " WHERE RelationAttribute = '" & lrRecordset1.CurrentFact.Id & "'"
-
-                            lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                            lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
-
-                            lrRecordset1.MoveNext()
-                        End While
-
-                        For Each lrDictionaryEntry In lrDictionary
-
-                            lrColumn = New RDS.Column
-                            Try
-                                lrColumn = (From Table In Me.RDS.Table
-                                            From Column In Table.Column
-                                            Where Column.Table.Name = lrRelation.DestinationTable.Name
-                                            Where Column.Id = lrDictionaryEntry.Value
-                                            Select Column).First
-
-                                lrColumn.Relation.Add(lrRelation)
-                                lrRelation.DestinationColumns.Add(lrColumn)
-                            Catch ex As Exception
-                                'CodeSafe
-                                Dim lsMessage As String = "Could not find Column in Destination Table, " & lrRelation.DestinationTable.Name
-                                lsMessage.AppendLine("Origin Table: " & lrRelation.OriginTable.Name)
-                                lsMessage.AppendLine("Column Id: " & lrDictionaryEntry.Value)
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
-                            End Try
-                        Next
-
-                        If lrRelation.is1To1BinaryRelation Then
-                            Call lrRelation.establishReverseColumns()
-                        End If
-
-                        Me.RDS.Relation.Add(lrRelation)
-
-                    End If 'DestinationTable IsNot Nothing
+                    Call Me.populateRDSRelationForOriginTableRelation(lrOriginTable, lsRelationId)
 
                     lrRecordset.MoveNext()
                 End While
 
                 '==================================================================
                 'CodeSafe
-                Dim larRelation = From Relation In Me.RDS.Relation _
+                Dim larRelation = From Relation In Me.RDS.Relation
                                   Where Relation.OriginColumns.FindAll(Function(x) x.Role Is Nothing).Count > 0
                                   Select Relation
-                
+
                 For Each lrRelation In larRelation.ToArray
                     MsgBox("Removing one redundant relation")
                     Call Me.RDS.removeRelation(lrRelation)
@@ -2604,6 +2357,284 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Private Sub populateRDSRelationForOriginTableRelation(ByRef arOriginTable As RDS.Table, asRelationId As String)
+
+            Dim lsSQLQuery As String = ""
+            Dim lrRecordset1 As ORMQL.Recordset
+            Dim lrRecordset2 As ORMQL.Recordset
+            Dim lrDestinationTable As RDS.Table = Nothing
+            Dim lrFactType As FBM.FactType
+            Dim lsMessage As String
+
+            Try
+                '-----------------------------
+                'Find the Destination Entity
+                '-----------------------------
+                lrDestinationTable = New RDS.Table 'So the name can be set.
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                lsSQLQuery &= " WHERE Relation = '" & asRelationId & "'"
+
+                lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Try
+                    lrDestinationTable.Name = lrRecordset1("Entity").Data
+
+                    lrDestinationTable = Me.RDS.Table.Find(AddressOf lrDestinationTable.Equals)
+                Catch ex As Exception
+                    lsMessage = "Relation with Origin Entity, " & arOriginTable.Name & ", has no Destination Entity"
+                    lsMessage.AppendDoubleLineBreak("Boston will remove this Relation from the Relational View as a precaution. Determine which Relation is missing and try and remake the Relation from the Object-Role Model view.")
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                    Dim lrRelation As New RDS.Relation
+                    lrRelation.Id = asRelationId
+                    Me.RDS.removeRelation(lrRelation)
+                End Try
+
+                If lrDestinationTable IsNot Nothing Then
+
+                    '================================
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM CoreOriginMultiplicity"
+                    lsSQLQuery &= " WHERE ERDRelation = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lsOriginMultiplicity As String = lrRecordset1("Multiplicity").Data
+
+                    Dim liOriginMultiplicity As pcenumCMMLMultiplicity
+                    Select Case lsOriginMultiplicity
+                        Case Is = pcenumCMMLMultiplicity.One.ToString
+                            liOriginMultiplicity = pcenumCMMLMultiplicity.One
+                        Case Is = pcenumCMMLMultiplicity.Many.ToString
+                            liOriginMultiplicity = pcenumCMMLMultiplicity.Many
+                    End Select
+
+                    lsSQLQuery = "SELECT COUNT(*)"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
+                    lsSQLQuery &= " WHERE OriginIsMandatory = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lbRelationOriginIsMandatory As Boolean = False
+                    If CInt(lrRecordset1("Count").Data) > 0 Then
+                        lbRelationOriginIsMandatory = True
+                    End If
+
+                    '================================
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM CoreDestinationMultiplicity"
+                    lsSQLQuery &= " WHERE ERDRelation = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lsDestinationMultiplicity As String = lrRecordset1("Multiplicity").Data
+
+                    Dim liDestinationMultiplicity As pcenumCMMLMultiplicity
+                    Select Case lsDestinationMultiplicity
+                        Case Is = pcenumCMMLMultiplicity.One.ToString
+                            liDestinationMultiplicity = pcenumCMMLMultiplicity.One
+                        Case Is = pcenumCMMLMultiplicity.Many.ToString
+                            liDestinationMultiplicity = pcenumCMMLMultiplicity.Many
+                    End Select
+
+                    lsSQLQuery = "SELECT COUNT(*)"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
+                    lsSQLQuery &= " WHERE DestinationIsMandatory = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lbRelationDestinationIsMandatory As Boolean = False
+                    If CInt(lrRecordset1("Count").Data) > 0 Then
+                        lbRelationDestinationIsMandatory = True
+                    End If
+
+                    '-------------------------------------------------------------------------------
+                    'Check to see whether the Relation contributes to the PrimaryKey of the Entity
+                    '-------------------------------------------------------------------------------
+                    lsSQLQuery = "SELECT COUNT(*)"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
+                    lsSQLQuery &= " WHERE " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & " = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lbContributesToPrimaryKey As Boolean = False
+
+                    If CInt(lrRecordset1("Count").Data) > 0 Then
+                        lbContributesToPrimaryKey = True
+                    End If
+
+                    '-----------------------------------
+                    'Get the FactType for the Relation
+                    '-----------------------------------
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Try
+                        lrFactType = New FBM.FactType(Me, lrRecordset1("FactType").Data, True)
+                        lrFactType = Me.FactType.Find(AddressOf lrFactType.Equals)
+                    Catch ex As Exception
+                        Throw New ApplicationException("Can't find Fact Type for Relation  with RelationId: " & asRelationId)
+                    End Try
+
+                    Dim lrRelation As New RDS.Relation(asRelationId,
+                                                           arOriginTable,
+                                                           liOriginMultiplicity,
+                                                           lbRelationOriginIsMandatory,
+                                                           lbContributesToPrimaryKey,
+                                                           "",
+                                                           lrDestinationTable,
+                                                           liDestinationMultiplicity,
+                                                           lbRelationDestinationIsMandatory,
+                                                           "",
+                                                           lrFactType)
+
+                    'Predicates
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    If Not lrRecordset1.EOF Then
+                        lrRelation.OriginPredicate = lrRecordset1("Predicate").Data
+                    End If
+
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & asRelationId & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    If Not lrRecordset1.EOF Then
+                        lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
+                    End If
+
+                    '==============================================================
+                    'Get the Columns and their OrdinalPositions for the Relation.
+                    Dim larColumn As New List(Of RDS.Column)
+                    Dim lrColumn As RDS.Column
+                    Dim lrDictionary As New SortedDictionary(Of Integer, String)
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOrigin.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & lrRelation.Id & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    While Not lrRecordset1.EOF
+
+                        lsSQLQuery = "SELECT *"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOriginHasOrdinalPosition.ToString
+                        lsSQLQuery &= " WHERE RelationAttribute = '" & lrRecordset1.CurrentFact.Id & "'"
+
+                        lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        While lrDictionary.ContainsKey(lrRecordset2("OrdinalPosition").Data)
+                            lrRecordset2("OrdinalPosition").Data += 1
+                            lrRecordset2("OrdinalPosition").makeDirty()
+                        End While
+
+                        lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
+
+                        lrRecordset1.MoveNext()
+                    End While
+
+                    For Each lrDictionaryEntry In lrDictionary
+
+                        lrColumn = New RDS.Column
+                        Dim larOriginColumn = From Table In Me.RDS.Table
+                                              From Column In Table.Column
+                                              Where Column.Table.Name = lrRelation.OriginTable.Name
+                                              Where Column.Id = lrDictionaryEntry.Value
+                                              Select Column
+
+                        If larOriginColumn.Count > 0 Then
+                            lrColumn = larOriginColumn.First
+                            lrColumn.Relation.Add(lrRelation)
+                            lrRelation.OriginColumns.Add(lrColumn)
+                        Else
+                            prApplication.ThrowErrorMessage("Relation: " & lrRelation.Id & ", had no origin column with " & lrDictionaryEntry.Value, pcenumErrorType.Warning, Nothing, False, False, False)
+                        End If
+                    Next
+
+                    'DestinationColumns
+                    lrDictionary.Clear()
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestination.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & lrRelation.Id & "'"
+
+                    lrRecordset1 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    While Not lrRecordset1.EOF
+
+                        lsSQLQuery = "SELECT *"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition.ToString
+                        lsSQLQuery &= " WHERE RelationAttribute = '" & lrRecordset1.CurrentFact.Id & "'"
+
+                        lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
+
+                        lrRecordset1.MoveNext()
+                    End While
+
+                    For Each lrDictionaryEntry In lrDictionary
+
+                        lrColumn = New RDS.Column
+                        Try
+                            lrColumn = (From Table In Me.RDS.Table
+                                        From Column In Table.Column
+                                        Where Column.Table.Name = lrRelation.DestinationTable.Name
+                                        Where Column.Id = lrDictionaryEntry.Value
+                                        Select Column).First
+
+                            lrColumn.Relation.Add(lrRelation)
+                            lrRelation.DestinationColumns.Add(lrColumn)
+                        Catch ex As Exception
+                            'CodeSafe
+                            lsMessage = "Could not find Column in Destination Table, " & lrRelation.DestinationTable.Name
+                            lsMessage.AppendLine("Origin Table: " & lrRelation.OriginTable.Name)
+                            lsMessage.AppendLine("Column Id: " & lrDictionaryEntry.Value)
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                        End Try
+                    Next
+
+                    If lrRelation.is1To1BinaryRelation Then
+                        Call lrRelation.establishReverseColumns()
+                    End If
+
+                    Me.RDS.Relation.Add(lrRelation)
+
+                End If 'DestinationTable IsNot Nothing
+
+            Catch AppEx As ApplicationException
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & AppEx.Message
+                Try
+                    lsMessage.AppendLine("Origin Table: " & arOriginTable.Name)
+                    lsMessage.AppendLine("Destination Table: " & lrDestinationTable.Name)
+
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, AppEx.StackTrace)
+                Catch ex As Exception
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, AppEx.StackTrace)
+                End Try
+
+            Catch ex As Exception
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
     End Class
