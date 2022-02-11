@@ -2,7 +2,7 @@
 Imports System.Xml.Serialization
 Imports System.Xml.Linq
 Imports System.Reflection
-
+Imports Humanizer
 Imports <xmlns:orm="http://schemas.neumont.edu/ORM/2006-04/ORMCore">
 Imports <xmlns:ormDiagram="http://schemas.neumont.edu/ORM/2006-04/ORMDiagram">
 
@@ -881,7 +881,7 @@ SkippedSubtypeRelationship:
 
                     lrFactType = New FBM.FactType(arModel, loElement.Attribute("_Name").Value, loElement.Attribute("_Name").Value)
                     lrFactType.NORMAName = lrFactType.Name
-                    lrFactType.Name = Strings.Left(lrFactType.Name, 99)
+                    lrFactType.Name = Strings.Left(lrFactType.Name, 99).Replace(Chr(34), "")
                     lrFactType.NORMAReferenceId = loElement.Attribute("id").Value
                     lrFactType.Id = arModel.CreateUniqueFactTypeName(lrFactType.Name, 0)
                     lrFactType.Name = lrFactType.Id
@@ -3715,6 +3715,20 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         '------------------------------------------------------------------------------------------------------
                         Dim lsModelElementName As String = Trim(Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME)
                         If arFactTypeReading.FactType.GetRoleByJoinedObjectTypeId(lsModelElementName) Is Nothing Then
+                            '------------------------------------------------------------------------
+                            'Fixes a problem with NORMA files where predicates can contain numbers in NORMA.
+                            '  E.g. "ModelElement1 has ModelElement2 in position 2" and where '2' is not a ModelElementName in the Model.
+                            '  The below will change that to "ModelElement1 has ModelElement2 in position two", which works for Boston.
+                            If lsModelElementName.IsNumeric Then
+                                Try
+                                    Dim lsPredicatePart = CInt(lsModelElementName).ToWords.ToLower
+                                    arFactTypeReading.PredicatePart.Last.PredicatePartText &= " " & lsPredicatePart
+                                    GoTo SkippedModelElement
+                                Catch ex As Exception
+                                    'Let Boston report the error below.
+                                End Try
+                            End If
+
                             lsMessage = "Having trouble getting the Predicate Parts for a Fact Type Reading." & vbCrLf & vbCrLf
                             lsMessage &= lsModelElementName & " is not the name of an Object Type linked by the Fact Type." & vbCrLf & vbCrLf
                             lsMessage &= "Reading: " & asReading & vbCrLf
@@ -3773,6 +3787,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                         lrPredicatePart.makeDirty()
                         arFactTypeReading.PredicatePart.Add(lrPredicatePart)
+SkippedModelElement:
                     Next
 
                     '-----------------------------------------------
