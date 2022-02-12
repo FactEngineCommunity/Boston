@@ -1272,7 +1272,7 @@ Namespace XMLModel
                                                                 , True
                                                                 )
 
-                    lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry)
+                    lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry,,,, True,,,)
 
                     For Each lrXMLFactData In lrXMLFact.Data
                         lrRole = New FBM.Role
