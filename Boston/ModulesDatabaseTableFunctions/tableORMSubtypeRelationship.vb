@@ -15,8 +15,8 @@ Namespace TableSubtypeRelationship
                 lsSQLQuery &= " #" & Now & "#"
                 lsSQLQuery &= " ,#" & Now & "#"
                 lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.Model.ModelId) & "'"
-                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
-                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
+                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.ModelElement.Id) & "'"
+                lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.parentModelElement.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.FactType.Id) & "'"
                 lsSQLQuery &= " ," & arSubtypeRelationship.IsPrimarySubtypeRelationship
                 lsSQLQuery &= ")"
@@ -40,8 +40,8 @@ Namespace TableSubtypeRelationship
 
             lsSQLQuery = "DELETE FROM MetaModelSubtypeRelationship"
             lsSQLQuery &= " WHERE ModelId = '" & arSubtype.Model.ModelId & "'"
-            lsSQLQuery &= "   AND ObjectTypeId = '" & arSubtype.EntityType.Id & "'"
-            lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & arSubtype.parentEntityType.Id & "'"
+            lsSQLQuery &= "   AND ObjectTypeId = '" & arSubtype.ModelElement.Id & "'"
+            lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & arSubtype.parentModelElement.Id & "'"
 
             pdbConnection.BeginTrans()
             pdbConnection.Execute(lsSQLQuery)
@@ -66,8 +66,8 @@ Namespace TableSubtypeRelationship
                 lsSQLQuery = "SELECT COUNT(*)"
                 lsSQLQuery &= "  FROM MetaModelSubtypeRelationship"
                 lsSQLQuery &= " WHERE ModelId = '" & Trim(arSubtypeRelationship.Model.ModelId) & "'"
-                lsSQLQuery &= "   AND ObjectTypeId = '" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
-                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
+                lsSQLQuery &= "   AND ObjectTypeId = '" & Trim(arSubtypeRelationship.ModelElement.Id) & "'"
+                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentModelElement.Id) & "'"
 
 
                 lREcordset.Open(lsSQLQuery)
@@ -200,8 +200,8 @@ Namespace TableSubtypeRelationship
 
                             If IsSomething(lrParentEntityTypeInstance) Then
                                 Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
-                                lrSubtypeRelationship.EntityType = lrEntityTypeInstance.EntityType
-                                lrSubtypeRelationship.parentEntityType = lrParentEntityTypeInstance.EntityType
+                                lrSubtypeRelationship.ModelElement = lrEntityTypeInstance.EntityType
+                                lrSubtypeRelationship.parentModelElement = lrParentEntityTypeInstance.EntityType
 
                                 lrSubtypeRelationship = lrEntityTypeInstance.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeRelationship.Equals)
                                 lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(lrRecordset("IsPrimarySubtypeRelationship").Value)
@@ -265,11 +265,11 @@ Namespace TableSubtypeRelationship
                 Dim lsSQLQuery As String
 
                 lsSQLQuery = " UPDATE MetaModelSubtypeRelationship"
-                lsSQLQuery &= "   SET ObjectTypeId = '" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
-                lsSQLQuery &= "       ,SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
+                lsSQLQuery &= "   SET ObjectTypeId = '" & Trim(arSubtypeRelationship.ModelElement.Id) & "'"
+                lsSQLQuery &= "       ,SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentModelElement.Id) & "'"
                 lsSQLQuery &= "       ,IsPrimarySubtypeRelationship = " & arSubtypeRelationship.IsPrimarySubtypeRelationship
-                lsSQLQuery &= " WHERE ObjectTypeId = '" & Trim(arSubtypeRelationship.EntityType.Id) & "'"
-                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentEntityType.Id) & "'"
+                lsSQLQuery &= " WHERE ObjectTypeId = '" & Trim(arSubtypeRelationship.ModelElement.Id) & "'"
+                lsSQLQuery &= "   AND SupertypeObjectTypeId = '" & Trim(arSubtypeRelationship.parentModelElement.Id) & "'"
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)

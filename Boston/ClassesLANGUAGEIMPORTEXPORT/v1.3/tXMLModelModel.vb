@@ -90,7 +90,7 @@ Namespace XMLModel13
                 For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
 
                     lrXMLSubtypeRelationship = New XMLModel13.SubtypeRelationship
-                    lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentEntityType.Id
+                    lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
                     lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
 
                     lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
@@ -929,10 +929,10 @@ Namespace XMLModel13
                     lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals)
 
                     Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
-                    lrSubtypeConstraint.EntityType = lrEntityTypeInstance.EntityType
-                    lrSubtypeConstraint.parentEntityType = lrParentEntityTypeInstance.EntityType
+                    lrSubtypeConstraint.ModelElement = lrEntityTypeInstance.EntityType
+                    lrSubtypeConstraint.parentModelElement = lrParentEntityTypeInstance.EntityType
 
-                    lrSubtypeConstraint = lrSubtypeConstraint.EntityType.SubtypeRelationship.Find(AddressOf lrSubtypeConstraint.Equals)
+                    lrSubtypeConstraint = lrSubtypeConstraint.ModelElement.SubtypeRelationship.Find(AddressOf lrSubtypeConstraint.Equals)
 
                     Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
 

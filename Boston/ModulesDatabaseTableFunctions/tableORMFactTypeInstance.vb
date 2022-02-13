@@ -329,8 +329,8 @@ Namespace TableFactTypeInstance
                                 lrParentEntityTypeInstance = lrFactTypeInstance.RoleGroup(1).JoinsEntityType
 
                                 Dim lrSubtypeConstraintInstance As New FBM.SubtypeRelationshipInstance
-                                lrSubtypeConstraintInstance.EntityType = lrEntityTypeInstance
-                                lrSubtypeConstraintInstance.parentEntityType = lrParentEntityTypeInstance
+                                lrSubtypeConstraintInstance.ModelElement = lrEntityTypeInstance
+                                lrSubtypeConstraintInstance.parentModelElement = lrParentEntityTypeInstance
                                 lrFactTypeInstance.SubtypeConstraintInstance = lrEntityTypeInstance.SubtypeRelationship.Find(AddressOf lrSubtypeConstraintInstance.Equals)
                             End If
 

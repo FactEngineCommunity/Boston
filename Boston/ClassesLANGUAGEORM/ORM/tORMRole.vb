@@ -4,6 +4,7 @@ Imports System.Runtime.Serialization
 Imports System.Reflection
 Imports System.Security.Permissions
 Imports System.Xml.Schema
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -519,6 +520,7 @@ Namespace FBM
         ''' This is far easier to implement than a recursive loading of FactTypeInstances.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False, Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing) As FBM.RoleInstance
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
@@ -610,7 +612,9 @@ Namespace FBM
                     End If
 
                     If abAddToPage Then
-                        arPage.RoleInstance.AddUnique(lrRoleInstance)
+                        SyncLock arPage.RoleInstance
+                            arPage.RoleInstance.AddUnique(lrRoleInstance)
+                        End SyncLock
                     End If
 
                 End With
@@ -1580,7 +1584,7 @@ Namespace FBM
                                     larRolesToReturn.Add(CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype, FBM.EntityType).ReferenceModeFactType.RoleGroup(1))
                                 Else
                                     If Me.JoinsEntityType.SubtypeRelationship.Count > 0 Then
-                                        lrSupertype = Me.JoinsEntityType.SubtypeRelationship.First.parentEntityType
+                                        lrSupertype = Me.JoinsEntityType.SubtypeRelationship.First.parentModelElement
 
                                         If CType(lrSupertype, FBM.EntityType).ReferenceModeFactType Is Nothing Then
                                             lrSupertype = lrSupertype.GetTopmostSupertype

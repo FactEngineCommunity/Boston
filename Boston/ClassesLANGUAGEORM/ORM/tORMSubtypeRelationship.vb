@@ -1,5 +1,6 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -18,11 +19,11 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        Public EntityType As New FBM.ModelObject 'The EntityType for which the SubtypeConstraint is applicable
+        <XmlIgnore()>
+        Public ModelElement As New FBM.ModelObject 'The EntityType for which the SubtypeConstraint is applicable
 
         <XmlIgnore()>
-        Public parentEntityType As New FBM.ModelObject 'The Parent EntityType to Me.EntityType
+        Public parentModelElement As New FBM.ModelObject 'The Parent EntityType to Me.EntityType
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -51,13 +52,13 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arEntityType As FBM.EntityType,
+        Public Sub New(ByRef arEntityType As FBM.ModelObject,
                        ByRef arParentEntityType As FBM.ModelObject,
                        ByRef arSubtypingFactType As FBM.FactType)
 
             Me.Model = arEntityType.Model
-            Me.EntityType = arEntityType
-            Me.parentEntityType = arParentEntityType
+            Me.ModelElement = arEntityType
+            Me.parentModelElement = arParentEntityType
             Me.FactType = arSubtypingFactType
 
         End Sub
@@ -75,19 +76,19 @@ Namespace FBM
 
             With Me
                 lrSubtypeRelationship.Model = arModel
-                lrSubtypeRelationship.EntityType = .EntityType.Clone(arModel, abAddToModel)
-                lrSubtypeRelationship.parentEntityType = .parentEntityType.Clone(arModel, abAddToModel)
+                lrSubtypeRelationship.ModelElement = .ModelElement.Clone(arModel, abAddToModel)
+                lrSubtypeRelationship.parentModelElement = .parentModelElement.Clone(arModel, abAddToModel)
                 lrSubtypeRelationship.FactType = .FactType.Clone(arModel, abAddToModel)
                 lrSubtypeRelationship.IsPrimarySubtypeRelationship = .IsPrimarySubtypeRelationship
                 lrSubtypeRelationship.isDirty = True
 
                 If abAddToModel Then
-                    If lrSubtypeRelationship.EntityType.SubtypeRelationship.Contains(lrSubtypeRelationship) Then
+                    If lrSubtypeRelationship.ModelElement.SubtypeRelationship.Contains(lrSubtypeRelationship) Then
                         '------------------------------------------------------------------------------------------------------------
                         'The SubtypeRelationship already exists within the set of SubtypeRelationships for the EntityType (Subtype)
                         '------------------------------------------------------------------------------------------------------------
                     Else
-                        lrSubtypeRelationship.EntityType.SubtypeRelationship.Add(lrSubtypeRelationship)
+                        lrSubtypeRelationship.ModelElement.SubtypeRelationship.Add(lrSubtypeRelationship)
                     End If
                 End If
             End With
@@ -96,7 +97,7 @@ Namespace FBM
 
         End Function
 
-
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrSubtypeConstraintInstance As New FBM.SubtypeRelationshipInstance
@@ -106,9 +107,9 @@ Namespace FBM
                     lrSubtypeConstraintInstance.Page = arPage
                     lrSubtypeConstraintInstance.Model = arPage.Model
 
-                    lrSubtypeConstraintInstance.EntityType = arPage.EntityTypeInstance.Find(Function(x) x.Id = .EntityType.Id)
+                    lrSubtypeConstraintInstance.ModelElement = arPage.getModelElementById(.ModelElement.Id)
 
-                    lrSubtypeConstraintInstance.parentEntityType = arPage.EntityTypeInstance.Find(Function(x) x.Id = .parentEntityType.Id)
+                    lrSubtypeConstraintInstance.parentModelElement = arPage.getModelElementById(.parentModelElement.Id)
 
                     Dim lrFactTypeInstance As New FBM.FactTypeInstance
                     lrFactTypeInstance.Id = .FactType.Id
@@ -142,7 +143,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.tSubtypeRelationship) As Boolean Implements System.IEquatable(Of FBM.tSubtypeRelationship).Equals
 
-            Return (Me.EntityType.Id = other.EntityType.Id) And (Me.parentEntityType.Id = other.parentEntityType.Id)
+            Return (Me.ModelElement.Id = other.ModelElement.Id) And (Me.parentModelElement.Id = other.parentModelElement.Id)
 
         End Function
 
@@ -153,12 +154,12 @@ Namespace FBM
         Public Shadows Sub RemoveFromModel()
 
             Try
-                Call Me.EntityType.RemoveSubtypeRelationship(Me)
+                Call Me.ModelElement.RemoveSubtypeRelationship(Me)
                 Call Me.FactType.RemoveFromModel(True, False, True, True)
                 Call Me.Delete()
 
                 'RDS
-                Dim lrTable = CType(Me.EntityType, FBM.EntityType).getCorrespondingRDSTable
+                Dim lrTable = CType(Me.ModelElement, FBM.EntityType).getCorrespondingRDSTable
 
                 If lrTable IsNot Nothing Then
                     If lrTable.getPrimaryKeyColumns.Count > 0 Then
@@ -203,8 +204,8 @@ Namespace FBM
 
             Try
 
-                If abIsPrimarySubtypeRelationship And Me.EntityType.SubtypeRelationship.Count > 1 Then
-                    Dim larSubtypeRelationship = From SubtypeRelationship In Me.EntityType.SubtypeRelationship
+                If abIsPrimarySubtypeRelationship And Me.ModelElement.SubtypeRelationship.Count > 1 Then
+                    Dim larSubtypeRelationship = From SubtypeRelationship In Me.ModelElement.SubtypeRelationship
                                                  Where SubtypeRelationship IsNot Me
                                                  Select SubtypeRelationship
 
@@ -218,12 +219,12 @@ Namespace FBM
                 If Not abIsPrimarySubtypeRelationship And Me.IsPrimarySubtypeRelationship Then
                     'Remove the PrimaryKey from the supertype
                     Try
-                        Dim larSupertypePKColumn = Me.parentEntityType.getCorrespondingRDSTable.getPrimaryKeyColumns
+                        Dim larSupertypePKColumn = Me.parentModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
 
                         For Each lrColumn In larSupertypePKColumn
-                            Dim lrSubtypeTable = Me.EntityType.getCorrespondingRDSTable
+                            Dim lrSubtypeTable = Me.ModelElement.getCorrespondingRDSTable
                             Dim lrSubtypeColumn As RDS.Column = lrSubtypeTable.Column.Find(Function(x) x.Role Is lrColumn.Role)
-                            Me.EntityType.getCorrespondingRDSTable.removeColumn(lrSubtypeColumn)
+                            Me.ModelElement.getCorrespondingRDSTable.removeColumn(lrSubtypeColumn)
                         Next
 
                     Catch ex As Exception

@@ -806,7 +806,7 @@ Namespace RDS
                 End If
 
                 For Each lrSubtypeRelationship In larSubtypeRelationship
-                    Dim lrSupertypeTable = lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable
+                    Dim lrSupertypeTable = lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable
                     larSupertypeTable.AddUnique(lrSupertypeTable)
                     If abIsRecursive Then
                         Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
@@ -1255,24 +1255,24 @@ Namespace RDS
                     Return True
                 Else
                     For Each lrSubtypeRelationship In arTable.FBMModelElement.SubtypeRelationship.FindAll(Function(x) x.IsPrimarySubtypeRelationship)
-                        Select Case lrSubtypeRelationship.parentEntityType.GetType
+                        Select Case lrSubtypeRelationship.parentModelElement.GetType
                             Case Is = GetType(FBM.EntityType)
-                                Dim lrEntityType As FBM.EntityType = CType(lrSubtypeRelationship.parentEntityType, FBM.EntityType)
+                                Dim lrEntityType As FBM.EntityType = CType(lrSubtypeRelationship.parentModelElement, FBM.EntityType)
                                 If lrEntityType.IsObjectifyingEntityType Then
                                     If lrEntityType.ObjectifiedFactType Is Me.FBMModelElement Then
                                         Return True
                                     End If
                                 Else
-                                    If lrSubtypeRelationship.parentEntityType Is Me.FBMModelElement Then
+                                    If lrSubtypeRelationship.parentModelElement Is Me.FBMModelElement Then
                                         Return True
                                     End If
                                 End If
                             Case Else
-                                If lrSubtypeRelationship.parentEntityType Is Me.FBMModelElement Then
+                                If lrSubtypeRelationship.parentModelElement Is Me.FBMModelElement Then
                                     Return True
                                 End If
                         End Select
-                        Return lrSubtypeRelationship.parentEntityType.getCorrespondingRDSTable.IsPartOfPrimarySubtypeRelationshipPath(arTable)
+                        Return lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable.IsPartOfPrimarySubtypeRelationshipPath(arTable)
                     Next
                 End If
 

@@ -2192,7 +2192,7 @@ Public Class frmDiagramORM
                     Dim lrRoleInstance As New FBM.RoleInstance
                     lrSubtypeConstraintInstance = trg.Tag
                     lbJoinedSubtypingRelationship = True
-                    lrRoleInstance = lrSubtypeConstraintInstance.FactType.FindFirstRoleByModelObject(lrSubtypeConstraintInstance.parentEntityType)
+                    lrRoleInstance = lrSubtypeConstraintInstance.FactType.FindFirstRoleByModelObject(lrSubtypeConstraintInstance.parentModelElement)
 
                     lrTargetModelObject = lrRoleInstance
 
@@ -5124,7 +5124,8 @@ Public Class frmDiagramORM
                 '----------------------------------------------
                 '  Create the new ShapeNode for the FactType.
                 '----------------------------------------------            
-                Call lrFactTypeInstance.DisplayAndAssociate(Me.ViewFactTablesToolStripMenuItem.Checked, My.Settings.ShowFactTypeNamesOnORMModelLoad)
+                Call lrFactTypeInstance.DisplayAndAssociate(Me.ViewFactTablesToolStripMenuItem.Checked,
+                                                            My.Settings.ShowFactTypeNamesOnORMModelLoad)
             Next
 
             '-----------------------------------
@@ -5132,6 +5133,11 @@ Public Class frmDiagramORM
             '-----------------------------------        
             For Each lrEntityTypeInstance In arPage.EntityTypeInstance
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
+                    Call lrSubtypeRelationship.DisplayAndAssociate()
+                Next
+            Next
+            For Each lrValueTypeInstance In arPage.ValueTypeInstance
+                For Each lrSubtypeRelationship In lrValueTypeInstance.SubtypeRelationship
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
             Next

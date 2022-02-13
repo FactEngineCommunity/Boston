@@ -1804,7 +1804,7 @@ Public Class frmDiagramORMForGlossary
                     Dim lrRoleInstance As New FBM.RoleInstance
                     lrSubtypeConstraintInstance = trg.Tag
                     lbJoinedSubtypingRelationship = True
-                    lrRoleInstance = lrSubtypeConstraintInstance.FactType.FindFirstRoleByModelObject(lrSubtypeConstraintInstance.parentEntityType)
+                    lrRoleInstance = lrSubtypeConstraintInstance.FactType.FindFirstRoleByModelObject(lrSubtypeConstraintInstance.parentModelElement)
 
                     lrTargetModelObject = lrRoleInstance
 
@@ -5338,7 +5338,7 @@ Public Class frmDiagramORMForGlossary
 
             Dim larSuptypeRelationshipParent = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
                                                From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
-                                               Select SubtypeRelationshipInstance.parentEntityType
+                                               Select SubtypeRelationshipInstance.parentModelElement
 
             If larSuptypeRelationshipParent.Count > 0 Then
                 For Each lrSubtypeRelationsipParent In larSuptypeRelationshipParent
@@ -5346,13 +5346,13 @@ Public Class frmDiagramORMForGlossary
                     If lrSubtypeRelationsipParent IsNot Nothing Then
                         Dim larSubtypeRelationhipChildren = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
                                                             From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
-                                                            Where SubtypeRelationshipInstance.parentEntityType.Id = lrSubtypeRelationsipParent.Id
-                                                            Select SubtypeRelationshipInstance.EntityType
+                                                            Where SubtypeRelationshipInstance.parentModelElement.Id = lrSubtypeRelationsipParent.Id
+                                                            Select SubtypeRelationshipInstance.ModelElement
 
-                        liX = lrSubtypeRelationsipParent.X - (larSubtypeRelationhipChildren.Count / 2) * 30
+                        liX = CType(lrSubtypeRelationsipParent, Object).X - (larSubtypeRelationhipChildren.Count / 2) * 30
 
                         For Each lrEntityTypeInstance In larSubtypeRelationhipChildren
-                            lrEntityTypeInstance.Move(liX, lrSubtypeRelationsipParent.Y + 40, False)
+                            lrEntityTypeInstance.Move(liX, CType(lrSubtypeRelationsipParent, Object).Y + 40, False)
                             liX += 30
                         Next
                     End If

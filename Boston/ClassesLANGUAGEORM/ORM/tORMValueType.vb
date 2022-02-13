@@ -2,6 +2,7 @@ Imports System.ComponentModel
 Imports System.Collections.Specialized
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -228,6 +229,7 @@ Namespace FBM
         Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
 
         Sub New()
             Me.ConceptType = pcenumConceptType.ValueType
@@ -276,11 +278,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.ValueType) As Boolean Implements System.IEquatable(Of FBM.ValueType).Equals
 
-            If Me.Id = other.Id Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.Id = other.Id
 
         End Function
 
@@ -430,6 +428,115 @@ Namespace FBM
 
             End If
         End Sub
+
+        Public Overrides Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
+                                                            Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
+                                                            Optional ByVal asSubtypeRoleId As String = Nothing,
+                                                            Optional ByVal asSupertypeRoleId As String = Nothing) As FBM.tSubtypeRelationship
+
+            Try
+
+                Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+
+                lrSubtypeRelationship.Model = Me.Model
+                lrSubtypeRelationship.ModelElement = Me
+                lrSubtypeRelationship.parentModelElement = arParentModelElement
+                lrSubtypeRelationship.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
+
+                Me.parentModelObjectList.Add(arParentModelElement)
+                arParentModelElement.childModelObjectList.Add(Me)
+
+                '---------------------------------------------
+                'Create a FactType for the SubtypeConstraint
+                '---------------------------------------------
+                Dim lsFactTypeName As String = ""
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim larRole As New List(Of FBM.Role)
+
+                larModelObject.Add(Me)
+                If arParentModelElement.IsObjectifyingEntityType Then
+                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
+                    larModelObject.Add(arParentModelElement.ObjectifiedFactType)
+                Else
+                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
+                    larModelObject.Add(arParentModelElement)
+                End If
+
+                lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
+                lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
+
+                lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
+                lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
+
+                If asSubtypeRoleId IsNot Nothing Then
+                    lrSubtypeRelationship.FactType.RoleGroup(0).Id = asSubtypeRoleId
+                End If
+
+                If asSupertypeRoleId IsNot Nothing Then
+                    lrSubtypeRelationship.FactType.RoleGroup(1).Id = asSupertypeRoleId
+                End If
+
+                lrSubtypeRelationship.FactType.RoleGroup(0).Mandatory = True
+
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, arParentModelElement.GetTopmostSupertype)
+
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
+
+                Dim lrFactTypeReading As FBM.FactTypeReading
+                Dim lasPredicatePart As New List(Of String)
+                lasPredicatePart.Add("is")
+                lasPredicatePart.Add("")
+
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+                lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+
+                larRole.Clear()
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+                lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+
+                If Me.SubtypeRelationship.Count = 0 Then
+                    lrSubtypeRelationship.IsPrimarySubtypeRelationship = True
+                End If
+
+                Me.SubtypeRelationship.Add(lrSubtypeRelationship)
+
+                If Me.getCorrespondingRDSTable Is Nothing Then
+                    If Not Me.IsAbsorbed Then
+                        'Create a Table for the EntityType.
+                        Dim lrTable As New RDS.Table(Me.Model.RDS, Me.Id, Me)
+                        Call Me.Model.RDS.addTable(lrTable)
+                    End If
+                Else
+                    Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
+                End If
+
+                RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
+
+                Call Me.Model.MakeDirty()
+
+                Return lrSubtypeRelationship
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Public Sub AddValueConstraint(ByVal asValueConstraint As String)
 
@@ -603,6 +710,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
@@ -636,9 +744,9 @@ Namespace FBM
                     Next
 
                     If abAddToPage Then
-                        If Not arPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
+                        SyncLock arPage.ValueTypeInstance
                             arPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                        End If
+                        End SyncLock
                     End If
 
                 End With

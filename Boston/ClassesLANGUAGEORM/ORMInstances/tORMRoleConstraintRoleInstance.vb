@@ -33,9 +33,19 @@ Namespace FBM
         ''' <remarks></remarks>
         Public SubtypeConstraintInstance As FBM.SubtypeRelationshipInstance = Nothing
 
-        <NonSerialized(), _
-        XmlIgnore()> _
-        Public Shape As New ShapeNode
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
+        <XmlIgnore()>
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
+
 
         <NonSerialized()> _
         Public Link As DiagramLink

@@ -1,6 +1,7 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Threading.Tasks
+Imports System.Runtime.CompilerServices
 
 Namespace XMLModel
 
@@ -24,6 +25,9 @@ Namespace XMLModel
         Public Sub MapFromFBMModel(ByVal arFBMModel As FBM.Model)
 
             Try
+                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrXMLSubtypeRelationship As XMLModel.SubtypeRelationship
+
                 Me.ORMModel = New XMLModel.ORMModel
                 Me.ORMModel.ModelId = arFBMModel.ModelId
                 Me.ORMModel.Name = arFBMModel.Name
@@ -53,6 +57,15 @@ Namespace XMLModel
 
                     For Each lsValueConstraintValue In lrValueType.ValueConstraint
                         lrXMLValueType.ValueConstraint.Add(lsValueConstraintValue)
+                    Next
+
+                    For Each lrSubtypeRelationship In lrValueType.SubtypeRelationship
+
+                        lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
+                        lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
+                        lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
+
+                        lrXMLValueType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
                     Next
 
                     Me.ORMModel.ValueTypes.Add(lrXMLValueType)
@@ -92,17 +105,13 @@ Namespace XMLModel
                         lrXMLEntityType.ReferenceModeValueTypeId = lrEntityType.ReferenceModeValueType.Id
                     End If
 
-                    Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
-                    Dim lrXMLSubtypeRelationship As XMLModel.SubtypeRelationship
-
                     For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
 
                         lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
-                        lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentEntityType.Id
+                        lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
                         lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
 
                         lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
-
                     Next
 
                     Me.ORMModel.EntityTypes.Add(lrXMLEntityType)
@@ -680,23 +689,23 @@ Namespace XMLModel
                                                       Where FactType.IsSubtypeRelationshipFactType
                                                       Select FactType
 
-
+                Dim lrModelElement As FBM.ModelObject
                 For Each lrXMLFactType In larSubtypeRelationshipFactTypes
 
                     lrFactType = New FBM.FactType(lrXMLFactType.Id, True)
                     lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
 
                     Dim lrParentModelElement As FBM.ModelObject
-                    lrEntityType = lrModel.EntityType.Find(Function(x) x.Id = lrFactType.RoleGroup(0).JoinedORMObject.Id)
+                    lrModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(0).JoinedORMObject.Id)
                     lrParentModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(1).JoinedORMObject.Id)
                     If lrParentModelElement.GetType = GetType(FBM.FactType) Then
                         lrParentModelElement = CType(lrParentModelElement, FBM.FactType).ObjectifyingEntityType
                     End If
-                    lrEntityType.parentModelObjectList.Add(lrParentModelElement)
-                    lrParentModelElement.childModelObjectList.Add(lrEntityType)
+                    lrModelElement.parentModelObjectList.Add(lrParentModelElement)
+                    lrParentModelElement.childModelObjectList.Add(lrModelElement)
 
-                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrEntityType, lrParentModelElement, lrFactType)
-                    lrEntityType.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
+                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
+                    lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
                 Next
 
 
@@ -956,6 +965,7 @@ Namespace XMLModel
 
         End Sub
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
                                       ByRef arModel As FBM.Model,
                                       Optional ByRef arPage As FBM.Page = Nothing) As FBM.Page
@@ -996,7 +1006,9 @@ Namespace XMLModel
                     lrValueTypeInstance.X = lrConceptInstance.X
                     lrValueTypeInstance.Y = lrConceptInstance.Y
 
-                    lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                    SyncLock lrPage.ValueTypeInstance
+                        lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                    End SyncLock
                 Next
 
                 '=============================
@@ -1032,7 +1044,9 @@ Namespace XMLModel
                     lrEntityTypeInstance.X = lrConceptInstance.X
                     lrEntityTypeInstance.Y = lrConceptInstance.Y
 
-                    lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+                    SyncLock lrPage.EntityTypeInstance
+                        lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+                    End SyncLock
                 Next
 
                 '===========================
@@ -1045,7 +1059,6 @@ Namespace XMLModel
                 Dim lrFactType As FBM.FactType
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
-                    lrFactTypeInstance = New FBM.FactTypeInstance
                     lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
                     lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True)
@@ -1102,7 +1115,9 @@ Namespace XMLModel
                                     lrFactDataInstance.X = lrFactDataConceptInstance.X
                                     lrFactDataInstance.Y = lrFactDataConceptInstance.Y
                                 End If
-                                lrFactTypeInstance.Page.ValueInstance.AddUnique(lrFactDataInstance)
+                                SyncLock lrPage
+                                    lrPage.ValueInstance.AddUnique(lrFactDataInstance)
+                                End SyncLock
                             Next
 
                         End If
@@ -1141,23 +1156,44 @@ Namespace XMLModel
                                                       Where FactType.IsSubtypeRelationshipFactType
                                                       Select FactType
 
+                Dim lrModelElementInstance As FBM.ModelObject
                 Dim lrParentModelElementInstance As FBM.ModelObject
-                Dim lrSubtypeConstraint As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
                 For Each lrFactTypeInstance In larSubtypeRelationshipFactTypes.ToArray
-                    lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.RoleGroup(0).JoinedORMObject.Id)
-                    lrParentModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(1).JoinedORMObject.Id)
+                    Try
+                        lrModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(0).JoinedORMObject.Id)
+                        lrParentModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(1).JoinedORMObject.Id)
 
-                    If lrParentModelElementInstance.ConceptType = pcenumConceptType.FactType Then
-                        Dim lsParentModelElementInstanceId = CType(lrParentModelElementInstance, FBM.FactTypeInstance).FactType.ObjectifyingEntityType.Id
-                        lrParentModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lsParentModelElementInstanceId)
-                    End If
-                    lrSubtypeConstraint = lrEntityTypeInstance.EntityType.SubtypeRelationship.Find(Function(x) x.EntityType.Id = lrEntityTypeInstance.EntityType.Id And x.parentEntityType.Id = lrParentModelElementInstance.Id)
+                        If lrParentModelElementInstance.ConceptType = pcenumConceptType.FactType Then
+                            Dim lsParentModelElementInstanceId = CType(lrParentModelElementInstance, FBM.FactTypeInstance).FactType.ObjectifyingEntityType.Id
+                            lrParentModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lsParentModelElementInstanceId)
+                        End If
 
-                    Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
+                        lrSubtypeRelationship = Nothing
+                        Select Case lrModelElementInstance.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                lrSubtypeRelationship = CType(lrModelElementInstance, FBM.EntityTypeInstance).EntityType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                            Case Is = pcenumConceptType.ValueType
+                                lrSubtypeRelationship = CType(lrModelElementInstance, FBM.ValueTypeInstance).ValueType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                        End Select
 
-                    lrSubtypeConstraintInstance = lrSubtypeConstraint.CloneInstance(lrPage, True)
+                        lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, True)
 
-                    lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeConstraintInstance)
+                        Select Case lrModelElementInstance.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                CType(lrModelElementInstance, FBM.EntityTypeInstance).SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+                            Case Is = pcenumConceptType.ValueType
+                                CType(lrModelElementInstance, FBM.ValueTypeInstance).SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+                        End Select
+
+
+
+                    Catch ex As Exception
+                        lsMessage = "Problem loading Subtype Relationship for Subtype Relationship Fact Type with Id: " & lrFactTypeInstance.Id
+                        lsMessage.AppendDoubleLineBreak("Page: " & lrPage.Name)
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                    End Try
                 Next
 #End Region
 
@@ -1199,7 +1235,9 @@ Namespace XMLModel
                             lrRoleConstraintInstance.X = lrConceptInstance.X
                             lrRoleConstraintInstance.Y = lrConceptInstance.Y
 
-                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            SyncLock lrPage.RoleConstraintInstance
+                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            End SyncLock
                         Catch ex As Exception
                             lsMessage = "Error loading Role Constraint with Id: " & lrConceptInstance.Symbol
                             lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)

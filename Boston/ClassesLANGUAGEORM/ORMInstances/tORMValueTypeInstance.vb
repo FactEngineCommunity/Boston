@@ -77,12 +77,25 @@ Namespace FBM
         BindableAttribute(False)>
         Public Shadows WithEvents Concept As New FBM.Concept
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
+        Public Shadows SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
+
+        <XmlIgnore()>
         Public Page As FBM.Page
 
-        <NonSerialized(), _
-        XmlIgnore()> _
-        Public Shape As ShapeNode
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
+        <XmlIgnore()>
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
+
 
         <XmlIgnore()> _
         Public _X As Integer
@@ -113,6 +126,13 @@ Namespace FBM
                 End If
             End Set
         End Property
+
+        ''' <summary>
+        ''' Only used, at this stage, with SubtypeRelationshipInstances (added to Outgoing links)
+        ''' </summary>
+        <NonSerialized(),
+        XmlIgnore()>
+        Public OutgoingLink As New List(Of DiagramLink)
 
         <XmlIgnore>
         <Browsable(True)>

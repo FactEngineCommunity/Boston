@@ -14,8 +14,20 @@ Namespace FBM
 
         Public Page As FBM.Page
 
-        <NonSerialized()> _
-        Public Shape As ShapeNode
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
+        <XmlIgnore()>
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
+
+
         Public Property X As Integer Implements FBM.iPageObject.X 'The X coordinate of the PageObject
         Public Property Y As Integer Implements FBM.iPageObject.Y 'The Y coordinate of the PageObject
 

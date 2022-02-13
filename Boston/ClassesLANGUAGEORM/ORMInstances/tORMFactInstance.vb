@@ -7,6 +7,7 @@ Namespace FBM
     <Serializable()> _
     Public Class FactInstance
         Inherits FBM.Fact
+        Implements FBM.iPageObject
 
         <XmlAttribute()> _
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Fact
@@ -44,10 +45,22 @@ Namespace FBM
         '  - NB See also the similar functionality within the FBM.FactDataInstance class.
         '----------------------------------------------------------------------------------------------------------------------------------------
 
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
+        <XmlIgnore()>
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _X As Integer
-        Public Property X() As Integer
+        Public Property X() As Integer Implements iPageObject.X
             Get
                 Return Me._X
             End Get
@@ -61,7 +74,7 @@ Namespace FBM
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Y As Integer
-        Public Property Y() As Integer
+        Public Property Y() As Integer Implements iPageObject.Y
             Get
                 Return Me._Y
             End Get
@@ -72,10 +85,6 @@ Namespace FBM
                 End If
             End Set
         End Property
-
-        <NonSerialized()>
-        <XmlIgnore()>
-        Public Shape As New ShapeNode
 
         <XmlIgnore()> _
         Public Page As FBM.Page
@@ -527,6 +536,53 @@ Namespace FBM
 
         End Sub
 
+        Public Sub MouseDown() Implements iPageObject.MouseDown
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseMove() Implements iPageObject.MouseMove
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub MouseUp() Implements iPageObject.MouseUp
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeModified() Implements iPageObject.NodeModified
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub Moved() Implements iPageObject.Moved
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+            Throw New NotImplementedException()
+        End Sub
     End Class
 
 End Namespace

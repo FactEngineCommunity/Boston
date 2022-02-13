@@ -57,9 +57,18 @@ Namespace FBM
         <XmlIgnore()>
         Public Page As FBM.Page
 
-        <NonSerialized()>
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
         <XmlIgnore()>
-        Public Shape As New ShapeNode
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
 
         <NonSerialized(),
         XmlIgnore()>

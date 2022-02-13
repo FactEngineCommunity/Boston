@@ -9,7 +9,7 @@ Namespace FBM
     <Serializable()> _
     Public Class RoleConstraintInstance
         Inherits FBM.RoleConstraint
-        Implements FBM.iPageObject
+        Implements FBM.iRoleConstraintObject
         Implements IEquatable(Of FBM.RoleConstraintInstance)
 
         <XmlIgnore()>
@@ -97,15 +97,38 @@ Namespace FBM
         <XmlIgnore()>
         Public Page As FBM.Page
 
-        Public Property X As Integer Implements FBM.iPageObject.X
-        Public Property Y As Integer Implements FBM.iPageObject.Y
+        Public Property X As Integer Implements FBM.iRoleConstraintObject.X
+        Public Property Y As Integer Implements FBM.iRoleConstraintObject.Y
 
         Public Height As Integer
         Public Width As Integer
 
-        <NonSerialized()>
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As New FBM.RoleConstraintShape ' ShapeNode
         <XmlIgnore()>
-        Public Shape As New FBM.RoleConstraintShape
+        Public Property Shape As FBM.RoleConstraintShape Implements iRoleConstraintObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As FBM.RoleConstraintShape)
+                Me._Shape = value
+            End Set
+        End Property
+
+        Private Property iPageObject_Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As ShapeNode)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        '20220211-VM-Was. See above 
+        '<NonSerialized()>
+        '<XmlIgnore()>
+        'Public Shape As New FBM.RoleConstraintShape
 
         Public Sub New()
             '-------------------
@@ -516,31 +539,31 @@ Namespace FBM
 
         End Function
 
-        Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
+        Public Sub MouseDown() Implements FBM.iRoleConstraintObject.MouseDown
 
         End Sub
 
-        Public Sub MouseMove() Implements FBM.iPageObject.MouseMove
+        Public Sub MouseMove() Implements FBM.iRoleConstraintObject.MouseMove
 
         End Sub
 
-        Public Sub MouseUp() Implements FBM.iPageObject.MouseUp
+        Public Sub MouseUp() Implements FBM.iRoleConstraintObject.MouseUp
 
         End Sub
 
-        Public Sub Moved() Implements FBM.iPageObject.Moved
+        Public Sub Moved() Implements FBM.iRoleConstraintObject.Moved
 
         End Sub
 
-        Public Sub NodeDeleting() Implements FBM.iPageObject.NodeDeleting
+        Public Sub NodeDeleting() Implements FBM.iRoleConstraintObject.NodeDeleting
 
         End Sub
 
-        Public Sub NodeModified() Implements FBM.iPageObject.NodeModified
+        Public Sub NodeModified() Implements FBM.iRoleConstraintObject.NodeModified
 
         End Sub
 
-        Public Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
+        Public Sub NodeSelected() Implements FBM.iRoleConstraintObject.NodeSelected
 
             Try
 
@@ -1848,7 +1871,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
+        Public Sub NodeDeselected() Implements FBM.iRoleConstraintObject.NodeDeselected
 
             If Me.Shape IsNot Nothing Then
                 Me.Shape.Transparent = True
@@ -1987,7 +2010,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+        Public Sub SetAppropriateColour() Implements iRoleConstraintObject.SetAppropriateColour
 
             If Me.Shape IsNot Nothing Then
                 If Me.Shape.Selected Then
@@ -2006,11 +2029,11 @@ Namespace FBM
 
         End Sub
 
-        Public Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+        Public Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer) Implements iRoleConstraintObject.RepellNeighbouringPageObjects
 
         End Sub
 
-        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iRoleConstraintObject.Move
 
         End Sub
 
@@ -2024,7 +2047,7 @@ Namespace FBM
             Return Me.Id = other.Id
         End Function
 
-        Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
+        Public Sub EnableSaveButton() Implements iRoleConstraintObject.EnableSaveButton
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form IsNot Nothing Then
                     Call Me.Page.Form.EnableSaveButton()

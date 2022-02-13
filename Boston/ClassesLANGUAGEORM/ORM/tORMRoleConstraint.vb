@@ -2,6 +2,7 @@ Imports System.ComponentModel
 Imports System.Collections.Generic
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -1481,6 +1482,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.RoleConstraintInstance
 
             Try
@@ -1518,7 +1520,9 @@ Namespace FBM
                     lrRoleConstraintInstance.ValueRangeType = .ValueRangeType
 
                     If abAddToPage And Not arPage.RoleConstraintInstance.Contains(lrRoleConstraintInstance) Then
-                        arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                        SyncLock arPage.RoleConstraintInstance
+                            arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                        End SyncLock
                     End If
 
                     '-------------------------------------------------------------------------
@@ -1568,6 +1572,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function CloneFrequencyConstraintInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.FrequencyConstraint
 
             Dim lrRoleConstraintInstance As New FBM.FrequencyConstraint()
@@ -1589,7 +1594,9 @@ Namespace FBM
                 lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
 
                 If abAddToPage Then
-                    arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                    SyncLock arPage.RoleConstraintInstance
+                        arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                    End SyncLock
                 End If
 
                 '-------------------------------------------------------------------------
@@ -1619,6 +1626,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function CloneRoleValueConstraintInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.RoleValueConstraint
 
             Dim lrRoleConstraintInstance As New FBM.RoleValueConstraint
@@ -1640,7 +1648,9 @@ Namespace FBM
                 lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
 
                 If abAddToPage Then
-                    arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                    SyncLock arPage.RoleConstraintInstance
+                        arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                    End SyncLock
                 End If
 
                 '-------------------------------------------------------------------------

@@ -141,6 +141,16 @@ Namespace XMLModel
             End Set
         End Property
 
+        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+            Get
+                Return Me._SubtypeRelationships
+            End Get
+            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+                Me._SubtypeRelationships = value
+            End Set
+        End Property
+
     End Class
 
 End Namespace

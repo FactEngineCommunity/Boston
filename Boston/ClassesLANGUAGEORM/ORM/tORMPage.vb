@@ -3,6 +3,7 @@ Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -423,7 +424,7 @@ Namespace FBM
                             'Find the EntityTypeInstance on the Page to add the clone of the SubtypeRelationshipInstance
                             '---------------------------------------------------------------------------------------------
                             Dim lrSubtypeEntityTypeInstance As New FBM.EntityTypeInstance
-                            lrSubtypeEntityTypeInstance.Id = lrSubtypeRelationshipInstance.EntityType.Id
+                            lrSubtypeEntityTypeInstance.Id = lrSubtypeRelationshipInstance.ModelElement.Id
                             lrSubtypeEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrSubtypeEntityTypeInstance.Equals)
                             lrSubtypeEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance.Clone(lrPage, True))
                         Next
@@ -911,6 +912,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function DropFactTypeAtPoint(ByRef arFactType As FBM.FactType,
                                             ByVal ao_pt As PointF,
                                             ByVal abDisplayFactTable As Boolean,
@@ -1606,6 +1608,11 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Gets a ModelElement(Instance) on the Page for the given asModelElementId.
+        ''' </summary>
+        ''' <param name="asModelElementId">The Id of the ModelElement(Instance) on the Page to return.</param>
+        ''' <returns></returns>
         Public Function getModelElementById(ByVal asModelElementId As String) As FBM.ModelObject
 
             Try

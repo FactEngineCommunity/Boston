@@ -18,8 +18,8 @@ Namespace FBM
         XmlIgnore()> _
         Public Shadows WithEvents Page As FBM.Page
 
-        <NonSerialized()> _
-        Public WithEvents TableShape As New TableNode
+        <NonSerialized()>
+        Public Shadows WithEvents TableShape As New TableNode
 
         Public Shadows Property X As Integer Implements FBM.iPageObject.X
         Public Shadows Property Y As Integer Implements FBM.iPageObject.Y

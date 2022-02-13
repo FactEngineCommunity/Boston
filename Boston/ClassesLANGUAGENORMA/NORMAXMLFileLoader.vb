@@ -546,6 +546,71 @@ SkippedSubtypeRelationship:
                     End If
                 Next
 
+                '-----------------------------------------------------
+                'Check for Subtype relationships for each ValueType
+                '-----------------------------------------------------
+                For Each lrValueType In arModel.ValueType.ToArray
+                    loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:SubtypeFact>
+                                               From FactRoles In ModelInformation.<orm:FactRoles>
+                                               From SubtypeMetaRole In FactRoles.<orm:SubtypeMetaRole>
+                                               From RolePlayer In SubtypeMetaRole.<orm:RolePlayer>
+                                               Where RolePlayer.Attribute("ref") = lrValueType.NORMAReferenceId
+                                               Select ModelInformation
+
+                    If loEnumElementQueryResult.Count > 0 Then
+
+                        Dim lrSupertypeModelElement As FBM.ModelObject
+
+                        For Each loElement In loEnumElementQueryResult
+
+                            Dim loSuprtypeElement As IEnumerable(Of XElement)
+                            loSuprtypeElement = From FactRoles In loElement.<orm:FactRoles>
+                                                From SupertypeMetaRole In FactRoles.<orm:SupertypeMetaRole>
+                                                From RolePlayer In SupertypeMetaRole.<orm:RolePlayer>
+                                                Select RolePlayer
+
+                            lrSupertypeModelElement = arModel.ValueType.Find(Function(x) x.NORMAReferenceId = loSuprtypeElement(0).Attribute("ref").Value)
+
+                            If lrSupertypeModelElement Is Nothing Then
+                                Dim lsUltimateNORMAReferenceId As String = Nothing
+                                Select Case Me.GetTypeOfObjectFromNORMAFile(arNORMAXMLDOC,
+                                                                            loSuprtypeElement(0).Attribute("ref").Value,
+                                                                            lsUltimateNORMAReferenceId)
+                                    Case Is = pcenumConceptType.EntityType
+                                        lrSupertypeModelElement = Me.LoadEntityType(arModel, arNORMAXMLDOC, lsUltimateNORMAReferenceId)
+                                    Case Is = pcenumConceptType.FactType
+                                        Dim lrFactType As New FBM.FactType(arModel, "DummyFactType", True)
+                                        lrFactType.NORMAReferenceId = lsUltimateNORMAReferenceId
+                                        lrFactType = Me.LoadFactType(lrFactType, arNORMAXMLDOC)
+                                        If lrFactType.IsObjectified Then
+                                            lrSupertypeModelElement = lrFactType.ObjectifyingEntityType
+                                        Else
+                                            prApplication.ThrowErrorMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
+                                            GoTo SkippedSubtypeRelationship
+                                        End If
+                                End Select
+
+                            End If
+
+                            Dim lsSubtypeRoleId As String = loElement.<orm:FactRoles>.<orm:SubtypeMetaRole>.AsEnumerable.First.Attribute("id").Value
+                            Dim lsSupertypeRoleId As String = loElement.<orm:FactRoles>.<orm:SupertypeMetaRole>.AsEnumerable.First.Attribute("id").Value
+
+                            Dim lrSubtypeRelationship As FBM.tSubtypeRelationship = Nothing
+                            lrSubtypeRelationship = lrValueType.CreateSubtypeRelationship(lrSupertypeModelElement,
+                                                                                          False,
+                                                                                          lsSubtypeRoleId,
+                                                                                          lsSupertypeRoleId)
+                            Try
+                                lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(loElement.Attribute("PreferredIdentificationPath").Value)
+                            Catch ex As Exception
+                                lrSubtypeRelationship.IsPrimarySubtypeRelationship = False
+                            End Try
+SkippedSubtypeRelationship:
+                        Next
+                    End If
+                Next
+
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2537,6 +2602,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
             Dim lrFactTypeInstance2 As FBM.FactTypeInstance
             Dim lrModelNote As FBM.ModelNote
+            Dim lsMessage As String
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance
             Dim ldblScalar As Double = 30.5
@@ -2740,12 +2806,12 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                                 'Load the FactInstances to the Page
                                 '------------------------------------
                                 For Each lrFact In lrFactType.Fact
-                                        lrFactTypeInstance.AddFact(lrFact, False)
-                                    Next
-                                Else
-                                    lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
-                                End If
-                            End If 'IsSomething(lrFactType)
+                                    lrFactTypeInstance.AddFact(lrFact, False)
+                                Next
+                            Else
+                                lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
+                            End If
+                        End If 'IsSomething(lrFactType)
                     Next 'FactTypeShape in NORMA XML 
 
                     Dim larFaultyFactTypeInstances = From Page In arModel.Page
@@ -2782,22 +2848,49 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                     '-----------------------
                     'Subtype Relationships
                     '-----------------------
-                    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
-                        If lrEntityTypeInstance.EntityType.SubtypeRelationship.Count > 0 Then
-                            For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship
+                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+                    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.FindAll(Function(x) x.EntityType.SubtypeRelationship.Count > 0).ToArray
+                        For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship
+                            Dim lrParentModelElement As FBM.ModelObject
+                            lrParentModelElement = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.parentModelElement.Id)
+                            If lrParentModelElement IsNot Nothing Then
+                                If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id) Is Nothing Then
+                                    Call lrPage.DropFactTypeAtPoint(lrSubtypeRelationship.FactType, New PointF(10, 10), False, False, False, False)
+                                End If
+                                lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, False)
+                                'New FBM.SubtypeRelationshipInstance(lrPage, lrEntityTypeInstance, lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals))
+                                lrEntityTypeInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                lrPage.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                            End If
+                        Next
+                    Next
+
+                    For Each lrValueTypeInstance In lrPage.ValueTypeInstance.FindAll(Function(x) x.ValueType.SubtypeRelationship.Count > 0).ToArray
+                        For Each lrSubtypeRelationship In lrValueTypeInstance.ValueType.SubtypeRelationship
+                            Try
                                 Dim lrParentModelElement As FBM.ModelObject
-                                lrParentModelElement = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.parentEntityType.Id)
+                                lrParentModelElement = lrPage.getModelElementById(lrSubtypeRelationship.parentModelElement.Id)
                                 If lrParentModelElement IsNot Nothing Then
                                     If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id) Is Nothing Then
                                         Call lrPage.DropFactTypeAtPoint(lrSubtypeRelationship.FactType, New PointF(10, 10), False, False, False, False)
                                     End If
-                                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, False)
+                                    lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, False)
                                     'New FBM.SubtypeRelationshipInstance(lrPage, lrEntityTypeInstance, lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals))
-                                    lrEntityTypeInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                    lrValueTypeInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
                                     lrPage.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
                                 End If
-                            Next
-                        End If
+                            Catch ex As Exception
+                                lsMessage = "Trouble loading Subtype Relationship Instance."
+                                lsMessage.AppendDoubleLineBreak("Page: " & lrPage.Name)
+                                Try
+                                    lsMessage.AppendLine("Subtype: " & lrSubtypeRelationshipInstance.ModelElement.Id)
+                                    lsMessage.AppendLine("Supertype: " & lrSubtypeRelationshipInstance.parentModelElement.Id)
+                                Catch ex1 As Exception
+                                    'Not a biggie.
+                                End Try
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                            End Try
+                        Next
                     Next
 
                     '---------------------------------------------------------------------
@@ -3114,7 +3207,6 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                             End If
                         Next
                     Catch ex As Exception
-                        Dim lsMessage As String
                         Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -3253,7 +3345,6 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                                 lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                                 lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                             Catch ex As Exception
-                                Dim lsMessage As String
                                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                                 lsMessage = "Error loading Exclusion Constraint instance."
                                 lsMessage.AppendLine("Role Constraint Name:" & lrRoleConstraint.Name)
@@ -3350,7 +3441,6 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                 Next 'Page in NORMA XML
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

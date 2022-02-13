@@ -15,8 +15,16 @@
 
         Sub EnableSaveButton()
 
+        Property Shape As MindFusion.Diagramming.ShapeNode
+
         Property X As Integer
         Property Y As Integer
+    End Interface
+
+    Interface iObjectTypePageObject 'for EntityType,ValueType,FactType Intances
+        Inherits iPageObject
+
+        Shadows Property Shape As tORMDiagrammingShapeNode
     End Interface
 
     Interface iTableNodePageObject
@@ -36,6 +44,13 @@
         Inherits FBM.iPageObject
 
         Sub ValidateAnchorPoint()
+    End Interface
+
+    Interface iRoleConstraintObject
+        Inherits FBM.iPageObject
+
+        Shadows Property Shape As FBM.RoleConstraintShape
+
     End Interface
 
 End Namespace

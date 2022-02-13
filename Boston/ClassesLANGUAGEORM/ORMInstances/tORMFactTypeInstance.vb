@@ -137,9 +137,19 @@ Namespace FBM
         BindableAttribute(False)> _
         Public Shadows WithEvents Concept As New FBM.Concept
 
-        <NonSerialized(), _
-        XmlIgnore()> _
-        Public Shape As ShapeNode
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
+        <XmlIgnore()>
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
+
 
         <XmlIgnore()>
         Private _X As Integer
@@ -2044,7 +2054,7 @@ Namespace FBM
                     'Is already Displayed and Associated on the Page.
                     '  Used when recursively loading FactTypeInstances onto a Page.
                     'OR
-                    'Is a SubtypeConstraintFactType, which are hidden.
+                    'Is a SubtypeRelationshipFactType, which are hidden.
                     '----------------------------------------------------------------
                 Else
                     loFactTypeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 12, 12 + ((Me.GetHighestConstraintLevel - 1) * 1.6), Shapes.RoundRect)

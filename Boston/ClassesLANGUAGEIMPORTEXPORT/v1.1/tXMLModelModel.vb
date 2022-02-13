@@ -75,7 +75,7 @@ Namespace XMLModel11
                 For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
 
                     lrXMLSubtypeRelationship = New XMLModel11.SubtypeRelationship
-                    lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentEntityType.Id
+                    lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
                     lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
 
                     lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)

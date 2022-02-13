@@ -2585,7 +2585,7 @@ Public Class frmMain
 
                                 lrSubtypeRelationshipInstance = lrSubtypeRelationshipInstance.Clone(lrPage, True)
 
-                                Dim lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationshipInstance.EntityType.Id)
+                                Dim lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationshipInstance.ModelElement.Id)
                                 lrModelElementInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
 
                         End Select

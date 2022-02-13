@@ -24,8 +24,8 @@ Namespace FBM
         ''' The EntityType for which the SubTypeIstance (line) acts as View/Proxy.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Shadows EntityType As FBM.EntityTypeInstance
-        Public Shadows parentEntityType As FBM.EntityTypeInstance
+        Public Shadows ModelElement As FBM.ModelObject
+        Public Shadows parentModelElement As FBM.ModelObject
 
         ''' <summary>
         ''' The FactTypeInstance of the FactType that represents the Subtype
@@ -62,6 +62,20 @@ Namespace FBM
         XmlIgnore()>
         Public Page As FBM.Page
 
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As ShapeNode
+        <XmlIgnore()>
+        Public Property Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As ShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
+
+
         Public Property X As Integer Implements iPageObject.X
             Get
                 'Throw New NotImplementedException()
@@ -94,14 +108,14 @@ Namespace FBM
 
             Me.Model = arPage.Model
             Me.Page = arPage
-            Me.EntityType = ar_entity_type_instance
-            Me.parentEntityType = ar_parentEntityTypeInstance
+            Me.ModelElement = ar_entity_type_instance
+            Me.parentModelElement = ar_parentEntityTypeInstance
 
         End Sub
 
         Public Overloads Function Equals(other As SubtypeRelationshipInstance) As Boolean Implements IEquatable(Of SubtypeRelationshipInstance).Equals
 
-            Return (Me.EntityType.Id = other.EntityType.Id) And (Me.parentEntityType.Id = other.parentEntityType.Id)
+            Return (Me.ModelElement.Id = other.ModelElement.Id) And (Me.parentModelElement.Id = other.parentModelElement.Id)
 
         End Function
 
@@ -120,8 +134,8 @@ Namespace FBM
                     lrSubtypeRelationshipInstance.Page = arPage
                     lrSubtypeRelationshipInstance.Model = arPage.Model
                     lrSubtypeRelationshipInstance.SubtypeRelationship = .SubtypeRelationship.Clone(arPage.Model, abAddToModel)
-                    lrSubtypeRelationshipInstance.EntityType = arPage.EntityTypeInstance.Find(AddressOf .EntityType.Equals)
-                    lrSubtypeRelationshipInstance.parentEntityType = arPage.EntityTypeInstance.Find(AddressOf .parentEntityType.Equals)
+                    lrSubtypeRelationshipInstance.ModelElement = arPage.getModelElementById(.ModelElement.Id)
+                    lrSubtypeRelationshipInstance.parentModelElement = arPage.getModelElementById(.parentModelElement.Id)
                     lrSubtypeRelationshipInstance.FactType = arPage.FactTypeInstance.Find(AddressOf .FactType.Equals)
                 End With
 
@@ -155,33 +169,33 @@ Namespace FBM
                 Dim loNode As MindFusion.Diagramming.ShapeNode
 
                 'CodeSafe
-                If Me.EntityType Is Nothing Then
-                    Me.EntityType = Me.Page.getModelElementById(Me.SubtypeRelationship.EntityType.Id)
+                If Me.ModelElement Is Nothing Then
+                    Me.ModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.ModelElement.Id)
                 End If
 
-                If Me.parentEntityType Is Nothing Then
-                    If Me.parentEntityType.IsObjectifyingEntityType Then
-                        Me.parentEntityType = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentEntityType, FBM.EntityType).ObjectifiedFactType.Id)
+                If Me.parentModelElement Is Nothing Then
+                    If Me.parentModelElement.IsObjectifyingEntityType Then
+                        Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
                     Else
-                        Me.parentEntityType = Me.Page.getModelElementById(Me.SubtypeRelationship.parentEntityType.Id)
+                        Me.parentModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.parentModelElement.Id)
                     End If
                 End If
 
-                If IsSomething(Me.parentEntityType) Then
+                If IsSomething(Me.parentModelElement) Then
 
-                    If Me.parentEntityType.IsObjectifyingEntityType Then
-                        loNode = Me.parentEntityType.ObjectifiedFactType.Shape
+                    If Me.parentModelElement.IsObjectifyingEntityType Then
+                        loNode = CType(Me.parentModelElement, FBM.EntityTypeInstance).ObjectifiedFactType.Shape
                     Else
-                        loNode = Me.parentEntityType.Shape
+                        loNode = CType(Me.parentModelElement, Object).Shape
                     End If
 
                     '-------------------------------------------------------------------
                     'CodeSafe: Esp for working with the Core model
-                    If (Me.EntityType.Shape Is Nothing) Or (loNode Is Nothing) Then
+                    If (CType(Me.ModelElement, Object).Shape Is Nothing) Or (loNode Is Nothing) Then
                         Exit Sub
                     End If
 
-                    lo_subtype_link = Me.Page.Diagram.Factory.CreateDiagramLink(Me.EntityType.Shape, loNode)
+                    lo_subtype_link = Me.Page.Diagram.Factory.CreateDiagramLink(CType(Me.ModelElement, Object).Shape, loNode)
                     lo_subtype_link.BaseShape = ArrowHead.None
                     lo_subtype_link.HeadShape = ArrowHead.PointerArrow
                     lo_subtype_link.HeadShapeSize = 3.0
@@ -198,7 +212,7 @@ Namespace FBM
 
                     lo_subtype_link.Tag = Me
                     Me.Link = lo_subtype_link
-                    Me.EntityType.OutgoingLink.Add(lo_subtype_link)
+                    CType(Me.ModelElement, Object).OutgoingLink.Add(lo_subtype_link)
                 End If
 
             Catch ex As Exception

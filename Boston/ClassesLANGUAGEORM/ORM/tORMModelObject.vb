@@ -2,6 +2,7 @@ Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -95,6 +96,18 @@ Namespace FBM
         ''' FactEngine specific. Used to change names like 'Order' to '[Order]'. See Me.DatabaseName
         ''' </summary>
         Public IsDatabaseReservedWord As Boolean = False
+
+        ''' <summary>
+        ''' Used only if the ModelElement is an EntityType. True if the EntityType is an ObjectifyingEntityType for an ObjectifiedFactType.
+        ''' </summary>
+        <XmlAttribute()>
+        Public IsObjectifyingEntityType As Boolean = False
+
+        ''' <summary>
+        ''' Used only if the ModelElement is an EntityType. The ObjectifiedFactType for the EntityType/ModelElement if IsObjectifyingEntityType.
+        ''' </summary>
+        <XmlIgnore()>
+        Public ObjectifiedFactType As FBM.FactType = Nothing
 
         Public ReadOnly Property DatabaseName As String
             Get
@@ -235,7 +248,7 @@ Namespace FBM
         Property parentModelObjectList() As List(Of FBM.ModelObject)
             Get
                 Dim larParentModelObjects = From SubtypeRelationship In Me.SubtypeRelationship
-                                            Select SubtypeRelationship.parentEntityType
+                                            Select SubtypeRelationship.parentModelElement
 
                 Return larParentModelObjects.ToList
             End Get
@@ -335,7 +348,7 @@ Namespace FBM
                     Dim lrPrimarySubtypeRelationship As FBM.tSubtypeRelationship
                     lrPrimarySubtypeRelationship = Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship)
                     If lrPrimarySubtypeRelationship IsNot Nothing Then
-                        lsPrimarySupertypeName = lrPrimarySubtypeRelationship.parentEntityType.Id
+                        lsPrimarySupertypeName = lrPrimarySubtypeRelationship.parentModelElement.Id
                     End If
                 End If
 
@@ -499,6 +512,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overridable Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrPageObject As New FBM.PageObject
@@ -528,6 +542,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overridable Function CloneEntityType(ByRef arModel As FBM.Model) As FBM.ModelObject
 
             Dim lrEntityType As New FBM.EntityType
@@ -545,6 +560,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overridable Function CloneValueType(ByRef arModel As FBM.Model) As FBM.ModelObject
 
             Dim lrValueType As New FBM.ValueType
@@ -562,6 +578,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overridable Function CloneFactType(ByRef arModel As FBM.Model) As FBM.ModelObject
 
             Dim lrFactType As New FBM.FactType
@@ -579,6 +596,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function CloneEntityTypeInstance(ByRef arPage As FBM.Page) As FBM.EntityTypeInstance
 
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
@@ -607,6 +625,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function CloneRoleConstraintInstance(ByRef arPage As FBM.Page) As FBM.RoleConstraintInstance
 
             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
@@ -624,8 +643,31 @@ Namespace FBM
 
         End Function
 
+        Public Sub AddDataInstance(ByVal asDataInstance As String)
+
+            Me.Instance.AddUnique(asDataInstance)
+        End Sub
+
         Public Overridable Function CanSafelyRemoveFromModel() As Boolean
             Return False
+        End Function
+
+
+
+        ''' <summary>
+        ''' Creates a SubtypeRelationship for the Model Element.
+        ''' </summary>
+        ''' <param name="arParentModelElement"></param>
+        ''' <param name="abIsPrimarySubtypeRelationship"></param>
+        ''' <param name="asSubtypeRoleId">Used when importing NORMA .orm files.</param>
+        ''' <param name="asSupertypeRoleId">Used when importing NORMA .orm files.</param>
+        ''' <returns></returns>
+        Public Overridable Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
+                                                              Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
+                                                              Optional ByVal asSubtypeRoleId As String = Nothing,
+                                                              Optional ByVal asSupertypeRoleId As String = Nothing) As FBM.tSubtypeRelationship
+
+            Return Nothing
         End Function
 
         ''' <summary>
@@ -655,7 +697,7 @@ Namespace FBM
                     If Me.GetType = GetType(FBM.EntityType) Then
                         If CType(Me, FBM.EntityType).ReferenceModeValueType Is Nothing Then
                             Try
-                                Return Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship).parentEntityType.GetTopmostNonAbsorbedSupertype(abRequireLocalSimpleReferenceScheme)
+                                Return Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship).parentModelElement.GetTopmostNonAbsorbedSupertype(abRequireLocalSimpleReferenceScheme)
                             Catch ex As Exception
                                 Return Me
                             End Try
@@ -703,7 +745,7 @@ Namespace FBM
                 If lrPrimarySubtypeRelationship Is Nothing Then
                     Return Me
                 Else
-                    Return lrPrimarySubtypeRelationship.parentEntityType.GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
+                    Return lrPrimarySubtypeRelationship.parentModelElement.GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
                 End If
             Else
                 Return Me.parentModelObjectList(0).GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
@@ -789,8 +831,8 @@ Namespace FBM
             Dim larModelElement As New List(Of FBM.ModelObject)
             Try
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship
-                    larModelElement.AddUnique(lrSubtypeRelationship.parentEntityType)
-                    larModelElement.AddRange(lrSubtypeRelationship.parentEntityType.getSupertypes)
+                    larModelElement.AddUnique(lrSubtypeRelationship.parentModelElement)
+                    larModelElement.AddRange(lrSubtypeRelationship.parentModelElement.getSupertypes)
                 Next
 
                 Return larModelElement
@@ -859,9 +901,9 @@ Namespace FBM
             Try
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship
 
-                    If lrSubtypeRelationship.parentEntityType Is arModelElement Then
+                    If lrSubtypeRelationship.parentModelElement Is arModelElement Then
                         Return True
-                    ElseIf lrSubtypeRelationship.parentEntityType.isSubtypeOfModelElement(arModelElement) Then
+                    ElseIf lrSubtypeRelationship.parentModelElement.isSubtypeOfModelElement(arModelElement) Then
                         Return True
                     End If
                 Next
@@ -962,8 +1004,8 @@ Namespace FBM
             Try
                 Dim larSubtypeModelObject = From ModelObject In Me.Model.getModelObjects
                                             From SubtypeRelationship In ModelObject.SubtypeRelationship
-                                            Where SubtypeRelationship.parentEntityType Is Me
-                                            Select SubtypeRelationship.EntityType
+                                            Where SubtypeRelationship.parentModelElement Is Me
+                                            Select SubtypeRelationship.ModelElement
 
                 Return larSubtypeModelObject.ToList
 

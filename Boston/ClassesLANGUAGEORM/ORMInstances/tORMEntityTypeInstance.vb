@@ -11,7 +11,7 @@ Namespace FBM
         Inherits FBM.EntityType
         Implements IEquatable(Of FBM.EntityTypeInstance)
         Implements ICloneable
-        Implements FBM.iPageObject
+        Implements FBM.iObjectTypePageObject
 
         <XmlAttribute()> _
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EntityType
@@ -255,9 +255,18 @@ Namespace FBM
         <XmlIgnore()> _
         Public Page As FBM.Page
 
-        <NonSerialized(), _
-        XmlIgnore()> _
-        Public Shape As tORMDiagrammingShapeNode ' ShapeNode
+        <NonSerialized(),
+        XmlIgnore()>
+        Public _Shape As tORMDiagrammingShapeNode
+        <XmlIgnore()>
+        Public Property Shape As tORMDiagrammingShapeNode Implements iObjectTypePageObject.Shape
+            Get
+                Return Me._Shape
+            End Get
+            Set(value As tORMDiagrammingShapeNode)
+                Me._Shape = value
+            End Set
+        End Property
 
         <NonSerialized(), _
         XmlIgnore()> _
@@ -315,8 +324,17 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        Private Property iPageObject_Shape As ShapeNode Implements iPageObject.Shape
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As ShapeNode)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        <NonSerialized(),
+        XmlIgnore()>
         Public OutgoingLink As New List(Of DiagramLink) 'For when the EntityType is an Actor in a UseCaseDiagram etc
 
         <NonSerialized(),
@@ -672,7 +690,7 @@ Namespace FBM
             If IsSomething(Me.SubtypeRelationship) Then
                 Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance
                 For Each lrSubtypeInstance In Me.SubtypeRelationship
-                    lrSubtypeInstance.parentEntityType.AddDataInstance(asDataInstance)
+                    lrSubtypeInstance.parentModelElement.AddDataInstance(asDataInstance)
                 Next
             End If
 
@@ -2269,7 +2287,7 @@ Namespace FBM
             Try
                 '-----------------------------------------------------------------------------------------------------------
                 'Check to see whether the Supertype is on the Page
-                Dim lsParentEntityTypeId As String = arSubtypeRelationship.parentEntityType.Id
+                Dim lsParentEntityTypeId As String = arSubtypeRelationship.parentModelElement.Id
                 Dim lrParentEntityType As FBM.EntityType = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lsParentEntityTypeId)
                 If lrParentEntityType Is Nothing Then
                     '---------------------------------------------------------------------------------------------------------------

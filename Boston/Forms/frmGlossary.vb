@@ -428,10 +428,10 @@ Public Class frmGlossary
                                              Select SubtypeRelationship
 
                 For Each lrSubtypeRelationship In larSuptypeRelationship
-                    If Not zrFrmORMDiagramViewer.zrPage.ContainsModelElement(lrSubtypeRelationship.parentEntityType) Then
-                        Select Case lrSubtypeRelationship.parentEntityType.ConceptType
+                    If Not zrFrmORMDiagramViewer.zrPage.ContainsModelElement(lrSubtypeRelationship.parentModelElement) Then
+                        Select Case lrSubtypeRelationship.parentModelElement.ConceptType
                             Case Is = pcenumConceptType.EntityType
-                                Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrSubtypeRelationship.parentEntityType, New PointF(30, 30))
+                                Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrSubtypeRelationship.parentModelElement, New PointF(30, 30))
                         End Select
                     End If
                 Next
