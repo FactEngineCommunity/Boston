@@ -93,6 +93,10 @@ Public Module tableDatabaseUpgrade
         Dim lrRecordset As New ADODB.Recordset
 
         Try
+            Dim lsDatabaseVersionNumber As String = ""
+            lsDatabaseVersionNumber = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+
+
             lrRecordset.ActiveConnection = pdbDatabaseUpgradeConnection
             lrRecordset.CursorType = pcOpenStatic
 
@@ -109,7 +113,7 @@ Public Module tableDatabaseUpgrade
                 lrDatabaesUpgrade.UpgradeId = lrRecordset("UpgradeId").Value
                 lrDatabaesUpgrade.FromVersionNr = lrRecordset("FromVersion").Value
                 lrDatabaesUpgrade.ToVersionNr = lrRecordset("ToVersion").Value
-                lrDatabaesUpgrade.SuccessfulImplementation = False
+                lrDatabaesUpgrade.SuccessfulImplementation = lrDatabaesUpgrade.ToVersionNr <= CDbl(lsDatabaseVersionNumber)
 
                 If Not tableDatabaseUpgrade.ExistsDatabaseUpgradeInRichmond(lrDatabaesUpgrade.FromVersionNr, lrDatabaesUpgrade.ToVersionNr) Then
                     Call lrDatabaesUpgrade.Save()

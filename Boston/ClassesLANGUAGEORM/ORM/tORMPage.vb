@@ -3,7 +3,7 @@ Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
-Imports System.Runtime.CompilerServices
+
 
 Namespace FBM
     <Serializable()> _
@@ -912,7 +912,7 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+
         Public Function DropFactTypeAtPoint(ByRef arFactType As FBM.FactType,
                                             ByVal ao_pt As PointF,
                                             ByVal abDisplayFactTable As Boolean,

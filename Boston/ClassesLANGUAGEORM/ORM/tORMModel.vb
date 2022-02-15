@@ -3069,6 +3069,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub RemoveFromDatabase()
 
+            Dim lsMessage As String
             'Dim liInd As Integer = 0
             'Dim lrEntityType As FBM.EntityType
             'Dim lrValueType As FBM.ValueType
@@ -3107,9 +3108,49 @@ Namespace FBM
             '    TableModelDictionary.DeleteModelDictionaryEntry(lrDictionaryEntry)
             'Next
             'Me.ModelDictionary.Clear()
-            RaiseEvent Deleting()
 
-            Call TableModel.DeleteModel(Me)
+            Dim lsFileLocationName As String = ""
+
+            Try
+
+                RaiseEvent Deleting()
+
+                Call TableModel.DeleteModel(Me)
+
+                Try
+                    If Me.StoreAsXML Then
+
+                        Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+                        Dim lsFolderLocation As String
+                        Dim lsFileName As String
+
+                        If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                            Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                            lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                            lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                        Else
+                            lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                        End If
+                        System.IO.Directory.CreateDirectory(lsFolderLocation)
+                        lsFileName = Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
+                        lsFileLocationName = lsFolderLocation & "\" & lsFileName
+                        System.IO.File.Delete(lsFileLocationName)
+                    End If
+                Catch ex As Exception
+                    lsMessage = "Problem deleting the XML file for the Model"
+                    lsMessage.AppendDoubleLineBreak(lsFileLocationName)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
+                End Try
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -3896,7 +3937,7 @@ Namespace FBM
                         lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
                     End If
                     System.IO.Directory.CreateDirectory(lsFolderLocation)
-                    lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
+                    lsFileName = Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
                     lsFileLocationName = lsFolderLocation & "\" & lsFileName
 
                     loStreamWriter = New StreamWriter(lsFileLocationName)

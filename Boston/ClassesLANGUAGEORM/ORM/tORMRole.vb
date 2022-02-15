@@ -4,7 +4,7 @@ Imports System.Runtime.Serialization
 Imports System.Reflection
 Imports System.Security.Permissions
 Imports System.Xml.Schema
-Imports System.Runtime.CompilerServices
+
 
 Namespace FBM
     <Serializable()> _
@@ -520,7 +520,6 @@ Namespace FBM
         ''' This is far easier to implement than a recursive loading of FactTypeInstances.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False, Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing) As FBM.RoleInstance
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
@@ -612,9 +611,7 @@ Namespace FBM
                     End If
 
                     If abAddToPage Then
-                        SyncLock arPage.RoleInstance
-                            arPage.RoleInstance.AddUnique(lrRoleInstance)
-                        End SyncLock
+                        arPage.RoleInstance.AddUnique(lrRoleInstance)
                     End If
 
                 End With

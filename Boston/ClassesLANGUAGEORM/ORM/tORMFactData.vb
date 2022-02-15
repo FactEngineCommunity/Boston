@@ -1,7 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Xml.Serialization
 Imports System.Reflection
-Imports System.Runtime.CompilerServices
+
 
 Namespace FBM
     <Serializable()> _
@@ -382,8 +382,7 @@ Namespace FBM
         ''' <param name="arPage">The Page onto which the FactDataInstance will be allocated.</param>
         ''' <param name="arFactInstance">The FactInstance for the FactDataInstance. Provide if adding directly to the FactInstance when FactTypeInstance.Fact does not contain the FactInstance</param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+        ''' <remarks></remarks>        
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
                                               Optional ByRef arFactInstance As FBM.FactInstance = Nothing,
                                               Optional ByVal abMakeFactDataDirty As Boolean = False) As FBM.FactDataInstance

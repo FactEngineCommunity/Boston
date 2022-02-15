@@ -1,6 +1,6 @@
 Imports System.Xml.Serialization
 Imports System.Reflection
-Imports System.Runtime.CompilerServices
+
 
 Namespace FBM
     <Serializable()> _
@@ -209,7 +209,7 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
                                               Optional ByVal abAddToPage As Boolean = False,
                                               Optional ByVal abMakeFactDataDirty As Boolean = False) As FBM.FactInstance
@@ -230,9 +230,7 @@ Namespace FBM
                     Next
 
                     If abAddToPage Then
-                        SyncLock arPage.FactInstance
-                            arPage.FactInstance.Add(lrFactInstance)
-                        End SyncLock
+                        arPage.FactInstance.Add(lrFactInstance)
                     End If
 
                 End With

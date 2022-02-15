@@ -1,7 +1,6 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Threading.Tasks
-Imports System.Runtime.CompilerServices
 
 Namespace XMLModel
 
@@ -64,6 +63,7 @@ Namespace XMLModel
                         lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
                         lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
                         lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
+                        lrXMLSubtypeRelationship.IsPrimarySubtypeRelationship = lrSubtypeRelationship.IsPrimarySubtypeRelationship
 
                         lrXMLValueType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
                     Next
@@ -110,6 +110,7 @@ Namespace XMLModel
                         lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
                         lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
                         lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
+                        lrXMLSubtypeRelationship.IsPrimarySubtypeRelationship = lrSubtypeRelationship.IsPrimarySubtypeRelationship
 
                         lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
                     Next
@@ -648,7 +649,7 @@ Namespace XMLModel
                                                   lrXMLFactType.Name,
                                                   lrXMLFactType.Id)
 
-                    Call Me.GetFactTypeDetails(lrFactType)
+                    Call Me.GetFactTypeDetails(lrFactType, lrXMLFactType)
                 Next
 
                 '===============================================================================================
@@ -705,6 +706,24 @@ Namespace XMLModel
                     lrParentModelElement.childModelObjectList.Add(lrModelElement)
 
                     Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.EntityType)
+                            Dim larSubtypeRelationship = From EntityType In Me.ORMModel.EntityTypes
+                                                         From SubtypeRelationship In EntityType.SubtypeRelationships
+                                                         Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                                                         Select SubtypeRelationship
+
+                            lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                        Case Is = GetType(FBM.ValueType)
+                            Dim larSubtypeRelationship = From ValueType In Me.ORMModel.ValueTypes
+                                                         From SubtypeRelationship In ValueType.SubtypeRelationships
+                                                         Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                                                         Select SubtypeRelationship
+
+                            lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                    End Select
+
                     lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
                 Next
 
@@ -965,7 +984,6 @@ Namespace XMLModel
 
         End Sub
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
                                       ByRef arModel As FBM.Model,
                                       Optional ByRef arPage As FBM.Page = Nothing) As FBM.Page
@@ -1006,9 +1024,7 @@ Namespace XMLModel
                     lrValueTypeInstance.X = lrConceptInstance.X
                     lrValueTypeInstance.Y = lrConceptInstance.Y
 
-                    SyncLock lrPage.ValueTypeInstance
-                        lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                    End SyncLock
+                    lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
                 Next
 
                 '=============================
@@ -1044,9 +1060,7 @@ Namespace XMLModel
                     lrEntityTypeInstance.X = lrConceptInstance.X
                     lrEntityTypeInstance.Y = lrConceptInstance.Y
 
-                    SyncLock lrPage.EntityTypeInstance
-                        lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
-                    End SyncLock
+                    lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
                 Next
 
                 '===========================
@@ -1115,9 +1129,7 @@ Namespace XMLModel
                                     lrFactDataInstance.X = lrFactDataConceptInstance.X
                                     lrFactDataInstance.Y = lrFactDataConceptInstance.Y
                                 End If
-                                SyncLock lrPage
-                                    lrPage.ValueInstance.AddUnique(lrFactDataInstance)
-                                End SyncLock
+                                lrPage.ValueInstance.AddUnique(lrFactDataInstance)
                             Next
 
                         End If
@@ -1235,9 +1247,7 @@ Namespace XMLModel
                             lrRoleConstraintInstance.X = lrConceptInstance.X
                             lrRoleConstraintInstance.Y = lrConceptInstance.Y
 
-                            SyncLock lrPage.RoleConstraintInstance
-                                lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
-                            End SyncLock
+                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                         Catch ex As Exception
                             lsMessage = "Error loading Role Constraint with Id: " & lrConceptInstance.Symbol
                             lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
@@ -1281,7 +1291,8 @@ Namespace XMLModel
             End Try
         End Function
 
-        Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType) 'As List(Of FBM.Fact)
+        Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType,
+                                       Optional ByVal arXMLFactType As XMLModel.FactType = Nothing) 'As List(Of FBM.Fact)
 
             Dim lrDictionaryEntry As New FBM.DictionaryEntry
             Dim lrFact As New FBM.Fact
@@ -1296,7 +1307,14 @@ Namespace XMLModel
                 Dim lrXMLFactData As XMLModel.FactData
                 Dim lrXMLFactType As XMLModel.FactType
 
-                lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
+                If arXMLFactType Is Nothing Then
+                    lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
+                Else
+                    lrXMLFactType = arXMLFactType
+                End If
+
+                Dim lrConcept As FBM.Concept = Nothing
+                Dim lrFactData As New FBM.FactData
 
                 For Each lrXMLFact In lrXMLFactType.Facts
 
@@ -1313,9 +1331,7 @@ Namespace XMLModel
                     lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry,,,, True,,,)
 
                     For Each lrXMLFactData In lrXMLFact.Data
-                        lrRole = New FBM.Role
-                        lrRole.Id = lrXMLFactData.RoleId
-                        lrRole = arFactType.RoleGroup.Find(AddressOf lrRole.Equals)
+                        lrRole = arFactType.RoleGroup.Find(Function(x) x.Id = lrXMLFactData.RoleId)
 
                         '--------------------------------------------------------------------------------------------------
                         'Get the Concept from the ModelDictionary so that FactData objects are linked directly to the Concept/Value in the ModelDictionary
@@ -1329,9 +1345,9 @@ Namespace XMLModel
 
                         lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry)
 
-                        Dim lrConcept As FBM.Concept = lrDictionaryEntry.Concept
+                        lrConcept = lrDictionaryEntry.Concept
 
-                        Dim lrFactData As New FBM.FactData(lrRole, lrConcept, lrFact)
+                        lrFactData = New FBM.FactData(lrRole, lrConcept, lrFact)
                         lrFactData.isDirty = True
                         lrFactData.Model = arFactType.Model
                         '-----------------------------
@@ -1343,9 +1359,7 @@ Namespace XMLModel
                         '-------------------------------------
                         lrRole.Data.Add(lrFactData)
 
-                        If Not lrRole.JoinedORMObject.Instance.Exists(Function(x) x = lrFactData.Data) Then
-                            lrRole.JoinedORMObject.Instance.Add(lrFactData.Data)
-                        End If
+                        lrRole.JoinedORMObject.Instance.AddUnique(lrConcept.Symbol)
                     Next
 
                     '----------------------------------------------------------------------------------------------------------
@@ -1378,7 +1392,8 @@ Namespace XMLModel
         ''' </summary>
         ''' <param name="arFactType">The FactType for which the details are being retrieved</param>
         ''' <remarks></remarks>
-        Public Sub GetFactTypeDetails(ByRef arFactType As FBM.FactType)
+        Public Sub GetFactTypeDetails(ByRef arFactType As FBM.FactType,
+                                      Optional arXMlFactType As XMLModel.FactType = Nothing)
 
             Dim lsMessage As String = ""
 
@@ -1388,7 +1403,12 @@ Namespace XMLModel
                 Dim lrRole As FBM.Role
                 Dim lrXMLFactType As XMLModel.FactType
 
-                lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
+                If arXMlFactType Is Nothing Then
+                    lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
+                Else
+                    lrXMLFactType = arXMlFactType
+                End If
+
 
                 'arFactType.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
                 'arFactType.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
@@ -1400,7 +1420,9 @@ Namespace XMLModel
                 arFactType.IsStored = lrXMLFactType.IsStored
                 arFactType.DerivationText = lrXMLFactType.DerivationText
                 arFactType.IsLinkFactType = lrXMLFactType.IsLinkFactType
-                arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = lrXMLFactType.LinkFactTypeRoleId)
+                If lrXMLFactType.IsLinkFactType Then
+                    arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = lrXMLFactType.LinkFactTypeRoleId)
+                End If
                 arFactType.IsMDAModelElement = lrXMLFactType.IsMDAModelElement
                 arFactType.IsSubtypeStateControlling = lrXMLFactType.IsSubtypeStateControlling
                 arFactType.StoreFactCoordinates = lrXMLFactType.StoreFactCoordinates
@@ -1411,8 +1433,7 @@ Namespace XMLModel
                 Else
                     Dim lsEntityTypeId As String = ""
                     lsEntityTypeId = lrXMLFactType.ObjectifyingEntityTypeId
-                    arFactType.ObjectifyingEntityType = New FBM.EntityType(arFactType.Model, pcenumLanguage.ORMModel, lsEntityTypeId, Nothing, True)
-                    arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(AddressOf arFactType.ObjectifyingEntityType.Equals)
+                    arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
                     arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
                     arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
                     arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
@@ -1432,7 +1453,8 @@ Namespace XMLModel
 
                 '-----------------------------------------------------
                 'Get the Roles within the RoleGroup for the FactType
-                '-----------------------------------------------------
+                '-----------------------------------------------------                
+                Dim lrModelElement As FBM.ModelObject
                 For Each lrXMLRole In lrXMLFactType.RoleGroup
 
                     lrRole = New FBM.Role
@@ -1442,13 +1464,12 @@ Namespace XMLModel
                     lrRole.Name = lrXMLRole.Name
                     lrRole.SequenceNr = lrXMLRole.SequenceNr
                     lrRole.Mandatory = lrXMLRole.Mandatory
-                    lrRole.JoinedORMObject = New FBM.ModelObject
-                    lrRole.JoinedORMObject.Id = lrXMLRole.JoinedObjectTypeId
 
-                    If IsSomething(arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                        lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    ElseIf IsSomething(arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
-                        lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                    lrModelElement = arFactType.Model.EntityType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId)
+                    If lrModelElement IsNot Nothing Then
+                        lrRole.JoinedORMObject = lrModelElement
+                    ElseIf issomething(arFactType.Model.ValueType.Find(Function(x) x.id = lrXMLRole.JoinedObjectTypeId), lrModelElement) Then
+                        lrRole.JoinedORMObject = lrModelElement
                     Else
                         lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                         If lrRole.JoinedORMObject Is Nothing Then
@@ -1468,12 +1489,12 @@ Namespace XMLModel
                 '-------------------------------------------
                 'Get the FactTypeReadings for the FactType
                 '-------------------------------------------
-                arFactType.FactTypeReading = Me.GetFactTypeReadingsForFactType(arFactType)
+                arFactType.FactTypeReading = Me.GetFactTypeReadingsForFactType(arFactType, lrXMLFactType)
 
                 '-------------------------------------------
                 'Get the Facts (FactData) for the FactType
                 '-------------------------------------------
-                Call Me.GetFactsForFactType(arFactType)
+                Call Me.GetFactsForFactType(arFactType, lrXMLFactType)
 
                 '------------------------------------------------
                 'Link to the Concept within the ModelDictionary
@@ -1503,7 +1524,8 @@ Namespace XMLModel
 
         End Sub
 
-        Public Function GetFactTypeReadingsForFactType(ByRef arFactType As FBM.FactType) As List(Of FBM.FactTypeReading)
+        Public Function GetFactTypeReadingsForFactType(ByRef arFactType As FBM.FactType,
+                                                       Optional ByVal arXMLFactType As XMLModel.FactType = Nothing) As List(Of FBM.FactTypeReading)
 
             Dim lrXMLFactType As XMLModel.FactType
             Dim lrXMLFactTypeReading As XMLModel.FactTypeReading
@@ -1516,10 +1538,12 @@ Namespace XMLModel
             GetFactTypeReadingsForFactType = New List(Of FBM.FactTypeReading)
 
             Try
-
-                lrXMLFactType = New XMLModel.FactType
-                lrXMLFactType.Id = arFactType.Id
-                lrXMLFactType = Me.ORMModel.FactTypes.Find(AddressOf lrXMLFactType.Equals)
+                Dim lsFactTypeId As String = arFactType.Id
+                If arXMLFactType Is Nothing Then
+                    lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
+                Else
+                    lrXMLFactType = arXMLFactType
+                End If
 
                 Dim liSequenceNr As Integer = 0
                 Dim lrPredicatePart As FBM.PredicatePart
@@ -1537,7 +1561,6 @@ Namespace XMLModel
                     '--------------------------------------------------
                     'Get the PredicateParts within the FactTypeReading
                     '--------------------------------------------------
-                    Dim lrRole As FBM.Role
                     For Each lrXMLPredicatePart In lrXMLFactTypeReading.PredicateParts
 
                         lrPredicatePart = New FBM.PredicatePart(arFactType.Model, lrFactTypeReading, Nothing, True)
@@ -1546,10 +1569,7 @@ Namespace XMLModel
                         lrPredicatePart.PostBoundText = lrXMLPredicatePart.PostboundReadingText
                         lrPredicatePart.PredicatePartText = Trim(lrXMLPredicatePart.PredicatePartText)
 
-                        lrRole = New FBM.Role
-                        lrRole.Id = lrXMLPredicatePart.Role_Id
-                        lrRole = arFactType.Model.Role.Find(AddressOf lrRole.Equals)
-                        lrPredicatePart.Role = lrRole
+                        lrPredicatePart.Role = arFactType.RoleGroup.Find(Function(x) x.Id = lrXMLPredicatePart.Role_Id)
 
                         lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
                     Next

@@ -2,7 +2,7 @@ Imports System.ComponentModel
 Imports System.Collections.Specialized
 Imports System.Xml.Serialization
 Imports System.Reflection
-Imports System.Runtime.CompilerServices
+
 
 Namespace FBM
     <Serializable()> _
@@ -710,7 +710,6 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
@@ -744,9 +743,7 @@ Namespace FBM
                     Next
 
                     If abAddToPage Then
-                        SyncLock arPage.ValueTypeInstance
-                            arPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                        End SyncLock
+                        arPage.ValueTypeInstance.Add(lrValueTypeInstance)
                     End If
 
                 End With

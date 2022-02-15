@@ -18,13 +18,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _SubtypingFactTypeId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property SubtypingFactTypeId() As String
             Get
                 Return Me._SubtypingFactTypeId
             End Get
             Set(ByVal value As String)
                 Me._SubtypingFactTypeId = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _IsPrimarySubtypeRelationship As Boolean = False
+        <XmlAttribute()>
+        Public Property IsPrimarySubtypeRelationship() As Boolean
+            Get
+                Return Me._IsPrimarySubtypeRelationship
+            End Get
+            Set(ByVal value As Boolean)
+                Me._IsPrimarySubtypeRelationship = value
             End Set
         End Property
 

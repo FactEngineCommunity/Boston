@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DatabaseVersionNumber" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.31</Value>
+      <Value Profile="(Default)">1.32</Value>
     </Setting>
     <Setting Name="DisplayStatusBar" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

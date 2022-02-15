@@ -2,7 +2,7 @@ Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
-Imports System.Runtime.CompilerServices
+
 
 Namespace FBM
     <Serializable()> _
@@ -512,7 +512,7 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+
         Public Overridable Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrPageObject As New FBM.PageObject
@@ -542,7 +542,7 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+
         Public Overridable Function CloneEntityType(ByRef arModel As FBM.Model) As FBM.ModelObject
 
             Dim lrEntityType As New FBM.EntityType
@@ -560,7 +560,6 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overridable Function CloneValueType(ByRef arModel As FBM.Model) As FBM.ModelObject
 
             Dim lrValueType As New FBM.ValueType
@@ -578,7 +577,7 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+
         Public Overridable Function CloneFactType(ByRef arModel As FBM.Model) As FBM.ModelObject
 
             Dim lrFactType As New FBM.FactType
@@ -596,7 +595,6 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function CloneEntityTypeInstance(ByRef arPage As FBM.Page) As FBM.EntityTypeInstance
 
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
@@ -625,7 +623,7 @@ Namespace FBM
 
         End Function
 
-        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+
         Public Function CloneRoleConstraintInstance(ByRef arPage As FBM.Page) As FBM.RoleConstraintInstance
 
             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
@@ -1280,7 +1278,7 @@ Namespace FBM
                             '  We're going to deprecate Realisations for the DictionaryEntry anyway.
                             '----------------------------------------------------------------------------------------------------------------------------------
                             lsMessage = "Original DictionaryEntry for FactData.Concept not found in the ModelDictionary"
-                            Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            'Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
                         End If
 
                         Me.Concept = lrNewDictionaryEntry.Concept

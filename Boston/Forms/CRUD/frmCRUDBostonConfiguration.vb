@@ -133,6 +133,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked
             My.Settings.ThrowInformationDebugMessagesToScreen = Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked
             My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
+            My.Settings.RequireLoginAtStartup = Me.CheckBoxEnableClientServer.Checked
             My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
             My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
             My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked

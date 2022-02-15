@@ -156,6 +156,7 @@ Namespace NORMA
 
         Public Sub SetSimpleReferenceSchemesObjectifyingEntityTypes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
+            Dim lsMessage As String
             Try
 
                 Dim lrEntityType As New FBM.EntityType
@@ -174,6 +175,7 @@ Namespace NORMA
                 'Step through the EntityTypes
                 '---------------------------------
                 Dim lsReferenceMode As String
+                Dim lrFactType As FBM.FactType = Nothing
                 For Each loElement In loEnumElementQueryResult
                     'Simple Reference Scheme
                     lsReferenceMode = loElement.Attribute("_ReferenceMode").Value
@@ -183,7 +185,7 @@ Namespace NORMA
 
                         lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = loElement.Attribute("id").Value)
                         If lrEntityType Is Nothing Then
-                            Dim lrFactType As FBM.FactType = arModel.FactType.Find(Function(x) x.Id = loElement.Attribute("Name").Value)
+                            lrFactType = arModel.FactType.Find(Function(x) x.Id = loElement.Attribute("Name").Value)
                             lrEntityType = lrFactType.ObjectifyingEntityType
                         End If
 
@@ -202,7 +204,14 @@ Namespace NORMA
                                     lrEntityType.ReferenceModeRoleConstraint = larRoleConstraint.First
                                     lrEntityType.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(True)
                                 Catch ex As Exception
-                                    Debugger.Break()
+                                    lsMessage = "Problem setting Simple Reference Scheme fo Objectifying Entity Type."
+                                    Try
+                                        lsMessage.AppendDoubleLineBreak("Entity Type: " & lrEntityType.Id)
+                                        lsMessage.AppendLine("Fact Type: " & lrFactType.Id)
+                                    Catch
+                                        'Not a biggie.
+                                    End Try
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
                                 End Try
                             End If
                         End If
@@ -222,7 +231,7 @@ Namespace NORMA
                 Next
 
             Catch ex As Exception
-                Dim lsMessage As String
+
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
