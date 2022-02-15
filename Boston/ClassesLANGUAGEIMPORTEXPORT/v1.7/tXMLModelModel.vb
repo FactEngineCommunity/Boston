@@ -1031,28 +1031,24 @@ Namespace XMLModel
                 'Map the EntityTypeInstances
                 '=============================
                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-
+                Dim lrEntityType As FBM.EntityType
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
                     lrEntityTypeInstance = New FBM.EntityTypeInstance
                     lrEntityTypeInstance.Model = arModel
                     lrEntityTypeInstance.Page = lrPage
                     lrEntityTypeInstance.Id = lrConceptInstance.Symbol
-                    lrEntityTypeInstance.EntityType.Id = lrEntityTypeInstance.Id
-                    lrEntityTypeInstance.EntityType = arModel.EntityType.Find(AddressOf lrEntityTypeInstance.EntityType.Equals)
+                    lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                    lrEntityTypeInstance.EntityType = lrEntityType
                     lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
-                    lrEntityTypeInstance.ReferenceMode = lrEntityTypeInstance.EntityType.ReferenceMode
-                    lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityTypeInstance.EntityType.IsObjectifyingEntityType
-                    lrEntityTypeInstance.IsAbsorbed = lrEntityTypeInstance.EntityType.IsAbsorbed
-                    lrEntityTypeInstance.IsDerived = lrEntityTypeInstance.EntityType.IsDerived
-                    lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
-                    lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
+                    lrEntityTypeInstance.ReferenceMode = lrEntityType.ReferenceMode
+                    lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityType.IsObjectifyingEntityType
+                    lrEntityTypeInstance.IsAbsorbed = lrEntityType.IsAbsorbed
+                    lrEntityTypeInstance.IsDerived = lrEntityType.IsDerived
+                    lrEntityTypeInstance.DerivationText = lrEntityType.DerivationText
+                    lrEntityTypeInstance.DBName = lrEntityType.DBName
 
-                    If lrEntityTypeInstance.EntityType.ReferenceModeValueType Is Nothing Then
-                        lrEntityTypeInstance.ReferenceModeValueType = Nothing
-                    Else
-                        lrEntityTypeInstance.ReferenceModeValueType = New FBM.ValueTypeInstance
-                        lrEntityTypeInstance.ReferenceModeValueType.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id
-                        lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(AddressOf lrEntityTypeInstance.ReferenceModeValueType.Equals)
+                    If lrEntityTypeInstance.EntityType.ReferenceModeValueType IsNot Nothing Then
+                        lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(Function(x) x.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id)
                     End If
 
                     lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityTypeInstance.EntityType.PreferredIdentifierRCId

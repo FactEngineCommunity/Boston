@@ -16,8 +16,8 @@ Namespace FBM
         <XmlAttribute()> _
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.EntityType
 
-        <XmlIgnore()> _
-        Private WithEvents _EntityType As New FBM.EntityType 'The EntityType for which the EntityTypeIstance acts as View/Proxy.
+        <XmlIgnore()>
+        Private WithEvents _EntityType As FBM.EntityType 'The EntityType for which the EntityTypeIstance acts as View/Proxy.
         <XmlIgnore()>
         <Browsable(False)>
         Public Property EntityType() As FBM.EntityType
@@ -32,10 +32,16 @@ Namespace FBM
 
         Public Overloads Property Instances As Viev.Strings.StringCollection
             Get
-                Return Me.EntityType.Instances
+                If Me.EntityType Is Nothing Then
+                    Return New Viev.Strings.StringCollection
+                Else
+                    Return Me.EntityType.Instances
+                End If
             End Get
             Set(value As Viev.Strings.StringCollection)
-                Me.EntityType.Instances = value
+                If Me.EntityType IsNot Nothing Then
+                    Me.EntityType.Instances = value
+                End If
             End Set
         End Property
 
@@ -182,7 +188,9 @@ Namespace FBM
          TypeConverter(GetType(Enumeration.EnumDescConverter))> _
         Public Property DataType() As pcenumORMDataType
             Get
-                If Me.EntityType.HasSimpleReferenceScheme Then
+                If Me.EntityType Is Nothing Then
+                    Return pcenumORMDataType.DataTypeNotSet
+                ElseIf Me.EntityType.HasSimpleReferenceScheme Then
                     Try
                         Dim lrTopmostEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
                         Return lrTopmostEntityType.ReferenceModeValueType.DataType
@@ -210,7 +218,9 @@ Namespace FBM
          DescriptionAttribute("The 'Data Type Precision' of the Data Type.")> _
         Public Property DataTypePrecision() As Integer
             Get
-                If Me.EntityType.HasSimpleReferenceScheme Then
+                If Me.EntityType Is Nothing Then
+                    Return 0
+                ElseIf Me.EntityType.HasSimpleReferenceScheme Then
                     Dim lrTopmostEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
                     Return lrTopmostEntityType.ReferenceModeValueType.DataTypePrecision
                 Else
@@ -234,7 +244,9 @@ Namespace FBM
          DescriptionAttribute("The 'Data Type Length' of the Data Type.")> _
         Public Property DataTypeLength() As Integer
             Get
-                If Me.EntityType.HasSimpleReferenceScheme Then
+                If Me.EntityType Is Nothing Then
+                    Return 0
+                ElseIf Me.EntityType.HasSimpleReferenceScheme Then
                     Dim lrTopmostEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
                     Return lrTopmostEntityType.ReferenceModeValueType.DataTypeLength
                 Else
