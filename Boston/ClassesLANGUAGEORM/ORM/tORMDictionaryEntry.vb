@@ -418,9 +418,10 @@ Namespace FBM
             End Select
 
             Me.Realisations.AddUnique(aiConceptType)
-            If Me.Model.Loaded Then
-                If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True
-            End If
+            '20220215-VM-Was. Was too slow.
+            'If Me.Model.Loaded Then
+            '    If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True
+            'End If
         End Sub
 
         Public Sub AddRealisation(ByVal aiConceptType As pcenumConceptType, Optional ByVal abUnique As Boolean = False)

@@ -1910,7 +1910,8 @@ Namespace FBM
                                                 Optional ByVal abStraightSave As Boolean = False,
                                                 Optional ByVal abMatchCase As Boolean = False,
                                                 Optional ByVal abMakeDirtyIfNotExists As Boolean = False,
-                                                Optional ByVal abCaseInsensitive As Boolean = False) As FBM.DictionaryEntry
+                                                Optional ByVal abCaseInsensitive As Boolean = False,
+                                                Optional ByVal abStraightReturn As Boolean = False) As FBM.DictionaryEntry
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry = Nothing
             Dim liInd As Integer
@@ -1919,13 +1920,15 @@ Namespace FBM
                 If abStraightSave Then
                     lrDictionaryEntry = arDictionaryEntry
                     Me.ModelDictionary.Add(arDictionaryEntry)
-                    If abMakeModelDirty Then
-                        Me.MakeDirty(False, abCheckForErrors)
-                    End If
                     Try
                         Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
                     Catch ex As Exception
                     End Try
+
+                    If abMakeModelDirty Then
+                        Me.MakeDirty(False, abCheckForErrors)
+                    End If
+                    If abStraightReturn Then Return lrDictionaryEntry
                 ElseIf abMatchCase Then
                     If Me.Dictionary.ContainsKey(arDictionaryEntry.Symbol) Then
                         lrDictionaryEntry = Me.ModelDictionary(Me.Dictionary(arDictionaryEntry.Symbol))
@@ -1957,7 +1960,7 @@ Namespace FBM
                     'Concept already exists in the ModelDictionary. Effectively we are updating the DictionaryEntry.
                     ' Make sure the DictionaryEntry contains the ConceptType of the DictionaryEntry attempted to be added.
                     '-------------------------------------------------------------------------------------------------------                    
-                    lrDictionaryEntry.AddConceptType(arDictionaryEntry.GetConceptType)
+                    lrDictionaryEntry.AddConceptType(arDictionaryEntry.ConceptType)
                     '20220129-VM-Commented out below. AddConceptType above adds a realisation.
                     'If abAppendRealisations Then
                     '    'CodeSafe - Only allow multiple Value realisations.
