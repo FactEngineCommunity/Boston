@@ -4,7 +4,7 @@ Imports System.Runtime.Serialization
 Imports System.Reflection
 Imports System.Security.Permissions
 Imports System.Xml.Schema
-
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -520,6 +520,7 @@ Namespace FBM
         ''' This is far easier to implement than a recursive loading of FactTypeInstances.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False, Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing) As FBM.RoleInstance
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
@@ -532,17 +533,10 @@ Namespace FBM
                     lrRoleInstance.Model = arPage.Model
                     lrRoleInstance.Page = arPage
                     lrRoleInstance.Role = Me
-
-                    Dim lrFactTypeInstance As New FBM.FactTypeInstance(arPage.Model, arPage, pcenumLanguage.ORMModel, .FactType.Name, True)
-                    lrFactTypeInstance.Id = .FactType.Id
-
                     lrRoleInstance.Id = .Id
                     lrRoleInstance.Name = .Name
                     lrRoleInstance.ConceptType = .ConceptType
-                    lrRoleInstance.FactType = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                    If lrFactTypeInstance.FactType Is Nothing Then
-                        Throw New ApplicationException("Error: No FactTypeInstance exists for Role with Role.Id: " & lrRoleInstance.Id & ", and for Role.FactType.Id: " & .FactType.Id)
-                    End If
+                    lrRoleInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
                     lrRoleInstance.Deontic = .Deontic
                     lrRoleInstance.Mandatory = .Mandatory
                     lrRoleInstance.SequenceNr = .SequenceNr
@@ -551,9 +545,7 @@ Namespace FBM
 
                     Select Case .TypeOfJoin
                         Case Is = pcenumRoleJoinType.EntityType
-                            'lrEntityTypeInstance = New FBM.EntityTypeInstance
-                            lrEntityTypeInstance = arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
-                            'lrRoleInstance.JoinsEntityType = New FBM.EntityTypeInstance
+                            lrEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id)
                             lrRoleInstance.JoinedORMObject = lrEntityTypeInstance
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneEntityTypeInstance(arPage)

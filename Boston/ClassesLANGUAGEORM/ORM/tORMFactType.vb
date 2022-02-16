@@ -3,7 +3,7 @@ Imports System.Collections.Generic
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
-
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -846,6 +846,7 @@ Namespace FBM
         ''' <param name="arPage">The Page for which the FactType is to be cloned to a FactTypeInstance</param>
         ''' <param name="abAddToPage">True if the FactTypeInstance is to be added to the Page, else False</param>
         ''' <returns></returns>
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -2156,7 +2157,7 @@ Namespace FBM
 
         End Function
 
-        Function IsUnaryFactType() As Integer
+        Public Overloads Function IsUnaryFactType() As Integer
 
             '---------------------------------------------------
             'RETURNS true if the FactType is Unary

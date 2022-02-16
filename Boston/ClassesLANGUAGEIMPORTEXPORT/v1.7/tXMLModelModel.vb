@@ -1,6 +1,7 @@
 ﻿Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Threading.Tasks
+Imports System.Runtime.CompilerServices
 
 Namespace XMLModel
 
@@ -945,33 +946,33 @@ Namespace XMLModel
             'Dim lrXMLPage As XMLModel.Page
             Dim lrModel As FBM.Model = arModel
             Try
-                For Each lrXMLPage In Me.ORMDiagram
-                    lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
-                    If lrPage Is Nothing Then
-                        lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
-                    Else
-                        Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
-                    End If
+                'For Each lrXMLPage In Me.ORMDiagram
+                '    lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
+                '    If lrPage Is Nothing Then
+                '        lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                '    Else
+                '        Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
+                '    End If
 
-                    lrPage.Loaded = True
-                    lrPage.IsDirty = True
-                    lrModel.Page.AddUnique(lrPage)
-                Next 'XMLModel.Page
+                '    lrPage.Loaded = True
+                '    lrPage.IsDirty = True
+                '    lrModel.Page.AddUnique(lrPage)
+                'Next 'XMLModel.Page
 
-                'Parallel.ForEach(Me.ORMDiagram,
-                '                 Sub(lrXMLPage As XMLModel.Page)
-                '                     lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
-                '                     If lrPage Is Nothing Then
-                '                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
-                '                     Else
-                '                         Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
-                '                     End If
+                Parallel.ForEach(Me.ORMDiagram,
+                                 Sub(lrXMLPage As XMLModel.Page)
+                                     lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
+                                     If lrPage Is Nothing Then
+                                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                                     Else
+                                         Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
+                                     End If
 
-                '                     lrPage.Loaded = True
-                '                     lrPage.IsDirty = True
-                '                     lrModel.Page.AddUnique(lrPage)
+                                     lrPage.Loaded = True
+                                     lrPage.IsDirty = True
+                                     lrModel.Page.AddUnique(lrPage)
 
-                '                 End Sub)
+                                 End Sub)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -984,6 +985,7 @@ Namespace XMLModel
 
         End Sub
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
                                       ByRef arModel As FBM.Model,
                                       Optional ByRef arPage As FBM.Page = Nothing) As FBM.Page
@@ -999,7 +1001,9 @@ Namespace XMLModel
                                           arXMLPage.Name,
                                           arXMLPage.Language)
                 Else
-                    lrPage = arPage
+                    'Even though passed, was adding instances to another page when using Paralle.ForEach
+                    Dim lsPageId = arXMLPage.Id
+                    lrPage = arModel.Page.Find(Function(x) x.PageId = lsPageId)
                 End If
 
                 '=============================
@@ -1323,7 +1327,7 @@ Namespace XMLModel
                                                                 ,
                                                                 , True
                                                                 )
-
+                    lrDictionaryEntry.Realisations.Add(pcenumConceptType.Fact)
                     arFactType.Model.ModelDictionary.Add(lrDictionaryEntry)
 
 
