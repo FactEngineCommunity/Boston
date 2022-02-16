@@ -553,6 +553,21 @@ SkippedSubtypeRelationship:
                         lrValueType.DataTypeLength = loDataTypeElement.Attribute("Length").Value
                         lrValueType.DataTypePrecision = loDataTypeElement.Attribute("Scale").Value
                     End If
+
+                    '-------------------------------------------------------------------------
+                    'ValueConstraints
+                    If loElement.<orm:ValueRestriction>.Count > 0 Then
+                        Dim lsValue As String
+
+                        For Each loValueTypeValueConstraint In loElement.<orm:ValueRestriction>.<orm:ValueConstraint>.<orm:ValueRanges>.<orm:ValueRange>
+
+                            lsValue = loValueTypeValueConstraint.Attribute("MinValue").Value
+
+                            lrValueType.ValueConstraint.Add(lsValue)
+                            lrValueType.Instance.Add(lsValue)
+                        Next
+                    End If
+
                 Next
 
                 '-----------------------------------------------------
@@ -598,7 +613,6 @@ SkippedSubtypeRelationship:
                                             GoTo SkippedSubtypeRelationship
                                         End If
                                 End Select
-
                             End If
 
                             Dim lsSubtypeRoleId As String = loElement.<orm:FactRoles>.<orm:SubtypeMetaRole>.AsEnumerable.First.Attribute("id").Value
