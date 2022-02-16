@@ -67,7 +67,7 @@ Module tableORMFactInstance
 
                     lrFactInstance.X = lRecordset("fci.x").Value
                     lrFactInstance.Y = lRecordset("fci.y").Value
-                    Dim lrFactDataInstance As New FBM.FactDataInstance
+                    Dim lrFactDataInstance As FBM.FactDataInstance
 
                     '-----------------------------------
                     'Find the RoleInstance for the Data

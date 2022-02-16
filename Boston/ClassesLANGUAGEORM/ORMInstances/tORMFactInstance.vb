@@ -15,8 +15,8 @@ Namespace FBM
         <XmlIgnore()> _
         Public WithEvents Fact As FBM.Fact 'Pointer to the Fact that this FactInstance relates to. 
 
-        <XmlIgnore()> _
-        Public Shadows FactType As New FBM.FactTypeInstance
+        <XmlIgnore()>
+        Public Shadows FactType As FBM.FactTypeInstance
 
         Private Shadows _Data As New List(Of FBM.FactDataInstance)
         <XmlIgnore()>

@@ -2024,14 +2024,7 @@ Namespace FBM
 
                 '---------------
                 'Get FactTypes
-                '---------------
-                Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Fact Types")
-                prApplication.ThrowErrorMessage("Loading Page.FactTypes for Page.Name:" & Me.Name, pcenumErrorType.Information)
-
-                '-----------------------------------------------
-                'There are FactTypes within the ORMDiagram
-                '  Get the list of FactTypes within the ORMDiagram
-                '--------------------------------------------------
+                '---------------                
                 Call TableFactTypeInstance.GetFactTypeInstancesByPage(Me)
 
                 '====================================================================================================================
