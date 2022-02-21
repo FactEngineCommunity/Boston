@@ -3355,28 +3355,39 @@ Namespace FBM
             Dim lrFactTypeReading As FBM.FactTypeReading
             Dim lrFactTypeReadingInstance As FBM.FactTypeReadingInstance
 
-            Call Me.SortRoleGroup()
-            Dim larRole As New List(Of FBM.Role)
-            Dim lrRoleInstance As FBM.RoleInstance
+            Try
+                Call Me.SortRoleGroup()
+                Dim larRole As New List(Of FBM.Role)
+                Dim lrRoleInstance As FBM.RoleInstance
 
-            For Each lrRoleInstance In Me.RoleGroup
-                larRole.Add(lrRoleInstance.Role)
-            Next
-            lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole)
+                For Each lrRoleInstance In Me.RoleGroup
+                    larRole.Add(lrRoleInstance.Role)
+                Next
+                lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole)
 
-            If IsSomething(lrFactTypeReading) Then
-                lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.Page)
-                lrFactTypeReadingInstance.shape = Me.FactTypeReadingShape.shape
-                Me.FactTypeReadingShape = lrFactTypeReadingInstance
-                Me.FactTypeReadingShape.RefreshShape()
-            Else
-                If IsSomething(Me.FactTypeReadingShape) Then
-                    If IsSomething(Me.FactTypeReadingShape.shape) Then
-                        Me.FactTypeReadingShape.shape.Text = ""
+                If IsSomething(lrFactTypeReading) Then
+                    lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.Page)
+                    If Me.FactTypeReadingShape Is Nothing Then
+                        Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance
+                    End If
+                    lrFactTypeReadingInstance.shape = Me.FactTypeReadingShape.shape
+                    Me.FactTypeReadingShape = lrFactTypeReadingInstance
+                    Me.FactTypeReadingShape.RefreshShape()
+                Else
+                    If IsSomething(Me.FactTypeReadingShape) Then
+                        If IsSomething(Me.FactTypeReadingShape.shape) Then
+                            Me.FactTypeReadingShape.shape.Text = ""
+                        End If
                     End If
                 End If
-            End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

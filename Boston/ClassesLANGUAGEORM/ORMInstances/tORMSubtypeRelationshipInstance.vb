@@ -173,12 +173,14 @@ Namespace FBM
                     Me.ModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.ModelElement.Id)
                 End If
 
-                If Me.parentModelElement Is Nothing Then
+                If Me.parentModelElement IsNot Nothing Then
                     If Me.parentModelElement.IsObjectifyingEntityType Then
                         Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
                     Else
                         Me.parentModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.parentModelElement.Id)
                     End If
+                Else
+                    Me.parentModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.parentModelElement.Id)
                 End If
 
                 If IsSomething(Me.parentModelElement) Then

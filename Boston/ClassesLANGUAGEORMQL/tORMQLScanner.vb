@@ -85,7 +85,7 @@ Namespace TinyPG
             Patterns.Add(TokenType.NUMBER, regex)
             Tokens.Add(TokenType.NUMBER)
 
-            regex = new Regex("[aA-zZ0-9\s\-]+", RegexOptions.Compiled)
+            regex = new Regex("[aA-zZ0-9\.\s\-]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.PAGENAME, regex)
             Tokens.Add(TokenType.PAGENAME)
 
