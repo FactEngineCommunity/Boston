@@ -88,16 +88,33 @@ Namespace ORMQL
             Get
                 Try
                     Dim liInd As Integer = 0
+                    Dim lsDataAsString As String
 
                     For Each lrData In Me.mrRecordset.Facts(index).Data
                         Dim lsString = Me.mrRecordset.Columns(liInd)
                         Dim piInstance As PropertyInfo = Me.DynamicObject.GetType.GetProperty(lsString)
-                        piInstance.SetValue(Me.DynamicObject, lrData.Data)
+
+                        Select Case Me.mrTable.Column.Find(Function(x) x.Name = lsString).getMetamodelDataType
+                            Case Is = pcenumORMDataType.TemporalDate,
+                                      pcenumORMDataType.TemporalDateAndTime
+                                Try
+                                    'lsDataAsString = DateTime.ParseExact(lrData.Data,
+                                    '                                     System.Threading.Thread.CurrentThread.CurrentUICulture.DateTimeFormat.FullDateTimePattern,
+                                    '                                     System.Globalization.CultureInfo.InvariantCulture).ToString(System.Threading.Thread.CurrentThread.CurrentUICulture.DateTimeFormat.FullDateTimePattern)
+                                    lsDataAsString = Convert.ToDateTime(lrData.Data).ToString(My.Settings.FactEngineUserDateTimeFormat)
+                                Catch ex As Exception
+                                    lsDataAsString = lrData.Data
+                                End Try
+                            Case Else
+                                lsDataAsString = lrData.Data
+                        End Select
+
+                        piInstance.SetValue(Me.DynamicObject, lsDataAsString)
                         liInd += 1
                     Next
                     Return Me.DynamicObject
                 Catch ex As Exception
-                    Return Nothing
+                    Return Me.DynamicObject
                 End Try
             End Get
             Set(value As Object)

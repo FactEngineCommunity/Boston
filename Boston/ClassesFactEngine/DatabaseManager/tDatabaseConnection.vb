@@ -5,6 +5,14 @@
 
         Public DefaultQueryLimit As Integer = 100
 
+        Public Overridable Function DataTypeWrapper(ByVal aiDataType As pcenumORMDataType) As String
+            Return ""
+        End Function
+
+        Public Overridable Function DateTimeFormat() As String
+            Return "yyyy-MM-dd HH:mm:ss"
+        End Function
+
         Public Overridable Function GO(ByVal asQuery As String) As ORMQL.Recordset
             Return New ORMQL.Recordset
         End Function

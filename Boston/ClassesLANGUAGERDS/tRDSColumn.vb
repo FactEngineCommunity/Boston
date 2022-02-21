@@ -167,10 +167,8 @@ Namespace RDS
                               pcenumORMDataType.TextVariableLength
 
                         Return True
-
                     Case Else
                         Return False
-
                 End Select
             End Get
         End Property

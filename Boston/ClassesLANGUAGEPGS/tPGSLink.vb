@@ -88,7 +88,9 @@ Namespace PGS
         Public Sub DisplayAndAssociate()
 
             Try
-                Dim lrPGSLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.shape, Me.DestinationModelElement.shape)
+                If Me.OriginModelElement.Shape Is Nothing Then Exit Sub
+
+                Dim lrPGSLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.Shape, Me.DestinationModelElement.Shape)
 
                 lrPGSLink.Style = LinkStyle.Bezier
                 lrPGSLink.Pen.Width = 0.1
@@ -105,7 +107,7 @@ Namespace PGS
                 lrPGSLink.Tag = Me
                 Me.Link = lrPGSLink
 
-                Call Me.setHeadShapes
+                Call Me.setHeadShapes()
 
                 Me.Page.Diagram.Links.Add(lrPGSLink)
 

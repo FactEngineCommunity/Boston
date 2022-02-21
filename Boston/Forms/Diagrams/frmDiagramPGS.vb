@@ -401,10 +401,12 @@ Public Class frmDiagramPGS
                     If lbAllFound Then
                         If lrNode.RDSTable.isPGSRelation Then
                             Call Me.zrPage.DisplayPGSRelationNodeLink(lrNode, lrRDSRelation)
-                            lrNode.Shape.Visible = False
-                            For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
-                                lrEdge.Visible = False
-                            Next
+                            If lrNode.Shape IsNot Nothing Then
+                                lrNode.Shape.Visible = False
+                                For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
+                                    lrEdge.Visible = False
+                                Next
+                            End If
                         End If
                     End If
                 Else

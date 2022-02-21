@@ -457,7 +457,7 @@ Namespace FBM
             Dim lrConceptInstance As New FBM.ConceptInstance
             Dim lrConcept As FBM.Concept
             Try
-                lrConceptInstance.ModelId = Me.FactType.Model.ModelId
+                lrConceptInstance.ModelId = Me.Model.ModelId
                 lrConceptInstance.PageId = Me.Page.PageId
                 lrConceptInstance.Symbol = Me.Fact.Symbol
                 lrConceptInstance.X = Me.X
@@ -529,7 +529,9 @@ Namespace FBM
 
             Catch ex As Exception
                 Dim lsMessage As String
-                lsMessage = "Error: GetFactsForFactTypeInstance:"
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try

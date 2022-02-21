@@ -321,6 +321,37 @@ Namespace FactEngine
 
         End Sub
 
+        Public Overrides Function DataTypeWrapper(ByVal aiDataType As pcenumORMDataType) As String
+            Try
+                Select Case aiDataType
+                    Case Is = pcenumORMDataType.TextFixedLength,
+                              pcenumORMDataType.TextLargeLength,
+                              pcenumORMDataType.TextVariableLength
+                        Return "'"
+                    Case Is = pcenumORMDataType.TemporalDate,
+                              pcenumORMDataType.TemporalDateAndTime
+                        Return "'"
+                    Case Else
+                        Return ""
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
+
+                Return ""
+            End Try
+
+        End Function
+
+        Public Overrides Function DateTimeFormat() As String
+            Return "yyyy-MM-dd HH:mm:ss"
+        End Function
+
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
                                                  Optional ByVal abIgnoreError As Boolean = False) As String
 
@@ -974,7 +1005,8 @@ Namespace FactEngine
                                 Else
                                     loFieldValue = ""
                                 End If
-
+                            Case Is = GetType(DateTime)
+                                loFieldValue = lrSQLiteDataReader.GetDateTime(liInd).ToString(Me.DateTimeFormat)
                             Case Else
                                 Try
                                     loFieldValue = lrSQLiteDataReader.GetValue(liInd)

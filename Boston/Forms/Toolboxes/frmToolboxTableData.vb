@@ -97,9 +97,16 @@ Public Class frmToolboxTableData
                 liInd = 0
                 For Each lsColumn In Me.mrRecordset.Columns
                     If liInd > 0 Then lsSQLQuery &= ","
-                    lsSQLQuery &= Richmond.returnIfTrue(larColumn(liInd).DataTypeIsText, "'", "")
-                    lsSQLQuery &= lrFact.Data(liInd).Data
-                    lsSQLQuery &= Richmond.returnIfTrue(larColumn(liInd).DataTypeIsText, "'", "")
+                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                    Select Case larColumn(liInd).getMetamodelDataType
+                        Case Is = pcenumORMDataType.TemporalDate,
+                                  pcenumORMDataType.TemporalDateAndTime
+                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
+                        Case Else
+                            lsSQLQuery &= lrFact.Data(liInd).Data
+                    End Select
+
+                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
                     liInd += 1
                 Next
                 lsSQLQuery &= ")"
@@ -181,12 +188,19 @@ Public Class frmToolboxTableData
     Private Sub AdvancedDataGridView1_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles AdvancedDataGridView.CellEndEdit
 
         Try
+            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
+
+            Select Case lrColumn.getMetamodelDataType
+                Case Is = pcenumORMDataType.TemporalDate,
+                          pcenumORMDataType.TemporalDateAndTime
+                    Me.NewValue = Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(Me.NewValue)
+                Case Else
+                    'Nothing to do.
+            End Select
+
             Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
 
-
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
-
-            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
 
             Dim larPKColumn As List(Of RDS.Column) = Me.mrTable.getPrimaryKeyColumns
 
