@@ -1,10 +1,7 @@
 ﻿Imports System.Reflection
-Imports System.Xml.Serialization
-Imports System.Xml.Linq
-Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
+Imports System.Runtime.CompilerServices
 
 Namespace ORMQL
-
 
     Public Class AddFactStatement
 
@@ -995,6 +992,7 @@ Namespace ORMQL
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Private Function ProcessSelectStatement(ByVal asORMQLStatement As String) As Object
 
             Dim lrFact As New FBM.Fact

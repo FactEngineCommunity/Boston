@@ -455,6 +455,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function GetFactDataByRoleName(ByVal asRoleName As String) As FBM.FactData
 
             Dim lsMessage As String

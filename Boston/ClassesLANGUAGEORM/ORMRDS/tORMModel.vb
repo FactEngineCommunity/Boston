@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports System.Threading.Tasks
 
 Namespace FBM
 
@@ -2003,11 +2004,11 @@ Namespace FBM
 
                                 lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
                                 If prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Information,
-                                                                   ex.StackTrace,
-                                                                   False,
-                                                                   False,
-                                                                   True,
-                                                                   MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                                                        ex.StackTrace,
+                                                                        False,
+                                                                        False,
+                                                                        True,
+                                                                        MessageBoxButtons.YesNo) = DialogResult.Yes Then
                                     '20210813-VM-If this gets out of hand, remove this functionality.
                                     Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
                                 End If
@@ -2031,7 +2032,7 @@ Namespace FBM
                         For Each lrColumn In larNullActiveRoles.ToArray
                             Try
                                 If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
-                                lrColumn.Role.FactType.IsObjectified Then
+                                    lrColumn.Role.FactType.IsObjectified Then
                                     If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
                                         lrColumn.ActiveRole = lrColumn.Role
                                         Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)

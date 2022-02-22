@@ -3923,6 +3923,8 @@ Namespace FBM
                 lrExportModel.ORMModel.ModelId = Me.ModelId
                 lrExportModel.ORMModel.Name = Me.Name
 
+                If Me.Loaded = False Then Exit Sub
+
                 Call lrExportModel.MapFromFBMModel(Me)
 
                 Dim lsFileLocationName As String = ""
@@ -4006,8 +4008,41 @@ Namespace FBM
 
         Public Sub SetName(ByVal asNewName As String)
 
-            Me.Name = asNewName
-            Call Me.MakeDirty()
+            Try
+                If Me.StoreAsXML Then
+                    Dim lsFileName, lsNewFileName As String
+                    Dim lsFolderLocation As String
+                    Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+
+                    If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                        lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                    Else
+                        lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                    End If
+                    System.IO.Directory.CreateDirectory(lsFolderLocation)
+
+                    lsFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
+                    Me.Name = asNewName
+                    lsNewFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
+                    System.IO.File.Move(lsFileName, lsNewFileName)
+                    Call Me.Save()
+                Else
+                    Me.Name = asNewName
+                    Call Me.MakeDirty()
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         ''' <summary>
@@ -5470,6 +5505,8 @@ Namespace FBM
                     lrPage.IsDirty = False
                     Me.Page.Add(lrPage)
                 Next
+
+                objStreamReader.Close()
 
             Catch ex As Exception
                 Dim lsMessage As String
