@@ -98,8 +98,7 @@ Namespace TableModelNoteInstance
                     lrModelNoteInstance.Model = arPage.Model
                     lrModelNoteInstance.Page = arPage
                     lrModelNoteInstance.Id = lREcordset("ModelNoteId").Value
-                    lrModelNoteInstance.ModelNote.Id = lrModelNoteInstance.Id
-                    lrModelNoteInstance.ModelNote = arPage.Model.ModelNote.Find(AddressOf lrModelNoteInstance.ModelNote.Equals)
+                    lrModelNoteInstance.ModelNote = arPage.Model.ModelNote.Find(Function(x) x.Id = lrModelNoteInstance.Id)
 
                     lrModelNoteInstance.Text = Trim(lREcordset("Note").Value)
 

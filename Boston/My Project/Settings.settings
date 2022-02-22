@@ -185,5 +185,8 @@
     <Setting Name="AutomaticallyDeleteTroublesomeColumns" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="NORMAImportingThrowRoleConstraintRoleWarnings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -79,6 +79,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -636,6 +637,7 @@ Partial Class frmCRUDBostonConfiguration
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.AutoSize = True
+        Me.GroupBox4.Controls.Add(Me.ButtonReplaceCoreMetamodel)
         Me.GroupBox4.Controls.Add(Me.CheckBoxDiagramSpyShowLinkFactTypes)
         Me.GroupBox4.Controls.Add(Me.CheckBoxSuperuserMode)
         Me.GroupBox4.Location = New System.Drawing.Point(10, 9)
@@ -671,6 +673,16 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
+        '
+        'ButtonReplaceCoreMetamodel
+        '
+        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(256, 12)
+        Me.ButtonReplaceCoreMetamodel.Name = "ButtonReplaceCoreMetamodel"
+        Me.ButtonReplaceCoreMetamodel.Size = New System.Drawing.Size(149, 23)
+        Me.ButtonReplaceCoreMetamodel.TabIndex = 2
+        Me.ButtonReplaceCoreMetamodel.Text = "Replace Core Metamodel"
+        Me.ButtonReplaceCoreMetamodel.UseVisualStyleBackColor = True
+        Me.ButtonReplaceCoreMetamodel.Visible = False
         '
         'frmCRUDBostonConfiguration
         '
@@ -775,4 +787,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents LabelPromptReverseEngineeringDefaultReferenceMode As Label
     Friend WithEvents TextBoxReverseEngineeringDefaultReferenceMode As TextBox
     Friend WithEvents CheckBoxDiagramSpyShowLinkFactTypes As CheckBox
+    Friend WithEvents ButtonReplaceCoreMetamodel As Button
 End Class

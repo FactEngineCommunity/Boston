@@ -418,7 +418,25 @@ Public Class frmCRUDBostonConfiguration
             If mbSuperUserModeClicks = 7 Then
                 mbSuperUserModeClicks = 0
                 Me.CheckBoxSuperuserMode.Enabled = True
+                Me.ButtonReplaceCoreMetamodel.Visible = True
             End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonReplaceCoreMetamodel_Click(sender As Object, e As EventArgs) Handles ButtonReplaceCoreMetamodel.Click
+
+        Try
+            Call DatabaseUpgradeFunctions.ReplaceCoreModel(True)
+            Richmond.WriteToStatusBar("")
+            MsgBox("Core Metamodel Replaced.")
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

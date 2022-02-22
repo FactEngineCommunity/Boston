@@ -3325,6 +3325,16 @@ Public Class frmMain
                         frmDatabaseUpgrade.ShowDialog()
                     End If
 
+                    '------------------------------------------------------------------------------------------------------
+                    'Always replace the CoreMetaModel
+                    '  This is because there is no safe way to replace the Core metamodel for skipped Database Upgrades.
+                    '  E.g. If the user skips a Database Upgrade, and the Model structure changes (in the database),
+                    '  then the code in Boston will be at the 'last' version of the model, not the earlier version
+                    '  and the Model.Save function will fail.
+                    '  Therefore the very last thing to do on a database upgrade is replace the Core Metamodel.
+                    '------------------------------------------------------------------------------------------------------
+                    Call DatabaseUpgradeFunctions.ReplaceCoreModel()
+
                     '------------------------------------------------
                     'Check to see if the user upgraded the database
                     '------------------------------------------------

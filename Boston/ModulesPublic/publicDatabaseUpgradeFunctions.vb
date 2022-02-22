@@ -411,7 +411,7 @@ Namespace DatabaseUpgradeFunctions
         ''' For Boston v4.1; replaces the existing Core model with a Core model distributed as a .fbm (XML) model.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub ReplaceCoreModel()
+        Public Sub ReplaceCoreModel(Optional ByVal abForceReplace As Boolean = False)
 
             '--------------------------------------------------------------------------------
             'PSEUDOCODE
@@ -441,15 +441,27 @@ Namespace DatabaseUpgradeFunctions
 
                 lrNewCoreModel = lrXMLModel.MapToFBMModel
 
-                'Delete the existing Core model from the database
-                Dim lrCoreModel As New FBM.Model("Core", "Core")
-                Call TableModel.DeleteModel(lrCoreModel)
+                Dim lbReplaceeCoreMetamodel As Boolean = False
 
-                'Replace the in-memory Core model (prApplication.CMML.Core) with the newly loaded Core model.
-                prApplication.CMML.Core = lrNewCoreModel
+                If prApplication.CMML.Core Is Nothing Or abForceReplace Then
+                    lbReplaceeCoreMetamodel = True
+                ElseIf prApplication.CMML.Core.CoreVersionNumber <> lrNewCoreModel.CoreVersionNumber Then
+                    lbReplaceeCoreMetamodel = True
+                End If
 
-                '* Save the in-memory Core model (prApplication.CMML.Core) to the database.
-                Call prApplication.CMML.Core.Save()
+                If lbReplaceeCoreMetamodel Then
+                    'Only replace the Core if it needs replacing.
+
+                    'Delete the existing Core model from the database
+                    Dim lrCoreModel As New FBM.Model("Core", "Core")
+                    Call TableModel.DeleteModel(lrCoreModel)
+
+                    'Replace the in-memory Core model (prApplication.CMML.Core) with the newly loaded Core model.
+                    prApplication.CMML.Core = lrNewCoreModel
+
+                    '* Save the in-memory Core model (prApplication.CMML.Core) to the database.
+                    Call prApplication.CMML.Core.Save()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -465,3 +477,4 @@ Namespace DatabaseUpgradeFunctions
     End Module
 
 End Namespace
+

@@ -893,7 +893,8 @@ SkippedSubtypeRelationship:
                         'Check to see if the FactType is Objectified
                         '---------------------------------------------
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                                  Where ModelInformation.Attribute("Name") = lrFactType.Name
+                                                  Where ModelInformation.Attribute("Name").Value = lrFactType.Name
+                                                  Where ModelInformation.Attribute("IsIndependant") Is Nothing
                                                   Select ModelInformation
 
                         '--------------------------------------------
@@ -1213,7 +1214,8 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         'Check to see if the FactType is Objectified
                         '---------------------------------------------
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
-                                                  Where ModelInformation.Attribute("Name") = lrFactType.NORMAName
+                                                  Where ModelInformation.Attribute("Name").Value = lrFactType.NORMAName
+                                                  Where ModelInformation.Attribute("IsIndependent") Is Nothing
                                                   Select ModelInformation
 
                         '--------------------------------------------
@@ -1465,11 +1467,13 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         Else
                             lbRolesFound = False
 
-                            Dim lsMessage As String = ""
-                            lsMessage = "Warning: Loading NORMA XML (.orm) file"
-                            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
-                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            If My.Settings.NORMAImportingThrowRoleConstraintRoleWarnings Then
+                                Dim lsMessage As String = ""
+                                lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                lsMessage &= vbCrLf & " No Role found for RoleConstraint.Name: " & loElement.Attribute("Name").Value
+                                lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            End If
                         End If
                     Next
 
@@ -1505,6 +1509,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
             Dim loEnumElementQueryResult As IEnumerable(Of XElement)
             Dim loElement As XElement
             Dim lrRoleXElement As XElement
+            Dim lsMessage As String = ""
 
             loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
                                        Select ModelInformation
@@ -1534,11 +1539,12 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                     Else
                         lbRolesFound = False
 
-                        Dim lsMessage As String = ""
-                        lsMessage = "Warning: Loading NORMA XML (.orm) file"
-                        lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
-                        lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        If My.Settings.NORMAImportingThrowRoleConstraintRoleWarnings Then
+                            lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: " & loElement.Attribute("Name").Value
+                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        End If
                     End If
                 Next
 
@@ -2186,6 +2192,8 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         lrRole.Id = loRoleProxyXElement.Attribute("ref").Value
                         lrRole = arModel.Role.Find(Function(x) x.Id = lrRole.Id)
 
+                        If Not lrRole.FactType.IsObjectified Then GoTo SkippedRole
+
                         Dim loLinkFTRoleXElement As XElement = loElement.<orm:FactRoles>.<orm:Role>.First
 
                         Dim lrLinkFTRole As FBM.Role = (From FactType In Me.FBMModel.FactType
@@ -2195,6 +2203,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                         lrLinkFTRole.Id = loLinkFTRoleXElement.Attribute("id").Value
                         lrLinkFTRole.FactType.NORMAReferenceId = loElement.Attribute("id").Value
+SkippedRole:
 
                     Catch ex As Exception
                         Dim lsMessage As String
