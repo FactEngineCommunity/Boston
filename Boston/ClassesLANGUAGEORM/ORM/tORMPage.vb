@@ -768,6 +768,10 @@ Namespace FBM
                     lrEntityType = arEntityType
                 End If
 
+                'CodeSafe: Check to see if the FactType is already on the Page
+                If Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) IsNot Nothing Then
+                    Return Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
+                End If
 
                 '----------------------------------------------------------------------------------------
                 'Create a ConceptInstance that can be broadcast to other ClientServer Boston instances.
@@ -918,7 +922,8 @@ Namespace FBM
                                             ByVal abDisplayFactTable As Boolean,
                                             Optional ByVal abCloneFactType As Boolean = True,
                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
-                                            Optional ByVal abExpandIfReferenceModeFactType As Boolean = False) As FBM.FactTypeInstance
+                                            Optional ByVal abExpandIfReferenceModeFactType As Boolean = False,
+                                            Optional ByVal abForceDropOfRelatedModelElements As Boolean = False) As FBM.FactTypeInstance
 
             Dim lrRoleInstance As New FBM.RoleInstance
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -936,8 +941,14 @@ Namespace FBM
 
                 lrFactType = arFactType
                 'CodeSafe: Check to see if the FactType is already on the Page
-                If Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then Exit Function
+                If Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then
 
+                    If abForceDropOfRelatedModelElements Then
+                        Call Me.DropModelElementsForFactType(arFactType)
+                    End If
+
+                    Return Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id)
+                End If
 
                 If Me.Diagram IsNot Nothing Then
                     Me.DiagramView.Cursor = Cursors.WaitCursor
@@ -959,100 +970,7 @@ Namespace FBM
                     '  are already loaded on the Page. Just make sure their shapes are visible.
                     '--------------------------------------------------------------
                 Else
-                    '--------------------------------------------------------------
-                    'Find out which ObjectTypes need loading on the Page, for the
-                    '  FactType, and load them.
-                    '--------------------------------------------------------------            
-                    Dim lrModelObject As Object
-                    Dim lrRole As FBM.Role
-                    Dim loPoint As New PointF(0, 0)
-                    Dim liInd As Integer = 0
-
-                    For Each lrRole In arFactType.RoleGroup
-
-                        liInd += 1
-
-                        lrModelObject = lrRole.JoinedORMObject
-
-                        ' If liInd = 1 Then
-                        loPoint.X = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
-                        loPoint.Y = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
-                        'Else
-                        '    Dim abEmptySpaceFound As Boolean = False
-                        '    loPoint = Me.FindBlankSpaceInRelationToModelObject(arFactType.RoleGroup(liInd - 2).JoinedORMObject, abEmptySpaceFound)
-                        '    If Not abEmptySpaceFound Then
-                        '        loPoint.X = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
-                        '        loPoint.Y = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
-                        '    End If
-                        'End If
-
-                        Select Case lrModelObject.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                Dim lrEntityType As New FBM.EntityType
-                                lrEntityType = lrModelObject
-                                '----------------------------------------------------------------------
-                                'Change the Model of the EntityType to the Model of the current Page.
-                                '  The reason for this is that the EntityType may have been dragged
-                                '  from the ModelDictionary of another Model.
-                                '----------------------------------------------------------------------
-                                lrEntityType.Model = Me.Model
-
-                                If Not IsSomething(Me.EntityTypeInstance.Find(AddressOf lrEntityType.Equals)) Then
-                                    Dim lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrEntityType, loPoint)
-
-                                    For Each lrSubtypeModelObject As FBM.ModelObject In lrEntityTypeInstance.EntityType.getSubtypes
-
-                                        If lrSubtypeModelObject.ConceptType = pcenumConceptType.EntityType Then
-                                            lrEntityType = CType(lrSubtypeModelObject, FBM.EntityType)
-                                            Try
-                                                Dim lrSubtypeEntityTypeInstance As FBM.EntityTypeInstance = Me.getModelElementById(lrEntityType.Id)
-                                                If lrSubtypeEntityTypeInstance IsNot Nothing Then
-                                                    Call lrSubtypeEntityTypeInstance.showSubtypeRelationships()
-                                                End If
-                                            Catch ex As Exception
-                                                Dim lsMessage1 As String
-                                                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                                                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                                                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                                                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-                                            End Try
-                                        End If
-                                    Next
-
-                                End If
-                            Case Is = pcenumConceptType.ValueType
-                                Dim lrValueType As New FBM.ValueType
-                                lrValueType = lrModelObject
-                                '----------------------------------------------------------------------
-                                'Change the Model of the ValueType to the Model of the current Page.
-                                '  The reason for this is that the ValueType may have been dragged
-                                '  from the ModelDictionary of another Model.
-                                '----------------------------------------------------------------------
-                                lrValueType.Model = Me.Model
-
-                                Dim lrValueTypeInstance As FBM.ValueTypeInstance = Me.ValueTypeInstance.Find(AddressOf lrValueType.Equals)
-                                If lrValueTypeInstance Is Nothing Then
-                                    Call Me.DropValueTypeAtPoint(lrValueType, loPoint)
-                                ElseIf arFactType.IsPreferredReferenceMode Then
-                                    lrValueTypeInstance.Shape.Visible = False
-                                End If
-                            Case Is = pcenumConceptType.FactType
-                                Dim lrRoleJoinedFactType As New FBM.FactType
-                                lrRoleJoinedFactType = lrModelObject
-                                '----------------------------------------------------------------------
-                                'Change the Model of the FactType to the Model of the current Page.
-                                '  The reason for this is that the FactType may have been dragged
-                                '  from the ModelDictionary of another Model.
-                                '----------------------------------------------------------------------
-                                lrRoleJoinedFactType.Model = Me.Model
-
-                                If Me.FactTypeInstance.Find(AddressOf lrRoleJoinedFactType.Equals) Is Nothing Then
-                                    Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False)
-                                End If
-
-                        End Select
-                    Next
+                    Call Me.DropModelElementsForFactType(arFactType)
                 End If
 
                 '-----------------------------------------------------------------------------------
@@ -1204,6 +1122,113 @@ Namespace FBM
 
         End Function
 
+        Public Function DropModelElementsForFactType(ByRef arFactType As FBM.FactType)
+
+            Try
+                '--------------------------------------------------------------
+                'Find out which ObjectTypes need loading on the Page, for the
+                '  FactType, and load them.
+                '--------------------------------------------------------------            
+                Dim lrModelObject As Object
+                Dim lrRole As FBM.Role
+                Dim loPoint As New PointF(0, 0)
+                Dim liInd As Integer = 0
+
+                For Each lrRole In arFactType.RoleGroup
+
+                    liInd += 1
+
+                    lrModelObject = lrRole.JoinedORMObject
+
+                    ' If liInd = 1 Then
+                    loPoint.X = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
+                    loPoint.Y = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
+                    'Else
+                    '    Dim abEmptySpaceFound As Boolean = False
+                    '    loPoint = Me.FindBlankSpaceInRelationToModelObject(arFactType.RoleGroup(liInd - 2).JoinedORMObject, abEmptySpaceFound)
+                    '    If Not abEmptySpaceFound Then
+                    '        loPoint.X = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
+                    '        loPoint.Y = CInt(Math.Floor((100 - 10 + 1) * Rnd())) + 10
+                    '    End If
+                    'End If
+
+                    Select Case lrModelObject.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                            Dim lrEntityType As New FBM.EntityType
+                            lrEntityType = lrModelObject
+                            '----------------------------------------------------------------------
+                            'Change the Model of the EntityType to the Model of the current Page.
+                            '  The reason for this is that the EntityType may have been dragged
+                            '  from the ModelDictionary of another Model.
+                            '----------------------------------------------------------------------
+                            lrEntityType.Model = Me.Model
+
+                            If Not IsSomething(Me.EntityTypeInstance.Find(AddressOf lrEntityType.Equals)) Then
+                                Dim lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrEntityType, loPoint)
+
+                                For Each lrSubtypeModelObject As FBM.ModelObject In lrEntityTypeInstance.EntityType.getSubtypes
+
+                                    If lrSubtypeModelObject.ConceptType = pcenumConceptType.EntityType Then
+                                        lrEntityType = CType(lrSubtypeModelObject, FBM.EntityType)
+                                        Try
+                                            Dim lrSubtypeEntityTypeInstance As FBM.EntityTypeInstance = Me.getModelElementById(lrEntityType.Id)
+                                            If lrSubtypeEntityTypeInstance IsNot Nothing Then
+                                                Call lrSubtypeEntityTypeInstance.showSubtypeRelationships()
+                                            End If
+                                        Catch ex As Exception
+                                            Dim lsMessage1 As String
+                                            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                                            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                                            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                                        End Try
+                                    End If
+                                Next
+
+                            End If
+                        Case Is = pcenumConceptType.ValueType
+                            Dim lrValueType As New FBM.ValueType
+                            lrValueType = lrModelObject
+                            '----------------------------------------------------------------------
+                            'Change the Model of the ValueType to the Model of the current Page.
+                            '  The reason for this is that the ValueType may have been dragged
+                            '  from the ModelDictionary of another Model.
+                            '----------------------------------------------------------------------
+                            lrValueType.Model = Me.Model
+
+                            Dim lrValueTypeInstance As FBM.ValueTypeInstance = Me.ValueTypeInstance.Find(AddressOf lrValueType.Equals)
+                            If lrValueTypeInstance Is Nothing Then
+                                Call Me.DropValueTypeAtPoint(lrValueType, loPoint)
+                            ElseIf arFactType.IsPreferredReferenceMode Then
+                                lrValueTypeInstance.Shape.Visible = False
+                            End If
+                        Case Is = pcenumConceptType.FactType
+                            Dim lrRoleJoinedFactType As New FBM.FactType
+                            lrRoleJoinedFactType = lrModelObject
+                            '----------------------------------------------------------------------
+                            'Change the Model of the FactType to the Model of the current Page.
+                            '  The reason for this is that the FactType may have been dragged
+                            '  from the ModelDictionary of another Model.
+                            '----------------------------------------------------------------------
+                            lrRoleJoinedFactType.Model = Me.Model
+
+                            If Me.FactTypeInstance.Find(AddressOf lrRoleJoinedFactType.Equals) Is Nothing Then
+                                Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False)
+                            End If
+
+                    End Select
+                Next
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Function
+
         Public Function DropFrequencyConstraintAtPoint(ByRef arRoleConstraint As FBM.RoleConstraint,
                                                        ByVal aoPoint As PointF,
                                                        Optional ByVal abBroadcastInterfaceEvent As Boolean = False) As FBM.RoleConstraintInstance
@@ -1255,6 +1280,45 @@ Namespace FBM
 
             Return lrRoleConstraintInstance
 
+        End Function
+
+        ''' <summary>
+        ''' Drops a ModelElement onto a Page.
+        ''' </summary>
+        ''' <param name="arModelElement">The ModelElement to be dropped.</param>
+        ''' <param name="aoPoint">The point at which the ModelElement will be dropped</param>
+        ''' <param name="abBroadcastInterfaceEvent">True if the dropping of the ModelElement is to be broadcast to other clients (Client/Server mode).</param>
+        ''' <param name="abForceDropOfRelatedModelElements">If a FactType is being dropped, True if to force the dropping of the related ModelElements</param>
+        ''' <returns></returns>
+        Public Function DropModelElementAtPoint(ByRef arModelElement As FBM.ModelObject,
+                                                ByVal aoPoint As PointF,
+                                                Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
+                                                Optional ByVal abForceDropOfRelatedModelElements As Boolean = False) As FBM.ModelObject
+
+            Try
+                Dim lrModelElement As FBM.ModelObject = Nothing
+
+                Select Case arModelElement.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        lrModelElement = Me.DropEntityTypeAtPoint(arModelElement, aoPoint, abBroadcastInterfaceEvent)
+                    Case Is = GetType(FBM.FactType)
+                        lrModelElement = Me.DropFactTypeAtPoint(arModelElement, aoPoint, False, abBroadcastInterfaceEvent,,, abForceDropOfRelatedModelElements)
+                    Case Is = GetType(FBM.ValueType)
+                        lrModelElement = Me.DropValueTypeAtPoint(arModelElement, aoPoint, abBroadcastInterfaceEvent)
+                End Select
+
+                Return lrModelElement
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
         End Function
 
         Public Function DropRoleConstraintAtPoint(ByRef arRoleConstraint As FBM.RoleConstraint,

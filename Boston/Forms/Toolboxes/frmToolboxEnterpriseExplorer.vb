@@ -722,14 +722,14 @@ Public Class frmToolboxEnterpriseExplorer
                     loObject = Me.TreeView.SelectedNode.Tag
                     Select Case loObject.MenuType
                         Case Is = pcenumMenuType.modelORMModel
-                            Dim lr_model As New FBM.Model
-                            lr_model = loObject.tag
-                            Call lr_model.SetName(e.Label)
-                            '--------------------------------------
-                            'Change the dirty flag on the Model
-                            '--------------------------------------
-                            lr_model.IsDirty = True
-                            loObject.tag = lr_model
+                            Dim lrModel As New FBM.Model
+                            lrModel = loObject.tag
+                            If lrModel.SetName(e.Label) Then
+                                loObject.tag = lrModel
+                            Else
+                                Me.TreeView.SelectedNode.Text = lrModel.Name
+                            End If
+
                         Case Is = pcenumMenuType.pageORMModel,
                                   pcenumMenuType.pageERD,
                                   pcenumMenuType.pagePGSDiagram,

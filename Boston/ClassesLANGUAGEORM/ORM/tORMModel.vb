@@ -4006,7 +4006,9 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetName(ByVal asNewName As String)
+        Public Function SetName(ByVal asNewName As String) As Boolean
+
+            Dim lsOldName As String = Me.Name
 
             Try
                 If Me.StoreAsXML Then
@@ -4028,10 +4030,14 @@ Namespace FBM
                     Me.Name = asNewName
                     lsNewFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
                     System.IO.File.Move(lsFileName, lsNewFileName)
-                    Call Me.Save()
+                    Call Me.MakeDirty()
+                    Call Me.Save() 'Saves the database details of the Model.
+
+                    Return True
                 Else
                     Me.Name = asNewName
                     Call Me.MakeDirty()
+                    Return True
                 End If
 
             Catch ex As Exception
@@ -4041,9 +4047,12 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Me.Name = lsOldName
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         ''' <summary>
         ''' Makes all Page.IsDirty flags of each of the Pages within the Model = False.

@@ -56,7 +56,7 @@ Namespace FBM
 
         <NonSerialized(),
         XmlIgnore()>
-        Public Link As DiagramLink
+        Public Link As DiagramLink = Nothing
 
         <NonSerialized(),
         XmlIgnore()>
@@ -162,6 +162,7 @@ Namespace FBM
                 '----------------------------------------------
                 'CodeSafe
                 If Me.Page.Diagram Is Nothing Then Exit Sub
+                If Me.Link IsNot Nothing Then Exit Sub
 
                 '--------------------------------------------------------
                 'Create a Link for the SubType on the DiagramView object
