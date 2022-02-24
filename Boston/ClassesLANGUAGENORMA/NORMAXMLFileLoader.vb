@@ -82,6 +82,26 @@ Namespace NORMA
 
         End Sub
 
+        Public Function getModelErrorCount(ByRef arNORMAXMLDOC As XDocument) As Integer
+
+            Try
+                Dim loEnumElementQueryResult = From ModelError In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:ModelErrors>
+                                               Select ModelError
+
+                Return loEnumElementQueryResult.Count
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return 0
+            End Try
+
+        End Function
+
         Public Sub SetSimpleReferenceSchemes(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
 
             Try
@@ -1001,8 +1021,10 @@ SkippedSubtypeRelationship:
                                 'Can't guarantee that NORMA Roles actually join something and are not in error.
                                 'I.e. e.g. NORMA can have a Role that is in error, and the joinedModelElement is 'Missing'.
                                 'In this case we can't create the Role for the FactType
-                                lsMessage = "The Fact Type, " & lrFactType.Id & ", in the NORMA .orm file is in error and has a Role that is joined to nothing. Please fix the NORMA file and reImport into Boston."
-                                MsgBox(lsMessage)
+                                lsMessage = "The Fact Type, " & lrFactType.Id & ", in the NORMA .orm file is in error and has a Role that is joined to nothing."
+                                lsMessage.AppendDoubleLineBreak("Boston will load the Fact Type without the Role that joins nothing.")
+                                lsMessage.AppendDoubleLineBreak("Recommendation: Fix the errors in NORMA .orm files before loading into Boston.")
+                                MsgBox(lsMessage, MsgBoxStyle.Exclamation)
                                 GoTo SkipRole
                             End Try
 
@@ -2880,7 +2902,7 @@ SkippedRole:
                     '-----------------------
                     'Subtype Relationships
                     '-----------------------
-                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing
                     For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.FindAll(Function(x) x.EntityType.SubtypeRelationship.Count > 0).ToArray
                         For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship
                             Dim lrParentModelElement As FBM.ModelObject

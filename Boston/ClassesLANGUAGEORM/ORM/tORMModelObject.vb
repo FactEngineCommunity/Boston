@@ -2,7 +2,7 @@ Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
-
+Imports System.Runtime.CompilerServices
 
 Namespace FBM
     <Serializable()> _
@@ -512,7 +512,7 @@ Namespace FBM
 
         End Function
 
-
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Overridable Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrPageObject As New FBM.PageObject
@@ -595,6 +595,7 @@ Namespace FBM
 
         End Function
 
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Public Function CloneEntityTypeInstance(ByRef arPage As FBM.Page) As FBM.EntityTypeInstance
 
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance

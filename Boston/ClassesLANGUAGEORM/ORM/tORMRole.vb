@@ -549,13 +549,13 @@ Namespace FBM
                             lrRoleInstance.JoinedORMObject = lrEntityTypeInstance
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneEntityTypeInstance(arPage)
-                                lsMessage = "Error: No EntityTypeInstance found for:"
-                                lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
-                                lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
-                                lsMessage &= vbCrLf & " for Role.JoinsEntityTypeId: " & Me.JoinedORMObject.Id
-                                lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
                                 If IsSomething(abForceReferencingErrorThrowing) Then
                                     If abForceReferencingErrorThrowing Then
+                                        lsMessage = "Error: No EntityTypeInstance found for:"
+                                        lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
+                                        lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
+                                        lsMessage &= vbCrLf & " for Role.JoinsEntityTypeId: " & Me.JoinedORMObject.Id
+                                        lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
                                         Throw New ApplicationException(lsMessage)
                                     End If
                                 End If
@@ -564,14 +564,13 @@ Namespace FBM
                             lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage)
-                                lsMessage = "Error: No ValueTypeInstance found for "
-                                lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
-                                lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
-                                lsMessage &= vbCrLf & " for Role.JoinsValueTypeId: " & Me.JoinedORMObject.Id
-                                lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
-
                                 If IsSomething(abForceReferencingErrorThrowing) Then
                                     If abForceReferencingErrorThrowing Then
+                                        lsMessage = "Error: No ValueTypeInstance found for "
+                                        lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
+                                        lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
+                                        lsMessage &= vbCrLf & " for Role.JoinsValueTypeId: " & Me.JoinedORMObject.Id
+                                        lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
                                         Throw New ApplicationException(lsMessage)
                                     End If
                                 End If
@@ -580,14 +579,13 @@ Namespace FBM
                             lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage, abAddToPage)
-
-                                lsMessage = "Error: No FactTypeInstance found for "
-                                lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
-                                lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
-                                lsMessage &= vbCrLf & " for Role.JoinsFactTypeId: " & Me.JoinedORMObject.Id
-                                lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
                                 If IsSomething(abForceReferencingErrorThrowing) Then
                                     If abForceReferencingErrorThrowing Then
+                                        lsMessage = "Error: No FactTypeInstance found for "
+                                        lsMessage &= vbCrLf & " Role with Role.Id: " & lrRoleInstance.Id & ", and"
+                                        lsMessage &= vbCrLf & " for Role.FactType.Id: " & .FactType.Id
+                                        lsMessage &= vbCrLf & " for Role.JoinsFactTypeId: " & Me.JoinedORMObject.Id
+                                        lsMessage &= vbCrLf & " for Page.Name: " & arPage.Name
                                         Throw New ApplicationException(lsMessage)
                                     End If
                                 End If

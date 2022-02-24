@@ -3244,7 +3244,7 @@ Public Class frmToolboxEnterpriseExplorer
             lrEnterpriseView = Me.TreeView.SelectedNode.Tag
             lrPage = lrEnterpriseView.Tag 'prApplication.WorkingPage 
 
-            If lrPage.Loaded = False And Not lrPage.Loading Then
+            If Not lrPage.Model.StoreAsXML And lrPage.Loaded = False And Not lrPage.Loading Then
                 With New WaitCursor
                     lrPage.Load(False)
                 End With
@@ -4569,63 +4569,77 @@ Public Class frmToolboxEnterpriseExplorer
                 'ModelName/Id & Model
                 Dim lsModelName As String = Path.GetFileNameWithoutExtension(Me.DialogOpenFile.FileName)
 
-                Dim lrModel As New FBM.Model(lsModelName, lsModelName)
-                Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
-
-                If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
-                    lrModel.ModelId = System.Guid.NewGuid.ToString
-                End If
-
-                If TableModel.ExistsModelByName(lrModel.Name) Then
-                    lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
-                End If
-
                 '========================================================================================
-                'XDocument
+                'XDocument - Open the document for reading.
                 Dim loXDocument As XDocument = XDocument.Load(Me.DialogOpenFile.FileName)
 
-                '========================================================================================
-                'TreeNode
-                Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
+                '=======================================================
+                'Model Errors? Does the user wish to proceed?
+                Dim lrNORMAFileLoader As New NORMA.NORMAXMLFileLoader(Nothing)
+                If lrNORMAFileLoader.getModelErrorCount(loXDocument) > 0 Then
+                    lsMessage = "The NORMA .orm file you are attempting to load contains modelling errors."
+                    lsMessage.AppendDoubleLineBreak("Do you wish to proceed?")
+                    lsMessage.AppendDoubleLineBreak("If you decide to proceed Boston will do its best to compensate for those errors.")
+                    If MsgBox(lsMessage, MsgBoxStyle.YesNo + MsgBoxStyle.Exclamation) = MsgBoxResult.No Then
+                        Exit Sub
+                    End If
+                End If
 
-                '========================================================================================
-                'Load the NORMA file
-                Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
+                '==================================================================
+                'Create the Model
+                Dim lrModel As New FBM.Model(lsModelName, lsModelName)
+                    Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
 
-                '========================================================================================
-                'Save the Model?
-                Dim lrCustomMessageBox As New frmCustomMessageBox
+                    If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
+                        lrModel.ModelId = System.Guid.NewGuid.ToString
+                    End If
 
-                lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
-                lsMessage &= "Save the model now? (Recommended)"
+                    If TableModel.ExistsModelByName(lrModel.Name) Then
+                        lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
+                    End If
 
-                lrCustomMessageBox.Message = lsMessage
-                lrCustomMessageBox.ButtonText.Add("No")
-                lrCustomMessageBox.ButtonText.Add("Save to database")
-                lrCustomMessageBox.ButtonText.Add("Store as XML")
+                    '========================================================================================
+                    'TreeNode
+                    Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
 
-                Select Case lrCustomMessageBox.ShowDialog
-                    Case Is = "Store as XML"
-                        lrModel.StoreAsXML = True
-                        Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
-                        Call lrModel.Save(True, False)
-                        Richmond.WriteToStatusBar("Model Saved")
-                    Case Is = "Save to database"
-                        With New WaitCursor
+                    '========================================================================================
+                    'Load the NORMA file
+                    Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
+
+                    '========================================================================================
+                    'Save the Model?
+                    Dim lrCustomMessageBox As New frmCustomMessageBox
+
+                    lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
+                    lsMessage &= "Save the model now? (Recommended)"
+
+                    lrCustomMessageBox.Message = lsMessage
+                    lrCustomMessageBox.ButtonText.Add("No")
+                    lrCustomMessageBox.ButtonText.Add("Save to database")
+                    lrCustomMessageBox.ButtonText.Add("Store as XML")
+
+                    Select Case lrCustomMessageBox.ShowDialog
+                        Case Is = "Store as XML"
+                            lrModel.StoreAsXML = True
                             Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
                             Call lrModel.Save(True, False)
                             Richmond.WriteToStatusBar("Model Saved")
-                        End With
-                End Select
+                        Case Is = "Save to database"
+                            With New WaitCursor
+                                Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                                Call lrModel.Save(True, False)
+                                Richmond.WriteToStatusBar("Model Saved")
+                            End With
+                    End Select
 
-                Call lrNewTreeNode.EnsureVisible()
+                    Call lrNewTreeNode.EnsureVisible()
 
-                'Me.zrToolTip.IsBalloon = True
-                lsMessage = "New Model added: " & lrModel.Name
-                Me.zrToolTip.IsBalloon = True
-                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
-            End If
+                    'Me.zrToolTip.IsBalloon = True
+                    lsMessage = "New Model added: " & lrModel.Name
+                    Me.zrToolTip.IsBalloon = True
+                    Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                    Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
+                End If
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

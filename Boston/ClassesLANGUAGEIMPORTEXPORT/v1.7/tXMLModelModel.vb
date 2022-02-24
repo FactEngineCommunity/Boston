@@ -1276,6 +1276,9 @@ Namespace XMLModel
 
                 Next
 
+                lrPage.Loaded = True
+                lrPage.Loaded = False
+
                 Return lrPage
 
             Catch ex As Exception
