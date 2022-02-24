@@ -3897,6 +3897,8 @@ Namespace FBM
                         lrPage.Save(abRapidSave)
                     End If
                 Next
+
+                Richmond.WriteToStatusBar("",, 0)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -3988,9 +3990,6 @@ Namespace FBM
                     If lrModelDictionaryEntry.Realisations.FindAll(Function(x) x <> pcenumConceptType.Value).Count = 0 Then
                         lrModelDictionaryEntry.Symbol = Strings.Left(lrModelDictionaryEntry.Symbol, 100)
                     End If
-
-                    lrConcept = New FBM.Concept(lrModelDictionaryEntry.Symbol, True)
-                    lrConcept.Save(abRapidSave)
                     Call lrModelDictionaryEntry.Save(abRapidSave)
                 Else
                     '---------------------------------------------------------------------
@@ -5528,7 +5527,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub performCoreManagement()
+        Public Sub performCoreManagement(Optional ByVal abSaveModel As Boolean = True)
 
             Dim lsSQLQuery As String
 
@@ -5564,7 +5563,7 @@ Namespace FBM
 
                 Me.CoreVersionNumber = "2.3"
                 Me.MakeDirty(False, False)
-                Call Me.Save()
+                If abSaveModel Then Call Me.Save()
 
             ElseIf Me.CoreVersionNumber = "2.0" Then
                 'NB Tightly coupled to the v5.5 release of Boston.
@@ -5600,7 +5599,7 @@ Namespace FBM
                 'Upgrade to CoreVersionNumber, v2.1
                 Me.CoreVersionNumber = "2.1"
 
-                Call TableModel.update_model(Me)
+                If abSaveModel Then Call TableModel.update_model(Me)
 
                 '==================================================
                 'CMML. STM - (State Transition Model). Create a CMML Page and then dispose of it.                
@@ -5636,7 +5635,7 @@ Namespace FBM
                     Call Me.ORMQL.ProcessORMQLStatement(lsSQLCommand)
                 End If
                 Me.CoreVersionNumber = "2.2"
-                Call Me.Save()
+                If abSaveModel Then Call Me.Save()
             End If
 
             If Me.CoreVersionNumber = "2.2" Then
@@ -5651,7 +5650,7 @@ Namespace FBM
 
                 Me.CoreVersionNumber = "2.3"
                 Me.MakeDirty(False, False)
-                Call Me.Save()
+                If abSaveModel Then Call Me.Save()
             End If
 
         End Sub

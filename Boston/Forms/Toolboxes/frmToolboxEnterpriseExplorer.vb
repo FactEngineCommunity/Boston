@@ -3006,7 +3006,7 @@ Public Class frmToolboxEnterpriseExplorer
             '================================================================================================================
             'RDS
             If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
-                Call lrModel.performCoreManagement()
+                Call lrModel.performCoreManagement(False)
                 Call lrModel.PopulateRDSStructureFromCoreMDAElements()
                 lrModel.RDSCreated = True
             ElseIf (lrModel.ModelId <> "Core") Then
@@ -3076,7 +3076,7 @@ Public Class frmToolboxEnterpriseExplorer
                 lfrmFlashCard.zsText = "Saving model."
                 lfrmFlashCard.Show(Me)
                 Richmond.WriteToStatusBar("Saving model.", True)
-                Call lrModel.Save()
+                Call lrModel.Save(True, True)
             End If
 
         Catch ex As Exception
@@ -4592,24 +4592,40 @@ Public Class frmToolboxEnterpriseExplorer
                 'Load the NORMA file
                 Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
 
+                '========================================================================================
+                'Save the Model?
+                Dim lrCustomMessageBox As New frmCustomMessageBox
+
                 lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
                 lsMessage &= "Save the model now? (Recommended)"
-                If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                    With New WaitCursor
+
+                lrCustomMessageBox.Message = lsMessage
+                lrCustomMessageBox.ButtonText.Add("No")
+                lrCustomMessageBox.ButtonText.Add("Save to database")
+                lrCustomMessageBox.ButtonText.Add("Store as XML")
+
+                Select Case lrCustomMessageBox.ShowDialog
+                    Case Is = "Store as XML"
+                        lrModel.StoreAsXML = True
                         Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
                         Call lrModel.Save(True, False)
                         Richmond.WriteToStatusBar("Model Saved")
-                    End With
-                End If
+                    Case Is = "Save to database"
+                        With New WaitCursor
+                            Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                            Call lrModel.Save(True, False)
+                            Richmond.WriteToStatusBar("Model Saved")
+                        End With
+                End Select
 
                 Call lrNewTreeNode.EnsureVisible()
 
-                    'Me.zrToolTip.IsBalloon = True
-                    lsMessage = "New Model added: " & lrModel.Name
-                    Me.zrToolTip.IsBalloon = True
-                    Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                    Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
-                End If
+                'Me.zrToolTip.IsBalloon = True
+                lsMessage = "New Model added: " & lrModel.Name
+                Me.zrToolTip.IsBalloon = True
+                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
+            End If
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

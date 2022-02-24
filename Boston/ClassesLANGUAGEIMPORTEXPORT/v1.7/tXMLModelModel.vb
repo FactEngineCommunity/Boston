@@ -649,7 +649,6 @@ Namespace XMLModel
                     lrFactType = New FBM.FactType(lrModel,
                                                   lrXMLFactType.Name,
                                                   lrXMLFactType.Id)
-
                     Call Me.GetFactTypeDetails(lrFactType, lrXMLFactType)
                 Next
 

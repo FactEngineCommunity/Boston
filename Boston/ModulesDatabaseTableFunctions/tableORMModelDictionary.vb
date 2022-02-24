@@ -1,8 +1,11 @@
+Imports System.Reflection
+
 Namespace TableModelDictionary
 
     Public Module TableModelDictionary
 
-        Public Sub AddModelDictionaryEntry(ByVal arModelDictionaryEntry As FBM.DictionaryEntry)
+        Public Sub AddModelDictionaryEntry(ByVal arModelDictionaryEntry As FBM.DictionaryEntry,
+                                           Optional ByVal abIgnoreAnyErrors As Boolean = False)
 
             Dim lsSQLQuery As String = ""
 
@@ -30,10 +33,14 @@ Namespace TableModelDictionary
                 pdbConnection.Execute(lsSQLQuery)
 
             Catch ex As Exception
-                Dim lsMessage As String
-                lsMessage = "Error: TableModelDictionary.AddModelDictionaryEntry"
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                If Not abIgnoreAnyErrors Then
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End If
             End Try
 
         End Sub
@@ -383,11 +390,11 @@ Namespace TableModelDictionary
                 lsSQLQuery = " UPDATE MetaModelModelDictionary"
                 lsSQLQuery &= "   SET ShortDescription = '" & Trim(arModelDictionaryEntry.ShortDescription.Replace("'", "''")) & "'"
                 lsSQLQuery &= "       ,LongDescription = '" & Trim(arModelDictionaryEntry.LongDescription.Replace("'", "''")) & "'"
-                lsSQLQuery &= "   ,IsEntityType = " & arModelDictionaryEntry.isEntityType                
+                lsSQLQuery &= "   ,IsEntityType = " & arModelDictionaryEntry.isEntityType
                 lsSQLQuery &= "   ,IsValueType = " & arModelDictionaryEntry.isValueType
                 lsSQLQuery &= "   ,IsFactType = " & arModelDictionaryEntry.isFactType
                 lsSQLQuery &= "   ,IsFact = " & arModelDictionaryEntry.isFact
-                lsSQLQuery &= "   ,IsValue = " & arModelDictionaryEntry.isValue                    
+                lsSQLQuery &= "   ,IsValue = " & arModelDictionaryEntry.isValue
                 lsSQLQuery &= "   ,IsRoleConstraint = " & arModelDictionaryEntry.isRoleConstraint
                 lsSQLQuery &= "   ,IsModelNote = " & arModelDictionaryEntry.isModelNote
                 lsSQLQuery &= "   ,IsGeneralConcept = " & arModelDictionaryEntry.isGeneralConcept

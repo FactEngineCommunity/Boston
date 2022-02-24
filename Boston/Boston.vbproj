@@ -443,6 +443,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\classVievToopTip.vb" />
+    <Compile Include="ClassesGeneral\CustomMessageBox\frmCustomerMessageBox.Designer.vb">
+      <DependentUpon>frmCustomerMessageBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\CustomMessageBox\frmCustomerMessageBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\FlexibleListBox.Designer.vb">
       <DependentUpon>FlexibleListBox.vb</DependentUpon>
     </Compile>
@@ -1805,6 +1811,9 @@
     <Compile Include="Thinfinity.VirtualUI.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ClassesGeneral\CustomMessageBox\frmCustomerMessageBox.resx">
+      <DependentUpon>frmCustomerMessageBox.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\FlexibleListBox.resx">
       <DependentUpon>FlexibleListBox.vb</DependentUpon>
     </EmbeddedResource>

@@ -561,7 +561,7 @@ Namespace FBM
                 '---------------------------------------------------------
                 Dim lrConcept As New FBM.Concept(Me.Symbol, True)
                 lrConcept.Save()
-                Call TableModelDictionary.AddModelDictionaryEntry(Me)
+                Call TableModelDictionary.AddModelDictionaryEntry(Me, True)
                 Me.isDirty = False
             ElseIf Me.isDirty Then
 

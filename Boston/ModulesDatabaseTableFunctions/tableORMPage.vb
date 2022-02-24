@@ -144,6 +144,10 @@ Namespace TablePage
 
                 lREcordset.Open(lsSQLQuery)
 
+                '===========================================================================================================
+                'STOP: Before you think about reintroducing threading, the reason why it was removed because
+                '  the system would run out of memory for large models with many pages, not because threading didn't work.
+                '-----------------------------------------------------------------------------------------------------------
                 '-----------------------------
                 'Initialise the return value
                 '-----------------------------
