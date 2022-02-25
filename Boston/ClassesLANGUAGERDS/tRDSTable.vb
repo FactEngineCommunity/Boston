@@ -443,6 +443,8 @@ Namespace RDS
                 arIndex.ResponsibleRoleConstraint = arRoleConstraint
             End If
 
+            If Me.Name = "ApplicationProcess" Then Debugger.Break()
+
             Me.Index.AddUnique(arIndex)
             Me.Model.Index.AddUnique(arIndex)
 
@@ -771,11 +773,12 @@ Namespace RDS
         ''' Non recursive, single layer return of subtype Tables.
         ''' </summary>
         ''' <returns></returns>
-        Public Function getSubtypeTables(Optional ByVal abCreateTableIfNotExists As Boolean = True) As List(Of RDS.Table)
+        Public Function getSubtypeTables(Optional ByVal abCreateTableIfNotExists As Boolean = True,
+                                         Optional ByVal abPrimarySubtypeRelationshipsOnly As Boolean = False) As List(Of RDS.Table)
 
             Dim larSubtypeTable As New List(Of RDS.Table)
 
-            Dim larModelObject = Me.FBMModelElement.getSubtypes
+            Dim larModelObject = Me.FBMModelElement.getSubtypes(abPrimarySubtypeRelationshipsOnly)
 
             For Each lrModelObject In larModelObject
                 If Not lrModelObject.IsAbsorbed Then 'Absorbed Subtypes do not have Tables.
@@ -1708,7 +1711,7 @@ Namespace RDS
         Public Sub addPrimaryKeyToNonAbsorbedTables(ByRef arPrimaryKeyIndex As RDS.Index, ByVal abIsPreferredIdentifier As Boolean)
 
             Try
-                For Each lrTable In Me.getSubtypeTables.FindAll(Function(x) x.isAbsorbed = False)
+                For Each lrTable In Me.getSubtypeTables(True, True).FindAll(Function(x) x.isAbsorbed = False)
 
                     Dim larIndexColumn As New List(Of RDS.Column)
                     For Each lrColumn In arPrimaryKeyIndex.Column
@@ -1732,7 +1735,7 @@ Namespace RDS
                     Next
 
                     For Each lrColumn In Me.Column
-                        For Each lrRelation In lrColumn.Relation
+                        For Each lrRelation In lrColumn.Relation.ToArray
 
                             Dim lrNewRelation = lrRelation.Clone(lrTable)
 

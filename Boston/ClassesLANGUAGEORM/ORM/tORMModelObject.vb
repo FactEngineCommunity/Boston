@@ -821,7 +821,7 @@ Namespace FBM
 
         End Function
 
-        Public Overridable Function getSubtypes() As List(Of FBM.ModelObject)
+        Public Overridable Function getSubtypes(Optional ByVal abPrimarySubtypeRelationshipsOnly As Boolean = False) As List(Of FBM.ModelObject)
             Return New List(Of ModelObject)
         End Function
 

@@ -1814,15 +1814,25 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Function getSubtypes() As List(Of FBM.ModelObject)
+        Public Overrides Function getSubtypes(Optional ByVal abPrimarySubtypeRelationshipsOnly As Boolean = False) As List(Of FBM.ModelObject)
 
             Try
-                Dim larModelElement = From EntityType In Me.Model.EntityType
-                                      From SubtypeRelationship In EntityType.SubtypeRelationship
-                                      Where SubtypeRelationship.parentModelElement.Id = Me.Id
-                                      Select SubtypeRelationship.ModelElement
+                Dim larModelElement As List(Of FBM.ModelObject)
 
-                Return larModelElement.ToList
+                If abPrimarySubtypeRelationshipsOnly Then
+                    larModelElement = (From EntityType In Me.Model.EntityType
+                                       From SubtypeRelationship In EntityType.SubtypeRelationship
+                                       Where SubtypeRelationship.parentModelElement.Id = Me.Id
+                                       Where SubtypeRelationship.IsPrimarySubtypeRelationship = True
+                                       Select SubtypeRelationship.ModelElement).ToList
+                Else
+                    larModelElement = (From EntityType In Me.Model.EntityType
+                                       From SubtypeRelationship In EntityType.SubtypeRelationship
+                                       Where SubtypeRelationship.parentModelElement.Id = Me.Id
+                                       Select SubtypeRelationship.ModelElement).ToList
+                End If
+
+                Return larModelElement
 
             Catch ex As Exception
                 Dim lsMessage1 As String

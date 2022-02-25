@@ -71,12 +71,33 @@ Public Class frmToolboxORMVerbalisation
             Dim liInd As Integer = 0
 
             If arEntityType.IsSubtype Then
-                lrTopmostSupertype = arEntityType.GetTopmostSupertype
+                lrTopmostSupertype = arEntityType.GetTopmostSupertype(True)
             Else 'Is Not Subtype
                 lrTopmostSupertype = arEntityType
             End If
 
-            If lrTopmostSupertype.HasSimpleReferenceScheme Then
+            If arEntityType.HasCompoundReferenceMode Then
+                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
+                For Each lrRoleConstraintRole In arEntityType.ReferenceModeRoleConstraint.RoleConstraintRole
+                    lrFactType = lrRoleConstraintRole.Role.FactType
+                    Dim larRole As New List(Of FBM.Role)
+                    larRole.Add(lrFactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
+                    larRole.Add(lrRoleConstraintRole.Role)
+                    Dim lrFactTypeReading As FBM.FactTypeReading
+                    lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+                    If lrFactTypeReading IsNot Nothing Then
+                        Call lrFactTypeReading.GetReadingText(lrVerbaliser)
+                    Else
+                        lrVerbaliser.VerbaliseError("Provide a Fact Type Reading for the Fact Type:")
+                        lrVerbaliser.VerbaliseModelObject(lrFactType)
+                        lrVerbaliser.VerbaliseError(" with  " & lrRoleConstraintRole.Role.JoinedORMObject.Id & " at the last position in the reading.")
+                    End If
+                    If liInd < arEntityType.ReferenceModeRoleConstraint.RoleConstraintRole.Count - 1 Then
+                        lrVerbaliser.VerbaliseQuantifier(", ")
+                    End If
+                    liInd += 1
+                Next
+            ElseIf lrTopmostSupertype.HasSimpleReferenceScheme Then
                 lrVerbaliser.VerbaliseQuantifier("Reference Scheme: " & lrTopmostSupertype.Name & " has ")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
                 lrVerbaliser.VerbaliseQuantifier(" has ")
@@ -3482,7 +3503,7 @@ Public Class frmToolboxORMVerbalisation
                 lrVerbaliser.VerbaliseBlackText("(")
                 Dim liInd As Integer = 1
                 For Each lrColumn In lrIndex.Column
-                    lrVerbaliser.VerbaliseModelObject(lrColumn.ActiveRole.JoinedORMObject)
+                    lrVerbaliser.VerbaliseBlackText(lrColumn.Name) '20220225-VM-Was ActiveRole.JoinedORMObject)
                     If liInd < lrIndex.Column.Count Then lrVerbaliser.VerbaliseBlackText(", ")
                     liInd += 1
                 Next
@@ -3600,6 +3621,8 @@ Public Class frmToolboxORMVerbalisation
 
                     lrFactTypeReading = arAttribute.Column.Role.FactType.FactTypeReading(0)
                     lrFactTypeReading.GetReadingText(lrVerbaliser)
+                    lrVerbaliser.VerbaliseTextLightGray(" Fact Type: ")
+                    lrVerbaliser.VerbaliseModelObjectLightGray(arAttribute.Column.Role.FactType)
                     lrVerbaliser.HTW.WriteBreak()
 
                     lrVerbaliser.VerbaliseIndent()

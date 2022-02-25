@@ -435,7 +435,8 @@ Namespace FBM
                     'Flush unused ModelDictionary entries
                     '--------------------------------------
                     For Each lrDictionaryEntry In lrPage.Model.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
-                        lrPage.Model.RemoveDictionaryEntry(lrDictionaryEntry, True)
+                        '20220223-VM-Was removing Facts for newly loaded NORMA models when creating an ERD from an ORM Page.
+                        'lrPage.Model.RemoveDictionaryEntry(lrDictionaryEntry, True)
                     Next
 
                 End With
