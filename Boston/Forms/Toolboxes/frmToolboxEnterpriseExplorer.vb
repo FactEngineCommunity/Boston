@@ -3367,10 +3367,11 @@ Public Class frmToolboxEnterpriseExplorer
                         Dim lrToolTip As New BalloonTip
                         'lrToolTip.IsBalloon = True
                         'lrToolTip.ToolTipIcon = ToolTipIcon.None
-                        'lrToolTip.BackColor = Color.SteelBlue
+                        'lrToolTip.BackColor = Color.Yellow
                         'lrToolTip.ForeColor = Color.White
                         'lrToolTip.OwnerDraw = True
                         lrToolTip.Show("", lsMessage, lrPage.Form, New Point(lrFinalPoint.X, lrFinalPoint.Y), 0, 4000)
+
                     End If
                 Catch ex As Exception
 

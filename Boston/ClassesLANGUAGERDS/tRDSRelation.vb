@@ -609,7 +609,7 @@ Namespace RDS
 
                     For Each lrColumn In arIndex.Column
 
-                        Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
+                        Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me,, True)
                         If lrColumnRole IsNot Nothing Then
                             lrNewColumn.Role = lrColumnRole
                             lrNewColumn.FactType = lrColumnRole.FactType

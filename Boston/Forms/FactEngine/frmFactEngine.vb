@@ -925,8 +925,6 @@ Public Class frmFactEngine
                                         End If
                                         liInd += 1
                                     Next
-
-
                                 Next
 
                                 For Each lrNode In Me.GraphNodes

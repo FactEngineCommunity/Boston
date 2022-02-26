@@ -357,10 +357,6 @@ Namespace FBM
             Dim lrModelElement As FBM.ModelObject
 
             Try
-                '---------------------------------------------------------------------------------------
-                'Get the underlying ModelElement
-                lrModelElement = Me.GetModelObjectByName(asEntityName)
-
                 '---------------------------------------------------------------------
                 'Check to see that the Entity (already) exists in the ERD MetaModel.
                 '  If the Entity doesn't exist, create it.
@@ -382,6 +378,10 @@ Namespace FBM
                     lsSQLQuery &= " VALUES ('" & asEntityName & "', 'Entity')"
 
                     Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    '---------------------------------------------------------------------------------------
+                    'Get the underlying ModelElement
+                    lrModelElement = Me.GetModelObjectByName(asEntityName)
 
                     lrTable = New RDS.Table(Me.RDS, asEntityName, lrModelElement)
                     Me.RDS.Table.AddUnique(lrTable)

@@ -276,7 +276,8 @@ Namespace RDS
         ''' <returns></returns>
         Public Function Clone(Optional ByRef arOriginTable As RDS.Table = Nothing,
                               Optional ByRef arRelation As RDS.Relation = Nothing,
-                              Optional ByVal abSetSupertypeColumnAsMe As Boolean = False) As RDS.Column
+                              Optional ByVal abSetSupertypeColumnAsMe As Boolean = False,
+                              Optional ByVal abCreateNewId As Boolean = False) As RDS.Column
 
             Dim lrColumn As New RDS.Column
 
@@ -286,7 +287,12 @@ Namespace RDS
                 Else
                     lrColumn.Table = .Table
                 End If
-                lrColumn.Id = .Id
+                If abCreateNewId Then
+                    lrColumn.Id = System.Guid.NewGuid.ToString
+                Else
+                    lrColumn.Id = .Id
+                End If
+
                 lrColumn.ActiveRole = .ActiveRole
                 lrColumn.DataType = .DataType
                 lrColumn.FactType = .FactType

@@ -12,10 +12,20 @@ Public Class BalloonTip
     Private semaphore As New System.Threading.SemaphoreSlim(1)
     Private hWnd As IntPtr
 
+    Private Enum ToolTipStyle
+        TTS_BALLOON = 64
+        WS_BORDER = 8388608
+        TTS_NOPREFIX = 2
+        TTM_SETTITLE = 1056
+        TTM_UPDATETIPTEXT = 1036
+        TTM_SETTIPBKCOLOR = 1043
+        TTM_SETTIPTEXTCOLOR = 1044
+    End Enum
+
     Public Sub New()
     End Sub
 
-    Public Sub Show(title As String, text As String, form As System.Windows.Forms.IWin32Window, arPoint As Point, Optional icon As ICON = 0, Optional timeout As Double = 0)
+    Public Function Show(title As String, text As String, form As System.Windows.Forms.IWin32Window, arPoint As Point, Optional icon As ICON = 0, Optional timeout As Double = 0)
 
         Dim liX As UShort = arPoint.X
         Dim liY As UShort = arPoint.Y
@@ -39,9 +49,12 @@ Public Class BalloonTip
         hWnd = User32.CreateWindowEx(&H8, "tooltips_class32", "", &HC3, 0, 0, 0, 0, form.Handle, CType(0, IntPtr), CType(0, IntPtr), CType(0, IntPtr))
         User32.SendMessage(hWnd, 1028, CType(0, IntPtr), pToolInfo)
 
-        ' TTM_ADDTOOL
-        'User32.SendMessage(hWnd, 1043, CType(0, IntPtr), CType(0, IntPtr); ' TTM_SETTIPBKCOLOR
+        User32.SetWindowTheme(hWnd, "", "")
+
+        ' TTM_ADDTOOL        
+        'User32.SendMessage(hWnd, 1043, CType(&HFFFFE0, IntPtr), CType(0, IntPtr)) 'TTM_SETTIPBKCOLOR
         'User32.SendMessage(hWnd, 1044, CType(&HFFFF, IntPtr), CType(0, IntPtr); ' TTM_SETTIPTEXTCOLOR
+        Call Me.SetToolTipBackColor(hWnd, Color.Beige, pToolInfo)
         User32.SendMessage(hWnd, 1056, CType(icon, IntPtr), pszTitle)
 
         ' TTM_SETTITLE 0:None, 1:Info, 2:Warning, 3:Error, >3:assumed to be an hIcon. ; 1057 for Unicode
@@ -72,7 +85,21 @@ Public Class BalloonTip
             timer.Start()
         End If
 
+        Return hWnd
+
+    End Function
+
+    ''' <summary>
+    ''' Set the back color of the tooltip
+    ''' </summary>
+    ''' <param name="aoHandle"></param>
+    ''' <param name="c"></param>
+    ''' <param name="tPtr"></param>
+    Private Sub SetToolTipBackColor(ByRef aoHandle As IntPtr, ByVal c As Color, ByRef tPtr As IntPtr)
+        Dim Col As Integer = ColorTranslator.ToWin32(Color.FromArgb(Convert.ToInt32(c.R), Convert.ToInt32(c.G), Convert.ToInt32(c.B)))
+        User32.SendMessage(aoHandle, &H413, Col, tPtr)
     End Sub
+
 
     Private Sub timer_Elapsed(sender As Object, e As System.Timers.ElapsedEventArgs)
         Close()
@@ -149,9 +176,13 @@ NotInheritable Class User32
     Public Shared Function SendMessage(hWnd As IntPtr, Msg As UInt32, wParam As IntPtr, lParam As IntPtr) As Integer
     End Function
 
-    <DllImportAttribute("user32.dll")> _
-    Public Shared Function CreateWindowEx(dwExStyle As UInteger, lpClassName As String, lpWindowName As String, dwStyle As UInteger, x As Integer, y As Integer, _
+    <DllImportAttribute("user32.dll")>
+    Public Shared Function CreateWindowEx(dwExStyle As UInteger, lpClassName As String, lpWindowName As String, dwStyle As UInteger, x As Integer, y As Integer,
             nWidth As Integer, nHeight As Integer, hWndParent As IntPtr, hMenu As IntPtr, hInstance As IntPtr, LPVOIDlpParam As IntPtr) As IntPtr
+    End Function
+
+    <DllImportAttribute("uxtheme.dll")>
+    Public Shared Function SetWindowTheme(hWnd As IntPtr, pszSubAppName As String, pszSubIdList As String) As Integer
     End Function
 
 End Class

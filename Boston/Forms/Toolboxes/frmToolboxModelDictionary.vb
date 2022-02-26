@@ -561,7 +561,7 @@ Public Class frmToolboxModelDictionary
                             Select Case loModelObject.GetType
                                 Case Is = GetType(FBM.EntityType)
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
-                                    Call LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                                    Call Me.LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(FBM.ValueType)
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
                                     Call LoadPagesForValueType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
