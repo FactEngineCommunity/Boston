@@ -578,7 +578,6 @@ Namespace RDS
 
             Try
                 If arIndex.IsPrimaryKey Then
-
                     Dim lbColumnsArePartOfPrimaryKey As Boolean = False
                     Dim lrIndex As RDS.Index = arIndex
                     Dim lrPrimaryKeyIndex As RDS.Index = Nothing

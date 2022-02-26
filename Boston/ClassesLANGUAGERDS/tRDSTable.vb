@@ -396,8 +396,10 @@ Namespace RDS
                 End If
 
                 'NonAbsorbed Subtypes
+                Dim lrColumnAdded As RDS.Column
                 For Each lrTable In Me.getSubtypeTables(False).FindAll(Function(x) x.isAbsorbed = False)
-                    Call lrTable.addColumn(arColumn)
+                    lrColumnAdded = arColumn.Clone(lrTable, Nothing, True)
+                    Call lrTable.addColumn(lrColumnAdded)
                 Next
 
                 '------------------------------------------------------------------------------
