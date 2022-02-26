@@ -169,30 +169,43 @@ Namespace RDS
 
         Public Sub addColumn(ByRef arColumn As RDS.Column)
 
-            Me.Column.Add(arColumn)
-            arColumn.addIndex(Me)
+            Try
+                'CodeSafe
+                If Me.Column.Contains(arColumn) Then Exit Sub
 
-            'CodeSafe
-            'If Table has incoming Relation and Index is PK, then need to add the Column to the Destination Columns of the Relation.
-            Dim larRelation = From Relation In Me.Model.Relation
-                              Where Relation.DestinationTable Is Me.Table
-                              Select Relation
+                Me.Column.Add(arColumn)
+                arColumn.addIndex(Me)
 
-            For Each lrRelation In larRelation
-                Call lrRelation.DestinationColumns.AddUnique(arColumn)
-            Next
+                'CodeSafe
+                'If Table has incoming Relation and Index is PK, then need to add the Column to the Destination Columns of the Relation.
+                Dim larRelation = From Relation In Me.Model.Relation
+                                  Where Relation.DestinationTable Is Me.Table
+                                  Select Relation
 
-            'CMML
-            Call Me.Model.Model.addCMMLColumnToIndex(Me, arColumn)
+                For Each lrRelation In larRelation
+                    Call lrRelation.DestinationColumns.AddUnique(arColumn)
+                Next
 
-            'Database synchronisation.
-            If Me.Model.Model.IsDatabaseSynchronised Then
-                Call Me.Model.Model.connectToDatabase()
-                Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
-            End If
+                'CMML
+                Call Me.Model.Model.addCMMLColumnToIndex(Me, arColumn)
 
-            Call Me.Table.triggerIndexModified(Me)
-            Call Me.Table.triggerIndexColumnAdded(Me, arColumn)
+                'Database synchronisation.
+                If Me.Model.Model.IsDatabaseSynchronised Then
+                    Call Me.Model.Model.connectToDatabase()
+                    Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
+                End If
+
+                Call Me.Table.triggerIndexModified(Me)
+                Call Me.Table.triggerIndexColumnAdded(Me, arColumn)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

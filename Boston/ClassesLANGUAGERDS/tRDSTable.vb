@@ -443,8 +443,6 @@ Namespace RDS
                 arIndex.ResponsibleRoleConstraint = arRoleConstraint
             End If
 
-            If Me.Name = "ApplicationProcess" Then Debugger.Break()
-
             Me.Index.AddUnique(arIndex)
             Me.Model.Index.AddUnique(arIndex)
 

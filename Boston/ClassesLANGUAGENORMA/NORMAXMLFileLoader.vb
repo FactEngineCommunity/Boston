@@ -1538,66 +1538,82 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                                        Order By ModelInformation.Attribute("Name").Value
 
             For Each loElement In loEnumElementQueryResult
-                '-------------------------------------------------------------------------
-                'Create the list of Roles that are to be added to the new RoleConstraint
-                '-------------------------------------------------------------------------
-                Dim larRoleList As New List(Of FBM.Role)
-                Dim lbRolesFound As Boolean = True
-                For Each lrRoleXElement In loElement.<orm:RoleSequence>.<orm:Role>
-                    lrRole = New FBM.Role
-                    '--------------------------------
-                    'Find the Role within the Model
-                    '--------------------------------
-                    lrRole.Id = lrRoleXElement.Attribute("ref").Value
-                    lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                    If IsSomething(lrRole) Then
-                        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
-                            '------------------------------------------
-                            'Don't add the Role to the RoleConstraint
-                            '------------------------------------------
+
+                Try
+                    '-------------------------------------------------------------------------
+                    'Create the list of Roles that are to be added to the new RoleConstraint
+                    '-------------------------------------------------------------------------
+                    Dim larRoleList As New List(Of FBM.Role)
+                    Dim lbRolesFound As Boolean = True
+
+                    If arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = loElement.Attribute("id").Value) IsNot Nothing Then
+                        'RoleConstraint has already been added to the Model.
+                        GoTo SkipRoleConstraint
+                    End If
+
+                    For Each lrRoleXElement In loElement.<orm:RoleSequence>.<orm:Role>
+                        lrRole = New FBM.Role
+                        '--------------------------------
+                        'Find the Role within the Model
+                        '--------------------------------
+                        lrRole.Id = lrRoleXElement.Attribute("ref").Value
+                        lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
+                        If IsSomething(lrRole) Then
+                            If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
+                                '------------------------------------------
+                                'Don't add the Role to the RoleConstraint
+                                '------------------------------------------
+                            Else
+                                larRoleList.Add(lrRole)
+                            End If
                         Else
-                            larRoleList.Add(lrRole)
-                        End If
-                    Else
-                        lbRolesFound = False
+                            lbRolesFound = False
 
-                        If My.Settings.NORMAImportingThrowRoleConstraintRoleWarnings Then
-                            lsMessage = "Warning: Loading NORMA XML (.orm) file"
-                            lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: " & loElement.Attribute("Name").Value
-                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            If My.Settings.NORMAImportingThrowRoleConstraintRoleWarnings Then
+                                lsMessage = "Warning: Loading NORMA XML (.orm) file"
+                                lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: " & loElement.Attribute("Name").Value
+                                lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            End If
+                        End If
+                    Next
+
+                    Dim lrRoleConstraint As FBM.RoleConstraint
+                    If lbRolesFound Then
+                        If arModel.AreRolesWithinTheSameFactType(larRoleList) Then
+                            '----------------------------------------------------------
+                            'Represents an Internal Uniqueness Constraint, do nothing
+                            '----------------------------------------------------------
+                        Else
+                            '---------------------------
+                            'Create the RoleConstraint
+                            '---------------------------
+                            lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
+                            lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id")
+                            arModel.AddRoleConstraint(lrRoleConstraint)
+
+                            Try
+                                Dim lsPreferredIdentifierForModelElementId = (From PreferredIdentiferFor In loElement.<orm:PreferredIdentifierFor>
+                                                                              Select PreferredIdentiferFor).First.Attribute("ref").Value
+
+                                Dim lrEntityType As FBM.EntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lsPreferredIdentifierForModelElementId)
+                                lrEntityType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
+                                Call lrRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
+
+                            Catch ex As Exception
+                                'Not a concern if it doesn't exist.
+                            End Try
+
                         End If
                     End If
-                Next
+SkipRoleConstraint:
+                Catch ex As Exception
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                Dim lrRoleConstraint As FBM.RoleConstraint
-                If lbRolesFound Then
-                    If arModel.AreRolesWithinTheSameFactType(larRoleList) Then
-                        '----------------------------------------------------------
-                        'Represents an Internal Uniqueness Constraint, do nothing
-                        '----------------------------------------------------------
-                    Else
-                        '---------------------------
-                        'Create the RoleConstraint
-                        '---------------------------
-                        lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
-                        lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id")
-                        arModel.AddRoleConstraint(lrRoleConstraint)
-
-                        Try
-                            Dim lsPreferredIdentifierForModelElementId = (From PreferredIdentiferFor In loElement.<orm:PreferredIdentifierFor>
-                                                                          Select PreferredIdentiferFor).First.Attribute("ref").Value
-
-                            Dim lrEntityType As FBM.EntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lsPreferredIdentifierForModelElementId)
-                            lrEntityType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
-                            Call lrRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
-
-                        Catch ex As Exception
-                            'Not a concern if it doesn't exist.
-                        End Try
-
-                    End If
-                End If
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, False, False, True)
+                End Try
             Next
 
         End Sub

@@ -2484,12 +2484,13 @@ Namespace FBM
                                             Optional ByRef arExistingPreferedReferenceSchemeRoleConstraint As FBM.RoleConstraint = Nothing)
 
             Try
-                If Me.Name.StartsWith("ExternalUniquenessConstraint5") Then Debugger.Break()
-
                 '============================================================================================
                 'If changing the PK/Preferred Identifier for a FactType, make sure the exising RC/preferredIdentifier is False
                 '  E.g. If a Fact Type accross Part, Bin and Warehouse has a binary Internal RC that is Preferred,
                 '    and now we are making a second IUC preferred, then neeed to set the existing preferred IUC to isPreferred = False.
+
+                If Me.Id.StartsWith("ExternalUniquenessConstraint24") Then Debugger.Break()
+
                 If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                     If Me.Role(0).FactType.Is1To1BinaryFactType Then
                         If Me.Role(0).FactType.IsPreferredReferenceMode Then
@@ -2550,66 +2551,66 @@ Namespace FBM
                     'Index
                     Dim lrTable As RDS.Table = larColumnsAffected.First.Table
 
-                    If lrTable.FBMModelElement IsNot Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject Then
-                        lrTable = Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject.getCorrespondingRDSTable
+                    If Me.Role(0).FactType.Arity = 2 Then
+                        If lrTable.FBMModelElement IsNot Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject Then
+                            lrTable = Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject.getCorrespondingRDSTable
+                        End If
                     End If
 
-                    If lrTable.Name = "ApplicationProcess" Then Debugger.Break()
+                    '--------------------------------
+                    'Modify the existing PrimaryKey
+                    '20200722-VM-Removed because if exists, should change the actual Index
+                    'Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
 
-                        '--------------------------------
-                        'Modify the existing PrimaryKey
-                        '20200722-VM-Removed because if exists, should change the actual Index
-                        'Call lrTable.makeExistingPrimaryKeySimplyUnique(larColumnsAffected)
+                    Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larColumnsAffected)
 
-                        Dim lrExistingIndex As RDS.Index = lrTable.getIndexByColumns(larColumnsAffected)
+                    If lrExistingIndex Is Nothing Then
 
-                        If lrExistingIndex Is Nothing Then
+                        Dim lsQualifier As String = "UC"
+                        'No existing Index exists for the Columns
+                        If abIsPreferredIdentifier = True Then
+                            lsQualifier = "PK"
+                        End If
+                        '------------------------------
+                        'Add the new PrimaryKey Index
+                        Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
+                                                           Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_" & lsQualifier, 0),
+                                                           lsQualifier,
+                                                           pcenumODBCAscendingOrDescending.Ascending,
+                                                           True,
+                                                           True,
+                                                           False,
+                                                           larColumnsAffected,
+                                                           False,
+                                                           True)
 
-                            Dim lsQualifier As String = "UC"
-                            'No existing Index exists for the Columns
-                            If abIsPreferredIdentifier = True Then
-                                lsQualifier = "PK"
-                            End If
-                            '------------------------------
-                            'Add the new PrimaryKey Index
-                            Dim lrPrimaryKeyIndex As New RDS.Index(lrTable,
-                                                               Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_" & lsQualifier, 0),
-                                                               lsQualifier,
-                                                               pcenumODBCAscendingOrDescending.Ascending,
-                                                               True,
-                                                               True,
-                                                               False,
-                                                               larColumnsAffected,
-                                                               False,
-                                                               True)
+                        Call lrTable.addIndex(lrPrimaryKeyIndex)
 
-                            Call lrTable.addIndex(lrPrimaryKeyIndex)
+                        'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
 
-                            'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrPrimaryKeyIndex, abIsPreferredIdentifier)
-
-                        Else 'Index already exists
-                            If abIsPreferredIdentifier Then
-                                lrExistingIndex.IsPrimaryKey = abIsPreferredIdentifier
-                                Call lrExistingIndex.setQualifier("PK")
-                                Call lrExistingIndex.setName(Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_PK", 0))
-                                Call lrExistingIndex.setIsPrimaryKey(True)
-                            Else
-                                lrExistingIndex.IsPrimaryKey = abIsPreferredIdentifier
-                                Call lrExistingIndex.setQualifier("UC")
-                                Call lrExistingIndex.setName(Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_UC", 0))
-                                Call lrExistingIndex.setIsPrimaryKey(False)
-                            End If
-
-                            'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
-                            Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
+                    Else 'Index already exists
+                        If abIsPreferredIdentifier Then
+                            lrExistingIndex.IsPrimaryKey = abIsPreferredIdentifier
+                            Call lrExistingIndex.setQualifier("PK")
+                            Call lrExistingIndex.setName(Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_PK", 0))
+                            Call lrExistingIndex.setIsPrimaryKey(True)
+                        Else
+                            lrExistingIndex.IsPrimaryKey = abIsPreferredIdentifier
+                            Call lrExistingIndex.setQualifier("UC")
+                            Call lrExistingIndex.setName(Me.Model.RDS.createUniqueIndexName(lrTable.Name & "_UC", 0))
+                            Call lrExistingIndex.setIsPrimaryKey(False)
                         End If
 
-                        For Each lrColumn In larColumnsAffected
-                            Call lrColumn.triggerForceRefreshEvent()
-                        Next
+                        'Need to add the Columns and Index to each Subtype ModelObject/Table that is not absorbed
+                        Call lrTable.addPrimaryKeyToNonAbsorbedTables(lrExistingIndex, abIsPreferredIdentifier)
+                    End If
 
-                    End If 'larColumnsAffected.Count > 0
+                    For Each lrColumn In larColumnsAffected
+                        Call lrColumn.triggerForceRefreshEvent()
+                    Next
+
+                End If 'larColumnsAffected.Count > 0
 
             Catch ex As Exception
                 Dim lsMessage1 As String

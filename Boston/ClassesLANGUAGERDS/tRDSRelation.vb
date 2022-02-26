@@ -432,13 +432,22 @@ Namespace RDS
 
         End Sub
 
-        Public Sub AddDestinationColumn(ByRef arColumn As RDS.Column, ByVal aiOrdinalPosition As Integer)
+        Public Sub AddDestinationColumn(ByRef arColumn As RDS.Column,
+                                        Optional ByVal aiOrdinalPosition As Integer = -1)
 
             Try
+                'CodeSafe
+                If Me.DestinationColumns.Contains(arColumn) Then Exit Sub
+
                 Me.DestinationColumns.Add(arColumn)
 
+                Dim liOrdinalPosition As Integer = aiOrdinalPosition
+                If aiOrdinalPosition = -1 Then
+                    liOrdinalPosition = Me.OriginColumns.Count + 1
+                End If
+
                 'CMML
-                Call Me.Model.Model.addCMMLColumnToRelationDestination(Me, arColumn, aiOrdinalPosition)
+                Call Me.Model.Model.addCMMLColumnToRelationDestination(Me, arColumn, liOrdinalPosition)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -450,13 +459,22 @@ Namespace RDS
             End Try
         End Sub
 
-        Public Sub AddOriginColumn(ByRef arColumn As RDS.Column, ByVal aiOrdinalPosition As Integer)
+        Public Sub AddOriginColumn(ByRef arColumn As RDS.Column,
+                                   Optional ByVal aiOrdinalPosition As Integer = -1)
 
             Try
+                'CodeSafe
+                If Me.OriginColumns.Contains(arColumn) Then Exit Sub
+
                 Me.OriginColumns.Add(arColumn)
 
+                Dim liOrdinalPosition As Integer = aiOrdinalPosition
+                If aiOrdinalPosition = -1 Then
+                    liOrdinalPosition = Me.OriginColumns.Count + 1
+                End If
+
                 'CMML
-                Call Me.Model.Model.addCMMLColumnToRelationOrigin(Me, arColumn, aiOrdinalPosition)
+                Call Me.Model.Model.addCMMLColumnToRelationOrigin(Me, arColumn, liOrdinalPosition)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -558,18 +576,31 @@ Namespace RDS
 
             Try
                 If arIndex.IsPrimaryKey Then
+
+                    If Me.OriginTable.Name = "Function" Then Debugger.Break()
+
                     Dim lbColumnsArePartOfPrimaryKey As Boolean = False
                     Dim lrIndex As RDS.Index = arIndex
                     Dim lrPrimaryKeyIndex As RDS.Index = Nothing
 
                     lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
-                    For Each lrColumn In Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinedORMObject.Id = lrIndex.Table.Name And x.ActiveRole.JoinsEntityType IsNot Nothing).ToArray
-                        If lrColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
+
+                    Dim larColumn = From Column In Me.OriginColumns
+                                    Where Column.ActiveRole.JoinedORMObject.Id = lrIndex.Table.Name And Column.ActiveRole.JoinsEntityType IsNot Nothing
+                                    Select Column
+
+                    For Each lrColumn In larColumn.ToArray
+
+                        Dim lrActualColumn As RDS.Column = lrColumn.Clone(Nothing, Nothing)
+                        lrActualColumn.Table = Me.OriginTable 'CodeSafe: Was returning Columns on different Tables. Relevant but wrong Table.
+
+                        If lrActualColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
+
                         If lrPrimaryKeyIndex IsNot Nothing Then
-                            lrPrimaryKeyIndex.removeColumn(lrColumn)
+                            lrPrimaryKeyIndex.removeColumn(lrActualColumn)
                         End If
-                        Me.OriginColumns.Remove(lrColumn)
-                        Me.OriginTable.removeColumn(lrColumn)
+                        Me.RemoveOriginColumn(lrColumn)
+                        Me.OriginTable.removeColumn(lrActualColumn)
                     Next
 
                     If lbColumnsArePartOfPrimaryKey Then
@@ -579,12 +610,13 @@ Namespace RDS
                     For Each lrColumn In arIndex.Column
 
                         Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
+                        lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn, lrNewColumn.Name, 0)
                         lrNewColumn.Relation.AddUnique(Me)
 
                         Me.OriginTable.addColumn(lrNewColumn)
 
-                        Me.OriginColumns.Add(lrNewColumn)
-                        Me.DestinationColumns.Add(lrColumn)
+                        Me.AddOriginColumn(lrNewColumn)
+                        Me.AddDestinationColumn(lrColumn)
 
                         If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
                             lrPrimaryKeyIndex.addColumn(lrNewColumn)
