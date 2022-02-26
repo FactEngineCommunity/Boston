@@ -3960,6 +3960,8 @@ Namespace FBM
                                        Return x
                                    End Function).ToList
 
+                    Me.IsDirty = False
+
                 End If 'IsSerialisable
             Catch ex As Exception
                 Dim lsMessage As String

@@ -538,6 +538,8 @@ Namespace RDS
                                     End If
                                 Next
 
+                                '20220226-VM-Found this commented out. If not missed after a while, delete.
+                                'Was possibly replaced by Me.DestinationTable.IndexColumnAdded method functionality. Either way, was found like this Feb 2022.
                                 'If lbColumnsArePartOfPrimaryKey Then
                                 '    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
                                 'End If
@@ -577,11 +579,10 @@ Namespace RDS
             Try
                 If arIndex.IsPrimaryKey Then
 
-                    If Me.OriginTable.Name = "Function" Then Debugger.Break()
-
                     Dim lbColumnsArePartOfPrimaryKey As Boolean = False
                     Dim lrIndex As RDS.Index = arIndex
                     Dim lrPrimaryKeyIndex As RDS.Index = Nothing
+                    Dim lrColumnRole As FBM.Role = Nothing
 
                     lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
 
@@ -590,7 +591,7 @@ Namespace RDS
                                     Select Column
 
                     For Each lrColumn In larColumn.ToArray
-
+                        lrColumnRole = lrColumn.Role
                         Dim lrActualColumn As RDS.Column = lrColumn.Clone(Nothing, Nothing)
                         lrActualColumn.Table = Me.OriginTable 'CodeSafe: Was returning Columns on different Tables. Relevant but wrong Table.
 
@@ -610,6 +611,10 @@ Namespace RDS
                     For Each lrColumn In arIndex.Column
 
                         Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
+                        If lrColumnRole IsNot Nothing Then
+                            lrNewColumn.Role = lrColumnRole
+                            lrNewColumn.FactType = lrColumnRole.FactType
+                        End If
                         lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn, lrNewColumn.Name, 0)
                         lrNewColumn.Relation.AddUnique(Me)
 

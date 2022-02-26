@@ -2488,9 +2488,6 @@ Namespace FBM
                 'If changing the PK/Preferred Identifier for a FactType, make sure the exising RC/preferredIdentifier is False
                 '  E.g. If a Fact Type accross Part, Bin and Warehouse has a binary Internal RC that is Preferred,
                 '    and now we are making a second IUC preferred, then neeed to set the existing preferred IUC to isPreferred = False.
-
-                If Me.Id.StartsWith("ExternalUniquenessConstraint24") Then Debugger.Break()
-
                 If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                     If Me.Role(0).FactType.Is1To1BinaryFactType Then
                         If Me.Role(0).FactType.IsPreferredReferenceMode Then
