@@ -1582,7 +1582,7 @@ Public Class frmMain
                 'Nothing to load but the form itself.
                 '--------------------------------------
             Else
-                Dim loPt As New PointF(100, 100)
+                Dim loPt As New PointF(200, 100)
 
                 Select Case arFocalModelObject.ConceptType
                     Case Is = pcenumConceptType.ValueType

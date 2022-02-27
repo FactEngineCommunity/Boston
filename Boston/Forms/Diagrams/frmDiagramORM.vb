@@ -542,13 +542,38 @@ Public Class frmDiagramORM
             End If
         End If
 
+        Dim lrFactTypeInstance As FBM.FactTypeInstance
+        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+        Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+
         For Each lrFactType In larFactType
 
             If lrFactType.IsObjectified Then
                 Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If
 
-            Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False)
+            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False)
+
+            If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
+
+                Try
+                    If lrFactType.RoleGroup(0).JoinedORMObject Is aoModelObject Then
+                        lrSubtypeRelationship = (From SubtypeRelationship In aoModelObject.SubtypeRelationship
+                                                 Where SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                 Select SubtypeRelationship).First
+                    Else
+                        lrSubtypeRelationship = (From SubtypeRelationship In lrFactType.RoleGroup(0).JoinedORMObject.SubtypeRelationship
+                                                 Where SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                 Select SubtypeRelationship).First
+                    End If
+
+                    lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(Me.zrPage, True)
+                    Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                Catch ex As Exception
+                    'Not a biggie. But shouldn't fail.
+                End Try
+
+            End If
 
             Try
                 If lrFactType.Is1To1BinaryFactType Then
@@ -6738,7 +6763,7 @@ Public Class frmDiagramORM
             'Put the EntityTypes with SubTypes towards the top of the page
             '---------------------------------------------------------------
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.HasSubTypes = True And Not x.IsObjectifyingEntityType)
-                lrEntityTypeInstance.Shape.Move(100, 85)
+                lrEntityTypeInstance.Shape.Move(200, 85)
                 lrEntityTypeInstance.HasBeenMoved = True
                 Call lrEntityTypeInstance.AutoLayout(False, False)
 
