@@ -121,7 +121,6 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemEntityTypeModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator20 = New System.Windows.Forms.ToolStripSeparator()
         Me.LockToThisPositionOnPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
         Me.ShowInDiagramSpyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -297,6 +296,10 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.AddToPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AllAssociatedFactTypesrelatedtoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AllAssociatedSubtypeRelationshipsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -877,9 +880,9 @@ Partial Class frmDiagramORM
         '
         'ContextMenuStrip_EntityType
         '
-        Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.LockToThisPositionOnPageToolStripMenuItem, Me.AddAllAssociatedFactTypesToPageToolStripMenuItem, Me.ShowInModelDictionaryToolStripMenuItem, Me.ToolStripSeparator12, Me.ShowInDiagramSpyToolStripMenuItem, Me.ToolStripSeparator30, Me.ToolStripMenuItemCopy, Me.ToolStripSeparator40, Me.ExpandTheReferenceSchemeToolStripMenuItem, Me.HideTheReferenceSchemeToolStripMenuItem, Me.ToolStripSeparator32, Me.RemoveFromPageToolStripMenuItem, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
+        Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.LockToThisPositionOnPageToolStripMenuItem, Me.AddToPageToolStripMenuItem, Me.ShowInModelDictionaryToolStripMenuItem, Me.ToolStripSeparator12, Me.ShowInDiagramSpyToolStripMenuItem, Me.ToolStripSeparator30, Me.ToolStripMenuItemCopy, Me.ToolStripSeparator40, Me.ExpandTheReferenceSchemeToolStripMenuItem, Me.HideTheReferenceSchemeToolStripMenuItem, Me.ToolStripSeparator32, Me.RemoveFromPageToolStripMenuItem, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
         Me.ContextMenuStrip_EntityType.Name = "ContextMenuStrip_EntityType"
-        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(270, 310)
+        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(234, 332)
         '
         'mnuOption_EntityTypeMorphTo
         '
@@ -954,12 +957,6 @@ Partial Class frmDiagramORM
         Me.LockToThisPositionOnPageToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
         Me.LockToThisPositionOnPageToolStripMenuItem.Text = "&Lock to this position on Page"
         Me.LockToThisPositionOnPageToolStripMenuItem.Visible = False
-        '
-        'AddAllAssociatedFactTypesToPageToolStripMenuItem
-        '
-        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem.Name = "AddAllAssociatedFactTypesToPageToolStripMenuItem"
-        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
-        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem.Text = "&Add all associated Fact Types to Page"
         '
         'ShowInModelDictionaryToolStripMenuItem
         '
@@ -1043,7 +1040,7 @@ Partial Class frmDiagramORM
         Me.ContextMenuStrip_ExternalRoleConstraint.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_ExternalRoleConstraint.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemModelErrorsExternalRoleConstraint, Me.ToolStripSeparator27, Me.ChangeToToolStripMenuItem1, Me.ToolStripSeparator7, Me.ToolStripMenuItemRemoveAllArguments, Me.ToolStripMenuItemRemoveArgument, Me.RemoveLinksToolStripMenuItem, Me.RedoJoinPathToolStripMenuItem, Me.ToolStripSeparator24, Me.ShowInModelDictionaryToolStripMenuItem3, Me.ToolStripSeparator37, Me.RemoveFromPageToolStripMenuItem1, Me.RemoveFromPageModelToolStripMenuItem2, Me.ToolStripSeparator14, Me.PropertiesToolStripMenuItem2})
         Me.ContextMenuStrip_ExternalRoleConstraint.Name = "ContextMenuStrip_ExternalRoleConstraint"
-        Me.ContextMenuStrip_ExternalRoleConstraint.Size = New System.Drawing.Size(234, 356)
+        Me.ContextMenuStrip_ExternalRoleConstraint.Size = New System.Drawing.Size(234, 334)
         '
         'ToolStripMenuItemModelErrorsExternalRoleConstraint
         '
@@ -1067,35 +1064,35 @@ Partial Class frmDiagramORM
         '
         Me.ToolStripMenuItemChangeToUniquenessConstraint.Image = Global.Boston.My.Resources.Resources.externalUniqueness
         Me.ToolStripMenuItemChangeToUniquenessConstraint.Name = "ToolStripMenuItemChangeToUniquenessConstraint"
-        Me.ToolStripMenuItemChangeToUniquenessConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToUniquenessConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToUniquenessConstraint.Text = "&Uniqueness Constraint"
         '
         'ToolStripMenuItemChangeToUniquenessPreferredConstraint
         '
         Me.ToolStripMenuItemChangeToUniquenessPreferredConstraint.Image = Global.Boston.My.Resources.Resources.preferred_uniqueness
         Me.ToolStripMenuItemChangeToUniquenessPreferredConstraint.Name = "ToolStripMenuItemChangeToUniquenessPreferredConstraint"
-        Me.ToolStripMenuItemChangeToUniquenessPreferredConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToUniquenessPreferredConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToUniquenessPreferredConstraint.Text = "&Preferred Uniqueness Constraint"
         '
         'ToolStripMenuItemChangeToDeonticUniqueness
         '
         Me.ToolStripMenuItemChangeToDeonticUniqueness.Image = Global.Boston.My.Resources.Resources.deontic_external_uniqueness
         Me.ToolStripMenuItemChangeToDeonticUniqueness.Name = "ToolStripMenuItemChangeToDeonticUniqueness"
-        Me.ToolStripMenuItemChangeToDeonticUniqueness.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToDeonticUniqueness.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToDeonticUniqueness.Text = "Deontic Uniqueness Constraint"
         '
         'ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint
         '
         Me.ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint.Image = Global.Boston.My.Resources.Resources.deontic_external_preferred_uniqueness
         Me.ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint.Name = "ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint"
-        Me.ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToDeonticPreferredUniquenessConstraint.Text = "Deontic Preferred Uniqueness Constraint"
         '
         'ToolStripMenuItemChangeToValueComparison
         '
         Me.ToolStripMenuItemChangeToValueComparison.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem4, Me.GreaterThanOREqualToToolStripMenuItem, Me.LessThanToolStripMenuItem, Me.LessThanOREqualToToolStripMenuItem, Me.DeonticGreaterThanToolStripMenuItem, Me.DeonticGreaterThanOREqualToToolStripMenuItem, Me.DeonticLessThanToolStripMenuItem, Me.DeonticLessThanOREqualToToolStripMenuItem})
         Me.ToolStripMenuItemChangeToValueComparison.Name = "ToolStripMenuItemChangeToValueComparison"
-        Me.ToolStripMenuItemChangeToValueComparison.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToValueComparison.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToValueComparison.Text = "&Value Comparison"
         Me.ToolStripMenuItemChangeToValueComparison.Visible = False
         '
@@ -1103,112 +1100,112 @@ Partial Class frmDiagramORM
         '
         Me.ToolStripMenuItem4.Image = Global.Boston.My.Resources.ORMShapes.value_comparison_greater
         Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(259, 30)
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(251, 22)
         Me.ToolStripMenuItem4.Text = "&Greater Than"
         '
         'GreaterThanOREqualToToolStripMenuItem
         '
         Me.GreaterThanOREqualToToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparison_greater_equal
         Me.GreaterThanOREqualToToolStripMenuItem.Name = "GreaterThanOREqualToToolStripMenuItem"
-        Me.GreaterThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.GreaterThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.GreaterThanOREqualToToolStripMenuItem.Text = "&Greater Than OR Equal To"
         '
         'LessThanToolStripMenuItem
         '
         Me.LessThanToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparison_less_than_equal
         Me.LessThanToolStripMenuItem.Name = "LessThanToolStripMenuItem"
-        Me.LessThanToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.LessThanToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.LessThanToolStripMenuItem.Text = "&Less Than"
         '
         'LessThanOREqualToToolStripMenuItem
         '
         Me.LessThanOREqualToToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.value_comparison_less_than
         Me.LessThanOREqualToToolStripMenuItem.Name = "LessThanOREqualToToolStripMenuItem"
-        Me.LessThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.LessThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.LessThanOREqualToToolStripMenuItem.Text = "Less Than OR Equal To"
         '
         'DeonticGreaterThanToolStripMenuItem
         '
         Me.DeonticGreaterThanToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.deontic_value_comparison_greater
         Me.DeonticGreaterThanToolStripMenuItem.Name = "DeonticGreaterThanToolStripMenuItem"
-        Me.DeonticGreaterThanToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.DeonticGreaterThanToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.DeonticGreaterThanToolStripMenuItem.Text = "Deontic Greater Than"
         '
         'DeonticGreaterThanOREqualToToolStripMenuItem
         '
         Me.DeonticGreaterThanOREqualToToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.deontic_value_comparison_greater_equal
         Me.DeonticGreaterThanOREqualToToolStripMenuItem.Name = "DeonticGreaterThanOREqualToToolStripMenuItem"
-        Me.DeonticGreaterThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.DeonticGreaterThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.DeonticGreaterThanOREqualToToolStripMenuItem.Text = "Deontic Greater Than OR Equal To"
         '
         'DeonticLessThanToolStripMenuItem
         '
         Me.DeonticLessThanToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.deontic_value_comparrison_less
         Me.DeonticLessThanToolStripMenuItem.Name = "DeonticLessThanToolStripMenuItem"
-        Me.DeonticLessThanToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.DeonticLessThanToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.DeonticLessThanToolStripMenuItem.Text = "Deontic Less Than"
         '
         'DeonticLessThanOREqualToToolStripMenuItem
         '
         Me.DeonticLessThanOREqualToToolStripMenuItem.Image = Global.Boston.My.Resources.ORMShapes.deontic_value_comparrison_less_than
         Me.DeonticLessThanOREqualToToolStripMenuItem.Name = "DeonticLessThanOREqualToToolStripMenuItem"
-        Me.DeonticLessThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.DeonticLessThanOREqualToToolStripMenuItem.Size = New System.Drawing.Size(251, 22)
         Me.DeonticLessThanOREqualToToolStripMenuItem.Text = "Deontic Less Than OR Equal To"
         '
         'ToolStripMenuItemChangeToExclusiveConstraint
         '
         Me.ToolStripMenuItemChangeToExclusiveConstraint.Image = Global.Boston.My.Resources.ORMShapes.exclusion
         Me.ToolStripMenuItemChangeToExclusiveConstraint.Name = "ToolStripMenuItemChangeToExclusiveConstraint"
-        Me.ToolStripMenuItemChangeToExclusiveConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToExclusiveConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToExclusiveConstraint.Text = "Exclusion Constraint"
         '
         'ToolStripMenuItemChangeToInclusiveOrConstraint
         '
         Me.ToolStripMenuItemChangeToInclusiveOrConstraint.Image = Global.Boston.My.Resources.ORMShapes.inclusive_or
         Me.ToolStripMenuItemChangeToInclusiveOrConstraint.Name = "ToolStripMenuItemChangeToInclusiveOrConstraint"
-        Me.ToolStripMenuItemChangeToInclusiveOrConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToInclusiveOrConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToInclusiveOrConstraint.Text = "Inclusive Or Constraint"
         '
         'ToolStripMenuItemChangeToExclusiveOrConstranit
         '
         Me.ToolStripMenuItemChangeToExclusiveOrConstranit.Image = Global.Boston.My.Resources.ORMShapes.exclusiveOr
         Me.ToolStripMenuItemChangeToExclusiveOrConstranit.Name = "ToolStripMenuItemChangeToExclusiveOrConstranit"
-        Me.ToolStripMenuItemChangeToExclusiveOrConstranit.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToExclusiveOrConstranit.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToExclusiveOrConstranit.Text = "Exclusive Or Constraint"
         '
         'ToolStripMenuItemChangeToEqualityConstraint
         '
         Me.ToolStripMenuItemChangeToEqualityConstraint.Image = Global.Boston.My.Resources.ORMShapes.equality
         Me.ToolStripMenuItemChangeToEqualityConstraint.Name = "ToolStripMenuItemChangeToEqualityConstraint"
-        Me.ToolStripMenuItemChangeToEqualityConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToEqualityConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToEqualityConstraint.Text = "Equality Constraint"
         '
         'ToolStripMenuItemChangeToDeonticExclusiveConstraint
         '
         Me.ToolStripMenuItemChangeToDeonticExclusiveConstraint.Image = Global.Boston.My.Resources.ORMShapes.deontic_exclusion
         Me.ToolStripMenuItemChangeToDeonticExclusiveConstraint.Name = "ToolStripMenuItemChangeToDeonticExclusiveConstraint"
-        Me.ToolStripMenuItemChangeToDeonticExclusiveConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToDeonticExclusiveConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToDeonticExclusiveConstraint.Text = "Deontic Exclusion Constraint"
         '
         'ToolStripMenuItemChangeToDeonticInclusiveOrConstraint
         '
         Me.ToolStripMenuItemChangeToDeonticInclusiveOrConstraint.Image = Global.Boston.My.Resources.ORMShapes.deontic_inclusive_or
         Me.ToolStripMenuItemChangeToDeonticInclusiveOrConstraint.Name = "ToolStripMenuItemChangeToDeonticInclusiveOrConstraint"
-        Me.ToolStripMenuItemChangeToDeonticInclusiveOrConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToDeonticInclusiveOrConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToDeonticInclusiveOrConstraint.Text = "Deontic Inclusive Or Constraint"
         '
         'ToolStripMenuItemChangeToDeonticExclusiveOrConstraint
         '
         Me.ToolStripMenuItemChangeToDeonticExclusiveOrConstraint.Image = Global.Boston.My.Resources.ORMShapes.deontic_exclusiveOr
         Me.ToolStripMenuItemChangeToDeonticExclusiveOrConstraint.Name = "ToolStripMenuItemChangeToDeonticExclusiveOrConstraint"
-        Me.ToolStripMenuItemChangeToDeonticExclusiveOrConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToDeonticExclusiveOrConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToDeonticExclusiveOrConstraint.Text = "Deontic Exclusive Or Constraint"
         '
         'ToolStripMenuItemChangeToDeonticEqualityConstraint
         '
         Me.ToolStripMenuItemChangeToDeonticEqualityConstraint.Image = Global.Boston.My.Resources.ORMShapes.deontic_equality
         Me.ToolStripMenuItemChangeToDeonticEqualityConstraint.Name = "ToolStripMenuItemChangeToDeonticEqualityConstraint"
-        Me.ToolStripMenuItemChangeToDeonticEqualityConstraint.Size = New System.Drawing.Size(296, 30)
+        Me.ToolStripMenuItemChangeToDeonticEqualityConstraint.Size = New System.Drawing.Size(288, 22)
         Me.ToolStripMenuItemChangeToDeonticEqualityConstraint.Text = "Deontic Equality Constraint"
         '
         'ToolStripSeparator7
@@ -2133,6 +2130,31 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'AddToPageToolStripMenuItem
+        '
+        Me.AddToPageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddAllAssociatedFactTypesToPageToolStripMenuItem, Me.AllAssociatedFactTypesrelatedtoToolStripMenuItem, Me.AllAssociatedSubtypeRelationshipsToolStripMenuItem})
+        Me.AddToPageToolStripMenuItem.Name = "AddToPageToolStripMenuItem"
+        Me.AddToPageToolStripMenuItem.Size = New System.Drawing.Size(233, 22)
+        Me.AddToPageToolStripMenuItem.Text = "Add to &Page..."
+        '
+        'AddAllAssociatedFactTypesToPageToolStripMenuItem
+        '
+        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem.Name = "AddAllAssociatedFactTypesToPageToolStripMenuItem"
+        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem.Size = New System.Drawing.Size(295, 22)
+        Me.AddAllAssociatedFactTypesToPageToolStripMenuItem.Text = "...all associated Fact Types (related &from...)"
+        '
+        'AllAssociatedFactTypesrelatedtoToolStripMenuItem
+        '
+        Me.AllAssociatedFactTypesrelatedtoToolStripMenuItem.Name = "AllAssociatedFactTypesrelatedtoToolStripMenuItem"
+        Me.AllAssociatedFactTypesrelatedtoToolStripMenuItem.Size = New System.Drawing.Size(295, 22)
+        Me.AllAssociatedFactTypesrelatedtoToolStripMenuItem.Text = "...all associated Fact Types (related &to...)"
+        '
+        'AllAssociatedSubtypeRelationshipsToolStripMenuItem
+        '
+        Me.AllAssociatedSubtypeRelationshipsToolStripMenuItem.Name = "AllAssociatedSubtypeRelationshipsToolStripMenuItem"
+        Me.AllAssociatedSubtypeRelationshipsToolStripMenuItem.Size = New System.Drawing.Size(295, 22)
+        Me.AllAssociatedSubtypeRelationshipsToolStripMenuItem.Text = "...all associated Subtype Relationships"
+        '
         'frmDiagramORM
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2438,7 +2460,6 @@ Partial Class frmDiagramORM
     Friend WithEvents ToolStripSeparator40 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemShowLinkFactType As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAddRole As ToolStripMenuItem
-    Friend WithEvents AddAllAssociatedFactTypesToPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddAllAssociatedFactTypesToPageToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator36 As ToolStripSeparator
     Friend WithEvents PropertiesToolStripMenuItem4 As ToolStripMenuItem
@@ -2446,4 +2467,8 @@ Partial Class frmDiagramORM
     Friend WithEvents ToolStripMenuItem14 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator42 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemCopyMultiple As ToolStripMenuItem
+    Friend WithEvents AddToPageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddAllAssociatedFactTypesToPageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AllAssociatedFactTypesrelatedtoToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AllAssociatedSubtypeRelationshipsToolStripMenuItem As ToolStripMenuItem
 End Class

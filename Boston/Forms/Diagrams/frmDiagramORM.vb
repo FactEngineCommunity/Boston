@@ -883,6 +883,7 @@ Public Class frmDiagramORM
             Dim lrModelObject As FBM.ModelObject
             lrDroppedObject = lrDraggedNode.Tag
 
+            'ModelObjects first.
             If Not (TypeOf (lrDroppedObject) Is MindFusion.Diagramming.Shape) Then
                 '---------------------------------------------------------------------
                 'DraggedObject is a ModelObject (from the ModelDictionary form etc),
@@ -897,7 +898,7 @@ Public Class frmDiagramORM
                     '---------------------------------------------------------------------------------------------------
                     'Dropping a ModelObject onto the DiagramSpy Page. Need to show that ModelObject in the DiagramSpy.
                     '---------------------------------------------------------------------------------------------------
-                    Call Me.ShowSpyInformationForModelObject(lrModelObject)
+                    Call Me.ShowSpyInformationForModelObject(lrModelObject, Control.ModifierKeys = Keys.Control)
                     Exit Sub
                 End If
 
@@ -1648,6 +1649,15 @@ Public Class frmDiagramORM
 
                 If Not (TypeOf (lrModelOject) Is MindFusion.Diagramming.Shape) Then
                     e.Effect = DragDropEffects.Copy
+
+                    Select Case lrModelOject.GetType
+                        Case = GetType(FBM.EntityType)
+                            'HelpTipsLabel
+                            If (GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
+                                Me.LabelHelp.Text = "Hold down the [Ctrl] key on your keyboard to only show this Model Element in the Diagram Spy and not related Fact Types."
+                            End If
+                    End Select
+
                 ElseIf lrDraggedNode.Index >= 0 Then
                     Dim lrToolboxForm As frmToolbox
                     lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
@@ -1712,15 +1722,21 @@ Public Class frmDiagramORM
             ElseIf e.Data.GetDataPresent(GetType(FBM.EntityType).ToString, False) Then
                 Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.None)
                 e.Effect = DragDropEffects.Copy
+
+                'HelpTipsLabel
+                If (GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
+                    Me.LabelHelp.Text = "Hold down the [Ctrl] key on your keyboard to only show this Model Element in the Diagram Spy and not related Fact Types."
+                End If
+
             ElseIf e.Data.GetDataPresent(GetType(FBM.ValueType).ToString, False) Then
-                Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.None)
-                e.Effect = DragDropEffects.Copy
-            ElseIf e.Data.GetDataPresent(GetType(FBM.FactType).ToString, False) Then
-                Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.None)
-                e.Effect = DragDropEffects.Copy
-            Else
-                'e.Effect = DragDropEffects.None
-            End If
+                    Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.None)
+                    e.Effect = DragDropEffects.Copy
+                ElseIf e.Data.GetDataPresent(GetType(FBM.FactType).ToString, False) Then
+                    Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.None)
+                    e.Effect = DragDropEffects.Copy
+                Else
+                    'e.Effect = DragDropEffects.None
+                End If
 
 
             'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
@@ -10823,7 +10839,12 @@ Public Class frmDiagramORM
         Me.Briana.Visible = True
     End Sub
 
-    Private Sub ShowSpyInformationForModelObject(ByRef arModelObject As FBM.ModelObject)
+    ''' <summary>
+    ''' Shows the Diagram Spy Page for the nominated ModelElement.
+    ''' </summary>
+    ''' <param name="arModelObject">The Model Element for which information will be shown in the Diagram Spy Page.</param>
+    ''' <param name="abControlKeyPressed">If True...don't load associated FactTypes.</param>
+    Private Sub ShowSpyInformationForModelObject(ByRef arModelObject As FBM.ModelObject, Optional ByVal abControlKeyPressed As Boolean = False)
 
         Me.Diagram.Links.Clear()
         Me.Diagram.Nodes.Clear()
@@ -10849,16 +10870,16 @@ Public Class frmDiagramORM
                 Dim lrValueType As FBM.ValueType
                 lrValueType = arModelObject
                 Call Me.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
-                Call Me.LoadAssociatedFactTypes(lrValueType)
+                If Not abControlKeyPressed Then Call Me.LoadAssociatedFactTypes(lrValueType)
             Case Is = pcenumConceptType.EntityType
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = arModelObject
                 Call Me.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
-                Call Me.LoadAssociatedFactTypes(lrEntityType)
+                If Not abControlKeyPressed Then Call Me.LoadAssociatedFactTypes(lrEntityType)
             Case Is = pcenumConceptType.FactType
                 Dim lrFactType As FBM.FactType
                 lrFactType = arModelObject
-                Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False)
+                If Not abControlKeyPressed Then Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False)
             Case Is = pcenumConceptType.RoleConstraint
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -11272,7 +11293,7 @@ Public Class frmDiagramORM
             Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrPage.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrEntityTypeInstance.EntityType)
+            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrEntityTypeInstance.EntityType, Control.ModifierKeys = Keys.Control)
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -11785,85 +11806,6 @@ Public Class frmDiagramORM
 
     End Sub
 
-    Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem.Click
-
-        Try
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings
-
-                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
-
-                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
-                    If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
-
-                        Try
-                            Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                                 Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                                 Select SubtypeRelationshipInstance).First
-
-                            Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                        Catch ex As Exception
-                            'Not a biggie. But shouldn't fail.
-                        End Try
-
-                    End If
-                ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
-                    Try
-                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
-
-                        Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                             Select SubtypeRelationshipInstance).First
-
-                        Dim lrModelElement As FBM.ModelObject
-                        Dim lrModelelementInstance As FBM.FactTypeInstance
-
-                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
-
-                        If lrModelElement Is Nothing Then
-                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
-
-                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
-                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
-                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
-                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
-                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
-                                    Select Case lrModelelementInstance.GetType
-                                        Case Is = GetType(FBM.FactTypeInstance)
-                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
-                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
-                                    End Select
-                                End If
-                            End If
-
-                        End If
-
-                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                    Catch ex As Exception
-                        'Not a biggie. But shouldn't fail.
-                    End Try
-                End If
-            Next
-
-            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
-                Call Me.AutoLayout()
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
 
     Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem1.Click
 
@@ -11982,4 +11924,250 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings
+
+                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
+
+                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                    If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
+
+                        Try
+                            Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                                 Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                                 Select SubtypeRelationshipInstance).First
+
+                            Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                        Catch ex As Exception
+                            'Not a biggie. But shouldn't fail.
+                        End Try
+
+                    End If
+                ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
+                    Try
+                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
+
+                        Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                             Select SubtypeRelationshipInstance).First
+
+                        Dim lrModelElement As FBM.ModelObject
+                        Dim lrModelelementInstance As FBM.FactTypeInstance
+
+                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
+
+                        If lrModelElement Is Nothing Then
+                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
+
+                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
+
+                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
+                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
+                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
+                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
+                                    Select Case lrModelelementInstance.GetType
+                                        Case Is = GetType(FBM.FactTypeInstance)
+                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
+                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
+                                    End Select
+                                End If
+                            End If
+
+                        End If
+
+                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                    Catch ex As Exception
+                        'Not a biggie. But shouldn't fail.
+                    End Try
+                End If
+            Next
+
+            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
+                Call Me.AutoLayout()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
+    End Sub
+
+    Private Sub AllAssociatedFactTypesrelatedtoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AllAssociatedFactTypesrelatedtoToolStripMenuItem.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getIncomingFactTypeReadings
+
+                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
+
+                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                    If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
+
+                        Try
+                            Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                                 Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                                 Select SubtypeRelationshipInstance).First
+
+                            Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                        Catch ex As Exception
+                            'Not a biggie. But shouldn't fail.
+                        End Try
+
+                    End If
+                ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
+                    Try
+                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
+
+                        Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                             Select SubtypeRelationshipInstance).First
+
+                        Dim lrModelElement As FBM.ModelObject
+                        Dim lrModelelementInstance As FBM.FactTypeInstance
+
+                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
+
+                        If lrModelElement Is Nothing Then
+                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
+
+                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
+
+                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
+                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
+                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
+                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
+                                    Select Case lrModelelementInstance.GetType
+                                        Case Is = GetType(FBM.FactTypeInstance)
+                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
+                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
+                                    End Select
+                                End If
+                            End If
+
+                        End If
+
+                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                    Catch ex As Exception
+                        'Not a biggie. But shouldn't fail.
+                    End Try
+                End If
+            Next
+
+            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
+                Call Me.AutoLayout()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub AllAssociatedSubtypeRelationshipsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AllAssociatedSubtypeRelationshipsToolStripMenuItem.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+            Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            For Each lrFactType In lrEntityTypeInstance.EntityType.getConnectedFactTypes.FindAll(Function(x) x.IsSubtypeRelationshipFactType)
+
+                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count = 0 Then
+
+                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, New PointF(10, 10), False, False, True, False)
+
+                    Try
+                        If lrFactType.RoleGroup(0).JoinedORMObject Is lrEntityTypeInstance.EntityType Then
+                            lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                             Select SubtypeRelationshipInstance).First
+                        Else
+                            Dim lrSubtypeRelationship = (From SubtypeRelationship In lrFactType.RoleGroup(0).JoinedORMObject.SubtypeRelationship
+                                                         Where SubtypeRelationship.FactType.Id = lrFactType.Id
+                                                         Select SubtypeRelationship).First
+                            lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(Me.zrPage, True)
+                        End If
+
+                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                    Catch ex As Exception
+                        'Not a biggie. But shouldn't fail.
+                    End Try
+
+                Else
+                    Try
+                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id)
+
+                        lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                         Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                         Select SubtypeRelationshipInstance).First
+
+                        Dim lrModelElement As FBM.ModelObject
+                        Dim lrModelelementInstance As FBM.FactTypeInstance
+
+                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
+
+                        If lrModelElement Is Nothing Then
+                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
+
+                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
+
+                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
+                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
+                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
+                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
+                                    Select Case lrModelelementInstance.GetType
+                                        Case Is = GetType(FBM.FactTypeInstance)
+                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
+                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
+                                    End Select
+                                End If
+                            End If
+
+                        End If
+
+                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                    Catch ex As Exception
+                        'Not a biggie. But shouldn't fail.
+                    End Try
+                End If
+            Next
+
+            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
+                Call Me.AutoLayout()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

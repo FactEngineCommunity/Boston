@@ -1540,7 +1540,7 @@ Public Class frmMain
     ''' </summary>
     ''' <param name="arPage"></param>
     ''' <remarks></remarks>
-    Public Sub LoadDiagramSpy(ByRef arPage As FBM.Page, ByRef arFocalModelObject As FBM.ModelObject)
+    Public Sub LoadDiagramSpy(ByRef arPage As FBM.Page, ByRef arFocalModelObject As FBM.ModelObject, Optional ByVal abControlKeyPressed As Boolean = False)
 
         Dim child As New frmDiagramORM
 
@@ -1589,17 +1589,17 @@ Public Class frmMain
                         Dim lrValueType As FBM.ValueType
                         lrValueType = arFocalModelObject
                         Call child.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
-                        Call child.LoadAssociatedFactTypes(lrValueType)
+                        If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrValueType)
                     Case Is = pcenumConceptType.EntityType
                         Dim lrEntityType As FBM.EntityType
                         lrEntityType = arFocalModelObject
                         Call child.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
-                        Call child.LoadAssociatedFactTypes(lrEntityType)
+                        If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrEntityType)
                     Case Is = pcenumConceptType.FactType
                         Dim lrFactType As FBM.FactType
                         lrFactType = arFocalModelObject
                         Call child.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False, False, False, True)
-                        Call child.LoadAssociatedFactTypes(lrFactType)
+                        If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrFactType)
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As FBM.RoleConstraint
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -1609,11 +1609,11 @@ Public Class frmMain
                         Select Case lrRoleConstraint.RoleConstraintType
                             Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                                 lrRoleConstraintInstance = arPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                            Case Is = pcenumRoleConstraintType.RingConstraint, _
-                                      pcenumRoleConstraintType.EqualityConstraint, _
-                                      pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                                      pcenumRoleConstraintType.ExclusiveORConstraint, _
-                                      pcenumRoleConstraintType.ExclusionConstraint, _
+                            Case Is = pcenumRoleConstraintType.RingConstraint,
+                                      pcenumRoleConstraintType.EqualityConstraint,
+                                      pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                      pcenumRoleConstraintType.ExclusiveORConstraint,
+                                      pcenumRoleConstraintType.ExclusionConstraint,
                                       pcenumRoleConstraintType.SubsetConstraint
                                 lrRoleConstraintInstance = arPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                             Case Is = pcenumRoleConstraintType.FrequencyConstraint

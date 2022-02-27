@@ -769,22 +769,69 @@ Namespace FBM
 
         End Function
 
+        Public Function getIncomingFactTypeReadings(Optional ByVal aiMaximumFactTypeArity As Integer = 10) As List(Of FBM.FactTypeReading)
+
+            Dim larFactTypeReading As New List(Of FBM.FactTypeReading)
+
+            Try
+                Dim larRelatedFactType = From FactType In Me.Model.FactType
+                                         From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject IsNot Nothing
+                                         Where Role.JoinedORMObject.Id = Me.Id
+                                         Select FactType
+
+                larFactTypeReading = (From FactType In larRelatedFactType
+                                      From FactTypeReading In FactType.FactTypeReading
+                                      From PredicatePart In FactTypeReading.PredicatePart
+                                      Where FactType.Arity <= aiMaximumFactTypeArity
+                                      Where PredicatePart.SequenceNr > 1
+                                      Where PredicatePart.Role.JoinedORMObject.Id = Me.Id
+                                      Select FactTypeReading Distinct).ToList
+
+                Return larFactTypeReading
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larFactTypeReading
+            End Try
+
+        End Function
+
+
         Public Function getOutgoingFactTypeReadings(Optional ByVal aiMaximumFactTypeArity As Integer = 10) As List(Of FBM.FactTypeReading)
 
-            Dim larOutgoingFactType = From FactType In Me.Model.FactType
-                                      From Role In FactType.RoleGroup
-                                      Where Role.JoinedORMObject.Id = Me.Id
-                                      Select FactType
+            Dim larFactTypeReading As New List(Of FBM.FactTypeReading)
 
-            'Where Role.HasInternalUniquenessConstraint
+            Try
+                Dim larRelatedFactType = From FactType In Me.Model.FactType
+                                         From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject.Id = Me.Id
+                                         Select FactType
 
-            Dim larFactTypeReading = From FactType In larOutgoingFactType
-                                     From FactTypeReading In FactType.FactTypeReading
-                                     Where FactType.Arity <= aiMaximumFactTypeArity
-                                     Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
-                                     Select FactTypeReading Distinct
+                larFactTypeReading = (From FactType In larRelatedFactType
+                                      From FactTypeReading In FactType.FactTypeReading
+                                      Where FactType.Arity <= aiMaximumFactTypeArity
+                                      Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
+                                      Select FactTypeReading Distinct).ToList
 
-            Return larFactTypeReading.ToList
+                Return larFactTypeReading
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larFactTypeReading
+            End Try
 
         End Function
 

@@ -21,6 +21,12 @@
         Property Y As Integer
     End Interface
 
+    Interface iPageModelObject
+        Inherits iPageObject
+
+        Property SubtypeRelationship As FBM.SubtypeRelationshipInstance
+    End Interface
+
     Interface iObjectTypePageObject 'for EntityType,ValueType,FactType Intances
         Inherits iPageObject
 
