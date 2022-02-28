@@ -698,9 +698,19 @@ Public Class frmCRUDModel
                 If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
                     With New WaitCursor
                         Me.zrModel.StoreAsXML = False
-                        Call Database.CompactAndRepairDatabase()
-                        Call Me.zrModel.RapidEmpty(True)
-                        Call Me.zrModel.Save(True, True)
+                        Try
+                            Call Database.CompactAndRepairDatabase()
+                            Call Me.zrModel.RapidEmpty(True)
+                            Call Me.zrModel.Save(True, False)
+                        Catch ex As Exception
+                            lsMessage = "Couldn't successfully save the Model to the Boston database. The Model will remain stored as XML."
+                            Me.zrModel.StoreAsXML = True
+                            Call Me.zrModel.Save(False, False)
+                            GoTo CouldntSaveToBostonDatabase
+                        End Try
+                        'Only remove the XML file if safely saved in the database.
+                        Call Me.zrModel.RemoveCorrespondingXMLFile()
+CouldntSaveToBostonDatabase:
                     End With
                 Else
                     RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged

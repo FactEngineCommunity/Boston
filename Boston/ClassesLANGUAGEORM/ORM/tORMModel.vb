@@ -3157,6 +3157,41 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Removes the corresponding XML file for the Model if it is stored as XML, as opposed stored in the Boston database.
+        ''' </summary>
+        Public Sub RemoveCorrespondingXMLFile()
+
+            Try
+                Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+                Dim lsFolderLocation As String
+                Dim lsFileName As String
+                Dim lsFileLocationName As String
+
+                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                Else
+                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                End If
+
+                lsFileName = Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
+                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+                System.IO.File.Delete(lsFileLocationName)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Function PagesLoading() As Boolean
 
             Return Me.Page.Find(Function(x) x.Loaded = False) IsNot Nothing

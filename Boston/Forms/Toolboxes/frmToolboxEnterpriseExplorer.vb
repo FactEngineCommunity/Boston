@@ -3069,15 +3069,36 @@ Public Class frmToolboxEnterpriseExplorer
             Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + 20 + lrNewTreeNode.Bounds.Height, 4000)
 
 
-            lsMessage = "Save the Model? (Recommended)"
-            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                lfrmFlashCard = New frmFlashCard
-                lfrmFlashCard.ziIntervalMilliseconds = 3500
-                lfrmFlashCard.zsText = "Saving model."
-                lfrmFlashCard.Show(Me)
-                Richmond.WriteToStatusBar("Saving model.", True)
-                Call lrModel.Save(True, True)
-            End If
+            '----------------------------------------------------------------------------------------------------------------
+            'Saving the Model
+            Dim lrCustomMessageBox As New frmCustomMessageBox
+
+            lsMessage = "Your Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
+            lsMessage &= "Save the model now? (Recommended)"
+
+            lrCustomMessageBox.Message = lsMessage
+            lrCustomMessageBox.ButtonText.Add("No")
+            lrCustomMessageBox.ButtonText.Add("Save to database")
+            lrCustomMessageBox.ButtonText.Add("Store as XML")
+
+            lfrmFlashCard = New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 3500
+            lfrmFlashCard.zsText = "Saving model."
+
+            Select Case lrCustomMessageBox.ShowDialog
+                Case Is = "Store as XML"
+                    lrModel.StoreAsXML = True
+                    Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                    Call lrModel.Save(True, False)
+                    Richmond.WriteToStatusBar("Model Saved")
+                Case Is = "Save to database"
+                    With New WaitCursor
+                        Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                        lfrmFlashCard.Show(Me)
+                        Call lrModel.Save(True, True)
+                        Richmond.WriteToStatusBar("Model Saved")
+                    End With
+            End Select
 
         Catch ex As Exception
             Dim lsMessage1 As String
