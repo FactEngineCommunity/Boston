@@ -328,7 +328,7 @@ Namespace FBM
         Public Event ObjectifyingEntityTypeChanged(ByRef arNewObjectifyingEntityType As FBM.EntityType)
         Public Event ObjectificationRemoved() 'When the objectification of the FactType is removed.
         Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
-        Public Event ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean)
+        Public Event ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page)
 
         Public Sub New()
             '-------------------------------------------------------------
@@ -878,9 +878,6 @@ Namespace FBM
                     lrFactTypeInstance.FactTable.FactTypeInstance = New FBM.FactTypeInstance
                     lrFactTypeInstance.FactTable.FactTypeInstance = lrFactTypeInstance
                     lrFactTypeInstance.ShowFactTypeName = .ShowFactTypeName
-                    If .IsObjectified Then
-                        lrFactTypeInstance.ShowFactTypeName = True
-                    End If
                     lrFactTypeInstance.DBName = .DBName
                     lrFactTypeInstance.IsDerived = .IsDerived
                     lrFactTypeInstance.IsStored = .IsStored
@@ -4295,14 +4292,14 @@ Namespace FBM
 
         End Function
 
-        Public Sub SetShowFactTypeName(ByVal abNewShowFactTypeName As Boolean)
+        Public Sub SetShowFactTypeName(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page)
 
             Me.ShowFactTypeName = abNewShowFactTypeName
 
             Call Me.makeDirty()
             Call Me.Model.MakeDirty(False, False)
 
-            RaiseEvent ShowFactTypeNameChanged(abNewShowFactTypeName)
+            RaiseEvent ShowFactTypeNameChanged(abNewShowFactTypeName, arPage)
 
         End Sub
 

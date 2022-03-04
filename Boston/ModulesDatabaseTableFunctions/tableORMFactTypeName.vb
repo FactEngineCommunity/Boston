@@ -33,9 +33,7 @@
                 'Call TableConceptInstance.GetConceptInstanceDetails(lrConceptInstance)
                 arFactTypeName.X = lrConceptInstance.X
                 arFactTypeName.Y = lrConceptInstance.Y
-                If Not arFactTypeName.FactTypeInstance.IsObjectified Then
-                    arFactTypeName.FactTypeInstance.ShowFactTypeName = lrConceptInstance.Visible
-                End If
+                arFactTypeName.FactTypeInstance.ShowFactTypeName = lrConceptInstance.Visible
             Else
                 arFactTypeName.FactTypeInstance.ShowFactTypeName = False
             End If

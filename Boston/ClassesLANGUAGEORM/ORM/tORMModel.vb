@@ -5541,6 +5541,7 @@ Namespace FBM
 
                 xml = XDocument.Load(lsFileLocationName)
 
+                Dim larPage As New List(Of FBM.Page)
                 For Each loPage In xml.<Model>.<ORMDiagram>.<Page>
                     Dim lrPage As New FBM.Page(Me,
                                                loPage.Attribute("Id").Value,
@@ -5548,9 +5549,10 @@ Namespace FBM
                                                Richmond.GetEnumFromDescriptionAttribute(Of pcenumLanguage)(loPage.Attribute("Language").Value)
                                                )
                     lrPage.IsDirty = False
-                    Me.Page.Add(lrPage)
+                    larPage.Add(lrPage)
                 Next
 
+                Me.Page = larPage.OrderBy(Function(x) x.Name).ToList
                 objStreamReader.Close()
 
             Catch ex As Exception

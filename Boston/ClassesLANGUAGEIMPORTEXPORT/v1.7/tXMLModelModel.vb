@@ -451,6 +451,16 @@ Namespace XMLModel
                         lrConceptInstance.X = lrFactTypeInstance.FactTypeReadingPoint.X
                         lrConceptInstance.Y = lrFactTypeInstance.FactTypeReadingPoint.Y
                         lrExportPage.ConceptInstance.Add(lrConceptInstance)
+
+                        'FactTypeName
+                        lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                     lrFactTypeInstance.Page,
+                                                                     lrFactTypeInstance.Id,
+                                                                     pcenumConceptType.FactTypeName)
+                        lrConceptInstance.Visible = lrFactTypeInstance.ShowFactTypeName
+                        lrConceptInstance.X = lrFactTypeInstance.FactTypeName.X
+                        lrConceptInstance.Y = lrFactTypeInstance.FactTypeName.Y
+                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
                     Next
 
                     '--------------------------------------------------------------
@@ -1086,6 +1096,7 @@ Namespace XMLModel
                 Dim lrFactTypeInstance As FBM.FactTypeInstance
                 Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
                 Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
+                Dim lrFactTypeNameConceptInstance As FBM.ConceptInstance
                 Dim lrFact As FBM.Fact
                 Dim lrFactType As FBM.FactType
 
@@ -1111,7 +1122,15 @@ Namespace XMLModel
                     lrFactTypeReadingConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
                     If lrFactTypeReadingConceptInstance IsNot Nothing Then
                         lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeReadingConceptInstance.X,
-                                                                                lrFactTypeReadingConceptInstance.Y)
+                                                                            lrFactTypeReadingConceptInstance.Y)
+                    End If
+
+                    lrFactTypeNameConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeName And x.Symbol = lrFactType.Id)
+                    If lrFactTypeNameConceptInstance IsNot Nothing Then
+                        lrFactTypeInstance.FactTypeName = New FBM.FactTypeName(arPage.Model, lrPage, lrFactTypeInstance, lrFactTypeInstance.Name)
+                        lrFactTypeInstance.FactTypeName.X = lrFactTypeNameConceptInstance.X
+                        lrFactTypeInstance.FactTypeName.Y = lrFactTypeNameConceptInstance.Y
+                        lrFactTypeInstance.ShowFactTypeName = lrFactTypeNameConceptInstance.Visible
                     End If
 
                     '----------------------------------------

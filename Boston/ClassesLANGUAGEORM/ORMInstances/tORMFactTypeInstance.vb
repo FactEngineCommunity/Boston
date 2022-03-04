@@ -114,8 +114,25 @@ Namespace FBM
         <XmlIgnore()> _
         Public Shadows InternalUniquenessConstraint As New List(Of FBM.RoleConstraintInstance)
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows Fact As New List(Of FBM.FactInstance)
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public Shadows _ShowFactTypeName As Boolean = False
+        <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+        DefaultValueAttribute(True),
+        DescriptionAttribute("Display the Fact Type Name.")>
+        Public Shadows Property ShowFactTypeName() As Boolean
+            Get
+                Return Me._ShowFactTypeName
+            End Get
+
+            Set(ByVal value As Boolean)
+                Me._ShowFactTypeName = value
+            End Set
+        End Property
 
         Public _Visible As Boolean = False
         Public Property Visible() As Boolean
@@ -2435,7 +2452,7 @@ Namespace FBM
                                 MsgBox("The Fact Type must be objectified to have a Reference Mode.")
                             End If
                         Case Is = "ShowFactTypeName"
-                            Call Me.FactType.SetShowFactTypeName(Me.ShowFactTypeName)
+                            Call Me.FactType.SetShowFactTypeName(Me.ShowFactTypeName, Me.Page)
                         Case Is = "IsDerived"
                             If Me.IsDerived Then
                                 Call Me.SetPropertyAttributes(Me, "IsStored", True)
@@ -2828,8 +2845,6 @@ Namespace FBM
                 '----------------------------------
                 Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 15, Me.Shape.Bounds.Top - CInt(1.5 * Me.FactTypeNameShape.Bounds.Height))
                 Me.FactTypeNameShape.Visible = Me.IsObjectified
-                Me.ShowFactTypeName = True
-
 
                 Me.Shape.ShadowOffsetX = 1
                 Me.Shape.ShadowOffsetY = 1
@@ -2949,10 +2964,17 @@ Namespace FBM
         End Sub
 
 
-        Private Sub _FactType_ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean) Handles _FactType.ShowFactTypeNameChanged
+        Private Sub _FactType_ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page) Handles _FactType.ShowFactTypeNameChanged
 
-            Me.ShowFactTypeName = abNewShowFactTypeName
-            Call Me.RefreshShape()
+            If Me.Page Is arPage Then
+                Me.ShowFactTypeName = abNewShowFactTypeName
+
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeName)
+                lrConceptInstance.Visible = Me.ShowFactTypeName
+                Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+
+                Call Me.RefreshShape()
+            End If
 
         End Sub
 

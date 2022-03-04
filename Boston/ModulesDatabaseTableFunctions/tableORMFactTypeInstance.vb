@@ -196,7 +196,6 @@ Namespace TableFactTypeInstance
 
 
                             lrFactTypeInstance.IsObjectified = lrFactTypeInstance.FactType.IsObjectified
-                            lrFactTypeInstance.ShowFactTypeName = lrFactTypeInstance.IsObjectified
 
                             If lrFactTypeInstance.IsObjectified Then
                                 Dim lrObjectifyingEntityTypeInstance As FBM.EntityTypeInstance
@@ -230,6 +229,7 @@ Namespace TableFactTypeInstance
 
                             '==============================================================================================================
                             Call TableFactTypeName.GetFactTypeNameDetails(lrFactTypeInstance.FactTypeName)
+
                             'FactTypeReadingPoint
                             Dim lrFTRConceptInstance As New FBM.ConceptInstance(lrFactTypeInstance.Model, lrFactTypeInstance.Page, lrFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
                             Call TableConceptInstance.ExistsConceptInstance(lrFTRConceptInstance)

@@ -1123,7 +1123,7 @@ Namespace FBM
 
         End Function
 
-        Public Function DropModelElementsForFactType(ByRef arFactType As FBM.FactType)
+        Public Sub DropModelElementsForFactType(ByRef arFactType As FBM.FactType)
 
             Try
                 '--------------------------------------------------------------
@@ -1228,7 +1228,7 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
-        End Function
+        End Sub
 
         Public Function DropFrequencyConstraintAtPoint(ByRef arRoleConstraint As FBM.RoleConstraint,
                                                        ByVal aoPoint As PointF,

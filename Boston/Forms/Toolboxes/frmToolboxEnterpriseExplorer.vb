@@ -199,6 +199,9 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
             Next
 
+            Me.TreeView.Nodes(0).Expand()
+            Me.TreeView.Nodes(0).EnsureVisible()
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -932,6 +935,44 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub ShowCircularProgressBar()
+        Try
+            Me.CircularProgressBar.Top = Me.Height / 3 - (Me.CircularProgressBar.Height / 2)
+            Me.CircularProgressBar.Left = Me.Panel1.Width - (Me.CircularProgressBar.Width + 30)
+            Me.CircularProgressBar.BringToFront()
+            Me.CircularProgressBar.Value = 0
+            Me.CircularProgressBar.Value = 1
+            Me.CircularProgressBar.Invalidate()
+            Me.Invalidate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Private Sub HideCircularProgressBar()
+
+        Try
+            Me.CircularProgressBar.Value = 0
+            Me.CircularProgressBar.Text = "0%"
+            Me.CircularProgressBar.Invalidate()
+            Me.CircularProgressBar.SendToBack()
+            Me.Invalidate(True)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
     Private Sub DoModelLoading(ByRef arModel As FBM.Model)
 
         Try
@@ -968,24 +1009,14 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Me.Cursor = Cursors.WaitCursor
                 Richmond.WriteToStatusBar("Loading Model")
-                Me.CircularProgressBar.Top = Me.Height / 3 - (Me.CircularProgressBar.Height / 2)
-                Me.CircularProgressBar.Left = Me.Panel1.Width - (Me.CircularProgressBar.Width + 30)
-                Me.CircularProgressBar.BringToFront()
-                Me.CircularProgressBar.Value = 0
-                Me.CircularProgressBar.Value = 1
-                Me.CircularProgressBar.Invalidate()
-                Me.Invalidate()
+                Call Me.ShowCircularProgressBar()
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
                     pdbConnection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                     pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                     Richmond.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                 End If
                 Call arModel.Load(True, False, Me.BackgroundWorkerModelLoader)
-                Me.CircularProgressBar.Value = 0
-                Me.CircularProgressBar.Text = "0%"
-                Me.CircularProgressBar.Invalidate()
-                Me.CircularProgressBar.SendToBack()
-                Me.Invalidate(True)
+                Call Me.HideCircularProgressBar
                 Me.Cursor = Cursors.Default
                 Richmond.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
             End If
@@ -1123,7 +1154,9 @@ Public Class frmToolboxEnterpriseExplorer
                                     '----------------------------------------------------------------------------------------------
                                     If Not lrPage.Model.Loading Then
                                         With New WaitCursor
-                                            lrPage.Model.Load(True, False)
+                                            Call Me.ShowCircularProgressBar()
+                                            lrPage.Model.Load(True, False, Me.BackgroundWorkerModelLoader)
+                                            Call Me.HideCircularProgressBar()
                                             Richmond.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
                                         End With
                                     End If
@@ -1207,7 +1240,11 @@ Public Class frmToolboxEnterpriseExplorer
                     '  if it already hasn't been loaded.
                     '---------------------------------------------------------------                                                        
                     If Not prApplication.WorkingModel.Loaded Then
-                        Call prApplication.WorkingModel.Load()
+                        With New WaitCursor
+                            Call Me.ShowCircularProgressBar()
+                            Call prApplication.WorkingModel.Load(,, Me.BackgroundWorkerModelLoader)
+                            Call Me.HideCircularProgressBar()
+                        End With
                     End If
 
                     prApplication.WorkingPage = prApplication.WorkingModel.Page.Find(AddressOf lr_page.Equals)
@@ -3846,7 +3883,7 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
 
                 If Me.TreeView.Nodes(0).Nodes.Count = 1 Then
-                    Me.TreeView.Nodes(0).Nodes(0).Expand()
+                    Me.TreeView.Nodes(0).Expand()
                 End If
 
             End If
