@@ -3706,11 +3706,13 @@ Namespace FBM
 
                 '------------------------------------------------------------------------------------------------------------
                 'Save the FactType because there's a need to remove the ObjectifyingEntityType reference from the FactType.
-                '------------------------------------------------------------------------------------------------------------
-                'If abBroadcastInterfaceEvent Then 'Because if not, is the receiving Client and the sending Client has already performed the database actions.
-                Me.makeDirty()
-                Me.Save()
-                'End If
+                '------------------------------------------------------------------------------------------------------------                                
+                If Me.Model.StoreAsXML Then
+                    Me.Model.Save()
+                Else
+                    Me.makeDirty()
+                    Me.Save()
+                End If
 
 
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
@@ -4219,30 +4221,37 @@ Namespace FBM
                     '  reflect the new key, otherwise it will not be possible to Update an existing FactType.
                     '------------------------------------------------------------------------------------------
                     Dim lrDictionaryEntry As New DictionaryEntry(Me.Model, asNewName, pcenumConceptType.FactType, , , True, True)
-                    lrDictionaryEntry.Save()
-                    Call TableFactType.ModifyKey(Me, asNewName)
-
+                    If Not Me.Model.StoreAsXML Then
+                        lrDictionaryEntry.Save()
+                        Call TableFactType.ModifyKey(Me, asNewName)
+                    End If
 
                     If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                         Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
                     End If
 
+
                     Me.Id = asNewName
                     Call TableFactType.UpdateFactType(Me) 'Sets the new Name, TableFactType.ModifyKey (above) only modifies the key.
+
 
                     Me.Model.MakeDirty()
                     Call Me.RaiseEventNameChanged(asNewName)
                     RaiseEvent Updated()
 
-                    Dim larRole = From Role In Me.Model.Role
-                                  Where Role.JoinedORMObject Is Me
-                                  Select Role
+                    If Not Me.Model.StoreAsXML Then
+                        Dim larRole = From Role In Me.Model.Role
+                                      Where Role.JoinedORMObject Is Me
+                                      Select Role
 
-                    For Each lrRole In larRole
-                        lrRole.makeDirty()
-                        lrRole.FactType.makeDirty()
-                        lrRole.FactType.Save()
-                    Next
+                        For Each lrRole In larRole
+                            lrRole.makeDirty()
+                            lrRole.FactType.makeDirty()
+                            lrRole.FactType.Save()
+                        Next
+                    End If
+
+                    Me.Model.Save()
 
                     Return True
                 End If 'Me.Id <> asNewName
@@ -4260,10 +4269,13 @@ Namespace FBM
                 '  may reference another FactType, so that FactType must be saved...etc.
                 '  i.e. It's easier and safer to simply save the whole model.
                 '------------------------------------------------------------------------------------
-                For Each lrRole In Me.Model.Role.FindAll(Function(x) x.JoinedORMObject.Id = Me.Id)
-                    lrRole.makeDirty()
-                    Call lrRole.Save()
-                Next
+                If Not Me.Model.StoreAsXML Then
+                    For Each lrRole In Me.Model.Role.FindAll(Function(x) x.JoinedORMObject.Id = Me.Id)
+
+                        lrRole.makeDirty()
+                        Call lrRole.Save()
+                    Next
+                End If
 
                 '-------------------------------------------------------------
                 'To make sure all the FactData and FactDataInstances/Pages are saved for RDS

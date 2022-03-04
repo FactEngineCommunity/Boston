@@ -1144,15 +1144,19 @@ Namespace FBM
                     '  may reference another FactType, so that FactType must be saved...etc.
                     '  i.e. It's easier and safer to simply save the whole model.
                     '------------------------------------------------------------------------------------
-                    Dim larRole = From Role In Me.Model.Role
-                                  Where Role.JoinedORMObject Is Me
-                                  Select Role
+                    If Me.Model.StoreAsXML Then
+                        Me.Model.Save()
+                    Else
+                        Dim larRole = From Role In Me.Model.Role
+                                      Where Role.JoinedORMObject Is Me
+                                      Select Role
 
-                    For Each lrRole In larRole
-                        lrRole.makeDirty()
-                        lrRole.FactType.makeDirty()
-                        lrRole.FactType.Save()
-                    Next
+                        For Each lrRole In larRole
+                            lrRole.makeDirty()
+                            lrRole.FactType.makeDirty()
+                            lrRole.FactType.Save()
+                        Next
+                    End If
 
                     '====================================================================================
                     'RDS

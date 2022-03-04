@@ -1926,15 +1926,28 @@ Namespace FBM
                             '--------------------------------------------------------------------------------------
                             'CodeSafe: Model is in an unstable state. Remove the ReferenceMode and warn the user.
                             '--------------------------------------------------------------------------------------
+                            Dim lsOldReferenceMode As String = Me.ReferenceMode
                             Me.ReferenceMode = ""
                             Me.ReferenceModeRoleConstraint = Nothing
                             Me.ReferenceModeFactType = Nothing
                             Me.ReferenceModeValueType = Nothing
-                            Me.Save()
+                            If Me.Model.StoreAsXML Then
+                                Me.Model.Save()
+                            Else
+                                Me.Save()
+                            End If
 
                             Dim lsMessage As String = ""
                             lsMessage = "Entity Type, '" & Me.Id & "', had a Reference Mode but no associated Value Type or Fact Type."
                             lsMessage &= vbCrLf & "As a precaution, the ReferenceMode has been removed and the Model saved."
+                            lsMessage.AppendDoubleLineBreak("Reference Mode was: " & lsOldReferenceMode)
+                            Try
+                                If Me.IsObjectifyingEntityType Then
+                                    lsMessage.AppendLine("Objectifying Entity Type for Fact Type: " & Me.ObjectifiedFactType.Id)
+                                End If
+                            Catch ex As Exception
+                                'Not a biggie, but want the message returned no matter what.
+                            End Try
 
                             Throw New Exception(lsMessage)
                         ElseIf Me.ReferenceModeRoleConstraint IsNot Nothing Then
@@ -2784,17 +2797,22 @@ Namespace FBM
                     End If
 
                     Me.Id = asNewName
-                    Call TableEntityType.UpdateEntityType(Me) 'Sets the new Name
 
-                    Dim larRole = From Role In Me.Model.Role
-                                  Where Role.JoinedORMObject Is Me
-                                  Select Role
+                    If Me.Model.StoreAsXML Then
+                        Me.Model.Save()
+                    Else
+                        Call TableEntityType.UpdateEntityType(Me) 'Sets the new Name
 
-                    For Each lrRole In larRole
-                        lrRole.makeDirty()
-                        lrRole.FactType.makeDirty()
-                        lrRole.FactType.Save()
-                    Next
+                        Dim larRole = From Role In Me.Model.Role
+                                      Where Role.JoinedORMObject Is Me
+                                      Select Role
+
+                        For Each lrRole In larRole
+                            lrRole.makeDirty()
+                            lrRole.FactType.makeDirty()
+                            lrRole.FactType.Save()
+                        Next
+                    End If
 
                     '====================================================================================
                     'RDS
@@ -2815,11 +2833,15 @@ Namespace FBM
                 '  may reference another FactType, so that FactType must be saved...etc.
                 '  i.e. It's easier and safer to simply save the whole model.
                 '------------------------------------------------------------------------------------
-                For Each lrRole In Me.Model.Role.FindAll(Function(x) x.JoinedORMObject.Id = Me.Id)
-                    lrRole.makeDirty()
-                    lrRole.FactType.makeDirty()
-                    Call lrRole.FactType.Save()
-                Next
+                If Me.Model.StoreAsXML Then
+                    Me.Model.Save()
+                Else
+                    For Each lrRole In Me.Model.Role.FindAll(Function(x) x.JoinedORMObject.Id = Me.Id)
+                        lrRole.makeDirty()
+                        lrRole.FactType.makeDirty()
+                        Call lrRole.FactType.Save()
+                    Next
+                End If
 
                 '-------------------------------------------------------------
                 'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
@@ -2858,7 +2880,11 @@ Namespace FBM
                         'CodeSafe
                         Me.PreferredIdentifierRCId = ""
                         Me.ReferenceMode = ""
-                        Call Me.Save()
+                        If Me.Model.StoreAsXML Then
+                            Me.Model.Save()
+                        Else
+                            Call Me.Save()
+                        End If
                         Exit Sub
                     End If
 
