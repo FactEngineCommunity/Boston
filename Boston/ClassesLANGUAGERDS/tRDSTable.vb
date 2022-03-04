@@ -1262,7 +1262,8 @@ Namespace RDS
                             Case Is = GetType(FBM.EntityType)
                                 Dim lrEntityType As FBM.EntityType = CType(lrSubtypeRelationship.parentModelElement, FBM.EntityType)
                                 If lrEntityType.IsObjectifyingEntityType Then
-                                    If lrEntityType.ObjectifiedFactType Is Me.FBMModelElement Then
+                                    If Me.FBMModelElement Is Nothing Then Return False
+                                    If lrEntityType.ObjectifiedFactType.Id = Me.FBMModelElement.Id Then
                                         Return True
                                     End If
                                 Else
@@ -1275,10 +1276,14 @@ Namespace RDS
                                     Return True
                                 End If
                         End Select
+                        'CodeSafe
+                        If lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable Is Me Then Return False
+
                         Return lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable.IsPartOfPrimarySubtypeRelationshipPath(arTable)
                     Next
                 End If
 
+                Return False
 
             Catch ex As Exception
                 Dim lsMessage As String

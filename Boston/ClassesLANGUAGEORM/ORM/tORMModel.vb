@@ -5444,7 +5444,7 @@ Namespace FBM
                         Dim lrXMLModel As New XMLModel.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
                         objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
+                        lrXMLModel.MapToFBMModel(Me, aoBackgroundWorker)
                 End Select
 
                 Me.Page.Select(Function(x)
@@ -5458,7 +5458,7 @@ Namespace FBM
                 'RDS
                 If (Me.ModelId <> "Core") And Me.HasCoreModel Then
                     Call Me.performCoreManagement()
-                    Call Me.PopulateRDSStructureFromCoreMDAElements()
+                    Call Me.PopulateRDSStructureFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 ElseIf (Me.ModelId <> "Core") Then
                     '==================================================
@@ -5494,7 +5494,7 @@ Namespace FBM
                     '==================================================
 
                     Call Me.createEntityRelationshipArtifacts()
-                    Call Me.PopulateRDSStructureFromCoreMDAElements()
+                    Call Me.PopulateRDSStructureFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 End If
 

@@ -1820,7 +1820,11 @@ Namespace FBM
 
         End Sub
 
-        Public Sub PopulateRDSStructureFromCoreMDAElements()
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="aoBackgroundWorker">To report progress. Start at 80%.</param>
+        Public Sub PopulateRDSStructureFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Try
                 Me.RDSLoading = True
@@ -1844,6 +1848,7 @@ Namespace FBM
                 Dim lsColumnName As String = ""
                 Dim lrResponsibleRole As FBM.Role
                 Dim lrActiveRole As FBM.Role
+                Dim liInd As Integer = 0 'For reporting progress on Tables loaded.
 
                 While Not lrORMRecordset.EOF
 #Region "Tables"
@@ -1885,6 +1890,7 @@ Namespace FBM
                 Dim larSortedTables = Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
 
                 For Each lrTable In larSortedTables
+
                     '==========================================================================================================
                     'Columns
                     lsSQLQuery = " SELECT *"
@@ -2046,10 +2052,14 @@ Namespace FBM
                             End Try
                         Next
                     End If
+
+                    If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(Viev.Lesser(99, 80 + CInt(19 * (liInd / larSortedTables.Count))))
+                    liInd += 1 'For reporting progress on Tables loaded.
                 Next
 
                 '==========================================================================================================
                 'Relations                
+
                 Call Me.populateRDSRelationsFromCoreMDAElements()
 
                 '==========================================================

@@ -3488,10 +3488,15 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub BackgroundWorkerModelLoader_ProgressChanged(ByVal sender As Object, ByVal e As System.ComponentModel.ProgressChangedEventArgs) Handles BackgroundWorkerModelLoader.ProgressChanged
 
+        'CodeSafe: Don't let a percentage get greater than 100
+        Dim liPercentage As Integer = Viev.Lesser(100, e.ProgressPercentage)
+
         Me.CircularProgressBar.Value = 0
-        Me.CircularProgressBar.Value = e.ProgressPercentage
-        Me.CircularProgressBar.Text = e.ProgressPercentage & "%"
+        Me.CircularProgressBar.Value = liPercentage
+        Me.CircularProgressBar.Text = liPercentage & "%"
         Me.CircularProgressBar.Invalidate()
+        Me.TreeView.Refresh()
+        Me.CircularProgressBar.Refresh()
         Me.Refresh()
 
     End Sub

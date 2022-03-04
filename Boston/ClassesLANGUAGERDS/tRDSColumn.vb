@@ -627,7 +627,12 @@ Namespace RDS
                         lrTable = Me.FactType.getCorrespondingRDSTable
                     Else
                         'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
-                        lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
+                        If Me.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                            lrTable = Me.Table
+                        Else
+                            lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
+                        End If
+
                     End If
 
                     If Not lrTable.IsPartOfPrimarySubtypeRelationshipPath(Me.Table) Then

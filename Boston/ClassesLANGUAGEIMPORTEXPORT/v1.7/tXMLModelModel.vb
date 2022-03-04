@@ -540,9 +540,12 @@ Namespace XMLModel
         ''' <summary>
         ''' Maps an instance of this class to an instance of FBM.Model
         ''' </summary>
+        ''' <param name="arModel">The FBM Model to map to.</param>
+        ''' <param name="aoBackgroundWorker">For reporting progress. Start at 60%.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function MapToFBMModel(Optional ByRef arModel As FBM.Model = Nothing) As FBM.Model
+        Public Function MapToFBMModel(Optional ByRef arModel As FBM.Model = Nothing,
+                                      Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing) As FBM.Model
 
             Try
 
@@ -596,6 +599,8 @@ Namespace XMLModel
                     lrModel.ValueType.Add(lrValueType)
                 Next
 
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(62)
+
                 '==============================
                 'Map the EntityTypes
                 '==============================
@@ -639,6 +644,8 @@ Namespace XMLModel
                     lrModel.EntityType.Add(lrEntityType)
                 Next
 
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(64)
+
                 '==============================
                 'Map the FactTypes
                 '==============================
@@ -651,6 +658,8 @@ Namespace XMLModel
                                                   lrXMLFactType.Id)
                     Call Me.GetFactTypeDetails(lrFactType, lrXMLFactType)
                 Next
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(66)
 
                 '===============================================================================================
                 'Populate Roles that are (still) joined to Nothing
@@ -872,6 +881,8 @@ Namespace XMLModel
                     Next
                 Next
 
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(68)
+
                 '-----------------------------------------------------------------------------
                 'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
                 '-----------------------------------------------------------------------------            
@@ -906,6 +917,8 @@ Namespace XMLModel
                     lrModel.AddModelNote(lrModelNote, False)
                 Next
 
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70)
+
                 '----------------------------------------------------------------------------------------------
                 'Reference any FactType.LinkFactTypeRole values that are NOTHING
                 Dim larFactType = From [FactType] In lrModel.FactType
@@ -920,7 +933,9 @@ Namespace XMLModel
                 '=====================
                 'Map the Pages
                 '=====================
-                Call Me.MapToFBMPages(lrModel)
+                Call Me.MapToFBMPages(lrModel, aoBackgroundWorker)
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
 
                 lrModel.Loaded = True
                 lrModel.LoadedFromXMLFile = True
@@ -939,11 +954,13 @@ Namespace XMLModel
 
         End Function
 
-        Public Sub MapToFBMPages(ByRef arModel As FBM.Model)
+        Public Sub MapToFBMPages(ByRef arModel As FBM.Model,
+                                 Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Dim lrPage As FBM.Page
             'Dim lrXMLPage As XMLModel.Page
             Dim lrModel As FBM.Model = arModel
+            Dim loBackgroundWorker As System.ComponentModel.BackgroundWorker = aoBackgroundWorker
             Try
                 'For Each lrXMLPage In Me.ORMDiagram
                 '    lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
@@ -964,7 +981,7 @@ Namespace XMLModel
                                      If lrPage Is Nothing Then
                                          lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
                                      Else
-                                         Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
+                                         Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker)
                                      End If
 
                                      lrPage.Loaded = True
@@ -987,7 +1004,8 @@ Namespace XMLModel
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
         Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
                                       ByRef arModel As FBM.Model,
-                                      Optional ByRef arPage As FBM.Page = Nothing) As FBM.Page
+                                      Optional ByRef arPage As FBM.Page = Nothing,
+                                      Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing) As FBM.Page
 
             Dim lsMessage As String
 
@@ -1275,6 +1293,8 @@ Namespace XMLModel
                     End Try
 
                 Next
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70 + CInt(9 * (arModel.Page.FindAll(Function(x) x.Loaded = True).Count / arModel.Page.Count)))
 
                 lrPage.Loaded = True
                 lrPage.Loaded = False
