@@ -157,6 +157,10 @@ Namespace FBM
                 Call Me.FactType.RemoveFromModel(True, False, True, True)
                 Call Me.Delete()
 
+                '-----------------------------------------------------------------------------------------------------
+                'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.
+                If Me.Model.StoreAsXML Then Me.Model.Save()
+
                 'RDS
                 Dim lrTable = CType(Me.ModelElement, FBM.EntityType).getCorrespondingRDSTable
 

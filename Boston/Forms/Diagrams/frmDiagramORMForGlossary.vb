@@ -5346,6 +5346,7 @@ Public Class frmDiagramORMForGlossary
                     If lrSubtypeRelationsipParent IsNot Nothing Then
                         Dim larSubtypeRelationhipChildren = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
                                                             From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
+                                                            Where SubtypeRelationshipInstance.parentModelElement IsNot Nothing
                                                             Where SubtypeRelationshipInstance.parentModelElement.Id = lrSubtypeRelationsipParent.Id
                                                             Select SubtypeRelationshipInstance.ModelElement
 
@@ -5967,68 +5968,79 @@ Public Class frmDiagramORMForGlossary
 
     Public Sub morph_to_ORM_diagram(ByVal sender As Object, ByVal e As EventArgs)
 
-        '-----------------------------------------------
-        'Get the Menu that just called this procedure.
-        '-----------------------------------------------
-        Dim item As ToolStripItem = CType(sender, ToolStripItem)
 
-        If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
-        If Me.zrPage.SelectedObject.Count > 1 Then Exit Sub
+        Try
+            '-----------------------------------------------
+            'Get the Menu that just called this procedure.
+            '-----------------------------------------------
+            Dim item As ToolStripItem = CType(sender, ToolStripItem)
 
-        '----------------------------------------------------------
-        'Diagram1 is on the HiddenDiagramView
-        '  Is a MindFusion Diagram on which the morphing is done.
-        '----------------------------------------------------------
-        Me.HiddenDiagram.Nodes.Clear()
-        Call Me.DiagramView.SendToBack()
-        Call Me.HiddenDiagramView.BringToFront()
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject.Count > 1 Then Exit Sub
 
-        Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
-        lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+            '----------------------------------------------------------
+            'Diagram1 is on the HiddenDiagramView
+            '  Is a MindFusion Diagram on which the morphing is done.
+            '----------------------------------------------------------
+            Me.HiddenDiagram.Nodes.Clear()
+            Call Me.DiagramView.SendToBack()
+            Call Me.HiddenDiagramView.BringToFront()
 
-        Dim lrShapeNode As ShapeNode
-        lrShapeNode = lrEntityTypeInstance.Shape.Clone(True)
+            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-        Me.MorphVector(0).Shape = lrShapeNode
-        Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
-        Me.HiddenDiagram.Invalidate()
+            Dim lrShapeNode As ShapeNode
+            lrShapeNode = New ShapeNode(lrEntityTypeInstance.Shape) '20220305-VM-Was lrEntityTypeInstance.Shape.Clone(True)
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
-            lrEnterpriseView = item.Tag
-            prApplication.WorkingPage = lrEnterpriseView.Tag
+            Me.MorphVector(0).Shape = lrShapeNode
+            Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
+            Me.HiddenDiagram.Invalidate()
 
-            '------------------------------------------------------------------
-            'Get the X,Y co-ordinates of the Actor/EntityType being morphed
-            '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
-            lr_page = lrEnterpriseView.Tag
-            Dim lrEntityTypeInstanceList = From EntityTypeInstance In lr_page.EntityTypeInstance _
-                                           Where EntityTypeInstance.Id = lrEntityTypeInstance.Id _
-                                           Select New FBM.EntityTypeInstance(lr_page.Model, _
-                                                                    pcenumLanguage.ORMModel, _
-                                                                    lrEntityTypeInstance.Name, _
-                                                                    True, _
-                                                                    EntityTypeInstance.X, _
-                                                                    EntityTypeInstance.Y)
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag
+                prApplication.WorkingPage = lrEnterpriseView.Tag
 
-            For Each lrEntityTypeInstance In lrEntityTypeInstanceList
-                Exit For
-            Next
+                '------------------------------------------------------------------
+                'Get the X,Y co-ordinates of the Actor/EntityType being morphed
+                '------------------------------------------------------------------
+                Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
+                lr_page = lrEnterpriseView.Tag
+                Dim lrEntityTypeInstanceList = From EntityTypeInstance In lr_page.EntityTypeInstance
+                                               Where EntityTypeInstance.Id = lrEntityTypeInstance.Id
+                                               Select New FBM.EntityTypeInstance(lr_page.Model,
+                                                                        pcenumLanguage.ORMModel,
+                                                                        lrEntityTypeInstance.Name,
+                                                                        True,
+                                                                        EntityTypeInstance.X,
+                                                                        EntityTypeInstance.Y)
 
-            Me.MorphTimer.Enabled = True
-            Me.MorphStepTimer.Enabled = True
-            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X, _
-                                                 Me.MorphVector(0).StartPoint.Y, _
-                                                 lrEntityTypeInstance.X, _
-                                                 lrEntityTypeInstance.Y, _
-                                                 40, _
-                                                 Me.MorphVector(0).Shape)
-            Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
-            Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
-            Me.MorphStepTimer.Start()
-            Me.MorphTimer.Start()
-        End If
+                For Each lrEntityTypeInstance In lrEntityTypeInstanceList
+                    Exit For
+                Next
+
+                Me.MorphTimer.Enabled = True
+                Me.MorphStepTimer.Enabled = True
+                Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X,
+                                                     Me.MorphVector(0).StartPoint.Y,
+                                                     lrEntityTypeInstance.X,
+                                                     lrEntityTypeInstance.Y,
+                                                     40,
+                                                     Me.MorphVector(0).Shape)
+                Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,, True)
+        End Try
 
     End Sub
 

@@ -117,6 +117,22 @@ Public Class frmGlossary
 
     End Sub
 
+    Public Sub FocusModelElement(ByRef arModelElement As FBM.ModelObject)
+
+        Try
+            Me.ListBox1.SelectedIndex = Me.ListBox1.Items.IndexOf(arModelElement.Id)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
 
         'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
@@ -363,46 +379,61 @@ Public Class frmGlossary
 
             If lsSelectedString <> "" Then
                 lrModelObject = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                Select Case zrModel.GetConceptTypeByNameFuzzy(lsSelectedString, lsSelectedString)
-                    Case Is = pcenumConceptType.EntityType
-                        Dim lrEntityType As FBM.EntityType
-                        lrEntityType = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                        Call Me.VerbaliseEntityType(lrEntityType)
 
-                    Case Is = pcenumConceptType.ValueType
-                        Dim lrValueType As FBM.ValueType
-                        lrValueType = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                        Call Me.VerbaliseValueType(lrValueType)
-
-                    Case Is = pcenumConceptType.FactType
-                        Dim lrFactType As FBM.FactType
-                        lrFactType = Me.zrModel.GetModelObjectByName(lsSelectedString)
-                        Call Me.VerbaliseFactType(lrFactType)
-                    Case Is = pcenumConceptType.GeneralConcept
-                        Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString)))
-                End Select
-
-                '-----------------------------------------------
-                If lrModelObject Is Nothing Then
-                    '-----------------------------------------------------------------
-                    'Clear the ORMDiagramView
-                    Me.zrFrmORMDiagramViewer.clear_diagram()
-
-                    '==============================================================
-                    Dim lrPropertyGridForm As frmToolboxProperties
-                    lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                    If IsSomething(lrPropertyGridForm) Then
-                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsSelectedString))
-                    End If
-                Else
-                    Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
-                End If
-
+                Call Me.DescribeModelElement(lrModelObject)
             End If
         End With
 
+    End Sub
+
+    Public Sub DescribeModelElement(ByVal arModelElement As FBM.ModelObject)
+
+        Try
+            Select Case zrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
+                Case Is = pcenumConceptType.EntityType
+                    Dim lrEntityType As FBM.EntityType
+                    lrEntityType = Me.zrModel.GetModelObjectByName(arModelElement.Id)
+                    Call Me.VerbaliseEntityType(lrEntityType)
+
+                Case Is = pcenumConceptType.ValueType
+                    Dim lrValueType As FBM.ValueType
+                    lrValueType = Me.zrModel.GetModelObjectByName(arModelElement.Id)
+                    Call Me.VerbaliseValueType(lrValueType)
+
+                Case Is = pcenumConceptType.FactType
+                    Dim lrFactType As FBM.FactType
+                    lrFactType = Me.zrModel.GetModelObjectByName(arModelElement.Id)
+                    Call Me.VerbaliseFactType(lrFactType)
+                Case Is = pcenumConceptType.GeneralConcept
+                    Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
+            End Select
+
+            '-----------------------------------------------
+            If arModelElement Is Nothing Then
+                '-----------------------------------------------------------------
+                'Clear the ORMDiagramView
+                Me.zrFrmORMDiagramViewer.clear_diagram()
+
+                '==============================================================
+                Dim lrPropertyGridForm As frmToolboxProperties
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                If IsSomething(lrPropertyGridForm) Then
+                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id))
+                End If
+            Else
+                Call Me.DisplayORMDiagramViewForModelObject(arModelElement)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub DisplayORMDiagramViewForModelObject(ByRef arModelObject As FBM.ModelObject)

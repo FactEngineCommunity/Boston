@@ -44,6 +44,7 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ViewInGlossaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -163,9 +164,9 @@ Partial Class frmToolboxModelDictionary
         '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 114)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 158)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -233,6 +234,12 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
         '
+        'ViewInGlossaryToolStripMenuItem
+        '
+        Me.ViewInGlossaryToolStripMenuItem.Name = "ViewInGlossaryToolStripMenuItem"
+        Me.ViewInGlossaryToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
+        Me.ViewInGlossaryToolStripMenuItem.Text = "View in &Glossary"
+        '
         'frmToolboxModelDictionary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -272,4 +279,5 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents ToolStripMenuItemViewInDiagramSpy As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemMakeNewPageForThisModelElement As ToolStripMenuItem
     Friend WithEvents PropertiesToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ViewInGlossaryToolStripMenuItem As ToolStripMenuItem
 End Class

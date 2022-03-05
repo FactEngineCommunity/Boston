@@ -97,6 +97,8 @@ Namespace FBM
         ''' </summary>
         Public IsDatabaseReservedWord As Boolean = False
 
+        Public Overridable Property IsMDAModelElement As Boolean
+
         ''' <summary>
         ''' Used only if the ModelElement is an EntityType. True if the EntityType is an ObjectifyingEntityType for an ObjectifiedFactType.
         ''' </summary>

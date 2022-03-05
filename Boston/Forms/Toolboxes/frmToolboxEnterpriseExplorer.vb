@@ -3528,15 +3528,19 @@ Public Class frmToolboxEnterpriseExplorer
         'CodeSafe: Don't let a percentage get greater than 100
         Dim liPercentage As Integer = Viev.Lesser(100, e.ProgressPercentage)
 
-        Me.CircularProgressBar.Value = 0
-        Me.CircularProgressBar.Value = liPercentage
-        Me.CircularProgressBar.Text = liPercentage & "%"
-        Me.CircularProgressBar.Invalidate()
-        Me.TreeView.Refresh()
-        Me.CircularProgressBar.Refresh()
-        Me.Refresh()
+        Me.Invoke(New Action(Sub()
+                                 Me.CircularProgressBar.Value = 0
+                                 Me.CircularProgressBar.Value = liPercentage
+                                 Me.CircularProgressBar.Text = liPercentage & "%"
+                                 Me.CircularProgressBar.Invalidate()
+                                 Me.TreeView.Refresh()
+                                 Me.CircularProgressBar.Refresh()
+                                 Me.Refresh()
+                             End Sub
+            ))
 
     End Sub
+
 
     Private Sub BackgroundWorkerModelLoader_RunWorkerCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles BackgroundWorkerModelLoader.RunWorkerCompleted
 

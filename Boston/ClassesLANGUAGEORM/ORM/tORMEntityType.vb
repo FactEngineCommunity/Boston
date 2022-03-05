@@ -29,8 +29,8 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _IsMDAModelElement As Boolean = False
-        <XmlAttribute()> _
-        Public Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
+        <XmlAttribute()>
+        Public Overrides Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
             Get
                 Return Me._IsMDAModelElement
             End Get
@@ -2121,6 +2121,10 @@ Namespace FBM
 
                 If abDoDatabaseProcessing Then
                     Call TableEntityType.DeleteEntityType(Me)
+
+                    '-----------------------------------------------------------------------------------------------------
+                    'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.
+                    If Me.Model.StoreAsXML Then Me.Model.Save()
                 End If
 
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship

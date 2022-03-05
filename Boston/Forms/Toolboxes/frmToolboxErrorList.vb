@@ -8,6 +8,7 @@ Public Class frmToolboxErrorList
 
     Private WithEvents HelpProvider As New System.Windows.Forms.HelpProvider
     Private ziSelectedErrorNumber As Integer = 0
+    Private mbShowCoreModelErrors As Boolean = False
 
     Private Sub frmToolboxErrorList_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
 
@@ -31,7 +32,12 @@ Public Class frmToolboxErrorList
     Sub SetupForm()
 
         Try
-            DataGrid_ErrorList.DataSource = Me.zrModel.ModelError
+            If mbShowCoreModelErrors Then
+                DataGrid_ErrorList.DataSource = Me.zrModel.ModelError
+            Else
+                DataGrid_ErrorList.DataSource = Me.zrModel.ModelError.FindAll(Function(x) x.ModelObject.IsMDAModelElement = False)
+            End If
+
             Me.cManager = CType(DataGrid_ErrorList.BindingContext(Me.zrModel.ModelError), CurrencyManager)
             Me.DataGrid_ErrorList.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             Me.DataGrid_ErrorList.Refresh()
@@ -229,8 +235,12 @@ Public Class frmToolboxErrorList
 
     Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
 
-        Call Me.zrModel.checkForErrors()
+        With New WaitCursor
 
+            RemoveHandler zrModel.ModelErrorAdded, AddressOf Me.zrModel_ModelErrorAdded
+            Call Me.zrModel.checkForErrors()
+            AddHandler zrModel.ModelErrorAdded, AddressOf Me.zrModel_ModelErrorAdded
+        End With
     End Sub
 
     Private Sub DataGrid_ErrorList_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGrid_ErrorList.CellClick
@@ -291,4 +301,30 @@ Public Class frmToolboxErrorList
 
     End Sub
 
+    Private Sub ShowCoreModelErrorsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemShowCoreModelErrors.Click
+
+        Me.ToolStripMenuItemShowCoreModelErrors.Checked = Not Me.ToolStripMenuItemShowCoreModelErrors.Checked
+
+        Me.mbShowCoreModelErrors = Me.ToolStripMenuItemShowCoreModelErrors.Checked
+
+    End Sub
+
+    Private Sub frmToolboxErrorList_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
+
+        Try
+            If e.Button = MouseButtons.Right Then
+                Me.ContextMenuStrip = ContextMenuStripShowCoreModelErrors
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
+    End Sub
 End Class

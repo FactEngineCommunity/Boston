@@ -2409,9 +2409,10 @@ Namespace FBM
 
             Try
                 If Me.Diagram IsNot Nothing Then
+
                     Me.Diagram.Nodes.Remove(arFactTypeInstance.Shape)
-                    Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeReadingShape.Shape)
-                    Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTable.TableShape)
+                    If arFactTypeInstance.FactTypeReadingShape IsNot Nothing Then Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeReadingShape.Shape)
+                    If arFactTypeInstance.FactTable IsNot Nothing Then Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTable.TableShape)
                     Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeNameShape)
                     'Derivation Text
                     If arFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
@@ -2471,6 +2472,10 @@ Namespace FBM
                 Me.Model.Page.Remove(Me)
 
                 TablePage.DeletePage(Me)
+
+                '-----------------------------------------------------------------------------------------------------
+                'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.
+                If Me.Model.StoreAsXML Then Me.Model.Save()
 
                 '------------------------------------------------------
                 'Remove the Page from the EnterpriseExplorer TreeView

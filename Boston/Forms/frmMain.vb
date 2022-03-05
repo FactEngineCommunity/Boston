@@ -1754,7 +1754,7 @@ Public Class frmMain
     ''' Loads the Glossary form within the main DockPanel
     ''' </summary>
     ''' <remarks></remarks>
-    Sub LoadGlossaryForm()
+    Sub LoadGlossaryForm(Optional arModelElement As FBM.ModelObject = Nothing)
 
         Dim child As New frmGlossary
 
@@ -1762,6 +1762,11 @@ Public Class frmMain
             Me.Cursor = Cursors.WaitCursor
 
             child.Show(DockPanel)
+
+            If arModelElement IsNot Nothing Then
+                child.FocusModelElement(arModelElement)
+                child.DescribeModelElement(arModelElement)
+            End If
 
             Me.Cursor = Cursors.Default
 

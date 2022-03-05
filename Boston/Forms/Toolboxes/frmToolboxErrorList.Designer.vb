@@ -37,8 +37,11 @@ Partial Class frmToolboxErrorList
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemShowInDiagram = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
+        Me.ContextMenuStripShowCoreModelErrors = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItemShowCoreModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.DataGrid_ErrorList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripHelp.SuspendLayout()
+        Me.ContextMenuStripShowCoreModelErrors.SuspendLayout()
         Me.SuspendLayout()
         '
         'DataGrid_ErrorList
@@ -86,6 +89,18 @@ Partial Class frmToolboxErrorList
         Me.ButtonRefresh.TabIndex = 2
         Me.ButtonRefresh.UseVisualStyleBackColor = True
         '
+        'ContextMenuStripShowCoreModelErrors
+        '
+        Me.ContextMenuStripShowCoreModelErrors.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemShowCoreModelErrors})
+        Me.ContextMenuStripShowCoreModelErrors.Name = "ContextMenuStripShowCoreModelErrors"
+        Me.ContextMenuStripShowCoreModelErrors.Size = New System.Drawing.Size(202, 48)
+        '
+        'ToolStripMenuItemShowCoreModelErrors
+        '
+        Me.ToolStripMenuItemShowCoreModelErrors.Name = "ToolStripMenuItemShowCoreModelErrors"
+        Me.ToolStripMenuItemShowCoreModelErrors.Size = New System.Drawing.Size(201, 22)
+        Me.ToolStripMenuItemShowCoreModelErrors.Text = "Show &Core Model errors"
+        '
         'frmToolboxErrorList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -99,6 +114,7 @@ Partial Class frmToolboxErrorList
         Me.Text = "Error List"
         CType(Me.DataGrid_ErrorList, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ContextMenuStripHelp.ResumeLayout(False)
+        Me.ContextMenuStripShowCoreModelErrors.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -107,4 +123,6 @@ Partial Class frmToolboxErrorList
     Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemShowInDiagram As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ButtonRefresh As Button
+    Friend WithEvents ContextMenuStripShowCoreModelErrors As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItemShowCoreModelErrors As ToolStripMenuItem
 End Class

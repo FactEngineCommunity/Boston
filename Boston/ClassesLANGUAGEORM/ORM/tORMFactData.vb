@@ -500,6 +500,10 @@ Namespace FBM
 
             If abDoDatabaseProcessing Then
                 TableFactData.DeleteFactData(Me)
+
+                '-----------------------------------------------------------------------------------------------------
+                'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.
+                If Me.Model.StoreAsXML Then Me.Model.Save()
             End If
 
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Data, pcenumConceptType.Value)

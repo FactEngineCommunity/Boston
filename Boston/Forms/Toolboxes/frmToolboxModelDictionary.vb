@@ -1199,4 +1199,25 @@ Public Class frmToolboxModelDictionary
         End Try
 
     End Sub
+
+    Private Sub ViewInGlossaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewInGlossaryToolStripMenuItem.Click
+
+        Try
+            Dim lrModelObject As FBM.ModelObject
+
+            If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
+
+            lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+
+            Call frmMain.LoadGlossaryForm(lrModelObject)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
 End Class

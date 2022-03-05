@@ -103,11 +103,11 @@ Partial Class frmLogin
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(406, 103)
-        Me.ControlBox = false
+        Me.ControlBox = False
         Me.Controls.Add(Me.button_cancel)
         Me.Controls.Add(Me.button_okay)
         Me.Controls.Add(Me.groupbox_main)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = false
         Me.MinimizeBox = false
         Me.Name = "frmLogin"
