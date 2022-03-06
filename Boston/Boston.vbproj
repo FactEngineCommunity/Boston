@@ -777,6 +777,9 @@
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker100PopulationUniquenessError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tModelValidator.vb" />
     <Compile Include="ClassesODBCDatabaseReverseEngineer\tODBCDatabaseReverseEngineer.vb" />
+    <Compile Include="ClassesOntology\tOntologyItem.vb" />
+    <Compile Include="ClassesOntology\tUnifiedOntologyModel.vb" />
+    <Compile Include="ClassesOntology\tUnifiedOntology.vb" />
     <Compile Include="ClassesParserFTR\TinyPG\tFTRParser.vb" />
     <Compile Include="ClassesParserFTR\TinyPG\tFTRParseTree.vb" />
     <Compile Include="ClassesParserFTR\TinyPG\tFTRScanner.vb" />
@@ -1319,6 +1322,12 @@
     <Compile Include="Forms\frmGenericSelect.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\frmUnifiedOntologyBrowser.Designer.vb">
+      <DependentUpon>frmUnifiedOntologyBrowser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmUnifiedOntologyBrowser.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmGlossary.Designer.vb">
       <DependentUpon>frmGlossary.vb</DependentUpon>
     </Compile>
@@ -1388,6 +1397,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNotifications.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProject.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectGroup.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableUnifiedOntologyModel.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUserRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUser.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectGroupPermission.vb" />
@@ -1402,6 +1412,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableORMJoinPathRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintArgument.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleValueConstraint.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableORMUnifiedOntology.vb" />
     <Compile Include="ModulesPublic\ClassDummyToolStripItem.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -2081,6 +2092,9 @@
     <EmbeddedResource Include="Forms\frmGenericSelect.resx">
       <DependentUpon>frmGenericSelect.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmUnifiedOntologyBrowser.resx">
+      <DependentUpon>frmUnifiedOntologyBrowser.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmGlossary.resx">
       <DependentUpon>frmGlossary.vb</DependentUpon>

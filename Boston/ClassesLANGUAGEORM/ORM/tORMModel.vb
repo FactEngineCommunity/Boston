@@ -2920,6 +2920,10 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Removes all components of the model from the Model (object) and from the databse. Preserves the actual Model object and database entry.
+        ''' </summary>
+        ''' <param name="abDatabaseOnly"></param>
         Public Sub RapidEmpty(Optional ByVal abDatabaseOnly As Boolean = False)
 
             Try
@@ -3820,7 +3824,9 @@ Namespace FBM
         ''' </summary>
         ''' <param name="abRapidSave"></param>        
         ''' <remarks></remarks>
-        Sub Save(Optional ByVal abRapidSave As Boolean = False, Optional abModelDictionaryRapidSave As Boolean = False)
+        Sub Save(Optional ByVal abRapidSave As Boolean = False,
+                 Optional ByVal abModelDictionaryRapidSave As Boolean = False,
+                 Optional ByVal abForceDatabaseSave As Boolean = False)
 
             '-------------------------------------------------------
             'Saves the currently loaded ORM model to the database
@@ -3856,7 +3862,7 @@ Namespace FBM
                     Call TableModel.add_model(Me)
                 End If
 
-                If Me.StoreAsXML Then
+                If Me.StoreAsXML And Not abForceDatabaseSave Then
                     Call Me.SaveToXMLDocument()
                 Else
                     Call Me.SaveToDatabase(abRapidSave, abModelDictionaryRapidSave)
@@ -5497,6 +5503,7 @@ Namespace FBM
                     Call Me.PopulateRDSStructureFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 End If
+
 
                 Me.IsDirty = False
                 '==================================================================================================

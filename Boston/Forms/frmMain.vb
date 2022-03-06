@@ -538,6 +538,7 @@ Public Class frmMain
                 Me.ToolStripMenuItemRecentNodes.Visible = False
                 Me.ToolStripSeparator10.Visible = False
                 Me.ToolStripSeparator5.Visible = False
+                Me.ToolStripMenuItemUnifiedOntologyBrowser.Visible = True
             ElseIf Not My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemUser.Visible = False
                 Me.ToolStripMenuItemProject.Visible = False
@@ -1747,6 +1748,37 @@ Public Class frmMain
             zfrmCodeGenerator = UI.MainForm
             Call zfrmCodeGenerator.Show(DockPanel)
         End If
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads the Glossary form within the main DockPanel
+    ''' </summary>
+    ''' <remarks></remarks>
+    Sub LoadUnifiedOntologyBrowser(Optional arModelElement As FBM.ModelObject = Nothing)
+
+        Dim child As New frmUnifiedOntologyBrowser
+
+        Try
+            Me.Cursor = Cursors.WaitCursor
+
+            child.Show(DockPanel)
+
+            If arModelElement IsNot Nothing Then
+                child.FocusModelElement(arModelElement)
+                child.DescribeModelElement(arModelElement)
+            End If
+
+            Me.Cursor = Cursors.Default
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

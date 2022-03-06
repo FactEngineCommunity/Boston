@@ -48,6 +48,8 @@ Public Class frmCRUDModel
         Me.CheckBoxSaveToXML.Checked = Me.zrModel.StoreAsXML
         AddHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
 
+        If Me.CheckBoxSaveToXML.Checked Then Me.ButtonReplaceDatabaseModel.Visible = True
+
     End Sub
 
     Private Sub frmCRUDModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -730,4 +732,33 @@ CouldntSaveToBostonDatabase:
 
     End Sub
 
+    Private Sub ButtonReplaceDatabaseModel_Click(sender As Object, e As EventArgs) Handles ButtonReplaceDatabaseModel.Click
+
+        Try
+            Dim lsMessage As String
+
+            lsMessage = "Are you sure you want to replace the database copy of the Model?"
+            lsMessage.AppendDoubleLineBreak("The Model is currently stored as XML. If you proceed a copy of the Model (in its current state) will be made to the Boston database.")
+            lsMessage.AppendDoubleLineBreak("There is no inherent risk in this action and copying the Model to the Boston database will give you a backup of the Model.")
+
+            If MsgBox(lsMessage, MsgBoxStyle.Information + MsgBoxStyle.YesNoCancel) = DialogResult.Yes Then
+
+                With New WaitCursor
+                    If Not Me.zrModel.Loaded Then Me.zrModel.Load(True, True, Nothing)
+                    Me.zrModel.RapidEmpty(True)
+                    Me.zrModel.Save(True, True, True)
+                End With
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

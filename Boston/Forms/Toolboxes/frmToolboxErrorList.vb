@@ -136,10 +136,10 @@ Public Class frmToolboxErrorList
 
             If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
                 ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
-                lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
+                lrModelError = Me.DataGrid_ErrorList.SelectedRows(0).DataBoundItem 'Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
             ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
                 ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
-                lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
+                lrModelError = Me.DataGrid_ErrorList.CurrentRow.DataBoundItem '.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
             Else
                 ziSelectedErrorNumber = 0
             End If
@@ -327,4 +327,6 @@ Public Class frmToolboxErrorList
 
 
     End Sub
+
+
 End Class

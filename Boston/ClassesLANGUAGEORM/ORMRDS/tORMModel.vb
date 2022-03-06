@@ -2069,7 +2069,10 @@ Namespace FBM
                     Call Me.PopulateSTMStructureFromCoreMDAElements()
                 End If
 
-                Me.RDSLoading = False
+                SyncLock Me
+                    Me.RDSLoading = False
+                End SyncLock
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String

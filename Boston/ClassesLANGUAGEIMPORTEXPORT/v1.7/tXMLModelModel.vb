@@ -944,7 +944,6 @@ Namespace XMLModel
                 'Map the Pages
                 '=====================
                 Call Me.MapToFBMPages(lrModel, aoBackgroundWorker)
-
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
 
                 lrModel.Loaded = True

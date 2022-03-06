@@ -73,6 +73,7 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.ButtonReplaceDatabaseModel = New System.Windows.Forms.Button()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -395,6 +396,7 @@ Partial Class frmCRUDModel
         '
         'Advanced
         '
+        Me.Advanced.Controls.Add(Me.ButtonReplaceDatabaseModel)
         Me.Advanced.Controls.Add(Me.CheckBoxSaveToXML)
         Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
         Me.Advanced.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
@@ -589,6 +591,16 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
+        'ButtonReplaceDatabaseModel
+        '
+        Me.ButtonReplaceDatabaseModel.Location = New System.Drawing.Point(179, 87)
+        Me.ButtonReplaceDatabaseModel.Name = "ButtonReplaceDatabaseModel"
+        Me.ButtonReplaceDatabaseModel.Size = New System.Drawing.Size(170, 23)
+        Me.ButtonReplaceDatabaseModel.TabIndex = 10
+        Me.ButtonReplaceDatabaseModel.Text = "&Update database copy of Model"
+        Me.ButtonReplaceDatabaseModel.UseVisualStyleBackColor = True
+        Me.ButtonReplaceDatabaseModel.Visible = False
+        '
         'frmCRUDModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -672,4 +684,5 @@ Partial Class frmCRUDModel
     Friend WithEvents LabelPromptPort As Label
     Friend WithEvents CheckBoxReverseEngineeringShowExtraInformation As CheckBox
     Friend WithEvents CheckBoxSaveToXML As CheckBox
+    Friend WithEvents ButtonReplaceDatabaseModel As Button
 End Class
