@@ -5165,11 +5165,31 @@ Namespace FBM
 
         End Sub
 
+        Public Sub LoadEntityTypesReferenceSchemeModelElements(ByRef arEntityType As FBM.EntityType)
+
+            Try
+                'CodeSafe
+                If arEntityType.PreferredIdentifierRCId Is Nothing Then Exit Sub
+
+                Call Me.LoadModelElementById(pcenumConceptType.RoleConstraint, arEntityType.PreferredIdentifierRCId)
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         ''' <summary>
         ''' Loads a ModelElement to the Model by its Id. Predominantly only used by the UnifiedOntologyBrowser which dynamically loads ModelElements to the Model.
         ''' </summary>
         ''' <param name="asModelElementId"></param>
-        Public Sub LoadModelElementById(ByVal aiConceptType As pcenumConceptType, ByVal asModelElementId As String)
+        Public Function LoadModelElementById(ByVal aiConceptType As pcenumConceptType, ByVal asModelElementId As String) As FBM.ModelObject
 
             Try
                 Select Case aiConceptType
@@ -5182,18 +5202,33 @@ Namespace FBM
 
                         lrValueType.Concept = lrDictionaryEntry.Concept
                         lrValueType.DBName = lrDictionaryEntry.DBName
+
+                        Return lrValueType
                     Case Is = pcenumConceptType.EntityType
                         Dim lrEntityType As New FBM.EntityType(Me, pcenumLanguage.ORMModel, asModelElementId, Nothing, True)
                         Me.EntityType.AddUnique(TableEntityType.GetEntityTypeDetails(lrEntityType))
+
+                        Call Me.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
+
+                        Call lrEntityType.SetReferenceModeObjects()
 
                         Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lrEntityType.Name, pcenumConceptType.EntityType)
                         lrDictionaryEntry = Me.AddModelDictionaryEntry(lrDictionaryEntry, True, False)
 
                         lrEntityType.Concept = lrDictionaryEntry.Concept
                         lrEntityType.DBName = lrDictionaryEntry.DBName
+
+                        Return lrEntityType
                     Case Is = pcenumConceptType.FactType
+                        Return Nothing
+                    Case Is = pcenumConceptType.RoleConstraint
+                        Dim lrRoleConstraint As New FBM.RoleConstraint(Me, asModelElementId, True)
+                        Call TableRoleConstraint.getAndLoadJoinedFactTypesByRoleConstraint(lrRoleConstraint)
+                        Me.RoleConstraint.AddUnique(TableRoleConstraint.getRoleConstraintDetailsByModel(lrRoleConstraint))
 
-
+                        Return lrRoleConstraint
+                    Case Else
+                        Return Nothing
                 End Select
 
             Catch ex As Exception
@@ -5203,9 +5238,11 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
             End Try
 
-        End Sub
+        End Function
 
         Public Sub LoadFromDatabase(Optional ByVal abLoadPages As Boolean = False,
                                     Optional ByVal abUseThreading As Boolean = True,

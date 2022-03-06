@@ -23,7 +23,6 @@ Partial Class frmUnifiedOntologyBrowser
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         Me.LabelOntologyName = New System.Windows.Forms.Label()
         Me.LabelPromptOntology = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
@@ -48,7 +47,6 @@ Partial Class frmUnifiedOntologyBrowser
         '
         'SplitContainer1.Panel1
         '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonGenerateHTMLGlossary)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelOntologyName)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelPromptOntology)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextBox1)
@@ -60,16 +58,6 @@ Partial Class frmUnifiedOntologyBrowser
         Me.SplitContainer1.Size = New System.Drawing.Size(884, 574)
         Me.SplitContainer1.SplitterDistance = 289
         Me.SplitContainer1.TabIndex = 0
-        '
-        'ButtonGenerateHTMLGlossary
-        '
-        Me.ButtonGenerateHTMLGlossary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.ButtonGenerateHTMLGlossary.Location = New System.Drawing.Point(12, 534)
-        Me.ButtonGenerateHTMLGlossary.Name = "ButtonGenerateHTMLGlossary"
-        Me.ButtonGenerateHTMLGlossary.Size = New System.Drawing.Size(141, 23)
-        Me.ButtonGenerateHTMLGlossary.TabIndex = 5
-        Me.ButtonGenerateHTMLGlossary.Text = "Generate &HTML Glossary"
-        Me.ButtonGenerateHTMLGlossary.UseVisualStyleBackColor = True
         '
         'LabelOntologyName
         '
@@ -103,9 +91,9 @@ Partial Class frmUnifiedOntologyBrowser
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ListBox1.FormattingEnabled = True
-        Me.ListBox1.Location = New System.Drawing.Point(12, 95)
+        Me.ListBox1.Location = New System.Drawing.Point(12, 69)
         Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(262, 433)
+        Me.ListBox1.Size = New System.Drawing.Size(262, 498)
         Me.ListBox1.Sorted = True
         Me.ListBox1.TabIndex = 0
         '
@@ -139,7 +127,7 @@ Partial Class frmUnifiedOntologyBrowser
         Me.ClientSize = New System.Drawing.Size(884, 574)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Name = "frmUnifiedOntologyBrowser"
-        Me.TabText = "Glossary"
+        Me.TabText = "Unified Ontology Browser"
         Me.Text = "Unified Ontology Browser"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.PerformLayout()
@@ -159,5 +147,4 @@ Partial Class frmUnifiedOntologyBrowser
     Friend WithEvents WebBrowser As System.Windows.Forms.WebBrowser
     Friend WithEvents LabelOntologyName As System.Windows.Forms.Label
     Friend WithEvents LabelPromptOntology As System.Windows.Forms.Label
-    Friend WithEvents ButtonGenerateHTMLGlossary As Button
 End Class

@@ -388,13 +388,28 @@ Public Class frmUnifiedOntologyBrowser
                             lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
 
                         Case Is = pcenumConceptType.EntityType
-                            Dim lrEntityType As New FBM.EntityType(lrModelDictionaryEntry.Model,
-                                                                   pcenumLanguage.ORMModel,
-                                                                   lrModelDictionaryEntry.Symbol,
-                                                                   Nothing,
-                                                                   True)
-                            Call TableEntityType.GetEntityTypeDetails(lrEntityType)
+                            Dim lrEntityType As FBM.EntityType
+
+                            lrEntityType = lrModelDictionaryEntry.Model.EntityType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
+
+                            If lrEntityType Is Nothing Then
+                                lrEntityType = New FBM.EntityType(lrModelDictionaryEntry.Model,
+                                                                  pcenumLanguage.ORMModel,
+                                                                  lrModelDictionaryEntry.Symbol,
+                                                                  Nothing,
+                                                                  True)
+                                lrEntityType.Model.EntityType.AddUnique(TableEntityType.GetEntityTypeDetails(lrEntityType))
+
+                                Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
+
+                                Call lrEntityType.SetReferenceModeObjects()
+                            End If
+
+
                             lrModelElement = lrEntityType
+
+                            'Load the related FactTypes.
+                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
                         Case Else
                             lrModelElement = Nothing
                     End Select
@@ -1092,44 +1107,6 @@ Public Class frmUnifiedOntologyBrowser
             zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
             zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         End If
-
-    End Sub
-
-    Private Sub ButtonGenerateHTMLGlossary_Click(sender As Object, e As EventArgs) Handles ButtonGenerateHTMLGlossary.Click
-
-        Dim loSaveFileDialog = New SaveFileDialog
-        Dim lrGlossaryMaker As New FBM.ORMGlossaryMaker
-
-        loSaveFileDialog.OverwritePrompt = True
-        loSaveFileDialog.Filter = "HTML File (*.html)|*.html"
-
-        If loSaveFileDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
-
-            Dim lsFileLocationName = loSaveFileDialog.FileName
-
-            Dim lsGlossaryHTML = lrGlossaryMaker.Create
-
-            Dim loStreamWriter As StreamWriter
-            loStreamWriter = My.Computer.FileSystem.OpenTextFileWriter(lsFileLocationName, False)
-            loStreamWriter.WriteLine(lsGlossaryHTML)
-            loStreamWriter.Close()
-
-            'Copy the glossaryfiles folder
-            Dim loComputer = New Microsoft.VisualBasic.Devices.Computer()
-            Try
-                loComputer.FileSystem.CreateDirectory(Path.GetDirectoryName(lsFileLocationName) & "\glossaryfiles")
-                loComputer.FileSystem.CopyDirectory(Richmond.MyPath & "\glossaryfiles", Path.GetDirectoryName(lsFileLocationName) & "\glossaryfiles", True)
-            Catch ex As Exception
-                MsgBox(ex.Message)
-            End Try
-
-            Me.WebBrowser.Navigate(lsFileLocationName)
-
-            'MsgBox(lsGlossaryHTML)
-
-        End If
-
-
 
     End Sub
 

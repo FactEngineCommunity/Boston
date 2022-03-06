@@ -1252,10 +1252,10 @@ Namespace FBM
 
                 For Each lrRole In larRole
                     Select Case lrRole.TypeOfJoin
-                        Case Is = pcenumRoleJoinType.EntityType
-                            lrRole.JoinedORMObject = Me.Model.EntityType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
                         Case Is = pcenumRoleJoinType.ValueType
                             lrRole.JoinedORMObject = Me.Model.ValueType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
+                        Case Is = pcenumRoleJoinType.EntityType
+                            lrRole.JoinedORMObject = Me.Model.EntityType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
                         Case Is = pcenumRoleJoinType.FactType
                             lrRole.JoinedORMObject = Me.Model.FactType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
                     End Select

@@ -1412,7 +1412,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableORMJoinPathRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleConstraintArgument.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableORMRoleValueConstraint.vb" />
-    <Compile Include="ModulesDatabaseTableFunctions\tableORMUnifiedOntology.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableUnifiedOntology.vb" />
     <Compile Include="ModulesPublic\ClassDummyToolStripItem.vb">
       <SubType>Component</SubType>
     </Compile>

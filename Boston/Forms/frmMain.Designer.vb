@@ -507,25 +507,25 @@ Partial Class frmMain
         'ToolStripMenuItemAddUser
         '
         Me.ToolStripMenuItemAddUser.Name = "ToolStripMenuItemAddUser"
-        Me.ToolStripMenuItemAddUser.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemAddUser.Size = New System.Drawing.Size(122, 22)
         Me.ToolStripMenuItemAddUser.Text = "&Add User"
         '
         'EditUserToolStripMenuItem
         '
         Me.EditUserToolStripMenuItem.Name = "EditUserToolStripMenuItem"
-        Me.EditUserToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.EditUserToolStripMenuItem.Size = New System.Drawing.Size(122, 22)
         Me.EditUserToolStripMenuItem.Text = "&Edit User"
         '
         'ToolStripSeparator7
         '
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-        Me.ToolStripSeparator7.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(119, 6)
         '
         'GroupToolStripMenuItem
         '
         Me.GroupToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddGroup, Me.ToolStripMenuItemEditGroup})
         Me.GroupToolStripMenuItem.Name = "GroupToolStripMenuItem"
-        Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(122, 22)
         Me.GroupToolStripMenuItem.Text = "&Group"
         '
         'ToolStripMenuItemAddGroup
@@ -543,13 +543,13 @@ Partial Class frmMain
         'ToolStripSeparator9
         '
         Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-        Me.ToolStripSeparator9.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator9.Size = New System.Drawing.Size(119, 6)
         '
         'ToolStripMenuItemRole
         '
         Me.ToolStripMenuItemRole.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddRoleToolStripMenuItem, Me.EditRoleToolStripMenuItem})
         Me.ToolStripMenuItemRole.Name = "ToolStripMenuItemRole"
-        Me.ToolStripMenuItemRole.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemRole.Size = New System.Drawing.Size(122, 22)
         Me.ToolStripMenuItemRole.Text = "&Role"
         '
         'AddRoleToolStripMenuItem
@@ -567,18 +567,18 @@ Partial Class frmMain
         'ToolStripSeparator15
         '
         Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
-        Me.ToolStripSeparator15.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator15.Size = New System.Drawing.Size(119, 6)
         '
         'LogOutToolStripMenuItem
         '
         Me.LogOutToolStripMenuItem.Name = "LogOutToolStripMenuItem"
-        Me.LogOutToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.LogOutToolStripMenuItem.Size = New System.Drawing.Size(122, 22)
         Me.LogOutToolStripMenuItem.Text = "&Log Out"
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(122, 22)
         '
         'ToolStripMenuItemProject
         '

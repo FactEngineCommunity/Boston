@@ -196,7 +196,8 @@ Namespace TableModelDictionary
 
         End Function
 
-        Public Function GetDictionaryEntriesByModel(ByVal ar_model As FBM.Model) As List(Of FBM.DictionaryEntry)
+        Public Function GetDictionaryEntriesByModel(ByVal ar_model As FBM.Model,
+                                                    Optional ByVal abIgnoreCoreMDAModelElements As Boolean = False) As List(Of FBM.DictionaryEntry)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
             Dim lsSQLQuery As String = ""
@@ -215,8 +216,36 @@ Namespace TableModelDictionary
                 'First get EntityTypes with no ParentEntityId
                 '---------------------------------------------
                 lsSQLQuery = " SELECT *"
-                lsSQLQuery &= "  FROM MetaModelModelDictionary MD"
-                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(ar_model.ModelId) & "'"
+                lsSQLQuery &= "  FROM MetaModelModelDictionary MDE"
+                lsSQLQuery &= " WHERE MDE.ModelId = '" & Trim(ar_model.ModelId) & "'"
+
+                If abIgnoreCoreMDAModelElements Then
+                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
+                    lsSQLQuery &= " SELECT ValueTypeId"
+                    lsSQLQuery &= "   FROM MetaModelValueType"
+                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
+                    lsSQLQuery &= "                       )"
+                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
+                    lsSQLQuery &= " SELECT EntityTypeId"
+                    lsSQLQuery &= "   FROM MetaModelEntityType"
+                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
+                    lsSQLQuery &= "                       )"
+                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
+                    lsSQLQuery &= " SELECT FactTypeId"
+                    lsSQLQuery &= "   FROM MetaModelFactType"
+                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
+                    lsSQLQuery &= "                       )"
+                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
+                    lsSQLQuery &= " SELECT ModelNoteId"
+                    lsSQLQuery &= "   FROM MetaModelModelNote"
+                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
+                    lsSQLQuery &= "                       )"
+                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
+                    lsSQLQuery &= " SELECT RoleConstraintId"
+                    lsSQLQuery &= "   FROM MetaModelRoleConstraint"
+                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
+                    lsSQLQuery &= "                       )"
+                End If
 
                 lREcordset.Open(lsSQLQuery)
 
@@ -277,9 +306,12 @@ Namespace TableModelDictionary
                 Return ar_model.ModelDictionary
 
             Catch ex As Exception
-                MsgBox("Error: GetConceptsByModel: " & ex.Message)
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                Return New List(Of FBM.DictionaryEntry)
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

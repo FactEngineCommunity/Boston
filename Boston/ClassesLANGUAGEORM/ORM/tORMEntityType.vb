@@ -91,8 +91,8 @@ Namespace FBM
         <XmlIgnore()> _
         Public WithEvents ReferenceModeValueType As FBM.ValueType = Nothing
 
-        <XmlIgnore()> _
-        Public _PreferredIdentifierRCId As String
+        <XmlIgnore()>
+        Public _PreferredIdentifierRCId As String = Nothing
         <XmlIgnore()> _
         Public Property PreferredIdentifierRCId() As String
             Get
