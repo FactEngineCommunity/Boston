@@ -22,6 +22,7 @@ Partial Class frmUnifiedOntologyBrowser
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.LabelOntologyName = New System.Windows.Forms.Label()
         Me.LabelPromptOntology = New System.Windows.Forms.Label()
@@ -29,6 +30,8 @@ Partial Class frmUnifiedOntologyBrowser
         Me.ListBox1 = New System.Windows.Forms.ListBox()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.ContextMenuStripModelElementPages = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -36,6 +39,7 @@ Partial Class frmUnifiedOntologyBrowser
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer2.Panel1.SuspendLayout()
         Me.SplitContainer2.SuspendLayout()
+        Me.ContextMenuStripModelElementPages.SuspendLayout()
         Me.SuspendLayout()
         '
         'SplitContainer1
@@ -120,6 +124,18 @@ Partial Class frmUnifiedOntologyBrowser
         Me.WebBrowser.Size = New System.Drawing.Size(591, 358)
         Me.WebBrowser.TabIndex = 2
         '
+        'ContextMenuStripModelElementPages
+        '
+        Me.ContextMenuStripModelElementPages.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage})
+        Me.ContextMenuStripModelElementPages.Name = "ContextMenuStripModelElementPages"
+        Me.ContextMenuStripModelElementPages.Size = New System.Drawing.Size(181, 48)
+        '
+        'ToolStripMenuItemViewOnPage
+        '
+        Me.ToolStripMenuItemViewOnPage.Name = "ToolStripMenuItemViewOnPage"
+        Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemViewOnPage.Text = "View on &Page..."
+        '
         'frmUnifiedOntologyBrowser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -137,6 +153,7 @@ Partial Class frmUnifiedOntologyBrowser
         Me.SplitContainer2.Panel1.ResumeLayout(False)
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer2.ResumeLayout(False)
+        Me.ContextMenuStripModelElementPages.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -147,4 +164,6 @@ Partial Class frmUnifiedOntologyBrowser
     Friend WithEvents WebBrowser As System.Windows.Forms.WebBrowser
     Friend WithEvents LabelOntologyName As System.Windows.Forms.Label
     Friend WithEvents LabelPromptOntology As System.Windows.Forms.Label
+    Friend WithEvents ContextMenuStripModelElementPages As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItemViewOnPage As ToolStripMenuItem
 End Class

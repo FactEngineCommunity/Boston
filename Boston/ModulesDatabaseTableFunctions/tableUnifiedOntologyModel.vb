@@ -88,6 +88,10 @@ Public Module tableUnifiedOntologyModel
 
                     larModel.Add(lrmodel)
                     arUnifiedOntology.Model.Add(lrModel)
+
+                    'Get the Pages for the Model (but don't load the Pages)
+                    TablePage.GetPagesByModel(lrModel, False)
+
                     lREcordset.MoveNext()
                 End While
             End If

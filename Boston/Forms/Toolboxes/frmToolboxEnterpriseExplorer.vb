@@ -80,6 +80,9 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    ''' <summary>
+    ''' Called from Timer
+    ''' </summary>
     Sub SetupForm()
 
         Dim loNode As TreeNode

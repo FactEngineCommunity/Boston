@@ -148,6 +148,114 @@ Namespace TableConceptInstance
 
         End Sub
 
+        Public Function getConceptInstancesByPage(ByRef arPage As FBM.Page) As List(Of FBM.ConceptInstance)
+
+            Dim larConceptInstance As New List(Of FBM.ConceptInstance)
+
+            Try
+                Dim lrConceptInstance As FBM.ConceptInstance
+                Dim lsSQLQuery As String = ""
+                Dim lREcordset As New ADODB.Recordset
+
+
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
+
+                lsSQLQuery = " SELECT ci.*"
+                lsSQLQuery &= "  FROM ModelConceptInstance ci"
+                lsSQLQuery &= " WHERE ci.PageId = '" & Trim(arPage.PageId) & "'"
+                lsSQLQuery &= "   AND ci.ModelId = '" & Trim(arPage.Model.ModelId) & "'"
+
+                lREcordset.Open(lsSQLQuery)
+
+                While Not lREcordset.EOF
+                    lrConceptInstance = New FBM.ConceptInstance(arPage.Model, arPage, lREcordset("Symbol").Value)
+                    lrConceptInstance.X = lREcordset("x").Value
+                    lrConceptInstance.Y = lREcordset("y").Value
+                    lrConceptInstance.Orientation = lREcordset("Orientation").Value
+                    lrConceptInstance.Visible = lREcordset("IsVisible").Value
+
+                    larConceptInstance.Add(lrConceptInstance)
+
+                    lREcordset.MoveNext()
+                End While
+
+                lREcordset.Close()
+
+                Return larConceptInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larConceptInstance
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Will return the Page from the Model, else new FBM.Page
+        ''' </summary>
+        ''' <param name="lrModelDictionaryEntry"></param>
+        ''' <returns></returns>
+        Public Function getPagesContainingDictionaryEntry(ByRef arModelDictionaryEntry As FBM.DictionaryEntry) As List(Of FBM.Page)
+
+            Dim larPage As New List(Of FBM.Page)
+            Try
+                Dim lrPage As FBM.Page
+                Dim lsSQLQuery As String = ""
+                Dim lREcordset As New ADODB.Recordset
+
+
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
+
+                lsSQLQuery = " SELECT ci.*, P.*"
+                lsSQLQuery &= "  FROM ModelConceptInstance ci,"
+                lsSQLQuery &= "       ModelPage P"
+                lsSQLQuery &= " WHERE ci.Symbol = '" & Trim(arModelDictionaryEntry.Symbol) & "'"
+                lsSQLQuery &= "   AND ci.ConceptType = '" & arModelDictionaryEntry.GetModelObjectConceptType.ToString & "'"
+                lsSQLQuery &= "   AND ci.ModelId = '" & Trim(arModelDictionaryEntry.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND ci.ModelId = P.ModelId"
+                lsSQLQuery &= "   AND ci.PageId = P.PageId"
+
+                lREcordset.Open(lsSQLQuery)
+
+                While Not lREcordset.EOF
+                    lrPage = New FBM.Page(arModelDictionaryEntry.Model, lREcordset("ci.PageId").Value, lREcordset("PageName").Value, pcenumLanguage.ORMModel)
+
+                    If arModelDictionaryEntry.Model.Page.Find(AddressOf lrPage.Equals) Is Nothing Then
+                        larPage.Add(lrPage)
+                    Else
+                        larPage.Add(lrPage.Model.Page.Find(AddressOf lrPage.Equals))
+                    End If
+
+                    lREcordset.MoveNext()
+                End While
+
+                lREcordset.Close()
+
+                Return larPage
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larPage
+
+            End Try
+
+        End Function
+
+
         Public Function ExistsConceptInstance(ByRef arConceptInstance As FBM.ConceptInstance,
                                               Optional ByVal abReturnExistingConceptInstance As Boolean = True) As Boolean
 

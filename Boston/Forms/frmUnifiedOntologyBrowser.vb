@@ -87,8 +87,9 @@ Public Class frmUnifiedOntologyBrowser
                                       Select ModelDictionaryEntry
                                       Order By ModelDictionaryEntry.Symbol Ascending
 
+        Dim lrComboBoxItem As tComboboxItem
         For Each lrModelDictionaryEntry In larModelDictionaryEntry
-            Dim lrComboBoxItem As New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry)
+            lrComboBoxItem = New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry)
             Me.ListBox1.Items.Add(lrComboBoxItem)
         Next
 
@@ -128,16 +129,20 @@ Public Class frmUnifiedOntologyBrowser
         'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
         '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
 
-        Dim items = From it In prApplication.WorkingModel.ModelDictionary
-                    Where it.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                    And (it.isEntityType Or it.isValueType)
+        Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
+                                 From DictionaryEntry In Model.ModelDictionary
+                                 Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                    And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
+                                 Select DictionaryEntry
 
         'Dim matchingItemList As List(Of Object) = items.ToList()
 
         ListBox1.BeginUpdate()
         ListBox1.Items.Clear()
-        For Each item In items 'matchingItemList
-            ListBox1.Items.Add(item.Symbol)
+        Dim lrComboBoxItem As tComboboxItem
+        For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
+            lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
+            ListBox1.Items.Add(lrComboBoxItem)
         Next
         ListBox1.EndUpdate()
 
@@ -1107,6 +1112,139 @@ Public Class frmUnifiedOntologyBrowser
             zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
             zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         End If
+
+    End Sub
+
+    Private Sub ListBox1_MouseDown(sender As Object, e As MouseEventArgs) Handles ListBox1.MouseDown
+
+        Try
+            If e.Button = MouseButtons.Right Then
+                Me.ListBox1.ContextMenuStrip = Me.ContextMenuStripModelElementPages
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ContextMenuStripModelElementPages_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripModelElementPages.Opening
+
+        Try
+            Dim larPage As New List(Of FBM.Page)
+            Dim lrModel As FBM.Model
+            Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Nothing
+            Dim loMenuOption As ToolStripItem
+
+            If Me.ListBox1.SelectedIndex >= 0 Then
+                lrModelDictionaryEntry = ListBox1.SelectedItem.Tag
+            Else
+                Exit Sub
+            End If
+
+            '--------------------------------------------------------------------------------
+            'Load the ORMDiagrams that relate to the ModelElement as selectable menuOptions
+            '--------------------------------------------------------------------------------
+            lrModel = lrModelDictionaryEntry.Model
+            Select Case lrModelDictionaryEntry.GetModelObjectConceptType
+                Case Is = pcenumConceptType.ValueType
+                Case Is = pcenumConceptType.EntityType
+                    Dim lrEntityType As New FBM.EntityType(lrModel, pcenumLanguage.ORMModel, lrModelDictionaryEntry.Symbol, Nothing, True)
+
+                    larPage = TableConceptInstance.getPagesContainingDictionaryEntry(lrModelDictionaryEntry)
+                    For Each lrPage In prApplication.CMML.getORMDiagramPagesForEntityType(lrEntityType)
+                        larPage.AddUnique(lrPage)
+                    Next
+                Case Is = pcenumConceptType.FactType
+            End Select
+
+            Me.ToolStripMenuItemViewOnPage.DropDownItems.Clear()
+            For Each lrPage In larPage
+                '----------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, 
+                '  they will not be in the TreeView and so a menuOption
+                '  is now added for those hidden Pages.
+                '----------------------------------------------------------
+                '---------------------------------------------------
+                'Add the Page(Name) to the MenuOption.DropDownItems
+                '---------------------------------------------------
+                loMenuOption = Me.ToolStripMenuItemViewOnPage.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
+                loMenuOption.Tag = lrPage
+                AddHandler loMenuOption.Click, AddressOf Me.OpenORMModelPage
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Public Sub OpenORMModelPage(ByVal sender As Object, ByVal e As EventArgs)
+
+        Try
+            Dim lrPage As FBM.Page
+
+            With New WaitCursor
+                '-----------------------------------------------
+                'Get the Menu that just called this procedure.
+                '-----------------------------------------------
+                Dim lrToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+
+                lrPage = lrToolStripItem.Tag
+                prApplication.WorkingPage = lrPage
+
+                If Not lrPage.Loaded Then
+                    Call lrPage.Model.loadModelLevelModelElementsForPage(lrPage)
+                    Call lrPage.Load(True)
+                End If
+
+                Try
+                    If lrPage.FormLoaded Then
+                        '-------------------------------------------------------------------
+                        'The Page has already been loaded for Editing
+                        '  Set the ZOrder of the Form on which the Page is loaded to OnTop
+                        '-------------------------------------------------------------------
+                        lrPage.Form.BringToFront() 'Can put ModelElement to be focused here as parameter.
+                    Else
+                        '--------------------------------------------------------------------------------------------------
+                        'Add the Page to the Model.
+                        '  NB The Model is loaded when the User clicks on the Model in the TreeView, so is already loaded.
+                        '--------------------------------------------------------------------------------------------------  
+                        Select Case lrPage.Language
+                            Case Is = pcenumLanguage.ORMModel
+                                Call frmMain.loadORMModelPage(lrPage, Nothing)
+                        End Select
+
+                    End If
+                Catch ex As Exception
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End Try
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

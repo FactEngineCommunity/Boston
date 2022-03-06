@@ -214,37 +214,22 @@ Namespace TableModelDictionary
             Try
                 '---------------------------------------------
                 'First get EntityTypes with no ParentEntityId
-                '---------------------------------------------
-                lsSQLQuery = " SELECT *"
-                lsSQLQuery &= "  FROM MetaModelModelDictionary MDE"
-                lsSQLQuery &= " WHERE MDE.ModelId = '" & Trim(ar_model.ModelId) & "'"
-
+                '--------------------------------------------
                 If abIgnoreCoreMDAModelElements Then
-                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
-                    lsSQLQuery &= " SELECT ValueTypeId"
-                    lsSQLQuery &= "   FROM MetaModelValueType"
-                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
-                    lsSQLQuery &= "                       )"
-                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
-                    lsSQLQuery &= " SELECT EntityTypeId"
-                    lsSQLQuery &= "   FROM MetaModelEntityType"
-                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
-                    lsSQLQuery &= "                       )"
-                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
-                    lsSQLQuery &= " SELECT FactTypeId"
-                    lsSQLQuery &= "   FROM MetaModelFactType"
-                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
-                    lsSQLQuery &= "                       )"
-                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
-                    lsSQLQuery &= " SELECT ModelNoteId"
-                    lsSQLQuery &= "   FROM MetaModelModelNote"
-                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
-                    lsSQLQuery &= "                       )"
-                    lsSQLQuery &= " AND MDE.Symbol NOT IN ("
-                    lsSQLQuery &= " SELECT RoleConstraintId"
-                    lsSQLQuery &= "   FROM MetaModelRoleConstraint"
-                    lsSQLQuery &= "  WHERE IsMDAModelElement = True"
-                    lsSQLQuery &= "                       )"
+                    lsSQLQuery = "SELECT MD.*"
+                    lsSQLQuery &= " FROM MetaModelModelDictionary As MD"
+                    lsSQLQuery &= " Left Join"
+                    lsSQLQuery &= "         ("
+                    lsSQLQuery &= "             Select Symbol"
+                    lsSQLQuery &= "             From MDACoreModelElementsModelDictionary "
+                    lsSQLQuery &= "         ) AS MDA"
+                    lsSQLQuery &= "    On MD.Symbol = MDA.Symbol"
+                    lsSQLQuery &= " WHERE ModelId = '" & ar_model.ModelId & "'"
+                    lsSQLQuery &= " AND MDA.Symbol IS NULL"
+                Else
+                    lsSQLQuery = " SELECT *"
+                    lsSQLQuery &= "  FROM MetaModelModelDictionary MDE"
+                    lsSQLQuery &= " WHERE MDE.ModelId = '" & Trim(ar_model.ModelId) & "'"
                 End If
 
                 lREcordset.Open(lsSQLQuery)

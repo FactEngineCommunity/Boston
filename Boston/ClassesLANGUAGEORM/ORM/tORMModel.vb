@@ -3879,7 +3879,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SaveToDatabase(Optional ByVal abRapidSave As Boolean = False, Optional abModelDictionaryRapidSave As Boolean = False)
+        Public Sub SaveToDatabase(Optional ByVal abRapidSave As Boolean = False,
+                                  Optional abModelDictionaryRapidSave As Boolean = False)
 
             Try
                 '--------------------------------------------------
@@ -3934,8 +3935,8 @@ Namespace FBM
 
                 Richmond.WriteToStatusBar("Saving Pages",, 60)
                 For Each lrPage In Me.Page
-                    If lrPage.IsDirty Then
-                        lrPage.Save(abRapidSave)
+                    If lrPage.IsDirty Or abRapidSave Then
+                        lrPage.Save(abRapidSave, False, True)
                     End If
                 Next
 
@@ -4445,7 +4446,8 @@ Namespace FBM
         End Function
 
 
-        Public Function GetModelObjectByName(ByVal asModelObjectName As String) As FBM.ModelObject
+        Public Function GetModelObjectByName(ByVal asModelObjectName As String,
+                                             Optional abIgnoreErrorIfNotInModel As Boolean = False) As FBM.ModelObject
 
             Dim lrValueType As FBM.ValueType
             Dim lrEntityType As FBM.EntityType
@@ -4469,6 +4471,8 @@ Namespace FBM
                             Return Me.FactType.Find(Function(x) x.Id = lsModelObjectName)
                         ElseIf lrDictionaryEntry.isRoleConstraint Then
                             Return Me.RoleConstraint.Find(Function(x) x.Id = lsModelObjectName)
+                        ElseIf abIgnoreErrorIfNotInModel Then
+                            Return Nothing
                         Else
                             Dim lsMessage As String = ""
                             lsMessage = "Model Element doesn't actually exist in the Model. Only in the ModelDictionary: '" & lsModelObjectName & "'"
@@ -5192,6 +5196,12 @@ Namespace FBM
         Public Function LoadModelElementById(ByVal aiConceptType As pcenumConceptType, ByVal asModelElementId As String) As FBM.ModelObject
 
             Try
+                'CodeSafe: Check if already loaded.
+                Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(asModelElementId, True)
+                If lrModelElement IsNot Nothing Then
+                    Return lrModelElement
+                End If
+
                 Select Case aiConceptType
                     Case Is = pcenumConceptType.ValueType
                         Dim lrValueType As New FBM.ValueType(Me, pcenumLanguage.ORMModel, asModelElementId, asModelElementId)
@@ -5220,7 +5230,9 @@ Namespace FBM
 
                         Return lrEntityType
                     Case Is = pcenumConceptType.FactType
-                        Return Nothing
+                        Dim lrFactType As New FBM.FactType(Me, asModelElementId, True)
+                        TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
+
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As New FBM.RoleConstraint(Me, asModelElementId, True)
                         Call TableRoleConstraint.getAndLoadJoinedFactTypesByRoleConstraint(lrRoleConstraint)
@@ -5243,6 +5255,37 @@ Namespace FBM
             End Try
 
         End Function
+
+        ''' <summary>
+        ''' PRECONDITION: ModelDictionary is loaded for the Page.
+        ''' </summary>
+        ''' <param name="arPage">The Page for which the Model level ModelElements are to be loaded into the Model.</param>
+        Public Sub loadModelLevelModelElementsForPage(ByRef arPage As FBM.Page)
+
+            Try
+                Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+                Dim lrModelElement As FBM.ModelObject
+
+                For Each lrConceptInstance In TableConceptInstance.getConceptInstancesByPage(arPage)
+
+                    lrModelDictionaryEntry = arPage.Model.ModelDictionary.Find(Function(x) x.Symbol = lrConceptInstance.Symbol)
+                    lrModelElement = arPage.getModelElementById(lrModelDictionaryEntry.Symbol)
+
+                    If lrModelElement Is Nothing Then
+                        Call Me.LoadModelElementById(lrModelDictionaryEntry.GetModelObjectConceptType, lrModelDictionaryEntry.Symbol)
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Sub LoadFromDatabase(Optional ByVal abLoadPages As Boolean = False,
                                     Optional ByVal abUseThreading As Boolean = True,

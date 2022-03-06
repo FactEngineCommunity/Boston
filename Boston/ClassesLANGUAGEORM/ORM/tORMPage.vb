@@ -2046,7 +2046,7 @@ Namespace FBM
         ''' NB Is used in threading load of Model 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overloads Sub Load(ByVal abAddToModel As Object)
+        Public Overloads Sub Load(ByVal abAddToModel As Boolean)
             '-------------------------------------
             'Loads an ORM model from the database
             '-------------------------------------
@@ -2696,7 +2696,9 @@ Namespace FBM
         ''' </summary>
         ''' <param name="abRapidSave">True if Page is new to the database, else False</param>
         ''' <remarks></remarks>
-        Public Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False, Optional ByVal abSaveModel As Boolean = True)
+        Public Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False,
+                                  Optional ByVal abSaveModel As Boolean = True,
+                                  Optional ByVal abForceSaveToDatabase As Boolean = False)
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrValueTypeInstance As FBM.ValueTypeInstance
@@ -2721,13 +2723,13 @@ Namespace FBM
                     Call Me.Model.Save()
                 End If
 
-                If Me.IsDirty = False Then Exit Sub
+                If Me.IsDirty = False And Not abRapidSave Then Exit Sub
 
                 'CMML
                 Call Me.performCMMLPreSaveProcessing()
 
                 'No need for further processing if Model is stored to XML
-                If Me.Model.StoreAsXML Then Exit Sub
+                If Me.Model.StoreAsXML And Not abForceSaveToDatabase Then Exit Sub
 
                 '----------------------------------------------
                 'First, check to see if the Page itself exists

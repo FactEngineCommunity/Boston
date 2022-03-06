@@ -6,23 +6,34 @@ Public Class tCMML
 
     Public Function getORMDiagramPagesForEntityType(ByVal arEntityType As FBM.EntityType) As List(Of FBM.Page)
 
-        GetORMDiagramPagesForEntityType = New List(Of FBM.Page)
+        Try
+            getORMDiagramPagesForEntityType = New List(Of FBM.Page)
 
-        Dim lrModel As FBM.Model
-        Dim lrPage As FBM.Page
+            Dim lrModel As FBM.Model
+            Dim lrPage As FBM.Page
 
-        lrModel = arEntityType.Model
+            lrModel = arEntityType.Model
 
-        Dim larPage = From Page In lrModel.Page _
-                     From EntityTypeInstance In Page.EntityTypeInstance _
-                     Where Page.Language = pcenumLanguage.ORMModel _
-                     And EntityTypeInstance.EntityType.Id = arEntityType.Id _
-                     Select Page Distinct _
-                     Order By Page.Name
+            Dim larPage = From Page In lrModel.Page
+                          From EntityTypeInstance In Page.EntityTypeInstance
+                          Where Page.Language = pcenumLanguage.ORMModel
+                          Where EntityTypeInstance.EntityType IsNot Nothing
+                          Where EntityTypeInstance.EntityType.Id = arEntityType.Id
+                          Select Page Distinct
+                          Order By Page.Name
 
-        For Each lrPage In larPage
-            GetORMDiagramPagesForEntityType.Add(lrPage)
-        Next
+            For Each lrPage In larPage
+                GetORMDiagramPagesForEntityType.Add(lrPage)
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True,, True)
+        End Try
 
     End Function
 

@@ -96,6 +96,7 @@ Namespace TablePage
 
         End Function
 
+
         Public Function GetPageCountByModel(ByVal as_ModelId As String, Optional ByVal abIncludeCorePages As Boolean = False)
 
             Dim lsSQLQuery As String = ""

@@ -257,41 +257,44 @@ Namespace TableFactType
                         '----------------------------------------------
                         TableFact.GetFactsForFactType(arFactType)
 
-                        '---------------------------------------------
-                        'ObjectifyingEntityType
-                        '---------------------------------------------
-                        If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
-                            arFactType.ObjectifyingEntityType = Nothing
+                    '---------------------------------------------
+                    'ObjectifyingEntityType
+                    '---------------------------------------------
+                    If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
+                        arFactType.ObjectifyingEntityType = Nothing
+                    Else
+                        Dim lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
+                        arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
+                        If arFactType.ObjectifyingEntityType IsNot Nothing Then
+                            '---------------------------------------------
+                            'Okay, have found the ObjectifyingEntityType
+                            '---------------------------------------------
+                            arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                            arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                        ElseIf arFactType.ObjectifiedFactType Is Nothing And abDynamicallyLoadRelatedModelElements Then
+                            arFactType.ObjectifyingEntityType = arFactType.Model.LoadModelElementById(pcenumConceptType.EntityType, lsEntityTypeId)
+                            arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                            arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
                         Else
-                            Dim lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
-                            arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
-                            If arFactType.ObjectifyingEntityType IsNot Nothing Then
-                                '---------------------------------------------
-                                'Okay, have found the ObjectifyingEntityType
-                                '---------------------------------------------
-                                arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                                arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
-                                arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
-                            Else
-                                lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                                lsMessage &= vbCrLf & vbCrLf & "Creating one. Save the Model after loading."
+                            lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
+                            lsMessage &= vbCrLf & vbCrLf & "Creating one. Save the Model after loading."
 
-                                lsMessage &= vbCrLf & vbCrLf & "ModelId: " & arFactType.Model.ModelId
-                                lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
-                                lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+                            lsMessage &= vbCrLf & vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                            lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
+                            lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
 
-                                Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True)
-                                lrEntityType.IsObjectifyingEntityType = True
-                                lrEntityType.ObjectifiedFactType = arFactType
-                                arFactType.Model.IsDirty = True
+                            Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True)
+                            lrEntityType.IsObjectifyingEntityType = True
+                            lrEntityType.ObjectifiedFactType = arFactType
+                            arFactType.Model.IsDirty = True
 
-                                lREcordset.Close()
-                                Throw New Exception(lsMessage)
-                            End If
+                            lREcordset.Close()
+                            Throw New Exception(lsMessage)
                         End If
 
+                    End If
 
-                    Else
+                Else
                         lsMessage = "Error: No FactType exists in the database for FactType.Id: " & arFactType.Id
                         Throw New System.Exception(lsMessage)
                     End If
