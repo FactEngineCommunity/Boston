@@ -1755,13 +1755,15 @@ Public Class frmMain
     ''' Loads the Glossary form within the main DockPanel
     ''' </summary>
     ''' <remarks></remarks>
-    Sub LoadUnifiedOntologyBrowser(Optional arModelElement As FBM.ModelObject = Nothing)
+    Sub LoadUnifiedOntologyBrowser(ByRef arUnifedOntology As Ontology.UnifiedOntology,
+                                   Optional arModelElement As FBM.ModelObject = Nothing)
 
         Dim child As New frmUnifiedOntologyBrowser
 
         Try
             Me.Cursor = Cursors.WaitCursor
 
+            child.zrUnifiedOntology = arUnifedOntology
             child.Show(DockPanel)
 
             If arModelElement IsNot Nothing Then
@@ -4496,4 +4498,43 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub ToolStripMenuItemUnifiedOntologyBrowser_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemUnifiedOntologyBrowser.Click
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection()
+            Dim lrUnifiedOntology As New Ontology.UnifiedOntology
+
+            Dim lsWhereClause As String = ""
+
+            If Richmond.DisplayGenericSelectForm(lrGenericSelection,
+                                               "Unified Ontology",
+                                               "UnifiedOntology",
+                                               "UnifiedOntologyName",
+                                               "Id",
+                                               lsWhereClause,
+                                               Nothing,
+                                               pcenumComboBoxStyle.DropdownList,
+                                               "1",
+                                               1,
+                                               "120",
+                                               "Unified Ontology Name") = Windows.Forms.DialogResult.OK Then
+
+
+                lrUnifiedOntology.Id = lrGenericSelection.SelectValue
+                Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+
+                Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

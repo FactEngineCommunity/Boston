@@ -485,6 +485,20 @@ Namespace FBM
             Return Me.ConceptType
         End Function
 
+        Public Function GetModelObjectConceptType() As pcenumConceptType
+
+            If Me.isValueType Then
+                Return pcenumConceptType.ValueType
+            ElseIf Me.isFactType Then
+                'Before EntityType because eventually ModelDictionary entries will have IsFatType and IsEntityType as True for ObjectifiedFactTypes
+                Return pcenumConceptType.FactType
+            ElseIf Me.isEntityType Then
+                Return pcenumConceptType.EntityType
+            ElseIf Me.isRoleConstraint Then
+                Return pcenumConceptType.RoleConstraint
+            End If
+        End Function
+
         ''' <summary>
         ''' Returns TRUE if the DictionaryEntry is only of ConceptType, "GeneralConcept" and no other ConceptType, else returns FALSE
         ''' </summary>

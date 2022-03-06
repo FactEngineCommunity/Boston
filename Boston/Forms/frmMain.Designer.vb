@@ -78,6 +78,7 @@ Partial Class frmMain
         Me.StatusBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemUnifiedOntologyBrowser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemBoston = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigurationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator14 = New System.Windows.Forms.ToolStripSeparator()
@@ -148,7 +149,6 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
-        Me.ToolStripMenuItemUnifiedOntologyBrowser = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -420,6 +420,12 @@ Partial Class frmMain
         Me.ToolStripMenuItemDiagramSpy.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemDiagramSpy.Text = "&Diagram Spy"
         '
+        'ToolStripMenuItemUnifiedOntologyBrowser
+        '
+        Me.ToolStripMenuItemUnifiedOntologyBrowser.Name = "ToolStripMenuItemUnifiedOntologyBrowser"
+        Me.ToolStripMenuItemUnifiedOntologyBrowser.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemUnifiedOntologyBrowser.Text = "&Unified Ontology Browser"
+        '
         'ToolStripMenuItemBoston
         '
         Me.ToolStripMenuItemBoston.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConfigurationToolStripMenuItem, Me.ToolStripSeparator14, Me.PluginViewerToolStripMenuItem, Me.ToolStripSeparator2, Me.DatabaseToolStripMenuItem, Me.LogFileToolStripMenuItem})
@@ -501,25 +507,25 @@ Partial Class frmMain
         'ToolStripMenuItemAddUser
         '
         Me.ToolStripMenuItemAddUser.Name = "ToolStripMenuItemAddUser"
-        Me.ToolStripMenuItemAddUser.Size = New System.Drawing.Size(122, 22)
+        Me.ToolStripMenuItemAddUser.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemAddUser.Text = "&Add User"
         '
         'EditUserToolStripMenuItem
         '
         Me.EditUserToolStripMenuItem.Name = "EditUserToolStripMenuItem"
-        Me.EditUserToolStripMenuItem.Size = New System.Drawing.Size(122, 22)
+        Me.EditUserToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.EditUserToolStripMenuItem.Text = "&Edit User"
         '
         'ToolStripSeparator7
         '
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-        Me.ToolStripSeparator7.Size = New System.Drawing.Size(119, 6)
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(177, 6)
         '
         'GroupToolStripMenuItem
         '
         Me.GroupToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddGroup, Me.ToolStripMenuItemEditGroup})
         Me.GroupToolStripMenuItem.Name = "GroupToolStripMenuItem"
-        Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(122, 22)
+        Me.GroupToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.GroupToolStripMenuItem.Text = "&Group"
         '
         'ToolStripMenuItemAddGroup
@@ -537,13 +543,13 @@ Partial Class frmMain
         'ToolStripSeparator9
         '
         Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-        Me.ToolStripSeparator9.Size = New System.Drawing.Size(119, 6)
+        Me.ToolStripSeparator9.Size = New System.Drawing.Size(177, 6)
         '
         'ToolStripMenuItemRole
         '
         Me.ToolStripMenuItemRole.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddRoleToolStripMenuItem, Me.EditRoleToolStripMenuItem})
         Me.ToolStripMenuItemRole.Name = "ToolStripMenuItemRole"
-        Me.ToolStripMenuItemRole.Size = New System.Drawing.Size(122, 22)
+        Me.ToolStripMenuItemRole.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemRole.Text = "&Role"
         '
         'AddRoleToolStripMenuItem
@@ -561,18 +567,18 @@ Partial Class frmMain
         'ToolStripSeparator15
         '
         Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
-        Me.ToolStripSeparator15.Size = New System.Drawing.Size(119, 6)
+        Me.ToolStripSeparator15.Size = New System.Drawing.Size(177, 6)
         '
         'LogOutToolStripMenuItem
         '
         Me.LogOutToolStripMenuItem.Name = "LogOutToolStripMenuItem"
-        Me.LogOutToolStripMenuItem.Size = New System.Drawing.Size(122, 22)
+        Me.LogOutToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.LogOutToolStripMenuItem.Text = "&Log Out"
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(122, 22)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         '
         'ToolStripMenuItemProject
         '
@@ -894,12 +900,6 @@ Partial Class frmMain
         'TimerNotifications
         '
         Me.TimerNotifications.Interval = 5000
-        '
-        'ToolStripMenuItemUnifiedOntologyBrowser
-        '
-        Me.ToolStripMenuItemUnifiedOntologyBrowser.Name = "ToolStripMenuItemUnifiedOntologyBrowser"
-        Me.ToolStripMenuItemUnifiedOntologyBrowser.Size = New System.Drawing.Size(210, 22)
-        Me.ToolStripMenuItemUnifiedOntologyBrowser.Text = "&Unified Ontology Browser"
         '
         'frmMain
         '

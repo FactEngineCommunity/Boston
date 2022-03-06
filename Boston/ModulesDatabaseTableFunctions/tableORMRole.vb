@@ -103,8 +103,9 @@ Namespace TableRole
 
         End Function
 
-        Public Function GetRolesForModelFactType(ByRef arFactType As FBM.FactType, _
-                                                 Optional ByVal abAddToModel As Boolean = False) As List(Of FBM.Role)
+        Public Function GetRolesForModelFactType(ByRef arFactType As FBM.FactType,
+                                                 Optional ByVal abAddToModel As Boolean = False,
+                                                 Optional ByVal abSkipJoiningRoles As Boolean = False) As List(Of FBM.Role)
             '--------------------------------------------------------------------------------
             ' 
             'PRECONDITIONS
@@ -146,9 +147,23 @@ Namespace TableRole
                         lrRole.Name = Viev.NullVal(lREcordset("RoleName").Value, "")
                         lrRole.SequenceNr = lREcordset("SequenceNr").Value
                         lrRole.FactType = arFactType
-                        prApplication.ThrowErrorMessage("GetRolesForModelFactType: Loading Role: '" & lrRole.Id & "' for FactType: '" & lrRole.FactType.Id & "' for Model: '" & lrRole.Model.ModelId & "'", pcenumErrorType.Information)
 
                         lsId = Trim(Viev.NullVal(lREcordset("JoinsModelElementId").Value, ""))
+                        lrRole.JoinsModelElementId = lsId
+
+                        If abSkipJoiningRoles Then
+                            'Should only be called when loading ModelElements and related FactTypes in the UnifiedOntologyBrowser.
+                            Select Case lREcordset("TypeOfJoin").Value
+                                Case Is = pcenumRoleJoinType.EntityType
+                                    lrRole._TypeOfJoin = pcenumRoleJoinType.EntityType
+                                Case Is = pcenumRoleJoinType.ValueType
+                                    lrRole._TypeOfJoin = pcenumRoleJoinType.ValueType
+                                Case Is = pcenumRoleJoinType.FactType
+                                    lrRole._TypeOfJoin = pcenumRoleJoinType.FactType
+                            End Select
+                            lrRole.JoinedORMObject = Nothing
+                            GoTo SkipJoiningRole 'As used by UnifiedOntologyBrowser. Dynamically loads ModelElements into Model.
+                        End If
 
                         Select Case lREcordset("TypeOfJoin").Value
                             Case Is = pcenumRoleJoinType.EntityType
@@ -219,7 +234,7 @@ Namespace TableRole
                         If abAddToModel Then
                             arFactType.Model.Role.Add(lrRole)
                         End If
-
+SkipJoiningRole:
                         GetRolesForModelFactType.Add(lrRole)
                         lREcordset.MoveNext()
                     End While

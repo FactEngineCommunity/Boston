@@ -139,7 +139,7 @@ Namespace TableValueType
 
         End Function
 
-        Sub GetValueTypeDetails(ByRef arValueType As FBM.ValueType)
+        Public Function GetValueTypeDetails(ByRef arValueType As FBM.ValueType) As FBM.ValueType
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -172,14 +172,20 @@ Namespace TableValueType
 
                 lREcordset.Close()
 
+                Return arValueType
+
             Catch ex As Exception
                 Dim lsMessage As String
-                lsMessage = "Error: TableValueType.GetValueTypeDetailsById"
-                lsMessage &= vbCrLf & lsMessage
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return arValueType
             End Try
 
-        End Sub
+        End Function
 
         Public Function GetValueTypesByModel(ByRef arModel As FBM.Model) As List(Of FBM.ValueType)
 

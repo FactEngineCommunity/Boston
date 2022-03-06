@@ -257,13 +257,14 @@ Namespace TableModelDictionary
                         lrDictionaryEntry.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
                         lrDictionaryEntry.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
                         lrDictionaryEntry.DBName = Trim(NullVal(lREcordset("DBName").Value, ""))
+
                         '--------------------------------------------------------------------------
                         'Create a KL Identity Letter for the Concept in the dictionary, in memory
                         '  such that KL Theorems can be written.
                         '--------------------------------------------------------------------------
-                        If Not {pcenumConceptType.Value, pcenumConceptType.Fact}.Contains(lrDictionaryEntry.ConceptType) Then
-                            'Call lrDictionaryEntry.GenerateKLIdentityLetter(GetDictionaryEntriesByModel, 1)
-                        End If
+                        'If Not {pcenumConceptType.Value, pcenumConceptType.Fact}.Contains(lrDictionaryEntry.ConceptType) Then
+                        '    Call lrDictionaryEntry.GenerateKLIdentityLetter(GetDictionaryEntriesByModel, 1)
+                        'End If
 
                         ar_model.ModelDictionary.Add(lrDictionaryEntry)
                         ar_model.Dictionary.Add(lrDictionaryEntry.Symbol, ar_model.ModelDictionary.Count - 1)

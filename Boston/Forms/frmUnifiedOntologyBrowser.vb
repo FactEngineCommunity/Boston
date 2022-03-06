@@ -32,7 +32,7 @@ Public Class frmUnifiedOntologyBrowser
             'lrPage.Form = formToShow
             'lrPage.Diagram = formToShow.Diagram
             'lrPage.DiagramView = formToShow.DiagramView
-            Me.SplitContainer2.Panel2.Controls.Add(formToShow)
+            'Me.SplitContainer2.Panel2.Controls.Add(formToShow)
 
             formToShow.Show()
             formToShow.Height = Me.SplitContainer2.Panel2.Height
@@ -78,7 +78,19 @@ Public Class frmUnifiedOntologyBrowser
 
         Me.ListBox1.Items.Clear()
 
-        Dim larModel As List(Of FBM.Model) = tableUnifiedOntologyModel.getModelsForUnifiedOntology(arUnifiedOntology)
+        Dim larUnifiedOntology As Ontology.UnifiedOntology = arUnifiedOntology
+
+        Dim larModelDictionaryEntry = From Model In larUnifiedOntology.Model
+                                      From ModelDictionaryEntry In Model.ModelDictionary
+                                      Where ModelDictionaryEntry.isValueType Or
+                                            ModelDictionaryEntry.isEntityType
+                                      Select ModelDictionaryEntry
+                                      Order By ModelDictionaryEntry.Symbol Ascending
+
+        For Each lrModelDictionaryEntry In larModelDictionaryEntry
+            Dim lrComboBoxItem As New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry)
+            Me.ListBox1.Items.Add(lrComboBoxItem)
+        Next
 
         'For Each lrEntityType In arModel.EntityType.FindAll(Function(x) x.IsObjectifyingEntityType = False _
         '                                                        And x.IsMDAModelElement = False)
@@ -92,12 +104,6 @@ Public Class frmUnifiedOntologyBrowser
         'For Each lrFactType In arModel.FactType.FindAll(Function(x) (x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable)
         '    Me.ListBox1.Items.Add(lrFactType.Name)
         'Next
-
-        'If Me.CheckBoxShowGeneralConcepts.Checked Then
-        '    For Each lrDictionaryEntry In arModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept = True)
-        '        Me.ListBox1.Items.Add(lrDictionaryEntry.Symbol)
-        '    Next
-        'End If
 
     End Sub
 
@@ -351,30 +357,40 @@ Public Class frmUnifiedOntologyBrowser
     Private Sub ListBox1_Click(sender As Object, e As EventArgs) Handles ListBox1.Click
 
         Try
-            Dim lrSelectedOntologyItem As Ontology.UnifiedOntologyItem = Nothing
+            Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Nothing
 
             With New WaitCursor
                 If Me.ListBox1.SelectedIndex >= 0 Then
-                    lrSelectedOntologyItem = ListBox1.SelectedItem.Tag
+                    lrModelDictionaryEntry = ListBox1.SelectedItem.Tag
                 End If
 
-                If lrSelectedOntologyItem IsNot Nothing Then
+                If lrModelDictionaryEntry IsNot Nothing Then
 
                     Dim lrModelElement As FBM.ModelObject = Nothing
 
-                    Select Case lrSelectedOntologyItem.ModelElement.ConceptType
+                    Select Case lrModelDictionaryEntry.GetModelObjectConceptType
                         Case Is = pcenumConceptType.ValueType
-                            Dim lrValueType As New FBM.ValueType(lrSelectedOntologyItem.Model,
-                                                                 pcenumLanguage.ORMModel,
-                                                                 lrSelectedOntologyItem.ModelElement.Id,
-                                                                 lrSelectedOntologyItem.ModelElement.Id)
-                            Call TableValueType.GetValueTypeDetails(lrValueType)
+                            Dim lrValueType As FBM.ValueType
+                            lrValueType = lrModelDictionaryEntry.Model.ValueType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
+
+                            If lrValueType Is Nothing Then
+                                lrValueType = New FBM.ValueType(lrModelDictionaryEntry.Model,
+                                                                pcenumLanguage.ORMModel,
+                                                                lrModelDictionaryEntry.Symbol,
+                                                                lrModelDictionaryEntry.Symbol)
+
+                                lrValueType.Model.ValueType.Add(TableValueType.GetValueTypeDetails(lrValueType))
+                            End If
+
                             lrModelElement = lrValueType
 
+                            'Load the related FactTypes.
+                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+
                         Case Is = pcenumConceptType.EntityType
-                            Dim lrEntityType As New FBM.EntityType(lrSelectedOntologyItem.Model,
+                            Dim lrEntityType As New FBM.EntityType(lrModelDictionaryEntry.Model,
                                                                    pcenumLanguage.ORMModel,
-                                                                   lrSelectedOntologyItem.ModelElement.Id,
+                                                                   lrModelDictionaryEntry.Symbol,
                                                                    Nothing,
                                                                    True)
                             Call TableEntityType.GetEntityTypeDetails(lrEntityType)
@@ -437,7 +453,7 @@ Public Class frmUnifiedOntologyBrowser
                     lrPropertyGridForm.PropertyGrid.SelectedObject = arModelElement.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id))
                 End If
             Else
-                Call Me.DisplayORMDiagramViewForModelObject(arModelElement)
+                'Call Me.DisplayORMDiagramViewForModelObject(arModelElement)
             End If
 
         Catch ex As Exception

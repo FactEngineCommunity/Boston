@@ -223,7 +223,7 @@ Namespace TableEntityType
 
         End Function
 
-        Sub GetEntityTypeDetails(ByRef arEntityType As FBM.EntityType)
+        Public Function GetEntityTypeDetails(ByRef arEntityType As FBM.EntityType) As FBM.EntityType
 
             Try
                 Dim lsSQLQuery As String = ""
@@ -251,10 +251,19 @@ Namespace TableEntityType
                     arEntityType.IsAbsorbed = CBool(lREcordset("IsAbsorbed").Value)
                     arEntityType.IsDerived = CBool(lREcordset("IsDerived").Value)
                     arEntityType.DerivationText = Trim(Viev.NullVal(lREcordset("DerivationText").Value, ""))
+
+                    If Viev.NullVal(lREcordset("ValueTypeId").Value, "") = "" Then
+                        arEntityType.ReferenceModeValueType = Nothing
+                    Else
+                        arEntityType.ReferenceModeValueType = arEntityType.Model.ValueType.Find(Function(x) x.Id = Trim(Viev.NullVal(lREcordset("ValueTypeId").Value, "")))
+                    End If
+
                     arEntityType.isDirty = False
                 Else
-                    MsgBox("Error: GetEntityTypeDetailsById: No Project returned for EntityTypeId: " & arEntityType.Id)
+                    MsgBox("Error: GetEntityTypeDetailsById: No Entity Type returned for EntityTypeId: " & arEntityType.Id)
                 End If
+
+                Return arEntityType
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -263,9 +272,11 @@ Namespace TableEntityType
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return arEntityType
             End Try
 
-        End Sub
+        End Function
 
         Public Function getEntityTypesByModel(ByRef arModel As FBM.Model) As List(Of FBM.EntityType)
 
@@ -331,14 +342,6 @@ Namespace TableEntityType
                         '------------------------------------------------
                         Dim lrDictionaryEntry As New FBM.DictionaryEntry(arModel, lrEntityType.Name, pcenumConceptType.EntityType)
                         lrDictionaryEntry = arModel.AddModelDictionaryEntry(lrDictionaryEntry, True, False)
-
-
-                        If lrDictionaryEntry Is Nothing Then
-                            lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for FactType:"
-                            lsMessage &= vbCrLf & "Model.Id: " & arModel.ModelId
-                            lsMessage &= vbCrLf & "FactType.Id: " & lrEntityType.Id
-                            Throw New Exception(lsMessage)
-                        End If
 
                         lrEntityType.Concept = lrDictionaryEntry.Concept
                         lrEntityType.DBName = lrDictionaryEntry.DBName

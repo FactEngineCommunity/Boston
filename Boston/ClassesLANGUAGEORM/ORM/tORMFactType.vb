@@ -1245,6 +1245,46 @@ Namespace FBM
 
         End Function
 
+        Public Sub LoadRelatedModelElementsToModel()
+
+            Try
+                Dim larRole As List(Of FBM.Role) = TableRole.GetRolesForModelFactType(Me, False, True)
+
+                For Each lrRole In larRole
+                    Select Case lrRole.TypeOfJoin
+                        Case Is = pcenumRoleJoinType.EntityType
+                            lrRole.JoinedORMObject = Me.Model.EntityType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
+                        Case Is = pcenumRoleJoinType.ValueType
+                            lrRole.JoinedORMObject = Me.Model.ValueType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
+                        Case Is = pcenumRoleJoinType.FactType
+                            lrRole.JoinedORMObject = Me.Model.FactType.Find(Function(x) x.Id = lrRole.JoinsModelElementId)
+                    End Select
+
+                    If lrRole.JoinedORMObject Is Nothing Then
+                        Select Case lrRole.TypeOfJoin
+                            Case Is = pcenumRoleJoinType.ValueType
+                                Call Me.Model.LoadModelElementById(pcenumConceptType.ValueType, lrRole.JoinsModelElementId)
+                            Case Is = pcenumRoleJoinType.EntityType
+                                Call Me.Model.LoadModelElementById(pcenumConceptType.EntityType, lrRole.JoinsModelElementId)
+                            Case Is = pcenumRoleJoinType.FactType
+                                Dim lrFactType As New FBM.FactType(Me.Model, lrRole.JoinsModelElementId, True)
+                                Call TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
+                        End Select
+
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Function MakeNameFromFactTypeReadings() As String
 
             Try

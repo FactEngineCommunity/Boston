@@ -107,6 +107,10 @@ Namespace TableUnifiedOntology
                     arUnifiedOntology.Name = lREcordset("UnifiedOntologyName").Value
 
                     Call tableUnifiedOntologyModel.getModelsForUnifiedOntology(arUnifiedOntology)
+
+                    For Each lrModel In arUnifiedOntology.Model
+                        TableModelDictionary.GetDictionaryEntriesByModel(lrModel)
+                    Next
                 Else
                     Dim lsMessage As String = "Error: GetUnifiedOntologyDetails: No UnifiedOntology returned for UnifiedOntologyName: " & arUnifiedOntology.Name
                     Throw New Exception(lsMessage)

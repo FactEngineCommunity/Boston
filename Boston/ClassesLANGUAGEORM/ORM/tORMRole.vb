@@ -156,11 +156,17 @@ Namespace FBM
         <XmlIgnore()> _
         Public SequenceNr As Integer 'The position withn the FactType/RoleGroup
 
+        Public _TypeOfJoin As pcenumRoleJoinType = pcenumRoleJoinType.None
+
         <XmlAttribute()>
         Public ReadOnly Property TypeOfJoin As pcenumRoleJoinType
             Get
                 If Me.JoinedORMObject Is Nothing Then
-                    Return pcenumRoleJoinType.None
+                    If Me._TypeOfJoin <> pcenumRoleJoinType.None Then
+                        Return Me._TypeOfJoin 'Only used when dynamically loading ModelElements to the Model as in when using the UnifiedOntologyBrowser, otherwise we always expect that a Role is joined to an ModelElement in Boston
+                    Else
+                        Return pcenumRoleJoinType.None
+                    End If
                 End If
                 Select Case Me.JoinedORMObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
@@ -206,8 +212,14 @@ Namespace FBM
             End Get
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents JoinedORMObject As New FBM.ModelObject 'WithEvents
+
+        ''' <summary>
+        ''' Predominantly only used for the UnifiedOntologyBrowser, to dynamically load ModelElements to the Model. Normally Me.JoinedORMObject is populated.
+        ''' </summary>
+        <XmlAttribute()>
+        Public JoinsModelElementId As String
 
         <XmlIgnore()> _
         Public RoleConstraintRole As New List(Of FBM.RoleConstraintRole) 'RoleConstraints are serialized seperately so that the serialiser doesn't go into an infinite loop.

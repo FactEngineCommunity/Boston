@@ -183,7 +183,15 @@ Namespace TableFactType
 
         End Function
 
-        Public Sub GetFactTypeDetailsByModel(ByRef arFactType As FBM.FactType, Optional ByVal abAddFactTypeToModel As Boolean = False)
+        ''' <summary>
+        ''' Gets the details of a FactType from the Model.
+        ''' </summary>
+        ''' <param name="arFactType">The FactType to load.</param>
+        ''' <param name="abAddFactTypeToModel">True if the FactType is to be added to the Model.</param>
+        ''' <param name="abDynamicallyLoadRelatedModelElements">As used by the Unified Ontology Browser so the whole Model doesn't have to be loaded at once.</param>
+        Public Sub GetFactTypeDetailsByModel(ByRef arFactType As FBM.FactType,
+                                             Optional ByVal abAddFactTypeToModel As Boolean = False,
+                                             Optional ByVal abDynamicallyLoadRelatedModelElements As Boolean = False)
 
             Dim lsMessage As String
             Dim lsSQLQuery As String = ""
@@ -229,67 +237,72 @@ Namespace TableFactType
                     arFactType.StoreFactCoordinates = CBool(lREcordset("StoreFactCoordinates").Value)
                     arFactType.isDirty = False
 
+                    '---------------------------------------------------------------------------------
+                    'Dynamically load related ModelElements (ValueTypes,EntityTypes) if required.
+                    '-----------------------------------------------------------------------------
+                    If abDynamicallyLoadRelatedModelElements Then Call arFactType.LoadRelatedModelElementsToModel()
+
                     '------------------------------------------------------------
                     'Get the Roles within the RoleGroup for the FactType as well
                     '------------------------------------------------------------
                     arFactType.RoleGroup = TableRole.GetRolesForModelFactType(arFactType, abAddFactTypeToModel)
 
-                    '------------------------------------------------------------
-                    'Get the FactTypeReadings for the FactType
-                    '------------------------------------------------------------
-                    arFactType.FactTypeReading = TableFactTypeReading.GetFactTypeReadingsForFactType(arFactType)
+                        '------------------------------------------------------------
+                        'Get the FactTypeReadings for the FactType
+                        '------------------------------------------------------------
+                        arFactType.FactTypeReading = TableFactTypeReading.GetFactTypeReadingsForFactType(arFactType)
 
-                    '----------------------------------------------
-                    'Get the Facts (FactTypeData) for the FactType
-                    '----------------------------------------------
-                    TableFact.GetFactsForFactType(arFactType)
+                        '----------------------------------------------
+                        'Get the Facts (FactTypeData) for the FactType
+                        '----------------------------------------------
+                        TableFact.GetFactsForFactType(arFactType)
 
-                    '---------------------------------------------
-                    'ObjectifyingEntityType
-                    '---------------------------------------------
-                    If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
-                        arFactType.ObjectifyingEntityType = Nothing
-                    Else
-                        Dim lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
-                        arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
-                        If arFactType.ObjectifyingEntityType IsNot Nothing Then
-                            '---------------------------------------------
-                            'Okay, have found the ObjectifyingEntityType
-                            '---------------------------------------------
-                            arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                            arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
-                            arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                        '---------------------------------------------
+                        'ObjectifyingEntityType
+                        '---------------------------------------------
+                        If Viev.NullVal(lREcordset("ObjectifyingEntityTypeId").Value, "") = "" Then
+                            arFactType.ObjectifyingEntityType = Nothing
                         Else
-                            lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                            lsMessage &= vbCrLf & vbCrLf & "Creating one. Save the Model after loading."
+                            Dim lsEntityTypeId = lREcordset("ObjectifyingEntityTypeId").Value
+                            arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
+                            If arFactType.ObjectifyingEntityType IsNot Nothing Then
+                                '---------------------------------------------
+                                'Okay, have found the ObjectifyingEntityType
+                                '---------------------------------------------
+                                arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                                arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
+                                arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                            Else
+                                lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
+                                lsMessage &= vbCrLf & vbCrLf & "Creating one. Save the Model after loading."
 
-                            lsMessage &= vbCrLf & vbCrLf & "ModelId: " & arFactType.Model.ModelId
-                            lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
-                            lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+                                lsMessage &= vbCrLf & vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                                lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
+                                lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
 
-                            Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True)
-                            lrEntityType.IsObjectifyingEntityType = True
-                            lrEntityType.ObjectifiedFactType = arFactType
-                            arFactType.Model.IsDirty = True
+                                Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True)
+                                lrEntityType.IsObjectifyingEntityType = True
+                                lrEntityType.ObjectifiedFactType = arFactType
+                                arFactType.Model.IsDirty = True
 
-                            lREcordset.Close()
-                            Throw New Exception(lsMessage)
+                                lREcordset.Close()
+                                Throw New Exception(lsMessage)
+                            End If
                         End If
+
+
+                    Else
+                        lsMessage = "Error: No FactType exists in the database for FactType.Id: " & arFactType.Id
+                        Throw New System.Exception(lsMessage)
                     End If
 
+                    lREcordset.Close()
 
-                Else
-                    lsMessage = "Error: No FactType exists in the database for FactType.Id: " & arFactType.Id
-                    Throw New System.Exception(lsMessage)
-                End If
-
-                lREcordset.Close()
-
-                If abAddFactTypeToModel Then
-                    Dim lrDictionaryEntry As FBM.DictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
-                    arFactType.DBName = lrDictionaryEntry.DBName
-                    arFactType.Model.AddFactType(arFactType, False, False)
-                End If
+                    If abAddFactTypeToModel Then
+                        Dim lrDictionaryEntry As FBM.DictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
+                        arFactType.DBName = lrDictionaryEntry.DBName
+                        arFactType.Model.AddFactType(arFactType, False, False)
+                    End If
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -393,6 +406,94 @@ Namespace TableFactType
                 Return GetFactTypesByModel
             End Try
 
+
+        End Function
+
+        Public Function GetFactTypesByModelJoinedModelElement(ByRef arModel As FBM.Model,
+                                                              ByRef arModelElement As FBM.ModelObject,
+                                                              Optional ByVal abAddToModel As Boolean = False) As List(Of FBM.FactType)
+
+            Dim lsMessage As String
+            Dim lrFactType As FBM.FactType
+            Dim lsSQLQuery As String = ""
+            Dim lREcordset As New ADODB.Recordset
+
+            Dim larFactType As New List(Of FBM.FactType)
+
+            Try
+
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
+
+                lsSQLQuery = " SELECT FT.*, MD.*"
+                lsSQLQuery &= "  FROM MetaModelFactType FT,"
+                lsSQLQuery &= "       MetaModelModelDictionary MD,"
+                lsSQLQuery &= "       MetaModelRole MMR"
+                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arModel.ModelId) & "'"
+                lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
+                lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
+                lsSQLQuery &= "   AND MD.IsFactType = " & True
+                lsSQLQuery &= "   AND FT.FactTypeId = MMR.FactTypeId"
+                lsSQLQuery &= "   AND MMR.JoinsModelElementId = '" & arModelElement.Id & "'"
+                lsSQLQuery &= " ORDER BY FT.IsObjectified ASC, FT.IsLinkFactType ASC"
+
+                lREcordset.Open(lsSQLQuery)
+
+                If Not lREcordset.EOF Then
+                    While Not lREcordset.EOF
+                        lrFactType = New FBM.FactType
+                        lrFactType.isDirty = False
+                        lrFactType.Model = arModel
+                        lrFactType.Id = lREcordset("FactTypeId").Value
+
+                        Call TableFactType.GetFactTypeDetailsByModel(lrFactType, abAddToModel, True)
+
+                        larFactType.Add(lrFactType)
+
+                        If abAddToModel Then
+                            arModel.AddFactType(lrFactType, False, False, Nothing)
+                        End If
+
+                        lREcordset.MoveNext()
+                    End While
+                End If
+
+                '--------------------------------------------------------------
+                'Go through each of the Roles in each of the FactTypes,
+                '  and for those Roles that join a FactType, make
+                '  sure that the JoinedORMObject is populated for the Role.
+                '
+                'The reason that this is required is because the 'Joined' FactType
+                '  for a Role may not have been loaded at the time the Role
+                '  was loaded, so the 'find' function will have returned 'Nothing'
+                '--------------------------------------------------------------
+                Dim lrRole As FBM.Role
+                Dim larRole = From FactType In arModel.FactType
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject Is Nothing
+                              Select Role
+
+                For Each lrRole In larRole
+                    Try
+                        lrRole.JoinedORMObject = arModel.FactType.Find(Function(x) x.Id = lrRole.JoinsFactType.Id)
+                    Catch ex As Exception
+                        'Throw warning
+                    End Try
+                Next
+
+                lREcordset.Close()
+
+                Return larFactType
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage &= vbCrLf & vbCrLf & "Loading FactTypes for Model: '" & arModel.ModelId & "'"
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larFactType
+            End Try
 
         End Function
 
