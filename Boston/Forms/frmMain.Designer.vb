@@ -422,6 +422,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemUnifiedOntologyBrowser
         '
+        Me.ToolStripMenuItemUnifiedOntologyBrowser.Image = CType(resources.GetObject("ToolStripMenuItemUnifiedOntologyBrowser.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemUnifiedOntologyBrowser.Name = "ToolStripMenuItemUnifiedOntologyBrowser"
         Me.ToolStripMenuItemUnifiedOntologyBrowser.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemUnifiedOntologyBrowser.Text = "&Unified Ontology Browser"

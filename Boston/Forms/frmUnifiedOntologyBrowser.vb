@@ -19,19 +19,17 @@ Public Class frmUnifiedOntologyBrowser
             Me.LabelOntologyName.Text = Me.zrUnifiedOntology.Name
             Call Me.ShowGlossary(Me.zrUnifiedOntology)
 
+            'Dim lsFolderLocation As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+            'Dim lsFileName As String = "UnifiedOntologyBrowser.bmp"
+            'Dim lsFileLocationName As String = lsFolderLocation & "\" & lsFileName
 
-            Dim lsFolderLocation As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
-            Dim lsFileName As String = "UnifiedOntologyBrowser.bmp"
-            Dim lsFileLocationName As String = lsFolderLocation & "\" & lsFileName
+            'Try
+            '    Me.zrUnifiedOntology.Image.Save(lsFileLocationName)
+            'Catch ex As Exception
+            '    Debugger.Break()
+            'End Try
 
-            Try
-                Me.zrUnifiedOntology.Image.Save(lsFileLocationName)
-            Catch ex As Exception
-                Debugger.Break()
-            End Try
-
-
-            Me.WebBrowser.Navigate(lsFileLocationName)
+            Me.WebBrowser.Navigate(Me.zrUnifiedOntology.ImageFileLocationName)
 
             '======================================================================================
             'Load the Sub ORM Diagram Form/Viewer

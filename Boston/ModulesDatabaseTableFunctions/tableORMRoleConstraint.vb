@@ -192,7 +192,18 @@ Namespace TableRoleConstraint
                                 lrFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
                                 lrFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
                                 lrFactType.ObjectifyingEntityType.ObjectifiedFactType = lrFactType
+
+                            ElseIf lrFactType.ObjectifyingEntityType Is Nothing Then
+                                Dim lrEntityType As FBM.EntityType = arRoleConstraint.Model.LoadModelElementById(pcenumConceptType.EntityType, lsEntityTypeId)
+
+                                If lrEntityType Is Nothing Then GoTo LastResortObjectifyingEntityType
+
+                                lrFactType.ObjectifyingEntityType = lrEntityType
+                                lrFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                                lrFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
+                                lrFactType.ObjectifyingEntityType.ObjectifiedFactType = lrFactType
                             Else
+LastResortObjectifyingEntityType:
                                 lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
                                 lsMessage &= vbCrLf & vbCrLf & "Creating one. Save the Model after loading."
 
@@ -201,12 +212,12 @@ Namespace TableRoleConstraint
                                 lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
 
                                 Dim lrEntityType = lrFactType.Model.CreateEntityType(lsEntityTypeId, True)
+                                lrFactType.ObjectifyingEntityType = lrEntityType
                                 lrEntityType.IsObjectifyingEntityType = True
                                 lrEntityType.ObjectifiedFactType = lrFactType
                                 lrFactType.Model.IsDirty = True
 
-                                lREcordset.Close()
-                                Throw New Exception(lsMessage)
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False,, True)
                             End If
 
                         End If

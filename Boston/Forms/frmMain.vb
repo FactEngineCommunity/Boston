@@ -1761,17 +1761,27 @@ Public Class frmMain
         Dim child As New frmUnifiedOntologyBrowser
 
         Try
-            Me.Cursor = Cursors.WaitCursor
+            With New WaitCursor
 
-            child.zrUnifiedOntology = arUnifedOntology
-            child.Show(DockPanel)
+                'Close the StartupPage
+                If Me.zfrmStartup IsNot Nothing Then
+                    Me.zfrmStartup.Close()
+                    Me.zfrmStartup = Nothing
+                End If
 
-            If arModelElement IsNot Nothing Then
-                child.FocusModelElement(arModelElement)
-                child.DescribeModelElement(arModelElement)
-            End If
+                If Me.zfrmModelExplorer IsNot Nothing Then
+                    Me.zfrmModelExplorer.VisibleState = WeifenLuo.WinFormsUI.Docking.DockState.DockLeftAutoHide
+                End If
 
-            Me.Cursor = Cursors.Default
+                child.zrUnifiedOntology = arUnifedOntology
+                child.Show(DockPanel)
+
+                If arModelElement IsNot Nothing Then
+                    child.FocusModelElement(arModelElement)
+                    child.DescribeModelElement(arModelElement)
+                End If
+
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String

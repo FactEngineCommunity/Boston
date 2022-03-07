@@ -14,6 +14,7 @@ Namespace TableUnifiedOntology
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " '" & Trim(Replace(arUnifiedOntology.Id, "'", "`")) & "'"
                 lsSQLQuery &= " '" & Trim(Replace(arUnifiedOntology.Name, "'", "`")) & "'"
+                lsSQLQuery &= " '" & Trim(Replace(arUnifiedOntology.ImageFileLocationName, "'", "`")) & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -105,6 +106,7 @@ Namespace TableUnifiedOntology
                 If Not lREcordset.EOF Then
                     arUnifiedOntology.Id = lREcordset("Id").Value
                     arUnifiedOntology.Name = lREcordset("UnifiedOntologyName").Value
+                    arUnifiedOntology.ImageFileLocationName = lREcordset("ImageFileLocationName").Value
 
                     Call tableUnifiedOntologyModel.getModelsForUnifiedOntology(arUnifiedOntology)
 
@@ -112,34 +114,34 @@ Namespace TableUnifiedOntology
                         TableModelDictionary.GetDictionaryEntriesByModel(lrModel, True)
                     Next
 
-                    Using myConnection As New System.Data.OleDb.OleDbConnection(My.Settings.DatabaseConnectionString)
-                        Dim SQL As String = "SELECT [Image] FROM [UnifiedOntology] WHERE Id = '" & Trim(arUnifiedOntology.Id) & "'"
-                        Using myCommand As New System.Data.OleDb.OleDbCommand(SQL, myConnection)
-                            myConnection.Open()
-                            Using myReader As System.Data.OleDb.OleDbDataReader = myCommand.ExecuteReader
-                                If myReader.Read Then
+                    'Using myConnection As New System.Data.OleDb.OleDbConnection(My.Settings.DatabaseConnectionString)
+                    '    Dim SQL As String = "SELECT [Image] FROM [UnifiedOntology] WHERE Id = '" & Trim(arUnifiedOntology.Id) & "'"
+                    '    Using myCommand As New System.Data.OleDb.OleDbCommand(SQL, myConnection)
+                    '        myConnection.Open()
+                    '        Using myReader As System.Data.OleDb.OleDbDataReader = myCommand.ExecuteReader
+                    '            If myReader.Read Then
 
-                                    Dim barray() As Byte = myReader("Image")
+                    '                Dim barray() As Byte = myReader("Image")
 
-                                    Using mStream As New System.IO.MemoryStream()
-                                        mStream.Write(barray, 78, barray.Length - 78)
+                    '                Using mStream As New System.IO.MemoryStream()
+                    '                    mStream.Write(barray, 78, barray.Length - 78)
 
-                                        arUnifiedOntology.Image = System.Drawing.Image.FromStream(mStream, True)
+                    '                    arUnifiedOntology.Image = System.Drawing.Image.FromStream(mStream, True)
 
-                                        'OR TRY
-                                        'Dim tc As TypeConverter = TypeDescriptor.GetConverter(GetType(Bitmap))
-                                        'Dim bitmap1 As Bitmap = CType(tc.ConvertFrom(byteArray), Bitmap)
+                    '                    'OR TRY
+                    '                    'Dim tc As TypeConverter = TypeDescriptor.GetConverter(GetType(Bitmap))
+                    '                    'Dim bitmap1 As Bitmap = CType(tc.ConvertFrom(byteArray), Bitmap)
 
-                                    End Using
+                    '                End Using
 
-                                    'arUnifiedOntology.Image = myReader("Image")
-                                End If
-                                myReader.Close()
-                            End Using
+                    '                'arUnifiedOntology.Image = myReader("Image")
+                    '            End If
+                    '            myReader.Close()
+                    '        End Using
 
-                        End Using
-                        myConnection.Close()
-                    End Using
+                    '    End Using
+                    '    myConnection.Close()
+                    'End Using
                 Else
                     Dim lsMessage As String = "Error: GetUnifiedOntologyDetails: No UnifiedOntology returned for UnifiedOntologyName: " & arUnifiedOntology.Name
                     Throw New Exception(lsMessage)

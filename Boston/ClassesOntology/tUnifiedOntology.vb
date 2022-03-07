@@ -13,7 +13,7 @@ Namespace Ontology
 
         Public Model As New List(Of FBM.Model)
 
-        Public Image As System.Drawing.Image
+        Public ImageFileLocationName As String
 
 
         ''' <summary>
