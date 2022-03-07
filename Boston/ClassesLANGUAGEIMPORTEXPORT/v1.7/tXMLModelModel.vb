@@ -1126,7 +1126,7 @@ Namespace XMLModel
 
                     lrFactTypeNameConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeName And x.Symbol = lrFactType.Id)
                     If lrFactTypeNameConceptInstance IsNot Nothing Then
-                        lrFactTypeInstance.FactTypeName = New FBM.FactTypeName(arPage.Model, lrPage, lrFactTypeInstance, lrFactTypeInstance.Name)
+                        lrFactTypeInstance.FactTypeName = New FBM.FactTypeName(lrPage.Model, lrPage, lrFactTypeInstance, lrFactTypeInstance.Name)
                         lrFactTypeInstance.FactTypeName.X = lrFactTypeNameConceptInstance.X
                         lrFactTypeInstance.FactTypeName.Y = lrFactTypeNameConceptInstance.Y
                         lrFactTypeInstance.ShowFactTypeName = lrFactTypeNameConceptInstance.Visible

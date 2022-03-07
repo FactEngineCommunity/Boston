@@ -85,7 +85,7 @@ Public Module tableUnifiedOntologyModel
                 While Not lREcordset.EOF
                     lrModel = New FBM.Model
                     lrModel.ModelId = lREcordset("ModelId").Value
-
+                    Call TableModel.GetModelDetails(lrModel)
                     larModel.Add(lrmodel)
                     arUnifiedOntology.Model.Add(lrModel)
 

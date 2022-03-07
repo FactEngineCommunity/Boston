@@ -241,7 +241,8 @@ LastResortObjectifyingEntityType:
 
         End Function
 
-        Public Function getRoleConstraintDetailsByModel(ByRef arRoleConstraint As FBM.RoleConstraint) As FBM.RoleConstraint
+        Public Function getRoleConstraintDetailsByModel(ByRef arRoleConstraint As FBM.RoleConstraint,
+                                                        Optional ByVal abDynamicallyLoadRequiredModelElements As Boolean = False) As FBM.RoleConstraint
 
             Try
                 Dim lsMessage As String
@@ -314,7 +315,7 @@ LastResortObjectifyingEntityType:
 
                         arRoleConstraint.Concept = lrDictionaryEntry.Concept
 
-                        arRoleConstraint.Argument = TableRoleConstraintArgument.GetArgumentsForRoleConstraint(arRoleConstraint)
+                        arRoleConstraint.Argument = TableRoleConstraintArgument.GetArgumentsForRoleConstraint(arRoleConstraint, abDynamicallyLoadRequiredModelElements)
                         arRoleConstraint.Role = TableRoleConstraint.getRoles_for_RoleConstraint(arRoleConstraint)
 
                         '----------------------------------------------------------

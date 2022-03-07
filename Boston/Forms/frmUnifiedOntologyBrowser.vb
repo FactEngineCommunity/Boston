@@ -141,22 +141,24 @@ Public Class frmUnifiedOntologyBrowser
         'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
         '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
 
-        Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
-                                 From DictionaryEntry In Model.ModelDictionary
-                                 Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                    And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
-                                 Select DictionaryEntry
+        If Me.ListBox1.Items.Count < 200 Then
+            Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
+                                     From DictionaryEntry In Model.ModelDictionary
+                                     Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                        And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
+                                     Select DictionaryEntry
 
-        'Dim matchingItemList As List(Of Object) = items.ToList()
+            'Dim matchingItemList As List(Of Object) = items.ToList()
 
-        ListBox1.BeginUpdate()
-        ListBox1.Items.Clear()
-        Dim lrComboBoxItem As tComboboxItem
-        For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
-            lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
-            ListBox1.Items.Add(lrComboBoxItem)
-        Next
-        ListBox1.EndUpdate()
+            ListBox1.BeginUpdate()
+            ListBox1.Items.Clear()
+            Dim lrComboBoxItem As tComboboxItem
+            For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
+                lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
+                ListBox1.Items.Add(lrComboBoxItem)
+            Next
+            ListBox1.EndUpdate()
+        End If
 
     End Sub
 
@@ -1256,6 +1258,100 @@ Public Class frmUnifiedOntologyBrowser
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 End Try
             End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Public Sub VerbaliseUnfiedOntology(ByVal arUnifiedOntology As Ontology.UnifiedOntology)
+
+        Dim lrVerbaliser As New FBM.ORMVerbailser
+        Call lrVerbaliser.Reset()
+
+        '------------------------------------------------------
+        'Declare that the EntityType(Name) is an EntityType
+        '------------------------------------------------------
+        lrVerbaliser.VerbaliseHeading(arUnifiedOntology.Name)
+        lrVerbaliser.VerbaliseQuantifier(" is a Unified Ontology.")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
+        If arUnifiedOntology.Description <> "" Then
+            lrVerbaliser.VerbaliseQuantifier("Description: ")
+            lrVerbaliser.HTW.WriteBreak()
+            If arUnifiedOntology.Description <> "" Then
+                lrVerbaliser.VerbaliseHeading(arUnifiedOntology.Description)
+            End If
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+        End If
+
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.VerbaliseHeading("Included Models:")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
+
+
+
+        lrVerbaliser.VerbaliseQuantifier("The ontology includes the following models: ")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+        For Each lrModel In arUnifiedOntology.Model
+            lrVerbaliser.HTW.Write(lrModel.Name)
+            lrVerbaliser.HTW.WriteBreak()
+        Next
+
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.Write("-------------------------------------------------")
+
+        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+
+    End Sub
+
+    Private Sub ButtonDescribeUnifiedOntology_Click(sender As Object, e As EventArgs) Handles ButtonDescribeUnifiedOntology.Click
+
+        Try
+            Call Me.VerbaliseUnfiedOntology(Me.zrUnifiedOntology)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonSearch_Click(sender As Object, e As EventArgs) Handles ButtonSearch.Click
+
+        Try
+            Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
+                                     From DictionaryEntry In Model.ModelDictionary
+                                     Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                        And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
+                                     Select DictionaryEntry
+
+            'Dim matchingItemList As List(Of Object) = items.ToList()
+
+            ListBox1.BeginUpdate()
+            ListBox1.Items.Clear()
+            Dim lrComboBoxItem As tComboboxItem
+            For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
+                lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
+                ListBox1.Items.Add(lrComboBoxItem)
+            Next
+            ListBox1.EndUpdate()
 
         Catch ex As Exception
             Dim lsMessage As String

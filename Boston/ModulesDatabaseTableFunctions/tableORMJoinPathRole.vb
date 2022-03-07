@@ -74,7 +74,8 @@ Namespace TableJoinPathRole
 
         End Function
 
-        Public Function GetJoinPathForArgument(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument) As FBM.JoinPath
+        Public Function GetJoinPathForArgument(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument,
+                                               Optional ByVal abDynamicallyLoadRequiredModelElements As Boolean = False) As FBM.JoinPath
 
             Try
                 Dim lsMessage As String = ""
@@ -100,12 +101,23 @@ Namespace TableJoinPathRole
                     lrRole = arRoleConstraintArgument.Model.Role.Find(Function(x) x.Id = lsId)
 
                     If lrRole Is Nothing Then
-                        lsMessage = "Couldn't find Role in Model for JoinPath"
-                        lREcordset.Close()
-                        Throw New Exception(lsMessage)
+                        '----------------------------------------------------------------------------------------------------------
+                        'It is possible that the user is using the Unified Ontology Browser and is dynamically loading the Model.
+                        If abDynamicallyLoadRequiredModelElements Then
+                            Dim lsFactTypeId As String = TableFactType.getFactTypeIdByModelRoleId(arRoleConstraintArgument.Model, lsId)
+                            Call arRoleConstraintArgument.Model.LoadModelElementById(pcenumConceptType.FactType, lsFactTypeId)
+                        End If
+
+                        lrRole = arRoleConstraintArgument.Model.Role.Find(Function(x) x.Id = lsId)
+
+                        If lrRole Is Nothing Then
+                            lsMessage = "Couldn't find Role in Model for JoinPath"
+                            lREcordset.Close()
+                            Throw New Exception(lsMessage)
+                        End If
                     End If
 
-                    lrJoinPath.RolePath.AddUnique(lrRole)
+                        lrJoinPath.RolePath.AddUnique(lrRole)
                     lREcordset.MoveNext()
                 End While
 

@@ -188,5 +188,8 @@
     <Setting Name="NORMAImportingThrowRoleConstraintRoleWarnings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="ShowUnifiedOntologyBrowser" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

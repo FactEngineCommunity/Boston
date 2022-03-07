@@ -327,6 +327,48 @@ Namespace TableFactType
 
         End Function
 
+        Public Function getFactTypeIdByModelRoleId(ByRef arModel As FBM.Model, ByVal asRoleId As String) As String
+
+            Try
+                Dim lsFactTypeId As String = ""
+
+                Dim lsSQLQuery As String = ""
+                Dim lREcordset As New ADODB.Recordset
+
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
+
+                lsSQLQuery = " SELECT FT.*"
+                lsSQLQuery &= "  FROM MetaModelFactType FT,"
+                lsSQLQuery &= "       MetaModelRole R"
+                lsSQLQuery &= " WHERE FT.ModelId = '" & Trim(arModel.ModelId) & "'"
+                lsSQLQuery &= "   AND FT.FactTypeId = R.FactTypeId"
+                lsSQLQuery &= "   AND FT.ModelId = R.ModelId"
+                lsSQLQuery &= "   AND R.RoleId = '" & asRoleId & "'"
+
+                lREcordset.Open(lsSQLQuery)
+
+                If Not lREcordset.EOF Then
+                    lsFactTypeId = lREcordset("FactTypeId").Value
+                End If
+
+                lREcordset.Close()
+
+                Return lsFactTypeId
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return ""
+            End Try
+
+        End Function
+
         Public Function GetFactTypesByModel(ByRef arModel As FBM.Model, Optional ByVal abAddToModel As Boolean = False) As List(Of FBM.FactType)
 
             Dim lsMessage As String

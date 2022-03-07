@@ -25,12 +25,21 @@ Namespace FBM
         Sub New(ByVal arModel As FBM.Model, ByRef arPage As FBM.Page, ByRef arFactTypeInstance As FBM.FactTypeInstance, ByVal asName As String)
 
             Call Me.New()
+            Try
+                Me.Model = arModel
+                Me.Page = arPage
+                Me.Name = asName
+                Me.FactTypeInstance = arFactTypeInstance
+                Me.FactType = arFactTypeInstance.FactType
 
-            Me.Model = arModel
-            Me.Page = arPage
-            Me.Name = asName
-            Me.FactTypeInstance = arFactTypeInstance
-            Me.FactType = arFactTypeInstance.FactType
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

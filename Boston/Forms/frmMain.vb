@@ -609,6 +609,10 @@ Public Class frmMain
                 End If
             End If
 
+            '-----------------------------------------------------------
+            'Unified Ontology Browser
+            Me.ToolStripMenuItemUnifiedOntologyBrowser.Visible = My.Settings.ShowUnifiedOntologyBrowser
+
             '------------------------------------------------------------------------------------------------------
             'Toggle LogIn/LogOut menu items
             Me.ToolStripMenuItemLogOut.Visible = My.Settings.UseClientServer Or prApplication.User IsNot Nothing
@@ -4513,10 +4517,11 @@ Public Class frmMain
         Try
             Dim lrGenericSelection As New tGenericSelection()
             Dim lrUnifiedOntology As New Ontology.UnifiedOntology
-
             Dim lsWhereClause As String = ""
 
-            If Richmond.DisplayGenericSelectForm(lrGenericSelection,
+            With New WaitCursor
+
+                If Richmond.DisplayGenericSelectForm(lrGenericSelection,
                                                "Unified Ontology",
                                                "UnifiedOntology",
                                                "UnifiedOntologyName",
@@ -4530,11 +4535,13 @@ Public Class frmMain
                                                "Unified Ontology Name") = Windows.Forms.DialogResult.OK Then
 
 
-                lrUnifiedOntology.Id = lrGenericSelection.SelectValue
-                Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+                    lrUnifiedOntology.Id = lrGenericSelection.SelectValue
+                    Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
 
-                Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
-            End If
+                    Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
+                End If
+
+            End With
 
 
         Catch ex As Exception

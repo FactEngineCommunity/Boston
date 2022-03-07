@@ -24,6 +24,7 @@ Partial Class frmUnifiedOntologyBrowser
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.ButtonDescribeUnifiedOntology = New System.Windows.Forms.Button()
         Me.LabelOntologyName = New System.Windows.Forms.Label()
         Me.LabelPromptOntology = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
@@ -32,6 +33,7 @@ Partial Class frmUnifiedOntologyBrowser
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
         Me.ContextMenuStripModelElementPages = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ButtonSearch = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -51,6 +53,8 @@ Partial Class frmUnifiedOntologyBrowser
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonSearch)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonDescribeUnifiedOntology)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelOntologyName)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelPromptOntology)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextBox1)
@@ -62,6 +66,16 @@ Partial Class frmUnifiedOntologyBrowser
         Me.SplitContainer1.Size = New System.Drawing.Size(884, 574)
         Me.SplitContainer1.SplitterDistance = 289
         Me.SplitContainer1.TabIndex = 0
+        '
+        'ButtonDescribeUnifiedOntology
+        '
+        Me.ButtonDescribeUnifiedOntology.Location = New System.Drawing.Point(238, 12)
+        Me.ButtonDescribeUnifiedOntology.Margin = New System.Windows.Forms.Padding(0)
+        Me.ButtonDescribeUnifiedOntology.Name = "ButtonDescribeUnifiedOntology"
+        Me.ButtonDescribeUnifiedOntology.Size = New System.Drawing.Size(36, 21)
+        Me.ButtonDescribeUnifiedOntology.TabIndex = 4
+        Me.ButtonDescribeUnifiedOntology.Text = "..."
+        Me.ButtonDescribeUnifiedOntology.UseVisualStyleBackColor = True
         '
         'LabelOntologyName
         '
@@ -128,13 +142,22 @@ Partial Class frmUnifiedOntologyBrowser
         '
         Me.ContextMenuStripModelElementPages.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage})
         Me.ContextMenuStripModelElementPages.Name = "ContextMenuStripModelElementPages"
-        Me.ContextMenuStripModelElementPages.Size = New System.Drawing.Size(181, 48)
+        Me.ContextMenuStripModelElementPages.Size = New System.Drawing.Size(155, 26)
         '
         'ToolStripMenuItemViewOnPage
         '
         Me.ToolStripMenuItemViewOnPage.Name = "ToolStripMenuItemViewOnPage"
-        Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(154, 22)
         Me.ToolStripMenuItemViewOnPage.Text = "View on &Page..."
+        '
+        'ButtonSearch
+        '
+        Me.ButtonSearch.Location = New System.Drawing.Point(214, 43)
+        Me.ButtonSearch.Name = "ButtonSearch"
+        Me.ButtonSearch.Size = New System.Drawing.Size(60, 20)
+        Me.ButtonSearch.TabIndex = 5
+        Me.ButtonSearch.Text = "&Search"
+        Me.ButtonSearch.UseVisualStyleBackColor = True
         '
         'frmUnifiedOntologyBrowser
         '
@@ -166,4 +189,6 @@ Partial Class frmUnifiedOntologyBrowser
     Friend WithEvents LabelPromptOntology As System.Windows.Forms.Label
     Friend WithEvents ContextMenuStripModelElementPages As ContextMenuStrip
     Friend WithEvents ToolStripMenuItemViewOnPage As ToolStripMenuItem
+    Friend WithEvents ButtonDescribeUnifiedOntology As Button
+    Friend WithEvents ButtonSearch As Button
 End Class

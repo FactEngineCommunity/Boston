@@ -3863,6 +3863,11 @@ Namespace FBM
                 End If
 
                 If Me.StoreAsXML And Not abForceDatabaseSave Then
+                    If Not Me.Loaded Then
+                        With New WaitCursor
+                            Me.Load()
+                        End With
+                    End If
                     Call Me.SaveToXMLDocument()
                 Else
                     Call Me.SaveToDatabase(abRapidSave, abModelDictionaryRapidSave)
@@ -5237,7 +5242,7 @@ Namespace FBM
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As New FBM.RoleConstraint(Me, asModelElementId, True)
                         Call TableRoleConstraint.getAndLoadJoinedFactTypesByRoleConstraint(lrRoleConstraint)
-                        Me.RoleConstraint.AddUnique(TableRoleConstraint.getRoleConstraintDetailsByModel(lrRoleConstraint))
+                        Me.RoleConstraint.AddUnique(TableRoleConstraint.getRoleConstraintDetailsByModel(lrRoleConstraint, True))
 
                         Return lrRoleConstraint
                     Case Is = pcenumConceptType.ModelNote

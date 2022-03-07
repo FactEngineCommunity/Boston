@@ -13,6 +13,8 @@ Namespace Ontology
 
         Public Model As New List(Of FBM.Model)
 
+        Public Description As String
+
         Public ImageFileLocationName As String
 
 

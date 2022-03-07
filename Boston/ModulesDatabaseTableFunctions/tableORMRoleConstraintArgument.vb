@@ -118,11 +118,12 @@ Namespace TableRoleConstraintArgument
 
         End Function
 
-        Public Function GetArgumentsForRoleConstraint(ByVal arRoleConstraint As FBM.RoleConstraint) As List(Of FBM.RoleConstraintArgument)
+        Public Function GetArgumentsForRoleConstraint(ByVal arRoleConstraint As FBM.RoleConstraint,
+                                                      Optional ByVal abDynamicallyLoadRequiredModelElements As Boolean = False) As List(Of FBM.RoleConstraintArgument)
 
             Try
                 Dim larRoleConstraintArgument As New List(Of FBM.RoleConstraintArgument)
-                Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument                
+                Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
                 Dim lsSQLQuery As String = ""
                 Dim lREcordset As New ADODB.Recordset
 
@@ -137,12 +138,12 @@ Namespace TableRoleConstraintArgument
                 lREcordset.Open(lsSQLQuery)
 
                 While Not lREcordset.EOF
-                    lrRoleConstraintArgument = New FBM.RoleConstraintArgument(arRoleConstraint, _
-                                                                              lREcordset("SequenceNr").Value, _
-                                                                              Trim(lREcordset("Id").Value) _
+                    lrRoleConstraintArgument = New FBM.RoleConstraintArgument(arRoleConstraint,
+                                                                              lREcordset("SequenceNr").Value,
+                                                                              Trim(lREcordset("Id").Value)
                                                                               )
                     lrRoleConstraintArgument.isDirty = False
-                    lrRoleConstraintArgument.JoinPath = TableJoinPathRole.GetJoinPathForArgument(lrRoleConstraintArgument)
+                    lrRoleConstraintArgument.JoinPath = TableJoinPathRole.GetJoinPathForArgument(lrRoleConstraintArgument, abDynamicallyLoadRequiredModelElements)
 
                     larRoleConstraintArgument.Add(lrRoleConstraintArgument)
 
