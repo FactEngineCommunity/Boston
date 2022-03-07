@@ -7,14 +7,15 @@ Namespace FBM
         Inherits FBM.ModelObject
         Implements ICloneable
         Implements iMDAObject
+        Implements IEquatable(Of FBM.ModelNote)
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.ModelNote
 
         Public Text As String = "" 'The text of the ModelNote
         Public JoinedObjectType As FBM.ModelObject
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean = False
         <XmlAttribute()>
         Public Overrides Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
@@ -41,9 +42,15 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       Optional ByVal asModelNoteId As String = Nothing)
 
             Call Me.New()
+            If asModelNoteId IsNot Nothing Then
+                Me.Id = asModelNoteId
+            Else
+                Me.Id = System.Guid.NewGuid.ToString
+            End If
             Me.Model = arModel
 
         End Sub
@@ -92,6 +99,10 @@ Namespace FBM
 
             Return lrModelNoteInstance
 
+        End Function
+
+        Public Overloads Function Equals(other As ModelNote) As Boolean Implements IEquatable(Of ModelNote).Equals
+            Return Me.Id = other.Id
         End Function
 
         Public Overrides Function CanSafelyRemoveFromModel() As Boolean

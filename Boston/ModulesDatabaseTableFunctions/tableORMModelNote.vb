@@ -132,6 +132,92 @@ Namespace TableModelNote
 
         End Function
 
+        Public Function getModelNoteDetailsByModel(ByRef arModelNote As FBM.ModelNote, ByVal abAddToModel As Boolean) As FBM.ModelNote
+
+            Try
+                Dim lsSQLQuery As String = ""
+                Dim lRecordset As New ADODB.Recordset
+
+                Dim lsMessage As String
+
+                lRecordset.ActiveConnection = pdbConnection
+                lRecordset.CursorType = pcOpenStatic
+
+                '---------------------------------------------
+                'First get EntityTypes with no ParentEntityId
+                '---------------------------------------------
+                lsSQLQuery = " SELECT MN.*, MD.*"
+                lsSQLQuery &= "  FROM MetaModelModelNote MN,"
+                lsSQLQuery &= "       MetaModelModelDictionary MD"
+                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arModelNote.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND MD.Symbol = MN.ModelNoteId"
+                lsSQLQuery &= "   AND MD.ModelId = MN.ModelId"
+                lsSQLQuery &= "   AND MN.ModelNoteId = '" & arModelNote.Id & "'"
+
+                lRecordset.Open(lsSQLQuery)
+
+                If Not lRecordset.EOF Then
+                    arModelNote.isDirty = False
+                    arModelNote.ShortDescription = Trim(Viev.NullVal(lRecordset("ShortDescription").Value, ""))
+                    arModelNote.LongDescription = Trim(Viev.NullVal(lRecordset("LongDescription").Value, ""))
+                    arModelNote.ConceptType = pcenumConceptType.ModelNote
+                    arModelNote.Text = Trim(Viev.NullVal(lRecordset("Note").Value, ""))
+                    arModelNote.IsMDAModelElement = CBool(lRecordset("IsMDAModelElement").Value)
+                    arModelNote.isDirty = False
+
+                    If lRecordset("JoinedObjectTypeId").Value = "" Then
+                        arModelNote.JoinedObjectType = Nothing
+                    Else
+                        arModelNote.JoinedObjectType = New FBM.ModelObject
+                        arModelNote.JoinedObjectType.Id = Trim(Viev.NullVal(lRecordset("JoinedObjectTypeId").Value, ""))
+                        If IsSomething(arModelNote.Model.EntityType.Find(AddressOf arModelNote.JoinedObjectType.Equals)) Then
+                            arModelNote.JoinedObjectType = arModelNote.Model.EntityType.Find(AddressOf arModelNote.JoinedObjectType.Equals)
+                        ElseIf IsSomething(arModelNote.Model.ValueType.Find(AddressOf arModelNote.JoinedObjectType.Equals)) Then
+                            arModelNote.JoinedObjectType = arModelNote.Model.ValueType.Find(AddressOf arModelNote.JoinedObjectType.Equals)
+                        ElseIf IsSomething(arModelNote.Model.FactType.Find(AddressOf arModelNote.JoinedObjectType.Equals)) Then
+                            arModelNote.JoinedObjectType = arModelNote.Model.FactType.Find(AddressOf arModelNote.JoinedObjectType.Equals)
+                        End If
+                    End If
+
+                    '------------------------------------------------
+                    'Link to the Concept within the ModelDictionary
+                    '------------------------------------------------
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(arModelNote.Model, arModelNote.Id, pcenumConceptType.ModelNote, arModelNote.ShortDescription, arModelNote.LongDescription)
+                    lrDictionaryEntry = arModelNote.Model.AddModelDictionaryEntry(lrDictionaryEntry)
+
+                    If lrDictionaryEntry Is Nothing Then
+                        lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for ModelNote:"
+                        lsMessage &= vbCrLf & "Model.Id: " & arModelNote.Model.ModelId
+                        lsMessage &= vbCrLf & "ModelNote.Id: " & arModelNote.Id
+                        Throw New Exception(lsMessage)
+                    End If
+
+                    arModelNote.Concept = lrDictionaryEntry.Concept
+
+                    If abAddToModel Then
+                        Call arModelNote.Model.AddModelNote(arModelNote, True)
+                    End If
+                Else
+                    Throw New Exception("No Model Note exists in the database for ModelNoteId: " & arModelNote.Id)
+                End If
+
+                lRecordset.Close()
+
+                Return arModelNote
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return arModelNote
+            End Try
+
+        End Function
+
         Public Function getModelNotesByModel(ByRef arModel As FBM.Model) As List(Of FBM.ModelNote)
 
             Dim lrModelNote As FBM.ModelNote

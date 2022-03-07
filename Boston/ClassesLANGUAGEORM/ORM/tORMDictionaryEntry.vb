@@ -496,6 +496,8 @@ Namespace FBM
                 Return pcenumConceptType.EntityType
             ElseIf Me.isRoleConstraint Then
                 Return pcenumConceptType.RoleConstraint
+            ElseIf Me.isModelNote Then
+                Return pcenumConceptType.ModelNote
             End If
         End Function
 

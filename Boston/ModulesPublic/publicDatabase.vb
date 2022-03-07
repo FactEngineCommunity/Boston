@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports adox
 
 Namespace Database
 
@@ -272,6 +273,24 @@ Namespace Database
                                     GoTo error_handler
                                 End If
                                 transaction = pdb_OLEDB_connection.BeginTransaction()
+
+                            Case Is = 8 'Create Proceedure
+                                'NB Can use
+                                'CREATE VIEW MDB AS
+                                'Select *
+                                'From MetaModelModelDictionary
+
+                                '20220307-VM-To Do. Not yet implemented
+                                Throw New NotImplementedException("Not yet implemented. Type 8 upgrade type.")
+                                Dim cat As New ADOX.Catalog
+                                cat.ActiveConnection = pdbConnection
+                                'Delete existing procedure
+                                cat.Procedures.Delete("strProcedureName")
+
+                                'Create new procedure
+                                Dim cmd As New ADODB.Command
+                                cmd.CommandText = "strSQLStatement"
+                                cat.Procedures.Append("ProcedureName", cmd)
                         End Select
 
                         lrRecordset.MoveNext()

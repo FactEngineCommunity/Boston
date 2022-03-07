@@ -1248,6 +1248,7 @@ Namespace FBM
         Public Sub LoadRelatedModelElementsToModel()
 
             Try
+                Dim lrModelElement As FBM.ModelObject
                 Dim larRole As List(Of FBM.Role) = TableRole.GetRolesForModelFactType(Me, False, True)
 
                 For Each lrRole In larRole
@@ -1263,12 +1264,15 @@ Namespace FBM
                     If lrRole.JoinedORMObject Is Nothing Then
                         Select Case lrRole.TypeOfJoin
                             Case Is = pcenumRoleJoinType.ValueType
-                                Call Me.Model.LoadModelElementById(pcenumConceptType.ValueType, lrRole.JoinsModelElementId)
+                                lrModelElement = Me.Model.LoadModelElementById(pcenumConceptType.ValueType, lrRole.JoinsModelElementId)
+                                Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrModelElement, True)
                             Case Is = pcenumRoleJoinType.EntityType
-                                Call Me.Model.LoadModelElementById(pcenumConceptType.EntityType, lrRole.JoinsModelElementId)
+                                lrModelElement = Me.Model.LoadModelElementById(pcenumConceptType.EntityType, lrRole.JoinsModelElementId)
+                                Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrModelElement, True)
                             Case Is = pcenumRoleJoinType.FactType
                                 Dim lrFactType As New FBM.FactType(Me.Model, lrRole.JoinsModelElementId, True)
-                                Call TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
+                                lrModelElement = TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
+                                Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrModelElement, True)
                         End Select
 
                     End If

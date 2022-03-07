@@ -5233,12 +5233,17 @@ Namespace FBM
                         Dim lrFactType As New FBM.FactType(Me, asModelElementId, True)
                         TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
 
+                        Return lrFactType
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As New FBM.RoleConstraint(Me, asModelElementId, True)
                         Call TableRoleConstraint.getAndLoadJoinedFactTypesByRoleConstraint(lrRoleConstraint)
                         Me.RoleConstraint.AddUnique(TableRoleConstraint.getRoleConstraintDetailsByModel(lrRoleConstraint))
 
                         Return lrRoleConstraint
+                    Case Is = pcenumConceptType.ModelNote
+                        Dim lrModelNote As New FBM.ModelNote(Me, asModelElementId)
+                        Call TableModelNote.getModelNoteDetailsByModel(lrModelNote, True)
+                        Return lrModelNote
                     Case Else
                         Return Nothing
                 End Select
@@ -5268,12 +5273,30 @@ Namespace FBM
 
                 For Each lrConceptInstance In TableConceptInstance.getConceptInstancesByPage(arPage)
 
+                    Select Case lrConceptInstance.ConceptType
+                        Case Is = pcenumConceptType.Fact,
+                                  pcenumConceptType.FactTable,
+                                  pcenumConceptType.FactTypeName,
+                                  pcenumConceptType.FactTypeReading,
+                                  pcenumConceptType.RoleName,
+                                  pcenumConceptType.Value
+
+                            GoTo SkipModelElement
+                    End Select
                     lrModelDictionaryEntry = arPage.Model.ModelDictionary.Find(Function(x) x.Symbol = lrConceptInstance.Symbol)
-                    lrModelElement = arPage.getModelElementById(lrModelDictionaryEntry.Symbol)
+
+                    If lrModelDictionaryEntry Is Nothing Then
+                        GoTo SkipModelElement
+                    End If
+
+                    lrModelElement = arPage.Model.GetModelObjectByName(lrModelDictionaryEntry.Symbol, True)
 
                     If lrModelElement Is Nothing Then
-                        Call Me.LoadModelElementById(lrModelDictionaryEntry.GetModelObjectConceptType, lrModelDictionaryEntry.Symbol)
+                        lrModelElement = Me.LoadModelElementById(lrModelDictionaryEntry.GetModelObjectConceptType, lrModelDictionaryEntry.Symbol)
+
+                        Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrModelElement, True)
                     End If
+SkipModelElement: 'Because is not in the ModelDictionary
                 Next
 
             Catch ex As Exception

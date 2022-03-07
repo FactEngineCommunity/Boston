@@ -19,6 +19,20 @@ Public Class frmUnifiedOntologyBrowser
             Me.LabelOntologyName.Text = Me.zrUnifiedOntology.Name
             Call Me.ShowGlossary(Me.zrUnifiedOntology)
 
+
+            Dim lsFolderLocation As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+            Dim lsFileName As String = "UnifiedOntologyBrowser.bmp"
+            Dim lsFileLocationName As String = lsFolderLocation & "\" & lsFileName
+
+            Try
+                Me.zrUnifiedOntology.Image.Save(lsFileLocationName)
+            Catch ex As Exception
+                Debugger.Break()
+            End Try
+
+
+            Me.WebBrowser.Navigate(lsFileLocationName)
+
             '======================================================================================
             'Load the Sub ORM Diagram Form/Viewer
             Dim formToShow As New frmDiagramORMForGlossary
@@ -391,6 +405,7 @@ Public Class frmUnifiedOntologyBrowser
 
                             'Load the related FactTypes.
                             lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                            Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrValueType, True)
 
                         Case Is = pcenumConceptType.EntityType
                             Dim lrEntityType As FBM.EntityType
@@ -403,11 +418,12 @@ Public Class frmUnifiedOntologyBrowser
                                                                   lrModelDictionaryEntry.Symbol,
                                                                   Nothing,
                                                                   True)
-                                lrEntityType.Model.EntityType.AddUnique(TableEntityType.GetEntityTypeDetails(lrEntityType))
+                                lrEntityType = TableEntityType.GetEntityTypeDetails(lrEntityType)
+                                lrEntityType.Model.EntityType.AddUnique(lrEntityType)
 
                                 Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
-
                                 Call lrEntityType.SetReferenceModeObjects()
+                                Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrEntityType, True)
                             End If
 
 
@@ -1153,6 +1169,12 @@ Public Class frmUnifiedOntologyBrowser
             lrModel = lrModelDictionaryEntry.Model
             Select Case lrModelDictionaryEntry.GetModelObjectConceptType
                 Case Is = pcenumConceptType.ValueType
+                    Dim lrValueType As New FBM.ValueType(lrModel, pcenumLanguage.ORMModel, lrModelDictionaryEntry.Symbol, True)
+
+                    larPage = TableConceptInstance.getPagesContainingDictionaryEntry(lrModelDictionaryEntry)
+                    For Each lrPage In prApplication.CMML.getSTDDiagramPagesForValueType(lrValueType)
+                        larPage.AddUnique(lrPage)
+                    Next
                 Case Is = pcenumConceptType.EntityType
                     Dim lrEntityType As New FBM.EntityType(lrModel, pcenumLanguage.ORMModel, lrModelDictionaryEntry.Symbol, Nothing, True)
 

@@ -154,6 +154,89 @@ Namespace TableSubtypeRelationship
 
         End Function
 
+        Public Function GetSubtypeRelationshipsForModelElementByModel(ByRef arSubtypeModelElement As FBM.ModelObject,
+                                                                      ByVal abAddToSubtypeModelElement As Boolean) As List(Of FBM.tSubtypeRelationship)
+
+            Dim lrSupertypeModelElement As FBM.ModelObject
+            Dim lsSQLQuery As String
+            Dim lrRecordset As New ADODB.Recordset
+            Dim lsSubtypeModelElementId As String = arSubtypeModelElement.Id
+            Dim lsId As String
+            Dim lsMessage As String
+
+            '-----------------------------
+            'Initialise the return value
+            '-----------------------------
+            GetSubtypeRelationshipsForModelElementByModel = New List(Of FBM.tSubtypeRelationship)
+
+            Try
+                lrRecordset.ActiveConnection = pdbConnection
+                lrRecordset.CursorType = pcOpenStatic
+
+                '------------------------------------------------------
+                'Now Link the EntityTypes to their Parent EntityTypes
+                '------------------------------------------------------
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM MetaModelSubtypeRelationship"
+                lsSQLQuery &= " WHERE ModelId = '" & Trim(arSubtypeModelElement.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND ObjectTypeId = '" & Trim(arSubtypeModelElement.Id) & "'"
+
+                lrRecordset.Open(lsSQLQuery)
+
+                While Not lrRecordset.EOF
+                    lsId = Trim(lrRecordset("ObjectTypeId").Value)
+                    lsId = Trim(lrRecordset("SupertypeObjectTypeId").Value)
+                    lrSupertypeModelElement = arSubtypeModelElement.Model.GetModelObjectByName(lsId)
+                    If lrSupertypeModelElement Is Nothing Then
+                        Try
+                            Dim lrModelDictionaryEntry As FBM.DictionaryEntry = arSubtypeModelElement.Model.ModelDictionary.Find(Function(x) x.Symbol = lsSubtypeModelElementId)
+                            lrSupertypeModelElement = arSubtypeModelElement.Model.LoadModelElementById(lrModelDictionaryEntry.GetModelObjectConceptType, lsId)
+                            Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrSupertypeModelElement, True)
+                        Catch ex As Exception
+                            lsMessage = "Problems finding Supertype Model Element details in the Model Dictionary"
+                            lsMessage.AppendDoubleLineBreak("Supertype Model Element Id: " & lsId)
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
+                            GoTo SkipSubtypeRelationship
+                        End Try
+
+                    End If
+                    arSubtypeModelElement.parentModelObjectList.Add(lrSupertypeModelElement)
+                    lrSupertypeModelElement.childModelObjectList.Add(arSubtypeModelElement)
+
+                    Dim lrFactType As FBM.FactType
+                    lsId = Trim(lrRecordset("SubtypingFactTypeId").Value)
+                    lrFactType = arSubtypeModelElement.Model.FactType.Find(Function(x) x.Id = lsId)
+
+                    If lrFactType Is Nothing Then
+                        lrFactType = New FBM.FactType(arSubtypeModelElement.Model, lsId, True)
+                        lrFactType = TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
+                    End If
+
+                    Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship(arSubtypeModelElement, lrSupertypeModelElement, lrFactType)
+                    lrSubtypeRelationship.isDirty = False
+                    lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(lrRecordset("IsPrimarySubtypeRelationship").Value)
+
+                    If abAddToSubtypeModelElement Then
+                        arSubtypeModelElement.SubtypeRelationship.Add(lrSubtypeRelationship)
+                    End If
+
+                    GetSubtypeRelationshipsForModelElementByModel.Add(lrSubtypeRelationship)
+SkipSubtypeRelationship:
+                    lrRecordset.MoveNext()
+                End While
+
+                lrRecordset.Close()
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Gets the SubtypeInstances by Page.
         ''' NB Only returns those where both the EntityType and ParentEntityType are both on the Page.

@@ -174,6 +174,7 @@ Namespace TableConceptInstance
                     lrConceptInstance.Y = lREcordset("y").Value
                     lrConceptInstance.Orientation = lREcordset("Orientation").Value
                     lrConceptInstance.Visible = lREcordset("IsVisible").Value
+                    lrConceptInstance.ConceptType = CType([Enum].Parse(GetType(pcenumConceptType), Trim(lREcordset("ConceptType").Value)), pcenumConceptType)
 
                     larConceptInstance.Add(lrConceptInstance)
 

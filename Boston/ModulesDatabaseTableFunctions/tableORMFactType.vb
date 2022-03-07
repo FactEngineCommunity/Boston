@@ -189,9 +189,9 @@ Namespace TableFactType
         ''' <param name="arFactType">The FactType to load.</param>
         ''' <param name="abAddFactTypeToModel">True if the FactType is to be added to the Model.</param>
         ''' <param name="abDynamicallyLoadRelatedModelElements">As used by the Unified Ontology Browser so the whole Model doesn't have to be loaded at once.</param>
-        Public Sub GetFactTypeDetailsByModel(ByRef arFactType As FBM.FactType,
+        Public Function GetFactTypeDetailsByModel(ByRef arFactType As FBM.FactType,
                                              Optional ByVal abAddFactTypeToModel As Boolean = False,
-                                             Optional ByVal abDynamicallyLoadRelatedModelElements As Boolean = False)
+                                             Optional ByVal abDynamicallyLoadRelatedModelElements As Boolean = False) As FBM.FactType
 
             Dim lsMessage As String
             Dim lsSQLQuery As String = ""
@@ -247,15 +247,15 @@ Namespace TableFactType
                     '------------------------------------------------------------
                     arFactType.RoleGroup = TableRole.GetRolesForModelFactType(arFactType, abAddFactTypeToModel)
 
-                        '------------------------------------------------------------
-                        'Get the FactTypeReadings for the FactType
-                        '------------------------------------------------------------
-                        arFactType.FactTypeReading = TableFactTypeReading.GetFactTypeReadingsForFactType(arFactType)
+                    '------------------------------------------------------------
+                    'Get the FactTypeReadings for the FactType
+                    '------------------------------------------------------------
+                    arFactType.FactTypeReading = TableFactTypeReading.GetFactTypeReadingsForFactType(arFactType)
 
-                        '----------------------------------------------
-                        'Get the Facts (FactTypeData) for the FactType
-                        '----------------------------------------------
-                        TableFact.GetFactsForFactType(arFactType)
+                    '----------------------------------------------
+                    'Get the Facts (FactTypeData) for the FactType
+                    '----------------------------------------------
+                    TableFact.GetFactsForFactType(arFactType)
 
                     '---------------------------------------------
                     'ObjectifyingEntityType
@@ -295,17 +295,19 @@ Namespace TableFactType
                     End If
 
                 Else
-                        lsMessage = "Error: No FactType exists in the database for FactType.Id: " & arFactType.Id
-                        Throw New System.Exception(lsMessage)
-                    End If
+                    lsMessage = "Error: No FactType exists in the database for FactType.Id: " & arFactType.Id
+                    Throw New System.Exception(lsMessage)
+                End If
 
-                    lREcordset.Close()
+                lREcordset.Close()
 
-                    If abAddFactTypeToModel Then
-                        Dim lrDictionaryEntry As FBM.DictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
-                        arFactType.DBName = lrDictionaryEntry.DBName
-                        arFactType.Model.AddFactType(arFactType, False, False)
-                    End If
+                If abAddFactTypeToModel Then
+                    Dim lrDictionaryEntry As FBM.DictionaryEntry = arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
+                    arFactType.DBName = lrDictionaryEntry.DBName
+                    arFactType.Model.AddFactType(arFactType, False, False)
+                End If
+
+                Return arFactType
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -318,9 +320,12 @@ Namespace TableFactType
                     arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
                     arFactType.Model.AddFactType(arFactType, False, False)
                 End If
+
+                Return arFactType
+
             End Try
 
-        End Sub
+        End Function
 
         Public Function GetFactTypesByModel(ByRef arModel As FBM.Model, Optional ByVal abAddToModel As Boolean = False) As List(Of FBM.FactType)
 
