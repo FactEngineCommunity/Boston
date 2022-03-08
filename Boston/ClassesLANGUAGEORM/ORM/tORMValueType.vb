@@ -990,6 +990,14 @@ Namespace FBM
                     End If
                 Next
 
+                '--------------------------------------------------------------
+                'Save any SubtypeRelationships associated with the ValueType
+                '-----------------------------------------
+                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    Call lrSubtypeRelationship.Save(abRapidSave)
+                Next
+
                 'Removes ValueConstraintValues (from the database) that are no longer associated with this ValueType
                 Call TableValueTypeValueConstraint.remove_unneeded_value_constraints(Me)
 

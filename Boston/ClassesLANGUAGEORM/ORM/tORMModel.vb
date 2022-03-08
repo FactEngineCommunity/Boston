@@ -5159,10 +5159,10 @@ Namespace FBM
 
         End Sub
 
-        Public Sub LoadFactTypesRelatedToModelElement(ByRef arModelElement As FBM.ModelObject)
+        Public Sub LoadFactTypesRelatedToModelElement(ByRef arModelElement As FBM.ModelObject, ByVal abLoadAssociatedInternalUniquenessConstraints As Boolean)
 
             Try
-                TableFactType.GetFactTypesByModelJoinedModelElement(Me, arModelElement, True)
+                TableFactType.GetFactTypesByModelJoinedModelElement(Me, arModelElement, True, abLoadAssociatedInternalUniquenessConstraints)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

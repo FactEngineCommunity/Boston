@@ -545,6 +545,7 @@
     <Compile Include="ClassesLANGUAGEORM\FixModelErrors\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMGlossaryWriter\tORMGlossaryMaker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMEntityTypeDerivationText.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMModelObjectInstance.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintRoleValueConstraint.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintValueConstraint.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />

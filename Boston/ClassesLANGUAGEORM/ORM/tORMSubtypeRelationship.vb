@@ -97,18 +97,24 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Clones the SubtypeRelationship into a SubtypeRelationhip instance.
+        ''' </summary>
+        ''' <param name="arPage">The Page onto which the SubtypeRelatioship is to be cloned.</param>
+        ''' <param name="abAddToPage">Not used for SubtypeRelationship</param>
+        ''' <returns></returns>
         Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
-            Dim lrSubtypeConstraintInstance As New FBM.SubtypeRelationshipInstance
+            Dim lrSubtypeRelationshipInstance As New FBM.SubtypeRelationshipInstance
 
             Try
                 With Me
-                    lrSubtypeConstraintInstance.Page = arPage
-                    lrSubtypeConstraintInstance.Model = arPage.Model
+                    lrSubtypeRelationshipInstance.Page = arPage
+                    lrSubtypeRelationshipInstance.Model = arPage.Model
 
-                    lrSubtypeConstraintInstance.ModelElement = arPage.getModelElementById(.ModelElement.Id)
+                    lrSubtypeRelationshipInstance.ModelElement = arPage.getModelElementById(.ModelElement.Id)
 
-                    lrSubtypeConstraintInstance.parentModelElement = arPage.getModelElementById(.parentModelElement.Id)
+                    lrSubtypeRelationshipInstance.parentModelElement = arPage.getModelElementById(.parentModelElement.Id)
 
                     Dim lrFactTypeInstance As New FBM.FactTypeInstance
                     lrFactTypeInstance.Id = .FactType.Id
@@ -116,16 +122,16 @@ Namespace FBM
                     If lrFactTypeInstance Is Nothing Then
                         lrFactTypeInstance = .FactType.CloneInstance(arPage, abAddToPage)
                     End If
-                    lrSubtypeConstraintInstance.FactType = lrFactTypeInstance
-                    lrSubtypeConstraintInstance.FactType.SubtypeConstraintInstance = lrSubtypeConstraintInstance
+                    lrSubtypeRelationshipInstance.FactType = lrFactTypeInstance
+                    lrSubtypeRelationshipInstance.FactType.SubtypeRelationshipInstance = lrSubtypeRelationshipInstance
 
-                    lrSubtypeConstraintInstance.IsPrimarySubtypeRelationship = .IsPrimarySubtypeRelationship
+                    lrSubtypeRelationshipInstance.IsPrimarySubtypeRelationship = .IsPrimarySubtypeRelationship
 
-                    lrSubtypeConstraintInstance.SubtypeRelationship = Me
+                    lrSubtypeRelationshipInstance.SubtypeRelationship = Me
 
                 End With
 
-                Return lrSubtypeConstraintInstance
+                Return lrSubtypeRelationshipInstance
 
             Catch ex As Exception
                 Dim lsMessage As String

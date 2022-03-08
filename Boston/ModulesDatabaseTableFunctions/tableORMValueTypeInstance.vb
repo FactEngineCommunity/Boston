@@ -48,7 +48,7 @@ Namespace TableValueTypeInstance
 
         End Function
 
-        Function getValueTypeInstances_by_page(ByRef lrPage As FBM.Page) As List(Of FBM.ValueTypeInstance)
+        Function getValueTypeInstances_by_page(ByRef arPage As FBM.Page) As List(Of FBM.ValueTypeInstance)
 
             Dim lrValueTypeInstance As FBM.ValueTypeInstance
             Dim lsSQLQuery As String = ""
@@ -66,31 +66,30 @@ Namespace TableValueTypeInstance
                 lsSQLQuery = " SELECT vt.*, ci.*"
                 lsSQLQuery &= "  FROM MetaModelValueType vt,"
                 lsSQLQuery &= "       ModelConceptInstance ci"
-                lsSQLQuery &= " WHERE ci.PageId = '" & Trim(lrPage.PageId) & "'"
+                lsSQLQuery &= " WHERE ci.PageId = '" & Trim(arPage.PageId) & "'"
                 lsSQLQuery &= "   AND ci.Symbol = vt.ValueTypeId"
-                lsSQLQuery &= "   AND vt.ModelId = '" & Trim(lrPage.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND vt.ModelId = '" & Trim(arPage.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND ci.ConceptType = '" & pcenumConceptType.ValueType.ToString & "'"
 
                 lREcordset.Open(lsSQLQuery)
 
 
                 While Not lREcordset.EOF
-                        lrValueTypeInstance = New FBM.ValueTypeInstance
-                        lrValueTypeInstance.Id = lREcordset("ValueTypeId").Value
+                    lrValueTypeInstance = New FBM.ValueTypeInstance
+                    lrValueTypeInstance.Id = lREcordset("ValueTypeId").Value
 
-                        lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(Function(x) x.Id = lrValueTypeInstance.Id)
+                    lrValueTypeInstance.ValueType = arPage.Model.ValueType.Find(Function(x) x.Id = lrValueTypeInstance.Id)
 
-                        'CodeSafe
-                        If lrValueTypeInstance.ValueType Is Nothing Then
-                            prApplication.ThrowErrorMessage("The Value Type Instance, '" & lrValueTypeInstance.Id & "', on Page, '" & lrPage.Name & "', has no corresponding Value Type in the model. Boston will try and fix this.", pcenumErrorType.Critical)
+                    'CodeSafe
+                    If lrValueTypeInstance.ValueType Is Nothing Then
+                        prApplication.ThrowErrorMessage("The Value Type Instance, '" & lrValueTypeInstance.Id & "', on Page, '" & arPage.Name & "', has no corresponding Value Type in the model. Boston will try and fix this.", pcenumErrorType.Critical)
 
-                            lrValueTypeInstance.ValueType = lrPage.Model.ValueType.Find(Function(x) LCase(x.Id) = LCase(lrValueTypeInstance.Id))
+                        lrValueTypeInstance.ValueType = arPage.Model.ValueType.Find(Function(x) LCase(x.Id) = LCase(lrValueTypeInstance.Id))
 
-                            If lrValueTypeInstance.ValueType IsNot Nothing Then
-                                Call TableConceptInstance.ModifyKey(lrValueTypeInstance, lrValueTypeInstance.ValueType.Id)
-                            End If
+                        If lrValueTypeInstance.ValueType IsNot Nothing Then
+                            Call TableConceptInstance.ModifyKey(lrValueTypeInstance, lrValueTypeInstance.ValueType.Id)
                         End If
-
+                    End If
 
                     '-------------------------------------------------------------------------------------------
                     'CodeSafe: Remove the ValueTypeInstance if it references a ValueType that no longer exists
@@ -98,8 +97,8 @@ Namespace TableValueTypeInstance
                         Call TableValueTypeInstance.DeleteValueTypeInstance(lrValueTypeInstance)
                     Else
 
-                        lrValueTypeInstance.Model = lrPage.Model
-                        lrValueTypeInstance.Page = lrPage
+                        lrValueTypeInstance.Model = arPage.Model
+                        lrValueTypeInstance.Page = arPage
                         lrValueTypeInstance.Name = lREcordset("ValueTypeName").Value
                         lrValueTypeInstance.DataType = CType([Enum].Parse(GetType(pcenumORMDataType), Trim(lREcordset("DataType").Value)), pcenumORMDataType)
                         lrValueTypeInstance.DataTypeLength = lREcordset("DataTypeLength").Value
@@ -112,6 +111,10 @@ Namespace TableValueTypeInstance
 
                         lrValueTypeInstance.X = lREcordset("x").Value
                         lrValueTypeInstance.Y = lREcordset("y").Value
+
+                        For Each lrSubtypeRelationship In lrValueTypeInstance.ValueType.SubtypeRelationship
+                            lrValueTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationship.CloneInstance(arPage, False))
+                        Next
 
                         getValueTypeInstances_by_page.Add(lrValueTypeInstance)
                     End If

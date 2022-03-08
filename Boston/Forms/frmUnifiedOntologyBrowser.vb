@@ -19,6 +19,9 @@ Public Class frmUnifiedOntologyBrowser
             Me.LabelOntologyName.Text = Me.zrUnifiedOntology.Name
             Call Me.ShowGlossary(Me.zrUnifiedOntology)
 
+            Me.ToolStripStatusLabelModel.Visible = True
+            Me.ToolStripStatusLabelModel.Text = "Term Count: " & Me.ListBox1.Items.Count
+
             'Dim lsFolderLocation As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
             'Dim lsFileName As String = "UnifiedOntologyBrowser.bmp"
             'Dim lsFileLocationName As String = lsFolderLocation & "\" & lsFileName
@@ -443,7 +446,7 @@ Public Class frmUnifiedOntologyBrowser
                             lrModelElement = lrValueType
 
                             'Load the related FactTypes.
-                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
                             Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrValueType, True)
 
                         Case Is = pcenumConceptType.EntityType
@@ -469,7 +472,7 @@ Public Class frmUnifiedOntologyBrowser
                             lrModelElement = lrEntityType
 
                             'Load the related FactTypes.
-                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
                         Case Else
                             lrModelElement = Nothing
                     End Select
@@ -1164,7 +1167,7 @@ Public Class frmUnifiedOntologyBrowser
                         lrModelElement = lrValueType
 
                         'Load the related FactTypes.
-                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
                         Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrValueType, True)
 
                     Case Is = pcenumConceptType.EntityType
@@ -1190,13 +1193,13 @@ Public Class frmUnifiedOntologyBrowser
                         lrModelElement = lrEntityType
 
                         'Load the related FactTypes.
-                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
                     Case Else
                         lrModelElement = Nothing
                 End Select
 #End Region
             Else
-                lrModelElement.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                lrModelElement.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
             End If
 
             'CodeSafe

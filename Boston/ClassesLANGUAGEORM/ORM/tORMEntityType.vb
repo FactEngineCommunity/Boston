@@ -2374,9 +2374,8 @@ Namespace FBM
                     Me.isDirty = False
                 End If
 
-                '-----------------------------------------
-                'Save any SubtypeRelationships associated
-                '  with the EntityType
+                '--------------------------------------------------------------
+                'Save any SubtypeRelationships associated with the EntityType
                 '-----------------------------------------
                 Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship

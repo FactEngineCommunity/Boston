@@ -375,9 +375,18 @@ Namespace FBM
         Public PreboundReadingText As String = ""
 
 
-        '<NonSerialized()> _
+        Private _SubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
+
         <XmlElement()>
-        Public SubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
+        Public Overridable Property SubtypeRelationship As List(Of FBM.tSubtypeRelationship)
+            Get
+                Return Me._SubtypeRelationship
+            End Get
+            Set(value As List(Of FBM.tSubtypeRelationship))
+                Me._SubtypeRelationship = value
+            End Set
+        End Property
+
 
         Public Overridable ReadOnly Property isSubtype As Boolean
             Get

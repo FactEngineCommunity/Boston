@@ -1031,7 +1031,7 @@ Namespace FBM
                             '-------------------------------------------------------------                                   
                             If lrRoleInstance.FactType.IsSubtypeRelationshipFactType Then
                                 'See tORMRoleConstraintLink for Draw method for the link.
-                                lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrRoleInstance.FactType.SubtypeConstraintInstance
+                                lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrRoleInstance.FactType.SubtypeRelationshipInstance
                             Else
                                 Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, lrRoleInstance.Shape)
                                 lo_link.Visible = True
@@ -1899,7 +1899,7 @@ Namespace FBM
                 Dim lrRoleInstance As FBM.RoleInstance = lrRoleConstraintRoleInstance.Role
 
                 If lrRoleInstance.FactType.IsSubtypeRelationshipFactType Then
-                    lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrRoleInstance.FactType.SubtypeConstraintInstance
+                    lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrRoleInstance.FactType.SubtypeRelationshipInstance
                 End If
                 'If arSubtypeConstraintInstance IsNot Nothing Then
                 '    lrRoleConstraintRoleInstance.SubtypeConstraintInstance = arSubtypeConstraintInstance

@@ -886,13 +886,13 @@ Namespace FBM
                                 If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
                                     arVerbaliser.VerbaliseQuantifierLight(" one ")
                                 Else
-                                    arVerbaliser.VerbaliseQuantifierLight(" at most one ")
+                                    arVerbaliser.VerbaliseQuantifierLight(" one ")
                                 End If
                             Else
                                 If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
                                     arVerbaliser.VerbaliseQuantifierLight(" one ")
                                 Else
-                                    arVerbaliser.VerbaliseQuantifierLight(" at most one ")
+                                    arVerbaliser.VerbaliseQuantifierLight(" one ")
                                 End If
                             End If
                         Else

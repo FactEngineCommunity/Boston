@@ -117,6 +117,9 @@ Namespace FBM
         <XmlIgnore()>
         Public Shadows Fact As New List(Of FBM.FactInstance)
 
+        <XmlElement()>
+        Public Shadows SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
+
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public Shadows _ShowFactTypeName As Boolean = False
@@ -254,12 +257,12 @@ Namespace FBM
         Public FactTypeReadingShape As FBM.FactTypeReadingInstance 'Removed 'Shadows FactTypeReading and replaced with FactTypeReadingShape'
 
         ''' <summary>
-        ''' If the FactType represents a SubtypeConstraint, is the SubtypeConstraintInstance that this FactType represents.
+        ''' If the FactType represents a SubtypeRelationship, is the SubtypeRelationship that this FactType represents.
         ''' Used for joining RoleConstraints to SubtypeConstraints on a Page.Diagram. The RoleConstraint.RoleConstraintRole.Link joins the FactType.SubtypeConstraintInstance.Link
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        Public SubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
+        <XmlIgnore()>
+        Public SubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
 
         Public IsDisplayedAssociated As Boolean = False
 

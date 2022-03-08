@@ -461,7 +461,8 @@ Namespace TableFactType
 
         Public Function GetFactTypesByModelJoinedModelElement(ByRef arModel As FBM.Model,
                                                               ByRef arModelElement As FBM.ModelObject,
-                                                              Optional ByVal abAddToModel As Boolean = False) As List(Of FBM.FactType)
+                                                              Optional ByVal abAddToModel As Boolean = False,
+                                                              Optional ByVal abLoadAssociatedInternalUniquenessConstraints As Boolean = False) As List(Of FBM.FactType)
 
             Dim lsMessage As String
             Dim lrFactType As FBM.FactType
@@ -504,6 +505,10 @@ Namespace TableFactType
                             arModel.AddFactType(lrFactType, False, False, Nothing)
                         End If
 
+                        If abLoadAssociatedInternalUniquenessConstraints Then
+                            Call TableFactType.getUniquenessConstraintsForFactTypeByModel(lrFactType)
+                        End If
+
                         lREcordset.MoveNext()
                     End While
                 End If
@@ -543,6 +548,66 @@ Namespace TableFactType
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return larFactType
+            End Try
+
+        End Function
+
+        Public Function getUniquenessConstraintsForFactTypeByModel(ByRef arFactType As FBM.FactType) As List(Of FBM.RoleConstraint)
+
+            Dim larRoleConstraint As New List(Of FBM.RoleConstraint)
+
+            Dim lsMessage As String
+            Dim lsSQLQuery As String = ""
+            Dim lREcordset As New ADODB.Recordset
+            Try
+
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
+
+                lsSQLQuery = "SELECT RC.*"
+                lsSQLQuery &= "  FROM MetaModelFactType FT,"
+                lsSQLQuery &= "       MetaModelModelDictionary MD,"
+                lsSQLQuery &= "       MetaModelRole R,"
+                lsSQLQuery &= "       MetaModelRoleConstraintRole RCR,"
+                lsSQLQuery &= "       MetaModelRoleConstraint RC"
+                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arFactType.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
+                lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
+                lsSQLQuery &= "   AND FT.FactTypeId = '" & Trim(arFactType.Id) & "'"
+                lsSQLQuery &= "   AND R.ModelId = FT.ModelId"
+                lsSQLQuery &= "   AND R.FactTypeId = FT.FactTypeId"
+                lsSQLQuery &= "   AND RCR.RoleId = R.RoleId"
+                lsSQLQuery &= "   AND RCR.ModelId = R.ModelId"
+                lsSQLQuery &= "   AND RC.RoleConstraintId = RCR.RoleConstraintId"
+                lsSQLQuery &= "   AND RC.RoleConstraintType = 'InternalUniquenessConstraint'"
+                lsSQLQuery &= "   AND RC.ModelId = R.ModelId"
+
+                lREcordset.Open(lsSQLQuery)
+
+                Dim lrRoleConstraint As FBM.RoleConstraint
+
+                If Not lREcordset.EOF Then
+                    While Not lREcordset.EOF
+                        lrRoleConstraint = arFactType.Model.LoadModelElementById(pcenumConceptType.RoleConstraint, lREcordset("RoleConstraintId").Value)
+
+                        larRoleConstraint.Add(lrRoleConstraint)
+                        lREcordset.MoveNext()
+                    End While
+                End If
+
+                Return larRoleConstraint
+
+                lREcordset.Close()
+            Catch ex As Exception
+
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larRoleConstraint
             End Try
 
         End Function

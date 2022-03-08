@@ -323,15 +323,24 @@ Namespace TableFactTypeInstance
                             Call TableFactTableInstance.GetFactTableDetails(lrFactTypeInstance.FactTable)
 
                             If lrFactTypeInstance.IsSubtypeRelationshipFactType Then
-                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                                Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
-                                lrEntityTypeInstance = lrFactTypeInstance.RoleGroup(0).JoinsEntityType
-                                lrParentEntityTypeInstance = lrFactTypeInstance.RoleGroup(1).JoinsEntityType
+                                Dim lrSubtypeModelElementInstance As FBM.ModelObject
+                                Dim lrSupertypeModelElementInstance As FBM.ModelObject
+                                lrSubtypeModelElementInstance = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
+                                lrSupertypeModelElementInstance = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
 
-                                Dim lrSubtypeConstraintInstance As New FBM.SubtypeRelationshipInstance
-                                lrSubtypeConstraintInstance.ModelElement = lrEntityTypeInstance
-                                lrSubtypeConstraintInstance.parentModelElement = lrParentEntityTypeInstance
-                                lrFactTypeInstance.SubtypeConstraintInstance = lrEntityTypeInstance.SubtypeRelationship.Find(AddressOf lrSubtypeConstraintInstance.Equals)
+                                Dim lrSubtypeRelationshipInstance As New FBM.SubtypeRelationshipInstance
+                                lrSubtypeRelationshipInstance.ModelElement = lrSubtypeModelElementInstance
+                                lrSubtypeRelationshipInstance.parentModelElement = lrSupertypeModelElementInstance
+
+                                Dim larSubtypeRelationshipInstance As List(Of FBM.SubtypeRelationshipInstance) = CType(lrSubtypeModelElementInstance, Object).SubtypeRelationship
+
+                                'CodeSafe: Make sure the SubtypeRelationshipInstances are up to date
+                                For Each lrSubtypeRelationshipInstance In larSubtypeRelationshipInstance
+                                    lrSubtypeRelationshipInstance.ModelElement = arPage.getModelElementById(lrSubtypeRelationshipInstance.SubtypeRelationship.ModelElement.Id)
+                                    lrSubtypeRelationshipInstance.parentModelElement = arPage.getModelElementById(lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement.Id)
+                                Next
+
+                                lrFactTypeInstance.SubtypeRelationshipInstance = larSubtypeRelationshipInstance.Find(AddressOf lrSubtypeRelationshipInstance.Equals)
                             End If
 
                             '----------------------------------------------
