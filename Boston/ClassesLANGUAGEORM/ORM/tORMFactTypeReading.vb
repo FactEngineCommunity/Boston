@@ -878,7 +878,7 @@ Namespace FBM
 
                                 End If
                             End If
-                        ElseIf Me.FactType.Is1To1BinaryFactType Then '  InternalUniquenessConstraint.Count = 1 Then
+                        ElseIf Me.FactType.Is1To1BinaryFactType Then '  InternalUniquenessConstraint.Count = 1 Then..
 
                             arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
 
