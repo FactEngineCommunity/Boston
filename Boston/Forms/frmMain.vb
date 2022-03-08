@@ -4519,9 +4519,7 @@ Public Class frmMain
             Dim lrUnifiedOntology As New Ontology.UnifiedOntology
             Dim lsWhereClause As String = ""
 
-            With New WaitCursor
-
-                If Richmond.DisplayGenericSelectForm(lrGenericSelection,
+            If Richmond.DisplayGenericSelectForm(lrGenericSelection,
                                                "Unified Ontology",
                                                "UnifiedOntology",
                                                "UnifiedOntologyName",
@@ -4535,14 +4533,16 @@ Public Class frmMain
                                                "Unified Ontology Name") = Windows.Forms.DialogResult.OK Then
 
 
+                With New WaitCursor
+
+
                     lrUnifiedOntology.Id = lrGenericSelection.SelectValue
                     Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
 
                     Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
-                End If
+                End With
 
-            End With
-
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

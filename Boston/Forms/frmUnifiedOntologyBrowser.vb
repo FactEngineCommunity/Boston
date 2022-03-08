@@ -162,6 +162,35 @@ Public Class frmUnifiedOntologyBrowser
 
     End Sub
 
+    Private Sub ShowSelectedItem()
+
+        Try
+            Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
+                                     From DictionaryEntry In Model.ModelDictionary
+                                     Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                        And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
+                                     Select DictionaryEntry
+
+            'Dim matchingItemList As List(Of Object) = items.ToList()
+
+            ListBox1.BeginUpdate()
+            ListBox1.Items.Clear()
+            Dim lrComboBoxItem As tComboboxItem
+            For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
+                lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
+                ListBox1.Items.Add(lrComboBoxItem)
+            Next
+            ListBox1.EndUpdate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
     Public Sub VerbaliseEntityType(ByVal arEntityType As FBM.EntityType)
         '------------------------------------------------------
         'PSEUDOCODE
@@ -181,6 +210,11 @@ Public Class frmUnifiedOntologyBrowser
             '------------------------------------------------------
             lrVerbaliser.VerbaliseModelObject(arEntityType)
             lrVerbaliser.VerbaliseQuantifier(" is an Entity Type.")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+            lrVerbaliser.VerbaliseBlackText("Model: ")
+            lrVerbaliser.VerbaliseQuantifier(arEntityType.Model.Name)
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
@@ -384,6 +418,11 @@ Public Class frmUnifiedOntologyBrowser
                 End If
 
                 If lrModelDictionaryEntry IsNot Nothing Then
+
+                    Me.mrWebBrowserModel = lrModelDictionaryEntry.Model
+
+                    Me.ToolStripStatusLabelModel.Visible = True
+                    Me.ToolStripStatusLabelModel.Text = "Model: " & lrModelDictionaryEntry.Model.Name
 
                     Dim lrModelElement As FBM.ModelObject = Nothing
 
@@ -636,6 +675,11 @@ Public Class frmUnifiedOntologyBrowser
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()
 
+        lrVerbaliser.VerbaliseBlackText("Model: ")
+        lrVerbaliser.VerbaliseQuantifier(arValueType.Model.Name)
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
         If (arValueType.ShortDescription <> "") Or (arValueType.LongDescription <> "") Then
             lrVerbaliser.VerbaliseQuantifier("Informally: ")
             lrVerbaliser.HTW.WriteBreak()
@@ -748,7 +792,9 @@ Public Class frmUnifiedOntologyBrowser
 
 
         For Each lrFactType In FactType
-            lrVerbaliser.VerbaliseModelObject(lrFactType)
+            lrVerbaliser.VerbaliseTextLightGray(" (")
+            lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
+            lrVerbaliser.VerbaliseTextLightGray(") ")
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseIndent()
             If lrFactType.FactTypeReading.Count > 0 Then
@@ -800,6 +846,11 @@ Public Class frmUnifiedOntologyBrowser
             '------------------------------------------------------
             lrVerbaliser.VerbaliseModelObject(arFactType)
             lrVerbaliser.VerbaliseQuantifier(" is a Fact Type.")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+            lrVerbaliser.VerbaliseBlackText("Model: ")
+            lrVerbaliser.VerbaliseQuantifier(arFactType.Model.Name)
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
@@ -1079,27 +1130,95 @@ Public Class frmUnifiedOntologyBrowser
 
             lsModelObjectName = lasURLArgument(1)
 
-            Dim lrModelObject As FBM.ModelObject
+            Dim lrModelElement As FBM.ModelObject
 
-            lrModelObject = Me.mrWebBrowserModel.GetModelObjectByName(lsModelObjectName)
+            lrModelElement = Me.mrWebBrowserModel.GetModelObjectByName(lsModelObjectName)
 
-            Select Case lrModelObject.ConceptType
+            If lrModelElement Is Nothing Then
+#Region "Get ModelDictionaryEntry from Model"
+
+                Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+
+                Try
+                    lrModelDictionaryEntry = (From ModelDictionaryEntry In Me.mrWebBrowserModel.ModelDictionary
+                                              Where ModelDictionaryEntry.Symbol = lsModelObjectName
+                                              Select ModelDictionaryEntry).First
+                Catch ex As Exception
+                    Exit Sub
+                End Try
+
+                Select Case lrModelDictionaryEntry.GetModelObjectConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Dim lrValueType As FBM.ValueType
+                        lrValueType = lrModelDictionaryEntry.Model.ValueType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
+
+                        If lrValueType Is Nothing Then
+                            lrValueType = New FBM.ValueType(lrModelDictionaryEntry.Model,
+                                                                pcenumLanguage.ORMModel,
+                                                                lrModelDictionaryEntry.Symbol,
+                                                                lrModelDictionaryEntry.Symbol)
+
+                            lrValueType.Model.ValueType.Add(TableValueType.GetValueTypeDetails(lrValueType))
+                        End If
+
+                        lrModelElement = lrValueType
+
+                        'Load the related FactTypes.
+                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                        Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrValueType, True)
+
+                    Case Is = pcenumConceptType.EntityType
+                        Dim lrEntityType As FBM.EntityType
+
+                        lrEntityType = lrModelDictionaryEntry.Model.EntityType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
+
+                        If lrEntityType Is Nothing Then
+                            lrEntityType = New FBM.EntityType(lrModelDictionaryEntry.Model,
+                                                                  pcenumLanguage.ORMModel,
+                                                                  lrModelDictionaryEntry.Symbol,
+                                                                  Nothing,
+                                                                  True)
+                            lrEntityType = TableEntityType.GetEntityTypeDetails(lrEntityType)
+                            lrEntityType.Model.EntityType.AddUnique(lrEntityType)
+
+                            Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
+                            Call lrEntityType.SetReferenceModeObjects()
+                            Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrEntityType, True)
+                        End If
+
+
+                        lrModelElement = lrEntityType
+
+                        'Load the related FactTypes.
+                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+                    Case Else
+                        lrModelElement = Nothing
+                End Select
+#End Region
+            Else
+                lrModelElement.Model.LoadFactTypesRelatedToModelElement(lrModelElement)
+            End If
+
+            'CodeSafe
+            If lrModelElement Is Nothing Then Exit Sub
+
+            Select Case lrModelElement.ConceptType
                 Case Is = pcenumConceptType.ValueType
-                    Call Me.VerbaliseValueType(lrModelObject)
+                    Call Me.VerbaliseValueType(lrModelElement)
                 Case Is = pcenumConceptType.EntityType
-                    Call Me.VerbaliseEntityType(lrModelObject)
+                    Call Me.VerbaliseEntityType(lrModelElement)
                 Case Is = pcenumConceptType.FactType
-                    Call Me.VerbaliseFactType(lrModelObject)
+                    Call Me.VerbaliseFactType(lrModelElement)
                 Case Is = pcenumConceptType.RoleConstraint
                     'TBA
             End Select
 
-            Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
+            'Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
 
             Me.TextBox1.Text = ""
-            Call Me.LoadGlossaryListbox()
-            If Me.ListBox1.Items.Contains(lrModelObject.Id) Then
-                Me.ListBox1.SelectedIndex = Me.ListBox1.FindString(lrModelObject.Id)
+            'Call Me.LoadGlossaryListbox()
+            If Me.ListBox1.Items.Contains(lrModelElement.Id) Then
+                Me.ListBox1.SelectedIndex = Me.ListBox1.FindString(lrModelElement.Id)
             End If
 
             '------------------------------------------------------------------------------------------
@@ -1364,4 +1483,20 @@ Public Class frmUnifiedOntologyBrowser
 
     End Sub
 
+    Private Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyDown
+
+        Try
+            If e.KeyCode = Keys.Enter Then
+                Call Me.ShowSelectedItem()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
 End Class
