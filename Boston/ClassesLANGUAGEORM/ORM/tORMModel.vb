@@ -3863,7 +3863,7 @@ Namespace FBM
                 End If
 
                 If Me.StoreAsXML And Not abForceDatabaseSave Then
-                    If Not Me.Loaded Then
+                    If Not Me.Loaded And Not Me.Loading Then
                         With New WaitCursor
                             Me.Load()
                         End With
@@ -5162,7 +5162,9 @@ Namespace FBM
         Public Sub LoadFactTypesRelatedToModelElement(ByRef arModelElement As FBM.ModelObject, ByVal abLoadAssociatedInternalUniquenessConstraints As Boolean)
 
             Try
+                Richmond.WriteToStatusBar("Loading Fact Types related to the Model Element", True)
                 TableFactType.GetFactTypesByModelJoinedModelElement(Me, arModelElement, True, abLoadAssociatedInternalUniquenessConstraints)
+                Richmond.WriteToStatusBar("Loaded Fact Types related to the Model Element", True)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

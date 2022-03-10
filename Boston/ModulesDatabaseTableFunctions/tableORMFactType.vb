@@ -476,27 +476,28 @@ Namespace TableFactType
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
 
-                lsSQLQuery = " SELECT FT.*, MD.*"
+                lsSQLQuery = " SELECT FT.*"
                 lsSQLQuery &= "  FROM MetaModelFactType FT,"
-                lsSQLQuery &= "       MetaModelModelDictionary MD,"
                 lsSQLQuery &= "       MetaModelRole MMR"
-                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arModel.ModelId) & "'"
-                lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
-                lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
-                lsSQLQuery &= "   AND MD.IsFactType = " & True
+                lsSQLQuery &= " WHERE FT.ModelId = '" & Trim(arModel.ModelId) & "'"
                 lsSQLQuery &= "   AND FT.FactTypeId = MMR.FactTypeId"
+                lsSQLQuery &= "   AND FT.ModelId = MMR.ModelId"
                 lsSQLQuery &= "   AND MMR.JoinsModelElementId = '" & arModelElement.Id & "'"
-                lsSQLQuery &= " ORDER BY FT.IsObjectified ASC, FT.IsLinkFactType ASC"
 
                 lREcordset.Open(lsSQLQuery)
 
                 If Not lREcordset.EOF Then
+
+                    Richmond.WriteToStatusBar("Found " & lREcordset.RecordCount.ToString & " related Fact Types.", True)
                     While Not lREcordset.EOF
                         lrFactType = New FBM.FactType
                         lrFactType.isDirty = False
                         lrFactType.Model = arModel
                         lrFactType.Id = lREcordset("FactTypeId").Value
 
+                        If arModel.FactType.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then GoTo SkipFactType
+
+                        Richmond.WriteToStatusBar("Getting Fact Type details for Fact Type: " & lrFactType.Id, True)
                         Call TableFactType.GetFactTypeDetailsByModel(lrFactType, abAddToModel, True)
 
                         larFactType.Add(lrFactType)
@@ -505,6 +506,7 @@ Namespace TableFactType
                             arModel.AddFactType(lrFactType, False, False, Nothing)
                         End If
 
+SkipFactType:
                         If abLoadAssociatedInternalUniquenessConstraints Then
                             Call TableFactType.getUniquenessConstraintsForFactTypeByModel(lrFactType)
                         End If
@@ -560,19 +562,17 @@ Namespace TableFactType
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
             Try
+                Dim lsFactTypeId As String = arFactType.Id
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
 
                 lsSQLQuery = "SELECT RC.*"
                 lsSQLQuery &= "  FROM MetaModelFactType FT,"
-                lsSQLQuery &= "       MetaModelModelDictionary MD,"
                 lsSQLQuery &= "       MetaModelRole R,"
                 lsSQLQuery &= "       MetaModelRoleConstraintRole RCR,"
                 lsSQLQuery &= "       MetaModelRoleConstraint RC"
-                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arFactType.Model.ModelId) & "'"
-                lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
-                lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
+                lsSQLQuery &= " WHERE FT.ModelId = '" & Trim(arFactType.Model.ModelId) & "'"
                 lsSQLQuery &= "   AND FT.FactTypeId = '" & Trim(arFactType.Id) & "'"
                 lsSQLQuery &= "   AND R.ModelId = FT.ModelId"
                 lsSQLQuery &= "   AND R.FactTypeId = FT.FactTypeId"
@@ -588,9 +588,13 @@ Namespace TableFactType
 
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
+
+                        If arFactType.Model.RoleConstraint.Find(Function(x) x.Id = lsFactTypeId) IsNot Nothing Then GoTo SkipRoleConstraint
+
                         lrRoleConstraint = arFactType.Model.LoadModelElementById(pcenumConceptType.RoleConstraint, lREcordset("RoleConstraintId").Value)
 
                         larRoleConstraint.Add(lrRoleConstraint)
+SkipRoleConstraint:
                         lREcordset.MoveNext()
                     End While
                 End If

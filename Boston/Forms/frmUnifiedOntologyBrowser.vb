@@ -460,11 +460,14 @@ Public Class frmUnifiedOntologyBrowser
                                                                   lrModelDictionaryEntry.Symbol,
                                                                   Nothing,
                                                                   True)
+                                Richmond.WriteToStatusBar("Getting Entity Type details.", True)
                                 lrEntityType = TableEntityType.GetEntityTypeDetails(lrEntityType)
                                 lrEntityType.Model.EntityType.AddUnique(lrEntityType)
 
+                                Richmond.WriteToStatusBar("Loading Entity Type Reference Scheme Model Elements.", True)
                                 Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
                                 Call lrEntityType.SetReferenceModeObjects()
+                                Richmond.WriteToStatusBar("Getting Subtype Relationships for Model Element.", True)
                                 Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrEntityType, True)
                             End If
 
