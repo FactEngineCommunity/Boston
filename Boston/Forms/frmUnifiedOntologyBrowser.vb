@@ -141,49 +141,58 @@ Public Class frmUnifiedOntologyBrowser
 
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
 
-        'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
-        '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
+        ''Dim items = From it In ListBox1.Items.Cast(Of Object)() _
+        ''    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
 
-        If Me.ListBox1.Items.Count < 200 Then
-            Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
-                                     From DictionaryEntry In Model.ModelDictionary
-                                     Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                        And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
-                                     Select DictionaryEntry
+        'If Me.ListBox1.Items.Count < 200 Then
 
-            'Dim matchingItemList As List(Of Object) = items.ToList()
+        '    Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
+        '                             From DictionaryEntry In Model.ModelDictionary
+        '                             Where (DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+        '                                   Or Fastenshtein.Levenshtein.Distance(DictionaryEntry.Symbol, TextBox1.Text) < 4)
+        '                             Where DictionaryEntry.isEntityType Or DictionaryEntry.isValueType
+        '                             Select DictionaryEntry
 
-            ListBox1.BeginUpdate()
-            ListBox1.Items.Clear()
-            Dim lrComboBoxItem As tComboboxItem
-            For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
-                lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
-                ListBox1.Items.Add(lrComboBoxItem)
-            Next
-            ListBox1.EndUpdate()
-        End If
+        '    'Dim matchingItemList As List(Of Object) = items.ToList()
+
+        '    ListBox1.BeginUpdate()
+        '    ListBox1.Items.Clear()
+        '    Dim lrComboBoxItem As tComboboxItem
+        '    For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
+        '        lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
+        '        ListBox1.Items.Add(lrComboBoxItem)
+        '    Next
+        '    ListBox1.EndUpdate()
+        'End If
 
     End Sub
 
     Private Sub ShowSelectedItem()
 
         Try
-            Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
-                                     From DictionaryEntry In Model.ModelDictionary
-                                     Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                        And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
-                                     Select DictionaryEntry
 
-            'Dim matchingItemList As List(Of Object) = items.ToList()
+            With New WaitCursor
+                Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
+                                         From DictionaryEntry In Model.ModelDictionary
+                                         Where (DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                                               Or Fastenshtein.Levenshtein.Distance(DictionaryEntry.Symbol, TextBox1.Text) < 4 _
+                                               Or Richmond.Soundex(DictionaryEntry.Symbol, 4) = Richmond.Soundex(TextBox1.Text, 4))
+                                         Where DictionaryEntry.isEntityType Or DictionaryEntry.isValueType
+                                         Select DictionaryEntry
 
-            ListBox1.BeginUpdate()
-            ListBox1.Items.Clear()
-            Dim lrComboBoxItem As tComboboxItem
-            For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
-                lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
-                ListBox1.Items.Add(lrComboBoxItem)
-            Next
-            ListBox1.EndUpdate()
+                'Dim matchingItemList As List(Of Object) = items.ToList()
+
+                ListBox1.BeginUpdate()
+                ListBox1.Items.Clear()
+                Dim lrComboBoxItem As tComboboxItem
+                For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
+                    lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
+                    ListBox1.Items.Add(lrComboBoxItem)
+                Next
+
+                ListBox1.EndUpdate()
+            End With
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1461,22 +1470,7 @@ Public Class frmUnifiedOntologyBrowser
     Private Sub ButtonSearch_Click(sender As Object, e As EventArgs) Handles ButtonSearch.Click
 
         Try
-            Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
-                                     From DictionaryEntry In Model.ModelDictionary
-                                     Where DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                        And (DictionaryEntry.isEntityType Or DictionaryEntry.isValueType)
-                                     Select DictionaryEntry
-
-            'Dim matchingItemList As List(Of Object) = items.ToList()
-
-            ListBox1.BeginUpdate()
-            ListBox1.Items.Clear()
-            Dim lrComboBoxItem As tComboboxItem
-            For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
-                lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
-                ListBox1.Items.Add(lrComboBoxItem)
-            Next
-            ListBox1.EndUpdate()
+            Call Me.ShowSelectedItem()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1505,4 +1499,5 @@ Public Class frmUnifiedOntologyBrowser
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
+
 End Class

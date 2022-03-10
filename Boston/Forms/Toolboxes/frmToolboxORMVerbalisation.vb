@@ -151,7 +151,8 @@ Public Class frmToolboxORMVerbalisation
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
-            'LINQ
+            '--------------------------------------
+            'FactTypes
             Dim larFactType = zrModel.FactType.FindAll(Function(x) x.allRolesJoinSomething)
 
             Dim FactType = From ft In larFactType,
@@ -161,7 +162,8 @@ Public Class frmToolboxORMVerbalisation
 
             For Each lrFactType In FactType
 
-                lrVerbaliser.VerbaliseModelObject(lrFactType)
+                lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
+                lrVerbaliser.HTW.WriteBreak()
 
                 If lrFactType.FactTypeReading.Count > 0 Then
                     lrVerbaliser.HTW.Write(" (")
