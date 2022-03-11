@@ -585,7 +585,7 @@ Partial Public Class tBrain
                 End If
             End If
         Else
-                Me.Model.AddValueType(lrValueType, True, True, Nothing)
+            Me.Model.AddValueType(lrValueType, True, True, Nothing, True)
         End If
 
         Me.Timeout.Start()

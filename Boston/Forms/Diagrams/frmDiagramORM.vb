@@ -10344,7 +10344,7 @@ Public Class frmDiagramORM
 
             lrPage = Me.zrPage.CreatePropertyGraphSchema(Me.BackgroundWorker)
             lrPage.Loaded = True
-            lrPage.Save(True, True)
+            lrPage.Save(False, True)
 
             Me.CircularProgressBar.Value = 0
             Me.CircularProgressBar.Text = "0%"
@@ -10763,7 +10763,7 @@ Public Class frmDiagramORM
 
                 lrPage = Me.zrPage.CreateEntityRelationshipDiagram(Me.BackgroundWorker)
                 lrPage.Loaded = True
-                lrPage.Save(True, True)
+                lrPage.Save(False, True)
 
                 Me.CircularProgressBar.Value = 0
                 Me.CircularProgressBar.Text = "0%"

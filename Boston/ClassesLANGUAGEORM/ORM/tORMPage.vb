@@ -825,7 +825,7 @@ Namespace FBM
                             '--------------------------------------------------------------
                             'The ValueType is not already within the ORMModel so add it.
                             '--------------------------------------------------------------
-                            Me.Model.AddValueType(lrEntityTypeInstance.ReferenceModeValueType.ValueType, True, True, lrConceptInstance)
+                            Me.Model.AddValueType(lrEntityTypeInstance.ReferenceModeValueType.ValueType, True, True, lrConceptInstance, True)
                         End If
 
                         Call lrEntityTypeInstance.ReferenceModeValueType.DisplayAndAssociate()
@@ -1493,7 +1493,7 @@ Namespace FBM
                     '-------------------------------------------------------------
                     'The ValueType is not already within the ORMModel so add it.
 
-                    Me.Model.AddValueType(lrValuetype, True, True, lrConceptInstance)
+                    Me.Model.AddValueType(lrValuetype, True, True, lrConceptInstance, True)
                 End If
 
                 lrValueTypeInstance = lrValuetype.CloneInstance(Me, False)

@@ -19,7 +19,7 @@
             'Dim liDummyPcenum As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
             'lrValueType.DataType = liDummyPcenum.GetByDescription(lrInterfaceModel.ValueType(0).DataType.ToString)
 
-            Call arModel.AddValueType(lrValueType, True, False)
+            Call arModel.AddValueType(lrValueType, True, False,, True)
 
             If arInterfaceModel.Page IsNot Nothing Then
                 Dim lrPage As FBM.Page = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)

@@ -1111,7 +1111,7 @@ Namespace FBM
                     'Add the ValueType to the Model/ModelDictionary
                     '------------------------------------------------
                     lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsValueTypeName, True, aiORMDataType)
-                    Me.Model.AddValueType(lrValueType, True, abBroadcastInterfaceEvent)
+                    Me.Model.AddValueType(lrValueType, True, abBroadcastInterfaceEvent,, True)
                 End If
 
                 '------------------------------------------

@@ -207,6 +207,8 @@ Namespace TableRole
                                         lsMessage &= "To keep the show on the road, a Value Type with Id: " & lsMissingId & " will be created in the model."
                                         Dim lrValueType As New FBM.ValueType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, True)
                                         arFactType.Model.AddValueType(lrValueType, False, True, Nothing, True)
+                                        Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, lsMissingId, pcenumConceptType.ValueType,,, True, True,)
+                                        Call lrModelDictionaryEntry.Save()
                                         lrValueType.Save()
                                         lrRole.JoinedORMObject = lrValueType
                                         MsgBox(lsMessage)

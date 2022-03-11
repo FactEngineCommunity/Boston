@@ -2777,7 +2777,7 @@ Namespace FBM
             'Add the new ValueType to the Model
             '-----------------------------------------
             If abAddtoModel Then
-                Me.AddValueType(lrValueType)
+                Me.AddValueType(lrValueType, True, True,, True)
                 Call Me.MakeDirty()
             End If
 

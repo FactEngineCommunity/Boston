@@ -227,7 +227,7 @@ Namespace FBM
                         Else
                             Dim lrValueType As New FBM.ValueType
                             lrValueType = .ValueType.Clone(arPage.Model, False, abIsMDAModelElement)
-                            arPage.Model.AddValueType(lrValueType)
+                            arPage.Model.AddValueType(lrValueType,,,, True)
                             lrValueTypeInstance.ValueType = lrValueType
                         End If
 

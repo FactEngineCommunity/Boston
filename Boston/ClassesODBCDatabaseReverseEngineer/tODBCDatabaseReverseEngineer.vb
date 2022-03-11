@@ -864,7 +864,7 @@ Public Class ODBCDatabaseReverseEngineer
                     End Try
 
                     'Add the ValueType to the Model
-                    Me.Model.AddValueType(lrValueType)
+                    Me.Model.AddValueType(lrValueType,,,, True)
                     lrValueType.SetDBName(lrColumn.DatabaseName)
 
 Skip: 'Because is not a ValueType
