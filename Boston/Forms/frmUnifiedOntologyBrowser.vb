@@ -1331,7 +1331,7 @@ Public Class frmUnifiedOntologyBrowser
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
                 loMenuOption = Me.ToolStripMenuItemViewOnPage.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
-                loMenuOption.Tag = lrPage
+                loMenuOption.Tag = lrModel.Page.Find(Function(x) x.PageId = lrPage.PageId)
                 AddHandler loMenuOption.Click, AddressOf Me.OpenORMModelPage
             Next
 
@@ -1362,7 +1362,7 @@ Public Class frmUnifiedOntologyBrowser
 
                 If Not lrPage.Loaded Then
                     Call lrPage.Model.loadModelLevelModelElementsForPage(lrPage)
-                    Call lrPage.Load(True)
+                    Call lrPage.Load(True) 'Load and add to Model
                 End If
 
                 Try
