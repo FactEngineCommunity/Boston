@@ -5131,10 +5131,12 @@ Namespace FBM
         ''' <param name="abLoadPages"></param>
         ''' <param name="abUseThreading"></param>
         ''' <param name="aoBackgroundWorker">Used for Prgress reporting.</param>
+        ''' <param name="abSkipAlreadyLoadedModelElements">True if to test whether ModelElements have already been loaded.</param>
         ''' <remarks></remarks>
         Public Sub Load(Optional ByVal abLoadPages As Boolean = False,
                         Optional ByVal abUseThreading As Boolean = True,
-                        Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+                        Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                        Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False)
 
             'CodeSafe
             If Me.Loading Or Me.Loaded Then Exit Sub
@@ -5142,7 +5144,7 @@ Namespace FBM
             Me.Loading = True
 
             If Me.StoreAsXML Then
-                Call Me.LoadFromXML(aoBackgroundWorker)
+                Call Me.LoadFromXML(aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
             Else
                 Call Me.LoadFromDatabase(abLoadPages, abUseThreading, aoBackgroundWorker)
             End If
@@ -5527,7 +5529,13 @@ SkipModelElement: 'Because is not in the ModelDictionary
             End Try
         End Sub
 
-        Public Sub LoadFromXML(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="aoBackgroundWorker">BackgroundWorker for displaying the percentage of Model loaded.</param>
+        ''' <param name="abSkipAlreadyLoadedModelElements">True if to test whether ModelElements have already been loaded.</param>
+        Public Sub LoadFromXML(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                               Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False)
 
             Dim lsFolderLocation As String
             Dim lsFileName As String
@@ -5617,7 +5625,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                         Dim lrXMLModel As New XMLModel.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
                         objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me, aoBackgroundWorker)
+                        lrXMLModel.MapToFBMModel(Me, aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
                 End Select
 
                 Me.Page.Select(Function(x)

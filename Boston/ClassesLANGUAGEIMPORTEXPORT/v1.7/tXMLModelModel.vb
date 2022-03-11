@@ -552,10 +552,12 @@ Namespace XMLModel
         ''' </summary>
         ''' <param name="arModel">The FBM Model to map to.</param>
         ''' <param name="aoBackgroundWorker">For reporting progress. Start at 60%.</param>
+        ''' <param name="abSkipAlreadyLoadedModelElements">True if to test whether ModelElements have already been loaded.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function MapToFBMModel(Optional ByRef arModel As FBM.Model = Nothing,
-                                      Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing) As FBM.Model
+                                      Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                                      Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False) As FBM.Model
 
             Try
 
@@ -582,6 +584,13 @@ Namespace XMLModel
                 Dim lsValueTypeConstraintValue As String
 
                 For Each lrXMLValueType In Me.ORMModel.ValueTypes
+
+                    If abSkipAlreadyLoadedModelElements Then
+                        'Really only ever called when using the UnifiedOntologyBrowser
+                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                        If lrModel.ValueType.Find(Function(x) x.Id = lrXMLValueType.Id) IsNot Nothing Then GoTo SkipValueType
+                    End If
+
                     lrValueType = New FBM.ValueType
                     lrValueType.Model = lrModel
                     lrValueType.Id = lrXMLValueType.Id
@@ -607,6 +616,7 @@ Namespace XMLModel
                     lrValueType.Concept = lrDictionaryEntry.Concept
 
                     lrModel.ValueType.Add(lrValueType)
+SkipValueType:
                 Next
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(62)
@@ -618,6 +628,13 @@ Namespace XMLModel
                 Dim lrEntityType As FBM.EntityType
 
                 For Each lrXMLEntityType In Me.ORMModel.EntityTypes
+
+                    If abSkipAlreadyLoadedModelElements Then
+                        'Really only ever called when using the UnifiedOntologyBrowser
+                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                        If lrModel.EntityType.Find(Function(x) x.Id = lrXMLEntityType.Id) IsNot Nothing Then GoTo SkipEntityType
+                    End If
+
                     lrEntityType = New FBM.EntityType
                     lrEntityType.Model = lrModel
                     lrEntityType.Id = lrXMLEntityType.Id
@@ -652,6 +669,7 @@ Namespace XMLModel
                     lrEntityType.Concept = lrDictionaryEntry.Concept
 
                     lrModel.EntityType.Add(lrEntityType)
+SkipEntityType:
                 Next
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(64)
@@ -663,10 +681,18 @@ Namespace XMLModel
                 Dim lrFactType As FBM.FactType
 
                 For Each lrXMLFactType In Me.ORMModel.FactTypes
+
+                    If abSkipAlreadyLoadedModelElements Then
+                        'Really only ever called when using the UnifiedOntologyBrowser
+                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                        If lrModel.FactType.Find(Function(x) x.Id = lrXMLFactType.Id) IsNot Nothing Then GoTo SkipFactType
+                    End If
+
                     lrFactType = New FBM.FactType(lrModel,
                                                   lrXMLFactType.Name,
                                                   lrXMLFactType.Id)
                     Call Me.GetFactTypeDetails(lrFactType, lrXMLFactType)
+SkipFactType:
                 Next
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(66)
@@ -712,6 +738,12 @@ Namespace XMLModel
                 Dim lrModelElement As FBM.ModelObject
                 For Each lrXMLFactType In larSubtypeRelationshipFactTypes
 
+                    If abSkipAlreadyLoadedModelElements Then
+                        'Really only ever called when using the UnifiedOntologyBrowser
+                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                        If lrModel.FactType.Find(Function(x) x.Id = lrXMLFactType.Id) IsNot Nothing Then GoTo SkipSubtypeRelationship
+                    End If
+
                     lrFactType = New FBM.FactType(lrXMLFactType.Id, True)
                     lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
 
@@ -744,6 +776,7 @@ Namespace XMLModel
                     End Select
 
                     lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
+SkipSubtypeRelationship:
                 Next
 
 
@@ -754,8 +787,14 @@ Namespace XMLModel
                 Dim lrRoleConstraint As FBM.RoleConstraint
 
                 For Each lrXMLRoleConstraint In Me.ORMModel.RoleConstraints
-                    lrRoleConstraint = New FBM.RoleConstraint
 
+                    If abSkipAlreadyLoadedModelElements Then
+                        'Really only ever called when using the UnifiedOntologyBrowser
+                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                        If lrModel.RoleConstraint.Find(Function(x) x.Id = lrXMLRoleConstraint.Id) IsNot Nothing Then GoTo SkipRoleConstraint
+                    End If
+
+                    lrRoleConstraint = New FBM.RoleConstraint
                     lrRoleConstraint.Id = lrXMLRoleConstraint.Id
                     lrRoleConstraint.GUID = lrXMLRoleConstraint.GUID
                     lrRoleConstraint.Model = lrModel
@@ -889,6 +928,7 @@ Namespace XMLModel
                     For Each lsValueTypeConstraintValue In lrXMLRoleConstraint.ValueConstraint
                         lrRoleConstraint.ValueConstraint.Add(lsValueTypeConstraintValue)
                     Next
+SkipRoleConstraint:
                 Next
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(68)
@@ -897,7 +937,12 @@ Namespace XMLModel
                 'Set the ReferenceMode ObjectTypes for each of the EntityTypes in the Model
                 '-----------------------------------------------------------------------------            
                 For Each lrEntityType In lrModel.EntityType
+
+                    If abSkipAlreadyLoadedModelElements And lrEntityType.PreferredIdentifierRCId = "" Then GoTo SkipEntityTypeSetReferenceSchemeObjects
+
                     Call lrEntityType.SetReferenceModeObjects()
+
+SkipEntityTypeSetReferenceSchemeObjects:
                 Next
 
                 '==============================
@@ -907,6 +952,13 @@ Namespace XMLModel
                 Dim lrModelNote As FBM.ModelNote
 
                 For Each lrXMLModelNote In Me.ORMModel.ModelNotes
+
+                    If abSkipAlreadyLoadedModelElements Then
+                        'Really only ever called when using the UnifiedOntologyBrowser
+                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                        If lrModel.ModelNote.Find(Function(x) x.Id = lrXMLModelNote.Id) IsNot Nothing Then GoTo SkipModelNote
+                    End If
+
                     lrModelNote = New FBM.ModelNote(lrModel)
 
                     lrModelNote.Id = lrXMLModelNote.Id
@@ -925,6 +977,7 @@ Namespace XMLModel
                         End If
                     End If
                     lrModel.AddModelNote(lrModelNote, False)
+SkipModelNote:
                 Next
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70)
@@ -963,6 +1016,11 @@ Namespace XMLModel
 
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arModel"></param>
+        ''' <param name="aoBackgroundWorker"></param>
         Public Sub MapToFBMPages(ByRef arModel As FBM.Model,
                                  Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
@@ -990,7 +1048,9 @@ Namespace XMLModel
                                      If lrPage Is Nothing Then
                                          lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
                                      Else
-                                         Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker)
+                                         If Not lrPage.Loaded Then
+                                             Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker)
+                                         End If
                                      End If
 
                                      lrPage.Loaded = True
