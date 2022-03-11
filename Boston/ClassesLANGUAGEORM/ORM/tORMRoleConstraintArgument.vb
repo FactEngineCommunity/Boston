@@ -418,7 +418,7 @@ Namespace FBM
                             If lrFactTypeReading Is Nothing Then
                                 arVerbaliser.VerbaliseError("No suitable FactTypeReading exists for Fact Type, '" & Me.JoinPath.FactTypePath(0).Name & "'")
                             Else
-                                Call lrFactTypeReading.GetReadingTextThatOrSome(Me.JoinPath.RolePath, arVerbaliser, larVerbalisedModelObject, larArgumentCommonModelObjects)
+                                Call lrFactTypeReading.GetReadingTextThatOrSome(Me.JoinPath.RolePath, arVerbaliser, larArgumentCommonModelObjects, larVerbalisedModelObject)
                             End If
                     End Select
                 Else

@@ -1343,17 +1343,17 @@ Namespace FBM
                             arVerbaliser.VerbalisePredicateText(lrPredicatePart.PreBoundText)
                             arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
                             arVerbaliser.VerbalisePredicateText(lrPredicatePart.PostBoundText)
-                            End If
+                        End If
                     Else
-                            If aarVerbalisedModelObjects.Contains(lrPredicatePart.Role.JoinedORMObject) Then
-                                arVerbaliser.VerbaliseQuantifier("that ")
-                            Else
-                                arVerbaliser.VerbaliseQuantifier("some ")
-                            End If
+                        If aarVerbalisedModelObjects.Contains(lrPredicatePart.Role.JoinedORMObject) Then
+                            arVerbaliser.VerbaliseQuantifier("that ")
+                        Else
+                            arVerbaliser.VerbaliseQuantifier("some ")
+                        End If
 
-                            arVerbaliser.VerbalisePredicateText(lrPredicatePart.PreBoundText)
-                            arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
-                            arVerbaliser.VerbalisePredicateText(lrPredicatePart.PostBoundText)
+                        arVerbaliser.VerbalisePredicateText(lrPredicatePart.PreBoundText)
+                        arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
+                        arVerbaliser.VerbalisePredicateText(lrPredicatePart.PostBoundText)
                     End If
 
                     If lrPredicatePart.ModelObjectSubscriptNumber > 0 Then
