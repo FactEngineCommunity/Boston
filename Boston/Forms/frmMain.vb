@@ -7,6 +7,7 @@ Imports System.Reflection
 Imports System.Security.AccessControl
 Imports Boston.DuplexServiceClient  'Client/Server
 Imports System.ServiceModel
+Imports AutoUpdaterDotNET
 
 Public Class frmMain
 
@@ -86,12 +87,20 @@ Public Class frmMain
             psApplicationDatabaseVersionNr = "1.32"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
+            Dim lsAssemblyFileVersionNumber As String
+            Dim loAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
+            Dim loFVI As System.Diagnostics.FileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(loAssembly.Location)
+            lsAssemblyFileVersionNumber = loFVI.FileVersion
+
+            'AutoUpdater.InstalledVersion = New Version(psApplicationApplicationVersionNr)
+            'AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
                 ltSplashThread.IsBackground = True
-                ltSplashThread.Start()
+                ltSplashThread.Start(lsAssemblyFileVersionNumber)
             Else
-                Call Me.LoadSplashScreen()
+                Call Me.LoadSplashScreen(lsAssemblyFileVersionNumber)
             End If
 
             '==============================================================================================================================
@@ -393,8 +402,9 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub LoadSplashScreen()
+    Private Sub LoadSplashScreen(ByVal asAssemblyFileVersionNumber As String)
 
+        frmSplash.msAssemblyFileVersionNumber = asAssemblyFileVersionNumber
         frmSplash.ShowDialog()
 
     End Sub

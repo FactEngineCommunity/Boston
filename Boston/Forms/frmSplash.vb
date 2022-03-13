@@ -1,5 +1,7 @@
 Public Class frmSplash
 
+    Public msAssemblyFileVersionNumber As String = Nothing
+
     Private Sub title_frm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Me.TopMost = True
@@ -27,8 +29,13 @@ Public Class frmSplash
         End If
 
         ls_message = "Boston version: v" & psApplicationApplicationVersionNr
-        ls_message &= vbCrLf
-        ls_message &= "Boston database version: v" & psApplicationDatabaseVersionNr
+        If Me.msAssemblyFileVersionNumber IsNot Nothing Then
+            ls_message.AppendString(" (Assembly: " & Me.msAssemblyFileVersionNumber & ")" & vbCrLf)
+        Else
+            ls_message &= vbCrLf
+        End If
+
+        ls_message &= "Required Boston database version: v" & psApplicationDatabaseVersionNr
 
         label_splash.Text = ls_message
 
