@@ -175,18 +175,22 @@ Namespace RDS
 
         Public ReadOnly Property DBCreateString() As String
             Get
-                Dim lsCreateString As String
+                Try
+                    Dim lsCreateString As String
 
-                lsCreateString = Me.getMetamodelDataType.ToString
-                If Me.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
-                    lsCreateString &= "(" & Me.ActiveRole.JoinsValueType.DataTypeLength
-                    If Me.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
-                        lsCreateString &= "," & Me.ActiveRole.JoinsValueType.DataTypePrecision
+                    lsCreateString = Me.getMetamodelDataType.ToString
+                    If Me.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                        lsCreateString &= "(" & Me.ActiveRole.JoinsValueType.DataTypeLength
+                        If Me.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                            lsCreateString &= "," & Me.ActiveRole.JoinsValueType.DataTypePrecision
+                        End If
+                        lsCreateString &= ")"
                     End If
-                    lsCreateString &= ")"
-                End If
 
-                Return lsCreateString
+                    Return lsCreateString
+                Catch ex As Exception
+                    Return ""
+                End Try
             End Get
         End Property
 

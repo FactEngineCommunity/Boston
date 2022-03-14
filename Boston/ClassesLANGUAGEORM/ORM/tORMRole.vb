@@ -5,6 +5,7 @@ Imports System.Reflection
 Imports System.Security.Permissions
 Imports System.Xml.Schema
 Imports System.Runtime.CompilerServices
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -58,17 +59,21 @@ Namespace FBM
         Public ReadOnly Property DerivedRoleName As String
             Get
                 If Me.Name = "" Then
-                    If Me.FactType.allRolesJoinTheSameObject Then
-                        Return Me.JoinedORMObject.Id & Me.FactType.Id & Me.FactType.RoleGroup.IndexOf(Me)
+                    Try
+                        If Me.FactType.allRolesJoinTheSameObject Then
+                            Return Me.JoinedORMObject.Id & Me.FactType.Id & Me.FactType.RoleGroup.IndexOf(Me)
 
-                    Else
-                        If Me.FactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing Then
-                            Return Me.JoinedORMObject.Id & Me.FactType.getCorrespondingRDSTable.DatabaseName
                         Else
-                            Return Me.JoinedORMObject.Id & Me.FactType.Id
-                        End If
+                            If Me.FactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing Then
+                                Return Me.JoinedORMObject.Id & Me.FactType.getCorrespondingRDSTable.DatabaseName
+                            Else
+                                Return Me.JoinedORMObject.Id & Me.FactType.Id
+                            End If
 
-                    End If
+                        End If
+                    Catch ex As Exception
+                        Return "Error"
+                    End Try
                 Else
                     Return Me.Name
                 End If
@@ -179,6 +184,7 @@ Namespace FBM
             End Get
         End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public ReadOnly Property JoinsEntityType As FBM.EntityType
             Get
@@ -190,6 +196,7 @@ Namespace FBM
             End Get
         End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public ReadOnly Property JoinsValueType As FBM.ValueType
             Get
@@ -201,6 +208,7 @@ Namespace FBM
             End Get
         End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public ReadOnly Property JoinsFactType As FBM.FactType
             Get

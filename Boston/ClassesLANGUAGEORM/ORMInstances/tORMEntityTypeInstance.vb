@@ -3,6 +3,7 @@ Imports System.ComponentModel
 Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Linq
+Imports Newtonsoft.Json
 
 Namespace FBM
     <DefaultPropertyAttribute("Title")> _
@@ -270,6 +271,8 @@ Namespace FBM
         <NonSerialized(),
         XmlIgnore()>
         Public _Shape As tORMDiagrammingShapeNode
+
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Property Shape As tORMDiagrammingShapeNode Implements iObjectTypePageObject.Shape
             Get
@@ -319,9 +322,11 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _HasBeenMoved As Boolean = False
+        <JsonIgnore()>
         <XmlIgnore()> _
         Public Property HasBeenMoved() As Boolean  'Used in AutoLayout operations.
             Get

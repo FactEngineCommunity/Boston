@@ -6,6 +6,7 @@ Imports System.Linq
 Imports System.Xml.Linq
 Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 Imports System.Text.RegularExpressions
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()>
@@ -18,6 +19,7 @@ Namespace FBM
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelId As String = System.Guid.NewGuid.ToString
+
         <XmlAttribute()>
         Public Overridable Property ModelId() As String 'GUID
             Get
@@ -36,6 +38,7 @@ Namespace FBM
         ''' A list of Languages that the ORM Model represents. Defaults to including ORM, but may include EntityRelationshipDiagrams, PropertyGraphSchemas etc
         ''' </summary>
         ''' <remarks></remarks>
+        <NonSerialized()>
         Public ContainsLanguage As New List(Of pcenumLanguage)
 
         Public Name As String = ""
@@ -95,6 +98,7 @@ Namespace FBM
         <XmlAttribute()>
         Public IsNamespace As Boolean = False
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public [Namespace] As ClientServer.Namespace
 
@@ -105,9 +109,11 @@ Namespace FBM
         <XmlIgnore()>
         Public [Dictionary] As New Dictionary(Of String, Integer)
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelDictionary As New List(Of FBM.DictionaryEntry)
+
         Public Overridable Property ModelDictionary() As List(Of FBM.DictionaryEntry)
             Get
                 Return Me._ModelDictionary
@@ -118,6 +124,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _EntityType As New List(Of FBM.EntityType)
@@ -130,9 +137,9 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueType As New List(Of FBM.ValueType)
+        <XmlElement()>
         Public Overridable Property ValueType() As List(Of FBM.ValueType)
             Get
                 Return Me._ValueType
@@ -142,6 +149,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _FactType As New List(Of FBM.FactType)
@@ -165,6 +173,7 @@ Namespace FBM
             End Get
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Role As New List(Of FBM.Role)
@@ -178,6 +187,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _RoleConstraint As New List(Of FBM.RoleConstraint)
@@ -190,6 +200,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelNote As New List(Of FBM.ModelNote)
@@ -202,6 +213,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelError As New List(Of FBM.ModelError)
@@ -218,10 +230,13 @@ Namespace FBM
         ''' The list of Pages within the Model.
         ''' NB LinFu requires Overridable Properties to work.
         ''' </summary>
-        ''' <remarks></remarks>
+        ''' <remarks></remarks>  
+        <Newtonsoft.Json.JsonIgnore()>
+        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Page As New List(Of FBM.Page)
+
         Public Overridable Property Page() As List(Of FBM.Page)
             Get
                 Return Me._Page
@@ -284,10 +299,12 @@ Namespace FBM
         '  way that an SQL relational database has its own Parser
         ' for SQL statements.
         '-------------------------------------------------------
+        <JsonIgnore()>
         <XmlIgnore()>
         <NonSerialized()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ORMQL As New ORMQL.Processor(Me)
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Overridable Property ORMQL() As ORMQL.Processor
             Get
@@ -4020,6 +4037,70 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Sub SaveToJSONDocumentUsingObjectReferences()
+
+            Dim lsMessage As String
+
+            Try
+                Dim lsFolderLocation As String = ""
+                Dim lsFileName As String = ""
+
+                Dim lsFileLocationName As String = ""
+
+                Dim lrValueType As New FBM.ValueType(Me, pcenumLanguage.ORMModel, "NewValueType", "NewValueType")
+
+                'Dim liIndex As Integer = 14
+                'Me.ValueType.RemoveRange(0, liIndex)
+                'Me.ValueType.Add(lrValueType)
+
+
+                Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+
+                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
+                Else
+                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                End If
+                System.IO.Directory.CreateDirectory(lsFolderLocation)
+                lsFileName = Trim(Me.ModelId & "-OBJECTXML-" & Me.Name) & ".json"
+                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+
+                'Using fs As New FileStream(lsFileLocationName, FileMode.Create)
+                '    Using writer As XmlDictionaryWriter = XmlDictionaryWriter.CreateTextWriter(fs)
+                '        Dim serializer As NetDataContractSerializer = New NetDataContractSerializer()
+                '        Call serializer.WriteObject(writer, Me)
+                '    End Using
+                'End Using
+                Dim loJSONSerialiserSettings As New Newtonsoft.Json.JsonSerializerSettings() With {.PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                                                                                                   .ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                                                                                                   .TypeNameHandling = TypeNameHandling.All}
+                Dim lsJSON As String = Newtonsoft.Json.JsonConvert.SerializeObject(Me, Formatting.Indented, loJSONSerialiserSettings)
+
+                Using loStreamWriter As New StreamWriter(lsFileLocationName)
+                    loStreamWriter.Write(lsJSON)
+                End Using
+
+            Catch serExc As SerializationException
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name & vbCrLf
+                lsMessage.AppendLine("Serialisation Failed")
+                lsMessage.AppendDoubleLineBreak(serExc.Message)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, serExc.StackTrace)
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub SaveModelDictionary(Optional ByVal abRapidSave As Boolean = False)
 
             Dim lrConcept As New FBM.Concept
@@ -5527,6 +5608,27 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Public Sub LoadFromJSON()
+
+            Try
+                Throw New NotImplementedException("Not implemented")
+                Dim lsFolderLocation As String = ""
+                Dim lsJSON As String = System.IO.File.ReadAllText(lsFolderLocation & "\" & Trim(Me.ModelId & "-OBJECTXML-" & Me.Name) & ".json")
+                Dim lrModel As FBM.Model = JsonConvert.DeserializeObject(Of FBM.Model)(lsJSON, New JsonSerializerSettings With {.PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                                                                                                                                .TypeNameHandling = TypeNameHandling.Auto})
+                Debugger.Break()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         ''' <summary>

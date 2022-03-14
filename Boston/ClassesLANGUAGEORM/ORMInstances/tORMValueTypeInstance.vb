@@ -4,6 +4,7 @@ Imports System.Xml.Serialization
 Imports System.Collections.Specialized
 Imports System.Drawing.Drawing2D
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -83,6 +84,7 @@ Namespace FBM
         <XmlIgnore()>
         Public Page As FBM.Page
 
+        <JsonIgnore()>
         <NonSerialized(),
         XmlIgnore()>
         Public _Shape As ShapeNode
@@ -145,10 +147,12 @@ Namespace FBM
             End Get
         End Property
 
-
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _HasBeenMoved As Boolean = False
+
+        <JsonIgnore()>
         <XmlIgnore()> _
         Public Property HasBeenMoved() As Boolean  'Used in AutoLayout operations.
             Get

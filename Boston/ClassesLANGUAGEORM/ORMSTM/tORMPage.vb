@@ -1,10 +1,12 @@
 ﻿Imports Boston.FBM.STM
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
 
 
     Partial Public Class Page
+        <JsonIgnore()>
         <NonSerialized>
         Public WithEvents STModel As New FBM.STM.Model
 

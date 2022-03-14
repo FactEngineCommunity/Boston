@@ -2,7 +2,6 @@
 Imports System.Xml.Serialization
 Imports System.Reflection
 
-
 Namespace FBM
     <Serializable()> _
     Public Class FactData

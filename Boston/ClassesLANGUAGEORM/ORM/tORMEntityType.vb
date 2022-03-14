@@ -266,6 +266,9 @@ Namespace FBM
         Public Event ObjectifiedFactTypeChanged(ByRef arNewObjectifiedFactType As FBM.FactType)
         Public Event SimpleReferenceSchemeRemoved()
 
+        ''' <summary>
+        ''' Parameterless Constructor.
+        ''' </summary>
         Public Sub New()
             '--------
             'Default

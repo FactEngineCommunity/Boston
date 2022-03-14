@@ -2,6 +2,7 @@
 Imports System.Reflection
 Imports System.Xml.Serialization
 Imports Gios.Word
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -25,7 +26,10 @@ Namespace FBM
         ''' Used only in searching a set of FactTypeReadings for one that has a matching RoleList sequence.
         ''' </summary>
         ''' <remarks></remarks>
+        <JsonIgnore()>
         Public _RoleList As New List(Of FBM.Role)
+
+        <JsonIgnore()>
         Public Property RoleList As List(Of FBM.Role)
             Get
                 If _RoleList.Count = 0 Then
@@ -45,6 +49,7 @@ Namespace FBM
         End Property
 
         Public _PredicatePart As New List(Of FBM.PredicatePart)
+
         Public Overridable Property PredicatePart() As List(Of FBM.PredicatePart)
             Get
                 Return Me._PredicatePart

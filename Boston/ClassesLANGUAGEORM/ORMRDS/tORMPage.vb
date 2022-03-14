@@ -1,10 +1,12 @@
 ﻿Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
 
     Partial Public Class Page
 
-        <NonSerialized>
+        <Newtonsoft.Json.JsonIgnore()>
+        <NonSerialized()>
         Public WithEvents RDSModel As New RDS.Model
 
         Public Sub DisplayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node,

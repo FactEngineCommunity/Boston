@@ -3,6 +3,7 @@ Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -25,6 +26,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <XmlIgnore()>
         <Browsable(False),
         [ReadOnly](True),
@@ -111,6 +113,7 @@ Namespace FBM
         <XmlIgnore()>
         Public ObjectifiedFactType As FBM.FactType = Nothing
 
+        <XmlIgnore()>
         Public ReadOnly Property DatabaseName As String
             Get
                 Dim lsName As String
@@ -136,9 +139,11 @@ Namespace FBM
         <XmlAttribute()> _
         Public Id As String = System.Guid.NewGuid.ToString 'The unique Identifier of the ModelObject within the Model.
 
+        <XmlAttribute()>
         Public GUID As String = System.Guid.NewGuid.ToString
 
         Public _IsAbsorbed As Boolean = False
+        <XmlAttribute()>
         Public Property IsAbsorbed As Boolean
             Get
                 Return Me._IsAbsorbed
@@ -148,6 +153,7 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
         Public Overridable Property IsObjectified() As Boolean
             Get
                 If Me.ConceptType = pcenumConceptType.FactType Then
@@ -160,7 +166,6 @@ Namespace FBM
                 'Nothing to do here.
             End Set
         End Property
-
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -193,6 +198,7 @@ Namespace FBM
         ''' <summary>
         ''' Only set by the FactEngine FEQL Processor at query time, so that FBM objects are not coupled to the FactEngine.
         ''' </summary>
+        <XmlIgnore()>
         Public DerivationType As FactEngine.pcenumFEQLDerivationType = FactEngine.Constants.pcenumFEQLDerivationType.None
 
         <XmlIgnore()> _
@@ -243,8 +249,11 @@ Namespace FBM
         ''' Only used for Entity Types, Fact Types....those ModelObject ConceptTypes that can be Subtypes | Supertypes.
         ''' </summary>
         ''' <remarks></remarks>
+        <JsonIgnore()>
         <XmlIgnore()>
         Public _parentModelObjectList As New List(Of FBM.ModelObject) 'String = "" '0 -not sub type, otherwise used to store entity_id of super type, if this entity is a subtype
+
+        <JsonIgnore()>
         <XmlIgnore()> _
         <Browsable(False)> _
         Property parentModelObjectList() As List(Of FBM.ModelObject)
@@ -259,11 +268,14 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _childModelObjectList As New List(Of FBM.ModelObject) 'String = "" '0 -not sub type, otherwise used to store entity_id of super type, if this entity is a subtype
-        <XmlIgnore()> _
-        <Browsable(False)> _
+
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <Browsable(False)>
         Property childModelObjectList() As List(Of FBM.ModelObject)
             Get
                 Return Me._childModelObjectList
@@ -277,13 +289,14 @@ Namespace FBM
         ''' Instances of this EntityType as exist as FactData against Roles within FactTypes where those Roles join this EntityType.
         ''' </summary>
         ''' <remarks></remarks>
+        <XmlIgnore()>
         Public Instance As New List(Of String)
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Instances As New Viev.Strings.StringCollection
 
-        '<XmlIgnore()> _
+        <XmlIgnore()>
         <CategoryAttribute("Instances"),
          Browsable(True),
          [ReadOnly](False),
@@ -334,6 +347,7 @@ Namespace FBM
         ''' Used for TypeDB schema generation only at this stage. Defaults to 'entity' for an Entity Type or 'relation' for a Fact Type etc if no Supertype is found.
         ''' </summary>
         ''' <returns></returns>
+        <XmlIgnore()>
         Public ReadOnly Property PrimarySupertypeName As String
             Get
                 Dim lsPrimarySupertypeName As String = "thing"
@@ -387,7 +401,7 @@ Namespace FBM
             End Set
         End Property
 
-
+        <XmlIgnore()>
         Public Overridable ReadOnly Property isSubtype As Boolean
             Get
                 Return Me.SubtypeRelationship.Count > 0
@@ -406,14 +420,22 @@ Namespace FBM
         ''' <summary>
         ''' Used for Reverse Engineering NORMA files.
         ''' </summary>
+        <XmlIgnore()>
         Public NORMAName As String = "" 'The Original NORMA name for the ModelObject. Used because Boston limits Concept/Symbol lengths to 100, whereas NORMA names are boundless.
+        <XmlIgnore()>
         Public NORMAReferenceId As String = ""
 
+        <NonSerialized()>
         Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)
+        <NonSerialized()>
         Public Event DBNameChanged(ByVal asDBName As String)
+        <NonSerialized()>
         Public Event LongDescriptionChanged(ByVal asLongDescription As String)
+        <NonSerialized()>
         Public Event NameChanged(ByVal asNewName As String)
+        <NonSerialized()>
         Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
+        <NonSerialized()>
         Public Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
 
         ''' <summary>

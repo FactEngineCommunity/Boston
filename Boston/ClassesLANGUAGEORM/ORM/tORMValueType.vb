@@ -14,8 +14,8 @@ Namespace FBM
         Implements FBM.iValidationErrorHandler
         Implements FBM.iFBMIndependence
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <NonSerialized()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean = False
         <XmlAttribute()>
         Public Overrides Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
@@ -39,6 +39,7 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
         Public PrimativeType As String
 
         <XmlIgnore()> _
@@ -84,7 +85,9 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
         Private _DataTypeLength As Integer
+        <XmlAttribute()>
         <CategoryAttribute("Value Type"),
         Browsable(False),
         [ReadOnly](False),
@@ -101,6 +104,7 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
         Public ReadOnly Property DataTypeIsNumeric As Boolean
             Get
                 Select Case Me.DataType
@@ -127,14 +131,16 @@ Namespace FBM
             End Get
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <NonSerialized()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueConstraint As New List(Of FBM.Concept)
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <NonSerialized()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueConstraintList As New Viev.Strings.StringCollection
-        '<XmlIgnore()> _
+        <XmlIgnore()>
         <CategoryAttribute("Value Type"),
          Browsable(True),
          [ReadOnly](False),
@@ -178,7 +184,9 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         Private _ModelError As New List(Of FBM.ModelError)
+        <XmlIgnore()>
         Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
                 Return Me._ModelError
@@ -188,10 +196,10 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <NonSerialized()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean = True
-        <XmlAttribute()> _
+        <XmlIgnore()>
         <CategoryAttribute("Model Object"), _
         DefaultValueAttribute(False),
         DescriptionAttribute("True if the Model Object is independent.")>
@@ -214,21 +222,32 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
         Public ReadOnly Property HasModelError() As Boolean Implements iValidationErrorHandler.HasModelError
             Get
                 Return Me.ModelError.Count > 0
             End Get
         End Property
 
+        <NonSerialized()>
         Public Event DataTypeChanged(ByVal aiNewDataType As pcenumORMDataType)
+        <NonSerialized()>
         Public Event DataTypePrecisionChanged(ByVal aiNewDataTypePrecision As Integer)
+        <NonSerialized()>
         Public Event DataTypeLengthChanged(ByVal aiDataTypeLength As Integer)
+        <NonSerialized()>
         Public Event IsIndependentChanged(abNewIsIndependent As Boolean) Implements iFBMIndependence.IsIndependentChanged
+        <NonSerialized()>
         Public Event ValueConstraintAdded(ByVal asNewValueConstraint As String)
+        <NonSerialized()>
         Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
+        <NonSerialized()>
         Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
+        <NonSerialized()>
         Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        <NonSerialized()>
         Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
 
         Sub New()
@@ -611,6 +630,7 @@ Namespace FBM
 
         End Function
 
+        <XmlIgnore()>
         Public ReadOnly Property DBDataType() As String
             Get
                 Try

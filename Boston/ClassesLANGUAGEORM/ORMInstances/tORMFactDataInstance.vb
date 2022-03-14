@@ -1,6 +1,7 @@
 ﻿Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -57,9 +58,12 @@ Namespace FBM
         <XmlIgnore()>
         Public Page As FBM.Page
 
+        <JsonIgnore()>
         <NonSerialized(),
         XmlIgnore()>
         Public _Shape As ShapeNode
+
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Property Shape As ShapeNode Implements iPageObject.Shape
             Get

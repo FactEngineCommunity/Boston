@@ -1,4 +1,6 @@
-﻿Namespace FBM
+﻿Imports Newtonsoft.Json
+
+Namespace FBM
 
     Interface iPageObject
         Sub MouseDown()
@@ -15,6 +17,7 @@
 
         Sub EnableSaveButton()
 
+        <JsonIgnore()>
         Property Shape As MindFusion.Diagramming.ShapeNode
 
         Property X As Integer
@@ -36,7 +39,7 @@
     Interface iTableNodePageObject
         Inherits FBM.iPageObject
 
-        Sub CellClicked()        
+        Sub CellClicked()
         Sub NodeDoubleClicked()
 
     End Interface

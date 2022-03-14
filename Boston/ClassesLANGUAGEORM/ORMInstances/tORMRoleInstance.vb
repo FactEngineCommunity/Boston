@@ -5,6 +5,7 @@ Imports System.Xml
 Imports System.Xml.Serialization
 Imports System.Xml.Schema
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
     <DefaultPropertyAttribute("Title")> _
@@ -117,6 +118,8 @@ Namespace FBM
         <NonSerialized(),
         XmlIgnore()>
         Public _Shape As New ShapeNode
+
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Property Shape As ShapeNode Implements iPageObject.Shape
             Get

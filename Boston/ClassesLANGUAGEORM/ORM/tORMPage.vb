@@ -3,7 +3,7 @@ Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
-
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -59,9 +59,11 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Loaded As Boolean = False
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Loading As Boolean = False
 
@@ -78,6 +80,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _LanguageId As pcenumLanguage = pcenumLanguage.ORMModel 'Default to ORMModel
         <XmlAttribute()>
@@ -93,17 +96,21 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Page
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public FormLoaded As Boolean = False 'TRUE when the form/diagram of the Page is loaded within Richmond (i.e. displayed on the screen).
 
-
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         <NonSerialized(),
         XmlIgnore()>
         Public _Form As Object
+
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Overridable Property Form() As Object
             Get
@@ -114,29 +121,43 @@ Namespace FBM
             End Set
         End Property
 
-
-        <NonSerialized(),
+        <JsonIgnore(),
+        NonSerialized(),
         XmlIgnore()>
-        <CategoryAttribute("What the"),
+        Private WithEvents _Diagram As MindFusion.Diagramming.Diagram
+
+        <JsonIgnore(),
+        XmlIgnore()>
+        <CategoryAttribute("Diagram"),
         Browsable(False),
         [ReadOnly](True),
         BindableAttribute(False),
         DefaultValueAttribute(""),
         DesignOnly(True),
         DescriptionAttribute("The Mindfusion Diagram object for the Page.")>
-        Public WithEvents Diagram As MindFusion.Diagramming.Diagram
+        Public Property Diagram As MindFusion.Diagramming.Diagram
+            Get
+                Return Me._Diagram
+            End Get
+            Set(value As MindFusion.Diagramming.Diagram)
+                Me._Diagram = value
+            End Set
+        End Property
 
-        <NonSerialized(),
+        <Newtonsoft.Json.JsonIgnore(),
+        NonSerialized(),
         XmlIgnore()>
         <Browsable(False),
         [ReadOnly](False)>
         Public DiagramView As MindFusion.Diagramming.WinForms.DiagramView
 
+        <JsonIgnore()>
         <NonSerialized(),
         XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _SelectedObject As New List(Of Object) 'NB Each SelectedObject will be an 'Instance' type object with X,Y coordinates
 
+        <JsonIgnore()>
         <XmlIgnore()>
         <Browsable(False),
         [ReadOnly](False)>
@@ -164,11 +185,14 @@ Namespace FBM
         '''   NB Used predominantly to refresh the Verbalisation View.
         ''' </summary>
         ''' <remarks></remarks>
+        <JsonIgnore()>
         Public IsInvalidated As Boolean = False
 
+        <JsonIgnore()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _MultiSelectionPerformed As Boolean = False
+        <JsonIgnore()>
         <Browsable(False),
         [ReadOnly](False)>
         Public Property MultiSelectionPerformed() As Boolean
@@ -184,7 +208,7 @@ Namespace FBM
             End Set
         End Property
 
-
+        <JsonIgnore()>
         <NonSerialized(),
         XmlIgnore()>
         Public ModelObject As New List(Of FBM.ModelObject)
@@ -207,6 +231,7 @@ Namespace FBM
 
         Public SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
 
+        <JsonIgnore()>
         <NonSerialized()>
         <XmlIgnore()>
         Public ReferencedForm As WeifenLuo.WinFormsUI.Docking.DockContent
@@ -218,6 +243,7 @@ Namespace FBM
         <XmlIgnore()>
         Public ShowFacts As Boolean = False
 
+        <JsonIgnore()>
         <NonSerialized()>
         Private _ERDiagram As New ERD.Diagram
         Public Overridable Property ERDiagram As ERD.Diagram
@@ -229,10 +255,12 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         <NonSerialized()>
         Private _STDiagram As New STD.Diagram(Me)
         Private disposedValue As Boolean
 
+        <JsonIgnore()>
         Public Overridable Property STDiagram As STD.Diagram
             Get
                 Return Me._STDiagram
@@ -2935,7 +2963,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub TableCellClickedHandler(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs) Handles Diagram.CellClicked
+        Private Sub TableCellClickedHandler(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs) Handles _Diagram.CellClicked
             RaiseEvent TableCellClicked(sender, e)
         End Sub
 

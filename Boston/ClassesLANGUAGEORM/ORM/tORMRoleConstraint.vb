@@ -214,12 +214,14 @@ Namespace FBM
         <XmlIgnore()>
         Public ReadOnly Property FirstRoleConstraintRole As FBM.Role
             Get
+                If Me.RoleConstraintRole.Count = 0 Then Return Nothing
                 Return Me.RoleConstraintRole(0).Role
             End Get
         End Property
 
         Public ReadOnly Property FirstRoleConstraintRoleFactType As FBM.FactType
             Get
+                If Me.RoleConstraintRole.Count = 0 Then Return Nothing
                 Return Me.RoleConstraintRole(0).Role.FactType
             End Get
         End Property

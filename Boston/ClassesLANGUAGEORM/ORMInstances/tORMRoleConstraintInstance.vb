@@ -4,6 +4,7 @@ Imports System.Xml.Serialization
 Imports System.ComponentModel
 Imports System.Drawing.Drawing2D
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -106,6 +107,8 @@ Namespace FBM
         <NonSerialized(),
         XmlIgnore()>
         Public _Shape As New FBM.RoleConstraintShape ' ShapeNode
+
+        <JsonIgnore()>
         <XmlIgnore()>
         Public Property Shape As FBM.RoleConstraintShape Implements iRoleConstraintObject.Shape
             Get

@@ -4,6 +4,7 @@ Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -92,6 +93,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public LinkFactTypeRole As FBM.Role
 
+        <JsonIgnore()>
         Public ReadOnly Property ModelObjects() As List(Of FBM.ModelObject)
             Get
                 Return Me.RoleGroup.Select(Function(x) x.JoinedORMObject).ToList

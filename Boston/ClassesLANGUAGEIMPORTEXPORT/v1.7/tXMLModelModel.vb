@@ -599,6 +599,7 @@ Namespace XMLModel
                     lrValueType.DataType = lrXMLValueType.DataType
                     lrValueType.DataTypePrecision = lrXMLValueType.DataTypePrecision
                     lrValueType.DataTypeLength = lrXMLValueType.DataTypeLength
+                    lrValueType.IsIndependent = lrXMLValueType.IsIndependent
                     lrValueType.IsMDAModelElement = lrXMLValueType.IsMDAModelElement
 
                     For Each lsValueTypeConstraintValue In lrXMLValueType.ValueConstraint
