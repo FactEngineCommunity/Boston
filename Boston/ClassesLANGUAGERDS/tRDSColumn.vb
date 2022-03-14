@@ -173,6 +173,10 @@ Namespace RDS
             End Get
         End Property
 
+        ''' <summary>
+        ''' Not currently used. Designed to return the string to create the Column in the database.
+        ''' </summary>
+        ''' <returns></returns>
         Public ReadOnly Property DBCreateString() As String
             Get
                 Try
@@ -189,7 +193,7 @@ Namespace RDS
 
                     Return lsCreateString
                 Catch ex As Exception
-                    Return ""
+                    Return "Error"
                 End Try
             End Get
         End Property
