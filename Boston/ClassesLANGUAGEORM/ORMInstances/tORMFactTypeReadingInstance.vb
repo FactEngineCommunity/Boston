@@ -329,6 +329,10 @@ Namespace FBM
             Me.Y = aiNewY
             Me.FactType.FactTypeReadingPoint = New Point(Me.X, Me.Y)
 
+            If Me.Shape IsNot Nothing Then
+                Me.Shape.Move(aiNewX, aiNewY)
+            End If
+
         End Sub
 
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton

@@ -6070,11 +6070,24 @@ Public Class frmDiagramORM
                         loORMObject.x = loORMObject.shape.bounds.x
                         loORMObject.y = loORMObject.shape.bounds.y
 
-                        If loORMObject.ConceptType = pcenumConceptType.Role Then
-                            lrFactTypeInstance = loORMObject.FactType
-                            lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
-                            lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
-                        End If
+                        Select Case loORMObject.ConceptType
+                            Case Is = pcenumConceptType.Role
+                                lrFactTypeInstance = loORMObject.FactType
+                                lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
+                                lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
+                            Case Is = pcenumConceptType.FactType
+                                lrFactTypeInstance = loORMObject
+                                lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
+                                lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
+
+                                Try
+                                    lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeInstance.FactTypeReadingShape.Shape.Bounds.X,
+                                                                                        lrFactTypeInstance.FactTypeReadingShape.Shape.Bounds.Y)
+                                    lrFactTypeInstance.FactTypeReadingShape.Move(lrFactTypeInstance.FactTypeReadingPoint.X, lrFactTypeInstance.FactTypeReadingPoint.Y, True)
+                                Catch ex As Exception
+
+                                End Try
+                        End Select
 
                         '==============================================================================
                         'Broadcast the moving of the Object
@@ -6108,7 +6121,7 @@ Public Class frmDiagramORM
 
                     Call loORMObject.Moved()
 
-                    Call Me.SortJoiningFactTypes(loORMObject)
+                    Call Me.SortJoiningFactTypes(loORMObject, False)
 
                     '------------------------------------------------------------
                     'Resort the RoleGroup of any FactType associated with the 
@@ -6149,7 +6162,8 @@ Public Class frmDiagramORM
     ''' </summary>
     ''' <param name="arModelObject"></param>
     ''' <remarks></remarks>
-    Private Sub SortJoiningFactTypes(ByRef arModelObject As Object)
+    Private Sub SortJoiningFactTypes(ByRef arModelObject As Object,
+                                     Optional ByVal abMoveFactTypeReading As Boolean = True)
 
         Dim lo_link As DiagramLink
 
@@ -6187,7 +6201,7 @@ Public Class frmDiagramORM
                         larRole.Add(lrRole.Role)
                     Next
 
-                    Call lrFactTypeInstance.FindSuitableFactTypeReading()
+                    Call lrFactTypeInstance.FindSuitableFactTypeReading(abMoveFactTypeReading)
 
                     'lrFactTypeReading = lrFactTypeInstance.FactType.FindSuitableFactTypeReadingByRoles(larRole)
 

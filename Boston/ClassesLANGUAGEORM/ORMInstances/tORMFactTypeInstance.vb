@@ -1273,7 +1273,7 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function FindSuitableFactTypeReading() As FBM.FactTypeReadingInstance
+        Public Shadows Function FindSuitableFactTypeReading(Optional abMoveFactTypeReading As Boolean = True) As FBM.FactTypeReadingInstance
             '-----------------------------------------------------------------------------------
             'Finds a FactTypeReading within the FactType based on the order of 
             '  the Roles/JoinedModelObjects withn the RoleGroup
@@ -1362,7 +1362,7 @@ Namespace FBM
                     End If
                 End If
 
-                If Me.FactTypeReadingShape IsNot Nothing Then
+                If Me.FactTypeReadingShape IsNot Nothing And abMoveFactTypeReading Then
                     If Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
                         Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
                     End If

@@ -5618,8 +5618,6 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 Dim lsJSON As String = System.IO.File.ReadAllText(lsFolderLocation & "\" & Trim(Me.ModelId & "-OBJECTXML-" & Me.Name) & ".json")
                 Dim lrModel As FBM.Model = JsonConvert.DeserializeObject(Of FBM.Model)(lsJSON, New JsonSerializerSettings With {.PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                                                                                                                                 .TypeNameHandling = TypeNameHandling.Auto})
-                Debugger.Break()
-
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
