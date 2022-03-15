@@ -2051,7 +2051,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub createLinkFactTypeForRole(ByRef arRole As FBM.Role)
+        Public Function createLinkFactTypeForRole(ByRef arRole As FBM.Role) As FBM.FactType
 
             Dim larRole As New List(Of FBM.Role)
             Dim larModelObject As New List(Of FBM.ModelObject)
@@ -2096,6 +2096,8 @@ Namespace FBM
                 lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
                 lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
 
+                Return lrFactType
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2103,8 +2105,11 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
             End Try
-        End Sub
+
+        End Function
 
         ''' <summary>
         ''' Creates the LinkFactTypes for the FactType.

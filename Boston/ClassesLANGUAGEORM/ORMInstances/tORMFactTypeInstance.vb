@@ -1635,6 +1635,7 @@ Namespace FBM
             '--------------------------------------------
             For Each lrFactInstance In Me.Fact.FindAll(Function(x) x.isDirty)
                 Try
+                    lrFactInstance.FactType = Me
                     lrFactInstance.Save(abRapidSave)
                 Catch arErr As Exception
                     Dim lsMessage As String
@@ -3482,7 +3483,7 @@ Namespace FBM
             Dim liNewX As Integer
             Dim liNewY As Integer
 
-            If aiDepth > 20 Then
+            If aiDepth > 10 Then
                 Exit Sub
             Else
                 aiDepth += 1
@@ -3490,80 +3491,92 @@ Namespace FBM
 
             liRepellDistance = 10
 
-            Dim larEntityTypeInstance = From EntityTypeInstance In Me.Page.EntityTypeInstance _
-                                        Where (Math.Abs(Me.X - EntityTypeInstance.X) < liRepellDistance _
-                                        And Math.Abs(Me.Y - EntityTypeInstance.Y) < liRepellDistance) _
-                                        And EntityTypeInstance.Shape IsNot Nothing _
-                                        Select EntityTypeInstance
+            Try
 
-            For Each lrEntityTypeInstance In larEntityTypeInstance
 
-                If (Me.X - lrEntityTypeInstance.X > 0) And (Math.Abs(Me.X - lrEntityTypeInstance.X) < liRepellDistance) Then
-                    liNewX = lrEntityTypeInstance.X - 1
-                Else
-                    liNewX = lrEntityTypeInstance.X + 1
-                End If
+                Dim larEntityTypeInstance = (From EntityTypeInstance In Me.Page.EntityTypeInstance
+                                             Where (Math.Abs(Me.X - EntityTypeInstance.X) < liRepellDistance _
+                                            And Math.Abs(Me.Y - EntityTypeInstance.Y) < liRepellDistance) _
+                                            And EntityTypeInstance.Shape IsNot Nothing
+                                             Select EntityTypeInstance).ToArray
 
-                If Me.Y - lrEntityTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrEntityTypeInstance.Y) < liRepellDistance) Then
-                    liNewY = lrEntityTypeInstance.Y - 1
-                Else
-                    liNewY = lrEntityTypeInstance.Y + 1
-                End If
+                For Each lrEntityTypeInstance In larEntityTypeInstance
 
-                lrEntityTypeInstance.Move(liNewX, liNewY, True)
-                Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    If (Me.X - lrEntityTypeInstance.X > 0) And (Math.Abs(Me.X - lrEntityTypeInstance.X) < liRepellDistance) Then
+                        liNewX = lrEntityTypeInstance.X - 1
+                    Else
+                        liNewX = lrEntityTypeInstance.X + 1
+                    End If
 
-            Next
+                    If Me.Y - lrEntityTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrEntityTypeInstance.Y) < liRepellDistance) Then
+                        liNewY = lrEntityTypeInstance.Y - 1
+                    Else
+                        liNewY = lrEntityTypeInstance.Y + 1
+                    End If
 
-            Dim larValueTypeInstance = From ValueTypeInstance In Me.Page.ValueTypeInstance _
-                            Where (Math.Abs(Me.X - ValueTypeInstance.X) < liRepellDistance _
-                            And Math.Abs(Me.Y - ValueTypeInstance.Y) < liRepellDistance) _
-                            And ValueTypeInstance.Shape IsNot Nothing _
-                            Select ValueTypeInstance
+                    lrEntityTypeInstance.Move(liNewX, liNewY, True)
+                    Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth)
 
-            For Each lrValueTypeInstance In larValueTypeInstance
-                If (Me.X - lrValueTypeInstance.X > 0) And (Math.Abs(Me.X - lrValueTypeInstance.X) < liRepellDistance) Then
-                    liNewX = lrValueTypeInstance.X - 1
-                Else
-                    liNewX = lrValueTypeInstance.X + 1
-                End If
+                Next
 
-                If Me.Y - lrValueTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrValueTypeInstance.Y) < liRepellDistance) Then
-                    liNewY = lrValueTypeInstance.Y - 1
-                Else
-                    liNewY = lrValueTypeInstance.Y + 1
-                End If
+                Dim larValueTypeInstance = (From ValueTypeInstance In Me.Page.ValueTypeInstance
+                                            Where (Math.Abs(Me.X - ValueTypeInstance.X) < liRepellDistance _
+                                           And Math.Abs(Me.Y - ValueTypeInstance.Y) < liRepellDistance) _
+                                           And ValueTypeInstance.Shape IsNot Nothing
+                                            Select ValueTypeInstance).ToArray
 
-                lrValueTypeInstance.Move(liNewX, liNewY, True)
-                Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth)
-            Next
+                For Each lrValueTypeInstance In larValueTypeInstance
+                    If (Me.X - lrValueTypeInstance.X > 0) And (Math.Abs(Me.X - lrValueTypeInstance.X) < liRepellDistance) Then
+                        liNewX = lrValueTypeInstance.X - 1
+                    Else
+                        liNewX = lrValueTypeInstance.X + 1
+                    End If
 
-            '=========================================================
-            'FactTypes
-            '=========================================================
-            Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                      Where FactTypeInstance.Id <> Me.Id _
-                                      And (Math.Abs(Me.X - FactTypeInstance.X) < liRepellDistance _
-                                      And Math.Abs(Me.Y - FactTypeInstance.Y) < liRepellDistance) _
-                                      And FactTypeInstance.Shape IsNot Nothing _
-                                      Select FactTypeInstance
+                    If Me.Y - lrValueTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrValueTypeInstance.Y) < liRepellDistance) Then
+                        liNewY = lrValueTypeInstance.Y - 1
+                    Else
+                        liNewY = lrValueTypeInstance.Y + 1
+                    End If
 
-            For Each lrFactTypeInstance In larFactTypeInstance
-                If (Me.X - lrFactTypeInstance.X > 0) And (Math.Abs(Me.X - lrFactTypeInstance.X) < liRepellDistance) Then
-                    liNewX = lrFactTypeInstance.X - 1
-                Else
-                    liNewX = lrFactTypeInstance.X + 1
-                End If
+                    lrValueTypeInstance.Move(liNewX, liNewY, True)
+                    Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                Next
 
-                If Me.Y - lrFactTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrFactTypeInstance.Y) < liRepellDistance) Then
-                    liNewY = lrFactTypeInstance.Y - 1
-                Else
-                    liNewY = lrFactTypeInstance.Y + 1
-                End If
+                '=========================================================
+                'FactTypes
+                '=========================================================
+                Dim larFactTypeInstance = (From FactTypeInstance In Me.Page.FactTypeInstance
+                                           Where FactTypeInstance.Id <> Me.Id _
+                                          And (Math.Abs(Me.X - FactTypeInstance.X) < liRepellDistance _
+                                          And Math.Abs(Me.Y - FactTypeInstance.Y) < liRepellDistance) _
+                                          And FactTypeInstance.Shape IsNot Nothing
+                                           Select FactTypeInstance).ToArray
 
-                lrFactTypeInstance.Move(liNewX, liNewY, True)
-                Call lrFactTypeInstance.RepellNeighbouringPageObjects(aiDepth)
-            Next
+                For Each lrFactTypeInstance In larFactTypeInstance
+                    If (Me.X - lrFactTypeInstance.X > 0) And (Math.Abs(Me.X - lrFactTypeInstance.X) < liRepellDistance) Then
+                        liNewX = lrFactTypeInstance.X - 1
+                    Else
+                        liNewX = lrFactTypeInstance.X + 1
+                    End If
+
+                    If Me.Y - lrFactTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrFactTypeInstance.Y) < liRepellDistance) Then
+                        liNewY = lrFactTypeInstance.Y - 1
+                    Else
+                        liNewY = lrFactTypeInstance.Y + 1
+                    End If
+
+                    lrFactTypeInstance.Move(liNewX, liNewY, True)
+                    Call lrFactTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

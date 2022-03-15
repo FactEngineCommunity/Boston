@@ -1000,6 +1000,31 @@ Namespace FBM
 
         End Function
 
+        Public Function isSupertypeOfModelElement(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                For Each lrSubtypeRelationship In arModelElement.SubtypeRelationship
+
+                    If lrSubtypeRelationship.parentModelElement Is Me Then
+                        Return True
+                    ElseIf Me.isSupertypeOfModelElement(lrSubtypeRelationship.parentModelElement) Then
+                        Return True
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Function isUnaryFactType() As Boolean
 
             Try

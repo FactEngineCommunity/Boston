@@ -1610,6 +1610,9 @@ Public Class frmMain
                         lrEntityType = arFocalModelObject
                         Call child.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
                         If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrEntityType)
+                        If lrEntityType.HasCompoundReferenceMode Then
+                            Call child.zrPage.DropRoleConstraintAtPoint(lrEntityType.ReferenceModeRoleConstraint, New PointF(10, 10), False)
+                        End If
                     Case Is = pcenumConceptType.FactType
                         Dim lrFactType As FBM.FactType
                         lrFactType = arFocalModelObject

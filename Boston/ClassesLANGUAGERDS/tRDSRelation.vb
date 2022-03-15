@@ -186,6 +186,12 @@ Namespace RDS
 
         End Function
 
+        Public Function EqualsByOriginTableDestinationTable(other As RDS.Relation) As Boolean
+
+            Return Me.OriginTable.Name = other.OriginTable.Name And Me.DestinationTable.Name = other.DestinationTable.Name
+
+        End Function
+
         Public Function EqualsByOriginColumnsDesinationTableReverseEngineering(other As RDS.Relation) As Boolean
 
             Dim abReturnValue As Boolean = True

@@ -21,6 +21,8 @@ Namespace FBM
                                 Call Me.ColumnsWhereActiveRoleIsNothingTryAndFix()
                             Case Is = pcenumModelFixType.ColumnsWhereActiveRoleIsNothingRemoveTheColumn
                                 Call Me.ColumnsWhereActiveRoleIsNothingRemoveTheColumn()
+                            Case Is = pcenumModelFixType.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn
+                                Call Me.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn
                             Case Is = pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect
                                 Call Me.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect()
                             Case Is = pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
@@ -192,6 +194,29 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn()
+
+            Try
+                For Each lrTable In Me.RDS.Table.ToArray
+                    For Each lrColumn In lrTable.Column.ToArray
+                        If Not lrColumn.BelongsToModelElement(lrTable.FBMModelElement) Then
+                            If Not lrColumn.Role.JoinedORMObject.isSupertypeOfModelElement(lrTable.FBMModelElement) Then
+                                lrTable.removeColumn(lrColumn)
+                            End If
+                        End If
+                    Next
+                Next
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         ''' <summary>
@@ -449,6 +474,12 @@ Namespace FBM
 
                     For Each lrColumn In lrTable.Column.FindAll(Function(x) Not x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) And x.OutgoingRelation.Count = 0)
 
+                        If lrColumn.FactType IsNot Nothing Then
+                            If lrColumn.FactType.IsManyTo1BinaryFactType Then
+                                GoTo SkipColumn
+                            End If
+                        End If
+
                         Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
                                                                lrTable,
                                                                pcenumCMMLMultiplicity.Many,
@@ -462,6 +493,13 @@ Namespace FBM
                                                                lrTable.FBMModelElement
                                                               )
 
+                        Dim lrExistingRelation As RDS.Relation = Me.RDS.Relation.Find(AddressOf lrRelation.EqualsByOriginTableDestinationTable)
+
+                        If lrExistingRelation IsNot Nothing Then
+                            MsgBox("Relation already exists between " & lrRelation.OriginTable.Name & " and " & lrRelation.DestinationTable.Name & ". Find some other reason why it isn't being shown in/on the Model.")
+                            GoTo SkipColumn
+                        End If
+
                         lrRelation.OriginColumns.Add(lrColumn)
                         For Each lrDestinationPKColumn In lrColumn.Role.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                             lrRelation.DestinationColumns.Add(lrDestinationPKColumn)
@@ -469,6 +507,7 @@ Namespace FBM
                         lrColumn.Relation.Add(lrRelation)
                         Call Me.RDS.addRelation(lrRelation)
                     Next
+SkipColumn:
                 Next
 
             Catch ex As Exception

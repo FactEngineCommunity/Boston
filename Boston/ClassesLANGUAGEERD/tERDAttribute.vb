@@ -274,8 +274,11 @@ Namespace ERD
                 Dim lsMandatory As String = ""
 
                 If Me.Entity.RDSTable.HasPrimaryKeyIndex Then
-                    If Me.Entity.RDSTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Contains(Me.Column) Then
+                    If Me.Column.isPartOfPrimaryKey Then
                         lsPartOfPrimaryKey = "#"
+                        '20220315-VM-Commented out. If all seems okay then remove completely.
+                        'ElseIf Me.Entity.RDSTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Contains(Me.Column) Then
+                        '    lsPartOfPrimaryKey = "#"
                     Else
                         lsPartOfPrimaryKey = ""
                     End If

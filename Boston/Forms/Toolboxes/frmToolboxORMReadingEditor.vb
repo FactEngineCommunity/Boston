@@ -141,16 +141,16 @@ Public Class frmToolboxORMReadingEditor
                     Exit Sub
                 End If
 
-                Select Case Me.zrPage.SelectedObject(0).ConceptType
-                    Case Is = pcenumConceptType.Relation
+                Select Case Me.zrPage.SelectedObject(0).GetType
+                    Case Is = GetType(RDS.Relation)
                         'zrFactTypeInstance set by the frmDiagramPGS at this stage.
                         Me.LabelFactTypeName.Text = Me.zrFactTypeInstance.Name
                         Me.LabelFactTypeName.ForeColor = Color.Blue
-                    Case Is = pcenumConceptType.Role
+                    Case Is = GetType(FBM.Role)
                         Me.zrFactTypeInstance = Me.zrPage.SelectedObject(0).factType
                         Me.LabelFactTypeName.Text = Me.zrFactTypeInstance.Name
                         Me.LabelFactTypeName.ForeColor = Color.Blue
-                    Case Is = pcenumConceptType.FactType
+                    Case Is = GetType(FBM.FactType)
                         '--------------------------------------------------------------
                         'Is a FactTypeInstance even though the ConceptType is FactType
                         '--------------------------------------------------------------

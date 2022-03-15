@@ -28,6 +28,7 @@
         RelationsInvalidActiveRoleOnOriginColumns
         ColumnsWhereActiveRoleIsNothingTryAndFix
         ColumnsWhereActiveRoleIsNothingRemoveTheColumn
+        ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn
         InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect
         ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
         RDSTablesWithNoColumnsRemoveThoseTables

@@ -3,6 +3,7 @@
 Public Class frmFixModelErrors
 
     Public mrModel As FBM.Model
+    Dim marFixItem As New List(Of tComboboxItem)
 
     Private Sub frmFixModelErrors_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -15,6 +16,8 @@ Public Class frmFixModelErrors
         Try
 
             Me.LabelModelName.Text = Me.mrModel.Name
+
+            Me.CheckedListBoxFixTypes.Items.Clear()
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RolesWithoutJoinedORMObject,
                                                                   "Roles Without JoinedORMObject. Remove from Model.",
@@ -31,6 +34,10 @@ Public Class frmFixModelErrors
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ColumnsWhereActiveRoleIsNothingRemoveTheColumn,
                                                                   "RDS Columns Where ActiveRole Is Nothing. Remove The Column.",
                                                                   pcenumModelFixType.ColumnsWhereActiveRoleIsNothingRemoveTheColumn))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn,
+                                                                  "RDS Columns Where Column is no longer part of Subtype Relationship Hierarchy. Remove The Column.",
+                                                                  pcenumModelFixType.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect,
                                                                   "Internal Uniqueness Constraints Where Level Numbers Are Not Correct. Fix.",
@@ -99,8 +106,9 @@ Public Class frmFixModelErrors
 
                 Dim laiFixType As New List(Of pcenumModelFixType)
 
-                For Each loItem In Me.CheckedListBoxFixTypes.CheckedItems
-                    laiFixType.Add(loItem.Tag)
+                For Each liItemIndex In Me.CheckedListBoxFixTypes.CheckedIndices
+                    Dim lrItem As tComboboxItem = Me.CheckedListBoxFixTypes.Items(liItemIndex)
+                    laiFixType.Add(lrItem.Tag)
                 Next
 
                 Call Me.mrModel.FixErrors(laiFixType)

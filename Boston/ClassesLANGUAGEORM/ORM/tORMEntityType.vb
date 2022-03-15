@@ -1893,7 +1893,7 @@ Namespace FBM
         Public Overrides Function HasPrimaryReferenceScheme() As Boolean
 
             If Me.IsObjectifyingEntityType Then
-                Return False
+                Return True 'Because the Objectified Fact Type has a Primary Reference Scheme by default (or should).
             ElseIf (Me.HasSimpleReferenceScheme Or Me.HasCompoundReferenceMode) Then
                 Return True
             Else

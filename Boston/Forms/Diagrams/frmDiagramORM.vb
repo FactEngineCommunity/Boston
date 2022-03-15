@@ -11760,26 +11760,58 @@ Public Class frmDiagramORM
 
     Private Sub ToolStripMenuItemShowLinkFactType_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemShowLinkFactType.Click
 
-        If Me.zrPage.SelectedObject.Count > 0 Then
-            If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.Role Then
+        Dim lsMessage As String
 
-                Dim lrRoleInstance = CType(Me.zrPage.SelectedObject(0), FBM.RoleInstance)
+        Try
 
-                Dim lrLinkFactType = lrRoleInstance.Role.FactType.getLinkFactTypes.Find(Function(x) x.LinkFactTypeRole Is lrRoleInstance.Role)
-                Dim lrObject As Object = lrRoleInstance.JoinedORMObject
-                Dim liXMultiplier = 1
-                Dim liYMultiplier = 1
-                If lrObject.X > lrRoleInstance.FactType.X Then liXMultiplier = -1
-                If lrObject.Y > lrRoleInstance.FactType.Y Then liYMultiplier = -1
+            If Me.zrPage.SelectedObject.Count > 0 Then
+                If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.Role Then
 
-                Dim lrPointF = New PointF(lrObject.X + (((Math.Abs(lrRoleInstance.FactType.X - lrObject.X) + 1) / 2) * liXMultiplier),
-                                          lrObject.Y + (((Math.Abs(lrRoleInstance.FactType.Y - lrObject.Y) + 1) / 2) * liYMultiplier)
-                                          )
-                Call Me.zrPage.DropFactTypeAtPoint(lrLinkFactType, lrPointF, False)
+                    Dim lrRoleInstance = CType(Me.zrPage.SelectedObject(0), FBM.RoleInstance)
 
+                    Dim lrLinkFactType As FBM.FactType
+
+                    Try
+                        lrLinkFactType = lrRoleInstance.Role.FactType.getLinkFactTypes.Find(Function(x) x.LinkFactTypeRole Is lrRoleInstance.Role)
+                    Catch
+                        'CodeSafe: Create the missing LinkFactType.
+                        lsMessage = "The Link Fact Type for the selected Role seems to be missing. Do you want Boston to create it now?"
+                        If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Yes Then
+                            lrLinkFactType = lrRoleInstance.Role.FactType.createLinkFactTypeForRole(lrRoleInstance.Role)
+                        End If
+                    End Try
+
+                    If lrLinkFactType Is Nothing Then
+                        'CodeSafe: Create the missing LinkFactType.
+                        lsMessage = "The Link Fact Type for the selected Role seems to be missing. Do you want Boston to create it now?"
+                        If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Yes Then
+                            lrLinkFactType = lrRoleInstance.Role.FactType.createLinkFactTypeForRole(lrRoleInstance.Role)
+                        Else
+                            Exit Sub
+                        End If
+                    End If
+
+                    Dim lrObject As Object = lrRoleInstance.JoinedORMObject
+                    Dim liXMultiplier = 1
+                    Dim liYMultiplier = 1
+                    If lrObject.X > lrRoleInstance.FactType.X Then liXMultiplier = -1
+                    If lrObject.Y > lrRoleInstance.FactType.Y Then liYMultiplier = -1
+
+                    Dim lrPointF = New PointF(lrObject.X + (((Math.Abs(lrRoleInstance.FactType.X - lrObject.X) + 1) / 2) * liXMultiplier),
+                                              lrObject.Y + (((Math.Abs(lrRoleInstance.FactType.Y - lrObject.Y) + 1) / 2) * liYMultiplier)
+                                              )
+                    Call Me.zrPage.DropFactTypeAtPoint(lrLinkFactType, lrPointF, False)
+
+                End If
             End If
-        End If
 
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

@@ -133,8 +133,18 @@ Namespace RDS
         End Property
 
         Public ReadOnly Property HasPrimaryKeyIndex As Boolean
+
             Get
-                Return Me.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing
+                If Me.FBMModelElement.SubtypeRelationship.FindAll(Function(x) x.IsPrimarySubtypeRelationship) IsNot Nothing Then
+                    Try
+                        Return Me.FBMModelElement.GetTopmostSupertype(True).getCorrespondingRDSTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing
+                    Catch ex As Exception
+                        Return False
+                    End Try
+                Else
+                    Return Me.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing
+                End If
+
             End Get
         End Property
 

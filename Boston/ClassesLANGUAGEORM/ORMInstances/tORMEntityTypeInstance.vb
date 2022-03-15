@@ -723,7 +723,7 @@ Namespace FBM
                     lsMessage = "The selected Supertype, " & arParentEntityTypeInstance.Id & ", does not have a Primary Reference Scheme."
                     lsMessage &= vbCrLf & vbCrLf & "What you are asking Boston to do is create related Tables/Nodes that have no Primary Key."
                     lsMessage.AppendString(" While Boston can handle this, it makes no sense.")
-                    If arParentEntityTypeInstance.getCorrespondingRDSTable.Column.Count = 0 Then
+                    If arParentEntityTypeInstance.EntityType.getCorrespondingRDSTable.Column.Count = 0 Then
                         lsMessage &= vbCrLf & vbCrLf & "Also, the related Table/Node for the Supertype model element, " & arParentEntityTypeInstance.Id & ", has no Columns/Attributes/Properties at all."
                         If Not Me.EntityType.IsAbsorbed Then
                             lsMessage.AppendString(" Because the model element, " & Me.Id & ", is not absorbed this means that no Columns/Attributes/Properties will be pulled down to the related Table/Node for this model element.")
@@ -1685,16 +1685,16 @@ Namespace FBM
                             Call Me.EnableSaveButton()
                         Case Is = "IsAbsorbed"
 
-                            If Me.IsAbsorbed Then
-                                For Each lrModelObject In Me.EntityType.HasSubtype
-                                    If Not lrModelObject.IsAbsorbed Then
-                                        Dim lsMessage = "The model element, " & Me.Id & ", has subtypes that are not absorbed. It only makes sense for this model element to be absorbed if its subtypes are absorbed."
-                                        MsgBox(lsMessage, MsgBoxStyle.Exclamation)
-                                        Me.IsAbsorbed = False
-                                        Exit Sub
-                                    End If
-                                Next
-                            End If
+                            'If Me.IsAbsorbed Then
+                            '    For Each lrModelObject In Me.EntityType.HasSubtype
+                            '        If Not lrModelObject.IsAbsorbed Then
+                            '            Dim lsMessage = "The model element, " & Me.Id & ", has subtypes that are not absorbed. It only makes sense for this model element to be absorbed if its subtypes are absorbed."
+                            '            MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                            '            Me.IsAbsorbed = False
+                            '            Exit Sub
+                            '        End If
+                            '    Next
+                            'End If
 
                             With New WaitCursor
                                 Call Me.EntityType.SetIsAbsorbed(Me.IsAbsorbed)
@@ -2569,19 +2569,19 @@ Namespace FBM
 
             '----------------------------------
             'CodeSafe:
-            If aiDepth > 20 Then
+            If aiDepth > 10 Then
                 Exit Sub
             Else
                 aiDepth += 1
             End If
 
             Try
-                Dim larEntityTypeInstance = From EntityTypeInstance In Me.Page.EntityTypeInstance _
-                                            Where EntityTypeInstance.Id <> Me.Id _
+                Dim larEntityTypeInstance = (From EntityTypeInstance In Me.Page.EntityTypeInstance
+                                             Where EntityTypeInstance.Id <> Me.Id _
                                             And (Math.Abs(Me.X - EntityTypeInstance.X) < liRepellDistance _
                                             And Math.Abs(Me.Y - EntityTypeInstance.Y) < liRepellDistance) _
-                                            And EntityTypeInstance.Shape IsNot Nothing _
-                                            Select EntityTypeInstance
+                                            And EntityTypeInstance.Shape IsNot Nothing
+                                             Select EntityTypeInstance).ToArray
 
                 For Each lrEntityTypeInstance In larEntityTypeInstance
 
@@ -2602,11 +2602,11 @@ Namespace FBM
 
                 Next
 
-                Dim larValueTypeInstance = From ValueTypeInstance In Me.Page.ValueTypeInstance _
-                                Where (Math.Abs(Me.X - ValueTypeInstance.X) < liRepellDistance _
+                Dim larValueTypeInstance = (From ValueTypeInstance In Me.Page.ValueTypeInstance
+                                            Where (Math.Abs(Me.X - ValueTypeInstance.X) < liRepellDistance _
                                 And Math.Abs(Me.Y - ValueTypeInstance.Y) < liRepellDistance) _
-                                And ValueTypeInstance.Shape IsNot Nothing _
-                                Select ValueTypeInstance
+                                And ValueTypeInstance.Shape IsNot Nothing
+                                            Select ValueTypeInstance).ToArray
 
                 For Each lrValueTypeInstance In larValueTypeInstance
                     If (Me.X - lrValueTypeInstance.X > 0) And (Math.Abs(Me.X - lrValueTypeInstance.X) < liRepellDistance) Then

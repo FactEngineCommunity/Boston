@@ -154,6 +154,9 @@ Public Class frmDiagramERD
         Me.PageAsORMMetamodelToolStripMenuItem.Visible = My.Settings.SuperuserMode
         Me.ToolStripMenuItemDeleteAttribute.Visible = My.Settings.SuperuserMode
 
+        Me.ToolStripMenuItemDeleteRelation.Enabled = My.Settings.SuperuserMode
+        Me.ToolStripMenuItemEditRelation.Enabled = My.Settings.SuperuserMode
+
     End Sub
 
     Public Sub EnableSaveButton()
@@ -2583,7 +2586,7 @@ Public Class frmDiagramERD
 
                 lrORMReadingEditor.zrPage = Me.zrPage
                 lrORMReadingEditor.zrFactTypeInstance = lrERDLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
-                Me.zrPage.SelectedObject.Add(lrORMReadingEditor.zrFactTypeInstance)
+                Me.zrPage.SelectedObject.Add(lrERDLink.Relation.RDSRelation) '20220315-VM-Was (lrORMReadingEditor.zrFactTypeInstance)
                 Call lrORMReadingEditor.SetupForm()
 
             End If
@@ -2594,7 +2597,7 @@ Public Class frmDiagramERD
             Dim lrToolboxForm As frmToolboxORMVerbalisation = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
             If IsSomething(lrToolboxForm) Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
-                Call lrToolboxForm.VerbaliseRelation(lrERDLink.Relation.RDSRelation.ResponsibleFactType)
+                Call lrToolboxForm.VerbaliseRelation(lrERDLink.Relation.RDSRelation.ResponsibleFactType, lrERDLink.Relation.RDSRelation, ModifierKeys.HasFlag(Keys.Control))
             End If
 
         Catch ex As Exception
@@ -3466,4 +3469,32 @@ Public Class frmDiagramERD
         End Try
 
     End Sub
+
+    Private Sub ToolStripMenuItemDeleteRelation_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDeleteRelation.Click
+
+        Try
+            Dim lsMessage As String
+
+            lsMessage = "Are you sure you want to delete the Relation?"
+            lsMessage.AppendDoubleLineBreak("NB Deleting the Relation will not delete the Fact Type responsible for the Relation, only the Relation at the CMML level.")
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.Critical) = MsgBoxResult.Yes Then
+
+                Dim lrRelation As RDS.Relation = Me.zrPage.SelectedObject(0)
+
+                Call lrRelation.Model.removeRelation(lrRelation)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
 End Class

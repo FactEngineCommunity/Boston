@@ -1702,13 +1702,11 @@ Namespace ORMQL
                     lrModelDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry, True, True, False)
 
                     lrFactData = New FBM.FactData(lrRole, lrModelDictionaryEntry.Concept, lrFact)
-                    lrFact.isDirty = True
 
                     lrFact.Data.Add(lrFactData)
-                    lrFact.isDirty = True
                     liInd += 1
                 Next
-
+                lrFact.makeDirty()
                 lrFactType.AddFact(lrFact)
                 lrFactType.isDirty = True
 

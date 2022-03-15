@@ -2005,7 +2005,9 @@ Public Class frmToolboxORMVerbalisation
 
     End Sub
 
-    Public Sub VerbaliseRelation(ByVal arFactType As FBM.FactType)
+    Public Sub VerbaliseRelation(ByVal arFactType As FBM.FactType,
+                                 Optional ByRef arRelation As RDS.Relation = Nothing,
+                                 Optional ByVal abShowMetaInformation As Boolean = False)
 
         Try
             Dim lrFactTypeReading As FBM.FactTypeReading
@@ -2022,6 +2024,9 @@ Public Class frmToolboxORMVerbalisation
             '------------------------------------------------------
             lrVerbaliser.VerbalisePredicateText(arFactType.Id)
             lrVerbaliser.VerbaliseQuantifier(" is a Relation.")
+            If abShowMetaInformation And arRelation IsNot Nothing Then
+                lrVerbaliser.VerbaliseBlackText("Relation.Id: " & arRelation.Id)
+            End If
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
@@ -2053,6 +2058,8 @@ Public Class frmToolboxORMVerbalisation
                             lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.RoleList(1).JoinedORMObject)
                         End If
 
+                        lrVerbaliser.VerbaliseSeparator(" ")
+                        lrVerbaliser.VerbaliseModelObjectLightGray(arFactType)
                     End If
 
                 Case Else

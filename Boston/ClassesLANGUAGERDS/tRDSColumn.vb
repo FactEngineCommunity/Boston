@@ -380,6 +380,28 @@ Namespace RDS
 
         End Sub
 
+        Public Function BelongsToModelElement(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                If Me.Role.JoinedORMObject.IsObjectified Then
+                    Return Me.Role.FactType Is arModelElement
+                Else
+                    Return Me.Role.JoinedORMObject Is arModelElement
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Function getAttributeName() As String
 
             Try
@@ -637,6 +659,8 @@ Namespace RDS
                         'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
                         If Me.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
                             lrTable = Me.Table
+                        ElseIf Me.Table.Name <> Me.Role.JoinedORMObject.Id And Me.Role.FactType.IsObjectified Then
+                            lrTable = Me.Role.FactType.getCorrespondingRDSTable
                         Else
                             lrTable = Me.Role.JoinedORMObject.getCorrespondingRDSTable
                         End If
