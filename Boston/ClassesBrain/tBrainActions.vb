@@ -296,8 +296,10 @@ Partial Public Class tBrain
                 End If
 
                 lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
+                lrFactTypeInstance.Visible = True
 
-                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(0, True)
+
 
                 Dim loPoint As New PointF(100, 100)
                 If lrFactTypeInstance.Arity = 2 Then

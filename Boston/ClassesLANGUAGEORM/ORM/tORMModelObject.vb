@@ -1103,6 +1103,29 @@ Namespace FBM
 
         End Function
 
+        Public Function HasSubTypes() As Boolean
+
+            Try
+                Dim larSubtypeModelObject = From ModelObject In Me.Model.getModelObjects
+                                            From SubtypeRelationship In ModelObject.SubtypeRelationship
+                                            Where SubtypeRelationship.parentModelElement.Id = Me.Id
+                                            Select SubtypeRelationship.ModelElement
+
+                Return larSubtypeModelObject.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Function HasSubtype() As List(Of FBM.ModelObject)
 
             Try

@@ -22,6 +22,12 @@ Namespace Richmond
             Return New String(Enumerable.Repeat(chars, length).[Select](Function(s) s(random.[Next](s.Length))).ToArray())
         End Function
 
+        Public Function RandomInteger(ByVal aiMin As Integer, aiMax As Integer) As Integer
+
+            Return CInt(Int((aiMax * Rnd()) + aiMin))
+
+        End Function
+
         Public Declare Function GetAsyncKeyState Lib "user32" (ByVal vKey As System.Windows.Forms.Keys) As Integer 'was vKey As Long
 
         <Extension()>

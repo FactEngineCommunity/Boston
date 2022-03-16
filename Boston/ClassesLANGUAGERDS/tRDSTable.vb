@@ -1198,15 +1198,27 @@ Namespace RDS
                 lsUniqueColumnName = asColumnName & aiStartingInd.ToString
             End If
 
-            If arColumn Is Nothing Then
-                If Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName)).Count > 0 Then
+            Try
+                If arColumn Is Nothing Then
+                    If Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName)).Count > 0 Then
+                        lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
+                    End If
+                ElseIf Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName) And x.Id <> arColumn.Id).Count > 0 Then
                     lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
                 End If
-            ElseIf Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName) And x.Id <> arColumn.Id).Count > 0 Then
-                lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
-            End If
 
-            Return lsUniqueColumnName
+                Return lsUniqueColumnName
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lsUniqueColumnName
+            End Try
 
         End Function
 

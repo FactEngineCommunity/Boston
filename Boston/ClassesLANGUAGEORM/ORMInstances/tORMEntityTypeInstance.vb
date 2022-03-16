@@ -1023,14 +1023,6 @@ Namespace FBM
 
         End Function
 
-        Public Function HasSubTypes() As Boolean
-
-            HasSubTypes = False
-
-            HasSubTypes = Me.Model.EntityType.Exists(Function(x) x.parentModelObjectList.Contains(Me))
-
-        End Function
-
         Public Sub HideTheReferenceScheme()
 
             Try
@@ -2633,10 +2625,10 @@ Namespace FBM
                 '=========================================================
                 'FactTypes
                 '=========================================================
-                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
+                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
                                           Where (Math.Abs(Me.X - FactTypeInstance.X) < liRepellDistance _
                                           And Math.Abs(Me.Y - FactTypeInstance.Y) < liRepellDistance) _
-                                          And FactTypeInstance.Shape IsNot Nothing _
+                                          And FactTypeInstance.Shape IsNot Nothing
                                           Select FactTypeInstance
 
                 For Each lrFactTypeInstance In larFactTypeInstance

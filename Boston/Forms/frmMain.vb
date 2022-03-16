@@ -1598,17 +1598,18 @@ Public Class frmMain
                 '--------------------------------------
             Else
                 Dim loPt As New PointF(200, 100)
+                Dim lrFocalModelElementInstance As FBM.ModelObject = Nothing
 
                 Select Case arFocalModelObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
                         Dim lrValueType As FBM.ValueType
                         lrValueType = arFocalModelObject
-                        Call child.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
+                        lrFocalModelElementInstance = child.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
                         If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrValueType)
                     Case Is = pcenumConceptType.EntityType
                         Dim lrEntityType As FBM.EntityType
                         lrEntityType = arFocalModelObject
-                        Call child.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
+                        lrFocalModelElementInstance = child.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
                         If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrEntityType)
                         If lrEntityType.HasCompoundReferenceMode Then
                             Call child.zrPage.DropRoleConstraintAtPoint(lrEntityType.ReferenceModeRoleConstraint, New PointF(10, 10), False)
@@ -1616,7 +1617,7 @@ Public Class frmMain
                     Case Is = pcenumConceptType.FactType
                         Dim lrFactType As FBM.FactType
                         lrFactType = arFocalModelObject
-                        Call child.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False, False, False, True)
+                        lrFocalModelElementInstance = child.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False, False, False, True)
                         If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrFactType)
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As FBM.RoleConstraint
@@ -1626,16 +1627,16 @@ Public Class frmMain
 
                         Select Case lrRoleConstraint.RoleConstraintType
                             Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                                lrRoleConstraintInstance = arPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                                lrFocalModelElementInstance = arPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                             Case Is = pcenumRoleConstraintType.RingConstraint,
                                       pcenumRoleConstraintType.EqualityConstraint,
                                       pcenumRoleConstraintType.ExternalUniquenessConstraint,
                                       pcenumRoleConstraintType.ExclusiveORConstraint,
                                       pcenumRoleConstraintType.ExclusionConstraint,
                                       pcenumRoleConstraintType.SubsetConstraint
-                                lrRoleConstraintInstance = arPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                                lrFocalModelElementInstance = arPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                             Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                                Call arPage.DropFrequencyConstraintAtPoint(lrRoleConstraint, loPt)
+                                lrFocalModelElementInstance = arPage.DropFrequencyConstraintAtPoint(lrRoleConstraint, loPt)
                         End Select
                 End Select
 

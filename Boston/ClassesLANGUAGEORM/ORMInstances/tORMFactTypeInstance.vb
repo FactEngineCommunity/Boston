@@ -3429,7 +3429,7 @@ Namespace FBM
                 '----------------------------------
                 'CodeSafe:
                 aiDepth += 1
-                If aiDepth > 10 Then
+                If aiDepth > 15 Then
                     Exit Sub
                 End If
 
