@@ -2184,6 +2184,13 @@ Public Class frmDiagramORM
                         Me.Diagram.AllowUnconnectedLinks = False
                     End With
                 Case Is = pcenumConceptType.ModelNote
+
+                    'CodeSafe
+                    If lrTargetModelObject Is Nothing Then
+                        Me.Diagram.Links.Remove(e.Link)
+                        Exit Sub
+                    End If
+
                     Dim lrModelNoteInstance As FBM.ModelNoteInstance
                     lrModelNoteInstance = lrOriginModelObject
                     For Each lrLink In lrModelNoteInstance.Shape.OutgoingLinks
@@ -3023,6 +3030,7 @@ Public Class frmDiagramORM
 
             e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
             e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
+
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -4239,7 +4247,19 @@ Public Class frmDiagramORM
                             lrPropertyGridForm.zrSelectedObject = lrRoleInstance
                             lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleInstance
-
+                        Case Is = pcenumConceptType.ModelNote
+                            Dim lrModelNoteInstance As FBM.ModelNoteInstance = lrModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute,
+                                                                                                                                                     loMiscFilterAttribute2,
+                                                                                                                                                     loMiscFilterAttribute3,
+                                                                                                                                                     loMiscFilterAttribute4,
+                                                                                                                                                     loMiscFilterAttribute5})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelNoteInstance
                         Case Else
                             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                             Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
@@ -6758,12 +6778,12 @@ Public Class frmDiagramORM
 
     End Sub
 
-    Public Sub AutoLayout()
+    Public Sub AutoLayout(Optional ByRef arCentralModelElementInstance As FBM.ModelObject = Nothing)
 
         Dim liHighestOutgoingLinkCount As Integer = 0
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
         Dim lrFactTypeInstance As FBM.FactTypeInstance
-        Dim lrCentralEntityTypeInstance As New FBM.EntityTypeInstance
+        Dim lrCentralModelElementInstance As New FBM.ModelObject
         'Dim lrLink As MindFusion.Diagramming.DiagramLink
         'Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
@@ -6812,33 +6832,37 @@ Public Class frmDiagramORM
             Next
 
             '-----------------------------
-            'Find the central EntityType
+            'Set the central ModelElement
             '-----------------------------
-            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
+            If arCentralModelElementInstance Is Nothing Then
+                For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
 
-                Dim liTotalLinkCount = lrEntityTypeInstance.Shape.IncomingLinks.Count + lrEntityTypeInstance.Shape.OutgoingLinks.Count
+                    Dim liTotalLinkCount = lrEntityTypeInstance.Shape.IncomingLinks.Count + lrEntityTypeInstance.Shape.OutgoingLinks.Count
 
-                If liTotalLinkCount >= liHighestOutgoingLinkCount Then
-                    liHighestOutgoingLinkCount = liTotalLinkCount
-                    lrCentralEntityTypeInstance = lrEntityTypeInstance
-                End If
+                    If liTotalLinkCount >= liHighestOutgoingLinkCount Then
+                        liHighestOutgoingLinkCount = liTotalLinkCount
+                        lrCentralModelElementInstance = lrEntityTypeInstance
+                    End If
 
-            Next
+                Next
+            Else
+                lrCentralModelElementInstance = arCentralModelElementInstance
+            End If
 
             Dim liX As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
             Dim liY As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
 
-            If lrCentralEntityTypeInstance.HasBeenMoved Then
+            If CType(lrCentralModelElementInstance, Object).HasBeenMoved Then
                 '--------------------
                 'Moved as a SubType
                 '--------------------
             Else
-                lrCentralEntityTypeInstance.shape.Move(liX, liY)
-                lrCentralEntityTypeInstance.HasBeenMoved = True
+                CType(lrCentralModelElementInstance, Object).Shape.Move(liX, liY)
+                CType(lrCentralModelElementInstance, Object).HasBeenMoved = True
             End If
 
             Dim liDegrees As Integer
-            If lrCentralEntityTypeInstance.HasSubTypes Then
+            If lrCentralModelElementInstance.HasSubTypes Then
                 liDegrees = 270
             Else
                 liDegrees = 320
@@ -6847,14 +6871,14 @@ Public Class frmDiagramORM
             'For Each lrLink In lrCentralEntityTypeInstance.Shape.IncomingLinks
             'If lrLink.Tag.ConceptType = pcenumConceptType.Role Then
 
-            For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralEntityTypeInstance)
+            For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralModelElementInstance)
 
-                Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralEntityTypeInstance.Id)
+                Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralModelElementInstance.Id)
                 'lrRoleInstance = lrLink.Tag
                 'lrFactTypeInstance = lrRoleInstance.FactType
 
-                liX = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
-                liY = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
+                liX = Viev.Greater(10, CType(lrCentralModelElementInstance, Object).Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
+                liY = Viev.Greater(10, CType(lrCentralModelElementInstance, Object).Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
                 If lrFactTypeInstance.Shape IsNot Nothing Then
                     lrFactTypeInstance.Shape.Move(liX, liY)
                 End If
@@ -6864,8 +6888,8 @@ Public Class frmDiagramORM
                 If lrFactTypeInstance.IsBinaryFactType And Not lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
                     Dim lrObject As Object
                     lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
-                    liX = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 65)
-                    liY = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 65)
+                    liX = Viev.Greater(40, CType(lrCentralModelElementInstance, Object).Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 65)
+                    liY = Viev.Greater(40, CType(lrCentralModelElementInstance, Object).Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 65)
                     If Not lrObject.HasBeenMoved Then
                         lrObject.Shape.Move(liX, liY)
                     End If

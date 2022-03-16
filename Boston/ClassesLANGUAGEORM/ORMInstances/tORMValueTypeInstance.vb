@@ -416,6 +416,12 @@ Namespace FBM
 
         End Function
 
+        Public Overrides Function HasSubTypes() As Boolean
+
+            Return Me.ValueType.HasSubTypes
+
+        End Function
+
         Public Overrides Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False) As List(Of FBM.Role)
 
             Try

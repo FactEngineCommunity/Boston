@@ -1621,7 +1621,6 @@ Public Class frmMain
                         If Not abControlKeyPressed Then Call child.LoadAssociatedFactTypes(lrFactType)
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As FBM.RoleConstraint
-                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
                         lrRoleConstraint = arFocalModelObject
 
@@ -1640,8 +1639,12 @@ Public Class frmMain
                         End Select
                 End Select
 
-                Call child.AutoLayout()
-
+                Select Case lrFocalModelElementInstance.GetType
+                    Case Is = GetType(FBM.FactTypeInstance)
+                        Call child.AutoLayout(lrFocalModelElementInstance)
+                    Case Else
+                        Call child.AutoLayout()
+                End Select
             End If
 
             Call Me.ShowHideToolboxes()

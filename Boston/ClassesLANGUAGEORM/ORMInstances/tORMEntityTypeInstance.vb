@@ -1023,6 +1023,12 @@ Namespace FBM
 
         End Function
 
+        Public Overrides Function HasSubTypes() As Boolean
+
+            Return Me.EntityType.HasSubTypes
+
+        End Function
+
         Public Sub HideTheReferenceScheme()
 
             Try

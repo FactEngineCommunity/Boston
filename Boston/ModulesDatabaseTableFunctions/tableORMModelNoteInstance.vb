@@ -100,7 +100,7 @@ Namespace TableModelNoteInstance
                     lrModelNoteInstance.Id = lREcordset("ModelNoteId").Value
                     lrModelNoteInstance.ModelNote = arPage.Model.ModelNote.Find(Function(x) x.Id = lrModelNoteInstance.Id)
 
-                    lrModelNoteInstance.Text = Trim(lREcordset("Note").Value)
+                    lrModelNoteInstance.NoteText = Trim(lREcordset("Note").Value)
 
                     If IsSomething(lrModelNoteInstance.ModelNote.JoinedObjectType) Then
                         lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject

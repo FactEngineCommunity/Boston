@@ -1,4 +1,5 @@
-﻿Imports MindFusion.Diagramming
+﻿Imports System.ComponentModel
+Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
 
@@ -14,6 +15,24 @@ Namespace FBM
 
         Public Page As FBM.Page
 
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Text As String = ""
+
+        <XmlAttribute()>
+        <CategoryAttribute("Note"),
+        Browsable(True),
+        DescriptionAttribute("The text for the Model Note."),
+        Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Property NoteText As String
+            Get
+                Return Me._Text
+            End Get
+            Set(value As String)
+                Me._Text = value
+            End Set
+        End Property
+
         <NonSerialized(),
         XmlIgnore()>
         Public _Shape As ShapeNode
@@ -27,7 +46,6 @@ Namespace FBM
             End Set
         End Property
 
-
         Public Property X As Integer Implements FBM.iPageObject.X 'The X coordinate of the PageObject
         Public Property Y As Integer Implements FBM.iPageObject.Y 'The Y coordinate of the PageObject
 
@@ -39,6 +57,7 @@ Namespace FBM
         ''' Parameterless New for cloning
         ''' </summary>
         Public Sub New()
+            Me.ConceptType = pcenumConceptType.ModelNote
         End Sub
 
         Public Overloads Function Clone(ByRef arPage As FBM.Page) As Object
@@ -119,11 +138,12 @@ Namespace FBM
                 Dim loDroppedNode As ShapeNode
                 Dim StringSize As SizeF
 
-                StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Text), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize = Me.Page.Diagram.MeasureString(Trim(Me.NoteText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                 StringSize.Height += 5
+                StringSize.Width += 3
 
                 If StringSize.Width > 70 Then
-                    StringSize = New SizeF(70, (StringSize.Height + 2) * Me.Text.Length / 100)
+                    StringSize = New SizeF(70, (StringSize.Height + 2) * Me.NoteText.Length / 100)
                 End If
 
                 '--------------------------------------------------------------------
@@ -135,13 +155,14 @@ Namespace FBM
                 loDroppedNode.HandlesStyle = HandlesStyle.HatchFrame
                 loDroppedNode.AllowIncomingLinks = False
                 loDroppedNode.AllowOutgoingLinks = True
-                loDroppedNode.Text = Trim(Me.Text)
+                loDroppedNode.Text = Trim(Me.NoteText)
                 loDroppedNode.TextFormat.Alignment = StringAlignment.Near
-                If Me.Text.Length > 5 Then
+                If Me.NoteText.Length > 5 Then
                     Call loDroppedNode.ResizeToFitText(FitSize.KeepWidth)
                 Else
                     loDroppedNode.Resize(40, 10)
                 End If
+                loDroppedNode.Resize(loDroppedNode.Bounds.Width + 1, loDroppedNode.Bounds.Height + 4)
 
                 loDroppedNode.ShadowOffsetX = 1
                 loDroppedNode.ShadowOffsetY = 1
@@ -213,7 +234,7 @@ Namespace FBM
                 If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                 Else
-                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                         Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                     Else
                         Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
@@ -231,7 +252,29 @@ Namespace FBM
 
         End Sub
 
-        Public Sub RefreshShape()
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
+
+            Try
+                If IsSomething(aoChangedPropertyItem) Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "NoteText"
+                            Me.ModelNote.SetText(Me.NoteText)
+                    End Select
+                End If
+
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Text = Me.NoteText
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -278,7 +321,7 @@ Namespace FBM
 
         Private Sub ModelNote_TextChanged(ByVal asNewText As String) Handles ModelNote.TextChanged
 
-            Me.Text = asNewText
+            Me.NoteText = asNewText
             Call Me.RefreshShape()
 
         End Sub

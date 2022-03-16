@@ -1103,7 +1103,7 @@ Namespace FBM
 
         End Function
 
-        Public Function HasSubTypes() As Boolean
+        Public Overridable Function HasSubTypes() As Boolean
 
             Try
                 Dim larSubtypeModelObject = From ModelObject In Me.Model.getModelObjects

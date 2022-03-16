@@ -9,8 +9,6 @@ Namespace FBM
         Implements iMDAObject
         Implements IEquatable(Of FBM.ModelNote)
 
-        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.ModelNote
-
         Public Text As String = "" 'The text of the ModelNote
         Public JoinedObjectType As FBM.ModelObject
 
@@ -36,10 +34,7 @@ Namespace FBM
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()
-
-            '20220207-VM-Was
-            'Me.ConceptType = pcenumConceptType.ModelNote
-
+            Me.ConceptType = pcenumConceptType.ModelNote
         End Sub
 
         Public Sub New(ByRef arModel As FBM.Model,
@@ -77,7 +72,7 @@ Namespace FBM
                 lrModelNoteInstance.Id = .Id
                 lrModelNoteInstance.Model = arPage.Model
                 lrModelNoteInstance.Page = arPage
-                lrModelNoteInstance.Text = .Text
+                lrModelNoteInstance.NoteText = .Text
                 lrModelNoteInstance.ModelNote = Me
                 If IsSomething(.JoinedObjectType) Then
                     Select Case Me.JoinedObjectType.ConceptType

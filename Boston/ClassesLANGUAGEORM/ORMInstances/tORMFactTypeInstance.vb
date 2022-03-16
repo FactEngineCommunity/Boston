@@ -1168,6 +1168,12 @@ Namespace FBM
 
         End Function
 
+        Public Overrides Function HasSubTypes() As Boolean
+
+            Return Me.FactType.HasSubTypes
+
+        End Function
+
         Public Overloads Function HasTotalRoleConstraint() As Boolean
 
             '------------------------------------------------------------------------
