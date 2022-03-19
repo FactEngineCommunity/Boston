@@ -28,6 +28,9 @@ Namespace DuplexServiceClient
 
         Private _syncContext As SynchronizationContext = AsyncOperationManager.SynchronizationContext
 
+        ''' <summary>
+        ''' See prDuplexServiceClient.HandleBroadcastReceived
+        ''' </summary>
         Public Event BroadcastEventReceived As EventHandler(Of Broadcast)
 
         Public Sub ReceiveBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,

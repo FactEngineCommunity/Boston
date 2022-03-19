@@ -2022,34 +2022,58 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arTargetModel">The Model to which the FactType will be associated on completion of this method.</param>
         ''' <remarks></remarks>
-        Public Shadows Sub ChangeModel(ByRef arTargetModel As FBM.Model, ByVal abAddToModel As Boolean)
+        Public Shadows Function ChangeModel(ByRef arTargetModel As FBM.Model,
+                                       ByVal abAddToModel As Boolean,
+                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
 
-            Dim lrRole As FBM.Role
+            Try
 
-            Me.Model = arTargetModel
+                If abReturnExistingModelElementIfExists And arTargetModel.ModelId = Me.Model.OriginModelId Then
+                    Dim lrFactType As FBM.FactType = arTargetModel.FactType.Find(Function(x) x.Id = Me.Id)
+                    If lrFactType IsNot Nothing Then
+                        Return lrFactType
+                    End If
+                End If
 
-            If abAddToModel Then
-                arTargetModel.AddFactType(Me)
-            End If
+                Dim lrRole As FBM.Role
 
-            For Each lrRole In Me.RoleGroup
-                lrRole.ChangeModel(arTargetModel, abAddToModel)
-                Call lrRole.JoinedORMObject.changeModel(arTargetModel, abAddToModel)
-            Next
+                Me.Model = arTargetModel
 
-            For Each lrFactTypeReading In Me.FactTypeReading
-                Call lrFactTypeReading.ChangeModel(arTargetModel)
-            Next
+                If abAddToModel Then
+                    arTargetModel.AddFactType(Me)
+                End If
 
-            For Each lrInternalUniquenessConstraint In Me.InternalUniquenessConstraint
-                Call lrInternalUniquenessConstraint.ChangeModel(arTargetModel, abAddToModel)
-            Next
+                For Each lrRole In Me.RoleGroup
+                    lrRole.ChangeModel(arTargetModel, abAddToModel)
+                    Call lrRole.JoinedORMObject.changeModel(arTargetModel, abAddToModel)
+                Next
 
-            If Me.IsLinkFactType Then
-                Me.LinkFactTypeRole.ChangeModel(arTargetModel, abAddToModel)
-            End If
+                For Each lrFactTypeReading In Me.FactTypeReading
+                    Call lrFactTypeReading.ChangeModel(arTargetModel)
+                Next
 
-        End Sub
+                For Each lrInternalUniquenessConstraint In Me.InternalUniquenessConstraint
+                    Call lrInternalUniquenessConstraint.ChangeModel(arTargetModel, abAddToModel)
+                Next
+
+                If Me.IsLinkFactType Then
+                    Me.LinkFactTypeRole.ChangeModel(arTargetModel, abAddToModel)
+                End If
+
+                Return Me
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Public Function createLinkFactTypeForRole(ByRef arRole As FBM.Role) As FBM.FactType
 

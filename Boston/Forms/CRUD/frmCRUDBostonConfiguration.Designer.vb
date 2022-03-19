@@ -76,10 +76,11 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
         Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
+        Me.CheckBoxAutomaticallyCheckForUpdates = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -637,6 +638,7 @@ Partial Class frmCRUDBostonConfiguration
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.AutoSize = True
+        Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyCheckForUpdates)
         Me.GroupBox4.Controls.Add(Me.ButtonReplaceCoreMetamodel)
         Me.GroupBox4.Controls.Add(Me.CheckBoxDiagramSpyShowLinkFactTypes)
         Me.GroupBox4.Controls.Add(Me.CheckBoxSuperuserMode)
@@ -647,6 +649,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.Size = New System.Drawing.Size(583, 484)
         Me.GroupBox4.TabIndex = 0
         Me.GroupBox4.TabStop = False
+        '
+        'ButtonReplaceCoreMetamodel
+        '
+        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(256, 12)
+        Me.ButtonReplaceCoreMetamodel.Name = "ButtonReplaceCoreMetamodel"
+        Me.ButtonReplaceCoreMetamodel.Size = New System.Drawing.Size(149, 23)
+        Me.ButtonReplaceCoreMetamodel.TabIndex = 2
+        Me.ButtonReplaceCoreMetamodel.Text = "Replace Core Metamodel"
+        Me.ButtonReplaceCoreMetamodel.UseVisualStyleBackColor = True
+        Me.ButtonReplaceCoreMetamodel.Visible = False
         '
         'CheckBoxDiagramSpyShowLinkFactTypes
         '
@@ -674,15 +686,15 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'ButtonReplaceCoreMetamodel
+        'CheckBoxAutomaticallyCheckForUpdates
         '
-        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(256, 12)
-        Me.ButtonReplaceCoreMetamodel.Name = "ButtonReplaceCoreMetamodel"
-        Me.ButtonReplaceCoreMetamodel.Size = New System.Drawing.Size(149, 23)
-        Me.ButtonReplaceCoreMetamodel.TabIndex = 2
-        Me.ButtonReplaceCoreMetamodel.Text = "Replace Core Metamodel"
-        Me.ButtonReplaceCoreMetamodel.UseVisualStyleBackColor = True
-        Me.ButtonReplaceCoreMetamodel.Visible = False
+        Me.CheckBoxAutomaticallyCheckForUpdates.AutoSize = True
+        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 78)
+        Me.CheckBoxAutomaticallyCheckForUpdates.Name = "CheckBoxAutomaticallyCheckForUpdates"
+        Me.CheckBoxAutomaticallyCheckForUpdates.Size = New System.Drawing.Size(177, 17)
+        Me.CheckBoxAutomaticallyCheckForUpdates.TabIndex = 3
+        Me.CheckBoxAutomaticallyCheckForUpdates.Text = "Automatically check for updates"
+        Me.CheckBoxAutomaticallyCheckForUpdates.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -788,4 +800,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents TextBoxReverseEngineeringDefaultReferenceMode As TextBox
     Friend WithEvents CheckBoxDiagramSpyShowLinkFactTypes As CheckBox
     Friend WithEvents ButtonReplaceCoreMetamodel As Button
+    Friend WithEvents CheckBoxAutomaticallyCheckForUpdates As CheckBox
 End Class

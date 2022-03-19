@@ -707,11 +707,15 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arModel"></param>
         ''' <param name="abAddToModel"></param>
-        Public Sub changeModel(ByRef arModel As FBM.Model, ByVal abAddToModel As Boolean)
+        Public Overridable Function ChangeModel(ByRef arTargetModel As FBM.Model,
+                                       ByVal abAddToModel As Boolean,
+                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
 
-            Me.Model = arModel
+            Me.Model = arTargetModel
 
-        End Sub
+            Return Me
+
+        End Function
 
         ''' <summary>
         ''' Ultimately returns the topmost Supertype that is not Absorbed from within in the upper hierarchy,

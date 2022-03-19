@@ -6218,104 +6218,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-
-    Private Sub mnuOption_IsObjectified_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOption_IsObjectified.Click
-
-        Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-        Try
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            mnuOption_IsObjectified.Checked = Not mnuOption_IsObjectified.Checked
-
-            Select Case mnuOption_IsObjectified.Checked
-                Case Is = True
-                    '------------------------
-                    'Objectify the FactType
-                    '------------------------
-
-                    If lrFactTypeInstance.FactType.InternalUniquenessConstraint.Count = 0 Then
-                        MsgBox("The Fact Type must have at least one Internal Uniqueness Constraint before objectification.")
-                        Exit Sub
-                    End If
-
-
-                    Using loWaitCursor As New WaitCursor
-                        '-------------------------------------------------------------------------------
-                        'Set the 'IsObjectified' value for the FactTypeInstance and underlying FactType
-                        '-------------------------------------------------------------------------------
-                        lrFactTypeInstance.IsObjectified = mnuOption_IsObjectified.Checked
-                        lrFactTypeInstance.FactType.Objectify()
-
-                        If lrFactTypeInstance.InternalUniquenessConstraint.Count = 0 Then
-                            '------------------------------------------------------------------
-                            'Create an InternalUniquenessConstraint for the FactType/Instance
-                            '------------------------------------------------------------------
-                            Call lrFactTypeInstance.FactType.CreateInternalUniquenessConstraint(lrFactTypeInstance.FactType.RoleGroup)
-                        End If
-                    End Using
-
-                Case Is = False
-                    '--------------------------------------------
-                    'Remove the objectification of the FactType
-                    '--------------------------------------------   
-                    Dim larAssociatedFactType As New List(Of FBM.FactType)
-                    If lrFactTypeInstance.FactType.hasAssociatedFactTypes(larAssociatedFactType) Then
-                        Dim lsMessage As String = "Remove all links to Fact Types linked to this Fact Type before removing the objectification of this Fact Type."
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Hint: See the list of associated Fact Types in the ORM Verbalisation toolbox to choose which Fact Types to remove or modify in the model before removing the objectification of this Fact Type."
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Associated Fact Types include:" & vbCrLf
-                        For Each lrFactType In larAssociatedFactType
-                            lsMessage &= lrFactType.Id & vbCrLf
-                        Next
-
-                        MsgBox(lsMessage)
-
-                        'Sample Code to find the linked FactTypes. Can extend message above to show the FactType Names to remove.
-                        'Dim larFactType = From FactType In Me.Model.FactType
-                        '                  From Role In FactType.RoleGroup
-                        '                  Where Role.JoinedORMObject.Id = Me.Id
-                        '                  Where FactType.isLinkFactType = False
-                        '                  Select FactType
-
-                    Else
-                        lrFactTypeInstance.IsObjectified = mnuOption_IsObjectified.Checked
-                        lrFactTypeInstance.FactType.RemoveObjectification(True)
-                    End If
-
-            End Select
-
-            Call Me.ResetNodeAndLinkColors()
-
-            '--------------------------------------------
-            'Refresh the PropertiesGrid if it is showing
-            '--------------------------------------------
-            Dim lrPropertyGridForm As frmToolboxProperties
-            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-
-            If IsSomething(lrPropertyGridForm) Then
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-                If Me.Diagram.Selection.Items.Count > 0 Then
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
-                Else
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
-                End If
-            End If
-
-            Call Me.EnableSaveButton()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
     Private Sub mnuOption_ViewReadingEditor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOption_ViewReadingEditor.Click
 
         If Me.zrPage.SelectedObject.Count > 0 Then
@@ -7158,13 +7060,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub mnuOption_Toolbox_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOption_Toolbox.Click
-
-        Call frmMain.LoadToolbox()
-        Call Me.SetToolbox()
-
-    End Sub
-
     Private Sub mnuOption_CopyImageToClipboard_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOption_CopyImageToClipboard.Click
 
         Call Me.CopyImageToClipboard()
@@ -7196,15 +7091,6 @@ Public Class frmDiagramORMForOntologyBrowser
     Private Sub DeonticToolStripMenuItem_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DeonticToolStripMenuItem.Click
 
     End Sub
-
-    Private Sub ErrorListToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ErrorListToolStripMenuItem.Click
-
-        'Call Me.zrPage.Model.ReviewModelErrors()
-        Call frmMain.loadToolboxErrorListForm(Me.DockPanel.ActivePane)
-
-    End Sub
-
-
 
     Public Sub select_all()
 
@@ -7256,18 +7142,6 @@ Public Class frmDiagramORMForOntologyBrowser
         prApplication.WorkingPage = Me.zrPage
 
         Call frmMain.loadToolboxORMVerbalisationForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
-
-    End Sub
-
-
-    Private Sub RichmondBrainBoxToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RichmondBrainBoxToolStripMenuItem.Click
-
-        prApplication.WorkingModel = Me.zrPage.Model
-        prApplication.WorkingPage = Me.zrPage
-
-        frmMain.Cursor = Cursors.WaitCursor
-        Call frmMain.loadToolboxRichmondBrainBox(Me.zrPage, Me.DockPanel.ActivePane)
-        frmMain.Cursor = Cursors.Default
 
     End Sub
 
@@ -7693,14 +7567,6 @@ Public Class frmDiagramORMForOntologyBrowser
         lr_image = Me.CreateFramedImage(lr_image, Color.White, 15)
 
         lr_image.Save(asFileLocation, System.Drawing.Imaging.ImageFormat.Jpeg)
-
-    End Sub
-
-
-    Private Sub ModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
-
-        Call prApplication.setWorkingModel(Me.zrPage.Model)
-        Call frmMain.LoadToolboxModelDictionary(True)
 
     End Sub
 
@@ -8769,45 +8635,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub RemoveallInternalUniquenessConstraintsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveallInternalUniquenessConstraintsToolStripMenuItem.Click
-
-        Dim lrFactTypeInstance As FBM.FactTypeInstance
-        Dim lsMessage As String = ""
-
-        '------------------------------------------------------
-        'Get the FactType for the InternalUniquenessConstraint
-        '------------------------------------------------------                    
-        lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-        If lrFactTypeInstance.FactType.IsObjectified Then
-            lsMessage = "Remove the objectification of this Fact Type before removing all of the Internal Uniqueness Constraints of the Fact Type."
-            lsMessage &= vbCrLf & vbCrLf
-            lsMessage &= "A Fact Type cannot be objectified if it has no Internal Uniqueness Constraints."
-            MsgBox(lsMessage)
-        Else
-            Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True)
-        End If
-
-
-
-    End Sub
-
-    Private Sub LockToThisPositionOnPageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LockToThisPositionOnPageToolStripMenuItem.Click
-
-        Dim lrShapeNode As New MindFusion.Diagramming.ShapeNode
-
-        lrShapeNode = Me.zrPage.SelectedObject(0).Shape
-
-        Me.LockToThisPositionOnPageToolStripMenuItem.Checked = Not Me.LockToThisPositionOnPageToolStripMenuItem.Checked
-
-        If Me.LockToThisPositionOnPageToolStripMenuItem.Checked Then
-            lrShapeNode.IgnoreLayout = True
-        Else
-            lrShapeNode.IgnoreLayout = False
-        End If
-
-    End Sub
-
     Private Sub ToolStripMenuItem8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem8.Click
 
         prApplication.WorkingPage = Me.zrPage
@@ -8838,177 +8665,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub RemoveFromPageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveFromPageToolStripMenuItem.Click
-
-        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-
-        Try
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Call lrEntityTypeInstance.RemoveFromPage(True)
-
-            '-----------------------------------
-            'Setup the Undo for the UserAction
-            '-----------------------------------
-            Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.RemovedPageObjectFromPage, Me.zrPage)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-            Me.zrPage.MakeDirty()
-            Call Me.EnableSaveButton()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-
-    End Sub
-
-    Private Sub RemoveFromPageModelToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveFromPageModelToolStripMenuItem.Click
-
-        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-
-        Try
-            With New WaitCursor
-                lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-                'Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
-
-                If lrEntityTypeInstance Is Nothing Then Exit Sub
-
-                Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
-
-                For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship.ToArray
-                    Call lrSubtypeRelationship.RemoveFromModel()
-                Next
-
-                Call lrEntityTypeInstance.EntityType.RemoveFromModel(False, True, True, False)
-
-            End With
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ToolStripMenuItem11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem11.Click
-
-        Dim lrValueTypeInstance As FBM.ValueTypeInstance
-
-        Try
-            lrValueTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Call lrValueTypeInstance.RemoveFromPage(True)
-
-            Dim lrUserAction As New tUserAction(lrValueTypeInstance, pcenumUserAction.RemovedPageObjectFromPage, Me.zrPage)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-            Me.zrPage.MakeDirty()
-            Call Me.EnableSaveButton()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-
-    End Sub
-
-    Private Sub ToolStripMenuItem12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem12.Click
-
-        Try
-            Dim lrValueTypeInstance As FBM.ValueTypeInstance
-
-            lrValueTypeInstance = Me.zrPage.SelectedObject(0)
-
-            'Vm-20180329-The below probably not required.
-            'Call lrValueTypeInstance.RemoveFromPage()
-            Call lrValueTypeInstance.ValueType.RemoveFromModel(False, True, True)
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ToolStripMenuItem13_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemFactTypeInstanceRemoveFromPage.Click
-
-        Try
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Call lrFactTypeInstance.RemoveFromPage(True)
-
-            Dim lrUserAction As New tUserAction(lrFactTypeInstance, pcenumUserAction.RemovedPageObjectFromPage, Me.zrPage)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-            Me.zrPage.MakeDirty()
-            Call Me.EnableSaveButton()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ToolStripMenuItem14_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemFactTypeRemoveFromPageModel.Click
-
-        Try
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            If lrFactTypeInstance.FactType.UserCanSafelyRemoveFromModel Then
-
-                Using loWaitCursor As New WaitCursor
-                    Call lrFactTypeInstance.FactType.RemoveFromModel(True, , True)
-                End Using
-            Else
-                Dim lsMessage As String = "You cannot remove the Fact Type while there are other Fact Types that join the Fact Type."
-                lsMessage.AppendDoubleLineBreak("Check the Fact Type in the Diagram Spy to see what other Fact Types join to the Fact Type.")
-                MsgBox(lsMessage)
-            End If
-
-        Catch ex As Exception
-
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-
-        End Try
-
-    End Sub
 
     Private Sub MenuItemHelpTips_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItemHelpTips.Click
 
@@ -9680,14 +9336,14 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub SubtypeConstraintsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemSubtypeConstraints.Click
+    Private Sub SubtypeConstraintsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemSubtypeRelationships.Click
 
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
         Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance
 
-        ToolStripMenuItemSubtypeConstraints.Checked = Not ToolStripMenuItemSubtypeConstraints.Checked
+        ToolStripMenuItemSubtypeRelationships.Checked = Not ToolStripMenuItemSubtypeRelationships.Checked
 
-        If ToolStripMenuItemSubtypeConstraints.Checked Then
+        If ToolStripMenuItemSubtypeRelationships.Checked Then
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 For Each lrSubtypeInstance In lrEntityTypeInstance.SubtypeRelationship
                     If IsSomething(lrSubtypeInstance.Link) Then
@@ -10382,29 +10038,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub PropertyGraphSchemaToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertyGraphSchemaToolStripMenuItem.Click
-
-        Dim lsMessage As String
-
-        '====================================================================================
-        'Check to see that there are no Entity Types on this Page with no Reference Scheme
-        Dim larEntityTypeInstance As New List(Of FBM.EntityTypeInstance)
-        If Me.zrPage.hasEntityTypeInstancessWithoutReferenceScheme(larEntityTypeInstance) Then
-            lsMessage = "There are Entity Types on this Page that have no Reference Scheme."
-            lsMessage &= vbCrLf & vbCrLf & "Create a Reference Scheme for the following Entity Types before convertinng this page to a Property Graph Schema:" & vbCrLf
-            For Each lrEntityTypeInstance In larEntityTypeInstance
-                lsMessage &= vbCrLf & " - " & lrEntityTypeInstance.Id
-            Next
-            MsgBox(lsMessage)
-            Exit Sub
-        End If
-
-        With New WaitCursor
-            Call Me.createPropertyGraphSchemaPageFromCurrentPage(sender, e)
-        End With
-
-    End Sub
-
     Private Sub ContextMenuStrip_EntityType_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_EntityType.Opening
 
         Dim larPage_list As New List(Of FBM.Page)
@@ -10796,14 +10429,6 @@ Public Class frmDiagramORMForOntologyBrowser
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
-        End With
-
-    End Sub
-
-    Private Sub EntityRelationshipDiagramToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EntityRelationshipDiagramToolStripMenuItem.Click
-
-        With New WaitCursor
-            Call Me.createEntityRelationshipDiagramPageForCurrentPage(sender, e)
         End With
 
     End Sub
@@ -11388,105 +11013,6 @@ Public Class frmDiagramORMForOntologyBrowser
         End Try
     End Sub
 
-    Private Sub ShowInModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInModelDictionaryToolStripMenuItem.Click
-
-        Dim lfrmModelDictionary As New frmToolboxModelDictionary
-
-        Try
-            If Me.zrPage.SelectedObject.Count = 0 Then
-                Exit Sub
-            End If
-
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            If prApplication.RightToolboxForms.FindAll(AddressOf lfrmModelDictionary.EqualsByName).Count = 0 Then
-                Call frmMain.LoadToolboxModelDictionary()
-            End If
-
-            lfrmModelDictionary = prApplication.RightToolboxForms.Find(AddressOf lfrmModelDictionary.EqualsByName)
-
-            Call lfrmModelDictionary.FindTreeNode(lrEntityTypeInstance.Id)
-
-            lfrmModelDictionary.Show()
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ShowInModelDictionaryToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ShowInModelDictionaryToolStripMenuItem1.Click
-
-        Dim lfrmModelDictionary As New frmToolboxModelDictionary
-
-        Try
-            If Me.zrPage.SelectedObject.Count = 0 Then
-                Exit Sub
-            End If
-
-            Dim lrValueTypeInstance As FBM.ValueTypeInstance
-            lrValueTypeInstance = Me.zrPage.SelectedObject(0)
-
-            If prApplication.RightToolboxForms.FindAll(AddressOf lfrmModelDictionary.EqualsByName).Count = 0 Then
-                Call frmMain.LoadToolboxModelDictionary()
-            End If
-
-            lfrmModelDictionary = prApplication.RightToolboxForms.Find(AddressOf lfrmModelDictionary.EqualsByName)
-
-            Call lfrmModelDictionary.FindTreeNode(lrValueTypeInstance.Id)
-
-            lfrmModelDictionary.Show()
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ShowInModelDictionaryToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ShowInModelDictionaryToolStripMenuItem2.Click
-
-        Dim lfrmModelDictionary As New frmToolboxModelDictionary
-
-        Try
-            If Me.zrPage.SelectedObject.Count = 0 Then
-                Exit Sub
-            End If
-
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            If prApplication.RightToolboxForms.FindAll(AddressOf lfrmModelDictionary.EqualsByName).Count = 0 Then
-                Call frmMain.LoadToolboxModelDictionary()
-            End If
-
-            lfrmModelDictionary = prApplication.RightToolboxForms.Find(AddressOf lfrmModelDictionary.EqualsByName)
-
-            Call lfrmModelDictionary.FindTreeNode(lrFactTypeInstance.Id)
-
-            lfrmModelDictionary.Show()
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
     Private Sub ShowInModelDictionaryToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ShowInModelDictionaryToolStripMenuItem3.Click
 
         Dim lfrmModelDictionary As New frmToolboxModelDictionary
@@ -11783,59 +11309,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub AddRoleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAddRole.Click
-
-        Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-        Try
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Dim lrRole As New FBM.Role(lrFactTypeInstance.FactType, System.Guid.NewGuid.ToString)
-
-            Call lrFactTypeInstance.FactType.AddRole(lrRole, True)
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-
-    End Sub
-
-
-    Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem1.Click
-
-        Try
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            For Each lrFactTypeReading In lrFactTypeInstance.FactType.getOutgoingFactTypeReadings
-
-                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
-
-                    Call Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
-                End If
-
-            Next
-
-            Call Me.AutoLayout()
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
     Private Sub PropertiesToolStripMenuItem4_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem4.Click
 
         Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing
@@ -11924,250 +11397,4 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub AddAllAssociatedFactTypesToPageToolStripMenuItem_Click_1(sender As Object, e As EventArgs) Handles AddAllAssociatedFactTypesToPageToolStripMenuItem.Click
-
-        Try
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings
-
-                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
-
-                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
-                    If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
-
-                        Try
-                            Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                                 Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                                 Select SubtypeRelationshipInstance).First
-
-                            Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                        Catch ex As Exception
-                            'Not a biggie. But shouldn't fail.
-                        End Try
-
-                    End If
-                ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
-                    Try
-                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
-
-                        Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                             Select SubtypeRelationshipInstance).First
-
-                        Dim lrModelElement As FBM.ModelObject
-                        Dim lrModelelementInstance As FBM.FactTypeInstance
-
-                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
-
-                        If lrModelElement Is Nothing Then
-                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
-
-                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
-                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
-                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
-                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
-                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
-                                    Select Case lrModelelementInstance.GetType
-                                        Case Is = GetType(FBM.FactTypeInstance)
-                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
-                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
-                                    End Select
-                                End If
-                            End If
-
-                        End If
-
-                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                    Catch ex As Exception
-                        'Not a biggie. But shouldn't fail.
-                    End Try
-                End If
-            Next
-
-            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
-                Call Me.AutoLayout()
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-
-    End Sub
-
-    Private Sub AllAssociatedFactTypesrelatedtoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AllAssociatedFactTypesrelatedtoToolStripMenuItem.Click
-
-        Try
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getIncomingFactTypeReadings
-
-                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
-
-                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
-                    If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
-
-                        Try
-                            Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                                 Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                                 Select SubtypeRelationshipInstance).First
-
-                            Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                        Catch ex As Exception
-                            'Not a biggie. But shouldn't fail.
-                        End Try
-
-                    End If
-                ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
-                    Try
-                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
-
-                        Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                             Select SubtypeRelationshipInstance).First
-
-                        Dim lrModelElement As FBM.ModelObject
-                        Dim lrModelelementInstance As FBM.FactTypeInstance
-
-                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
-
-                        If lrModelElement Is Nothing Then
-                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
-
-                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
-                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
-                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
-                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
-                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
-                                    Select Case lrModelelementInstance.GetType
-                                        Case Is = GetType(FBM.FactTypeInstance)
-                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
-                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
-                                    End Select
-                                End If
-                            End If
-
-                        End If
-
-                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                    Catch ex As Exception
-                        'Not a biggie. But shouldn't fail.
-                    End Try
-                End If
-            Next
-
-            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
-                Call Me.AutoLayout()
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub AllAssociatedSubtypeRelationshipsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AllAssociatedSubtypeRelationshipsToolStripMenuItem.Click
-
-        Try
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-            Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
-
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            For Each lrFactType In lrEntityTypeInstance.EntityType.getConnectedFactTypes.FindAll(Function(x) x.IsSubtypeRelationshipFactType)
-
-                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count = 0 Then
-
-                    lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, New PointF(10, 10), False, False, True, False)
-
-                    Try
-                        If lrFactType.RoleGroup(0).JoinedORMObject Is lrEntityTypeInstance.EntityType Then
-                            lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                             Select SubtypeRelationshipInstance).First
-                        Else
-                            Dim lrSubtypeRelationship = (From SubtypeRelationship In lrFactType.RoleGroup(0).JoinedORMObject.SubtypeRelationship
-                                                         Where SubtypeRelationship.FactType.Id = lrFactType.Id
-                                                         Select SubtypeRelationship).First
-                            lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(Me.zrPage, True)
-                        End If
-
-                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                    Catch ex As Exception
-                        'Not a biggie. But shouldn't fail.
-                    End Try
-
-                Else
-                    Try
-                        lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id)
-
-                        lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                         Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                         Select SubtypeRelationshipInstance).First
-
-                        Dim lrModelElement As FBM.ModelObject
-                        Dim lrModelelementInstance As FBM.FactTypeInstance
-
-                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
-
-                        If lrModelElement Is Nothing Then
-                            lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
-
-                            lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
-                            If lrModelElement.GetType = GetType(FBM.EntityType) Then
-                                If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
-                                    lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
-                                    lrModelelementInstance = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True, True)
-                                    Select Case lrModelelementInstance.GetType
-                                        Case Is = GetType(FBM.FactTypeInstance)
-                                            Dim lrSupertypeFactTypeInstance As FBM.FactTypeInstance = lrModelelementInstance
-                                            lrSupertypeFactTypeInstance.DisplayAndAssociate()
-                                    End Select
-                                End If
-                            End If
-
-                        End If
-
-                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                    Catch ex As Exception
-                        'Not a biggie. But shouldn't fail.
-                    End Try
-                End If
-            Next
-
-            If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then
-                Call Me.AutoLayout()
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage1 As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
 End Class

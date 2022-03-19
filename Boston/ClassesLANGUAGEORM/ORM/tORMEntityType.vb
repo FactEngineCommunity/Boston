@@ -1005,31 +1005,54 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arTargetModel">The Model to which the EntityType will be associated on completion of this method.</param>
         ''' <remarks></remarks>
-        Public Shadows Sub ChangeModel(ByRef arTargetModel As FBM.Model, ByVal abAddToModel As Boolean)
+        Public Shadows Function ChangeModel(ByRef arTargetModel As FBM.Model,
+                                       ByVal abAddToModel As Boolean,
+                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
 
-            Me.Model = arTargetModel
+            Try
 
-            If abAddToModel Then
-                arTargetModel.AddEntityType(Me)
-            End If
+                If abReturnExistingModelElementIfExists And arTargetModel.ModelId = Me.Model.OriginModelId Then
+                    Dim lrEntityType As FBM.EntityType = arTargetModel.EntityType.Find(Function(x) x.Id = Me.Id)
+                    If lrEntityType IsNot Nothing Then
+                        Return lrEntityType
+                    End If
+                End If
 
-            If Me.ReferenceModeValueType IsNot Nothing Then
-                Me.ReferenceModeValueType.ChangeModel(arTargetModel)
-            End If
+                Me.Model = arTargetModel
 
-            If Me.ReferenceModeFactType IsNot Nothing Then
-                Me.ReferenceModeFactType.ChangeModel(arTargetModel, abAddToModel)
-            End If
+                If abAddToModel Then
+                    arTargetModel.AddEntityType(Me)
+                End If
 
-            For Each lrSubtypeRelationship In Me.SubtypeRelationship
-                lrSubtypeRelationship.Model = arTargetModel
-            Next
+                If Me.ReferenceModeValueType IsNot Nothing Then
+                    Me.ReferenceModeValueType.ChangeModel(arTargetModel, abAddToModel)
+                End If
 
-            'If Me.ReferenceModeRoleConstraint IsNot Nothing Then
-            '            Me.ReferenceModeRoleConstraint.ChangeModel(arTargetModel)
-            'End If
+                If Me.ReferenceModeFactType IsNot Nothing Then
+                    Me.ReferenceModeFactType.ChangeModel(arTargetModel, abAddToModel)
+                End If
 
-        End Sub
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    lrSubtypeRelationship.Model = arTargetModel
+                Next
+
+                '20220319-VM-Was commented out. If not missed, remove.
+                'If Me.ReferenceModeRoleConstraint IsNot Nothing Then
+                '            Me.ReferenceModeRoleConstraint.ChangeModel(arTargetModel)
+                'End If
+
+                Return Me
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
 
         ''' <summary>
         ''' Creates a ReferenceMode where there is none. Sets up ReferenceModeFactType, ReferenceModeValueType, ReferenceModeRoleConstraint, PreferredIdentifierRCId.

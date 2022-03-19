@@ -1765,24 +1765,48 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arTargetModel">The Model to which the RoleConstraint will be associated on completion of this method.</param>
         ''' <remarks></remarks>
-        Public Shadows Sub ChangeModel(ByRef arTargetModel As FBM.Model, ByVal abAddToModel As Boolean)
+        Public Shadows Function ChangeModel(ByRef arTargetModel As FBM.Model,
+                                       ByVal abAddToModel As Boolean,
+                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
 
-            Me.Model = arTargetModel
+            Try
 
-            For Each lrRoleConstraintRole In Me.RoleConstraintRole
-                lrRoleConstraintRole.Model = arTargetModel
-                lrRoleConstraintRole.Role.Model = arTargetModel
-            Next
+                If abReturnExistingModelElementIfExists And arTargetModel.ModelId = Me.Model.OriginModelId Then
+                    Dim lrRoleConstraint As FBM.RoleConstraint = arTargetModel.RoleConstraint.Find(Function(x) x.Id = Me.Id)
+                    If lrRoleConstraint IsNot Nothing Then
+                        Return lrRoleConstraint
+                    End If
+                End If
 
-            For Each lrRoleConstraintArgument In Me.Argument
-                lrRoleConstraintArgument.Model = arTargetModel
-            Next
+                Me.Model = arTargetModel
 
-            If abAddToModel Then
-                Call arTargetModel.AddRoleConstraint(Me)
-            End If
+                For Each lrRoleConstraintRole In Me.RoleConstraintRole
+                    lrRoleConstraintRole.Model = arTargetModel
+                    lrRoleConstraintRole.Role.Model = arTargetModel
+                Next
 
-        End Sub
+                For Each lrRoleConstraintArgument In Me.Argument
+                    lrRoleConstraintArgument.Model = arTargetModel
+                Next
+
+                If abAddToModel Then
+                    Call arTargetModel.AddRoleConstraint(Me)
+                End If
+
+                Return Me
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Public Function CreateRoleConstraintRole(ByRef arRole As FBM.Role,
                                                  Optional arArgument As FBM.RoleConstraintArgument = Nothing,

@@ -30,9 +30,23 @@ Namespace FBM
             End Set
         End Property
 
+        ''' <summary>
+        ''' Used when Pasting (Copy/Paste), to determine where the Model Elements in the clipboard came from.
+        ''' </summary>
+        Public OriginModelId As String = "NoSpecified"
+
         <NonSerialized()>
         <XmlIgnore()>
         Public SharedModel As New Viev.FBM.Interface.Model
+
+        ''' <summary>
+        ''' True if the Model was loaded by the Unified Ontology Browser, else False.
+        '''   Models loaded by the Unified Ontology Browser, at this stage, cannot be saved (to XML or database).
+        '''   The reason is that the Model is dynamically loaded piece by piece as the User selects terms in the Ontology Browser to view.
+        ''' </summary>
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public LoadedByOntologyBrowser As Boolean = False
 
         ''' <summary>
         ''' A list of Languages that the ORM Model represents. Defaults to including ORM, but may include EntityRelationshipDiagrams, PropertyGraphSchemas etc
@@ -149,10 +163,16 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized()>
-        <XmlIgnore()>
+        ''' <summary>
+        ''' NB The Clipboard requires this element to be serialised for copying and pasting orm diagram elements between Pages/Models.
+        ''' </summary>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _FactType As New List(Of FBM.FactType)
+
+        ''' <summary>
+        ''' NB The Clipboard requires this element to be serialised for copying and pasting orm diagram elements between Pages/Models.
+        ''' </summary>
+        <XmlElement>
         Public Overridable Property FactType() As List(Of FBM.FactType)
             Get
                 Return Me._FactType
@@ -187,10 +207,9 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized()>
-        <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _RoleConstraint As New List(Of FBM.RoleConstraint)
+        <XmlElement>
         Public Overridable Property RoleConstraint() As List(Of FBM.RoleConstraint)
             Get
                 Return Me._RoleConstraint
@@ -3857,6 +3876,8 @@ Namespace FBM
             Dim lrModelNote As FBM.ModelNote = Nothing
 
             Try
+                'CodeSafe
+                If Me.LoadedByOntologyBrowser Then Exit Sub
 
                 '------------------------------------------------------------------------------------
                 'OrganicComputing:SafeCode: Remove all Roles that reference Nothing

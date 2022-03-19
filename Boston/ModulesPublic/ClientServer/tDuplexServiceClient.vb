@@ -65,6 +65,7 @@ Namespace DuplexServiceClient
                     lrInterfaceModel.Name = arModelElement.Model.Name
                     lrInterfaceModel.Namespace = prApplication.WorkingNamespace.Id
                     lrInterfaceModel.ProjectId = prApplication.WorkingProject.Id
+                    lrInterfaceModel.StoreAsXML = arModelElement.Model.StoreAsXML
 
                     '=============================================================================
                     If arConceptInstance IsNot Nothing Then
@@ -356,6 +357,9 @@ Namespace DuplexServiceClient
 
                     Dim lrModel As FBM.Model
                     lrModel = prApplication.Models.Find(Function(x) x.ModelId = lrInterfaceModel.ModelId)
+
+                    'Model save method may have changed.
+                    lrModel.StoreAsXML = lrInterfaceModel.StoreAsXML
 
                     If lrModel Is Nothing And
                         Not e.BroadcastType = [Interface].pcenumBroadcastType.AddModel Then Exit Sub 'Nothing more to do here.

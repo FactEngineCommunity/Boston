@@ -410,21 +410,45 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arTargetModel">The Model to which the ValueType will be associated on completion of this method.</param>
         ''' <remarks></remarks>
-        Public Shadows Sub ChangeModel(ByRef arTargetModel As FBM.Model)
+        Public Shadows Function ChangeModel(ByRef arTargetModel As FBM.Model,
+                                       ByVal abAddToModel As Boolean,
+                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
 
-            Me.Model = arTargetModel
+            Try
 
-            If arTargetModel.ValueType.Exists(AddressOf Me.Equals) Then
-                '----------------------------------------------
-                'The ValueType is already in the TargetModel
-                '----------------------------------------------
-            Else
-                arTargetModel.AddValueType(Me)
-            End If
+                If abReturnExistingModelElementIfExists And arTargetModel.ModelId = Me.Model.OriginModelId Then
+                    Dim lrValueType As FBM.ValueType = arTargetModel.ValueType.Find(Function(x) x.Id = Me.Id)
+                    If lrValueType IsNot Nothing Then
+                        Return lrValueType
+                    End If
+                End If
 
-            Me.isDirty = True
+                Me.Model = arTargetModel
 
-        End Sub
+                If arTargetModel.ValueType.Exists(AddressOf Me.Equals) Then
+                    '----------------------------------------------
+                    'The ValueType is already in the TargetModel
+                    '----------------------------------------------
+                Else
+                    arTargetModel.AddValueType(Me)
+                End If
+
+                Me.isDirty = True
+
+                Return Me
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Public Sub CheckForErrors()
 

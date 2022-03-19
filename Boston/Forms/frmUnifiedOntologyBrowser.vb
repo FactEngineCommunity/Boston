@@ -1379,7 +1379,7 @@ Public Class frmUnifiedOntologyBrowser
                         '--------------------------------------------------------------------------------------------------  
                         Select Case lrPage.Language
                             Case Is = pcenumLanguage.ORMModel
-                                Call frmMain.loadORMModelPage(lrPage, Nothing)
+                                Call frmMain.loadOntologyORMModelPage(lrPage, Nothing)
                         End Select
 
                     End If

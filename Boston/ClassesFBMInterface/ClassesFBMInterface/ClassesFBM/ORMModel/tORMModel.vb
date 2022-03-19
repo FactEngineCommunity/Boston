@@ -38,8 +38,12 @@ Public Class Model
     <DataMember()> _
     Public RoleConstraint As New List(Of RoleConstraint)
 
-    <DataMember()> _
+    <DataMember()>
     Public Page As Page
+
+    <DataMember()>
+    Public StoreAsXML As Boolean
+
 
     ' ''' <summary>
     ' ''' The Relational Data Schema for the Model.

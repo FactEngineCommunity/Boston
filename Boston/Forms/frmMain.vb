@@ -36,6 +36,7 @@ Public Class frmMain
     Public zfrmCRUDEditRole As frmCRUDEditRole = Nothing
     Public zfrmCRUDEditUser As frmCRUDEditUser = Nothing
     Public zfrm_ER_diagram_view As frmDiagramERD = Nothing
+    Public zfrmOntologyORMModelView As frmDiagramORMForOntologyBrowser = Nothing
     Public zfrm_PGS_diagram_view As frmDiagramPGS = Nothing
     Public zfrmStateTransitionDiagramView As frmStateTransitionDiagram = Nothing
     Public zfrmNotifications As frmNotifications = Nothing
@@ -92,8 +93,13 @@ Public Class frmMain
             Dim loFVI As System.Diagnostics.FileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(loAssembly.Location)
             lsAssemblyFileVersionNumber = loFVI.FileVersion
 
-            'AutoUpdater.InstalledVersion = New Version(psApplicationApplicationVersionNr)
-            'AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+            '-----------------------------------------------------------
+            'Automatic Update Checker
+            '-------------------------
+            If My.Settings.UseAutoUpdateChecker Then
+                'AutoUpdater.InstalledVersion = New Version(psApplicationApplicationVersionNr)
+                'AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+            End If
 
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
@@ -1661,7 +1667,6 @@ Public Class frmMain
     End Sub
 
 
-
     ''' <summary>
     '''   * See also: Me.LoadDiagramSpy
     ''' </summary>
@@ -1682,6 +1687,107 @@ Public Class frmMain
             child.MdiParent = Me
 
             zrORMModel_view = child
+
+            '----------------------------------------------------
+            'Set the TreeNode from which the form was launched,
+            '  so that when the User clicks on the Form, the
+            '  respective TreeNode in the navigation tree can
+            '  be selected/expanded etc
+            '----------------------------------------------------
+            child.zoTreeNode = aoTreeNode
+
+            prApplication.ThrowErrorMessage("Showing the ORM Diagram Form", pcenumErrorType.Information)
+
+            child.Show(DockPanel)
+
+            '---------------------------------------------------------------
+            'Reference the Form back from the Page.
+            '  The reason for this is because if the User elects to Edit a 
+            '  Page that is already opened for editing, then it is very easy
+            '  to find the form that the page is displayed as to set the 
+            '  ZOrder of that form to OnTop.
+            '---------------------------------------------------------------
+            arPage.Form = New Windows.Forms.Form
+            arPage.Form = child
+            arPage.ReferencedForm = child
+            arPage.Diagram = child.Diagram
+            arPage.DiagramView = child.DiagramView
+
+            '--------------------------------------------------------------------
+            'If the Page IsDirty (i.e. Is a 'New' page), enable the Save [button]
+            '--------------------------------------------------------------------
+            If arPage.IsDirty Then
+                Me.ToolStripButton_Save.Enabled = True
+            End If
+
+            '-----------------
+            'Display the Page
+            '-----------------
+            prApplication.ThrowErrorMessage("About to load the ORM Model Page", pcenumErrorType.Information)
+
+
+            Call child.DisplayORMModelPage(arPage)
+
+            If abLoadToolboxes Then
+                Call Me.ShowHideToolboxes(True)
+            End If
+
+
+            Try
+                If My.Settings.UseClientServer Then
+                    If Not prApplication.User.ProjectPermission.FindAll(Function(x) x.Permission = pcenumPermission.Alter).Count > 0 Then
+                        Dim lfrmFlashCard As New frmFlashCard
+                        lfrmFlashCard.ziIntervalMilliseconds = 3500
+                        lfrmFlashCard.zsText = "Please note that you do not have Alter Permission on this Project."
+                        Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
+                    End If
+                End If
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Failed Here: Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            child.Focus()
+
+            Return child
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+    ''' <summary>
+    '''   * See also: Me.LoadDiagramSpy
+    ''' </summary>
+    ''' <param name="arPage"></param>
+    ''' <param name="aoTreeNode">The TreeView.Node in the Model Explorer corresponding to the Page being loaded.</param>
+    ''' <remarks></remarks>
+    Public Function loadOntologyORMModelPage(ByRef arPage As FBM.Page,
+                                             ByRef aoTreeNode As TreeNode,
+                                             Optional ByVal abLoadToolboxes As Boolean = True) As Object
+
+        Dim child As New frmDiagramORMForOntologyBrowser
+
+        Try
+            prApplication.WorkingModel = arPage.Model
+
+            prApplication.ThrowErrorMessage("Opening the Toolbox", pcenumErrorType.Information)
+
+            child.MdiParent = Me
+
+            zfrmOntologyORMModelView = child
 
             '----------------------------------------------------
             'Set the TreeNode from which the form was launched,
@@ -2552,6 +2658,8 @@ Public Class frmMain
                     'Dim lrPage As New Clipbrd.ClipboardPage(lrModel, System.Guid.NewGuid.ToString, prApplication.WorkingPage.Name, pcenumLanguage.ORMModel)
 
                     Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, System.Guid.NewGuid.ToString, True)
+                    lrModel.OriginModelId = prApplication.WorkingModel.ModelId 'Used for differentiation when Pasting.
+
                     Dim lrPage As New FBM.Page(lrModel, "ClipboardPage", "ClipboardPage", prApplication.WorkingPage.Language)
                     lrPage.CopiedModelId = prApplication.WorkingModel.ModelId
                     lrPage.CopiedPageId = prApplication.WorkingPage.PageId
@@ -2948,14 +3056,14 @@ Public Class frmMain
                 'CodeSafe: Some RoleConstraints are within copied FactTypes (as InternalUniquenessConstraints)
                 '  and not at the Page level.
                 For Each lrRoleConstraint In lrPage.Model.RoleConstraint
-                    Call lrRoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+                    lrRoleConstraint.ChangeModel(prApplication.WorkingModel, False)
                 Next
 
                 'RoleConstraints...change Model and make sure Ids are unique
                 If lrPage.CopiedModelId <> prApplication.WorkingModel.ModelId Then
                     For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
 
-                        Call lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+                        lrRoleConstraintInstance.RoleConstraint = lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False, True)
 
                         Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
 
@@ -2989,7 +3097,7 @@ Public Class frmMain
 
                         For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
 
-                            Call lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+                            lrRoleConstraintInstance.RoleConstraint = lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False, True)
 
                             Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
 
@@ -3009,7 +3117,7 @@ Public Class frmMain
                 lrPage.EntityTypeInstance.Sort(AddressOf FBM.EntityType.CompareSubtypeConstraintExistance)
                 For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
                     Dim loPt As New PointF(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
-                    lrEntityTypeInstance.EntityType.ChangeModel(prApplication.WorkingModel, False)
+                    lrEntityTypeInstance.EntityType = lrEntityTypeInstance.EntityType.ChangeModel(prApplication.WorkingModel, False, True)
                     If prApplication.WorkingPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count = 0 Then
                         'The EntityType doesn't already exist on the Page.
                         prApplication.WorkingPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType, loPt, True)

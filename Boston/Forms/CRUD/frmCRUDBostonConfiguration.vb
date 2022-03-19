@@ -60,6 +60,9 @@ Public Class frmCRUDBostonConfiguration
         Me.LabelConfigurationFileLocation.Text = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
         Me.LabelUserConfigurationFileLocation.Text = Richmond.GetConfigFileLocation
 
+        'Boston Tab
+        Me.CheckBoxAutomaticallyCheckForUpdates.Checked = My.Settings.UseAutoUpdateChecker
+
         Me.ComboBoxDatabaseType.Enabled = False
 
         Me.CheckBoxEnableClientServer.Checked = My.Settings.UseClientServer
@@ -143,6 +146,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.ReverseEngineeringKeepDatabaseColumnNames = Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked
             My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
             My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
+            My.Settings.UseAutoUpdateChecker = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
 
             'Superuser Mode          
             My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked

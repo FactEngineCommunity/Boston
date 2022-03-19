@@ -9718,14 +9718,14 @@ Public Class frmDiagramORM
 
     End Sub
 
-    Private Sub SubtypeConstraintsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemSubtypeConstraints.Click
+    Private Sub SubtypeConstraintsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemSubtypeRelationships.Click
 
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
         Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance
 
-        ToolStripMenuItemSubtypeConstraints.Checked = Not ToolStripMenuItemSubtypeConstraints.Checked
+        ToolStripMenuItemSubtypeRelationships.Checked = Not ToolStripMenuItemSubtypeRelationships.Checked
 
-        If ToolStripMenuItemSubtypeConstraints.Checked Then
+        If ToolStripMenuItemSubtypeRelationships.Checked Then
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 For Each lrSubtypeInstance In lrEntityTypeInstance.SubtypeRelationship
                     If IsSomething(lrSubtypeInstance.Link) Then
@@ -11807,7 +11807,7 @@ Public Class frmDiagramORM
 
                     Dim lrRoleInstance = CType(Me.zrPage.SelectedObject(0), FBM.RoleInstance)
 
-                    Dim lrLinkFactType As FBM.FactType
+                    Dim lrLinkFactType As FBM.FactType = Nothing
 
                     Try
                         lrLinkFactType = lrRoleInstance.Role.FactType.getLinkFactTypes.Find(Function(x) x.LinkFactTypeRole Is lrRoleInstance.Role)

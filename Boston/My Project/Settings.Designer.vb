@@ -809,6 +809,18 @@ Namespace My
                 Me("ShowUnifiedOntologyBrowser") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property UseAutoUpdateChecker() As Boolean
+            Get
+                Return CType(Me("UseAutoUpdateChecker"),Boolean)
+            End Get
+            Set
+                Me("UseAutoUpdateChecker") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
