@@ -672,7 +672,6 @@ Namespace FBM
 
             Return lrRoleConstraintInstance
 
-
         End Function
 
         Public Sub AddDataInstance(ByVal asDataInstance As String)

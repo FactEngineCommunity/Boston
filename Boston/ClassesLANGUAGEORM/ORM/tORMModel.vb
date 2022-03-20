@@ -119,7 +119,6 @@ Namespace FBM
         <XmlAttribute()>
         Public CreatedByUserId As String = "" 'The User who created the Model when in Client/Server mode.
 
-
         <XmlIgnore()>
         Public [Dictionary] As New Dictionary(Of String, Integer)
 

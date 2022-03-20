@@ -156,7 +156,7 @@ Namespace FBM
                         Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry,,,, True)
 
                         Me.Concept = lrNewDictionaryEntry.Concept
-                        If Me.Model.Loaded Then
+                        If Me.Model.Loaded And Not Me.Model.StoreAsXML Then
                             Call lrNewDictionaryEntry.Concept.Save()
                             lrNewDictionaryEntry.Save()
                         End If

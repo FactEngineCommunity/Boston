@@ -103,16 +103,20 @@ Partial Public Class tBrain
 
                 End If
 
-                Call lrEntityType.ReferenceModeValueType.Save()
-                Call lrEntityType.ReferenceModeFactType.Save()
+                If Not Me.Model.StoreAsXML Then
+                    Call lrEntityType.ReferenceModeValueType.Save()
+                    Call lrEntityType.ReferenceModeFactType.Save()
 
-                For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
-                    Call lrInternalUniquenessConstraint.Save()
-                Next
+
+                    For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
+                        Call lrInternalUniquenessConstraint.Save()
+                    Next
+                End If
             End If
 
-            Call lrEntityType.Save()
-
+            If Not Me.Model.StoreAsXML Then
+                Call lrEntityType.Save()
+            End If
 
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form.GetType = GetType(frmDiagramORM) And lrEntityTypeInstance IsNot Nothing Then
@@ -120,7 +124,7 @@ Partial Public Class tBrain
                 End If
             End If
 
-                Me.send_data("Ok")
+            Me.send_data("Ok")
 
         Catch ex As Exception
             Dim lsMessage1 As String

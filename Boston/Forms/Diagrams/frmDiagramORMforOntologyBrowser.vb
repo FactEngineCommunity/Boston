@@ -1923,8 +1923,6 @@ Public Class frmDiagramORMForOntologyBrowser
                 Me.Refresh()
 
                 Me.zrPage.SelectedObject.Add(lrFactTable)
-                DeleteRowToolStripMenuItem.Enabled = True
-                Me.DeleteRowFactFromPageAndModelToolStripMenuItem.Enabled = True
             End If
 
             '==============================================================================================
@@ -4763,11 +4761,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Case Is = pcenumConceptType.Role
                     Dim lrRoleInstance As FBM.RoleInstance
                     lrRoleInstance = e.Node.Tag
-                    If lrRoleInstance.Mandatory Then
-                        mnuOption_Mandatory.Checked = True
-                    Else
-                        mnuOption_Mandatory.Checked = False
-                    End If
+
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Role
                 Case Is = pcenumConceptType.FactType
                     Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -4775,8 +4769,6 @@ Public Class frmDiagramORMForOntologyBrowser
                     If Me.zrPage.SelectedObject.Count > 0 Then
                         If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.FactType Then
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
-                            mnuOption_IsObjectified.Checked = lrFactTypeInstance.IsObjectified
-                            Me.ToolStripMenuItemFactTypeInstanceRemoveFromPage.Enabled = Not lrFactTypeInstance.isPreferredReferenceMode
                         End If
                     End If
                     Call lrFactTypeInstance.Selected()
@@ -4794,8 +4786,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
                     Dim lo_table_node As TableNode = e.Node.Tag.TableShape
                     lo_table_node.TextColor = Color.Black
-                    DeleteRowToolStripMenuItem.Enabled = False
-                    Me.DeleteRowFactFromPageAndModelToolStripMenuItem.Enabled = False
                 Case Is = pcenumConceptType.ValueType
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ValueType
                 Case Is = pcenumConceptType.RoleConstraint
@@ -8246,19 +8236,11 @@ Public Class frmDiagramORMForOntologyBrowser
         lrFactType = lrFactTypeInstance.FactType
         lr_model = lrFactType.Model
 
-        Me.ToolStripMenuItemAddRole.Enabled = Not lrFactType.IsLinkFactType
-
         '----------------------------------------------------------------------------------------------
         'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,
         '  except by chaning the FactType to being one that is not Objectified.
         '----------------------------------------------------------------------------------------------
         'Me.ToolStripMenuItemFactTypeRemoveFromPageModel.Enabled = Not lrFactType.IsLinkFactType
-
-        '==============================================================================================
-        'Special menu options for SubtypeRelationship FactTypes.        
-        Me.ToolStripMenuItemFactTypeInstanceRemoveFromPage.Enabled = Not lrFactType.IsSubtypeRelationshipFactType
-        Me.ToolStripMenuItemFactTypeRemoveFromPageModel.Enabled = Not (lrFactType.IsSubtypeRelationshipFactType Or lrFactType.IsLinkFactType)
-        '===================---------------------------------------------------------------------------
 
         '--------------------------------------------------------------------
         'ModelErrors - Add menu items for the ModelErrors for the FactType
