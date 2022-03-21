@@ -805,6 +805,7 @@
     <Compile Include="ClassesParserVA\TinyPG\tVAQLTextHighlighter.vb" />
     <Compile Include="ClassesParserVA\tVAQLProcessor.vb" />
     <Compile Include="ClassesPluginServices\PluginServices.vb" />
+    <Compile Include="ClassesRegistration\tRegistrationResult.vb" />
     <Compile Include="CodeGeneration\Metadrone\ApplicationEvents.vb" />
     <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Connection.vb" />
     <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Description.vb" />
@@ -1342,6 +1343,12 @@
     <Compile Include="Forms\frmGenericSelect.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\frmRegistration.Designer.vb">
+      <DependentUpon>frmRegistration.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmRegistration.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmUnifiedOntologyBrowser.Designer.vb">
       <DependentUpon>frmUnifiedOntologyBrowser.vb</DependentUpon>
     </Compile>
@@ -1464,6 +1471,7 @@
     <Compile Include="ModulesPublic\publicConstantsPGS.vb" />
     <Compile Include="ModulesPublic\publicDatabaseUpgradeFunctions.vb" />
     <Compile Include="ModulesPublic\ClientServer\tDSCEntityType.vb" />
+    <Compile Include="ModulesPublic\publicRegistration.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -2116,6 +2124,9 @@
     <EmbeddedResource Include="Forms\frmGenericSelect.resx">
       <DependentUpon>frmGenericSelect.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmRegistration.resx">
+      <DependentUpon>frmRegistration.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmUnifiedOntologyBrowser.resx">
       <DependentUpon>frmUnifiedOntologyBrowser.vb</DependentUpon>

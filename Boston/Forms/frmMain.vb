@@ -4679,4 +4679,11 @@ Public Class frmMain
         End Try
 
     End Sub
+
+    Private Sub RegistrationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RegistrationToolStripMenuItem.Click
+
+        frmRegistration.ShowDialog()
+
+    End Sub
+
 End Class
