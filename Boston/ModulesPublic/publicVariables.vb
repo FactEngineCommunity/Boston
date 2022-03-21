@@ -1,3 +1,5 @@
+Imports Mindscape.Raygun4Net
+
 Public Module publicVariables
 
     Public prApplication As tApplication
@@ -22,5 +24,8 @@ Public Module publicVariables
     Public psApplicationDatabaseVersionNr As String
 
     Public prThinfinity As New Cybele.Thinfinity.VirtualUI
+
+    'Crash Reporting - Automated/Online using www.raygun.com
+    Public prRaygunClient As New RaygunClient("7M0bwJKUwe7HEJZen4wOpg")
 
 End Module

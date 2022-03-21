@@ -74,6 +74,8 @@ Public Class frmCRUDBostonConfiguration
             Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
         End If
 
+        Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
+
         'FactEngine
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
         Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked = My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
@@ -147,6 +149,7 @@ Public Class frmCRUDBostonConfiguration
             My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
             My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
             My.Settings.UseAutoUpdateChecker = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
+            My.Settings.UseAutomatedErrorReporting = Me.CheckBoxAutomaticallyReportErrorEvents.Checked
 
             'Superuser Mode          
             My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked

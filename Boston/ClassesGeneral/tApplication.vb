@@ -497,6 +497,15 @@ Public Class tApplication
 
                             If abAbortApplication Then Call Application.Exit()
 
+                            If My.Settings.UseAutomatedErrorReporting Then
+                                Try
+                                    Throw New Exception(asErrorMessage)
+                                Catch ex As Exception
+                                    prRaygunClient.Send(ex)
+                                End Try
+
+                            End If
+
                         End If
                     Case Is = pcenumErrorType.Warning
 

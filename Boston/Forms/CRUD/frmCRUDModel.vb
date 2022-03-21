@@ -50,6 +50,8 @@ Public Class frmCRUDModel
 
         If Me.CheckBoxSaveToXML.Checked Then Me.ButtonReplaceDatabaseModel.Visible = True
 
+        Me.LabelModelId.Text = "Model Id: " & Me.zrModel.ModelId
+
     End Sub
 
     Private Sub frmCRUDModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -761,4 +763,26 @@ CouldntSaveToBostonDatabase:
         End Try
 
     End Sub
+
+    Private Sub ButtonCopyModelIdToClipboard_Click(sender As Object, e As EventArgs) Handles ButtonCopyModelIdToClipboard.Click
+
+        Try
+            System.Windows.Forms.Clipboard.SetText(Me.zrModel.ModelId)
+
+            Dim lfrmFlashCard As New frmFlashCard
+            lfrmFlashCard.ziIntervalMilliseconds = 1500
+            lfrmFlashCard.zsText = "Saved to clipboard."
+            lfrmFlashCard.Show(frmMain)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

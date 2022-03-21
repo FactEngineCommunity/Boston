@@ -230,6 +230,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\MindFusion.Svg.dll</HintPath>
     </Reference>
+    <Reference Include="Mindscape.Raygun4Net, Version=5.12.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mindscape.Raygun4Net.5.13.0\lib\net40\Mindscape.Raygun4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Mindscape.Raygun4Net4, Version=5.13.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mindscape.Raygun4Net.5.13.0\lib\net40\Mindscape.Raygun4Net4.dll</HintPath>
+    </Reference>
     <Reference Include="MTGCCombobox">
       <HintPath>..\Dependencies\MTGCCombobox.dll</HintPath>
     </Reference>
@@ -2943,6 +2949,7 @@
     <None Include="Images\MenuImages\Cloud216x16.jpg" />
     <None Include="Images\MenuImages\Configuration16x16.jpg" />
     <None Include="Images\MenuImages\CQL16x16.png" />
+    <None Include="Images\MenuImages\CopyToClipboard16x16.png" />
     <Content Include="Images\MenuImages\dictionary16x16.png" />
     <None Include="Images\MenuImages\edit16x16.jpg" />
     <None Include="Images\MenuImages\empty16x16.jpg" />

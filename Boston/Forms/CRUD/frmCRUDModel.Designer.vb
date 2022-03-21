@@ -31,8 +31,6 @@ Partial Class frmCRUDModel
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelModel = New System.Windows.Forms.Label()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
-        Me.ButtonFileSelect = New System.Windows.Forms.Button()
-        Me.ButtonCreateDatabase = New System.Windows.Forms.Button()
         Me.LabelOpenSuccessfull = New System.Windows.Forms.Label()
         Me.ButtonTestConnection = New System.Windows.Forms.Button()
         Me.ComboBoxDatabaseType = New System.Windows.Forms.ComboBox()
@@ -54,6 +52,7 @@ Partial Class frmCRUDModel
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
+        Me.ButtonReplaceDatabaseModel = New System.Windows.Forms.Button()
         Me.CheckBoxSaveToXML = New System.Windows.Forms.CheckBox()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
         Me.TabPageReverseEngineering = New System.Windows.Forms.TabPage()
@@ -73,7 +72,11 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
-        Me.ButtonReplaceDatabaseModel = New System.Windows.Forms.Button()
+        Me.LabelModelId = New System.Windows.Forms.Label()
+        Me.ButtonFileSelect = New System.Windows.Forms.Button()
+        Me.ButtonCreateDatabase = New System.Windows.Forms.Button()
+        Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
+        Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -170,35 +173,6 @@ Partial Class frmCRUDModel
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
-        '
-        'ButtonFileSelect
-        '
-        Me.ButtonFileSelect.BackColor = System.Drawing.Color.White
-        Me.ButtonFileSelect.BackgroundImage = Global.Boston.My.Resources.Resources.folder16x16
-        Me.ButtonFileSelect.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.ButtonFileSelect.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.ButtonFileSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonFileSelect.ForeColor = System.Drawing.Color.White
-        Me.ButtonFileSelect.Location = New System.Drawing.Point(275, 23)
-        Me.ButtonFileSelect.Name = "ButtonFileSelect"
-        Me.ButtonFileSelect.Size = New System.Drawing.Size(16, 16)
-        Me.ButtonFileSelect.TabIndex = 8
-        Me.ButtonFileSelect.UseVisualStyleBackColor = False
-        Me.ButtonFileSelect.Visible = False
-        '
-        'ButtonCreateDatabase
-        '
-        Me.ButtonCreateDatabase.BackColor = System.Drawing.Color.White
-        Me.ButtonCreateDatabase.BackgroundImage = Global.Boston.My.Resources.Resources.Add16x16
-        Me.ButtonCreateDatabase.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.ButtonCreateDatabase.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.ButtonCreateDatabase.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonCreateDatabase.ForeColor = System.Drawing.Color.White
-        Me.ButtonCreateDatabase.Location = New System.Drawing.Point(253, 23)
-        Me.ButtonCreateDatabase.Name = "ButtonCreateDatabase"
-        Me.ButtonCreateDatabase.Size = New System.Drawing.Size(16, 16)
-        Me.ButtonCreateDatabase.TabIndex = 7
-        Me.ButtonCreateDatabase.UseVisualStyleBackColor = False
         '
         'LabelOpenSuccessfull
         '
@@ -396,6 +370,8 @@ Partial Class frmCRUDModel
         '
         'Advanced
         '
+        Me.Advanced.Controls.Add(Me.ButtonCopyModelIdToClipboard)
+        Me.Advanced.Controls.Add(Me.LabelModelId)
         Me.Advanced.Controls.Add(Me.ButtonReplaceDatabaseModel)
         Me.Advanced.Controls.Add(Me.CheckBoxSaveToXML)
         Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
@@ -408,6 +384,16 @@ Partial Class frmCRUDModel
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
+        '
+        'ButtonReplaceDatabaseModel
+        '
+        Me.ButtonReplaceDatabaseModel.Location = New System.Drawing.Point(179, 87)
+        Me.ButtonReplaceDatabaseModel.Name = "ButtonReplaceDatabaseModel"
+        Me.ButtonReplaceDatabaseModel.Size = New System.Drawing.Size(170, 23)
+        Me.ButtonReplaceDatabaseModel.TabIndex = 10
+        Me.ButtonReplaceDatabaseModel.Text = "&Update database copy of Model"
+        Me.ButtonReplaceDatabaseModel.UseVisualStyleBackColor = True
+        Me.ButtonReplaceDatabaseModel.Visible = False
         '
         'CheckBoxSaveToXML
         '
@@ -591,15 +577,55 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'ButtonReplaceDatabaseModel
+        'LabelModelId
         '
-        Me.ButtonReplaceDatabaseModel.Location = New System.Drawing.Point(179, 87)
-        Me.ButtonReplaceDatabaseModel.Name = "ButtonReplaceDatabaseModel"
-        Me.ButtonReplaceDatabaseModel.Size = New System.Drawing.Size(170, 23)
-        Me.ButtonReplaceDatabaseModel.TabIndex = 10
-        Me.ButtonReplaceDatabaseModel.Text = "&Update database copy of Model"
-        Me.ButtonReplaceDatabaseModel.UseVisualStyleBackColor = True
-        Me.ButtonReplaceDatabaseModel.Visible = False
+        Me.LabelModelId.AutoSize = True
+        Me.LabelModelId.Location = New System.Drawing.Point(39, 130)
+        Me.LabelModelId.Name = "LabelModelId"
+        Me.LabelModelId.Size = New System.Drawing.Size(71, 13)
+        Me.LabelModelId.TabIndex = 11
+        Me.LabelModelId.Text = "LabelModelId"
+        '
+        'ButtonFileSelect
+        '
+        Me.ButtonFileSelect.BackColor = System.Drawing.Color.White
+        Me.ButtonFileSelect.BackgroundImage = Global.Boston.My.Resources.Resources.folder16x16
+        Me.ButtonFileSelect.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonFileSelect.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.ButtonFileSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonFileSelect.ForeColor = System.Drawing.Color.White
+        Me.ButtonFileSelect.Location = New System.Drawing.Point(275, 23)
+        Me.ButtonFileSelect.Name = "ButtonFileSelect"
+        Me.ButtonFileSelect.Size = New System.Drawing.Size(16, 16)
+        Me.ButtonFileSelect.TabIndex = 8
+        Me.ButtonFileSelect.UseVisualStyleBackColor = False
+        Me.ButtonFileSelect.Visible = False
+        '
+        'ButtonCreateDatabase
+        '
+        Me.ButtonCreateDatabase.BackColor = System.Drawing.Color.White
+        Me.ButtonCreateDatabase.BackgroundImage = Global.Boston.My.Resources.Resources.Add16x16
+        Me.ButtonCreateDatabase.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonCreateDatabase.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.ButtonCreateDatabase.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCreateDatabase.ForeColor = System.Drawing.Color.White
+        Me.ButtonCreateDatabase.Location = New System.Drawing.Point(253, 23)
+        Me.ButtonCreateDatabase.Name = "ButtonCreateDatabase"
+        Me.ButtonCreateDatabase.Size = New System.Drawing.Size(16, 16)
+        Me.ButtonCreateDatabase.TabIndex = 7
+        Me.ButtonCreateDatabase.UseVisualStyleBackColor = False
+        '
+        'ButtonCopyModelIdToClipboard
+        '
+        Me.ButtonCopyModelIdToClipboard.FlatAppearance.BorderSize = 0
+        Me.ButtonCopyModelIdToClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCopyModelIdToClipboard.Image = Global.Boston.My.Resources.Resources.CopyToClipboard16x16
+        Me.ButtonCopyModelIdToClipboard.Location = New System.Drawing.Point(13, 125)
+        Me.ButtonCopyModelIdToClipboard.Name = "ButtonCopyModelIdToClipboard"
+        Me.ButtonCopyModelIdToClipboard.Size = New System.Drawing.Size(20, 23)
+        Me.ButtonCopyModelIdToClipboard.TabIndex = 12
+        Me.ToolTip.SetToolTip(Me.ButtonCopyModelIdToClipboard, "Copy the Model's Id to the clipboard.")
+        Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
         '
         'frmCRUDModel
         '
@@ -685,4 +711,7 @@ Partial Class frmCRUDModel
     Friend WithEvents CheckBoxReverseEngineeringShowExtraInformation As CheckBox
     Friend WithEvents CheckBoxSaveToXML As CheckBox
     Friend WithEvents ButtonReplaceDatabaseModel As Button
+    Friend WithEvents ButtonCopyModelIdToClipboard As Button
+    Friend WithEvents LabelModelId As Label
+    Friend WithEvents ToolTip As ToolTip
 End Class

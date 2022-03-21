@@ -76,11 +76,12 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxAutomaticallyCheckForUpdates = New System.Windows.Forms.CheckBox()
         Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
         Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxAutomaticallyCheckForUpdates = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxAutomaticallyReportErrorEvents = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -638,6 +639,7 @@ Partial Class frmCRUDBostonConfiguration
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.AutoSize = True
+        Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyReportErrorEvents)
         Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyCheckForUpdates)
         Me.GroupBox4.Controls.Add(Me.ButtonReplaceCoreMetamodel)
         Me.GroupBox4.Controls.Add(Me.CheckBoxDiagramSpyShowLinkFactTypes)
@@ -649,6 +651,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.Size = New System.Drawing.Size(583, 484)
         Me.GroupBox4.TabIndex = 0
         Me.GroupBox4.TabStop = False
+        '
+        'CheckBoxAutomaticallyCheckForUpdates
+        '
+        Me.CheckBoxAutomaticallyCheckForUpdates.AutoSize = True
+        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 78)
+        Me.CheckBoxAutomaticallyCheckForUpdates.Name = "CheckBoxAutomaticallyCheckForUpdates"
+        Me.CheckBoxAutomaticallyCheckForUpdates.Size = New System.Drawing.Size(177, 17)
+        Me.CheckBoxAutomaticallyCheckForUpdates.TabIndex = 3
+        Me.CheckBoxAutomaticallyCheckForUpdates.Text = "Automatically check for updates"
+        Me.CheckBoxAutomaticallyCheckForUpdates.UseVisualStyleBackColor = True
         '
         'ButtonReplaceCoreMetamodel
         '
@@ -686,15 +698,15 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxAutomaticallyCheckForUpdates
+        'CheckBoxAutomaticallyReportErrorEvents
         '
-        Me.CheckBoxAutomaticallyCheckForUpdates.AutoSize = True
-        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 78)
-        Me.CheckBoxAutomaticallyCheckForUpdates.Name = "CheckBoxAutomaticallyCheckForUpdates"
-        Me.CheckBoxAutomaticallyCheckForUpdates.Size = New System.Drawing.Size(177, 17)
-        Me.CheckBoxAutomaticallyCheckForUpdates.TabIndex = 3
-        Me.CheckBoxAutomaticallyCheckForUpdates.Text = "Automatically check for updates"
-        Me.CheckBoxAutomaticallyCheckForUpdates.UseVisualStyleBackColor = True
+        Me.CheckBoxAutomaticallyReportErrorEvents.AutoSize = True
+        Me.CheckBoxAutomaticallyReportErrorEvents.Location = New System.Drawing.Point(12, 101)
+        Me.CheckBoxAutomaticallyReportErrorEvents.Name = "CheckBoxAutomaticallyReportErrorEvents"
+        Me.CheckBoxAutomaticallyReportErrorEvents.Size = New System.Drawing.Size(246, 17)
+        Me.CheckBoxAutomaticallyReportErrorEvents.TabIndex = 4
+        Me.CheckBoxAutomaticallyReportErrorEvents.Text = "Automatically report error events to FactEngine"
+        Me.CheckBoxAutomaticallyReportErrorEvents.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -801,4 +813,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxDiagramSpyShowLinkFactTypes As CheckBox
     Friend WithEvents ButtonReplaceCoreMetamodel As Button
     Friend WithEvents CheckBoxAutomaticallyCheckForUpdates As CheckBox
+    Friend WithEvents CheckBoxAutomaticallyReportErrorEvents As CheckBox
 End Class
