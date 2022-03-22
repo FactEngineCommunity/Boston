@@ -90,6 +90,7 @@ Partial Class frmMain
         Me.RemoveUnneededConceptsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LogFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteLogFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RegistrationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemAddUser = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditUserToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -149,7 +150,6 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
-        Me.RegistrationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -439,31 +439,31 @@ Partial Class frmMain
         '
         Me.ConfigurationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ConfigurationToolStripMenuItem.Name = "ConfigurationToolStripMenuItem"
-        Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.ConfigurationToolStripMenuItem.Text = "&Configuration"
         '
         'ToolStripSeparator14
         '
         Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
-        Me.ToolStripSeparator14.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator14.Size = New System.Drawing.Size(145, 6)
         '
         'PluginViewerToolStripMenuItem
         '
         Me.PluginViewerToolStripMenuItem.Name = "PluginViewerToolStripMenuItem"
-        Me.PluginViewerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.PluginViewerToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.PluginViewerToolStripMenuItem.Text = "&Plugin Viewer"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(145, 6)
         '
         'DatabaseToolStripMenuItem
         '
         Me.DatabaseToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackupDatabaseToolStripMenuItem, Me.CompactAndRepairToolStripMenuItem, Me.RemoveUnneededConceptsToolStripMenuItem})
         Me.DatabaseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Database16x16
         Me.DatabaseToolStripMenuItem.Name = "DatabaseToolStripMenuItem"
-        Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.DatabaseToolStripMenuItem.Text = "&Database"
         '
         'BackupDatabaseToolStripMenuItem
@@ -489,7 +489,7 @@ Partial Class frmMain
         '
         Me.LogFileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteLogFileToolStripMenuItem})
         Me.LogFileToolStripMenuItem.Name = "LogFileToolStripMenuItem"
-        Me.LogFileToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.LogFileToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.LogFileToolStripMenuItem.Text = "&Log File"
         '
         'DeleteLogFileToolStripMenuItem
@@ -498,6 +498,12 @@ Partial Class frmMain
         Me.DeleteLogFileToolStripMenuItem.Name = "DeleteLogFileToolStripMenuItem"
         Me.DeleteLogFileToolStripMenuItem.Size = New System.Drawing.Size(151, 22)
         Me.DeleteLogFileToolStripMenuItem.Text = "&Delete Log File"
+        '
+        'RegistrationToolStripMenuItem
+        '
+        Me.RegistrationToolStripMenuItem.Name = "RegistrationToolStripMenuItem"
+        Me.RegistrationToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.RegistrationToolStripMenuItem.Text = "&Registration"
         '
         'ToolStripMenuItemUser
         '
@@ -902,12 +908,6 @@ Partial Class frmMain
         'TimerNotifications
         '
         Me.TimerNotifications.Interval = 5000
-        '
-        'RegistrationToolStripMenuItem
-        '
-        Me.RegistrationToolStripMenuItem.Name = "RegistrationToolStripMenuItem"
-        Me.RegistrationToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.RegistrationToolStripMenuItem.Text = "&Registration"
         '
         'frmMain
         '

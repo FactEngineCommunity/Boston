@@ -4487,6 +4487,9 @@ Public Class frmMain
             Call Me.zfrmStartup.Show()
         End If
 
+        Dim lsApplicationPath As String = Richmond.MyPath
+        Me.zfrmStartup.WebBrowser.Navigate("file:\\" & lsApplicationPath & "\startup\index.html")
+
     End Sub
 
     Private Sub CodeGeneratorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGeneratorToolStripMenuItem.Click
