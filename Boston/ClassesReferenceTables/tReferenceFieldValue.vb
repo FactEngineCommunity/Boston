@@ -9,7 +9,7 @@
         '-----------------------------------------
         'Saves the ReferenceTypeValue to the database
         '-----------------------------------------
-        If TableReferenceFieldValue.exists_reference_field_value(Me) Then
+        If TableReferenceFieldValue.ExistsReferenceFieldValue(Me) Then
             Call TableReferenceFieldValue.UpdateReferenceFieldValue(Me)
         Else
             Call TableReferenceFieldValue.AddReferenceFieldValue(Me)

@@ -43,7 +43,7 @@ Namespace TableReferenceFieldValue
 
         End Sub
 
-        Function exists_reference_field_value(ByVal ar_reference_field_value As tReferenceFieldValue, Optional ByVal av_return_value As Object = Nothing) As Boolean
+        Function ExistsReferenceFieldValue(ByVal ar_reference_field_value As tReferenceFieldValue, Optional ByVal av_return_value As Object = Nothing) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -64,9 +64,9 @@ Namespace TableReferenceFieldValue
                 If Not (IsNothing(av_return_value)) Then
                     av_return_value = GetReferenceFieldValue(ar_reference_field_value.ReferenceTableId, ar_reference_field_value.ReferenceFieldId)
                 End If
-                exists_reference_field_value = True
+                ExistsReferenceFieldValue = True
             Else
-                exists_reference_field_value = False
+                ExistsReferenceFieldValue = False
             End If
 
             lREcordset.Close()

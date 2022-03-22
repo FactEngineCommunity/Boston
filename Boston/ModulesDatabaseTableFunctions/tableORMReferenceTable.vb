@@ -1,20 +1,16 @@
+Imports System.Reflection
+
 Namespace TableReferenceTable
     Module TableReferenceTable
 
-        Public Class t_reference_table_type
-            Public reference_table_id As Integer
-            Public name As String
-        End Class
-
-
-        Sub add_reference_table(ByVal l_reference_table As t_reference_table_type)
+        Sub AddReferenceTable(ByVal l_reference_table As tReferenceTable)
 
 
             Dim lsSQLQuery As String = ""
             Dim l_reference_table_id As Integer
 
 
-            l_reference_table_id = get_next_reference_table_id()
+            l_reference_table_id = GetNextReferenceTableId()
 
             lsSQLQuery = "INSERT INTO ReferenceTable"
             lsSQLQuery &= " VALUES ("
@@ -25,8 +21,25 @@ Namespace TableReferenceTable
 
         End Sub
 
+        Public Sub CreateReferenceTableIfNotExists(ByVal arReferenceTable As tReferenceTable)
 
-        Sub delete_reference_table(ByVal l_reference_table_id As Integer)
+            Try
+                If Not TableReferenceTable.ExistsReferenceTableByName(arReferenceTable.name) Then
+                    Call TableReferenceTable.AddReferenceTable(arReferenceTable)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Sub DeleteReferenceTable(ByVal l_reference_table_id As Integer)
 
             Dim lsSQLQuery As String = ""
 
@@ -37,7 +50,7 @@ Namespace TableReferenceTable
 
         End Sub
 
-        Function exists_reference_table_by_name(ByVal as_reference_table_name As String, Optional ByRef av_return_value As Integer = 0) As Boolean
+        Function ExistsReferenceTableByName(ByVal as_reference_table_name As String, Optional ByRef av_return_value As Integer = 0) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
@@ -57,9 +70,9 @@ Namespace TableReferenceTable
                 If Not (IsNothing(av_return_value)) Then
                     av_return_value = GetReferenceTableIdByName(as_reference_table_name)
                 End If
-                exists_reference_table_by_name = True
+                ExistsReferenceTableByName = True
             Else
-                exists_reference_table_by_name = False
+                ExistsReferenceTableByName = False
             End If
 
             lREcordset.Close()
@@ -67,7 +80,7 @@ Namespace TableReferenceTable
 
         End Function
 
-        Function get_next_reference_table_id() As Integer
+        Function GetNextReferenceTableId() As Integer
 
             'Returns the next reference_field_id in sequence
             Dim lREcordset As New ADODB.Recordset
@@ -82,9 +95,9 @@ Namespace TableReferenceTable
             lREcordset.Open(lsSQLQuery, , , pc_cmd_table)  ' Create Snapshot.
 
             If Not IsDBNull(lREcordset(0)) Then
-                get_next_reference_table_id = lREcordset(0).Value
+                GetNextReferenceTableId = lREcordset(0).Value
             Else
-                get_next_reference_table_id = 1
+                GetNextReferenceTableId = 1
             End If
 
             lREcordset.Close()
@@ -121,7 +134,7 @@ Namespace TableReferenceTable
         End Function
 
 
-        Sub update_reference_table(ByVal ar_reference_table As t_reference_table_type)
+        Sub UdateReferenceTable(ByVal ar_reference_table As tReferenceTable)
 
             Dim lsSQLQuery As String = ""
 

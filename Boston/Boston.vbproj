@@ -805,6 +805,8 @@
     <Compile Include="ClassesParserVA\TinyPG\tVAQLTextHighlighter.vb" />
     <Compile Include="ClassesParserVA\tVAQLProcessor.vb" />
     <Compile Include="ClassesPluginServices\PluginServices.vb" />
+    <Compile Include="ClassesReferenceTables\tReferenceField.vb" />
+    <Compile Include="ClassesReferenceTables\tReferenceTable.vb" />
     <Compile Include="ClassesRegistration\tRegistrationResult.vb" />
     <Compile Include="CodeGeneration\Metadrone\ApplicationEvents.vb" />
     <Compile Include="CodeGeneration\Metadrone\BostonDummyPlugin\Connection.vb" />
@@ -1501,7 +1503,7 @@
     <Compile Include="ClassesGeneral\tGlobalForTypeCoverter.vb" />
     <Compile Include="ClassesGeneral\tMyConverter.vb" />
     <Compile Include="ClassesGeneral\tNodeDragItem.vb" />
-    <Compile Include="ClassesGeneral\tReferenceFieldValue.vb" />
+    <Compile Include="ClassesReferenceTables\tReferenceFieldValue.vb" />
     <Compile Include="ClassesGeneral\tApplication.vb" />
     <Compile Include="ClassesGeneral\tSpecialDragMode.vb" />
     <Compile Include="ClassesGeneral\tStringCollectionEditor.vb" />

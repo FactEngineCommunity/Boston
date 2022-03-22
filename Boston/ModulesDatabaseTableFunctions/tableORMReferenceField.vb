@@ -1,18 +1,5 @@
 Module tableORMReferenceField
 
-    Public Class t_reference_field
-        Public reference_table_id As Integer
-        Public reference_field_id As Integer
-        Public label As String
-        Public data_type As Integer
-        Public cardinality As Integer
-        Public required As Integer
-        Public system As Boolean 'Indicates whether the ReferenceField is System supplied (or User supplied/editable).
-        'Users cannot modify a 'System' ReferenceField.
-    End Class
-
-
-
     Function ExistsReferenceTableFieldByLabel(ByVal aiReferenceTableId As Integer, ByVal as_reference_field_label As String, Optional ByRef av_return_value As Integer = 0) As Boolean
 
         Dim lsSQLQuery As String = ""
@@ -123,7 +110,7 @@ Module tableORMReferenceField
     End Function
 
 
-    Function GetReferenceFieldDetailsById(ByVal l_reference_field_id As Integer, ByVal ar_reference_field As t_reference_field) As Boolean
+    Function GetReferenceFieldDetailsById(ByVal l_reference_field_id As Integer, ByVal ar_reference_field As tReferenceField) As Boolean
 
         'Returns the values for a reference_field
         'given a reference_field_Id
@@ -133,7 +120,6 @@ Module tableORMReferenceField
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
-
 
         '-------------------------
         'Set default return value
