@@ -5,6 +5,24 @@
     Public ReferenceFieldId As Integer = 0
     Public Data As String = ""
 
+    ''' <summary>
+    ''' Parameterless Constructor
+    ''' </summary>
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal aiReferenceTableId As Integer,
+                   ByVal aiReferenceFieldId As Integer,
+                   ByVal aiRowId As Integer,
+                   ByVal asData As String)
+
+        Me.ReferenceTableId = aiReferenceTableId
+        Me.ReferenceFieldId = aiReferenceFieldId
+        Me.RowId = aiRowId
+        Me.Data = asData
+
+    End Sub
+
     Public Sub Save()
         '-----------------------------------------
         'Saves the ReferenceTypeValue to the database

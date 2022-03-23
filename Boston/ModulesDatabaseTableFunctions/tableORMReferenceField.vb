@@ -1,4 +1,54 @@
-Module tableORMReferenceField
+Imports System.Reflection
+
+Module tableReferenceField
+
+    Public Sub AddReferenceField(ByRef arReferenceField As tReferenceField)
+
+        Try
+            Dim lsSQLQuery As String = ""
+
+            lsSQLQuery = "INSERT INTO ReferenceField"
+            lsSQLQuery &= " VALUES ("
+            lsSQLQuery &= arReferenceField.reference_table_id & ","
+            lsSQLQuery &= arReferenceField.reference_field_id & ","
+            lsSQLQuery &= "'" & arReferenceField.label & "'" & ","
+            lsSQLQuery &= arReferenceField.data_type & ","
+            lsSQLQuery &= arReferenceField.cardinality & ","
+            lsSQLQuery &= arReferenceField.required & ","
+            lsSQLQuery &= arReferenceField.system & ")"
+
+            pdbConnection.Execute(lsSQLQuery)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Public Sub CreateReferenceFieldIfNotExists(ByRef arReferenceField As tReferenceField)
+
+        Try
+            Dim lbReturnValue As Boolean
+            If Not tableReferenceField.ExistsReferenceTableFieldByLabel(arReferenceField.reference_table_id,
+                                                                        arReferenceField.label,
+                                                                        lbReturnValue) Then
+                Call tableReferenceField.AddReferenceField(arReferenceField)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 
     Function ExistsReferenceTableFieldByLabel(ByVal aiReferenceTableId As Integer, ByVal as_reference_field_label As String, Optional ByRef av_return_value As Integer = 0) As Boolean
 

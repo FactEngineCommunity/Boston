@@ -4,16 +4,15 @@ Imports System.Reflection
 
 Module publicRegistration
 
-    Public Function CheckRegistration(ByVal asApplicationKey As String, ByVal asRegistrationKey As String, ByRef arRegistrationResult As tRegistrationResult) As Boolean
+    Public Function CheckRegistration(ByVal asApplicationKey As String,
+                                      ByVal asRegistrationKey As String,
+                                      ByRef arRegistrationResult As tRegistrationResult,
+                                      ByRef asDefaultRegistrationKey As String) As Boolean
 
         Try
 
             Dim lsProductIdentifier As String
-            Dim lsSoftwareType As String
-            Dim lsSubscriptionType As String
-            Dim lsDate As String
             Dim lbResult As Boolean = False
-
 
             'asApplicationKey,lsSoftwareType,lsSubscriptionType,lsDate
 
@@ -69,6 +68,23 @@ Module publicRegistration
                 End If
             Next
 
+            'Default Registration (so that Subscriptions don't default to Not Registered. I.e. Default to Registered by no Subscription).
+            lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "None", "None")
+            If asDefaultRegistrationKey = FormatLicenseKey(GetMd5Sum(lsProductIdentifier)) Then
+                arRegistrationResult.IsRegistered = True
+                arRegistrationResult.SoftwareType = "Professional"
+                arRegistrationResult.SubscriptionType = "None"
+                lbResult = True
+                GoTo ReturnResult
+            End If
+
+            'Default to not registered
+            arRegistrationResult.IsRegistered = False
+            arRegistrationResult.SoftwareType = prApplication.SoftwareCategory.ToString
+            arRegistrationResult.SubscriptionType = "None"
+            arRegistrationResult.RegisteredToDate = "None"
+            lbResult = False
+
 ReturnResult:
             Return lbResult
 
@@ -85,7 +101,7 @@ ReturnResult:
 
     End Function
 
-    Private Function FormatProductIdentifier(ByVal asApplicationKey As String,
+    Public Function FormatProductIdentifier(ByVal asApplicationKey As String,
                                              ByVal asSoftwareType As String,
                                              ByVal asSubscriptionType As String,
                                              ByVal asDate As String) As String

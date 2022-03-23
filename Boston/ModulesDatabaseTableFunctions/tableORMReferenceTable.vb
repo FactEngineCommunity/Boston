@@ -5,7 +5,6 @@ Namespace TableReferenceTable
 
         Sub AddReferenceTable(ByVal l_reference_table As tReferenceTable)
 
-
             Dim lsSQLQuery As String = ""
             Dim l_reference_table_id As Integer
 

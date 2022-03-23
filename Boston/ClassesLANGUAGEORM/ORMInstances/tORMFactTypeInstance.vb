@@ -1370,7 +1370,9 @@ Namespace FBM
 
                 If Me.FactTypeReadingShape IsNot Nothing And abMoveFactTypeReading Then
                     If Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
-                        Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
+                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                            Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
+                        End If
                     End If
                 End If
 

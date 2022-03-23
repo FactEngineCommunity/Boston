@@ -74,7 +74,9 @@ Namespace TableReferenceFieldValue
 
         End Function
 
-        Function GetReferenceFieldValue(ByVal aiReferenceTableId As Integer, ByVal aiReference_field_id As Integer) As String
+        Function GetReferenceFieldValue(ByVal aiReferenceTableId As Integer,
+                                        ByVal aiReference_field_id As Integer,
+                                        Optional ByVal abIgnoreErrors As Boolean = False) As String
 
             Dim lsSQLQuery As String
             Dim lREcordset As New ADODB.Recordset
@@ -92,7 +94,9 @@ Namespace TableReferenceFieldValue
             If Not lREcordset.EOF Then
                 GetReferenceFieldValue = lREcordset("Data").Value
             Else
-                MsgBox("Error: get_reference_field_value_data: no record returned: parameter: aiReferenceTableId=" & aiReferenceTableId & ", aiReference_field_id=" & aiReference_field_id)
+                If Not abIgnoreErrors Then
+                    MsgBox("Error: get_reference_field_value_data: no record returned: parameter: aiReferenceTableId=" & aiReferenceTableId & ", aiReference_field_id=" & aiReference_field_id)
+                End If
                 GetReferenceFieldValue = ""
             End If
 

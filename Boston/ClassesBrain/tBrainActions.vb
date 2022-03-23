@@ -4,16 +4,20 @@ Partial Public Class tBrain
 
     Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement()
 
+        Dim lsMessage As String
+        Dim lsReferenceMode As String
+        Dim lsUnabatedReferenceMode As String
+
         Try
-
             Me.Model = prApplication.WorkingModel
-
 
             Dim lrEntityType As FBM.EntityType
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Nothing
 
             Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
             Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
+            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.KEYWDWRITTENAS = Nothing
+            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.VALUETYPEWRITTENASCLAUSE = Nothing
 
             Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
 
@@ -47,7 +51,8 @@ Partial Public Class tBrain
                 'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
             End If
 
-            Dim lsReferenceMode As String = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+            lsReferenceMode = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+            lsUnabatedReferenceMode = lsReferenceMode
 
             Dim items As Array
             items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
@@ -100,7 +105,11 @@ Partial Public Class tBrain
                     End Try
 
                     Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
-
+                Else
+                    lsMessage = "Remember that you can set the Data Type for the Value Type of the Reference Scheme by saying something like:"
+                    lsMessage.AppendLine(lrEntityType.Id & " IS IDENTIFIED BY ITS " & lsUnabatedReferenceMode & " WRITTEN AS AutoCounter")
+                    lsMessage.AppendLine("I.e. Add a 'WRITTEN AS' clause to your 'IS IDENTIFIED BY ITS' statement.")
+                    Me.send_data(lsMessage)
                 End If
 
                 If Not Me.Model.StoreAsXML Then
@@ -127,12 +136,11 @@ Partial Public Class tBrain
             Me.send_data("Ok")
 
         Catch ex As Exception
-            Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

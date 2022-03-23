@@ -2,6 +2,7 @@ BROpen = "(".
 BRClose = ")".
 CapitalLetter = ( "'A'" | "'B'" | "'C'" | "'D'" | "'E'" | "'F'" | "'G'" | "'H'" | "'I'" | "'J'" | "'K'" | "'L'" | "'M'" | "'N'" |
                   "'O'" | "'P'" | "'Q'" | "'R'" | "'S'" | "'T'" | "'U'" | "'V'" | "'W'" | "'X'" | "'Y'" | "'Z'").
+BinaryFactTypeProduction = ModelElementName PredicatePart ['ONE' | 'AT MOST ONE'] ModelElementName.
 DataType = ("'LogicalTrueFalse'" | "'LogicalYesNo'" | "'AutoCounter'" | "'FloatDoublePrecision'" | "'FloatSinglePrecision'" |
                           "'SignedBigInteger'" | "'SignedInteger'" | "'SignedSmallInteger'" | "'UnsignedBigInteger'" | "'UnsignedInteger'" |
                           "'UnsignedSmallInteger'" | "'UnsignedTinyInteger'" | "'ObjectId'" | "'RowId'" | "'RawDataOLEObject'" |
@@ -10,6 +11,7 @@ DataTypeWithLength = ("'RawDataFixedLength'" | "'RawDataLargeLength'" | "'RawDat
                           "'StringFixedLength'" | "'StringLargeLength'" | "'StringVariableLength'") BROpen Number BRClose.
 DataTypeWithPrecision = ("'FloatCustomPrecision'" | "'Decimal'" | "'Money'") BROpen Number BRClose.
 Digit = ("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ).
+EntityTypeIsIdentifiedByItsProduction = begin ModelElementName "'IS IDENTIFIED BY ITS'" ModelElementName [ValueTypeIsWrittenAsProduction] end.
 FactTypeProduction = ModelElementName {PredicatePart ModelElementName}.
 IsWhereClause = ModelElementName "IS WHERE" FactTypeProduction [{"," FactTypeProduction}].
 LowercaseLetter = ( "'a'" | "'b'" | "'c'" | "'d'" | "'e'" | "'f'" | "'g'" | "'h'" | "'i'" | "'j'" | "'k'" | "'l'" | "'m'" | "'n'" |
