@@ -55,20 +55,20 @@ Module publicRegistration
             'Professional - Active Trial
             For liInd = 1 To 30
 
-                Dim lsTrialDate As String = "01/" & Today.AddDays(liInd).Month.ToString & "/" & Today.AddDays(liInd).Year.ToString
+                Dim lsTrialDate As String = Today.AddDays(liInd).Day.ToString("D2") & "/" & Today.AddDays(liInd).Month.ToString("D2") & "/" & Today.AddDays(liInd).Year.ToString
 
                 lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "Trial", lsTrialDate)
                 If asRegistrationKey = FormatLicenseKey(GetMd5Sum(lsProductIdentifier)) Then
                     arRegistrationResult.IsRegistered = True
                     arRegistrationResult.SoftwareType = "Professional"
-                    arRegistrationResult.SubscriptionType = "Subscription"
+                    arRegistrationResult.SubscriptionType = "Trial"
                     arRegistrationResult.RegisteredToDate = lsTrialDate
                     lbResult = True
                     GoTo ReturnResult
                 End If
             Next
 
-            'Default Registration (so that Subscriptions don't default to Not Registered. I.e. Default to Registered by no Subscription).
+            'Default Registration (so that Subscriptions don't default to Not Registered. I.e. Default to Registered but no Subscription).
             lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "None", "None")
             If asDefaultRegistrationKey = FormatLicenseKey(GetMd5Sum(lsProductIdentifier)) Then
                 arRegistrationResult.IsRegistered = True

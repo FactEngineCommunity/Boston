@@ -2620,7 +2620,7 @@ SkippedRole:
         Public Sub GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(ByRef arModel As FBM.Model)
 
             Dim liInd As Integer = 0
-            Dim lrFactType As New FBM.FactType
+            Dim lrFactType As FBM.FactType = Nothing
             Dim lrRole As FBM.Role
 
             Dim liFactTypeInd As Integer = 0
@@ -2629,10 +2629,6 @@ SkippedRole:
                           From Role In FactType.RoleGroup
                           Where Role.NORMALinksToUnaryFactTypeValueType
                           Select Role
-
-            'For Each lrFactType In arModel.FactType.ToArray
-            '    For Each lrRole In lrFactType.RoleGroup.ToArray
-            '        If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
 
             For Each lrRole In larRole.ToArray
                 Dim larJoinPath = From RoleConstraint In arModel.RoleConstraint
@@ -2643,6 +2639,19 @@ SkippedRole:
 
                 Call lrRole.FactType.RemoveRole(lrRole, False, True)
 
+                'RDS - Need to create a Column in the RDS for the Unary Fact Type.
+                Try
+                    lrFactType = lrRole.FactType
+                    Dim lsPredicate As String = lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText
+                    lsPredicate = MakeCapCamelCase(lsPredicate, True)
+                    Dim lrTable = lrFactType.RoleGroup(0).JoinedORMObject.getCorrespondingRDSTable
+                    Dim lrColumn As New RDS.Column(lrTable, lsPredicate, lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
+                    Call lrTable.addColumn(lrColumn)
+                Catch ex As Exception
+                    MsgBox("Trouble creating Column for Unary Fact Type: " & lrFactType.Id)
+                End Try
+
+
                 For Each lrJoinPath In larJoinPath.ToArray
                     Dim liIndex As Integer = lrJoinPath.RolePath.IndexOf(lrRole)
                     lrJoinPath.RolePath.RemoveAt(liIndex)
@@ -2651,10 +2660,6 @@ SkippedRole:
 
                 Call arModel.RemoveValueType(lrRole.JoinsValueType, False)
             Next
-
-            '        End If
-            '    Next
-            'Next
 
         End Sub
 

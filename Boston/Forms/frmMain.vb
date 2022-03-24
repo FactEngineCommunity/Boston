@@ -400,13 +400,12 @@ Public Class frmMain
                     If publicRegistration.CheckRegistration(lsApplicationKey, lsRegistrationKey, lrRegistrationResult, lsDefaultRegistrationKey) Then
                         If lrRegistrationResult.SubscriptionType = "Subscription" Then lbCanCheckForUpdates = True
                     Else
-                        If lrRegistrationResult.SubscriptionType = "Trial" Then
-                            'The Trial must be up.
-                            Dim lrRegistrationForm As New frmRegistration
-                            Call lrRegistrationForm.ShowDialog()
-                            Call Me.Close()
-                            Exit Sub
-                        End If
+                        'The Trial must be up.
+                        MsgBox("Your trial of Boston has expired. Please contact FactEngine to obtain a registration key for Boston.")
+                        Dim lrRegistrationForm As New frmRegistration
+                        Call lrRegistrationForm.ShowDialog()
+                        Call Me.Close()
+                        Exit Sub
                     End If
 
                     'Me.LabelRegistrationStatus.Text = lrRegistrationResult.SoftwareType & " " & lrRegistrationResult.SubscriptionType & lrRegistrationResult.RegisteredToDate
