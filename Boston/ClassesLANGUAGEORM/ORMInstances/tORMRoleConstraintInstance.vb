@@ -78,7 +78,9 @@ Namespace FBM
             Get
                 Dim larRoleInstance As New List(Of FBM.RoleInstance)
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
-                    larRoleInstance.Add(lrRoleConstraintRole.Role)
+                    If lrRoleConstraintRole.Role IsNot Nothing Then
+                        larRoleInstance.Add(lrRoleConstraintRole.Role)
+                    End If
                 Next
                 Return larRoleInstance
             End Get
@@ -1089,8 +1091,15 @@ Namespace FBM
             Try
 
                 If Me.Role.Count > 0 Then
-                    lrFactTypeInstance = Me.Role(0).FactType
+                    Try
+                        lrFactTypeInstance = Me.Role(0).FactType
+                    Catch
+                        Debugger.Break()
+                    End Try
                 Else
+                    'CodeSafe: for now 20220327
+                    Exit Sub 'Because the FactType is obviously not on the Page. Therefore no RoleInstances
+                    'Else
                     lsMessage = "RoleConstraint.Role.Count = 0"
                     lsMessage &= vbCrLf & " RoleConstraint.Id: " & Me.Id
                     Throw New System.Exception(lsMessage)

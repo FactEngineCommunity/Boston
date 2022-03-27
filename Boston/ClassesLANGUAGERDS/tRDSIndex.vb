@@ -220,7 +220,7 @@ Namespace RDS
                         'Responsible Role Constraint is either the PrimaryReferenceScheme Role Constraint
                         '  OR an External Uniqueness Constraint joined to Roles of Fact Types joined to the Entity Type.
                         Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
-                        lrReferenceModeRoleConstraint = lrEntityType.ReferenceModeRoleConstraint
+                        lrReferenceModeRoleConstraint = CType(lrEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeRoleConstraint
 
                         If lrEntityType.IsSubtype And lrEntityType.HasSimpleReferenceScheme Then
                             Dim lrTopmostSupertype = CType(lrEntityType.GetTopmostSupertype, FBM.EntityType)

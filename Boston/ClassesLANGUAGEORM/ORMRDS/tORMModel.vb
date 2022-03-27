@@ -1361,7 +1361,10 @@ Namespace FBM
 
         End Sub
 
-        Public Sub generateRelationForManyTo1BinaryFactType(ByRef arRole As FBM.Role)
+        Public Function generateRelationForManyTo1BinaryFactType(ByRef arRole As FBM.Role,
+                                                                 Optional ByVal abAddToModel As Boolean = True) As RDS.Relation
+
+            Dim lrRelation As RDS.Relation = Nothing
 
             Try
                 '====================
@@ -1377,13 +1380,13 @@ Namespace FBM
                 Select Case lrOtherRole.JoinedORMObject.ConceptType
                     Case Is = pcenumConceptType.ValueType
                         'We don't generate Relations for ManyToOneFactTypes that join to a ValueType
-                    Case Is = pcenumConceptType.EntityType, _
+                    Case Is = pcenumConceptType.EntityType,
                               pcenumConceptType.FactType
 
                         lrOriginTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.JoinedORMObject.Id)
                         lrDestinationTable = Me.RDS.Table.Find(Function(x) x.Name = lrRole.FactType.GetOtherRoleOfBinaryFactType(lrRole.Id).JoinedORMObject.Id)
 
-                        If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
+                        If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Return Nothing
 
                         '------------------------------------------------------------------------------------------
                         'If the OriginEntity is a Subtype of another Entity, then need to set the OriginEntity to
@@ -1425,7 +1428,7 @@ Namespace FBM
                                 'Need to update this code when FactTypes can have supertypes in Boston.
                         End Select
 
-                        If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
+                        If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Return Nothing
 
                         Dim larRelation = From Relation In Me.RDS.Relation
                                           Where Relation.ResponsibleFactType IsNot Nothing
@@ -1435,7 +1438,7 @@ Namespace FBM
                                           Select Relation
 
                         If larRelation.Count > 0 Then
-                            Exit Sub
+                            Return Nothing
                         End If
 
 
@@ -1476,17 +1479,17 @@ Namespace FBM
                         '--------------------------------------------------------------------                        
                         Richmond.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
 
-                        Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
-                                                           lrOriginTable, _
-                                                           pcenumCMMLMultiplicity.Many, _
-                                                           arRole.Mandatory, _
-                                                           lbContributesToPrimaryKey, _
-                                                           lsOriginPredicate, _
-                                                           lrDestinationTable, _
-                                                            pcenumCMMLMultiplicity.One, _
-                                                           arRole.FactType.GetOtherRoleOfBinaryFactType(arRole.Id).Mandatory, _
-                                                           lsDestinationPredicate, _
-                                                           arRole.FactType)
+                        lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                      lrOriginTable,
+                                                      pcenumCMMLMultiplicity.Many,
+                                                      arRole.Mandatory,
+                                                      lbContributesToPrimaryKey,
+                                                      lsOriginPredicate,
+                                                      lrDestinationTable,
+                                                      pcenumCMMLMultiplicity.One,
+                                                      arRole.FactType.GetOtherRoleOfBinaryFactType(arRole.Id).Mandatory,
+                                                      lsDestinationPredicate,
+                                                      arRole.FactType)
 
                         '--------------------------------------------------------------------------
                         'Get the Origin/Destination Columns
@@ -1535,29 +1538,33 @@ Namespace FBM
                         'Origin Columns
                         lrRelation.OriginColumns = larOriginColumn
 
-                        For Each lrColumn In lrRelation.OriginColumns
-                            lrColumn.Relation.Add(lrRelation) 'Only need to do this on the Origin side. The Origin Column 'has' the Relation.
-                        Next
+                        If abAddToModel Then 'Default is TRue
 
-                        If lrRelation.OriginColumns.Count = 0 Then
-                            'CodeSafe. Destination Table has no PrimaryKey most likely,
-                            '  but can get Origin Column from the arRole
-                            Try
-                                Dim lrColumn = arRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
-                                If lrColumn IsNot Nothing Then
-                                    lrColumn.Relation.Add(lrRelation)
-                                    lrRelation.OriginColumns.Add(lrColumn)
-                                End If
-                            Catch ex As Exception
-                                'Not a good place to be. Can only create the OriginColumns once the PrimaryKey is created for the DestinationTable.
-                            End Try
+                            For Each lrColumn In lrRelation.OriginColumns
+                                lrColumn.Relation.Add(lrRelation) 'Only need to do this on the Origin side. The Origin Column 'has' the Relation.
+                            Next
 
+                            If lrRelation.OriginColumns.Count = 0 Then
+                                'CodeSafe. Destination Table has no PrimaryKey most likely,
+                                '  but can get Origin Column from the arRole
+                                Try
+                                    Dim lrColumn = arRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id = lrRole.Id)
+                                    If lrColumn IsNot Nothing Then
+                                        lrColumn.Relation.Add(lrRelation)
+                                        lrRelation.OriginColumns.Add(lrColumn)
+                                    End If
+                                Catch ex As Exception
+                                    'Not a good place to be. Can only create the OriginColumns once the PrimaryKey is created for the DestinationTable.
+                                End Try
+
+                            End If
+
+                            Me.RDS.addRelation(lrRelation)
                         End If
-
-                        Me.RDS.addRelation(lrRelation)
 
                 End Select 'GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject.ConceptType
 
+                Return lrRelation
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -1566,9 +1573,11 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
             End Try
 
-        End Sub
+        End Function
 
         Public Sub generateRelationForManyToManyFactTypeRole(ByVal arResponsibleRole As FBM.Role)
 

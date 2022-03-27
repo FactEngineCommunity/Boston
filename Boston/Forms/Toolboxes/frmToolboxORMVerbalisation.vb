@@ -24,8 +24,9 @@ Public Class frmToolboxORMVerbalisation
         '      * Verbalise the FactType for the associated Role
         '  * LOOP 
         '------------------------------------------------------
+        Dim lrVerbaliser As New FBM.ORMVerbailser
+
         Try
-            Dim lrVerbaliser As New FBM.ORMVerbailser
             Call lrVerbaliser.Reset()
 
             '------------------------------------------------------
@@ -78,7 +79,8 @@ Public Class frmToolboxORMVerbalisation
 
             If arEntityType.HasCompoundReferenceMode Then
                 lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
-                For Each lrRoleConstraintRole In arEntityType.ReferenceModeRoleConstraint.RoleConstraintRole
+                Dim lrEntityType As FBM.EntityType = arEntityType.GetTopmostNonAbsorbedSupertype(True)
+                For Each lrRoleConstraintRole In lrEntityType.ReferenceModeRoleConstraint.RoleConstraintRole
                     lrFactType = lrRoleConstraintRole.Role.FactType
                     Dim larRole As New List(Of FBM.Role)
                     larRole.Add(lrFactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id))
@@ -92,7 +94,7 @@ Public Class frmToolboxORMVerbalisation
                         lrVerbaliser.VerbaliseModelObject(lrFactType)
                         lrVerbaliser.VerbaliseError(" with  " & lrRoleConstraintRole.Role.JoinedORMObject.Id & " at the last position in the reading.")
                     End If
-                    If liInd < arEntityType.ReferenceModeRoleConstraint.RoleConstraintRole.Count - 1 Then
+                    If liInd < lrEntityType.ReferenceModeRoleConstraint.RoleConstraintRole.Count - 1 Then
                         lrVerbaliser.VerbaliseQuantifier(", ")
                     End If
                     liInd += 1
@@ -214,8 +216,10 @@ Public Class frmToolboxORMVerbalisation
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            lsMessage &= vbCrLf & vbCrLf & ex.Message & vbCrLf & ex.StackTrace
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseError(lsMessage)
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
         End Try
 
     End Sub

@@ -1883,10 +1883,17 @@ Namespace FBM
             Try
                 HasCompoundReferenceMode = False
 
-                If (Me.ReferenceMode = "") And (Me.ReferenceModeRoleConstraint Is Nothing) Then
+
+                Dim lrModelElement As FBM.EntityType = Me 'Even if checking for an ObjectifiedFactType, will be checking against the ObjectifyingEntityType
+
+                If Me.IsSubtype Then
+                    lrModelElement = Me.GetTopmostNonAbsorbedSupertype(True)
+                End If
+
+                If (lrModelElement.ReferenceMode = "") And (lrModelElement.ReferenceModeRoleConstraint Is Nothing) Then
                     HasCompoundReferenceMode = False
-                ElseIf IsSomething(Me.ReferenceModeRoleConstraint) Then
-                    If Me.ReferenceModeRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                ElseIf lrModelElement.ReferenceModeRoleConstraint IsNot Nothing Then
+                    If lrModelElement.ReferenceModeRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                         '-----------------------------------------------------------------------------------------------
                         'Must be an EntityType without a Compound Reference Mode.
                         '  Only EntityTypes with a ReferenceModeRoleConstraint that is an ExternalUniquenessConstraint

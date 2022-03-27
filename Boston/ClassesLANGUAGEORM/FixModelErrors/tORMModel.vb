@@ -470,6 +470,7 @@ Namespace FBM
         Private Sub RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations()
 
             Try
+                'ObjectifiedFactTypes
                 For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.FBMModelElement.IsObjectified Or x.isPGSNode)
 
                     For Each lrColumn In lrTable.Column.FindAll(Function(x) Not x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) And x.OutgoingRelation.Count = 0)
@@ -510,8 +511,40 @@ Namespace FBM
 SkipColumn:
                 Next
 
+                'EntityTypes with CompoundReferenceScheme
+                For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.FBMModelElement.GetType = GetType(FBM.EntityType))
+                    If lrTable.Name = "ModelElement" Then Debugger.Break()
+
+                    For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Role.FactType.Arity = 2)
+
+                        If lrColumn.Role.FactType.IsManyTo1BinaryFactType Then
+
+                            If Not lrColumn.Role.FactType.GetOtherRoleOfBinaryFactType(lrColumn.Role.Id).JoinedORMObject.GetType = GetType(FBM.ValueType) And lrColumn.OutgoingRelation.Count = 0 Then
+
+                                Dim lrRelation As RDS.Relation
+                                lrRelation = Me.generateRelationForManyTo1BinaryFactType(lrColumn.Role, False)
+
+                                Dim lrExistingRelation As RDS.Relation = Me.RDS.Relation.Find(AddressOf lrRelation.EqualsByOriginTableDestinationTable)
+
+                                If lrExistingRelation IsNot Nothing Then
+                                    MsgBox("Relation already exists between " & lrRelation.OriginTable.Name & " and " & lrRelation.DestinationTable.Name & ". Find some other reason why it isn't being shown in/on the Model.")
+                                    lrColumn.Relation.Remove(lrRelation)
+                                    GoTo SkipColumn2
+                                End If
+
+                                For Each lrOriginColumn In lrRelation.OriginColumns
+                                    lrOriginColumn.Relation.AddUnique(lrRelation)
+                                Next
+                                Call Me.RDS.addRelation(lrRelation)
+                            End If
+                        End If
+SkipColumn2:
+                    Next
+                Next
+
+
             Catch ex As Exception
-            Dim lsMessage As String
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
