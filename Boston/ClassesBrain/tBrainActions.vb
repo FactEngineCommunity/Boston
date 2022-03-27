@@ -663,12 +663,16 @@ Partial Public Class tBrain
 
     Private Sub ProcessISAVALUETYPECLAUSE()
 
+        Dim lsMessage As String
+
         Try
             With New WaitCursor
                 Me.Model = prApplication.WorkingModel
 
                 Me.VAQL.ISAVALUETYPEStatement.KEYWDISAVALUETYPE = ""
                 Me.VAQL.ISAVALUETYPEStatement.MODELELEMENTNAME = ""
+                Me.VAQL.ISAVALUETYPEStatement.KEYWDWRITTENAS = Nothing
+                Me.VAQL.ISAVALUETYPEStatement.VALUETYPEWRITTENASCLAUSE = Nothing
 
                 Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISAVALUETYPEStatement, Me.VAQLParsetree.Nodes(0))
 
@@ -686,8 +690,55 @@ Partial Public Class tBrain
                     Exit Sub
                 End If
 
-                'Have already checked to see wither it is okay to create the EntityType above.
+                'Have already checked to see wither it is okay to create the ValueType above.
                 Dim lrValueType = Me.Model.CreateValueType(Trim(lsValueTypeName), True)
+
+                '=================================================================================================================
+                'Check if the DataType of the ValueType has been specified
+                Dim lsDataTypeName As String = ""
+                Dim liDataTypeLength As Integer = 0
+                Dim liDataTypePrecision As Integer = 0
+                Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+
+                If Me.VAQL.ISAVALUETYPEStatement.KEYWDWRITTENAS IsNot Nothing Then
+
+                    Me.VAQL.VALUETYPEWRITTENASClause = Me.VAQL.ISAVALUETYPEStatement.VALUETYPEWRITTENASCLAUSE
+
+                    If Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                        liDataTypeLength = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                        liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    End If
+
+                    lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+                    If lsDataTypeName Is Nothing Then
+                        Me.send_data("That's not a valid Data Type.")
+                        Exit Sub
+                    End If
+
+                    Try
+                        liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+                    Catch ex As Exception
+                        Me.send_data("That's not a valid Data Type.")
+                        Exit Sub
+                    End Try
+
+                    Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+                    Dim lrModelError As New FBM.ModelError(127, lrValueType)
+                    lrValueType.ModelError.RemoveAll(AddressOf lrModelError.EqualsByErrorIdModelElementId)
+                    Call Me.Model.RemoveModelError(lrModelError)
+                Else
+                    lsMessage = "Remember that you can set the Data Type for the Value Type by saying something like:"
+                    lsMessage.AppendLine(lrValueType.Id & " IS A VALUE TYPE WRITTEN AS AutoCounter")
+                    lsMessage.AppendLine("I.e. Add a 'WRITTEN AS' clause to your 'IS A VALUE TYPE' statement.")
+                    Me.send_data(lsMessage)
+                End If
+                '=================================================================================================================
 
                 If Me.Page IsNot Nothing Then
                     Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
@@ -706,7 +757,6 @@ Partial Public Class tBrain
             End With
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

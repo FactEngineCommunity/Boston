@@ -70,6 +70,28 @@ Namespace VAQL
                 Me._KEYWDISAVALUETYPE = value
             End Set
         End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDWRITTENAS As String = Nothing
+        Public Property KEYWDWRITTENAS As String
+            Get
+                Return Me._KEYWDWRITTENAS
+            End Get
+            Set(value As String)
+                Me._KEYWDWRITTENAS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _VALUETYPEWRITTENASCLAUSE As New VAQL.ValueTypeWrittenAsClause
+        Public Property VALUETYPEWRITTENASCLAUSE As VAQL.ValueTypeWrittenAsClause
+            Get
+                Return Me._VALUETYPEWRITTENASCLAUSE
+            End Get
+            Set(value As VAQL.ValueTypeWrittenAsClause)
+                Me._VALUETYPEWRITTENASCLAUSE = value
+            End Set
+        End Property
     End Class
 
     Public Class IsAKindOfStatement
@@ -391,8 +413,6 @@ Namespace VAQL
                 Me._VALUETYPEWRITTENASCLAUSE = value
             End Set
         End Property
-
-
 
     End Class
 

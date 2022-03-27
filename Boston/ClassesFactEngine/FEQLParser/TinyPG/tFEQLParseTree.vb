@@ -421,6 +421,9 @@ Namespace FEQL
                 Case TokenType.INSERTCOLUMNLIST
                     Value = EvalINSERTCOLUMNLIST(tree, paramlist)
                     Exit Select
+                Case TokenType.ISAVALUETYPECLAUSE
+                    Value = EvalISAVALUETYPECLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.MATCHPREDICATE
                     Value = EvalMATCHPREDICATE(tree, paramlist)
                     Exit Select
@@ -898,6 +901,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalINSERTCOLUMNLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalISAVALUETYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

@@ -75,6 +75,12 @@ Namespace FBM
 
         End Function
 
+        Public Shadows Function EqualsByErrorIdModelElementId(ByVal other As FBM.ModelError) As Boolean
+
+            Return Me.ErrorId = other.ErrorId And Me.ModelObject.Id = other.ModelObject.Id
+
+        End Function
+
         Public Function Clone() As Object 'Implements System.ICloneable.Clone
 
             Dim lrModelerror As New FBM.ModelError

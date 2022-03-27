@@ -1206,6 +1206,8 @@ Namespace VAQL
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.ISAVALUETYPECLAUSE), "ISAVALUETYPECLAUSE")
             parent.Nodes.Add(node)
 
+
+             ' Concat Rule
             tok = m_scanner.Scan(TokenType.KEYWDISAVALUETYPE) ' Terminal Rule: KEYWDISAVALUETYPE
             n = node.CreateNode(tok, tok.ToString() )
             node.Token.UpdateRange(tok)
@@ -1216,6 +1218,26 @@ Namespace VAQL
 
             End If
 
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDWRITTENAS) ' Option Rule
+            If tok.Type = TokenType.KEYWDWRITTENAS Then
+                ParseVALUETYPEWRITTENASCLAUSE(node) ' NonTerminal Rule: VALUETYPEWRITTENASCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                            parent.Token.UpdateRange(node.Token)
+                            Exit Sub
+            End If
+            Else
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWRITTENAS"))
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
             If m_tree.Errors.Count > 0 Then
                         parent.Token.UpdateRange(node.Token)
                         Exit Sub
