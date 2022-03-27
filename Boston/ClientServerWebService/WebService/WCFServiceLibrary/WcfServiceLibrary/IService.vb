@@ -13,9 +13,9 @@ Public Module Module1
         <OperationContract(IsOneWay:=True)>
         Sub Connect()
 
-        <OperationContract(Isoneway:=True)>
+        <OperationContract(IsOneWay:=False)>  '20220327-VM-Was True
         Sub SendBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                          ByVal arObject As Viev.FBM.Interface.Broadcast)
+                          ByRef arObject As Viev.FBM.Interface.Broadcast) '20220327-VM-Was ByVal
 
         <OperationContract(IsOneWay:=True)>
         Sub Disconnect()
@@ -24,9 +24,9 @@ Public Module Module1
 
     Interface IDuplexCallback
 
-        <OperationContract(IsOneWay:=True)>
+        <OperationContract(IsOneWay:=False)>  '20220327-VM-Was False
         Sub ReceiveBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                             ByVal arObject As Viev.FBM.Interface.Broadcast)
+                             ByRef arObject As Viev.FBM.Interface.Broadcast) '20220327-VM-Was ByVal
 
     End Interface
 

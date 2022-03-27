@@ -22,7 +22,7 @@ Namespace DuplexServiceClient
         End Sub
     End Class
 
-    <CallbackBehavior(UseSynchronizationContext:=False)> _
+    <CallbackBehavior(UseSynchronizationContext:=False)>
     Friend Class DuplexCallback
         Implements BostonWCFServiceLibrary.IDuplexCallback
 
@@ -34,13 +34,17 @@ Namespace DuplexServiceClient
         Public Event BroadcastEventReceived As EventHandler(Of Broadcast)
 
         Public Sub ReceiveBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                                    ByVal arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexCallback.ReceiveBroadcast
-            _syncContext.Post(New SendOrPostCallback(AddressOf OnBroadcastEvent), New Broadcast(aiBroadcastType, arObject))
+                                    ByRef arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexCallback.ReceiveBroadcast
+
+            Dim lrBroadcast = New Broadcast(aiBroadcastType, arObject)
+            '20220327-VM-Was _syncContext.Post(New SendOrPostCallback(AddressOf OnBroadcastEvent), lrBroadcast)
+            _syncContext.Send(New SendOrPostCallback(AddressOf OnBroadcastEvent), lrBroadcast)
+            arObject.Model.Namespace = lrBroadcast.Broadcast.Model.Namespace
         End Sub
 
-        Private Sub OnBroadcastEvent(state As Object)
+        Private Sub OnBroadcastEvent(ByVal State As Broadcast)
 
-            Dim e As Broadcast = TryCast(state, Broadcast)
+            Dim e As Broadcast = TryCast(State, Broadcast)
             RaiseEvent BroadcastEventReceived(Me, e)
         End Sub
 

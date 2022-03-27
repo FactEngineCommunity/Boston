@@ -24,7 +24,7 @@ Public Class DuplexService
 
 
     Public Sub SendBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                             ByVal arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
+                             ByRef arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
 
         SyncLock _sycnRoot
 

@@ -96,7 +96,7 @@ Public Class frmMain
             smb.HttpGetEnabled = True
 
             selfHost.Description.Behaviors.Add(smb)
-            selfHost.AddServiceEndpoint(ServiceMetadataBehavior.MexContractName, MetadataExchangeBindings.CreateMexHttpBinding(), Convert.ToString(baseAddress) & "mex")
+            selfHost.AddServiceEndpoint(ServiceMetadataBehavior.MexContractName, MetadataExchangeBindings.CreateMexHttpBinding(), Convert.ToString(Me.baseAddress) & "mex")
 
             ' Step 5 Start the service.
             selfHost.Open()

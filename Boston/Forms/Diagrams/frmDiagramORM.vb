@@ -4649,7 +4649,6 @@ Public Class frmDiagramORM
                 Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
                 lrBroadcast.Model = lrModel
                 Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
-
             End If
             '==============================================================================
 
