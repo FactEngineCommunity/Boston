@@ -2461,7 +2461,7 @@ Namespace FBM
                     Call lrRoleConstraintInstance.RemoveFromPage(abBroadcastInterfaceEvent)
                 Next
 
-                Me.FactTypeInstance.Remove(arFactTypeInstance)
+                Me.FactTypeInstance.RemoveAll(AddressOf arFactTypeInstance.Equals)
 
                 'Do database processing if necessary.
                 If abBroadcastInterfaceEvent Then

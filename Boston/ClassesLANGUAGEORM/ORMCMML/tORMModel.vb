@@ -430,6 +430,10 @@ Namespace FBM
                         lbForceStorePropertyInformation = True
                     End If
                 End If
+                If asEntityName = arColumn.Table.Name And asEntityName = arColumn.Role.JoinedORMObject.GetTopmostNonAbsorbedSupertype(True).Id Then
+                    'Column may be for Supertype of absorbed Subtype.
+                    lbForceStorePropertyInformation = True
+                End If
                 If lbForceStorePropertyInformation Or (asEntityName = arColumn.Role.JoinedORMObject.Id Or asEntityName = arColumn.Role.FactType.Id) And lrRecordsetCount("Count").Data = 0 Then
                     'Columns can be reused on Subtype Entities, and don't need their definition twice,
                     '  just their relationship with the ERD Entity (above).
