@@ -1091,11 +1091,7 @@ Namespace FBM
             Try
 
                 If Me.Role.Count > 0 Then
-                    Try
-                        lrFactTypeInstance = Me.Role(0).FactType
-                    Catch
-                        Debugger.Break()
-                    End Try
+                    lrFactTypeInstance = Me.Role(0).FactType
                 Else
                     'CodeSafe: for now 20220327
                     Exit Sub 'Because the FactType is obviously not on the Page. Therefore no RoleInstances

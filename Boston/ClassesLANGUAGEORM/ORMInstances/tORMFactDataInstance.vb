@@ -791,12 +791,14 @@ Namespace FBM
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Symbol, pcenumConceptType.Value)
                 lrConceptInstance.RoleId = Me.Role.Id
 
-                If TableConceptInstance.ExistsConceptInstance(lrNewConceptInstance) Then 'If the NEW ConceptInstance exists
-                    Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance) 'We don't need the original Concept Instance for the Model, Page, Symbol, Role                    
-                Else
-                    Call TableConceptInstance.ModifySymbol(lrConceptInstance, Me.FactData.Concept.Symbol) 'Update the EXISTING ConceptInstance to the NEW ConceptInstance
-                    If Not TableConceptInstance.ExistsConceptInstance(lrNewConceptInstance) Then
-                        TableConceptInstance.AddConceptInstance(lrNewConceptInstance)
+                If Not Me.Model.StoreAsXML Then
+                    If TableConceptInstance.ExistsConceptInstance(lrNewConceptInstance) Then 'If the NEW ConceptInstance exists
+                        Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance) 'We don't need the original Concept Instance for the Model, Page, Symbol, Role                    
+                    Else
+                        Call TableConceptInstance.ModifySymbol(lrConceptInstance, Me.FactData.Concept.Symbol) 'Update the EXISTING ConceptInstance to the NEW ConceptInstance
+                        If Not TableConceptInstance.ExistsConceptInstance(lrNewConceptInstance) Then
+                            TableConceptInstance.AddConceptInstance(lrNewConceptInstance)
+                        End If
                     End If
                 End If
 

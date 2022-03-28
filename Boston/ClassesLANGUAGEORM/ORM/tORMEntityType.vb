@@ -3046,6 +3046,12 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Sets whether the corresponding RDS Table for the EntityType is absorbed into a supertype or not.
+        ''' See also BubbleUpColumns
+        ''' </summary>
+        ''' <param name="abNewIsAbsorbed"></param>
+        ''' <param name="abBroadcastInterfaceEvent"></param>
         Public Sub SetIsAbsorbed(ByVal abNewIsAbsorbed As Boolean, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
             Dim lbWasAbsorbed = Me.IsAbsorbed

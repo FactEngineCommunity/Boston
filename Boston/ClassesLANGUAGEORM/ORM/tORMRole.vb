@@ -2234,6 +2234,8 @@ Namespace FBM
 
                                     Dim lrNewTable = arNewJoinedModelObject.getCorrespondingRDSTable()
 
+                                    If lrNewTable Is lrOriginallyJoinedTable Then GoTo SkipMakingNewColumn
+
                                     Dim larCoveredRoles As New List(Of FBM.Role)
                                     Dim larDownstreamActiveRoles = Me.getDownstreamRoleActiveRoles(larCoveredRoles) 'Returns all Roles joined ObjectifiedFactTypes and their Roles' JoinedORMObjects (recursively).
 
@@ -2248,6 +2250,8 @@ Namespace FBM
                                                              Me.Mandatory)
                                         If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
                                             lrNewTable.addColumn(lrNewColumn)
+                                        Else
+                                            Call lrNewColumn.setTable(lrNewTable, True)
                                         End If
                                     Next
 
@@ -2268,11 +2272,13 @@ Namespace FBM
 
                                     'Remove the orginal Column from the Originally Joined Table
                                     For Each lrColumn In larOriginalColumn
-                                        Call lrOriginallyJoinedTable.removeColumn(lrColumn)
+                                        Call lrOriginallyJoinedTable.removeColumn(lrColumn, False, False)
                                     Next
+SkipMakingNewColumn:
                             End Select
 
                         Else
+                            'Me does not have InternalUniquenessConstraint
                             '==========================================================================
                             'RDS - NB See below for RDS Processing propper. Must get the responsible Columns before the move.                    
                             Dim larColumn As List(Of RDS.Column)

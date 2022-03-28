@@ -513,7 +513,6 @@ SkipColumn:
 
                 'EntityTypes with CompoundReferenceScheme
                 For Each lrTable In Me.RDS.Table.FindAll(Function(x) x.FBMModelElement.GetType = GetType(FBM.EntityType))
-                    If lrTable.Name = "ModelElement" Then Debugger.Break()
 
                     For Each lrColumn In lrTable.Column.FindAll(Function(x) x.Role.FactType.Arity = 2)
 
