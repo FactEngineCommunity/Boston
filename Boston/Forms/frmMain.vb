@@ -190,7 +190,11 @@ Public Class frmMain
 
                     Dim lsFirstRunDatabaseLocation As String = ""
                     lsFirstRunDatabaseLocation = Richmond.MyPath & "\database\" & lsDatabaseName
-                    IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName)
+                    Try
+                        IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName, False)
+                    Catch
+                        'If the file already exists then not a problem.
+                    End Try
 
                     lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
                     lrSQLConnectionStringBuilder.Add("Provider", lsDatabaseType)
@@ -404,6 +408,10 @@ Public Class frmMain
 
                     Dim lrRegistrationResult As New tRegistrationResult
 
+                    If prSoftwareCategory = pcenumSoftwareCategory.Student Then
+                        GoTo SkipRegistrationChecking
+                    End If
+
                     If publicRegistration.CheckRegistration(lsApplicationKey, lsRegistrationKey, lrRegistrationResult, lsDefaultRegistrationKey) Then
                         If lrRegistrationResult.SubscriptionType = "Subscription" Then lbCanCheckForUpdates = True
                     Else
@@ -424,6 +432,7 @@ Public Class frmMain
                     Exit Sub
                 End Try
 
+SkipRegistrationChecking:
                 '-----------------------------------------------------------
                 'Automatic Update Checker
                 '-------------------------
@@ -626,6 +635,7 @@ Public Class frmMain
                 Me.ToolStripSeparator10.Visible = False
                 Me.ToolStripSeparator5.Visible = False
                 Me.ToolStripMenuItemUnifiedOntologyBrowser.Visible = True
+                Me.RegistrationToolStripMenuItem.Visible = False
             ElseIf Not My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemUser.Visible = False
                 Me.ToolStripMenuItemProject.Visible = False
@@ -706,6 +716,11 @@ Public Class frmMain
             Me.ToolStripMenuItemLogIn.Visible = False
             If Me.ToolStripMenuItemLogOut.Visible = False And Me.ToolStripMenuItemLogIn.Visible = False Then
                 Me.ToolStripSeparator6.Visible = False
+            End If
+
+            'SuperUser
+            If prApplication.User IsNot Nothing Then
+                Me.RegistrationToolStripMenuItem.Visible = My.Settings.UseClientServer And prApplication.User.IsSuperuser
             End If
 
         Catch ex As Exception

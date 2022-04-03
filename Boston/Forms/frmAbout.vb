@@ -37,15 +37,15 @@ Public Class frmAbout
     Private Sub Label1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Label1.Click
 
         Try
-            'System.Diagnostics.Process.Start(String.Format("mailto:{0}?Subject=my report&Body={1}&Attachment={2}", "support@viev.com", lsText, "file://C:\Users\Viev\Desktop\Commands.txt"))
-            System.Diagnostics.Process.Start(String.Format("mailto:{0}", "support@viev.com"))
+            'System.Diagnostics.Process.Start(String.Format("mailto:{0}?Subject=my report&Body={1}&Attachment={2}", "support@factengine.ai", lsText, "file://C:\Users\Viev\Desktop\Commands.txt"))
+            System.Diagnostics.Process.Start(String.Format("mailto:{0}", "support@factengine.ai"))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: You might not have a default email application setup in Windows."
             lsMessage &= vbCrLf & vbCrLf
-            lsMessage &= "Email support@viev.com for support on Boston"
+            lsMessage &= "Email support@factengine.ai for support on Boston"
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 

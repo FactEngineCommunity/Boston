@@ -92,9 +92,9 @@ Partial Class frmAbout
         Me.Label1.ForeColor = System.Drawing.Color.Blue
         Me.Label1.Location = New System.Drawing.Point(12, 178)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(96, 13)
+        Me.Label1.Size = New System.Drawing.Size(114, 13)
         Me.Label1.TabIndex = 10
-        Me.Label1.Text = "support@viev.com"
+        Me.Label1.Text = "support@factengine.ai"
         '
         'LabelCategory
         '

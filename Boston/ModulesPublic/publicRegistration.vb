@@ -32,6 +32,7 @@ Module publicRegistration
                 arRegistrationResult.IsRegistered = True
                 arRegistrationResult.SoftwareType = "Professional"
                 arRegistrationResult.SubscriptionType = "None"
+                arRegistrationResult.RegisteredToDate = "Perpetual"
                 lbResult = True
                 GoTo ReturnResult
             End If
