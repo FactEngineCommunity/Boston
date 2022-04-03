@@ -76,6 +76,23 @@ Namespace DatabaseUpgradeFunctions
 
         End Sub
 
+        Public Sub CreateApplicationKey()
+
+            Try
+                Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 1, 1, publicRegistration.GenerateApplicationKey)
+                Call TableReferenceFieldValue.CreateReferenceFieldValueIfNotExists(lrReferenceFieldValue)
+                TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub InsertNewPredicatePartRecordsForRoleIds()
 
             Dim lsSQLQuery As String = ""

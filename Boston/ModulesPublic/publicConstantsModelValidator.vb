@@ -33,6 +33,7 @@
         DataTypeNotSpecifiedError = 127
         TooManyReadingRolesError = 128
         RoleConstraintConflictError = 129
+        ModelLoadingError = 300
     End Enum
 
 End Module

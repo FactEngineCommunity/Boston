@@ -367,6 +367,8 @@ error_handler:
                 '----------------------------------
                 Case Is = "CommitTransaction"
                     Call DatabaseUpgradeFunctions.CommitTransaction(True)
+                Case Is = "CreateApplicationKey"
+                    Call DatabaseUpgradeFunctions.CreateApplicationKey()
                 Case Is = "DoNothingDummyFunction"
                     Call DatabaseUpgradeFunctions.DoNothingDummyFunction()
                 Case Is = "SetInitialFactTypeReadingTypedPredicateIds"

@@ -27,7 +27,7 @@ Module publicRegistration
             End If
 
             'Professional - No Subscription
-            lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "None", "None")
+            lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "None", "Perpetual")
             If asRegistrationKey = FormatLicenseKey(GetMd5Sum(lsProductIdentifier)) Then
                 arRegistrationResult.IsRegistered = True
                 arRegistrationResult.SoftwareType = "Professional"
@@ -69,11 +69,13 @@ Module publicRegistration
             Next
 
             'Default Registration (so that Subscriptions don't default to Not Registered. I.e. Default to Registered but no Subscription).
-            lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "None", "None")
+            'I.e. Check the asDefaultRegistrationKey
+            lsProductIdentifier = FormatProductIdentifier(asApplicationKey, "Professional", "None", "Perpetual")
             If asDefaultRegistrationKey = FormatLicenseKey(GetMd5Sum(lsProductIdentifier)) Then
                 arRegistrationResult.IsRegistered = True
                 arRegistrationResult.SoftwareType = "Professional"
                 arRegistrationResult.SubscriptionType = "None"
+                arRegistrationResult.RegisteredToDate = "Perpetual"
                 lbResult = True
                 GoTo ReturnResult
             End If

@@ -32,8 +32,8 @@ Namespace FBM
                        ".primaryErrorReport { color: red; font-weight: bolder; }" & vbCrLf &
                        ".secondaryErrorReport { color: red; }" & vbCrLf &
                        ".verbalization { }" & vbCrLf &
-                       ".indent { margin.left: 20px; position: relative; }" & vbCrLf &
-                       ".smallIndent { margin.left: 8px; position: relative;}" & vbCrLf &
+                       ".indent { margin-left: 20px; position: relative; }" & vbCrLf &
+                       ".smallIndent { margin-left: 8px; position: relative;}" & vbCrLf &
                        ".listSeparator { color: windowtext; font-weight: 200;}" & vbCrLf &
                        ".logicalOperator { color: MediumBlue; font-weight: bold;}" & vbCrLf &
                        ".note { color: Black; font-style: italic; font-weight: normal; }" & vbCrLf &

@@ -2352,6 +2352,40 @@ Namespace FBM
 
         End Function
 
+        Public Function getFactTypeReadingByRoleSequence(ByRef aarRole As List(Of FBM.Role)) As FBM.FactTypeReading
+
+            Dim lrFactTypeReading As FBM.FactTypeReading
+            Try
+                Dim lsSentence As String
+
+                lsSentence = aarRole(0).JoinedORMObject.Id
+                For liInd = 1 To aarRole.Count
+                    lsSentence &= " has " & aarRole(liInd).JoinedORMObject.Id
+                Next
+                Dim lrSentence As New Language.Sentence(lsSentence)
+
+                For liInd = 1 To aarRole.Count
+                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                Next
+                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+
+                lrFactTypeReading = New FBM.FactTypeReading(Me, aarRole, lrSentence)
+                lrFactTypeReading = Me.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
+
+                Return lrFactTypeReading
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function GetFirstRoleWithInternalUniquenessConstraint() As FBM.Role
 
             Try

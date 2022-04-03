@@ -2936,6 +2936,7 @@ Public Class frmToolboxORMVerbalisation
                             Else
                                 lrVerbaliser.VerbaliseQuantifier(" at most one ")
                             End If
+                            lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
                             lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject)
                         Else
                             If arFactType.Is1To1BinaryFactType Then
@@ -2945,6 +2946,7 @@ Public Class frmToolboxORMVerbalisation
                                 Else
                                     lrVerbaliser.VerbaliseQuantifier(" at most one ")
                                 End If
+                                lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
                                 lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject)
                             Else
                                 If lrFactTypeReading.PredicatePart(0).Role.Mandatory Then

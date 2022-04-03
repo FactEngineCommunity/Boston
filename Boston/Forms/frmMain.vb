@@ -84,8 +84,8 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "6.0"
-            psApplicationDatabaseVersionNr = "1.32"
+            psApplicationApplicationVersionNr = "6.1"
+            psApplicationDatabaseVersionNr = "1.33"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
             Dim lsAssemblyFileVersionNumber As String
@@ -366,6 +366,13 @@ Public Class frmMain
                 Dim lrDefaultReferenceField As New tReferenceField(34, 3, "DefaultRegistrationKey", 3, 50, False, False)
                 tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
 
+                'Set the ApplicationKey
+                Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 1, 1, publicRegistration.GenerateApplicationKey)
+                Call TableReferenceFieldValue.CreateReferenceFieldValueIfNotExists(lrReferenceFieldValue)
+                If lbFirstRun Then
+                    TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
+                End If
+
                 '----------------------------------------------------------------------------
                 'Registration Checking
                 '-------------------------
@@ -375,23 +382,23 @@ Public Class frmMain
                     Dim lsRegistrationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 2, True)
                     Dim lsDefaultRegistrationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 3, True)
 
-                    If lsApplicationKey = "" Then
+                    If lsApplicationKey = "a" Then 'Initial value, but should have been covered by FirstRun (lbFirstRun)
                         'No Applicatipon Key exists in the database. Create one.
                         lsApplicationKey = publicRegistration.GenerateApplicationKey
-                        Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 1, 1, lsApplicationKey)
+                        lrReferenceFieldValue = New tReferenceFieldValue(34, 1, 1, lsApplicationKey)
                         Call lrReferenceFieldValue.Save()
                     End If
 
                     If lsRegistrationKey = "" Then
                         'No Registration Key exists in the database. Create one. Product won't be registered.
                         lsRegistrationKey = "1A66-067A-B9A2-5D7A-CE1F-0A38-EAB6"
-                        Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 2, 1, lsRegistrationKey)
+                        lrReferenceFieldValue = New tReferenceFieldValue(34, 2, 1, lsRegistrationKey)
                         Call lrReferenceFieldValue.Save()
                     End If
 
                     If lsDefaultRegistrationKey = "" Then
                         'No Default Registration Key exists in the database. Create one. Product won't be registered.                        
-                        Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 3, 1, lsRegistrationKey)
+                        lrReferenceFieldValue = New tReferenceFieldValue(34, 3, 1, lsRegistrationKey)
                         Call lrReferenceFieldValue.Save()
                     End If
 
@@ -401,11 +408,12 @@ Public Class frmMain
                         If lrRegistrationResult.SubscriptionType = "Subscription" Then lbCanCheckForUpdates = True
                     Else
                         'The Trial must be up.
-                        MsgBox("Your trial of Boston has expired. Please contact FactEngine to obtain a registration key for Boston.")
+                        MsgBox("Your trial of Boston has expired or your registration key is invalid. Please contact FactEngine to obtain a registration key for Boston.")
                         Dim lrRegistrationForm As New frmRegistration
-                        Call lrRegistrationForm.ShowDialog()
-                        Call Me.Close()
-                        Exit Sub
+                        If Not lrRegistrationForm.ShowDialog() Then
+                            Call Me.Close()
+                            Exit Sub
+                        End If
                     End If
 
                     'Me.LabelRegistrationStatus.Text = lrRegistrationResult.SoftwareType & " " & lrRegistrationResult.SubscriptionType & lrRegistrationResult.RegisteredToDate
@@ -2479,6 +2487,9 @@ Public Class frmMain
             Else
                 lrForm = lrPage.Form
             End If
+
+            'CodeSafe
+            If ToolStripComboBox_zoom.SelectedItem Is Nothing Then Exit Sub
 
             If IsSomething(lrForm) Then
                 If TypeOf (lrForm) Is frmDiagramORM Then

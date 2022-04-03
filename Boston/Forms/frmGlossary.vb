@@ -294,7 +294,19 @@ Public Class frmGlossary
                                 lrVerbaliser.HTW.WriteBreak()
                                 lrVerbaliser.VerbaliseIndent()
                                 Dim lrRole As FBM.Role
-                                lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id).Id)
+                                Dim larRole As New List(Of FBM.Role)
+                                lrRole = lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id)
+                                larRole.Add(lrRole)
+                                lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                                larRole.Add(lrRole)
+                                Dim lrSentence As New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
+                                If lrFactTypeReading IsNot Nothing Then
+                                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                                End If
                                 lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
                                 lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
                                 lrVerbaliser.VerbaliseModelObject(arEntityType)
@@ -682,11 +694,11 @@ Public Class frmGlossary
 
 
         For Each lrFactType In FactType
-            lrVerbaliser.VerbaliseModelObject(lrFactType)
             lrVerbaliser.HTW.WriteBreak()
-            lrVerbaliser.VerbaliseIndent()
             If lrFactType.FactTypeReading.Count > 0 Then
                 Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
+                lrVerbaliser.VerbaliseBlackText(" ")
+                lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
                 '=======================================================================================
                 If lrFactType.IsBinaryFactType Then
                     'No reverse reading is provided for the FactType.
@@ -803,6 +815,7 @@ Public Class frmGlossary
             For Each lrFactTypeReading In arFactType.FactTypeReading
                 lrFactTypeReading.GetReadingText(lrVerbaliser)
                 lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
             Next
 
             lrVerbaliser.HTW.WriteBreak()
@@ -917,6 +930,7 @@ Public Class frmGlossary
                     End If
 
                     lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
                 Next
             Else
                 '-------------------------------------------
@@ -962,7 +976,6 @@ Public Class frmGlossary
             '---------------------------
             'Mandatory RoleConstraints
             '---------------------------
-            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseHeading("Mandatory Role Constraints:")
             lrVerbaliser.HTW.WriteBreak()

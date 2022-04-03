@@ -1308,7 +1308,6 @@ Namespace FBM
 
                     lrFactTypeReading = Me.FactType.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByRoles)
                     If IsSomething(lrFactTypeReading) Then
-
                         If Me.Page.Diagram IsNot Nothing Then
                             Try
                                 Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
@@ -1320,9 +1319,10 @@ Namespace FBM
                                 Call Me.FactTypeReadingShape.DisplayAndAssociate()
                                 Call Me.FactTypeReadingShape.RefreshShape()
                             End If
+                            FindSuitableFactTypeReading = Me.FactTypeReadingShape
+                        Else
+                            FindSuitableFactTypeReading = lrFactTypeReading.CloneInstance(Me.Page)
                         End If
-
-                        FindSuitableFactTypeReading = lrFactTypeReading.CloneInstance(Me.Page)
                     Else
                         If Me.FactType.FactTypeReading.Count > 0 Then
                             If Me.FactType.Arity = 2 Then
@@ -2294,12 +2294,9 @@ Namespace FBM
 
                     '---------------------------------
                     'Find a suitable FactTypeReading
+                    '  Does DisplayingAndAssociating when found.
                     '---------------------------------
-                    Dim lrFactTypeReading As New FBM.FactTypeReading
-                    Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance
-
-                    'Does DisplayingAndAssociating when found.
-                    lrFactTypeReading = Me.FindSuitableFactTypeReading
+                    Me.FactTypeReadingShape = Me.FindSuitableFactTypeReading
 
                     '------------------------------------------
                     'Set the AnchorPatterns for the RoleGroup
@@ -2580,7 +2577,8 @@ Namespace FBM
         Private Sub _FactType_FactTypeReadingAdded(ByRef arFactTypeReading As FactTypeReading) Handles _FactType.FactTypeReadingAdded
 
             Try
-
+                'CodeSafe-Ignore stray FactTypeInstances.
+                If Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Me Then Exit Sub
 
                 Call Me.FindSuitableFactTypeReading()
 
@@ -2608,10 +2606,12 @@ Namespace FBM
                 '------------------------------------------------------------------------------------------------
                 'Replace the existing FactTypeReadingShape if it matches the FactTypeReading that was modified.
                 '------------------------------------------------------------------------------------------------
-                If Me.FactTypeReadingShape.Equals(arFactTypeReading) Then
-                    Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.shape)
-                    Me.FactTypeReadingShape = arFactTypeReading.CloneInstance(Me.Page)
-                    Me.FactTypeReadingShape.DisplayAndAssociate()
+                If Me.FactTypeReadingShape IsNot Nothing Then
+                    If Me.FactTypeReadingShape.Equals(arFactTypeReading) Then
+                        Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.shape)
+                        Me.FactTypeReadingShape = arFactTypeReading.CloneInstance(Me.Page)
+                        Me.FactTypeReadingShape.DisplayAndAssociate()
+                    End If
                 End If
 
                 Me.RefreshShape()
@@ -2632,6 +2632,9 @@ Namespace FBM
             Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance
 
             Try
+                'CodeSafe-Ignore stray FactTypeInstances.
+                If Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Me Then Exit Sub
+
                 Call Me.FindSuitableFactTypeReading()
 
                 Call Me.SetAppropriateColour()

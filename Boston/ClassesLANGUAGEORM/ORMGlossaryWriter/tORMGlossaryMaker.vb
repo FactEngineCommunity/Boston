@@ -174,17 +174,24 @@ Namespace FBM
             Me.HTW.Write(arModelObject.Id)
             Me.HTW.RenderEndTag() 'A (ModelObject)
 
-            Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "predicate")
-            Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
-            Me.HTW.Write(" is identified by its ")
-            Me.HTW.RenderEndTag() 'SPAN (is written as)
+            If lrEntityType.HasPrimaryReferenceScheme Then
 
-            If lrEntityType.ReferenceModeValueType IsNot Nothing Then
-                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
-                Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
-                Me.HTW.Write(lrEntityType.ReferenceModeValueType.Id)
-                Me.HTW.RenderEndTag() 'A (ReferenceMode)
+                If lrEntityType.HasSimpleReferenceScheme Then
+
+                    Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "predicate")
+                    Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
+                    Me.HTW.Write(" is identified by its ")
+                    Me.HTW.RenderEndTag()
+
+                    Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "object_type")
+                    Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+                    Me.HTW.Write(CType(lrEntityType.GetTopmostNonAbsorbedSupertype(False), FBM.EntityType).ReferenceModeValueType.Id)
+                    Me.HTW.RenderEndTag() 'A (ReferenceMode)
+                End If
+            Else
+                Me.HTW.Write("Provide a Reference Scheme for the Entity Type.")
             End If
+
 
             Me.HTW.RenderEndTag() 'DT
 

@@ -1047,10 +1047,10 @@ SkipModelNote:
                                  Sub(lrXMLPage As XMLModel.Page)
                                      lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
                                      If lrPage Is Nothing Then
-                                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel,,, True)
                                      Else
                                          If Not lrPage.Loaded Then
-                                             Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker)
+                                             Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker, True)
                                          End If
                                      End If
 
@@ -1075,7 +1075,8 @@ SkipModelNote:
         Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
                                       ByRef arModel As FBM.Model,
                                       Optional ByRef arPage As FBM.Page = Nothing,
-                                      Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing) As FBM.Page
+                                      Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                                      Optional ByVal abCalledAsThread As Boolean = False) As FBM.Page
 
             Dim lsMessage As String
 
@@ -1099,23 +1100,29 @@ SkipModelNote:
                 Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
-                    lrValueTypeInstance = New FBM.ValueTypeInstance
-                    lrValueTypeInstance.Model = arModel
-                    lrValueTypeInstance.Page = lrPage
-                    lrValueTypeInstance.Id = lrConceptInstance.Symbol
-                    lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
-                    lrValueTypeInstance.ValueType = arModel.ValueType.Find(AddressOf lrValueTypeInstance.ValueType.Equals)
-                    lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
-                    lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
-                    lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
+                    Try
+                        lrValueTypeInstance = New FBM.ValueTypeInstance
+                        lrValueTypeInstance.Model = arModel
+                        lrValueTypeInstance.Page = lrPage
+                        lrValueTypeInstance.Id = lrConceptInstance.Symbol
+                        lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
+                        lrValueTypeInstance.ValueType = arModel.ValueType.Find(AddressOf lrValueTypeInstance.ValueType.Equals)
+                        lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
+                        lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
+                        lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
 
-                    lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
+                        lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
 
-                    lrValueTypeInstance.Name = lrConceptInstance.Symbol
-                    lrValueTypeInstance.X = lrConceptInstance.X
-                    lrValueTypeInstance.Y = lrConceptInstance.Y
+                        lrValueTypeInstance.Name = lrConceptInstance.Symbol
+                        lrValueTypeInstance.X = lrConceptInstance.X
+                        lrValueTypeInstance.Y = lrConceptInstance.Y
 
-                    lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                        lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                    Catch ex As Exception
+                        Call Me.ReportModelLoadingError(arModel, ex.Message)
+                        GoTo SkipValueTypeInstance
+                    End Try
+SkipValueTypeInstance:
                 Next
 
                 '=============================
@@ -1386,11 +1393,39 @@ SkipModelNote:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-
+                If abCalledAsThread Then
+                    Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                                                           lsMessage,
+                                                           Nothing,
+                                                           Nothing)
+                    arModel.ModelError.Add(lrModelError)
+                Else
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End If
                 Return Nothing
+
             End Try
         End Function
+
+        Private Sub ReportModelLoadingError(ByRef arModel As FBM.Model, ByVal asErrorMessage As String)
+
+            Try
+                Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                                       asErrorMessage,
+                                       Nothing,
+                                       Nothing)
+                arModel.ModelError.Add(lrModelError)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType,
                                        Optional ByRef arXMLFactType As XMLModel.FactType = Nothing) 'As List(Of FBM.Fact)

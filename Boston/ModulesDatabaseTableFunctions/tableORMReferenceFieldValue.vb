@@ -30,6 +30,24 @@ Namespace TableReferenceFieldValue
 
         End Sub
 
+        Public Sub CreateReferenceFieldValueIfNotExists(ByRef lrReferenceFieldValue As tReferenceFieldValue)
+
+            Try
+                If Not TableReferenceFieldValue.ExistsReferenceFieldValue(lrReferenceFieldValue) Then
+                    Call TableReferenceFieldValue.AddReferenceFieldValue(lrReferenceFieldValue)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Sub DeleteReferenceFieldValue(ByVal ar_reference_field_value As tReferenceFieldValue)
 
             Dim lsSQLQuery As String = ""

@@ -457,7 +457,7 @@ Namespace FBM
             Dim lrConceptInstance As New FBM.ConceptInstance
             Dim lrConcept As FBM.Concept
             Try
-                lrConceptInstance.ModelId = Me.Model.ModelId
+                lrConceptInstance.ModelId = Me.Fact.Model.ModelId
                 lrConceptInstance.PageId = Me.Page.PageId
                 lrConceptInstance.Symbol = Me.Fact.Symbol
                 lrConceptInstance.X = Me.X
