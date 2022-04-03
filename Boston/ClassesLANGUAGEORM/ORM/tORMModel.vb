@@ -119,14 +119,17 @@ Namespace FBM
         <XmlAttribute()>
         Public CreatedByUserId As String = "" 'The User who created the Model when in Client/Server mode.
 
+        <Newtonsoft.Json.JsonIgnore()>
         <XmlIgnore()>
         Public [Dictionary] As New Dictionary(Of String, Integer)
 
+        <Newtonsoft.Json.JsonIgnore()>
         <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelDictionary As New List(Of FBM.DictionaryEntry)
 
+        <Newtonsoft.Json.JsonIgnore()>
         Public Overridable Property ModelDictionary() As List(Of FBM.DictionaryEntry)
             Get
                 Return Me._ModelDictionary
@@ -4057,6 +4060,10 @@ Namespace FBM
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Tested 20220404-VM-With NewtonSoft JSON serialiser. The TypeDB SocialNetwork model saved to 84MB for JSON (with object references)
+        '''   and 2.7MB for XML. Another solution is needed.
+        ''' </summary>
         Public Sub SaveToJSONDocumentUsingObjectReferences()
 
             Dim lsMessage As String
