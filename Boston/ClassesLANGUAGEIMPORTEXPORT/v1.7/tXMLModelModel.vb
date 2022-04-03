@@ -765,15 +765,25 @@ SkipFactType:
                                                          From SubtypeRelationship In EntityType.SubtypeRelationships
                                                          Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
                                                          Select SubtypeRelationship
+                            Try
+                                lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                            Catch ex As Exception
+                                'CodeSafe
+                                'Not a biggie at this stage.
+                            End Try
 
-                            lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
                         Case Is = GetType(FBM.ValueType)
                             Dim larSubtypeRelationship = From ValueType In Me.ORMModel.ValueTypes
                                                          From SubtypeRelationship In ValueType.SubtypeRelationships
                                                          Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
                                                          Select SubtypeRelationship
+                            Try
+                                lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                            Catch ex As Exception
+                                'CodeSafe
+                                'Not a biggie at this stage.
+                            End Try
 
-                            lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
                     End Select
 
                     lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
@@ -1307,7 +1317,16 @@ SkipValueTypeInstance:
                     Catch ex As Exception
                         lsMessage = "Problem loading Subtype Relationship for Subtype Relationship Fact Type with Id: " & lrFactTypeInstance.Id
                         lsMessage.AppendDoubleLineBreak("Page: " & lrPage.Name)
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                        If abCalledAsThread Then
+                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                                                           lsMessage,
+                                                           Nothing,
+                                                           Nothing)
+                            arModel.ModelError.Add(lrModelError)
+                        Else
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                        End If
+
                     End Try
                 Next
 #End Region
@@ -1317,9 +1336,13 @@ SkipValueTypeInstance:
                 '===========================
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleName)
                     lrRoleInstance = lrPage.RoleInstance.Find(Function(x) x.Id = lrConceptInstance.RoleId)
-                    lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
-                    lrRoleInstance.RoleName.X = lrConceptInstance.X
-                    lrRoleInstance.RoleName.Y = lrConceptInstance.Y
+                    Try
+                        lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+                        lrRoleInstance.RoleName.X = lrConceptInstance.X
+                        lrRoleInstance.RoleName.Y = lrConceptInstance.Y
+                    Catch ex As Exception
+                        'Not worth crashing over.
+                    End Try
                 Next
 
                 '=================================
@@ -1354,7 +1377,15 @@ SkipValueTypeInstance:
                         Catch ex As Exception
                             lsMessage = "Error loading Role Constraint with Id: " & lrConceptInstance.Symbol
                             lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                            If abCalledAsThread Then
+                                Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                                                           lsMessage,
+                                                           Nothing,
+                                                           Nothing)
+                                arModel.ModelError.Add(lrModelError)
+                            Else
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                            End If
                         End Try
 
                     End If
@@ -1375,7 +1406,15 @@ SkipValueTypeInstance:
                     Catch ex As Exception
                         lsMessage = "Error loading Model Note with Id: " & lrConceptInstance.Symbol
                         lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                        If abCalledAsThread Then
+                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                                                           lsMessage,
+                                                           Nothing,
+                                                           Nothing)
+                            arModel.ModelError.Add(lrModelError)
+                        Else
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                        End If
                     End Try
 
                 Next
