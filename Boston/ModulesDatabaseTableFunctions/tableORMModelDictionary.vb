@@ -226,6 +226,16 @@ Namespace TableModelDictionary
                     lsSQLQuery &= "    On MD.Symbol = MDA.Symbol"
                     lsSQLQuery &= " WHERE ModelId = '" & ar_model.ModelId & "'"
                     lsSQLQuery &= " AND MDA.Symbol IS NULL"
+
+                    'To Exclude EntityTypes that are ObjectifyingEntityTypes
+                    'SELECT MD.*
+                    ' FROM (MetaModelModelDictionary As MD
+                    ' Left Join (Select Symbol From MDACoreModelElementsModelDictionary) AS MDA On MD.Symbol = MDA.Symbol )
+                    ' Left Join MetaModelFactType AS MDFT On MD.Symbol = MDFT.ObjectifyingEntityTypeId AND MD.ModelId = MDFT.ModelId
+                    ' WHERE MD.ModelId = 'Test00-ECSS-E-ST-70-41'
+                    ' AND MDFT.ObjectifyingEntityTypeId IS NULL
+                    ' AND MDA.Symbol IS NULL
+
                 Else
                     lsSQLQuery = " SELECT *"
                     lsSQLQuery &= "  FROM MetaModelModelDictionary MDE"
