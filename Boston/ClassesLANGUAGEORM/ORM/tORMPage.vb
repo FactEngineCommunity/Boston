@@ -188,6 +188,7 @@ Namespace FBM
         <JsonIgnore()>
         Public IsInvalidated As Boolean = False
 
+        <NonSerialized()>
         <JsonIgnore()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -236,6 +237,7 @@ Namespace FBM
         <XmlIgnore()>
         Public ReferencedForm As WeifenLuo.WinFormsUI.Docking.DockContent
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public InternalUniquenessConstraintsExpanded As Boolean = False 'For use with ORM Models only: Toggle indicating whether 
         'the size of the InternalUniquenessConstraints is expanded or contracted so that users can click on them

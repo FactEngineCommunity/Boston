@@ -2614,7 +2614,9 @@ SkipRegistrationChecking:
                 'For Each lr_tree_node_model In lr_tree_node.Nodes
                 If IsSomething(lr_tree_node.Tag.Tag) Then
                     lr_model = lr_tree_node.Tag.Tag
-                    Call lr_model.Save()
+                    If lr_model.Loaded And lr_model.IsDirty Then
+                        Call lr_model.Save()
+                    End If
                 End If
                 'Next
             Next

@@ -181,21 +181,27 @@ Namespace FBM
                 Me.Shape.Visible = True
                 Me.Shape.ZTop()
 
+                Dim lbMove As Boolean = False
                 If Me.Y < 0 Then
                     Me.Y = Me.RoleInstance.Shape.Bounds.Y - 12
+                    lbMove = True
                 End If
 
                 If Math.Abs(Me.X - Me.RoleInstance.X) > (25 + StringSize.Width) Then
                     Me.X = Me.RoleInstance.X - 4
+                    lbMove = True
                 End If
 
                 If Math.Abs(Me.Y - Me.RoleInstance.Y) > 35 Then
                     Me.Y = Me.RoleInstance.Y - 12
+                    lbMove = True
                 End If
 
                 Me.Shape.AllowOutgoingLinks = False
-                Me.Shape.Move(Me.X, Me.Y)
-                Me.Move(Me.X, Me.Y, True)
+                If lbMove Then
+                    Me.Shape.Move(Me.X, Me.Y)
+                    Me.Move(Me.X, Me.Y, True)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

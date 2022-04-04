@@ -57,6 +57,7 @@ Namespace FBM
 
         Public Name As String = ""
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public AllowCheckForErrors As Boolean = False
 
@@ -70,17 +71,23 @@ Namespace FBM
         <NonSerialized()>
         Public TreeNode As TreeNode
 
+        <NonSerialized()>
+        <XmlIgnore()>
         Public Loading As Boolean = False
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public Loaded As Boolean = False 'Used to stop reloading every time the User selects a Model in the navigation tree.
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public RDSLoading As Boolean = False 'Used to stop loading of Pages when the RDS (Relational Data Structure/Schema) has not finished loading under threading. See also STMLoading below.
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public STMLoading As Boolean = False 'Used to stop loading of Pages when the STM (State Transition Model) has not finished loading under threading. See also RDSLoading above.
 
+        <NonSerialized()>
         <XmlIgnore()>
         Public LoadedFromXMLFile As Boolean = False
 
@@ -119,6 +126,7 @@ Namespace FBM
         <XmlAttribute()>
         Public CreatedByUserId As String = "" 'The User who created the Model when in Client/Server mode.
 
+        <NonSerialized()>
         <Newtonsoft.Json.JsonIgnore()>
         <XmlIgnore()>
         Public [Dictionary] As New Dictionary(Of String, Integer)
@@ -286,6 +294,7 @@ Namespace FBM
 
         <XmlIgnore()>
         Public TargetDatabaseType As pcenumDatabaseType = pcenumDatabaseType.None 'e.g. MSAccess, ORACLE, SQL Server, MySQL etc.
+
         <XmlIgnore()>
         Public TargetDatabaseConnectionString As String = "" 'The ConnectionString used to connect to the Target Database.
 

@@ -425,6 +425,11 @@ Namespace Richmond
                 bin.Serialize(mem, obj)
                 Return True
 
+            Catch Serex As System.Runtime.Serialization.SerializationException
+
+                MsgBox("Your object cannot be serialized. The reason is: " & Serex.ToString() & Serex.GetType.ToString)
+                Return False
+
             Catch ex As Exception
 
                 MsgBox("Your object cannot be serialized. The reason is: " & ex.ToString() & ex.GetType.ToString)

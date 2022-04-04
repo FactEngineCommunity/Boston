@@ -204,8 +204,9 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <NonSerialized()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _HasBeenMoved As Boolean = False
         <XmlIgnore()> _
         Public Property HasBeenMoved() As Boolean  'Used in AutoLayout operations.

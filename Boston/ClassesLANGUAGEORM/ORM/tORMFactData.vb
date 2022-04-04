@@ -15,7 +15,7 @@ Namespace FBM
         ''' The FactType of the Fact to which the RoleData belongs.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactType As FBM.FactType
 
         Public Overrides Property Model() As Model
@@ -182,6 +182,7 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         Private _ModelError As New List(Of FBM.ModelError)
         Public Overridable Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
@@ -192,10 +193,12 @@ Namespace FBM
             End Set
         End Property
 
-
+        <NonSerialized()>
         Public Shadows Event ConceptSymbolUpdated()
         'Public Shadows Event ConceptSwitched(ByRef arConcept As FBM.Concept)
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
+        <NonSerialized()>
         Public Event RemovedFromModel(ByVal abDeleteAll As Boolean)
 
         Public Sub New()

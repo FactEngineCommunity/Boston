@@ -29,6 +29,7 @@ Namespace FBM
         ''' </summary>
         ''' <remarks></remarks>
         <XmlIgnore()>
+        <NonSerialized()>
         Public WithEvents FactData As New FBM.FactData
 
         ''' <summary>
@@ -39,10 +40,12 @@ Namespace FBM
         Public WithEvents JoinedObjectType As FBM.ModelObject
 
         <XmlIgnore()>
+        <NonSerialized()>
         Public Shadows Fact As FBM.FactInstance
 
         <XmlIgnore()>
-        Public FactDataInstance As FBM.FactDataInstance 'Used to refer to original object when cloned for convenience.
+        <NonSerialized()>
+        Public FactDataInstance As FBM.FactDataInstance 'Used to refer to original object when cloned, and for convenience.
         'e.g. If working with a tActor or CMML.Process object (as a clone of a tFactDataInstance object), 'FactDataInstance'
         '  refers back to the FactDataInstance from where the clone was made. This is so that any changes made to the tActor/CMML.Process object
         '  can be reflected back against the original tFactDataInstance object. The reason that you would do this is because
@@ -77,6 +80,7 @@ Namespace FBM
         <NonSerialized(),
         XmlIgnore()>
         Public TableShape As TableNode
+        '20220405-VM-Remove if not missed.
         '<XmlIgnore()> _
         'Public Overridable Property TableShape() As TableNode 'Used in FactTypeInstances, ERDiagrams
         '    Get
@@ -122,28 +126,6 @@ Namespace FBM
                     '----------------------------------------------------------------------------
                     Me.Concept = lrNewDictionaryEntry.Concept
                     Me.Symbol = lrNewDictionaryEntry.Symbol
-
-                    'lsDebugMessage = "FactDataInstance.Data.Set"
-                    'If IsSomething(Me.FactType) Then
-                    '    lsDebugMessage &= vbCrLf & "FactType.Id: " & Me.FactType.Id
-                    'Else
-                    '    lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
-                    'End If
-                    'If IsSomething(Me.Fact) Then
-                    '    lsDebugMessage &= vbCrLf & "Fact.Symbol: " & Me.Fact.Symbol
-                    'Else
-                    '    lsDebugMessage &= vbCrLf & "Fact.Symbol: Nothing"
-                    'End If
-                    'If Me.Role IsNot Nothing Then
-                    '    lsDebugMessage &= vbCrLf & "Role.Id: " & Me.Role.Id
-                    'Else
-                    '    lsDebugMessage &= vbCrLf & "Role.Id: Nothing"
-                    'End If
-
-                    'lsDebugMessage &= vbCrLf & "Original Data/Concept.Symbol: " & Me.Data
-                    'lsDebugMessage &= vbCrLf & "New Data/Concept.Symbol: '" & lrNewDictionaryEntry.Symbol & "' already exists in the ModelDictionary"
-                    'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
-
                 Else
                     '-------------------------------------------------------
                     'The NewConcept does not exist in the ModelDictionary.
