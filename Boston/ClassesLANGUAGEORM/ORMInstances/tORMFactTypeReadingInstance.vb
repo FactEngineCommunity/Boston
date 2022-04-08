@@ -145,7 +145,16 @@ Namespace FBM
                 loDroppedNode.AttachTo(Me.FactType.Shape, AttachToNode.MiddleRight)
 
                 If Me.FactType.isPreferredReferenceMode Then
-                    loDroppedNode.Visible = False
+                    Dim lbReferenceSchemeVisible As Boolean = False
+                    Try
+                        Dim lrEntityType As FBM.EntityType = Me.RoleList.Find(Function(x) x.JoinedORMObject.GetType = GetType(FBM.EntityType)).JoinedORMObject
+                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
+                        lbReferenceSchemeVisible = lrEntityTypeInstance.ExpandReferenceMode
+                    Catch ex As Exception
+                        'Not a biggie
+                    End Try
+
+                    loDroppedNode.Visible = lbReferenceSchemeVisible
                 Else
                     loDroppedNode.Visible = True
                 End If

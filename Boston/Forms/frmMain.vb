@@ -3210,6 +3210,16 @@ SkipRegistrationChecking:
                     Dim loPt As New PointF(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
                     lrEntityTypeInstance.EntityType = lrEntityTypeInstance.EntityType.ChangeModel(prApplication.WorkingModel, False, True)
                     If prApplication.WorkingPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count = 0 Then
+                        'Make sure there is a DictionaryEntry for the EntityType.
+                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(prApplication.WorkingModel,
+                                                                         lrEntityTypeInstance.Id,
+                                                                         pcenumConceptType.EntityType,
+                                                                         lrEntityTypeInstance.EntityType.ShortDescription,
+                                                                         lrEntityTypeInstance.EntityType.LongDescription,
+                                                                         True,
+                                                                         True,
+                                                                         "")
+                        Call prApplication.WorkingModel.AddModelDictionaryEntry(lrDictionaryEntry,,,,,, True,,)
                         'The EntityType doesn't already exist on the Page.
                         prApplication.WorkingPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType, loPt, True)
                     End If

@@ -136,7 +136,6 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueConstraint As New List(Of FBM.Concept)
 
-        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueConstraintList As New Viev.Strings.StringCollection
@@ -189,6 +188,8 @@ Namespace FBM
         <XmlIgnore()>
         Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
+                'CodeSafe-Because does not serialise _ModelError
+                If Me._ModelError Is Nothing Then Me._ModelError = New List(Of FBM.ModelError)
                 Return Me._ModelError
             End Get
             Set(ByVal value As System.Collections.Generic.List(Of ModelError))
@@ -337,48 +338,60 @@ Namespace FBM
 
             Dim lrValueType As New FBM.ValueType
 
-            If arModel.ValueType.Exists(AddressOf Me.Equals) Then
-                '---------------------------------------------------------------------------------------------------------------------
-                'The target ValueType already exists in the target Model, so return the existing ValueType (from the target Model)
-                '  20150127-There seems no logical reason to clone an ValueType to a target Model if it already exists in the target
-                '  Model. This method is used when copying/pasting from one Model to a target Model, and (in general) the ValueType
-                '  won't exist in the target Model. If it does, then that's the ValueType that's needed.
-                '  NB Testing to see if the Signature of the ValueType already exists in the target Model is already performed in the
-                '  Paste proceedure before dropping the ValueType onto a target Page/Model. If there is/was any clashes, then the 
-                '  ValueType being copied/pasted will have it's Id/Name/Symbol changed and will not be affected by this test to see
-                '  if the ValueType already exists in the target Model.
-                '---------------------------------------------------------------------------------------------------------------------
-                lrValueType = arModel.ValueType.Find(AddressOf Me.Equals)
-            Else
-                With Me                    
-                    lrValueType.Model = arModel
-                    lrValueType.Id = .Id
-                    lrValueType.Name = .Name
-                    lrValueType.Symbol = .Symbol
-                    lrValueType.ConceptType = .ConceptType
-                    lrValueType.ShortDescription = .ShortDescription
-                    lrValueType.LongDescription = .LongDescription
-                    lrValueType.isDirty = True
-                    lrValueType.IsIndependent = .IsIndependent
-                    If abIsMDAModelElement = False Then
-                        lrValueType.IsMDAModelElement = .IsMDAModelElement
-                    Else
-                        lrValueType.IsMDAModelElement = abIsMDAModelElement
-                    End If
+            Try
+                If arModel.ValueType.Exists(AddressOf Me.Equals) Then
+                    '---------------------------------------------------------------------------------------------------------------------
+                    'The target ValueType already exists in the target Model, so return the existing ValueType (from the target Model)
+                    '  20150127-There seems no logical reason to clone an ValueType to a target Model if it already exists in the target
+                    '  Model. This method is used when copying/pasting from one Model to a target Model, and (in general) the ValueType
+                    '  won't exist in the target Model. If it does, then that's the ValueType that's needed.
+                    '  NB Testing to see if the Signature of the ValueType already exists in the target Model is already performed in the
+                    '  Paste proceedure before dropping the ValueType onto a target Page/Model. If there is/was any clashes, then the 
+                    '  ValueType being copied/pasted will have it's Id/Name/Symbol changed and will not be affected by this test to see
+                    '  if the ValueType already exists in the target Model.
+                    '---------------------------------------------------------------------------------------------------------------------
+                    lrValueType = arModel.ValueType.Find(AddressOf Me.Equals)
+                Else
+                    With Me
+                        lrValueType.Model = arModel
+                        lrValueType.Id = .Id
+                        lrValueType.Name = .Name
+                        lrValueType.Symbol = .Symbol
+                        lrValueType.ConceptType = .ConceptType
+                        lrValueType.ShortDescription = .ShortDescription
+                        lrValueType.LongDescription = .LongDescription
+                        lrValueType.isDirty = True
+                        lrValueType.IsIndependent = .IsIndependent
+                        If abIsMDAModelElement = False Then
+                            lrValueType.IsMDAModelElement = .IsMDAModelElement
+                        Else
+                            lrValueType.IsMDAModelElement = abIsMDAModelElement
+                        End If
 
-                    lrValueType.ValueConstraint = .ValueConstraint
-                    lrValueType.PrimativeType = .PrimativeType
-                    lrValueType.DataType = .DataType
-                    lrValueType.DataTypeLength = .DataTypeLength
-                    lrValueType.DataTypePrecision = .DataTypePrecision
+                        lrValueType.ValueConstraint = .ValueConstraint
+                        lrValueType.PrimativeType = .PrimativeType
+                        lrValueType.DataType = .DataType
+                        lrValueType.DataTypeLength = .DataTypeLength
+                        lrValueType.DataTypePrecision = .DataTypePrecision
 
-                    If abAddToModel Then
-                        arModel.AddValueType(lrValueType)
-                    End If
-                End With
-            End If
+                        If abAddToModel Then
+                            arModel.AddValueType(lrValueType)
+                        End If
+                    End With
+                End If
 
-            Return lrValueType
+                Return lrValueType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrValueType
+            End Try
 
         End Function
 
