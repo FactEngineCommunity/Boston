@@ -4836,6 +4836,7 @@ Public Class frmDiagramORM
                                   pcenumRoleConstraintType.RoleValueConstraint
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ExternalRoleConstraint
                     End Select
+                    'NodeSelected sets Role text/color values (Pastel)
                     Call lrRoleConstraintInstance.NodeSelected()
                 Case Is = pcenumConceptType.RoleConstraintRole
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance

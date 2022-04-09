@@ -181,7 +181,18 @@ Namespace TableRoleConstraintRole
                             lrRoleConstraintRole.RoleConstraintArgument = Nothing
                         Else
                             lrRoleConstraintRole.RoleConstraintArgument = arRoleConstraint.Argument.Find(Function(x) x.Id = Trim(lREcordset("ArgumentId").Value))
-                            lrRoleConstraintRole.RoleConstraintArgument.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            Try
+                                lrRoleConstraintRole.RoleConstraintArgument.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            Catch ex As Exception
+#Region "CodeSafe: Argument"
+                                'CodeSafe: OrganicComputing: Try and find an Argument for the RoleConstraintRole
+                                '  Might not even be the right Argument but will keep the show on the road.
+                                Dim lrArgument As FBM.RoleConstraintArgument = arRoleConstraint.Argument.Find(Function(x) x.SequenceNr = lrRoleConstraintRole.SequenceNr)
+                                If lrArgument IsNot Nothing Then
+                                    lrArgument.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                End If
+#End Region
+                            End Try
                         End If
                         lrRoleConstraintRole.ArgumentSequenceNr = NullVal(lREcordset("ArgumentSequenceNr").Value, 0)
 

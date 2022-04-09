@@ -620,7 +620,7 @@ Namespace FBM
         Public Sub RefreshRoleConstraintRoleTexts()
 
             Dim lrRoleInstance As FBM.RoleInstance
-            'Colours for RoleInstances
+            'Colours for RoleInstances (Pastel)
             Dim Values() As Integer = CType([Enum].GetValues(GetType(pcenumColourWheel)), Integer())
 
             If Me.RoleConstraint.Argument.Count > 0 Then

@@ -2912,6 +2912,10 @@ Namespace FBM
                     'Me.ReferenceModeRoleConstraint = New FBM.RoleConstraint(Me.Model,  Me.PreferredIdentifierRCId, True, pcenumRoleConstraintType.InternalUniquenessConstraint)
                     Me.ReferenceModeRoleConstraint = Me.Model.RoleConstraint.Find(Function(x) x.Id = Me.PreferredIdentifierRCId)
 
+                    If Me.ReferenceModeRoleConstraint.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                        GoTo SkipSettingReferenceModeObjects
+                    End If
+
                     If Me.ReferenceModeRoleConstraint Is Nothing Then
                         'CodeSafe
                         Me.PreferredIdentifierRCId = ""
@@ -2944,17 +2948,19 @@ Namespace FBM
                         '  The used can update the ReferenceMode on screen, but at least the objects are set for the EntityType
                         '--------------------------------------------------------------------------------------------------------
                         If Trim(Me.ReferenceMode) = "" Then
-                                Me.ReferenceMode = Me.ReferenceModeRoleConstraint.Role(0).JoinedORMObject.Id
-                            End If
-
-                            Me.ReferenceModeFactType = Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType
-
-                            '------------------------------------------------------------------------
-                            'CodeSafe: Set the IsPreferredReferenceMode member of the FactType to True
-                            '---------------------------------------------------------------------------
-                            Me.ReferenceModeFactType.IsPreferredReferenceMode = True
+                            Me.ReferenceMode = Me.ReferenceModeRoleConstraint.Role(0).JoinedORMObject.Id
                         End If
+
+                        Me.ReferenceModeFactType = Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType
+
+                        '------------------------------------------------------------------------
+                        'CodeSafe: Set the IsPreferredReferenceMode member of the FactType to True
+                        '---------------------------------------------------------------------------
+                        Me.ReferenceModeFactType.IsPreferredReferenceMode = True
                     End If
+                End If
+SkipSettingReferenceModeObjects:
+
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: FBM.EntityType.SetReferenceModeObjects"
