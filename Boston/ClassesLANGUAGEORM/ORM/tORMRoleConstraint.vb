@@ -1624,7 +1624,9 @@ Namespace FBM
         End Function
 
 
-        Public Function CloneRoleValueConstraintInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.RoleValueConstraint
+        Public Function CloneRoleValueConstraintInstance(ByRef arPage As FBM.Page,
+                                                         Optional ByVal abAddToPage As Boolean = False,
+                                                         Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As FBM.RoleValueConstraint
 
             Dim lrRoleConstraintInstance As New FBM.RoleValueConstraint
 
@@ -1655,11 +1657,15 @@ Namespace FBM
                 Dim lrRoleInstance As FBM.RoleInstance
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                 For Each lrRole In Me.Role
-                    lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
-                    If lrRoleInstance Is Nothing Then
-                        Dim lrFactTypeInstance As FBM.FactTypeInstance
-                        lrFactTypeInstance = arPage.DropFactTypeAtPoint(lrRole.FactType, New PointF(0, 0), False,, False, False)
+                    If arFactTypeInstance Is Nothing Then
                         lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
+                        If lrRoleInstance Is Nothing Then
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance
+                            lrFactTypeInstance = arPage.DropFactTypeAtPoint(lrRole.FactType, New PointF(0, 0), False,, False, False)
+                            lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
+                        End If
+                    Else
+                        lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRole.Id)
                     End If
 
                     lrRoleConstraintInstance.Role.Add(lrRoleInstance)

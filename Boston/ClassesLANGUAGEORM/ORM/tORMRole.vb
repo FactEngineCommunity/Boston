@@ -541,7 +541,10 @@ Namespace FBM
         ''' <returns></returns>
         ''' <remarks></remarks>
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False, Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing) As FBM.RoleInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
+                                              Optional ByVal abAddToPage As Boolean = False,
+                                              Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing,
+                                              Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As FBM.RoleInstance
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrRoleInstance As New FBM.RoleInstance
@@ -556,7 +559,12 @@ Namespace FBM
                     lrRoleInstance.Id = .Id
                     lrRoleInstance.Name = .Name
                     lrRoleInstance.ConceptType = .ConceptType
-                    lrRoleInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
+                    If arFactTypeInstance Is Nothing Then
+                        lrRoleInstance.FactType = arPage.FactTypeInstance.Find(Function(x) x.Id = .FactType.Id)
+                    Else
+                        lrRoleInstance.FactType = arFactTypeInstance
+                    End If
+
                     lrRoleInstance.Deontic = .Deontic
                     lrRoleInstance.Mandatory = .Mandatory
                     lrRoleInstance.SequenceNr = .SequenceNr
@@ -612,16 +620,17 @@ Namespace FBM
                             End If
                     End Select
 
+                    If abAddToPage Then
+                        arPage.RoleInstance.AddUnique(lrRoleInstance)
+                    End If
+
+                    'After adding to Page, because might need to reference RoleInstance on Page below.
                     If Me.RoleConstraintRoleValueConstraint IsNot Nothing Then
-                        lrRoleInstance.RoleConstraintRoleValueConstraint = Me.RoleConstraintRoleValueConstraint.CloneRoleValueConstraintInstance(arPage, False)
+                        lrRoleInstance.RoleConstraintRoleValueConstraint = Me.RoleConstraintRoleValueConstraint.CloneRoleValueConstraintInstance(arPage, False, arFactTypeInstance)
 
                         For Each lsConstraintValue In lrRoleInstance.RoleConstraintRoleValueConstraint.ValueConstraint
                             lrRoleInstance.ValueConstraint.Add(lsConstraintValue)
                         Next
-                    End If
-
-                    If abAddToPage Then
-                        arPage.RoleInstance.AddUnique(lrRoleInstance)
                     End If
 
                 End With

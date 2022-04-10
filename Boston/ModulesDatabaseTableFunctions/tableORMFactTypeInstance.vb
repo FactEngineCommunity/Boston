@@ -248,11 +248,11 @@ Namespace TableFactTypeInstance
                             '-------------------------------------------------------------                        
                             For Each lrRole In lrFactTypeInstance.FactType.RoleGroup
 
-                                lrRoleInstance = lrRole.CloneInstance(arPage, True)
+                                lrRoleInstance = lrRole.CloneInstance(arPage, True, False, lrFactTypeInstance)
 
                                 'prApplication.ThrowErrorMessage("Loading Page:'" & arPage.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
-
-                                lrRoleInstance.FactType = lrFactTypeInstance
+                                '20220410-VM-Replace with passing lrFactTypeInstance to lrRole.CloneInstance (above)
+                                'lrRoleInstance.FactType = lrFactTypeInstance
 
                                 If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.FactType Then
                                     If lrRoleInstance.JoinedORMObject Is Nothing Then

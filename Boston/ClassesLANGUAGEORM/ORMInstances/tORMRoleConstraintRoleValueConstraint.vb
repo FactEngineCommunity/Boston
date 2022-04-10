@@ -94,7 +94,7 @@ Namespace FBM
 
                 If lrRoleInstance IsNot Nothing And lrRoleInstance.Shape.Visible = True Then
                     Dim myFont As New Font(lrRoleInstance.Shape.Parent.Font.FontFamily, lrRoleInstance.Shape.Parent.Font.Size, FontStyle.Regular, GraphicsUnit.Pixel)
-                    StringSize = lrRoleInstance.Shape.Parent.MeasureString(lsRoleValueConstraintText, lrRoleInstance.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    StringSize = lrRoleInstance.Shape.Parent.MeasureString(lsRoleValueConstraintText + "MM", lrRoleInstance.Shape.Parent.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     loDiagramShape = lrRoleInstance
                 Else
                     If Me.RoleConstraint.RoleConstraintRole(0).Role.FactType.IsPreferredReferenceMode Then
@@ -125,10 +125,10 @@ Namespace FBM
                 Me.Page.Diagram.Nodes.Add(loDroppedNode)
                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
                 'loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
-                loDroppedNode.HandlesStyle = HandlesStyle.HatchHandles
+                loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.Text = lsRoleValueConstraintText
-                loDroppedNode.Resize(StringSize.Width, StringSize.Height)
-                loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
+                loDroppedNode.Resize(StringSize.Width + 4, StringSize.Height + 4)
+                'loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
                 loDroppedNode.TextColor = Color.Black
                 loDroppedNode.Transparent = True
                 loDroppedNode.Visible = True
@@ -156,11 +156,6 @@ Namespace FBM
                     lo_link.HeadShape = ArrowHead.None
                     lo_link.Pen.DashStyle = Drawing2D.DashStyle.Custom
                     lo_link.Pen.DashPattern = New Single() {2, 1, 2, 1}
-                    'ReDim lo_link.Pen.DashPattern(3)
-                    'lo_link.Pen.DashPattern(0) = 1
-                    'lo_link.Pen.DashPattern(1) = 2
-                    'lo_link.Pen.DashPattern(2) = 1
-                    'lo_link.Pen.DashPattern(3) = 2
                     Dim lrRoleConstraintRoleInstance As New FBM.RoleConstraintRoleInstance
                     lrRoleConstraintRoleInstance.RoleConstraint = Me
                     lo_link.Tag = lrRoleConstraintRoleInstance
@@ -178,6 +173,7 @@ Namespace FBM
                 End Using
 
                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                loDroppedNode.TextColor = Color.Purple
                 loDroppedNode.Visible = True
                 loDroppedNode.ImageAlign = ImageAlign.Stretch
                 loDroppedNode.AllowOutgoingLinks = True
