@@ -4183,6 +4183,12 @@ Public Class frmDiagramORM
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                     Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
                                     lrFrequencyConstraintInstance = lrModelObject
+                                    Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
+                                    Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                                    Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
+                                    Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
+
                                     lrPropertyGridForm.PropertyGrid.SelectedObject = lrFrequencyConstraintInstance
                                 Case Is = pcenumRoleConstraintType.RoleValueConstraint
                                     Dim lrRoleValueConstraintInstance As FBM.RoleValueConstraint
@@ -12237,6 +12243,33 @@ Public Class frmDiagramORM
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItem16_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem16.Click
+
+        Try
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+            Dim lrPropertyGridForm As frmToolboxProperties
+
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            Dim loMiscFilterAttribute1 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
+            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
+            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3})
+            If IsSomething(lrPropertyGridForm) Then
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            lsMessage = "Error: frmDiagramORM.ToolStripMenuItem10_Click"
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

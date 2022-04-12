@@ -113,7 +113,7 @@ Public Class frmToolboxProperties
                 Case Else
                     Try
                         If PropertyGrid.SelectedObject.Page IsNot Nothing Then
-                            Call PropertyGrid.SelectedObject.RefreshShape()
+                            Call PropertyGrid.SelectedObject.RefreshShape(e, Me.PropertyGrid.SelectedGridItem.Label)
                         End If
                     Catch ex As Exception
 

@@ -267,7 +267,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueConstraintList As New Viev.Strings.StringCollection
         '<XmlIgnore()> _
-        <CategoryAttribute("Value Type"),
+        <CategoryAttribute("Value Constraint"),
          Browsable(True),
          [ReadOnly](False),
          DescriptionAttribute("The List of Values that Objects of this Value Type may take."),

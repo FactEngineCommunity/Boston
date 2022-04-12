@@ -82,6 +82,20 @@ Namespace FBM
                 Dim lsFrequencyConstraintText As String = ""
                 Dim lo_link As DiagramLink
 
+                If (Me.MinimumFrequencyCount = 0) And (Me.MaximumFrequencyCount > 0) Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
+                    Me.Cardinality = Me.MaximumFrequencyCount
+                ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount = 0) Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
+                    Me.Cardinality = Me.MinimumFrequencyCount
+                ElseIf Me.MinimumFrequencyCount = Me.MaximumFrequencyCount Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.Equal
+                    Me.Cardinality = Me.MaximumFrequencyCount
+                ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount > 0) Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.Between
+                    Me.Cardinality = 0
+                End If
+
                 Select Case Me.CardinalityRangeType
                     Case Is = pcenumCardinalityRangeType.LessThanOREqual
                         lsFrequencyConstraintText = "<=" & Me.Cardinality
@@ -110,8 +124,8 @@ Namespace FBM
                 loDroppedNode.Move(lrRoleInstance.Shape.Bounds.X, lrRoleInstance.Shape.Bounds.Y - (StringSize.Height * 3))
                 Me.Page.Diagram.Nodes.Add(loDroppedNode)
                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
-                'loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
-                loDroppedNode.HandlesStyle = HandlesStyle.HatchHandles
+                loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
+                'loDroppedNode.HandlesStyle = HandlesStyle.HatchHandles
                 loDroppedNode.Text = lsFrequencyConstraintText
 
                 'loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
@@ -181,10 +195,25 @@ Namespace FBM
 
         End Sub
 
-        Public Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                          Optional ByVal asSelectedGridItemLabel As String = "")
 
 
             Try
+
+                If (Me.MinimumFrequencyCount = 0) And (Me.MaximumFrequencyCount > 0) Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
+                    Me.Cardinality = Me.MaximumFrequencyCount
+                ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount = 0) Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
+                    Me.Cardinality = Me.MinimumFrequencyCount
+                ElseIf Me.MinimumFrequencyCount = Me.MaximumFrequencyCount Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.Equal
+                    Me.Cardinality = Me.MaximumFrequencyCount
+                ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount > 0) Then
+                    Me.CardinalityRangeType = pcenumCardinalityRangeType.Between
+                    Me.Cardinality = 0
+                End If
 
                 If IsSomething(aoChangedPropertyItem) Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
@@ -202,31 +231,23 @@ Namespace FBM
                                 Me.Symbol = Me.Name
                             End If
                         Case Is = "MinimumFrequencyCount"
+                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType, Me.Cardinality, Me.MinimumFrequencyCount, Me.MaximumFrequencyCount)
                             Call Me.EnableSaveButton()
                         Case Is = "MaximumFrequencyCount"
+                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType, Me.Cardinality, Me.MinimumFrequencyCount, Me.MaximumFrequencyCount)
                             Call Me.EnableSaveButton()
                     End Select
                 End If
 
                 If (Me.MinimumFrequencyCount = 0) And (Me.MaximumFrequencyCount > 0) Then
-                    Me.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
                     Me.Shape.Text = "<=" & Me.MaximumFrequencyCount
-                    Me.Cardinality = Me.MaximumFrequencyCount
                 ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount = 0) Then
-                    Me.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOREqual
                     Me.Shape.Text = ">=" & Me.MinimumFrequencyCount
-                    Me.Cardinality = Me.MinimumFrequencyCount
                 ElseIf Me.MinimumFrequencyCount = Me.MaximumFrequencyCount Then
-                    Me.CardinalityRangeType = pcenumCardinalityRangeType.Equal
                     Me.Shape.Text = Me.MinimumFrequencyCount
-                    Me.Cardinality = Me.MaximumFrequencyCount
                 ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount > 0) Then
-                    Me.CardinalityRangeType = pcenumCardinalityRangeType.Between
                     Me.Shape.Text = Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString
-                    Me.Cardinality = 0
                 End If
-
-                Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType, Me.Cardinality, Me.MinimumFrequencyCount, Me.MaximumFrequencyCount)
 
                 Dim StringSize As New SizeF
 
@@ -308,6 +329,40 @@ Namespace FBM
                     End If
                 End If
             End If
+
+        End Sub
+
+        Private Shadows Sub _RoleConstraint_MaximumFrequencyCountChanged(aiNewMaximumFrequencyCount As Integer) Handles _RoleConstraint.MaximumFrequencyCountChanged
+
+            Try
+                Me.MaximumFrequencyCount = aiNewMaximumFrequencyCount
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Shadows Sub _RoleConstraint_MinimumFrequencyCountChanged(aiNewMinimumFrequencyCount As Integer) Handles _RoleConstraint.MinimumFrequencyCountChanged
+
+            Try
+                Me.MinimumFrequencyCount = aiNewMinimumFrequencyCount
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
