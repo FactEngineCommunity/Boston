@@ -3532,7 +3532,6 @@ SkipRegistrationChecking:
                 Call MsgBox(lsMessage, vbExclamation)
             End If
 
-
             '---------------------------------------------------------------------------------------------------------------------------
             'Check to see if the rostersdatabaseupgrade.vdb file has been posted to the <AppPath./rostersdatbase/rostersdatabaseupgrade/
             '  directory. If this file exists, then load the contents into the 'upgrade' and 'upgrade_sql' tables within the Richmond database.

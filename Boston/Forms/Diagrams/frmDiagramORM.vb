@@ -9961,11 +9961,21 @@ Public Class frmDiagramORM
 
     Private Sub RemoveFromPageAndModelToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveFromPageAndModelToolStripMenuItem.Click
 
-        Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
-        lrFrequencyConstraintInstance = Me.zrPage.SelectedObject(0)
+        Try
+            Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
+            lrFrequencyConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        'Call lrFrequencyConstraintInstance.RemoveFromPage()
-        Call lrFrequencyConstraintInstance.RoleConstraint.RemoveFromModel()
+            'Call lrFrequencyConstraintInstance.RemoveFromPage()
+            Call lrFrequencyConstraintInstance.RoleConstraint.RemoveFromModel()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

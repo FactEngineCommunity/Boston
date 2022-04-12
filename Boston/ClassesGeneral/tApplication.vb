@@ -489,6 +489,18 @@ Public Class tApplication
                         '-----------------------
                         Call prLogger.WriteToErrorLog(asErrorMessage, "", "Critial Error")
 
+                        If My.Settings.UseAutomatedErrorReporting Then
+                            Try
+                                Throw New Exception(asErrorMessage)
+                            Catch ex As Exception
+                                Try
+                                    prRaygunClient.Send(ex)
+                                Catch ex1 As Exception
+                                    'Should not get here, but have insurance.
+                                End Try
+                            End Try
+                        End If
+
                         If My.Settings.ThrowCriticalDebugMessagesToScreen Then
 
                             If abAbortApplication Then asErrorMessage &= vbCrLf & vbCrLf & "This is a critical error. Boston will now close."
@@ -496,15 +508,6 @@ Public Class tApplication
                             MsgBox(asErrorMessage, MsgBoxStyle.Critical)
 
                             If abAbortApplication Then Call Application.Exit()
-
-                            If My.Settings.UseAutomatedErrorReporting Then
-                                Try
-                                    Throw New Exception(asErrorMessage)
-                                Catch ex As Exception
-                                    prRaygunClient.Send(ex)
-                                End Try
-
-                            End If
 
                         End If
                     Case Is = pcenumErrorType.Warning

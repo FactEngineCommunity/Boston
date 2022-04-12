@@ -163,7 +163,7 @@ Namespace FBM
                 Dim lrRoleConstraintRoleInstance As New FBM.RoleConstraintRoleInstance
                 lrRoleConstraintRoleInstance.RoleConstraint = Me
                 lo_link.Tag = lrRoleConstraintRoleInstance
-
+                lrRoleConstraintRoleInstance.Link = lo_link
 
                 Me.Page.Diagram.Links.Add(lo_link)
                 Me.Page.Diagram.Invalidate()
@@ -363,6 +363,46 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Public Overrides Sub RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean)
+
+            Try
+
+                If Me.Page Is Nothing Then
+                    Exit Sub
+                End If
+
+                Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+
+
+                For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
+                    If Me.Page.Diagram IsNot Nothing Then
+                        Me.Page.Diagram.Links.Remove(lrRoleConstraintRoleInstance.Link)
+                    End If
+                Next
+
+                Me.Page.Diagram.Nodes.Remove(Me.Shape)
+
+                Call Me.Page.RemoveRoleConstraintInstance(Me, abBroadcastInterfaceEvent)
+
+                Me.Page.MakeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub _RoleConstraint_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles _RoleConstraint.RemovedFromModel
+
+            Call Me.RemoveFromPage(abBroadcastInterfaceEvent)
 
         End Sub
 
