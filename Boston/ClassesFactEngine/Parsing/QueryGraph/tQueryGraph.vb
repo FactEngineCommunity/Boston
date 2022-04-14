@@ -269,7 +269,7 @@
                         Dim larPredicatePart As New List(Of FBM.PredicatePart)
                         If lrNode.QueryEdge Is lrPrimaryQueryEdge Then
                             larPredicatePart = (From PredicatePart In lrNode.QueryEdge.FBMFactTypeReading.PredicatePart
-                                                Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
+                                                Where (PredicatePart.Role.JoinedORMObject.Id = lrNode.FBMModelObject.Id Or
                                                 PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
                                                 Where Not larUsedPredicatePart.Contains(PredicatePart)
                                                 Select PredicatePart).ToList
@@ -278,7 +278,7 @@
                             'larPredicatePart.Insert(0, lrPrimaryQueryEdge.FBMPredicatePart)
                             'Else
                             larPredicatePart = (From PredicatePart In lrPrimaryQueryEdge.FBMFactTypeReading.PredicatePart
-                                                Where (PredicatePart.Role.JoinedORMObject Is lrNode.FBMModelObject Or
+                                                Where (PredicatePart.Role.JoinedORMObject.Id = lrNode.FBMModelObject.Id Or
                                                        PredicatePart.Role.JoinedORMObject.isSubtypeOfModelElement(lrNode.FBMModelObject))
                                                 Where Not larUsedPredicatePart.Contains(PredicatePart)
                                                 Select PredicatePart).ToList

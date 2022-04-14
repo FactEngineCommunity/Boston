@@ -295,7 +295,7 @@ Namespace FBM
             End If
 
             For Each lrRole In Me.RoleList
-                If lrRole.JoinedORMObject IsNot other.RoleList(liInd).JoinedORMObject Then
+                If lrRole.JoinedORMObject.Id <> other.RoleList(liInd).JoinedORMObject.Id Then
                     Return False
                 End If
                 liInd += 1
@@ -323,7 +323,7 @@ Namespace FBM
                     If lrPredicatePart.Role.JoinedORMObject Is Me.RoleList(liMatchPosition).JoinedORMObject Then
                         liMatchPosition += 1
                         If lrPredicatePart.SequenceNr < other.PredicatePart.Count Then
-                            If other.PredicatePart(lrPredicatePart.SequenceNr).Role.JoinedORMObject Is Me.RoleList(liMatchPosition).JoinedORMObject Then
+                            If other.PredicatePart(lrPredicatePart.SequenceNr).Role.JoinedORMObject.Id = Me.RoleList(liMatchPosition).JoinedORMObject.Id Then
                                 Return True
                             End If
                         End If

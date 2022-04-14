@@ -93,6 +93,10 @@ Public Class frmMain
             Dim loFVI As System.Diagnostics.FileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(loAssembly.Location)
             lsAssemblyFileVersionNumber = loFVI.FileVersion
 
+            'Make sure the Config is up to date
+            My.Settings.Upgrade()
+            My.Settings.Save()
+
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
                 ltSplashThread.IsBackground = True
@@ -224,6 +228,7 @@ Public Class frmMain
             '  NB May be different from My.Settings.DatabaseVersionNumber, which is the actual version of the database installed.
             prApplication.DatabaseVersionNr = psApplicationDatabaseVersionNr
 
+#Region "Open the database & Upgrade if necessary"
             Me.StatusLabelGeneralStatus.Text = "Opening Database"
             If Richmond.OpenDatabase() Then
 
@@ -278,6 +283,7 @@ Public Class frmMain
                         Exit Sub
                     End If
                 End If
+#End Region
 
                 Me.StatusLabelGeneralStatus.Text = "Database Opened Successfully"
 
@@ -302,6 +308,7 @@ Public Class frmMain
 
                 '==========================================
                 'Client/Server                
+#Region "Client/Server"
                 If My.Settings.UseClientServer _
                 And My.Settings.RequireLoginAtStartup _
                 And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
@@ -336,6 +343,7 @@ Public Class frmMain
                         Call Me.logInUser(prUser)
                     End If
                 End If
+#End Region
 
                 Call Me.SetupForm()
 
@@ -380,6 +388,7 @@ Public Class frmMain
                 '----------------------------------------------------------------------------
                 'Registration Checking
                 '-------------------------
+#Region "Registration Checking"
                 Dim lbCanCheckForUpdates As Boolean = False
                 Try
                     Dim lsApplicationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 1, True)
@@ -431,6 +440,7 @@ Public Class frmMain
                     Call Me.Close()
                     Exit Sub
                 End Try
+#End Region
 
 SkipRegistrationChecking:
                 '-----------------------------------------------------------
