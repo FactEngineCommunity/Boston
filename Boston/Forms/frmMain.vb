@@ -8,6 +8,7 @@ Imports System.Security.AccessControl
 Imports Boston.DuplexServiceClient  'Client/Server
 Imports System.ServiceModel
 Imports AutoUpdaterDotNET
+Imports System.Configuration
 
 Public Class frmMain
 
@@ -53,7 +54,7 @@ Public Class frmMain
 
         Try
             'NB The current SVN Repository for Richmond is at
-            '  https://pl3.projectlocker.com/Viev/Richmond/svn/
+            '  github
             '-----------------------------------------------------
             'Configuration file ends up in something like: C:\Users\Viev\AppData\Local\Viev_Pty_Ltd\Boston.exe_Url_wd25rcgtvmds0ynngskc2ps2lwmmryie\2.5.0.0
             '------------------------------------------------------------------------------------------------------------------------
@@ -94,8 +95,10 @@ Public Class frmMain
             lsAssemblyFileVersionNumber = loFVI.FileVersion
 
             'Make sure the Config is up to date
-            My.Settings.Upgrade()
-            My.Settings.Save()
+            If Not ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).HasFile Then
+                My.Settings.Upgrade()
+                My.Settings.Save()
+            End If
 
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
@@ -269,7 +272,7 @@ Public Class frmMain
                         '--------------------------------------------------------------------------------------------------------------
                         'Real problems exist. The application requires a DatabaseVersionNumber 'less' than the one installed
                         '--------------------------------------------------------------------------------------------------------------
-                        lsMessage = "Contact Viev support. This installation of Boston requires a Database Version Number less than the one installed"
+                        lsMessage = "Contact FactEngine support. This installation of Boston requires a Database Version Number less than the one installed"
                         lsMessage &= vbCrLf & vbCrLf
                         lsMessage &= "Database version required by software: " & prApplication.DatabaseVersionNr & vbCrLf
                         lsMessage &= "Required database version (Configuration): " & My.Settings.DatabaseVersionNumber & vbCrLf
@@ -3655,7 +3658,7 @@ SkipRegistrationChecking:
                     'There is no sense proceding because there are no appropriate records in the 'upgrade' table.
                     '  i.e. where the 'successful_implementation' field is set to 'FALSE'
                     '------------------------------------------------------------------------------------------
-                    lsMessage = "Please contact Viev Customer Support. The Boston database requires an upgrade, however the upgrade information is not available."
+                    lsMessage = "Please contact FactEngine Customer Support. The Boston database requires an upgrade, however the upgrade information is not available."
                     Call MsgBox(lsMessage, vbExclamation)
                 End If
             Else
@@ -3667,7 +3670,7 @@ SkipRegistrationChecking:
                 '------------------------------------------------------------------------------------------
                 lsMessage = "The file required to upgrade the Boston database (bostondatabaseupgrade.vdb) is missing."
                 lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Reinstall the Boston upgrade, and if the problem still exists contact Viev."
+                lsMessage &= "Reinstall the Boston upgrade, and if the problem still exists contact FactEngine."
                 lsMessage &= vbCrLf & vbCrLf
                 lsMessage &= "Boston will now close."
                 lsMessage &= vbCrLf & vbCrLf
@@ -3694,14 +3697,14 @@ SkipRegistrationChecking:
     Private Sub EmailSupportvievcomToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles EmailSupportvievcomToolStripMenuItem.Click
 
         Try
-            System.Diagnostics.Process.Start(String.Format("mailto:{0}", "support@viev.com"))
+            System.Diagnostics.Process.Start(String.Format("mailto:{0}", "support@factengine.ai"))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: You might not have a default email application setup in Windows."
             lsMessage &= vbCrLf & vbCrLf
-            lsMessage &= "Email support@viev.com for support on Boston"
+            lsMessage &= "Email support@factengine.ai for support on Boston"
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
@@ -4234,14 +4237,14 @@ SkipRegistrationChecking:
             If My.Settings.UseVirtualUI Then
                 If prThinfinity.BrowserInfo Is Nothing Then
                     Dim lsMessage = "Friendly message: 'UseVirtualUI' is configured to 'True', but it seems that you are not running Boston through a browser."
-                    lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact Viev."
+                    lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact FactEngine."
                     MsgBox(lsMessage)
                 Else
                     Try
                         lrLogEntry.IPAddress = prThinfinity.BrowserInfo.IPAddress
                     Catch ex As Exception
                         Dim lsMessage = "Friendly message: 'UseVirtualUI' is configured to 'True', but it seems that you are not running Boston through a browser."
-                        lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact Viev."
+                        lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact FactEngine."
                         MsgBox(lsMessage)
                     End Try
                 End If

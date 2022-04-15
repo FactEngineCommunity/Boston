@@ -2953,9 +2953,9 @@ Public Class tBrain
 
                         Me.OutstandingSentences.Add(Me.CurrentSentence)
                     Else
-                        Me.OutputBuffer = "Type 'breakdown current sentence' and send a screenshot to support@viev.com to improve the Virtual Analyst."
+                        Me.OutputBuffer = "Type 'breakdown current sentence' and send a screenshot to support@factengine.ai to improve the Virtual Analyst."
                         Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
-                        Me.OutputBuffer = "Viev will respond to your mail with new language rules that you can load into Boston."
+                        Me.OutputBuffer = "FactEngine will respond to your mail with new language rules that you can load into Boston."
                         Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
                     End If
                 End If

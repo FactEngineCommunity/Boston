@@ -111,7 +111,7 @@ Namespace Richmond
                         lsMessage &= vbCrLf & vbCrLf
                         lsMessage &= lsLocalDatabaseLocation
                         lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "If this is a not a new installation of Boston, contact Viev support."
+                        lsMessage &= "If this is a not a new installation of Boston, contact FactEngine support."
 
                         If My.Settings.SilentPreConfiguration Then
                             '-------------------------------------
@@ -121,8 +121,24 @@ Namespace Richmond
                             MsgBox(lsMessage)
                         End If
 
+                        If System.IO.File.Exists(lsLocalDatabaseLocation) Then
+                            lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
+                            My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                            lsMessage = "Saving the following as the Database Connection String for your installation of Boston."
+                            lsMessage &= vbCrLf & vbCrLf
+                            lsMessage &= lrSQLConnectionStringBuilder.ConnectionString
+                            lsMessage &= vbCrLf & vbCrLf
+                            lsMessage.AppendLine("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
+                            lsMessage &= vbCrLf & vbCrLf
+                            lsMessage &= "To make changes to the Boston database connection string, go to [Boston]->[Configuration]"
 
-                        If Not System.IO.File.Exists(lsLocalDatabaseLocation) Then
+                            If Not My.Settings.SilentPreConfiguration Then
+                                MsgBox(lsMessage)
+                            End If
+
+                            My.Settings.Save()
+                            lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        Else
                             lsMessage = "Cannot find the Boston database at:"
                             lsMessage &= vbCrLf & vbCrLf
                             lsMessage &= lsDatabaseLocation
@@ -136,21 +152,6 @@ Namespace Richmond
                             MsgBox(lsMessage)
                             frmCRUDBostonConfiguration.ShowDialog()
                             Return False
-                        Else
-                            lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
-                            My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                            lsMessage = "Saving the following as the Database Connection String for your installation of Richmond:"
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage &= lrSQLConnectionStringBuilder.ConnectionString
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage &= "To make future changes to the Richmond database connection string, go to [Maintenance]->[Configuration]->[Richmond]"
-
-                            If Not My.Settings.SilentPreConfiguration Then
-                                MsgBox(lsMessage)
-                            End If
-
-                            My.Settings.Save()
-                            lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
                         End If
 
                     End If

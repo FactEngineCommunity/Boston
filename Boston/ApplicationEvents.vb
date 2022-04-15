@@ -73,7 +73,7 @@
 
             lsMessage = "An unhandled exception has occured in Boston"
             lsMessage &= vbCrLf & vbCrLf
-            lsMessage &= "If this problem reoccurs, please contact Viev support."
+            lsMessage &= "If this problem reoccurs, please contact FactEngine support."
             lsMessage &= vbCrLf & vbCrLf
             lsMessage &= e.Exception.Message
             lsMessage &= vbCrLf & vbCrLf
