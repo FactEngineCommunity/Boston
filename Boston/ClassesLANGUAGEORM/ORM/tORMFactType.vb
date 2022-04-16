@@ -100,6 +100,13 @@ Namespace FBM
             End Get
         End Property
 
+        <JsonIgnore()>
+        Public ReadOnly Property ModelObjectIds() As List(Of String)
+            Get
+                Return Me.RoleGroup.Select(Function(x) x.JoinedORMObject.Id).ToList
+            End Get
+        End Property
+
         <XmlAttribute()>
         Public IsSubtypeRelationshipFactType As Boolean = False
 

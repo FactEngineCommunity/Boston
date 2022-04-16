@@ -2161,11 +2161,12 @@ Namespace FBM
         Public Function getFactTypeByModelObjects(ByVal aarModelObject As List(Of FBM.ModelObject)) As List(Of FBM.FactType)
 
             Try
-                Dim [set] = New HashSet(Of FBM.ModelObject)(aarModelObject)
+                'Dim [set] = New HashSet(Of FBM.ModelObject)(aarModelObject)
+                Dim [set] = New HashSet(Of String)(aarModelObject.Select(Function(x) x.Id).ToList)
 
                 Dim larFactType = From FactType In Me.FactType
                                   Where FactType.RoleGroup.Count = aarModelObject.Count
-                                  Where [set].SetEquals(FactType.ModelObjects)
+                                  Where [set].SetEquals(FactType.ModelObjectIds)
                                   Select FactType
 
                 Return larFactType.ToList

@@ -688,8 +688,15 @@ PartialFactTypeMatch:
                 End If
 #End Region
 
+#Region "Alternate/New FactTypeReading"
+                If Me.QueryGraph.Model.hasCountFactTypesBetweenModelElements(arBaseNode.FBMModelObject, arTargetNode.FBMModelObject) = 1 Then
+                    Throw New Exception("There is no Fact Type, '" & arBaseNode.FBMModelObject.Id & " " & asPredicate & " " & arTargetNode.FBMModelObject.Id & "', in the Model.")
+                End If
+#End Region
+
                 '===================================================================================================================================
                 'ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge
+                'E.g. "Booking is for (Film:'Rocky')" where the actual path is "Booking is for A Session THAT is for (Film:'Rocky')"
 #Region "ReifiedFactType LinkFactType predicate requring an InjectedQueryEdge"
                 lrQueryEdge.QueryGraph = Me.QueryGraph
                 lrQueryEdge.WhichClause = Me.WhichClause
