@@ -596,10 +596,20 @@ Namespace FBM
 
         Public Sub AddValueConstraint(ByVal asValueConstraint As String)
 
-            Me.ValueConstraint.Add(asValueConstraint)
-            Call Me.makeDirty()
+            Try
+                Me.ValueConstraint.Add(asValueConstraint)
+                Call Me.makeDirty()
 
-            RaiseEvent ValueConstraintAdded(asValueConstraint)
+                RaiseEvent ValueConstraintAdded(asValueConstraint)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

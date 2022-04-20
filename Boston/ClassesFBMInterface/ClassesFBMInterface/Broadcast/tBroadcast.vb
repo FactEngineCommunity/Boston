@@ -14,8 +14,17 @@ Public Class Broadcast
     <DataMember()> _
     Public UserManagement As UserManagement
 
-    <DataMember()> _
+    <DataMember()>
     Public Invitation As Invitation
+
+    <DataMember()>
+    Public FEKLStatement As String
+
+    <DataMember()>
+    Public ErrorCode As Integer
+
+    <DataMember()>
+    Public ErrorText As String
 
 End Class
 

@@ -26,6 +26,8 @@ Namespace DuplexServiceClient
             lrRoleConstraint.IsDeontic = lrInterfaceRoleConstraint.IsDeontic
             lrRoleConstraint.Cardinality = lrInterfaceRoleConstraint.Cardinality
             lrRoleConstraint.CardinalityRangeType.GetByDescription(lrInterfaceRoleConstraint.CardinalityRangeType.ToString)
+            lrRoleConstraint.MinimumValue = lrInterfaceRoleConstraint.MinimumValue
+            lrRoleConstraint.MaximumValue = lrInterfaceRoleConstraint.MaximumValue
 
             For Each lrInterfaceRoleConstraintRole In lrInterfaceRoleConstraint.RoleConstraintRoles
 
@@ -181,6 +183,40 @@ Namespace DuplexServiceClient
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub HandleModelUpdateRoleConstraint(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
+
+            Try
+                Dim lrInterfaceRoleConstraint As Viev.FBM.Interface.RoleConstraint
+                lrInterfaceRoleConstraint = arInterfaceModel.RoleConstraint(0)
+
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrInterfaceRoleConstraint.Id)
+
+                If lrInterfaceRoleConstraint.Name <> lrRoleConstraint.Name Then
+                    Call lrRoleConstraint.SetName(lrInterfaceRoleConstraint.Name, False)
+                ElseIf lrInterfaceRoleConstraint.RingConstraintType <> lrRoleConstraint.RingConstraintType Then
+                    Call lrRoleConstraint.SetRingConstraintType(lrInterfaceRoleConstraint.RingConstraintType, False)
+                ElseIf lrInterfaceRoleConstraint.ValueRangeType <> lrRoleConstraint.ValueRangeType Then
+                    Call lrRoleConstraint.SetValueRangeType(lrInterfaceRoleConstraint.ValueRangeType, False)
+                ElseIf lrInterfaceRoleConstraint.MinimumValue <> lrRoleConstraint.MinimumValue Then
+                    Call lrRoleConstraint.SetMinimumValue(lrInterfaceRoleConstraint.MinimumValue, False)
+                ElseIf lrInterfaceRoleConstraint.MaximumValue <> lrRoleConstraint.MaximumValue Then
+                    Call lrRoleConstraint.SetMaximumValue(lrInterfaceRoleConstraint.MaximumValue, False)
+                ElseIf lrInterfaceRoleConstraint.IsDeontic <> lrRoleConstraint.IsDeontic Then
+                    Call lrRoleConstraint.SetIsDeontic(lrInterfaceRoleConstraint.IsDeontic, False)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

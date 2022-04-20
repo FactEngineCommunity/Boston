@@ -50,7 +50,7 @@ Namespace FBM
                     Case Is = "LongDescription"
                         Me.RoleConstraint.LongDescription = Me.LongDescription
                     Case Is = "IsDeontic"
-                        Me.RoleConstraint.IsDeontic = Me.IsDeontic
+                        Me.RoleConstraint.SetIsDeontic(Me.IsDeontic, True)
                         If Me.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RingConstraint Then
                             If Me.IsDeontic Then
                                 Select Case Me.RingConstraintType

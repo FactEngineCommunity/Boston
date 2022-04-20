@@ -1280,7 +1280,7 @@ Namespace FBM
                                 'Nothing to do. Name of the RoleConstraint has not been changed.
                                 '------------------------------------------------------------
                             Else
-                                Me.RoleConstraint.SetName(Me.Name)
+                                Me.RoleConstraint.SetName(Me.Name, True)
                                 Me.Id = Me.Name
                                 Me.Symbol = Me.Name
                             End If
@@ -1396,7 +1396,7 @@ Namespace FBM
 
                             Call Me.RoleConstraint.SetIsPreferredIdentifier(Me.IsPreferredIdentifier)
                         Case Is = "ValueRangeType"
-                            Call Me.RoleConstraint.SetValueRangeType(Me.ValueRangeType)
+                            Call Me.RoleConstraint.SetValueRangeType(Me.ValueRangeType, True)
                         Case Is = "IsDeontic"
                             Me.RoleConstraint.IsDeontic = Me.IsDeontic
                             If Me.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RingConstraint Then
@@ -1452,10 +1452,10 @@ Namespace FBM
                                     End Select
                                 End If
                             End If
-                            Call Me.RoleConstraint.SetIsDeontic(Me.IsDeontic)
+                            Call Me.RoleConstraint.SetIsDeontic(Me.IsDeontic, True)
                         Case Is = "RingConstraintType"
 
-                            Call Me.RoleConstraint.SetRingConstraintType(Me.RingConstraintType)
+                            Call Me.RoleConstraint.SetRingConstraintType(Me.RingConstraintType, True)
 
                     End Select
 

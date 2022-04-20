@@ -795,13 +795,23 @@ Namespace FBM
 
         End Function
 
-        Public Sub SetCardinality(ByVal aiCardinalityRangeType As pcenumCardinalityRangeType, ByVal aiCardinality As Integer, ByVal aiMinimumFrequencyCount As Integer, ByVal aiMaximumFrequencyCount As Integer)
+        Public Sub SetCardinality(ByVal aiCardinalityRangeType As pcenumCardinalityRangeType,
+                                  ByVal aiCardinality As Integer,
+                                  ByVal aiMinimumFrequencyCount As Integer,
+                                  ByVal aiMaximumFrequencyCount As Integer,
+                                  ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
                 Me.SetCardinalityRangeType(aiCardinalityRangeType)
                 Me.SetCardinality(aiCardinality)
                 Me.SetMinimumFrequencyCount(aiMinimumFrequencyCount)
                 Me.SetMaximumFrequencyCount(aiMaximumFrequencyCount)
+
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                    Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRoleConstraint,
+                                                                        Me,
+                                                                        Nothing)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1920,7 +1930,8 @@ Namespace FBM
 
         End Sub
 
-        Public Sub ModifyValueConstraint(ByVal asOldValueConstraint As String, asNewValueConstraint As String)
+        Public Sub ModifyValueConstraint(ByVal asOldValueConstraint As String,
+                                         ByVal asNewValueConstraint As String)
 
             Try
 
@@ -2169,7 +2180,6 @@ Namespace FBM
                 lrRoleToRemove = arRole
                 lrRoleConstraintRoleToRemove = Me.RoleConstraintRole.Find(Function(x) x.Role.Id = lrRoleToRemove.Id)
 
-
                 Me.RoleConstraintRole.Remove(lrRoleConstraintRoleToRemove)
                 Call lrRoleConstraintRoleToRemove.Delete()
 
@@ -2411,12 +2421,18 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetRingConstraintType(ByVal aiRingConstraintType As pcenumRingConstraintType)
+        Public Sub SetRingConstraintType(ByVal aiRingConstraintType As pcenumRingConstraintType, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.RingConstraintType = aiRingConstraintType
 
             Call Me.makeDirty()
             Call Me.Model.MakeDirty(False, False)
+
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRoleConstraint,
+                                                                    Me,
+                                                                    Nothing)
+            End If
 
             RaiseEvent RingConstraintTypeChanged(aiRingConstraintType)
 
@@ -2433,6 +2449,10 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' NB Broadcast handled in Me.SetCardinality
+        ''' </summary>
+        ''' <param name="aiCardinalityRangeType"></param>
         Public Sub SetCardinalityRangeType(ByVal aiCardinalityRangeType As pcenumCardinalityRangeType)
 
             Me.CardinalityRangeType = aiCardinalityRangeType
@@ -2443,6 +2463,10 @@ Namespace FBM
             RaiseEvent CardinalityRangeTypeChanged(aiCardinalityRangeType)
         End Sub
 
+        ''' <summary>
+        ''' NB Broadcast handled in Me.SetCardinality
+        ''' </summary>
+        ''' <param name="aiCardinality"></param>
         Public Sub SetCardinality(ByVal aiCardinality As Integer)
 
             Me.Cardinality = aiCardinality
@@ -2454,6 +2478,10 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' NB Broadcast handled in Me.SetCardinality
+        ''' </summary>
+        ''' <param name="aiMaximumFrequencyCount"></param>
         Public Sub SetMaximumFrequencyCount(ByVal aiMaximumFrequencyCount As Integer)
 
             Me.MaximumFrequencyCount = aiMaximumFrequencyCount
@@ -2465,17 +2493,27 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetMaximumValue(ByVal aiMaximumValue As String)
+        Public Sub SetMaximumValue(ByVal aiMaximumValue As String, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.MaximumValue = aiMaximumValue
 
             Call Me.makeDirty()
             Call Me.Model.MakeDirty(False, True)
 
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRoleConstraint,
+                                                                    Me,
+                                                                    Nothing)
+            End If
+
             RaiseEvent MaximumValueChanged(aiMaximumValue)
 
         End Sub
 
+        ''' <summary>
+        ''' NB Broadcast handled in Me.SetCardinality
+        ''' </summary>
+        ''' <param name="aiMinimumFrequencyCount"></param>
         Public Sub SetMinimumFrequencyCount(ByVal aiMinimumFrequencyCount As Integer)
 
             Me.MinimumFrequencyCount = aiMinimumFrequencyCount
@@ -2487,23 +2525,35 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetMinimumValue(ByVal aiMinimumValue As String)
+        Public Sub SetMinimumValue(ByVal aiMinimumValue As String, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.MinimumValue = aiMinimumValue
 
             Call Me.makeDirty()
             Call Me.Model.MakeDirty(False, True)
 
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRoleConstraint,
+                                                                    Me,
+                                                                    Nothing)
+            End If
+
             RaiseEvent MinimumValueChanged(aiMinimumValue)
 
         End Sub
 
-        Public Sub SetIsDeontic(ByVal abIsDeontic As Boolean)
+        Public Sub SetIsDeontic(ByVal abIsDeontic As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.IsDeontic = abIsDeontic
 
             Call Me.makeDirty()
             Call Me.Model.MakeDirty(False, False)
+
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRoleConstraint,
+                                                                    Me,
+                                                                    Nothing)
+            End If
 
             RaiseEvent IsDeonticChanged(abIsDeontic)
 
@@ -2655,7 +2705,7 @@ Namespace FBM
             End Try
         End Sub
 
-        Public Sub SetValueRangeType(ByVal aiValueRangeType As pcenumValueRangeType)
+        Public Sub SetValueRangeType(ByVal aiValueRangeType As pcenumValueRangeType, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
                 Me.ValueRangeType = aiValueRangeType
@@ -2663,7 +2713,14 @@ Namespace FBM
                 Call Me.makeDirty()
                 Call Me.Model.MakeDirty(False, False)
 
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                    Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateRoleConstraint,
+                                                                        Me,
+                                                                        Nothing)
+                End If
+
                 RaiseEvent ValueRangeTypeChanged(aiValueRangeType)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

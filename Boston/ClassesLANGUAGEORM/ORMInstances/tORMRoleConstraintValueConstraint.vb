@@ -193,10 +193,10 @@ Namespace FBM
                                 Me.Symbol = Me.Name
                             End If
                         Case Is = "MinimumValue"
-                            Call Me.RoleConstraint.SetMinimumValue(Me.MinimumValue)
+                            Call Me.RoleConstraint.SetMinimumValue(Me.MinimumValue, True)
                             Call Me.EnableSaveButton()
                         Case Is = "MaximumValue"
-                            Call Me.RoleConstraint.SetMaximumValue(Me.MaximumValue)
+                            Call Me.RoleConstraint.SetMaximumValue(Me.MaximumValue, True)
                             Call Me.EnableSaveButton()
                     End Select
                 End If

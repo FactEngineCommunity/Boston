@@ -10195,7 +10195,7 @@ Public Class frmDiagramORM
 
         lrExternalUniquenessConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        Call lrExternalUniquenessConstraintInstance.RoleConstraint.SetIsDeontic(True)
+        Call lrExternalUniquenessConstraintInstance.RoleConstraint.SetIsDeontic(True, True)
         Call lrExternalUniquenessConstraintInstance.SetIsPreferredIdentifier(True)
         lrExternalUniquenessConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExternalUniquenessConstraint)
         Call lrExternalUniquenessConstraintInstance.RefreshShape()
@@ -10208,7 +10208,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExternalUniquenessConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10221,7 +10221,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExternalUniquenessConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(True)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10234,7 +10234,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExternalUniquenessConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10248,7 +10248,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExclusionConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10261,7 +10261,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.InclusiveORConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10274,7 +10274,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExclusiveORConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10287,7 +10287,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(False, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.EqualityConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10300,7 +10300,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExclusionConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10314,7 +10314,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.InclusiveORConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10328,7 +10328,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.ExclusiveORConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()
@@ -10342,7 +10342,7 @@ Public Class frmDiagramORM
 
         lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
-        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True)
+        lrRoleConstraintInstance.RoleConstraint.SetIsDeontic(True, True)
         lrRoleConstraintInstance.RoleConstraint.SetRoleConstraintType(pcenumRoleConstraintType.EqualityConstraint)
         lrRoleConstraintInstance.RoleConstraint.SetIsPreferredIdentifier(False)
         Call lrRoleConstraintInstance.RefreshShape()

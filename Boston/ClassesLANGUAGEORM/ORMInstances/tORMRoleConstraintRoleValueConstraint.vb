@@ -216,7 +216,8 @@ Namespace FBM
                             End If
                         Case Is = "Value"
                             With New WaitCursor
-                                Call Me.RoleConstraint.ModifyValueConstraint(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                Call Me.RoleConstraint.ModifyValueConstraint(aoChangedPropertyItem.OldValue,
+                                                                             aoChangedPropertyItem.ChangedItem.Value.ToString)
                             End With
                     End Select
                 End If

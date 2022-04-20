@@ -231,10 +231,18 @@ Namespace FBM
                                 Me.Symbol = Me.Name
                             End If
                         Case Is = "MinimumFrequencyCount"
-                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType, Me.Cardinality, Me.MinimumFrequencyCount, Me.MaximumFrequencyCount)
+                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType,
+                                                                  Me.Cardinality,
+                                                                  Me.MinimumFrequencyCount,
+                                                                  Me.MaximumFrequencyCount,
+                                                                  True)
                             Call Me.EnableSaveButton()
                         Case Is = "MaximumFrequencyCount"
-                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType, Me.Cardinality, Me.MinimumFrequencyCount, Me.MaximumFrequencyCount)
+                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType,
+                                                                  Me.Cardinality,
+                                                                  Me.MinimumFrequencyCount,
+                                                                  Me.MaximumFrequencyCount,
+                                                                  True)
                             Call Me.EnableSaveButton()
                     End Select
                 End If

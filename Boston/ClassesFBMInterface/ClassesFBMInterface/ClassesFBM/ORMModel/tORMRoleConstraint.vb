@@ -126,14 +126,40 @@ Public Property Name() As String
 
     <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
     Private _MaximumFrequencyCount As Integer
-    <DataMember()> _
-    <XmlAttribute()> _
+    <DataMember()>
+    <XmlAttribute()>
     Public Property MaximumFrequencyCount() As Integer
         Get
             Return Me._MaximumFrequencyCount
         End Get
         Set(ByVal value As Integer)
             Me._MaximumFrequencyCount = value
+        End Set
+    End Property
+
+    <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+    Private _MinimumValue As Integer
+    <DataMember()>
+    <XmlAttribute()>
+    Public Property MinimumValue() As Integer
+        Get
+            Return Me._MinimumValue
+        End Get
+        Set(ByVal value As Integer)
+            Me._MinimumValue = value
+        End Set
+    End Property
+
+    <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+    Private _MaximumValue As Integer
+    <DataMember()>
+    <XmlAttribute()>
+    Public Property MaximumValue() As Integer
+        Get
+            Return Me._MaximumValue
+        End Get
+        Set(ByVal value As Integer)
+            Me._MaximumValue = value
         End Set
     End Property
 

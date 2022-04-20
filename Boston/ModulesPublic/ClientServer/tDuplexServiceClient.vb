@@ -300,6 +300,8 @@ Namespace DuplexServiceClient
                                     lrInterfaceRoleConstraint.IsDeontic = lrRoleConstraint.IsDeontic
                                     lrInterfaceRoleConstraint.Cardinality = lrRoleConstraint.Cardinality
                                     lrInterfaceRoleConstraint.CardinalityRangeType.GetByDescription(lrRoleConstraint.CardinalityRangeType.ToString)
+                                    lrInterfaceRoleConstraint.MinimumValue = lrRoleConstraint.MinimumValue
+                                    lrInterfaceRoleConstraint.MaximumValue = lrRoleConstraint.MaximumValue
 
                                     For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
 
