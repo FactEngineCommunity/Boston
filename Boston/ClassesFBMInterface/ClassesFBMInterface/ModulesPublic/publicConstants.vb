@@ -181,17 +181,20 @@ Public Module publicConstants
     <Serializable()> _
     Public Enum pcenumRingConstraintType
         None
-        Irreflexive
-        Asymmetric
-        Intransitive
-        Antisymmetric
         Acyclic
-        AsymmetricIntransitive
         AcyclicIntransitive
-        Symmetric
-        SymmetricIrreflexive
-        SymmetricIntransitive
+        AcyclicStronglyIntransitive
+        Antisymmetric
+        Asymmetric
+        AsymmetricIntransitive
+        Intransitive
+        Irreflexive
         PurelyReflexive
+        Symmetric
+        SymmetricIntransitive
+        SymmetricIrreflexive
+        SymmetricTransitive
+        Transitive
         DeonticIrreflexive
         DeonticAssymmetric
         DeonticIntransitive

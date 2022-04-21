@@ -2912,10 +2912,6 @@ Namespace FBM
                     'Me.ReferenceModeRoleConstraint = New FBM.RoleConstraint(Me.Model,  Me.PreferredIdentifierRCId, True, pcenumRoleConstraintType.InternalUniquenessConstraint)
                     Me.ReferenceModeRoleConstraint = Me.Model.RoleConstraint.Find(Function(x) x.Id = Me.PreferredIdentifierRCId)
 
-                    If Me.ReferenceModeRoleConstraint.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                        GoTo SkipSettingReferenceModeObjects
-                    End If
-
                     If Me.ReferenceModeRoleConstraint Is Nothing Then
                         'CodeSafe
                         Me.PreferredIdentifierRCId = ""
@@ -2926,6 +2922,10 @@ Namespace FBM
                             Call Me.Save()
                         End If
                         Exit Sub
+                    End If
+
+                    If Me.ReferenceModeRoleConstraint.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                        GoTo SkipSettingReferenceModeObjects
                     End If
 
                     If Me.ReferenceModeRoleConstraint.Role.Count = 1 Then

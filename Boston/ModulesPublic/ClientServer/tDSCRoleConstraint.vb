@@ -199,7 +199,9 @@ Namespace DuplexServiceClient
                 If lrInterfaceRoleConstraint.Name <> lrRoleConstraint.Name Then
                     Call lrRoleConstraint.SetName(lrInterfaceRoleConstraint.Name, False)
                 ElseIf lrInterfaceRoleConstraint.RingConstraintType <> lrRoleConstraint.RingConstraintType Then
-                    Call lrRoleConstraint.SetRingConstraintType(lrInterfaceRoleConstraint.RingConstraintType, False)
+                    Dim liRingConstraintType As pcenumRingConstraintType
+                    liRingConstraintType.GetByDescription(lrInterfaceRoleConstraint.RingConstraintType.ToString)
+                    Call lrRoleConstraint.SetRingConstraintType(liRingConstraintType, False)
                 ElseIf lrInterfaceRoleConstraint.ValueRangeType <> lrRoleConstraint.ValueRangeType Then
                     Call lrRoleConstraint.SetValueRangeType(lrInterfaceRoleConstraint.ValueRangeType, False)
                 ElseIf lrInterfaceRoleConstraint.MinimumValue <> lrRoleConstraint.MinimumValue Then

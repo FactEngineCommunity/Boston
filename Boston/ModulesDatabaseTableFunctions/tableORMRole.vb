@@ -208,6 +208,7 @@ Namespace TableRole
                                         Dim lrValueType As New FBM.ValueType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, True)
                                         arFactType.Model.AddValueType(lrValueType, False, True, Nothing, True)
                                         Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, lsMissingId, pcenumConceptType.ValueType,,, True, True,)
+                                        lrModelDictionaryEntry.isDirty = True
                                         Call lrModelDictionaryEntry.Save()
                                         lrValueType.Save()
                                         lrRole.JoinedORMObject = lrValueType

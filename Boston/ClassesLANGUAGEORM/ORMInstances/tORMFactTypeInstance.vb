@@ -1845,16 +1845,12 @@ Namespace FBM
                 '-------------------------------------------------------------------------------------------
                 DoAllRolesLinkToSameModelObject = True
 
-                'Select Case Me.RoleGroup(0).TypeOfJoin
-                '    Case Is = pcenumRoleJoinType.EntityType
-                '        ls_first_object_type_id = Me.RoleGroup(0).JoinsEntityType.Id
-                '    Case Is = pcenumRoleJoinType.FactType
-                '        ls_first_object_type_id = Me.RoleGroup(0).JoinsFactType.Id
-                '    Case Is = pcenumRoleJoinType.ValueType
-                '        ls_first_object_type_id = Me.RoleGroup(0).JoinsValueType.Id
-                'End Select                
-
                 If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
+                    Return False
+                End If
+
+                'CodeSafe
+                If Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
                     Return False
                 End If
 
@@ -2281,15 +2277,17 @@ Namespace FBM
                         lrRoleInstance.RoleName.Shape.AttachTo(lrRoleInstance.Shape, AttachToNode.TopLeft)
 
                         If Me.isPreferredReferenceMode Then
-                            If lrRoleInstance.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                'CodeSafe; Do Nothing.
+                            ElseIf lrRoleInstance.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
                                 Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
-                                If lrValueTypeInstance.Shape IsNot Nothing Then
-                                    If lrValueTypeInstance.Shape.OutgoingLinks.Count = 0 Then
-                                        lrValueTypeInstance.Shape.Visible = False
+                                    If lrValueTypeInstance.Shape IsNot Nothing Then
+                                        If lrValueTypeInstance.Shape.OutgoingLinks.Count = 0 Then
+                                            lrValueTypeInstance.Shape.Visible = False
+                                        End If
                                     End If
                                 End If
                             End If
-                        End If
 
                     Next
 

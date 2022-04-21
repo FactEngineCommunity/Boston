@@ -2491,7 +2491,17 @@ Namespace FBM
 
         Public Sub RemoveRoleInstance(ByRef arRoleInstance As FBM.RoleInstance)
 
-            Me.Diagram.Nodes.Remove(arRoleInstance.Shape)
+            Try
+                Me.Diagram.Nodes.Remove(arRoleInstance.Shape)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
 
         End Sub
 

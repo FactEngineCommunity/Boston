@@ -1463,10 +1463,14 @@ Namespace FBM
                             '--------------------------------------------------------
                             'Cascading delete of Facts referencing the Fact removed
                             '--------------------------------------------------------
-                            Dim larFactType As New List(Of FBM.FactType)
+                            Dim larFactType As List(Of FBM.FactType)
                             Dim lrFactType As FBM.FactType
                             Dim larFact As New List(Of FBM.Fact)
-                            larFactType = Me.Model.FactType.FindAll(Function(x) x.RoleGroup.FindAll(Function(y) y.JoinedORMObject.Id = Me.Id).Count > 0)
+                            larFactType = (From FactType In Me.Model.FactType
+                                           From Role In FactType.RoleGroup
+                                           Where Role.JoinedORMObject IsNot Nothing
+                                           Where Role.JoinedORMObject.Id = Me.Id
+                                           Select FactType).ToList
 
                             For Each lrFactType In larFactType
                                 larFact = lrFactType.Fact.FindAll(Function(x) x.Data.FindAll(Function(y) y.Data = lrFact.Id).Count > 0)

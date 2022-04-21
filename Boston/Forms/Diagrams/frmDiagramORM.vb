@@ -4196,6 +4196,16 @@ Public Class frmDiagramORM
                                     lrPropertyGridForm.zrSelectedObject = lrRoleValueConstraintInstance
                                     lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                                     lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleValueConstraintInstance
+                                Case Is = pcenumRoleConstraintType.RingConstraint
+                                    Dim lrRingConstraintInstance As FBM.RingConstraint
+                                    lrRingConstraintInstance = lrModelObject
+                                    Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
+                                    Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                                    Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
+                                    Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
+
+                                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrRingConstraintInstance
                                 Case Else
                                     lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
                             End Select
@@ -9695,7 +9705,20 @@ Public Class frmDiagramORM
             If Me.Diagram.Selection.Items.Count > 0 Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
-                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+                Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
+                Dim myHiddenAttribute As Attribute = New System.ComponentModel.DisplayNameAttribute("Language")
+                Dim myHiddenMiscAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                ' And you pass it to the PropertyGrid,
+                ' via its BrowsableAttributes property :
+                If My.Settings.SuperuserMode Then
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenMiscAttribute})
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+                Else
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenAttribute, myHiddenMiscAttribute})
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+                End If
             End If
         End If
 

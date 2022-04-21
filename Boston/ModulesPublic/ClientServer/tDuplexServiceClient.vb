@@ -457,6 +457,8 @@ Namespace DuplexServiceClient
                     Call Me.HandleModelUpdateFactTypeReading(arModel, arInterfaceModel)
                 Case Is = [Interface].pcenumBroadcastType.ModelUpdateRole
                     Call Me.HandleModelUpdateRole(arModel, arInterfaceModel)
+                Case Is = [Interface].pcenumBroadcastType.ModelUpdateRoleConstraint
+                    Call Me.HandleModelUpdateRoleConstraint(arModel, arInterfaceModel)
                 Case Is = [Interface].pcenumBroadcastType.PageDropModelElementAtPoint
                     Call Me.HandlePageDropModelElementAtPoint(arModel, arInterfaceModel)
                 Case Is = [Interface].pcenumBroadcastType.PageRemovePageObject

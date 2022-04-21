@@ -138,27 +138,27 @@ Public Property Name() As String
     End Property
 
     <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-    Private _MinimumValue As Integer
+    Private _MinimumValue As String
     <DataMember()>
     <XmlAttribute()>
-    Public Property MinimumValue() As Integer
+    Public Property MinimumValue() As String
         Get
             Return Me._MinimumValue
         End Get
-        Set(ByVal value As Integer)
+        Set(ByVal value As String)
             Me._MinimumValue = value
         End Set
     End Property
 
     <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-    Private _MaximumValue As Integer
+    Private _MaximumValue As String
     <DataMember()>
     <XmlAttribute()>
-    Public Property MaximumValue() As Integer
+    Public Property MaximumValue() As String
         Get
             Return Me._MaximumValue
         End Get
-        Set(ByVal value As Integer)
+        Set(ByVal value As String)
             Me._MaximumValue = value
         End Set
     End Property
