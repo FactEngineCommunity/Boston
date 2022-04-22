@@ -2031,9 +2031,11 @@ Namespace FBM
                         If Me.Page.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
                             Me.ReferenceModeFactType = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
                             Me.ReferenceModeFactType.isPreferredReferenceMode = True
-                            Me.ReferenceModeFactType.Shape.Visible = False
+                            If Me.ReferenceModeFactType.Shape IsNot Nothing Then
+                                Me.ReferenceModeFactType.Shape.Visible = False
+                            End If
                         Else
-                            Me.ReferenceModeFactType = Me.EntityType.ReferenceModeFactType.CloneInstance(Me.Page, True)
+                                Me.ReferenceModeFactType = Me.EntityType.ReferenceModeFactType.CloneInstance(Me.Page, True)
                             If IsSomething(Me.Shape) Then
                                 Me.ReferenceModeFactType.DisplayAndAssociate()
                                 Me.ReferenceModeFactType.Shape.Visible = False
