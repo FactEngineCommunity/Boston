@@ -2692,7 +2692,8 @@ Public Class frmDiagramORM
                             If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.SubsetConstraint Then
 
                                 lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role, lrRoleConstraintInstance.CurrentArgument)
-                                lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
+                                '20220426-VM-Removed because was adding twice.
+                                'lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
                                 lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
                                                             "." &
                                                             lrRoleConstraintRole.ArgumentSequenceNr.ToString

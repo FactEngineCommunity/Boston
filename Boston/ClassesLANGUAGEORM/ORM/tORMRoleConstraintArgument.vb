@@ -112,7 +112,6 @@ Namespace FBM
                 'Associate the RoleConstraintRole with the RoleConstraintArgument.
                 '-------------------------------------------------------------------
                 arRoleConstraintRole.RoleConstraintArgument = Me
-                arRoleConstraintRole.ArgumentSequenceNr = Me.RoleConstraintRole.Count
 
                 If (Me.RoleConstraintRole.Count = 0) Or abForceAddition Then
 
@@ -151,6 +150,8 @@ Namespace FBM
                     '----------------------------------------------------------------------------------------------------
                     Me.JoinPath.JoinPathError = liJoinPathError
                 End If
+
+                arRoleConstraintRole.ArgumentSequenceNr = Me.RoleConstraintRole.Count
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
