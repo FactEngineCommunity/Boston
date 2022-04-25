@@ -150,6 +150,7 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -643,26 +644,26 @@ Partial Class frmMain
         Me.ToolStripMenuItemHelp.Image = Global.Boston.My.Resources.Resources.Help16x16
         Me.ToolStripMenuItemHelp.Name = "ToolStripMenuItemHelp"
         Me.ToolStripMenuItemHelp.ShortcutKeys = System.Windows.Forms.Keys.F1
-        Me.ToolStripMenuItemHelp.Size = New System.Drawing.Size(206, 22)
+        Me.ToolStripMenuItemHelp.Size = New System.Drawing.Size(226, 22)
         Me.ToolStripMenuItemHelp.Text = "&Help"
         '
         'AboutRichmondToolStripMenuItem
         '
         Me.AboutRichmondToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.About16x16
         Me.AboutRichmondToolStripMenuItem.Name = "AboutRichmondToolStripMenuItem"
-        Me.AboutRichmondToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
+        Me.AboutRichmondToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.AboutRichmondToolStripMenuItem.Text = "&About Boston"
         '
         'ToolStripSeparator13
         '
         Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
-        Me.ToolStripSeparator13.Size = New System.Drawing.Size(203, 6)
+        Me.ToolStripSeparator13.Size = New System.Drawing.Size(223, 6)
         '
         'ToolStripMenuItemOpenLogFile
         '
         Me.ToolStripMenuItemOpenLogFile.Image = Global.Boston.My.Resources.Resources.LogFile16x16
         Me.ToolStripMenuItemOpenLogFile.Name = "ToolStripMenuItemOpenLogFile"
-        Me.ToolStripMenuItemOpenLogFile.Size = New System.Drawing.Size(206, 22)
+        Me.ToolStripMenuItemOpenLogFile.Size = New System.Drawing.Size(226, 22)
         Me.ToolStripMenuItemOpenLogFile.Text = "&Open Log File"
         '
         'EmailSupportvievcomToolStripMenuItem
@@ -674,7 +675,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemTestClientServer
         '
-        Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBroadcastEventMonitorToolStripMenuItem})
+        Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBroadcastEventMonitorToolStripMenuItem, Me.ShowClientServerBroadcastTesterToolStripMenuItem})
         Me.ToolStripMenuItemTestClientServer.Name = "ToolStripMenuItemTestClientServer"
         Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 22)
         Me.ToolStripMenuItemTestClientServer.Text = "Clie&nt Server"
@@ -682,7 +683,7 @@ Partial Class frmMain
         'ShowBroadcastEventMonitorToolStripMenuItem
         '
         Me.ShowBroadcastEventMonitorToolStripMenuItem.Name = "ShowBroadcastEventMonitorToolStripMenuItem"
-        Me.ShowBroadcastEventMonitorToolStripMenuItem.Size = New System.Drawing.Size(236, 22)
+        Me.ShowBroadcastEventMonitorToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
         Me.ShowBroadcastEventMonitorToolStripMenuItem.Text = "Show Broadcast Event Monitor"
         '
         'TestNotificationToolStripMenuItem
@@ -909,6 +910,12 @@ Partial Class frmMain
         '
         Me.TimerNotifications.Interval = 5000
         '
+        'ShowClientServerBroadcastTesterToolStripMenuItem
+        '
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Name = "ShowClientServerBroadcastTesterToolStripMenuItem"
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Text = "Show Client Server Broadcast Tester"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1048,4 +1055,5 @@ Partial Class frmMain
     Friend WithEvents CompactAndRepairToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemUnifiedOntologyBrowser As ToolStripMenuItem
     Friend WithEvents RegistrationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ShowClientServerBroadcastTesterToolStripMenuItem As ToolStripMenuItem
 End Class

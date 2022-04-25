@@ -4508,9 +4508,18 @@ SkipRegistrationChecking:
 
     Private Sub ShowBroadcastEventMonitorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowBroadcastEventMonitorToolStripMenuItem.Click
 
-        Dim lfrmBroadcastEventMonitor As New frmBroadcastEventMonitor
+        Try
+            Dim lfrmBroadcastEventMonitor As New frmBroadcastEventMonitor
+            lfrmBroadcastEventMonitor.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
 
-        lfrmBroadcastEventMonitor.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -4799,6 +4808,23 @@ SkipRegistrationChecking:
     Private Sub RegistrationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RegistrationToolStripMenuItem.Click
 
         frmRegistration.ShowDialog()
+
+    End Sub
+
+    Private Sub ShowClientServerBroadcastTesterToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowClientServerBroadcastTesterToolStripMenuItem.Click
+
+        Try
+            Dim lfrmToolboxClientServerBroadcastTester As New frmToolboxClientServerBroadcastTester
+            lfrmToolboxClientServerBroadcastTester.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

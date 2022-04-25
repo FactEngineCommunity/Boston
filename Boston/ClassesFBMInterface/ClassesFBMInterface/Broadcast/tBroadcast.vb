@@ -4,28 +4,39 @@ Imports System.Reflection
 Imports System.Xml
 Imports System.Runtime.Serialization
 
-<DataContractFormat()> _
-<Serializable()> _
+<DataContractFormat()>
+<Serializable()>
 Public Class Broadcast
 
-    <DataMember()> _
+    <DataMember()>
     Public Model As Model
 
-    <DataMember()> _
+    <DataMember()>
     Public UserManagement As UserManagement
 
     <DataMember()>
     Public Invitation As Invitation
 
     <DataMember()>
-    Public FEKLStatement As String
+    Public FEKLStatement As FEKLStatement
 
     <DataMember()>
-    Public ErrorCode As Integer
+    Public ErrorCode As pcenumErrorType
 
     <DataMember()>
-    Public ErrorText As String
+    Public ErrorMessage As String
 
+End Class
+
+<DataContractFormat()>
+<Serializable()>
+Public Class FEKLStatement
+
+    <DataMember()>
+    Public ModelId As String
+
+    <DataMember()>
+    Public Statement As String
 End Class
 
 <DataContractFormat()> _

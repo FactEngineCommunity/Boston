@@ -30,6 +30,7 @@ Namespace DuplexServiceClient
 
         ''' <summary>
         ''' See prDuplexServiceClient.HandleBroadcastReceived
+        ''' See also frmMain where: AddHandler DuplexCallback.BroadcastEventReceived, AddressOf prDuplexServiceClient.HandleBroadcastReceived
         ''' </summary>
         Public Event BroadcastEventReceived As EventHandler(Of Broadcast)
 
@@ -38,6 +39,7 @@ Namespace DuplexServiceClient
 
             Dim lrBroadcast = New Broadcast(aiBroadcastType, arObject)
             '20220327-VM-Was _syncContext.Post(New SendOrPostCallback(AddressOf OnBroadcastEvent), lrBroadcast)
+            'To send data back to client, must use Send.
             _syncContext.Send(New SendOrPostCallback(AddressOf OnBroadcastEvent), lrBroadcast)
             arObject.Model.Namespace = lrBroadcast.Broadcast.Model.Namespace
         End Sub
@@ -47,7 +49,6 @@ Namespace DuplexServiceClient
             Dim e As Broadcast = TryCast(State, Broadcast)
             RaiseEvent BroadcastEventReceived(Me, e)
         End Sub
-
 
     End Class
 

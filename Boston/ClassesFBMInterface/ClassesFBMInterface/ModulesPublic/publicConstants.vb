@@ -6,6 +6,7 @@ Public Module publicConstants
     Public Enum pcenumBroadcastType
         AddModel
         DeleteModel
+        FEKLStatement
         ModelAddPage
         ModelAddValueType
         ModelAddEntityType
@@ -21,9 +22,10 @@ Public Module publicConstants
         ModelDeleteFactTypeReading
         ModelDeleteRoleConstraint
         ModelDeleteModelNote
+        ModelGetModelIdByModelName
         ModelRoleConstraintAddRoleConstraintRole
         ModelRoleConstraintAddArgument
-        ModelSaved        
+        ModelSaved
         ModelUpdateEntityType
         ModelUpdateFactType
         ModelUpdateFactTypeReading
@@ -55,6 +57,14 @@ Public Module publicConstants
         UserManagementRemoveRoleFromUserOnProject
         UserManagementRemoveUserFromGroup
         UserManagementRemoveUserFromProject
+    End Enum
+
+    <Serializable()>
+    Public Enum pcenumErrorType
+        None = 0
+        ModelDoesntExist = 100
+        ModelElementAlreadyExists = 101
+        UndocumentedError = 1000
     End Enum
 
     <Serializable()> _

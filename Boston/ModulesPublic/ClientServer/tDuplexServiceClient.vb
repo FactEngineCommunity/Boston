@@ -353,20 +353,35 @@ Namespace DuplexServiceClient
                 Dim lrInterfaceBroadcast As Viev.FBM.Interface.Broadcast
                 lrInterfaceBroadcast = CType(e.Broadcast, Viev.FBM.Interface.Broadcast)
 
-                If lrInterfaceBroadcast.Model IsNot Nothing Then
+                If e.BroadcastType = [Interface].publicConstants.pcenumBroadcastType.FEKLStatement Then
+                    'Process FEKL Statement
+                    e.Broadcast.ErrorCode = [Interface].publicConstants.pcenumErrorType.None
+                    e.Broadcast.ErrorMessage = "Success"
+
+                ElseIf lrInterfaceBroadcast.Model IsNot Nothing Then
                     Dim lrInterfaceModel As Viev.FBM.Interface.Model
                     lrInterfaceModel = CType(e.Broadcast.Model, Viev.FBM.Interface.Model)
 
                     Dim lrModel As FBM.Model
-                    lrModel = prApplication.Models.Find(Function(x) x.ModelId = lrInterfaceModel.ModelId)
+                    If e.BroadcastType = [Interface].pcenumBroadcastType.ModelGetModelIdByModelName Then
+                        lrModel = prApplication.Models.Find(Function(x) x.Name = lrInterfaceModel.Name)
+                        If lrModel IsNot Nothing Then
+                            lrInterfaceModel.ModelId = lrModel.ModelId
+                        Else
+                            e.Broadcast.ErrorCode = [Interface].pcenumErrorType.ModelDoesntExist
+                            e.Broadcast.ErrorMessage = "Model does not exist for name: " & lrInterfaceModel.Name
+                        End If
+                    Else
+                        lrModel = prApplication.Models.Find(Function(x) x.ModelId = lrInterfaceModel.ModelId)
 
-                    'Model save method may have changed.
-                    lrModel.StoreAsXML = lrInterfaceModel.StoreAsXML
+                        'Model save method may have changed.
+                        lrModel.StoreAsXML = lrInterfaceModel.StoreAsXML
 
-                    If lrModel Is Nothing And
-                        Not e.BroadcastType = [Interface].pcenumBroadcastType.AddModel Then Exit Sub 'Nothing more to do here.
+                        If lrModel Is Nothing And
+                            Not e.BroadcastType = [Interface].pcenumBroadcastType.AddModel Then Exit Sub 'Nothing more to do here.
 
-                    Call Me.HandleModelBroadcastReceived(e.BroadcastType, lrModel, lrInterfaceModel)
+                        Call Me.HandleModelBroadcastReceived(e.BroadcastType, lrModel, lrInterfaceModel, e.Broadcast)
+                    End If
 
                 ElseIf lrInterfaceBroadcast.Invitation IsNot Nothing Then
 
@@ -408,7 +423,8 @@ Namespace DuplexServiceClient
 
         Public Sub HandleModelBroadcastReceived(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
                                                 ByRef arModel As FBM.Model,
-                                                ByRef arInterfaceModel As Viev.FBM.Interface.Model)
+                                                ByRef arInterfaceModel As Viev.FBM.Interface.Model,
+                                                ByRef arBroadcase As [Interface].Broadcast)
 
             Select Case aiBroadcastType
                 Case Is = [Interface].pcenumBroadcastType.ModelSaved
