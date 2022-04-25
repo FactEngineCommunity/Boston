@@ -33,11 +33,11 @@ Partial Class frmMain
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.SessionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EndSessionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.GroupBox = New System.Windows.Forms.GroupBox()
         Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MinimiseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MaximiseToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.NormalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GroupBox = New System.Windows.Forms.GroupBox()
         Me.ContextMenu_main.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.GroupBox.SuspendLayout()
@@ -54,23 +54,23 @@ Partial Class frmMain
         '
         Me.ContextMenu_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MaximiseToolStripMenuItem, Me.ToolStripSeparator1, Me.QuitToolStripMenuItem})
         Me.ContextMenu_main.Name = "ContextMenu_main"
-        Me.ContextMenu_main.Size = New System.Drawing.Size(125, 54)
+        Me.ContextMenu_main.Size = New System.Drawing.Size(126, 54)
         '
         'MaximiseToolStripMenuItem
         '
         Me.MaximiseToolStripMenuItem.Name = "MaximiseToolStripMenuItem"
-        Me.MaximiseToolStripMenuItem.Size = New System.Drawing.Size(124, 22)
+        Me.MaximiseToolStripMenuItem.Size = New System.Drawing.Size(125, 22)
         Me.MaximiseToolStripMenuItem.Text = "&Maximise"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(121, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(122, 6)
         '
         'QuitToolStripMenuItem
         '
         Me.QuitToolStripMenuItem.Name = "QuitToolStripMenuItem"
-        Me.QuitToolStripMenuItem.Size = New System.Drawing.Size(124, 22)
+        Me.QuitToolStripMenuItem.Size = New System.Drawing.Size(125, 22)
         Me.QuitToolStripMenuItem.Text = "&Quit"
         '
         'ListBox
@@ -104,6 +104,31 @@ Partial Class frmMain
         Me.EndSessionToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
         Me.EndSessionToolStripMenuItem.Text = "&End Session"
         '
+        'ViewToolStripMenuItem
+        '
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MinimiseToolStripMenuItem, Me.MaximiseToolStripMenuItem1, Me.NormalToolStripMenuItem})
+        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
+        Me.ViewToolStripMenuItem.Text = "&View"
+        '
+        'MinimiseToolStripMenuItem
+        '
+        Me.MinimiseToolStripMenuItem.Name = "MinimiseToolStripMenuItem"
+        Me.MinimiseToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.MinimiseToolStripMenuItem.Text = "&Minimise to Tray"
+        '
+        'MaximiseToolStripMenuItem1
+        '
+        Me.MaximiseToolStripMenuItem1.Name = "MaximiseToolStripMenuItem1"
+        Me.MaximiseToolStripMenuItem1.Size = New System.Drawing.Size(161, 22)
+        Me.MaximiseToolStripMenuItem1.Text = "Ma&ximise"
+        '
+        'NormalToolStripMenuItem
+        '
+        Me.NormalToolStripMenuItem.Name = "NormalToolStripMenuItem"
+        Me.NormalToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.NormalToolStripMenuItem.Text = "&Normal"
+        '
         'GroupBox
         '
         Me.GroupBox.Controls.Add(Me.ListBox)
@@ -115,37 +140,11 @@ Partial Class frmMain
         Me.GroupBox.TabStop = False
         Me.GroupBox.Text = "Status/Events:"
         '
-        'ViewToolStripMenuItem
-        '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MinimiseToolStripMenuItem, Me.MaximiseToolStripMenuItem1, Me.NormalToolStripMenuItem})
-        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
-        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
-        Me.ViewToolStripMenuItem.Text = "&View"
-        '
-        'MinimiseToolStripMenuItem
-        '
-        Me.MinimiseToolStripMenuItem.Name = "MinimiseToolStripMenuItem"
-        Me.MinimiseToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.MinimiseToolStripMenuItem.Text = "&Minimise"
-        '
-        'MaximiseToolStripMenuItem1
-        '
-        Me.MaximiseToolStripMenuItem1.Name = "MaximiseToolStripMenuItem1"
-        Me.MaximiseToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
-        Me.MaximiseToolStripMenuItem1.Text = "Ma&ximise"
-        '
-        'NormalToolStripMenuItem
-        '
-        Me.NormalToolStripMenuItem.Name = "NormalToolStripMenuItem"
-        Me.NormalToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.NormalToolStripMenuItem.Text = "&Normal"
-        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(731, 311)
-        Me.ControlBox = False
         Me.Controls.Add(Me.GroupBox)
         Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)

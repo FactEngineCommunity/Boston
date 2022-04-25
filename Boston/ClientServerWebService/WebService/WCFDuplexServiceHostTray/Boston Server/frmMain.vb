@@ -181,4 +181,8 @@ Public Class frmMain
         Me.WindowState = FormWindowState.Normal
 
     End Sub
+
+    Private Sub frmMain_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        e.Cancel = True
+    End Sub
 End Class

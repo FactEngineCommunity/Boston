@@ -398,6 +398,7 @@
     <Compile Include="ClassesApplication\tApplicationMetaModel.vb" />
     <Compile Include="ClassesApplication\tModelMatch.vb" />
     <Compile Include="ClassesBrain\tBrainActions.vb" />
+    <Compile Include="ClassesBrain\tBrainQuestionFormulation.vb" />
     <Compile Include="ClassesBrain\tBrainResponseChecking.vb" />
     <Compile Include="ClassesBrain\tPlan.vb" />
     <Compile Include="ClassesBrain\tPredicatePart.vb" />

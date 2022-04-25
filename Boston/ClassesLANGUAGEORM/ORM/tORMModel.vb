@@ -2092,7 +2092,8 @@ Namespace FBM
         ''' <returns>tEntityType</returns>
         ''' <remarks></remarks>
         Public Function CreateEntityType(Optional ByVal asEntityTypeName As String = Nothing,
-                                         Optional ByVal abAddToModel As Boolean = True) As FBM.EntityType
+                                         Optional ByVal abAddToModel As Boolean = True,
+                                         Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.EntityType
 
             Dim lrEntityType As FBM.EntityType
 
@@ -2123,7 +2124,7 @@ Namespace FBM
                 'Add the new EntityType to the Model
                 '-----------------------------------------
                 If abAddToModel Then
-                    Me.AddEntityType(lrEntityType, False)
+                    Me.AddEntityType(lrEntityType, False, abBroadcastInterfaceEvent)
                     Call Me.MakeDirty()
                 End If
 
@@ -2799,7 +2800,8 @@ Namespace FBM
                                         Optional ByVal abAddtoModel As Boolean = True,
                                         Optional ByVal aiDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet,
                                         Optional ByVal aiDataTypeLength As Integer = 0,
-                                        Optional ByVal aiDataTypePrecision As Integer = 0) As FBM.ValueType
+                                        Optional ByVal aiDataTypePrecision As Integer = 0,
+                                        Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.ValueType
 
             Dim lsNewUniqueName As String = ""
             Dim lrValueType As FBM.ValueType
@@ -2825,7 +2827,7 @@ Namespace FBM
             'Add the new ValueType to the Model
             '-----------------------------------------
             If abAddtoModel Then
-                Me.AddValueType(lrValueType, True, True,, True)
+                Me.AddValueType(lrValueType, True, abBroadcastInterfaceEvent,, True)
                 Call Me.MakeDirty()
             End If
 

@@ -2,7 +2,7 @@
 
 Partial Public Class tBrain
 
-    Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement()
+    Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Dim lsMessage As String
         Dim lsReferenceMode As String
@@ -41,7 +41,7 @@ Partial Public Class tBrain
                         Exit Sub
                     End If
                 End If
-                lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
+                lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
 
                 If Me.Page IsNot Nothing Then
                     lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
@@ -67,7 +67,7 @@ Partial Public Class tBrain
                 End If
             Next
 
-            Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, True)
+            Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, abBroadcastInterfaceEvent)
 
             'Check if the DataType of the ReferenceModeValueType has been specified
             Dim lsDataTypeName As String = ""
@@ -104,7 +104,7 @@ Partial Public Class tBrain
                         Exit Sub
                     End Try
 
-                    Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+                    Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
                 Else
                     lsMessage = "Remember that you can set the Data Type for the Value Type of the Reference Scheme by saying something like:"
                     lsMessage.AppendLine(lrEntityType.Id & " IS IDENTIFIED BY ITS " & lsUnabatedReferenceMode & " WRITTEN AS AutoCounter")
@@ -541,7 +541,7 @@ Partial Public Class tBrain
 
     End Function
 
-    Private Sub ProcessStatementAddValueType()
+    Private Sub ProcessStatementAddValueType(ByRef arQuestion As tQuestion)
 
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
@@ -554,24 +554,24 @@ Partial Public Class tBrain
 
         Dim lrValueType As FBM.ValueType
 
-        If Me.CurrentQuestion.ObjectType IsNot Nothing Then
+        If arQuestion.ObjectType IsNot Nothing Then
 
             lrValueType = Me.CurrentQuestion.ObjectType
 
         Else
 
-            Dim lrDummyValueType As FBM.ValueType = Me.CurrentQuestion.ValueType(0)
-            lsOldValueTypeName = Me.CurrentQuestion.ValueType(0).Id
-            lsValueTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ValueType(0).Id)
+            Dim lrDummyValueType As FBM.ValueType = arQuestion.ValueType(0)
+            lsOldValueTypeName = arQuestion.ValueType(0).Id
+            lsValueTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ValueType(0).Id)
 
-            If Me.CurrentQuestion.sentence IsNot Nothing Then
-                Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
-                Me.CurrentQuestion.sentence.ResetSentence()
+            If arQuestion.sentence IsNot Nothing Then
+                arQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
+                arQuestion.sentence.ResetSentence()
 
                 'Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
-                Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
-                If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
-                    Call Language.ResolveSentence(Me.CurrentQuestion.sentence)
+                Call Language.ProcessSentence(arQuestion.sentence)
+                If arQuestion.sentence.AreAllWordsResolved Then
+                    Call Language.ResolveSentence(arQuestion.sentence)
                 End If
             End If
 
@@ -606,7 +606,7 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessISANENTITYTYPECLAUSE()
+    Private Sub ProcessISANENTITYTYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Try
             With New WaitCursor
@@ -632,7 +632,7 @@ Partial Public Class tBrain
                 End If
 
                 'Have already checked to see wither it is okay to create the EntityType above.
-                Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True)
+                Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True, abBroadcastInterfaceEvent)
 
                 If Me.Page IsNot Nothing Then
                     Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
@@ -661,7 +661,7 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessISAVALUETYPECLAUSE()
+    Private Sub ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Dim lsMessage As String
 
@@ -691,7 +691,7 @@ Partial Public Class tBrain
                 End If
 
                 'Have already checked to see wither it is okay to create the ValueType above.
-                Dim lrValueType = Me.Model.CreateValueType(Trim(lsValueTypeName), True)
+                Dim lrValueType = Me.Model.CreateValueType(Trim(lsValueTypeName), True,,,, abBroadcastInterfaceEvent)
 
                 '=================================================================================================================
                 'Check if the DataType of the ValueType has been specified
@@ -923,73 +923,23 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessISAKINDOFStatement(ByVal asOriginalSentence As String)
+    Private Sub ProcessStatementCreateSubtypeRelationship(ByRef arQuestion As tQuestion)
 
         Try
-            Dim lsMessage As String = ""
-            Dim lrPlan As New Brain.Plan 'The Plan formulated to create the SubtypeRelationship.
+            Dim lrEntityType1, lrEntityType2 As New FBM.EntityType
 
-            Me.Model = prApplication.WorkingModel
+            lrEntityType1.Id = Trim(arQuestion.FocalSymbol(0))
+            lrEntityType2.Id = Trim(arQuestion.FocalSymbol(1))
 
-            Me.VAQL.ISAKINDOFStatement = New VAQL.IsAKindOfStatement
+            lrEntityType1 = Me.Model.EntityType.Find(AddressOf lrEntityType1.Equals)
+            lrEntityType2 = Me.Model.EntityType.Find(AddressOf lrEntityType2.Equals)
 
-            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISAKINDOFStatement, Me.VAQLParsetree.Nodes(0))
-
-
-            For Each lsModelElementName In Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME
-
-                If Me.Model.ExistsModelElement(lsModelElementName) Then
-                    If Array.IndexOf({pcenumConceptType.EntityType},
-                                      Me.Model.GetModelObjectByName(lsModelElementName).ConceptType) >= 0 Then
-                        '-----------------------------------------------------------------------------
-                        'A ObjectType already exists within the Model for the name lsModelElementName
-                        '-----------------------------------------------------------------------------                        
-                        Me.send_data("A Model Element already exists in the Model with the name, '" & lsModelElementName & "' of type " & Me.Model.GetModelObjectByName(lsModelElementName).ConceptType.ToString & ".")
-                    End If
-                Else
-                    Call Me.createPlanStepForModelElement(lsModelElementName, lrPlan, True)
-                End If
-            Next
-
-            Dim larModelObject As New List(Of FBM.ModelObject)
-            Dim lrModelObject1 = Me.Model.GetModelObjectByName(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0))
-            Dim lrModelObject2 = Me.Model.GetModelObjectByName(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1))
-            larModelObject.Add(lrModelObject1)
-            larModelObject.Add(lrModelObject2)
-
-            Dim lrStep As New Brain.Step(pcenumActionType.CreateSubtypeRelationship,
-                                         True,
-                                         pcenumActionType.None,
-                                         larModelObject,
-                                         pcenumStepFactTypeAttributes.None
-                                         )
-
-            Dim lrSentence As New Language.Sentence(asOriginalSentence, asOriginalSentence)
-
-            Dim lasSymbol As New List(Of String)
-            lasSymbol.Add(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0))
-            lasSymbol.Add(Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1))
-
-            Dim lrQuestion = New tQuestion("Would you like me to create the subtype relationship between " & Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(0) & " and " & Me.VAQL.ISAKINDOFStatement.MODELELEMENTNAME(1) & "'?",
-                                           pcenumQuestionType.CreateSubtypeRelationship,
-                                           True,
-                                           lasSymbol,
-                                           lrSentence,
-                                           Nothing,
-                                           lrPlan,
-                                           lrStep,
-                                           ,
-                                           Nothing)
-
-            lrQuestion.ModelObject = larModelObject
-
-            If Not Me.QuestionHasBeenRaised(lrQuestion) Then
-                Me.AddQuestion(lrQuestion)
+            If IsSomething(lrEntityType1) And IsSomething(lrEntityType2) Then
+                '----------------------------------------
+                'Create a Model level SubtypeConstraint
+                '----------------------------------------
+                Call lrEntityType1.CreateSubtypeRelationship(lrEntityType2)
             End If
-
-            Me.send_data("Ok.")
-
-            Me.Timeout.Start()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1097,7 +1047,7 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessVALUETYPEISWRITTENASStatement()
+    Private Sub ProcessVALUETYPEISWRITTENASStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Me.Model = prApplication.WorkingModel
 
@@ -1161,7 +1111,7 @@ Partial Public Class tBrain
                 lsInitialDataType &= ")"
             End If
 
-            Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+            Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
 
             Dim lsNewDataType = liDataType.ToString
             If liDataTypeLength > 0 Then
@@ -1182,7 +1132,7 @@ Partial Public Class tBrain
             Me.Timeout.Stop()
 
             Dim lrValueType As FBM.ValueType
-            lrValueType = Me.Model.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision)
+            lrValueType = Me.Model.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
 
             If Me.Page IsNot Nothing Then
 

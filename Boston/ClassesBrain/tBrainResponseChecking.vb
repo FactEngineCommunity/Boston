@@ -39,7 +39,7 @@ Partial Public Class tBrain
                                 Call Me.ProcessStatementAddEntityType()
 
                             Case Is = pcenumQuestionType.CreateValueType
-                                Call Me.ProcessStatementAddValueType()
+                                Call Me.ProcessStatementAddValueType(Me.CurrentQuestion)
 
                             Case Is = pcenumQuestionType.CreateFactType
                                 If Me.executeStatementAddFactType() Then
@@ -54,7 +54,7 @@ Partial Public Class tBrain
                                 End If
 
                             Case Is = pcenumQuestionType.CreateSubtypeRelationship
-                                Call Me.ProcessStatementCreateSubtypeRelationship()
+                                Call Me.ProcessStatementCreateSubtypeRelationship(Me.CurrentQuestion)
 
                             Case Is = pcenumQuestionType.CheckWordTypeVerb
                                 Dim lsORMQLQuery As String = ""
