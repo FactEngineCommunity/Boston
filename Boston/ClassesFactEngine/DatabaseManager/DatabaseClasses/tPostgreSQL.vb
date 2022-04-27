@@ -121,7 +121,7 @@ Namespace FactEngine
         Public Overrides Sub AddForeignKey(ByRef arRelation As RDS.Relation)
 
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)
@@ -181,7 +181,7 @@ Namespace FactEngine
                                                     ByVal asLength As Integer,
                                                     ByRef arPrecision As Integer)
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)
@@ -236,7 +236,7 @@ Namespace FactEngine
         Public Overrides Sub columnSetMandatory(ByRef arColumn As RDS.Column,
                                                   ByVal abIsMandatory As Boolean)
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)
@@ -1131,7 +1131,7 @@ Namespace FactEngine
         Public Overrides Sub IndexAddColumn(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
 
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)
@@ -1186,7 +1186,7 @@ Namespace FactEngine
         Public Overrides Sub IndexUpdate(ByRef arIndex As RDS.Index)
 
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)

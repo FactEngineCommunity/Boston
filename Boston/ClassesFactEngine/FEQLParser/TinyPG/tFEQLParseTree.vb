@@ -144,7 +144,7 @@ Namespace FEQL
             Optionals = New ParseErrors()
         End Sub
 
-        Public Function MaxDistance() As Integer
+        Public Overloads Function MaxDistance() As Integer
 
             Dim lrNode As ParseNode = Nothing
             Dim liMaxDistance As Integer = 0

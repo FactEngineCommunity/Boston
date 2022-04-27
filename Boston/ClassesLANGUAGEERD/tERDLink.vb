@@ -190,19 +190,19 @@ Namespace ERD
 
         End Sub
 
-        Public Sub MouseDown() Implements iLinkObject.MouseDown
+        Public Overloads Sub MouseDown() Implements iLinkObject.MouseDown
 
         End Sub
 
-        Public Sub MouseMove() Implements iLinkObject.MouseMove
+        Public Overloads Sub MouseMove() Implements iLinkObject.MouseMove
 
         End Sub
 
-        Public Sub MouseUp() Implements iLinkObject.MouseUp
+        Public Overloads Sub MouseUp() Implements iLinkObject.MouseUp
 
         End Sub
 
-        Public Sub Moved() Implements iLinkObject.Moved
+        Public Overloads Sub Moved() Implements iLinkObject.Moved
 
         End Sub
 

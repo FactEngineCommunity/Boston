@@ -36,17 +36,16 @@ Partial Public Class tBrain
                                 Call Me.executeStatementAddFactTypePredetermined(Me.CurrentQuestion)
 
                             Case Is = pcenumQuestionType.CreateEntityType
-                                Call Me.ProcessStatementAddEntityType()
+                                Call Me.ProcessStatementAddEntityType(Me.CurrentQuestion)
 
                             Case Is = pcenumQuestionType.CreateValueType
                                 Call Me.ProcessStatementAddValueType(Me.CurrentQuestion)
 
                             Case Is = pcenumQuestionType.CreateFactType
-                                If Me.executeStatementAddFactType() Then
+                                If Me.executeStatementAddFactType(Me.CurrentQuestion) Then
                                     Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)
                                     Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)
                                 End If
-
                             Case Is = pcenumQuestionType.CreateFactTypeReading
                                 If Me.ProcessStatementAddFactTypeReading() Then
                                     Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)

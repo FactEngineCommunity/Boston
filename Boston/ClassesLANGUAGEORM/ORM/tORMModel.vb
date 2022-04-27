@@ -826,6 +826,12 @@ Namespace FBM
                     If (Not arRoleConstraint.IsMDAModelElement) _
                         And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 
+                        'CodeSafe
+                        If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                            'Because may have been via BroadcastEvent.
+                            arRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.AddUnique(arRoleConstraint)
+                        End If
+
                         If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
                             And arRoleConstraint.isSubtypeRelationshipFactTypeIUConstraint Then
                             'PSEUDOCODE

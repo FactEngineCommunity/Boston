@@ -1915,7 +1915,8 @@ Namespace FBM
                                                            Optional ByVal abMakeModelDirty As Boolean = True,
                                                            Optional ByVal abAddToModel As Boolean = True,
                                                            Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
-                                                           Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing) As FBM.RoleConstraint
+                                                           Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing,
+                                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.RoleConstraint
 
             Try
                 '---------------------------------
@@ -1941,7 +1942,7 @@ Namespace FBM
                 Me.AddInternalUniquenessConstraint(lrRoleConstraint)
 
                 If abAddToModel Then
-                    Call Me.Model.AddRoleConstraint(lrRoleConstraint, abMakeModelDirty, True, Nothing, abIsSubtypeRelationshipSubtypeRole, arTopmostSupertypeModelObject)
+                    Call Me.Model.AddRoleConstraint(lrRoleConstraint, abMakeModelDirty, abBroadcastInterfaceEvent, Nothing, abIsSubtypeRelationshipSubtypeRole, arTopmostSupertypeModelObject)
                 End If
 
                 Return lrRoleConstraint

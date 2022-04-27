@@ -145,7 +145,36 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessStatementAddEntityType()
+    Private Sub ProcessISACONCEPTStatement()
+
+        Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME = ""
+        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISACONCEPTStatement, Me.VAQLParsetree.Nodes(0))
+
+        Dim lsConceptName As String = Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME
+        Dim lrConcept As New FBM.Concept(lsConceptName)
+        Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.GeneralConcept)
+
+        If Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+            lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+            If lrDictionaryEntry.isGeneralConcept Then
+                Me.OutputBuffer = Trim(lrDictionaryEntry.Symbol) & " is already a General Concept within the Model. But okay."
+                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            Else
+                lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
+                Me.OutputBuffer = "Okay"
+                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            End If
+        Else
+            Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
+
+            Me.OutputBuffer = "Okay"
+            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+        End If
+
+    End Sub
+
+    Private Sub ProcessStatementAddEntityType(ByRef arQuestion As tQuestion,
+                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Me.Model = prApplication.WorkingModel
 
@@ -156,24 +185,24 @@ Partial Public Class tBrain
 
         Me.Timeout.Stop()
 
-        lsOldEntityTypeName = Me.CurrentQuestion.ModelObject(0).Id
-        lsEntityTypeName = Viev.Strings.MakeCapCamelCase(Me.CurrentQuestion.ModelObject(0).Id)
+        lsOldEntityTypeName = arQuestion.ModelObject(0).Id
+        lsEntityTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ModelObject(0).Id)
 
-        If IsSomething(Me.CurrentQuestion.sentence) Then
-            Me.CurrentQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
-            Me.CurrentQuestion.sentence.ResetSentence()
+        If IsSomething(arQuestion.sentence) Then
+            arQuestion.sentence.Sentence = arQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
+            arQuestion.sentence.ResetSentence()
 
-            Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
-            Call Language.ProcessSentence(Me.CurrentQuestion.sentence)
-            If Me.CurrentQuestion.sentence.AreAllWordsResolved Then
-                Call Language.ResolveSentence(Me.CurrentQuestion.sentence)
+            Call Language.AnalyseSentence(arQuestion.sentence, Me.Model)
+            Call Language.ProcessSentence(arQuestion.sentence)
+            If arQuestion.sentence.AreAllWordsResolved Then
+                Call Language.ResolveSentence(arQuestion.sentence)
             End If
 
         End If
 
         Dim lrEntityType As FBM.EntityType
 
-        lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True)
+        lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
 
         If Me.Page IsNot Nothing Then
             lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
@@ -190,7 +219,7 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Function executeStatementAddFactType() As Boolean
+    Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lrResolvedWord As Language.WordResolved
@@ -204,7 +233,7 @@ Partial Public Class tBrain
 
             executeStatementAddFactType = True
 
-            For Each lrResolvedWord In Me.CurrentQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
+            For Each lrResolvedWord In arQuestion.sentence.WordListResolved.FindAll(Function(x) x.Sense = pcenumWordSense.Noun)
                 lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrResolvedWord.Word, Nothing, True)
                 lrEntityType = Me.Model.EntityType.Find(AddressOf lrEntityType.Equals)
 
@@ -255,7 +284,7 @@ Partial Public Class tBrain
             Dim lrFactTypeInstance As FBM.FactTypeInstance
             Dim loPointF As PointF
 
-            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, Me.CurrentQuestion.sentence)
+            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, arQuestion.sentence)
             lrFactTypeReading.IsPreferred = True
 
             '====================================================================
@@ -266,11 +295,11 @@ Partial Public Class tBrain
                 Return False
             End If
 
-            Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
+            Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, abBroadcastInterfaceEvent)
 
             'Additional FactTypeReadings
-            If Me.CurrentQuestion.AdditionalSentence IsNot Nothing Then
-                For Each lrSentence In Me.CurrentQuestion.AdditionalSentence
+            If arQuestion.AdditionalSentence IsNot Nothing Then
+                For Each lrSentence In arQuestion.AdditionalSentence
 
                     larRole = New List(Of FBM.Role)
                     For Each lrPredicatePart In lrSentence.PredicatePart
@@ -278,7 +307,7 @@ Partial Public Class tBrain
                         larRole.Add(lrPredicateRole)
                     Next
                     lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
-                    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, True)
+                    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, abBroadcastInterfaceEvent)
                 Next
             End If
 
@@ -292,7 +321,7 @@ Partial Public Class tBrain
             End If
 
             If Me.Page Is Nothing Then
-                Me.Model.AddFactType(lrFactType, True, True, Nothing)
+                Me.Model.AddFactType(lrFactType, True, abBroadcastInterfaceEvent, Nothing)
             Else
                 Dim lbAllObjectsOnPage As Boolean = True
                 For Each lrRole In lrFactType.RoleGroup
@@ -307,11 +336,10 @@ Partial Public Class tBrain
                     loPointF = New PointF(100, 100)
                 End If
 
-                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, True)
+                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, abBroadcastInterfaceEvent)
                 lrFactTypeInstance.Visible = True
 
-                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(0, True)
-
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(0, abBroadcastInterfaceEvent)
 
                 Dim loPoint As New PointF(100, 100)
                 If lrFactTypeInstance.Arity = 2 Then
@@ -323,7 +351,7 @@ Partial Public Class tBrain
                     loPoint.X = (lrFirstModelObject.X + lrSecondModelObject.X) / 2
                     loPoint.Y = (lrFirstModelObject.y + lrSecondModelObject.Y) / 2
 
-                    lrFactTypeInstance.Move(loPoint.X, loPoint.Y, True)
+                    lrFactTypeInstance.Move(loPoint.X, loPoint.Y, abBroadcastInterfaceEvent)
                 End If
 
                 If Me.AutoLayoutOn Then
@@ -331,7 +359,7 @@ Partial Public Class tBrain
                 End If
 
                 Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
+                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
 
             End If
 
@@ -354,7 +382,8 @@ Partial Public Class tBrain
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function executeStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion) As Boolean
+    Private Function executeStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion,
+                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lsResolvedModelElementName As String
@@ -395,7 +424,7 @@ Partial Public Class tBrain
                     Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
 
                     lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementId)
-                    lrRole.SetMandatory(True, True)
+                    lrRole.SetMandatory(True, abBroadcastInterfaceEvent)
                 End If
 
             End If
@@ -409,10 +438,10 @@ Partial Public Class tBrain
 
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, arQuestion.sentence)
 
-            Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+            Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, abBroadcastInterfaceEvent)
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
-                lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings)
+                lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, abBroadcastInterfaceEvent)
             End If
             '===========================================================
 
@@ -436,7 +465,7 @@ Partial Public Class tBrain
 
                 lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
 
-                Me.Model.AddRoleConstraint(lrRoleConstraint, True, True)
+                Me.Model.AddRoleConstraint(lrRoleConstraint, True, abBroadcastInterfaceEvent)
             End If
             '===========================
 
@@ -457,10 +486,10 @@ Partial Public Class tBrain
                     loPointF = New PointF(100, 100)
                 End If
 
-                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False)
+                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, abBroadcastInterfaceEvent)
 
                 Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, True)
+                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
 
                 If Me.AutoLayoutOn Then
                     Me.Page.Form.AutoLayout()
@@ -541,7 +570,8 @@ Partial Public Class tBrain
 
     End Function
 
-    Private Sub ProcessStatementAddValueType(ByRef arQuestion As tQuestion)
+    Private Sub ProcessStatementAddValueType(ByRef arQuestion As tQuestion,
+                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
@@ -555,9 +585,7 @@ Partial Public Class tBrain
         Dim lrValueType As FBM.ValueType
 
         If arQuestion.ObjectType IsNot Nothing Then
-
             lrValueType = Me.CurrentQuestion.ObjectType
-
         Else
 
             Dim lrDummyValueType As FBM.ValueType = arQuestion.ValueType(0)
@@ -579,7 +607,8 @@ Partial Public Class tBrain
                                                    False,
                                                    lrDummyValueType.DataType,
                                                    lrDummyValueType.DataTypeLength,
-                                                   lrDummyValueType.DataTypePrecision)
+                                                   lrDummyValueType.DataTypePrecision,
+                                                   abBroadcastInterfaceEvent)
 
         End If
 
@@ -638,7 +667,7 @@ Partial Public Class tBrain
                     Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
                     Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                    Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+                    Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, abBroadcastInterfaceEvent)
 
                     If Me.AutoLayoutOn Then
                         Me.Page.Form.AutoLayout()
@@ -744,7 +773,7 @@ Partial Public Class tBrain
                     Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
                     Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                    Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+                    Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, abBroadcastInterfaceEvent)
 
                     If Me.AutoLayoutOn Then
                         Me.Page.Form.AutoLayout()
@@ -766,164 +795,9 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Sub ProcessISWHEREStatement(ByVal asOriginalSentence As String)
 
-        Try
-            Dim lsMessage As String = ""
-            Dim lrPlan As New Brain.Plan 'The Plan formulated to create the FactType.
-            Dim lrStep As Brain.Step 'For Steps added to the Plan.
-            Dim lrPredicatePart As New Language.PredicatePart
-            Dim lrQuestion As tQuestion
-            Dim lrSentence = New Language.Sentence(asOriginalSentence, asOriginalSentence)
-
-            Me.Model = prApplication.WorkingModel
-
-            Me.VAQL.ISWHEREStatement = New VAQL.IsWhereStatement
-
-            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISWHEREStatement, Me.VAQLParsetree.Nodes(0))
-
-            '===================================================================
-            'Validate the IS WHERE Statement
-            If Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count > 1 Then
-                For liInd = 1 To Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count - 1
-                    If Me.VAQL.ISWHEREStatement.FACTTYPESTMT(liInd).MODELELEMENT.Count <> Me.VAQL.ISWHEREStatement.FACTTYPESTMT(0).MODELELEMENT.Count Then
-
-                        lsMessage = "That is an incorrect IS WHERE statement. Each Fact Type Reading must have the same number of Model Elements."
-                        Me.send_data(lsMessage)
-                        lsMessage = "'" & Me.VAQL.ISWHEREStatement.FACTTYPESTMT(liInd).makeSentence & "' does not have the same number of Model Elements as '" & Me.VAQL.ISWHEREStatement.FACTTYPESTMT(0).makeSentence & "'."
-                        Me.send_data(lsMessage)
-                        Exit Sub
-                    End If
-                Next
-            End If
-            '===================================================================
-
-            Me.Timeout.Stop()
-
-            'Check to see if the FactTypeName already exists
-            Dim lsFactTypeName = Me.VAQL.ISWHEREStatement.MODELELEMENT(0).MODELELEMENTNAME
-
-            If Me.Model.ExistsModelElement(lsFactTypeName) Then
-                If Array.IndexOf({pcenumConceptType.ValueType,
-                                      pcenumConceptType.EntityType,
-                                      pcenumConceptType.FactType},
-                                  Me.Model.GetModelObjectByName(lsFactTypeName).ConceptType) >= 0 Then
-                    '-----------------------------------------------------------------------------
-                    'A ObjectType already exists within the Model for the name lsModelObjectName
-                    '-----------------------------------------------------------------------------
-                    Me.send_data("A Model Element already exists in the Model with the name, '" & lsFactTypeName & "'.")
-                Else
-
-                End If
-            Else
-                'Get the ModelElements for the overall FactType. Only need to get them for the first FactTypeStatement.
-                '  NB Subsequent FactTypeStatements in the ISWHERE Statement must have matching ModelElementNames.
-
-                Dim lrFactTypeStatement = Me.VAQL.ISWHEREStatement.FACTTYPESTMT(0)
-                Dim liInd = 1
-                For Each lrModelElement In lrFactTypeStatement.MODELELEMENT
-
-                    Call Me.createPlanStepForModelElement(lrModelElement.MODELELEMENTNAME, lrPlan)
-
-                    Dim lrWordResolved = New Language.WordResolved(lrModelElement.MODELELEMENTNAME, pcenumWordSense.Noun)
-                    lrSentence.WordListResolved.Add(lrWordResolved)
-
-                    lrPredicatePart = New Language.PredicatePart
-                    lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
-                    lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
-                    lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
-
-                    If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
-                        For Each lsPredicatePartText In lrFactTypeStatement.PREDICATECLAUSE(liInd - 1).PREDICATEPART
-                            lrPredicatePart.PredicatePartText &= lsPredicatePartText
-                            lrPredicatePart.PredicatePartText = LTrim(lrPredicatePart.PredicatePartText)
-                        Next
-                    End If
-
-                    lrSentence.PredicatePart.Add(lrPredicatePart)
-
-                    liInd += 1
-                Next
-
-                lrSentence.FrontText = lrFactTypeStatement.FRONTREADINGTEXT
-                lrSentence.FollowingText = lrFactTypeStatement.FOLLOWINGREADINGTEXT
-
-                lrSentence.Sentence = lrFactTypeStatement.makeSentence
-                lrSentence.OriginalSentence = lrFactTypeStatement.makeSentence
-
-                lrStep = New Brain.Step(pcenumActionType.CreateFactType, True, pcenumActionType.None, Nothing)
-                lrPlan.AddStep(lrStep)
-
-                '===========================================================
-                'Additional FactTypeReadings/Sentences
-                Dim larAdditionalSentence As New List(Of Language.Sentence)
-                If Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count > 1 Then
-
-                    For liFactTypeStatement = 1 To Me.VAQL.ISWHEREStatement.FACTTYPESTMT.Count - 1
-
-                        Dim lrAdditionalSentence = New Language.Sentence("", "")
-
-                        lrFactTypeStatement = Me.VAQL.ISWHEREStatement.FACTTYPESTMT(liFactTypeStatement)
-
-                        liInd = 1
-                        For Each lrModelElement In lrFactTypeStatement.MODELELEMENT
-
-                            lrPredicatePart = New Language.PredicatePart
-                            lrPredicatePart.PreboundText = Trim(lrModelElement.PREBOUNDREADINGTEXT)
-                            lrPredicatePart.PostboundText = Trim(lrModelElement.POSTBOUNDREADINGTEXT)
-                            lrPredicatePart.ObjectName = lrModelElement.MODELELEMENTNAME
-
-                            If liInd < lrFactTypeStatement.MODELELEMENT.Count Then
-                                For Each lsPredicatePartText In lrFactTypeStatement.PREDICATECLAUSE(liInd - 1).PREDICATEPART
-                                    lrPredicatePart.PredicatePartText &= lsPredicatePartText
-                                    lrPredicatePart.PredicatePartText = LTrim(lrPredicatePart.PredicatePartText)
-                                Next
-                            End If
-                            lrAdditionalSentence.PredicatePart.Add(lrPredicatePart)
-
-                            liInd += 1
-                        Next
-
-                        larAdditionalSentence.Add(lrAdditionalSentence)
-                    Next
-                Else
-                    larAdditionalSentence = Nothing
-                End If
-
-
-
-                lrQuestion = New tQuestion("Would you like me to create a Fact Type for '" & Trim(lrSentence.Sentence) & "'?",
-                                            pcenumQuestionType.CreateFactType,
-                                            True,
-                                            Nothing,
-                                            lrSentence,
-                                            Nothing,
-                                            lrPlan,
-                                            lrStep,
-                                            ,
-                                            larAdditionalSentence)
-
-                If Not Me.QuestionHasBeenRaised(lrQuestion) Then
-                    Me.AddQuestion(lrQuestion)
-                End If
-
-                Me.send_data("Ok")
-            End If
-
-            Me.Timeout.Start()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ProcessStatementCreateSubtypeRelationship(ByRef arQuestion As tQuestion)
+    Private Sub ProcessStatementCreateSubtypeRelationship(ByRef arQuestion As tQuestion,
+                                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Try
             Dim lrEntityType1, lrEntityType2 As New FBM.EntityType
@@ -938,7 +812,7 @@ Partial Public Class tBrain
                 '----------------------------------------
                 'Create a Model level SubtypeConstraint
                 '----------------------------------------
-                Call lrEntityType1.CreateSubtypeRelationship(lrEntityType2)
+                Call lrEntityType1.CreateSubtypeRelationship(lrEntityType2,,,, abBroadcastInterfaceEvent)
             End If
 
         Catch ex As Exception

@@ -488,7 +488,8 @@ Namespace FBM
         Public Overrides Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
                                                             Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
                                                             Optional ByVal asSubtypeRoleId As String = Nothing,
-                                                            Optional ByVal asSupertypeRoleId As String = Nothing) As FBM.tSubtypeRelationship
+                                                            Optional ByVal asSupertypeRoleId As String = Nothing,
+                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
 
             Try
 

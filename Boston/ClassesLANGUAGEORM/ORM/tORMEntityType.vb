@@ -530,7 +530,7 @@ Namespace FBM
 
         End Function
 
-        Public Sub AddDataInstance(ByVal asDataInstance As String)
+        Public Overloads Sub AddDataInstance(ByVal asDataInstance As String)
 
             Me.Instance.AddUnique(asDataInstance)
 
@@ -1006,8 +1006,8 @@ Namespace FBM
         ''' <param name="arTargetModel">The Model to which the EntityType will be associated on completion of this method.</param>
         ''' <remarks></remarks>
         Public Shadows Function ChangeModel(ByRef arTargetModel As FBM.Model,
-                                       ByVal abAddToModel As Boolean,
-                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
+                                            ByVal abAddToModel As Boolean,
+                                            Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
 
             Try
 
@@ -1050,6 +1050,8 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Me
             End Try
 
         End Function
@@ -1401,7 +1403,8 @@ Namespace FBM
         Public Overrides Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
                                                             Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
                                                             Optional ByVal asSubtypeRoleId As String = Nothing,
-                                                            Optional ByVal asSupertypeRoleId As String = Nothing) As FBM.tSubtypeRelationship
+                                                            Optional ByVal asSupertypeRoleId As String = Nothing,
+                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
 
             Try
 
@@ -1418,6 +1421,7 @@ Namespace FBM
                 '---------------------------------------------
                 'Create a FactType for the SubtypeConstraint
                 '---------------------------------------------
+#Region "Create the FactType for the SubtypeRelationship"
                 Dim lsFactTypeName As String = ""
                 Dim larModelObject As New List(Of FBM.ModelObject)
                 Dim larRole As New List(Of FBM.Role)
@@ -1431,7 +1435,8 @@ Namespace FBM
                     larModelObject.Add(arParentModelElement)
                 End If
 
-                lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False)
+                lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False,,, False)
+                Me.Model.AddFactType(lrSubtypeRelationship.FactType,, abBroadcastInterfaceEvent)
                 lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
 
                 lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
@@ -1471,6 +1476,7 @@ Namespace FBM
                 larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
                 lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
                 lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+#End Region
 
                 If Me.SubtypeRelationship.Count = 0 Then
                     lrSubtypeRelationship.IsPrimarySubtypeRelationship = True

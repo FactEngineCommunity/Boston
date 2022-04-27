@@ -696,16 +696,18 @@ Namespace FBM
         Public Overridable Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
                                                               Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
                                                               Optional ByVal asSubtypeRoleId As String = Nothing,
-                                                              Optional ByVal asSupertypeRoleId As String = Nothing) As FBM.tSubtypeRelationship
+                                                              Optional ByVal asSupertypeRoleId As String = Nothing,
+                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
 
             Return Nothing
         End Function
 
         ''' <summary>
-        ''' 
+        ''' Used when Copying/Pasting. E.g. Change the Model of the ModelElement to the Model that the ModelElement has been pasted to.
         ''' </summary>
-        ''' <param name="arModel"></param>
+        ''' <param name="arTargetModel"></param>
         ''' <param name="abAddToModel"></param>
+        ''' <param name="abReturnExistingModelElementIfExists"></param>
         Public Overridable Function ChangeModel(ByRef arTargetModel As FBM.Model,
                                        ByVal abAddToModel As Boolean,
                                        Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
