@@ -2782,35 +2782,77 @@ SkipRegistrationChecking:
                         End If
                     Next
 
-                    For liInd = 1 To prApplication.WorkingPage.SelectedObject.Count
+                    Dim larSelectedObject As New List(Of FBM.ModelObject)
+                    'FactTypes first
+                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType).ToArray
+                        larSelectedObject.Add(lrModelElement)
+                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
+                    Next
+                    'ValueTypes
+                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType).ToArray
+                        larSelectedObject.Add(lrModelElement)
+                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
+                    Next
+                    'EntityType
+                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType).ToArray
+                        larSelectedObject.Add(lrModelElement)
+                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
+                    Next
+                    'RoleConstraint
+                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint).ToArray
+                        larSelectedObject.Add(lrModelElement)
+                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
+                    Next
+                    'The rest
+                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.ToArray
+                        larSelectedObject.Add(lrModelElement)
+                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
+                    Next
+
+                    'CodeSafe
+                    'EntityTypes with a CompoundReferenceScheme...but the FactTypes for the ReferenceSchemeRoleConstraint are not present...just don't serialise the ReferenceSchemeRoleConstraint
+                    For Each lrModelElement In larSelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
+                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+                        If lrEntityTypeInstance.EntityType.HasCompoundReferenceMode Then
+                            For Each lrRole In lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint.Role
+                                If larSelectedObject.Find(Function(x) x.Id = lrRole.FactType.Id) Is Nothing Then
+                                    lrEntityTypeInstance.ReferenceModeRoleConstraint = Nothing
+                                    lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint = Nothing
+                                End If
+                            Next
+                        End If
+                    Next
+
+                    For liInd = 1 To larSelectedObject.Count 'prApplication.WorkingPage.SelectedObject.Count
 
                         Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
 
-                        Dim lrModelObject = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                        Dim lrModelObject = larSelectedObject(liInd - 1) 'prApplication.WorkingPage.SelectedObject(liInd - 1)
 
                         Select Case lrModelObject.ConceptType
                             Case Is = pcenumConceptType.ValueType
                                 Dim lrValueTypeInstance As FBM.ValueTypeInstance
-                                lrValueTypeInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                                lrValueTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
 
                                 lrValueTypeInstance = lrValueTypeInstance.Clone(lrPage, lrValueTypeInstance.ValueType.IsMDAModelElement)
                                 lrPage.ValueTypeInstance.AddUnique(lrValueTypeInstance)
 
                             Case Is = pcenumConceptType.EntityType
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                                lrEntityTypeInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
-                                lrEntityTypeInstance = lrEntityTypeInstance.Clone(lrPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement)                                
+                                lrEntityTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
+                                Richmond.IsSerializable(lrPage)
+                                lrEntityTypeInstance = lrEntityTypeInstance.Clone(lrPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement)
+                                Richmond.IsSerializable(lrPage)
                                 lrPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
-
                             Case Is = pcenumConceptType.FactType
                                 Dim lrFactTypeInstance As FBM.FactTypeInstance
-                                lrFactTypeInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                                lrFactTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
 
                                 Call Me.CloneFactTypeInstanceToPage(lrFactTypeInstance, lrPage)
 
                             Case Is = pcenumConceptType.RoleConstraintRole
 
-                                lrRoleConstraintRoleInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                                lrRoleConstraintRoleInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
 
                                 If lrModel.RoleConstraint.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint.Equals) Then
                                     '--------------------------------------------------------------------------------------------
@@ -2845,13 +2887,13 @@ SkipRegistrationChecking:
                             Case Is = pcenumConceptType.RoleConstraint
 
                                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                                lrRoleConstraintInstance = prApplication.WorkingPage.SelectedObject(liInd - 1)
+                                lrRoleConstraintInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
 
                                 '---------------------------------------------------------------
                                 'Make sure the FactTypes are there for Roles in RoleConstraint
                                 '---------------------------------------------------------------
                                 For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                                    If Not lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then                                    
+                                    If Not lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then
                                         Call Me.CloneFactTypeInstanceToPage(lrRoleConstraintRoleInstance.Role.FactType, lrPage)
                                     End If
                                 Next
@@ -3215,8 +3257,6 @@ SkipRegistrationChecking:
 
                     Next
                 End If
-
-
 
                 lrPage.EntityTypeInstance.Sort(AddressOf FBM.EntityType.CompareSubtypeConstraintExistance)
                 For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray

@@ -59,10 +59,12 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         <JsonIgnore()>
         <XmlIgnore()>
         Public Loaded As Boolean = False
 
+        <NonSerialized()>
         <JsonIgnore()>
         <XmlIgnore()>
         Public Loading As Boolean = False
@@ -185,6 +187,7 @@ Namespace FBM
         '''   NB Used predominantly to refresh the Verbalisation View.
         ''' </summary>
         ''' <remarks></remarks>
+        <NonSerialized()>
         <JsonIgnore()>
         Public IsInvalidated As Boolean = False
 

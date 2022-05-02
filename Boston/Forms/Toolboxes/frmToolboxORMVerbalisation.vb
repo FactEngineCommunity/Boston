@@ -100,7 +100,7 @@ Public Class frmToolboxORMVerbalisation
                     liInd += 1
                 Next
             ElseIf lrTopmostSupertype.HasSimpleReferenceScheme Then
-                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: " & lrTopmostSupertype.Name & " has ")
+                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ") ' & lrTopmostSupertype.Name & " has ")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
                 lrVerbaliser.VerbaliseQuantifier(" has ")
 
@@ -2776,13 +2776,17 @@ Public Class frmToolboxORMVerbalisation
                         lrFactTypeReading.GetReadingText(lrVerbaliser)
                         lrVerbaliser.HTW.WriteBreak()
 
-
                         If arFactType.IsManyToOneByRoleOrder(lrFactTypeReading.RoleList) Then
                             lrVerbaliser.VerbaliseIndent()
                             lrVerbaliser.VerbaliseQuantifier("Each ")
                             lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(0).JoinedORMObject)
                             lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
-                            lrVerbaliser.VerbaliseQuantifier(" at most one ")
+                            If arFactType.RoleGroup(0).Mandatory Then
+                                lrVerbaliser.VerbaliseQuantifier(" one ")
+                            Else
+                                lrVerbaliser.VerbaliseQuantifier(" at most one ")
+                            End If
+
                             lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
                             lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(1).JoinedORMObject)
 
@@ -2795,16 +2799,15 @@ Public Class frmToolboxORMVerbalisation
                             lrVerbaliser.VerbaliseQuantifier(" the same ")
                             lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
                             lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(1).JoinedORMObject)
+                            lrVerbaliser.HTW.WriteBreak()
                         End If
-
+                        lrVerbaliser.HTW.WriteBreak()
                     End If
 
                 Case Else
-
+                    lrVerbaliser.HTW.WriteBreak()
             End Select
-            lrVerbaliser.HTW.WriteBreak()
 
-            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseHeading("Fact Type Readings:")
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
@@ -3011,6 +3014,7 @@ Public Class frmToolboxORMVerbalisation
                     lrVerbaliser.VerbaliseQuantifier("Role Constraint: ")
                     lrVerbaliser.VerbaliseModelObject(lrRoleConstraint)
                     lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.VerbaliseIndent()
                     lrVerbaliser.VerbaliseQuantifier("In each population of ")
                     lrVerbaliser.VerbaliseModelObject(arFactType)
                     lrVerbaliser.VerbaliseQuantifier(" each")
@@ -3033,6 +3037,7 @@ Public Class frmToolboxORMVerbalisation
                         End If
                     Next
 
+                    lrVerbaliser.HTW.WriteBreak()
                     lrVerbaliser.HTW.WriteBreak()
                 Next
             End If

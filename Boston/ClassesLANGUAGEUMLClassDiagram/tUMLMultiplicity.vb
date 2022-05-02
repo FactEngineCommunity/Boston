@@ -1,4 +1,6 @@
 ﻿Namespace UML
+
+    <Serializable()>
     Public Class Multiplicity
 
         Public Id As String = ""

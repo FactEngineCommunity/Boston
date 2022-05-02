@@ -120,6 +120,7 @@ Partial Class frmMain
         Me.EmailSupportvievcomToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemTestClientServer = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowBroadcastEventMonitorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TestNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DoNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip_main = New System.Windows.Forms.ToolStrip()
@@ -150,7 +151,6 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -686,6 +686,12 @@ Partial Class frmMain
         Me.ShowBroadcastEventMonitorToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
         Me.ShowBroadcastEventMonitorToolStripMenuItem.Text = "Show Broadcast Event Monitor"
         '
+        'ShowClientServerBroadcastTesterToolStripMenuItem
+        '
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Name = "ShowClientServerBroadcastTesterToolStripMenuItem"
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Text = "Show Client Server Broadcast Tester"
+        '
         'TestNotificationToolStripMenuItem
         '
         Me.TestNotificationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DoNotificationToolStripMenuItem})
@@ -909,12 +915,6 @@ Partial Class frmMain
         'TimerNotifications
         '
         Me.TimerNotifications.Interval = 5000
-        '
-        'ShowClientServerBroadcastTesterToolStripMenuItem
-        '
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Name = "ShowClientServerBroadcastTesterToolStripMenuItem"
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Text = "Show Client Server Broadcast Tester"
         '
         'frmMain
         '
