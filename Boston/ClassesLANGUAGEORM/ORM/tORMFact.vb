@@ -13,7 +13,7 @@ Namespace FBM
 
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Fact
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactType As FBM.FactType
 
         Private _Data As New List(Of FBM.FactData)
@@ -54,6 +54,7 @@ Namespace FBM
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
 
         Public Event Deleted()
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Public Sub New()
             '--------------------

@@ -151,6 +151,7 @@ Module tableORMFactInstance
                                 Try
                                     lrFact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId)
                                     lrFactInstance = lrFact.CloneInstance(arFactTypeInstance.Page, True)
+                                    lrFactInstance.FactType = arFactTypeInstance
                                     lrFactInstance.isDirty = True
                                     arFactTypeInstance.isDirty = True
                                     arFactTypeInstance.Page.IsDirty = True

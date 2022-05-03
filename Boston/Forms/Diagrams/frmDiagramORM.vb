@@ -11698,18 +11698,22 @@ Public Class frmDiagramORM
         Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
 
         Try
-            lrRoleConstraintRoleInstance = Me.zrPage.SelectedObject(0)
-            If lrRoleConstraintRoleInstance Is Nothing Then Exit Sub 'CodeSafe
+            Try
+                lrRoleConstraintRoleInstance = Me.zrPage.SelectedObject(0)
+                If lrRoleConstraintRoleInstance Is Nothing Then Exit Sub 'CodeSafe
+            Catch
+                Exit Sub
+            End Try
 
             'ToDo:Removed for v4.1. Not complete/tested.
             'If lrRoleConstraintRoleInstance.Role.FactType.Arity > lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraintRole.Count Then
             '    Me.ToolStripMenuItemExtendToCoverAllRolesInTheFactType.Visible = (lrRoleConstraintRoleInstance.Role.FactType.InternalUniquenessConstraint.Count = 1)        
             'Else
             Me.ToolStripMenuItemExtendToCoverAllRolesInTheFactType.Visible = False
-            'End If
+                'End If
 
-        Catch ex As Exception
-            Dim lsMessage1 As String
+            Catch ex As Exception
+                Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name

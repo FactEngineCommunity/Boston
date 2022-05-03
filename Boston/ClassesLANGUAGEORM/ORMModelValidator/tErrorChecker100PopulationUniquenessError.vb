@@ -21,9 +21,30 @@
             Dim lrFactList As New List(Of FBM.Fact)
             Dim lsErrorMessage As String = ""
             Dim lrModelError As FBM.ModelError
+
+
             For Each lrFactType In Me.Model.FactType
 
                 If lrFactType.Fact.Count > 1 Then
+
+                    If lrFactType.InternalUniquenessConstraint.Count = 0 Then
+                        Dim larModelErrorFactData = (From Fact In lrFactType.Fact
+                                                     From FactData In Fact.Data
+                                                     Where FactData.ModelError.Count > 0
+                                                     Select FactData).ToList
+
+                        For Each lrFactData In larModelErrorFactData
+                            Call lrFactData.ClearModelErrors()
+                        Next
+                    End If
+
+                    For Each lrRole In lrFactType.RoleGroup
+                        If Not lrRole.HasInternalUniquenessConstraint Then
+                            For Each lrFactData In lrRole.Data
+                                Call lrFactData.ClearModelErrors()
+                            Next
+                        End If
+                    Next
 
                     For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
                         '---------------------------------------------------------------------------
@@ -66,7 +87,7 @@
                             If lrFactList.Count > 1 Then
 
                                 lsErrorMessage = "Population Uniqueness Error - "
-                                lsErrorMessage &= "Multiple Facts violate Internal Uniqueness Constraint, '" & _
+                                lsErrorMessage &= "Multiple Facts violate Internal Uniqueness Constraint, '" &
                                                   lrInternalUniquenessConstraint.Name & "'."
                                 lsErrorMessage &= " Values include, {"
                                 Dim liInd As Integer
@@ -78,16 +99,16 @@
                                 Next
                                 lsErrorMessage &= "}"
 
-                                lrModelError = New FBM.ModelError(pcenumModelErrors.PopulationUniquenessError, _
-                                                                  lsErrorMessage, _
-                                                                  Nothing, _
+                                lrModelError = New FBM.ModelError(pcenumModelErrors.PopulationUniquenessError,
+                                                                  lsErrorMessage,
+                                                                  Nothing,
                                                                   lrFactType)
                                 For Each lrRole In lrInternalUniquenessConstraint.Role
                                     lrFact.GetFactDataByRoleId(lrRole.Id).ModelError.Add(lrModelError)
                                 Next
 
                                 lrFactType.ModelError.Add(lrModelError)
-                                lrFact.ModelError.Add(lrModelError)
+                                lrFact.AddModelError(lrModelError)
                                 Me.Model.AddModelError(lrModelError)
                             End If
 

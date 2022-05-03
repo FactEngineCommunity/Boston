@@ -27,7 +27,7 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows Property Name() As String
             Get
                 Return _Name
@@ -42,7 +42,7 @@ Namespace FBM
         <XmlIgnore()>
         Public PrimativeType As String
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public NORMAIsUnaryFactTypeValueType As Boolean = False
 
         <XmlIgnore()>
@@ -51,14 +51,14 @@ Namespace FBM
 
 
         <XmlAttribute()>
-        <CategoryAttribute("Value Type"), _
-        Browsable(True), _
-        [ReadOnly](False), _
-        BindableAttribute(True), _
-        DefaultValueAttribute(""), _
-        DesignOnly(False), _
-        DescriptionAttribute("The 'Data Type' for the Domain of the Value Type"), _
-        TypeConverter(GetType(Enumeration.EnumDescConverter))> _
+        <CategoryAttribute("Value Type"),
+        Browsable(True),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DefaultValueAttribute(""),
+        DesignOnly(False),
+        DescriptionAttribute("The 'Data Type' for the Domain of the Value Type"),
+        TypeConverter(GetType(Enumeration.EnumDescConverter))>
         Public Property DataType() As pcenumORMDataType
             Get
                 Return _DataType
@@ -201,7 +201,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean = True
         <XmlIgnore()>
-        <CategoryAttribute("Model Object"), _
+        <CategoryAttribute("Model Object"),
         DefaultValueAttribute(False),
         DescriptionAttribute("True if the Model Object is independent.")>
         Public Property IsIndependent As Boolean Implements iFBMIndependence.IsIndependent
@@ -332,8 +332,8 @@ Namespace FBM
 
         End Function
 
-        Public Overloads Function Clone(ByRef arModel As FBM.Model, _
-                                        Optional abAddToModel As Boolean = False, _
+        Public Overloads Function Clone(ByRef arModel As FBM.Model,
+                                        Optional abAddToModel As Boolean = False,
                                         Optional ByVal abIsMDAModelElement As Boolean = False) As Object
 
             Dim lrValueType As New FBM.ValueType
@@ -623,10 +623,10 @@ Namespace FBM
 
             ExistsRolesAssociatedWithValueType = False
 
-            Dim larRoles = From FactType In Me.Model.FactType _
-                              From Role In FactType.RoleGroup _
-                              Where Role.JoinedORMObject Is Me _
-                              Select Role
+            Dim larRoles = From FactType In Me.Model.FactType
+                           From Role In FactType.RoleGroup
+                           Where Role.JoinedORMObject Is Me
+                           Select Role
 
             Dim lrRole As New FBM.Role
 
@@ -645,8 +645,8 @@ Namespace FBM
 
             IsRoleIndependent = True
 
-            Dim larRole = From Role In Me.Model.Role _
-                          Where Role.JoinedORMObject Is Me _
+            Dim larRole = From Role In Me.Model.Role
+                          Where Role.JoinedORMObject Is Me
                           Select Role
 
             If larRole.Count > 0 Then
@@ -1122,7 +1122,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub SetDataTypeLength(ByVal aiNewDataTypeLength As Integer, _
+        Public Sub SetDataTypeLength(ByVal aiNewDataTypeLength As Integer,
                                      Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
             Me.DataTypeLength = aiNewDataTypeLength
@@ -1316,6 +1316,7 @@ Namespace FBM
         'End Sub
 
         Public Shadows Event updated()
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
 

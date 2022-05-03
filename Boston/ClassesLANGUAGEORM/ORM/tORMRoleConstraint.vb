@@ -333,7 +333,7 @@ Namespace FBM
         Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
         Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
         Public Event ValueRangeTypeChanged(ByVal aiNewValueRangeType As pcenumValueRangeType)
-
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Sub New()
             '------------------------------------------
@@ -2150,7 +2150,7 @@ Namespace FBM
 
                 Me.Model.RemoveRoleConstraint(Me, abCheckForErrors, abDoDatabaseProcessing)
 
-                Me.Model.MakeDirty(False, abCheckForErrors)
+                Me.Model.MakeDirty(False, False)
 
                 '-----------------------------------------------------------------------------------------------------
                 'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.

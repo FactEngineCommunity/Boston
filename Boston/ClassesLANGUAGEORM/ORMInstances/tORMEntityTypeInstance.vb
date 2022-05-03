@@ -1516,13 +1516,28 @@ Namespace FBM
                         End If
                     End If
                 Else
-                        lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
-                    Throw New Exception(lsMessage)
+                    lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
+                    Dim lrApplicationException As New ApplicationException(lsMessage)
+                    lrApplicationException.Data.Add("ErrorType", 100)
+                    Throw lrApplicationException
                 End If
 
                 Call Me.Page.RemoveEntityTypeInstance(Me, abBroadcastInterfaceEvent)
 
                 Call Me.Page.MakeDirty()
+            Catch appEx As ApplicationException
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                If appEx.Data("ErrorType") = 100 Then
+                    'See above (in the code for this method) for the ErrorType=100
+                    lsMessage = appEx.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                Else
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & appEx.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, appEx.StackTrace)
+                End If
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

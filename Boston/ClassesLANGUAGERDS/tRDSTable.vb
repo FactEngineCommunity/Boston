@@ -1589,6 +1589,16 @@ Namespace RDS
             Call Me.Index.Remove(arIndex)
             Call Me.Model.Index.Remove(arIndex)
 
+            Dim lsIndexQualifier = arIndex.IndexQualifier
+
+            Dim larColumn = From Column In Me.Column
+                            Where Column.Index.Find(Function(x) x.IndexQualifier = lsIndexQualifier) IsNot Nothing
+                            Select Column
+
+            For Each lrColumn In larColumn
+                Call lrColumn.removeIndex(arIndex)
+            Next
+
             '----------------------------------------------------------------------
             'CMML
             Call Me.Model.Model.removeCMMLIndex(arIndex)

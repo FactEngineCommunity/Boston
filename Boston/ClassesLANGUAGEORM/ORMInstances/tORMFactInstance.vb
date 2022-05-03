@@ -585,6 +585,30 @@ Namespace FBM
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Private Sub Fact_ModelErrorAdded(ByRef arModelError As ModelError) Handles Fact.ModelErrorAdded
+
+
+            Try
+                If Me.Page IsNot Nothing Then
+                    Try
+                        If Me.FactType.FactTable IsNot Nothing Then
+                            Me.FactType.FactTable.ResortFactTable()
+                        End If
+                    Catch
+                    End Try
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

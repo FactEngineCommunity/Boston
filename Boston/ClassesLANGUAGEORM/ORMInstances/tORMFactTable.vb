@@ -328,7 +328,7 @@ Namespace FBM
 
                         lrFactDataInstance.TableShape = Me.TableShape
                         lrFactDataInstance.Cell = Me.TableShape.Item(liInd, liRowNr)
-
+                        lrFactDataInstance.Cell.TextColor = Color.Black
                         Select Case lrFactDataInstance.Role.TypeOfJoin
                             Case Is = pcenumRoleJoinType.EntityType
                                 If lrFactDataInstance.Role.JoinsEntityType.EntityType.HasCompoundReferenceMode Then
@@ -363,6 +363,8 @@ Namespace FBM
                         End Select
                         If lrFactDataInstance.FactData.HasModelError Then
                             lrFactDataInstance.Cell.TextColor = Color.Red
+                        Else
+                            lrFactDataInstance.Cell.TextColor = Color.Black
                         End If
                         lrFactDataInstance.Cell.Tag = lrFactDataInstance
                     Next liInd

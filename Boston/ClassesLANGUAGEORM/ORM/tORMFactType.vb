@@ -16,7 +16,7 @@ Namespace FBM
         Implements FBM.iValidationErrorHandler
         Implements FBM.iFBMIndependence
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Shadows Property Name() As String
             Get
                 Return _Name
@@ -26,8 +26,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean = False
         <XmlAttribute()>
         Public Overrides Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
@@ -39,11 +39,11 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsObjectified As Boolean = False
-        <XmlAttribute()> _
-        <CategoryAttribute("Fact Type"), _
+        <XmlAttribute()>
+        <CategoryAttribute("Fact Type"),
         DefaultValueAttribute(False),
         DescriptionAttribute("True if the Fact Type is 'Objectified', else False.")>
         Public Overrides Property IsObjectified() As Boolean
@@ -60,10 +60,10 @@ Namespace FBM
         ''' To find out if a FactType is for a ReferenceScheme use FactType.IsUsedInReferenceScheme
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsPreferredReferenceMode As Boolean = False
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Overridable Property IsPreferredReferenceMode() As Boolean
             Get
                 Return Me._IsPreferredReferenceMode
@@ -73,10 +73,10 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsLinkFactType As Boolean = False
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Overridable Property IsLinkFactType() As Boolean
             Get
                 Return Me._IsLinkFactType
@@ -138,13 +138,13 @@ Namespace FBM
         Public StoreFactCoordinates As Boolean = False
 
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ShowFactTypeName As Boolean = False
-        <XmlIgnore()> _
-        <CategoryAttribute("Fact Type"), _
-        DefaultValueAttribute(True), _
-        DescriptionAttribute("Display the Fact Type Name.")> _
+        <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+        DefaultValueAttribute(True),
+        DescriptionAttribute("Display the Fact Type Name.")>
         Public Property ShowFactTypeName() As Boolean
             Get
                 Return _ShowFactTypeName
@@ -156,28 +156,28 @@ Namespace FBM
         End Property
 
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Arity As Integer = 0 'The number of roles in the fact type. Minimum is 1 and this is set when the Role is added to the FactType.
-        <XmlAttribute()> _
-        <CategoryAttribute("Fact Type"), _
-             DefaultValueAttribute(GetType(Integer), "0"), _
-             DescriptionAttribute("The Cardinality of the Fact Type."), _
+        <XmlAttribute()>
+        <CategoryAttribute("Fact Type"),
+             DefaultValueAttribute(GetType(Integer), "0"),
+             DescriptionAttribute("The Cardinality of the Fact Type."),
              ReadOnlyAttribute(True),
              Browsable(False)>
-        Public ReadOnly Overridable Property Arity() As Integer
+        Public Overridable ReadOnly Property Arity() As Integer
             Get
                 Return Me.RoleGroup.Count
             End Get
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _FactTypeOrientation As pcenumFactTypeOrientation = pcenumFactTypeOrientation.Horizontal
-        <CategoryAttribute("Fact Type"), _
-             DefaultValueAttribute(pcenumFactTypeOrientation.Horizontal), _
-             DescriptionAttribute("The visible orientation of the Fact Type."), _
-             Browsable(False)> _
+        <CategoryAttribute("Fact Type"),
+             DefaultValueAttribute(pcenumFactTypeOrientation.Horizontal),
+             DescriptionAttribute("The visible orientation of the Fact Type."),
+             Browsable(False)>
         Public Property FactTypeOrientation() As pcenumFactTypeOrientation
             Get
                 Return _FactTypeOrientation
@@ -187,7 +187,7 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Private _HighestInternalUniquenessConstraintLevel As Integer = 0
         Public ReadOnly Property HighestInternalUniquenessConstraintLevel() As Integer
             Get
@@ -195,10 +195,10 @@ Namespace FBM
             End Get
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public InternalUniquenessConstraint As New List(Of FBM.RoleConstraint) 'RoleConstraints are serialised seperately
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactTypeReading As New List(Of FBM.FactTypeReading)
 
         ''' <summary>
@@ -207,8 +207,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Public RoleGroup As New List(Of FBM.Role)
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Fact As New List(Of FBM.Fact)
         Public Property Fact() As List(Of FBM.Fact)
             Get
@@ -225,23 +225,23 @@ Namespace FBM
         ''' The EntityType for the FactType if the FactType is objectified.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public ObjectifyingEntityType As FBM.EntityType
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public KLFunctionLabel As String = "" 'When generating a proof for a model under KL, is the unique pcenumKLFunction label assigned to the FactType
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsCoreFactType As Boolean = False
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsStored As Boolean = False
-        <XmlIgnore()> _
-        <CategoryAttribute("Derivation"), _
-        Browsable(False), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Fact Type is derived and is stored.")> _
+        <XmlIgnore()>
+        <CategoryAttribute("Derivation"),
+        Browsable(False),
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Fact Type is derived and is stored.")>
         Public Property IsStored As Boolean
             Get
                 Return Me._IsStored
@@ -251,8 +251,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean
         <XmlAttribute()>
         <CategoryAttribute("Model Object"),
@@ -280,9 +280,9 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlAttribute()> _
-        <CategoryAttribute("Derivation"), _
-        Browsable(False), _
+        <XmlAttribute()>
+        <CategoryAttribute("Derivation"),
+        Browsable(False),
         DescriptionAttribute("The text for the derivation of the Fact Type when the Fact Type is derived."),
         Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Overrides Property DerivationText As String
@@ -316,11 +316,11 @@ Namespace FBM
         Public Event IUConstraintAdded(ByRef arFactType As FBM.FactType, ByRef arRoleConstraint As FBM.RoleConstraint)
         Public Event IUConstraintRemoved(ByRef arFactType As FBM.FactType, ByVal arRoleConstraint As FBM.RoleConstraint)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event FactTypeReadingAdded(ByRef arFactTypeReading As FBM.FactTypeReading)
         Public Event FactTypeReadingModified(ByRef arFactTypeReading As FBM.FactTypeReading)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event FactTypeReadingRemoved(ByRef arFactTypeReading As FBM.FactTypeReading)
         Public Event RoleAdded(ByRef arRole As FBM.Role)
         Public Event RoleRemoved(ByRef arRole As FBM.Role)
@@ -338,6 +338,7 @@ Namespace FBM
         Public Event ObjectificationRemoved() 'When the objectification of the FactType is removed.
         Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page)
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Public Sub New()
             '-------------------------------------------------------------

@@ -199,6 +199,8 @@ Namespace FBM
         <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         <NonSerialized()>
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
+        <NonSerialized()>
         Public Event RemovedFromModel(ByVal abDeleteAll As Boolean)
 
         Public Sub New()
@@ -466,7 +468,19 @@ Namespace FBM
         End Function
 
         Public Sub ClearModelErrors() Implements iValidationErrorHandler.ClearModelErrors
+
+            Dim lbHadErrors As Boolean = False
+
+            If Me.ModelError.Count > 0 Then
+                lbHadErrors = True
+            End If
+
             Me.ModelError.Clear()
+
+            If lbHadErrors Then
+                RaiseEvent ModelErrorsRemoved()
+            End If
+
         End Sub
 
         Public ReadOnly Property HasModelError() As Boolean Implements iValidationErrorHandler.HasModelError

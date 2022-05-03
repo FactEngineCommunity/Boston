@@ -5,6 +5,7 @@
         ReadOnly Property HasModelError() As Boolean
         Sub ClearModelErrors()
         Event ModelErrorAdded(ByRef arModelError As FBM.ModelError)
+        Event ModelErrorsRemoved()
         Sub AddModelError(ByRef arModelError As FBM.ModelError)
     End Interface
 

@@ -266,9 +266,13 @@ Partial Public Class tBrain
             Dim lrModelObject As FBM.ModelObject
             Dim lsFactTypeName As String = ""
 
-            For Each lrModelObject In larModelObject
-                lsFactTypeName &= lrModelObject.Name
-            Next
+            If arQuestion.ObjectType IsNot Nothing Then
+                lsFactTypeName = arQuestion.ObjectType.Id
+            Else
+                For Each lrModelObject In larModelObject
+                    lsFactTypeName &= lrModelObject.Name
+                Next
+            End If
 
             '==========================================================================
             'Adding the FactType to the Model is done in the 'DropFactTypeAtPoint' stage, 
@@ -311,9 +315,14 @@ Partial Public Class tBrain
                 Next
             End If
 
-            If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
-                Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
+            If arQuestion.ObjectType IsNot Nothing Then
+                Call lrFactType.setName(lsFactTypeName, False)
+            Else
+                If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
+                    Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
+                End If
             End If
+
 
             'Create a Column for unary FactTypes. Is an exception because does not have a RoleConstraint
             If lrFactType.RoleGroup.Count = 1 Then

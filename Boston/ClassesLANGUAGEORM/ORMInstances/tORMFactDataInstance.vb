@@ -1096,6 +1096,25 @@ Namespace FBM
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Private Sub FactData_ModelErrorsRemoved() Handles FactData.ModelErrorsRemoved
+
+            Try
+                If Me.Cell IsNot Nothing Then
+                    Me.Cell.TextColor = Color.Black
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

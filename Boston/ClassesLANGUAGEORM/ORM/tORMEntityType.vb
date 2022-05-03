@@ -14,7 +14,7 @@ Namespace FBM
         Implements FBM.iValidationErrorHandler
         Implements FBM.iFBMIndependence
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Shadows Property Name() As String
             Get
                 Return _Name
@@ -26,8 +26,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean = False
         <XmlAttribute()>
         Public Overrides Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
@@ -39,12 +39,12 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public ReferenceMode As String = ""
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public primitive_type_entity_id As Integer = 0
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public PrimativeType As String = ""
 
         <XmlIgnore()>
@@ -88,12 +88,12 @@ Namespace FBM
         End Property
 
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents ReferenceModeValueType As FBM.ValueType = Nothing
 
         <XmlIgnore()>
         Public _PreferredIdentifierRCId As String = Nothing
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Property PreferredIdentifierRCId() As String
             Get
                 Return Me._PreferredIdentifierRCId
@@ -103,8 +103,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlElement()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlElement()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ReferenceModeRoleConstraint As FBM.RoleConstraint = Nothing
         <XmlIgnore()>
         Public Property ReferenceModeRoleConstraint() As FBM.RoleConstraint
@@ -121,8 +121,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean
         <XmlAttribute()>
         <CategoryAttribute("Model Object"),
@@ -137,14 +137,14 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public value_constraint As New StringCollection
-        <XmlIgnore()> _
-        <CategoryAttribute("Entity Type"), _
-         Browsable(False), _
-         [ReadOnly](False), _
-         DescriptionAttribute("The List of Values that Objects of this Entity Type may take."), _
-         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <XmlIgnore()>
+        <CategoryAttribute("Entity Type"),
+         Browsable(False),
+         [ReadOnly](False),
+         DescriptionAttribute("The List of Values that Objects of this Entity Type may take."),
+         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Property ValueConstraint() As StringCollection 'StringCollection 
             '   DefaultValueAttribute(""), _
             '   BindableAttribute(True), _
@@ -157,13 +157,13 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsPersonal As Boolean = False
-        <XmlAttribute()> _
-        <CategoryAttribute("Entity Type"), _
-        DefaultValueAttribute(False), _
-        DescriptionAttribute("True if the Entity Type is personal.")> _
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
+        DefaultValueAttribute(False),
+        DescriptionAttribute("True if the Entity Type is personal.")>
         Public Property IsPersonal As Boolean
             Get
                 Return Me._IsPersonal
@@ -177,8 +177,8 @@ Namespace FBM
         '<XmlIgnore()>
         '<DebuggerBrowsable(DebuggerBrowsableState.Never)>
         'Public Shadows _IsAbsorbed As Boolean = False
-        <XmlAttribute()> _
-        <CategoryAttribute("Entity Type"), _
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
         DefaultValueAttribute(False),
         DescriptionAttribute("True if the Entity Type is absorbed by a SuperType.")>
         Public Overloads Property IsAbsorbed As Boolean
@@ -190,18 +190,18 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public KLLetter As String  'When doing proofs in ORM, is the letter within the formal theory of KL (Knowledge Language) assigned to this EntityType
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public date_created As Date 'The date that the EntityType was created within Richmond.
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public last_modified As Date 'The date on which the EntityType was last modified.
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public last_modified_user_id As String 'The Id of the Richmond User who last created/modified the EntityType.
 
 
-        <XmlAttribute()> _
-        <CategoryAttribute("Entity Type"), _
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
         DefaultValueAttribute(False),
         DescriptionAttribute("True if the Entity Type is derived.")>
         Public Overrides Property IsDerived As Boolean
@@ -213,9 +213,9 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlAttribute()> _
-        <CategoryAttribute("Derivation"), _
-        Browsable(False), _
+        <XmlAttribute()>
+        <CategoryAttribute("Derivation"),
+        Browsable(False),
         DescriptionAttribute("The text for the derivation of the Entity Type when the Entity Type is derived."),
         Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Overrides Property DerivationText As String
@@ -382,8 +382,8 @@ Namespace FBM
 
         End Function
 
-        Public Overloads Overrides Function Clone(ByRef arModel As FBM.Model, _
-                                        Optional ByVal abAddToModel As Boolean = False, _
+        Public Overloads Overrides Function Clone(ByRef arModel As FBM.Model,
+                                        Optional ByVal abAddToModel As Boolean = False,
                                         Optional ByVal abIsMDAModelElement As Boolean = False) As Object
 
             Dim lrEntityType As New FBM.EntityType
@@ -782,11 +782,11 @@ Namespace FBM
         Public Function GetCountRolesAssociatedWithEntityType() As Integer
 
 
-            Dim larRoles = From FactType In Me.Model.FactType _
-                           From Role In FactType.RoleGroup _
-                          Where Role.TypeOfJoin = pcenumRoleJoinType.EntityType _
-                            And Role.JoinsEntityType Is Me _
-                         Select Role
+            Dim larRoles = From FactType In Me.Model.FactType
+                           From Role In FactType.RoleGroup
+                           Where Role.TypeOfJoin = pcenumRoleJoinType.EntityType _
+                            And Role.JoinsEntityType Is Me
+                           Select Role
 
             Return larRoles.Count
 
@@ -801,9 +801,9 @@ Namespace FBM
 
             ExistsSubyTypeForEntityType = False
 
-            Dim larSubTypes = From SubType In Me.Model.EntityType _
-                              From EntityType In SubType.parentModelObjectList _
-                              Where EntityType.Id = Me.Id _
+            Dim larSubTypes = From SubType In Me.Model.EntityType
+                              From EntityType In SubType.parentModelObjectList
+                              Where EntityType.Id = Me.Id
                               Select EntityType
 
             Dim lrEntityType As New FBM.EntityType
@@ -2049,10 +2049,10 @@ Namespace FBM
 
             Dim lrFact As FBM.Fact
 
-            Dim larFact = From FactType In Me.Model.FactType _
-                          From Fact In FactType.Fact _
-                          From FactData In Fact.Data _
-                          Where FactData.Role.JoinedORMObject Is Me _
+            Dim larFact = From FactType In Me.Model.FactType
+                          From Fact In FactType.Fact
+                          From FactData In Fact.Data
+                          Where FactData.Role.JoinedORMObject Is Me
                           Select Fact
 
             For Each lrFact In larFact.ToArray
@@ -2081,10 +2081,10 @@ Namespace FBM
                 Next
             End If
 
-            Dim larChildEntityType = From EntityType In Me.Model.EntityType _
-                                    From lrParentEntityType In EntityType.parentModelObjectList _
-                                    Where lrParentEntityType Is Me _
-                                    Select EntityType
+            Dim larChildEntityType = From EntityType In Me.Model.EntityType
+                                     From lrParentEntityType In EntityType.parentModelObjectList
+                                     Where lrParentEntityType Is Me
+                                     Select EntityType
 
             For Each lrEntityType In larChildEntityType
                 If Not aarObjectType.Contains(lrEntityType) Then
@@ -2328,11 +2328,11 @@ Namespace FBM
 
             For Each lsInstance In Me.Instance.ToArray
 
-                Dim liUsingFactDataCount = Aggregate FactType In Me.Model.FactType _
-                                            From Fact In FactType.Fact _
-                                            From FactData In Fact.Data _
+                Dim liUsingFactDataCount = Aggregate FactType In Me.Model.FactType
+                                            From Fact In FactType.Fact
+                                            From FactData In Fact.Data
                                             Where FactData.Role.JoinedORMObject.Id = Me.Id _
-                                            And FactData.Data = lsInstance _
+                                            And FactData.Data = lsInstance
                                             Into Count()
 
                 If liUsingFactDataCount = 0 Then
@@ -2493,7 +2493,7 @@ Namespace FBM
                         End If
                     End If
 
-                    ElseIf Trim(asReferenceMode) = "" Then
+                ElseIf Trim(asReferenceMode) = "" Then
                     '--------------------------------------------------------------------------------------------
                     'Tried to set null ReferenceMode to an EntityType without a ReferenceMode.
                     '  Simply ignore the request.
@@ -2987,7 +2987,7 @@ SkipSettingReferenceModeObjects:
         End Sub
 
         Public Shadows Event updated(ByVal aiConceptType As pcenumConceptType)
-
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
 
