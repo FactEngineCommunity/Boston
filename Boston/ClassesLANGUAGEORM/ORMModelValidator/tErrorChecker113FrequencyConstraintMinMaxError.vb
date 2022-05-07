@@ -1,10 +1,12 @@
-﻿Namespace Validation
+﻿Imports System.Reflection
+
+Namespace Validation
 
     Public Class FrequencyConstraintMinMaxError
         Inherits Validation.ErrorChecker
 
         Public Sub New(ByRef arModel As FBM.Model)
-            Call MyBase.new(arModel)
+            Call MyBase.New(arModel)
 
         End Sub
 
@@ -16,56 +18,67 @@
             Dim lsErrorMessage As String = ""
             Dim lrModelError As FBM.ModelError
 
-            For Each lrRoleConstraint In Me.Model.RoleConstraint.FindAll(Function(x) x.RoleConstraintType = pcenumRoleConstraintType.FrequencyConstraint)
+            Try
 
-                For Each lrFactData In lrRoleConstraint.RoleConstraintRole(0).Role.Data
+                For Each lrRoleConstraint In Me.Model.RoleConstraint.FindAll(Function(x) x.RoleConstraintType = pcenumRoleConstraintType.FrequencyConstraint)
 
-                    Dim liFactDataCount = From fd In lrRoleConstraint.RoleConstraintRole(0).Role.Data _
-                                          Where fd.Data = lrFactData.Data _
-                                          Select fd Distinct.Count
+                    For Each lrFactData In lrRoleConstraint.RoleConstraintRole(0).Role.Data
 
-                    If liFactDataCount > lrRoleConstraint.MaximumFrequencyCount Then
+                        Dim liFactDataCount = From fd In lrRoleConstraint.RoleConstraintRole(0).Role.Data
+                                              Where fd.Data = lrFactData.Data
+                                              Select fd Distinct.Count
 
-                        lsErrorMessage = "Fact Data value, '" & lrFactData.Data & "', "
-                        lsErrorMessage &= " exists in " & liFactDataCount.ToString & " Facts"
-                        lsErrorMessage &= " where the Frequency Constraint, '" & lrRoleConstraint.Name & "',"
-                        lsErrorMessage &= " has a Maximum Frequency for the Role of <=" & lrRoleConstraint.MaximumFrequencyCount.ToString
+                        If liFactDataCount > lrRoleConstraint.MaximumFrequencyCount Then
 
-                        lrModelError = New FBM.ModelError(pcenumModelErrors.FrequencyConstraintMinMaxError, _
-                                  lsErrorMessage, _
-                                  Nothing, _
-                                  lrRoleConstraint)
+                            lsErrorMessage = "Fact Data value, '" & lrFactData.Data & "', "
+                            lsErrorMessage &= " exists in " & liFactDataCount.ToString & " Facts"
+                            lsErrorMessage &= " where the Frequency Constraint, '" & lrRoleConstraint.Name & "',"
+                            lsErrorMessage &= " has a Maximum Frequency for the Role of <=" & lrRoleConstraint.MaximumFrequencyCount.ToString
 
-                        lrRoleConstraint.AddModelError(lrModelError)
-                        Me.Model.AddModelError(lrModelError)
+                            lrModelError = New FBM.ModelError(pcenumModelErrors.FrequencyConstraintMinMaxError,
+                                      lsErrorMessage,
+                                      Nothing,
+                                      lrRoleConstraint)
 
-                    End If
+                            lrRoleConstraint.AddModelError(lrModelError)
+                            Me.Model.AddModelError(lrModelError)
+
+                        End If
+                    Next
+
+                    For Each lsInstance In lrRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject.Instance
+
+                        Dim liFactDataCount = From fd In lrRoleConstraint.RoleConstraintRole(0).Role.Data
+                                              Where fd.Data = lsInstance
+                                              Select fd Distinct.Count
+
+                        If liFactDataCount < lrRoleConstraint.MinimumFrequencyCount Then
+
+                            lsErrorMessage = "Fact Data value, '" & lsInstance & "', "
+                            lsErrorMessage &= " exists in " & liFactDataCount.ToString & " Facts"
+                            lsErrorMessage &= " where the Frequency Constraint, '" & lrRoleConstraint.Name & "',"
+                            lsErrorMessage &= " has a Minimum Frequency for the Role of " & lrRoleConstraint.MinimumFrequencyCount.ToString
+
+                            lrModelError = New FBM.ModelError(pcenumModelErrors.FrequencyConstraintMinMaxError,
+                                      lsErrorMessage,
+                                      Nothing,
+                                      lrRoleConstraint)
+
+                            lrRoleConstraint.AddModelError(lrModelError)
+                            Me.Model.AddModelError(lrModelError)
+                        End If
+                    Next
+
                 Next
 
-                For Each lsInstance In lrRoleConstraint.RoleConstraintRole(0).Role.JoinedORMObject.Instance
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                    Dim liFactDataCount = From fd In lrRoleConstraint.RoleConstraintRole(0).Role.Data _
-                                          Where fd.Data = lsInstance _
-                                          Select fd Distinct.Count
-
-                    If liFactDataCount < lrRoleConstraint.MinimumFrequencyCount Then
-
-                        lsErrorMessage = "Fact Data value, '" & lsInstance & "', "
-                        lsErrorMessage &= " exists in " & liFactDataCount.ToString & " Facts"
-                        lsErrorMessage &= " where the Frequency Constraint, '" & lrRoleConstraint.Name & "',"
-                        lsErrorMessage &= " has a Minimum Frequency for the Role of " & lrRoleConstraint.MinimumFrequencyCount.ToString
-
-                        lrModelError = New FBM.ModelError(pcenumModelErrors.FrequencyConstraintMinMaxError, _
-                                  lsErrorMessage, _
-                                  Nothing, _
-                                  lrRoleConstraint)
-
-                        lrRoleConstraint.AddModelError(lrModelError)
-                        Me.Model.AddModelError(lrModelError)
-                    End If
-                Next
-
-            Next
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -888,7 +888,6 @@ Namespace FBM
                             Call Me.ValueConstraintInstance.DisplayAndAssociate(Me)
 
                         End If
-
                     End If
 
                     '---------------------------------------------------------------------------------------------------------------
@@ -1088,6 +1087,12 @@ Namespace FBM
                     Next
                 Next
 
+                If Me.ValueConstraintInstance IsNot Nothing Then
+                    If Me.ValueConstraintInstance.Shape IsNot Nothing Then
+                        Me.ValueConstraintInstance.Shape.Visible = True
+                    End If
+                End If
+
                 Me.ExpandReferenceMode = False
                 Call Me.RefreshShape()
 
@@ -1153,6 +1158,18 @@ Namespace FBM
                                             lrFactTypeInstance.FactTypeNameShape.Bounds.Width + 4,
                                             lrFactTypeInstance.FactTypeNameShape.Bounds.Height)
 
+                Dim lbBlankSpaceFound As Boolean = False
+
+                'Tried this
+                'Call Me.getBlankCellCloseBy(lrFactTypeInstance.X, lrFactTypeInstance.Y, 40)
+                'Was this
+                'Dim loPointF As PointF = Me.Page.FindBlankSpaceInRelationToModelObject(Me, lbBlankSpaceFound, 90)
+                'If lbBlankSpaceFound Then
+                '  lrFactTypeInstance.Move(loPointF.X, loPointF.Y, False)
+                'End If
+
+                lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
+
                 If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
                     lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
                 End If
@@ -1173,6 +1190,8 @@ Namespace FBM
                         lrValueTypeInstance.Y = Me.Y
 
                         Call Me.getBlankCellCloseBy(lrValueTypeInstance.X, lrValueTypeInstance.Y, 40)
+                        '20220504-VM-Was...but trying above
+                        'Call Me.getBlankCellCloseBy(lrValueTypeInstance.X, lrValueTypeInstance.Y, 40)
 
                         lrValueTypeInstance.Shape.Visible = True
                         lrValueTypeInstance._ValueConstraint.Shape.Visible = True
@@ -1188,18 +1207,26 @@ Namespace FBM
                         End If
                     End If
                 Next
+
                 For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
                     For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
                         lrRoleConstraintRoleInstance.Shape.Visible = True
                     Next
                 Next
 
+                If Me.ValueConstraintInstance IsNot Nothing Then
+                    If Me.ValueConstraintInstance.Shape IsNot Nothing Then
+                        Me.ValueConstraintInstance.Shape.Visible = False
+                    End If
+                End If
+
+                '20220504-VM-Was...but trying new regime
                 Me.SetAdjoinedFactTypesBetweenModelElements(lrFactTypeInstance)
 
                 lrFactTypeInstance.SortRoleGroup()
+                lrFactTypeInstance.AdjustBorderHeight(True)
+
                 Me.Page.Invalidate()
-
-
 
                 Me.ExpandReferenceMode = True
                 Call Me.RefreshShape()
@@ -1308,6 +1335,7 @@ Namespace FBM
             Dim liLowestCount As Integer = 0
             Dim liLowestX, liLowestY As Integer
             liLowestCount = laiArray(0, 0)
+
             For liX = 0 To 2
                 For liY = 0 To 2
                     If (liX = 1) And (liY = 1) Then
@@ -1333,6 +1361,7 @@ Namespace FBM
             Select Case liLowestX
                 Case Is = 0
                     liNewX = Me.X - aiDistance
+
                 Case Is = 1
                     liNewX = Me.X + 2
                 Case Is = 2

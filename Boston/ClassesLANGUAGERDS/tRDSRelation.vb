@@ -620,7 +620,7 @@ Namespace RDS
                             lrNewColumn.Role = lrColumnRole
                             lrNewColumn.FactType = lrColumnRole.FactType
                         End If
-                        lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn, lrNewColumn.Name, 0)
+                        lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn.Name, lrNewColumn, 0)
                         lrNewColumn.Relation.AddUnique(Me)
 
                         Me.OriginTable.addColumn(lrNewColumn)

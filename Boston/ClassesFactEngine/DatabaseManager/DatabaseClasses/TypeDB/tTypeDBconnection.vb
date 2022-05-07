@@ -93,7 +93,7 @@ Namespace FactEngine.TypeDB
 
                             Dim lrTable As RDS.Table = arTable.Model.getTableByRoleNamePlayed(lrRelationPart.Label, False)
                             If lrTable IsNot Nothing Then
-                                lsColumnName = lrTable.createUniqueColumnName(Nothing, lrTable.Name, 0)
+                                lsColumnName = lrTable.createUniqueColumnName(lrTable.Name, Nothing, 0)
                             Else
                                 'Must be ValueType and not a Table.
                                 lsColumnName = lrRelationPart.Label

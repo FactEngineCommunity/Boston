@@ -579,6 +579,16 @@ Namespace FBM
 
         End Sub
 
+        Public Shadows Sub ChangeModel(ByRef arTargetModel As FBM.Model)
+
+            Me.Model = arTargetModel
+
+            For Each lrFactData In Me.Data
+                lrFactData.Model = arTargetModel
+            Next
+
+        End Sub
+
         Public Sub ClearModelErrors() Implements iValidationErrorHandler.ClearModelErrors
             Me.ModelError.Clear()
         End Sub

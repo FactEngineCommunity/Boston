@@ -1186,7 +1186,9 @@ Namespace RDS
         ''' <param name="asColumnName">The trial column name</param>
         ''' <param name="aiStartingInd">Start with 0. Recusion adds 1 each iteration. 0 is not added to the asColumnName</param>
         ''' <returns></returns>
-        Public Function createUniqueColumnName(ByVal arColumn As RDS.Column, ByVal asColumnName As String, ByVal aiStartingInd As Integer) As String
+        Public Function createUniqueColumnName(ByVal asColumnName As String,
+                                               Optional ByVal arColumn As RDS.Column = Nothing,
+                                               Optional ByVal aiStartingInd As Integer = 0) As String
 
             Dim lsUniqueColumnName As String = ""
 
@@ -1201,10 +1203,10 @@ Namespace RDS
             Try
                 If arColumn Is Nothing Then
                     If Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName)).Count > 0 Then
-                        lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
+                        lsUniqueColumnName = Me.createUniqueColumnName(asColumnName, arColumn, aiStartingInd + 1)
                     End If
                 ElseIf Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName) And x.Id <> arColumn.Id).Count > 0 Then
-                    lsUniqueColumnName = Me.createUniqueColumnName(arColumn, asColumnName, aiStartingInd + 1)
+                    lsUniqueColumnName = Me.createUniqueColumnName(asColumnName, arColumn, aiStartingInd + 1)
                 End If
 
                 Return lsUniqueColumnName

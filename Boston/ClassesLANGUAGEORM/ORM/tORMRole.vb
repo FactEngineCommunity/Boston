@@ -1070,7 +1070,7 @@ Namespace FBM
                 End Select
 
                 lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+                lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                 If Me.Mandatory Then
                     lbIsMandatory = True
@@ -1186,7 +1186,7 @@ Namespace FBM
                 End Select
 
                 lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+                lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                 If Me.Mandatory Then
                     lbIsMandatory = True
@@ -2212,7 +2212,7 @@ Namespace FBM
 
                                     Dim lrColumn As RDS.Column = larColumn.First
 
-                                    Dim lsColumnName As String = lrTable.createUniqueColumnName(lrColumn, Me.JoinedORMObject.Id, 0)
+                                    Dim lsColumnName As String = lrTable.createUniqueColumnName(Me.JoinedORMObject.Id, lrColumn, 0)
 
                                     Call lrColumn.setName(lsColumnName)
 
@@ -2556,7 +2556,6 @@ SkipMakingNewColumn:
                                             lrColumn.IsMandatory = Me.Mandatory
                                             lrTable.addColumn(lrColumn, Me.Model.IsDatabaseSynchronised)
                                         End If
-
                                     End If
 
                                 Case Else 'Joins a FactType.
@@ -2569,7 +2568,7 @@ SkipMakingNewColumn:
 
                                         If Not lrTable.Column.Exists(Function(x) x.Role.Id = Me.Id And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Then
                                             'There is no existing Column in the Table for lrColumn.
-                                            lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                            lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
                                             lrTable.addColumn(lrColumn, Me.Model.IsDatabaseSynchronised)
                                         End If
                                     Next

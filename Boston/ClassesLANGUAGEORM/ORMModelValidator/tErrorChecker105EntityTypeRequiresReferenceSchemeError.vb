@@ -1,4 +1,6 @@
-﻿Namespace Validation
+﻿Imports System.Reflection
+
+Namespace Validation
 
     Public Class EntityTypeRequiresReferenceSchemeError
         Inherits Validation.ErrorChecker
@@ -17,35 +19,46 @@
             Dim lbErrorFound As Boolean = False
             Dim lrTopMostSupertype As FBM.EntityType
 
-            For Each lrEntityType In Me.Model.EntityType
-                lbErrorFound = False
-                If (lrEntityType.IsObjectifyingEntityType = False) And
-                    (lrEntityType.HasCompoundReferenceMode = False) And (lrEntityType.HasSimpleReferenceScheme = False) Then
-                    If lrEntityType.SubtypeRelationship.Count > 0 Then
-                        lrTopMostSupertype = lrEntityType.GetTopmostSupertype
-                        If (lrTopMostSupertype.HasCompoundReferenceMode = False) And (lrTopMostSupertype.HasSimpleReferenceScheme = False) Then
+            Try
+
+                For Each lrEntityType In Me.Model.EntityType
+                    lbErrorFound = False
+                    If (lrEntityType.IsObjectifyingEntityType = False) And
+                        (lrEntityType.HasCompoundReferenceMode = False) And (lrEntityType.HasSimpleReferenceScheme = False) Then
+                        If lrEntityType.SubtypeRelationship.Count > 0 Then
+                            lrTopMostSupertype = lrEntityType.GetTopmostSupertype
+                            If (lrTopMostSupertype.HasCompoundReferenceMode = False) And (lrTopMostSupertype.HasSimpleReferenceScheme = False) Then
+                                lbErrorFound = True
+                            End If
+                        Else
                             lbErrorFound = True
                         End If
-                    Else
-                        lbErrorFound = True
                     End If
-                End If
 
-                If lbErrorFound Then
-                    lsErrorMessage = "Entity Type Requires Reference Scheme Error - "
-                    lsErrorMessage &= "Entity Type: '" & _
-                                      lrEntityType.Name & "'."
+                    If lbErrorFound Then
+                        lsErrorMessage = "Entity Type Requires Reference Scheme Error - "
+                        lsErrorMessage &= "Entity Type: '" &
+                                          lrEntityType.Name & "'."
 
-                    lrModelError = New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, _
-                                                      lsErrorMessage, _
-                                                      Nothing, _
-                                                      lrEntityType)
+                        lrModelError = New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,
+                                                          lsErrorMessage,
+                                                          Nothing,
+                                                          lrEntityType)
 
-                    lrEntityType.ModelError.Add(lrModelError)
+                        lrEntityType.ModelError.Add(lrModelError)
 
-                    Me.Model.AddModelError(lrModelError)
-                End If
-            Next
+                        Me.Model.AddModelError(lrModelError)
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

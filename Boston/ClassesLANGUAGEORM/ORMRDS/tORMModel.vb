@@ -442,7 +442,7 @@ Namespace FBM
                                     If Not lrTable.Column.Exists(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id) Then
                                         'There is no Column in the Table for the Role.
                                         lrColumn.Name = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lrColumn.Name))
-                                        lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                        lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
                                         If arRoleConstraint.Role.Contains(lrRole) Then
                                             lrColumn.IsMandatory = True
                                             '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
@@ -516,7 +516,7 @@ Namespace FBM
                             If Not lrTable.Column.Exists(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id) Then
                                 'There is no Column in the Table for the Role.
                                 lrColumn.Name = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lrColumn.Name))
-                                lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
                                 lrColumn.IsMandatory = lrRole.Mandatory
                                 lrTable.addColumn(lrColumn)
                             End If
@@ -1408,7 +1408,6 @@ Namespace FBM
                                 'Need to update this code when FactTypes can have supertypes in Boston.
                         End Select
 
-
                         '---------------------------------------------------------------------------------------------------
                         'If the DestinationEntity is a Subtype of another Entity, then need to set the DestinationTable to
                         '  the topmost Supertype.
@@ -1441,7 +1440,6 @@ Namespace FBM
                             Return Nothing
                         End If
 
-
                         '=================================================================
                         'Origin/Destination Predicates
                         Dim lsOriginPredicate As String = ""
@@ -1451,7 +1449,6 @@ Namespace FBM
                         Dim lrFactTypeReading As FBM.FactTypeReading
                         larRole.Add(arRole.FactType.GetOtherRoleOfBinaryFactType(arRole.Id)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
                         larRole.Add(arRole)
-
 
                         lrFactTypeReading = arRole.FactType.FindSuitableFactTypeReadingByRoles(larRole, True)
 
@@ -1515,8 +1512,9 @@ Namespace FBM
                                         If lrOriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
                                                                      And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
                                             '=====================================================
-                                            'The Column doesn't exist in the Table yet.
-                                            Dim lrNewColumn = New RDS.Column(lrOriginTable, lrColumn.ActiveRole.JoinedORMObject.Id, lrRole, lrColumn.ActiveRole, lrRole.Mandatory)
+                                            'The Column doesn't exist in the Table yet.                                            
+                                            Dim lsColumnName As String = lrOriginTable.createUniqueColumnName(lrColumn.ActiveRole.JoinedORMObject.Id)
+                                            Dim lrNewColumn = New RDS.Column(lrOriginTable, lsColumnName, lrRole, lrColumn.ActiveRole, lrRole.Mandatory)
                                             lrOriginTable.addColumn(lrNewColumn)
                                         End If
                                         larOriginColumn.Add(lrOriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _

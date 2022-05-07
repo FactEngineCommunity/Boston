@@ -469,17 +469,31 @@ Namespace FBM
 
         Public Sub ClearModelErrors() Implements iValidationErrorHandler.ClearModelErrors
 
-            Dim lbHadErrors As Boolean = False
+            Try
 
-            If Me.ModelError.Count > 0 Then
-                lbHadErrors = True
-            End If
+                Dim lbHadErrors As Boolean = False
 
-            Me.ModelError.Clear()
+                'CodeSafe
+                If Me.ModelError Is Nothing Then Me.ModelError = New List(Of ModelError)
 
-            If lbHadErrors Then
-                RaiseEvent ModelErrorsRemoved()
-            End If
+                If Me.ModelError.Count > 0 Then
+                    lbHadErrors = True
+                End If
+
+                Me.ModelError.Clear()
+
+                If lbHadErrors Then
+                    RaiseEvent ModelErrorsRemoved()
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

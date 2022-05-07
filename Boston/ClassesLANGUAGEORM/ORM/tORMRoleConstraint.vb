@@ -608,8 +608,10 @@ Namespace FBM
 
             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
+            If other Is Me Then Return False
+
             For Each lrRoleConstraintRole In Me.RoleConstraintRole
-                If Not other.RoleConstraintRole.Exists(AddressOf lrRoleConstraintRole.EqualsByRole) Then
+                If Not other.RoleConstraintRole.Exists(AddressOf lrRoleConstraintRole.EqualsByRole) Or other.RoleConstraintRole.Count <> Me.RoleConstraintRole.Count Then
                     Return False
                 End If
             Next
@@ -987,7 +989,13 @@ Namespace FBM
                                                         Return True
                                                     Case Is = pcenumConceptType.EntityType
                                                         Dim lrEntityType As FBM.EntityType = lrModelElement
-                                                        If lrEntityType.HasCompoundReferenceMode Then
+                                                        If lrEntityType Is lrRole.JoinsEntityType Then
+                                                            If lrEntityType.getCorrespondingRDSTable.Column.Find(Function(x) x.FactType Is lrRole.FactType) IsNot Nothing Then
+                                                                Return False
+                                                            Else
+                                                                Return True
+                                                            End If
+                                                        ElseIf lrEntityType.HasCompoundReferenceMode Then
                                                             Return False 'Because implied more than one Column
                                                         Else
                                                             Return True

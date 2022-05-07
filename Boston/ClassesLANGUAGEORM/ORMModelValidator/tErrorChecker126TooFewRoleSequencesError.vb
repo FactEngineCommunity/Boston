@@ -1,10 +1,12 @@
-﻿Namespace Validation
+﻿Imports System.Reflection
+
+Namespace Validation
 
     Public Class TooFewRoleSequencesError
         Inherits Validation.ErrorChecker
 
         Public Sub New(ByRef arModel As FBM.Model)
-            Call MyBase.new(arModel)
+            Call MyBase.New(arModel)
 
         End Sub
 
@@ -15,43 +17,53 @@
             Dim lsErrorMessage As String = ""
             Dim lrModelError As FBM.ModelError
 
+            Try
 
-            For Each lrRoleConstraint In Me.Model.RoleConstraint
-                Select Case lrRoleConstraint.RoleConstraintType
-                    Case Is = pcenumRoleConstraintType.RingConstraint
-                        If lrRoleConstraint.RoleConstraintRole.Count = 1 Then
+                For Each lrRoleConstraint In Me.Model.RoleConstraint
+                    Select Case lrRoleConstraint.RoleConstraintType
+                        Case Is = pcenumRoleConstraintType.RingConstraint
+                            If lrRoleConstraint.RoleConstraintRole.Count = 1 Then
 
-                            lsErrorMessage = "Role Constraint has too few Role Sequences - "
-                            lsErrorMessage &= "Role Constraint: '" & _
-                                              lrRoleConstraint.Name & "'."
+                                lsErrorMessage = "Role Constraint has too few Role Sequences - "
+                                lsErrorMessage &= "Role Constraint: '" &
+                                                  lrRoleConstraint.Name & "'."
 
-                            lrModelError = New FBM.ModelError(pcenumModelErrors.TooFewRoleSequencesError, _
-                                                              lsErrorMessage, _
-                                                              Nothing, _
-                                                              lrRoleConstraint)
+                                lrModelError = New FBM.ModelError(pcenumModelErrors.TooFewRoleSequencesError,
+                                                                  lsErrorMessage,
+                                                                  Nothing,
+                                                                  lrRoleConstraint)
 
-                            lrRoleConstraint.ModelError.Add(lrModelError)
-                            Me.Model.AddModelError(lrModelError)
-                        End If
+                                lrRoleConstraint.ModelError.Add(lrModelError)
+                                Me.Model.AddModelError(lrModelError)
+                            End If
 
-                    Case Else
-                        If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
+                        Case Else
+                            If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
 
-                            lsErrorMessage = "Role Constraint has too few Role Sequences - "
-                            lsErrorMessage &= "Role Constraint: '" & _
-                                              lrRoleConstraint.Name & "'."
+                                lsErrorMessage = "Role Constraint has too few Role Sequences - "
+                                lsErrorMessage &= "Role Constraint: '" &
+                                                  lrRoleConstraint.Name & "'."
 
-                            lrModelError = New FBM.ModelError(pcenumModelErrors.TooFewRoleSequencesError, _
-                                                              lsErrorMessage, _
-                                                              Nothing, _
-                                                              lrRoleConstraint)
+                                lrModelError = New FBM.ModelError(pcenumModelErrors.TooFewRoleSequencesError,
+                                                                  lsErrorMessage,
+                                                                  Nothing,
+                                                                  lrRoleConstraint)
 
-                            lrRoleConstraint.ModelError.Add(lrModelError)
-                            Me.Model.AddModelError(lrModelError)
+                                lrRoleConstraint.ModelError.Add(lrModelError)
+                                Me.Model.AddModelError(lrModelError)
 
-                        End If
-                End Select
-            Next
+                            End If
+                    End Select
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

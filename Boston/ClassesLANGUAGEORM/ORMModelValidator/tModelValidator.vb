@@ -92,15 +92,26 @@ Namespace Validation
 
         Public Sub CheckForErrors()
 
-            Dim lrErrorChecker As Validation.ErrorChecker
+            Try
 
-            Call Me.Model.ClearModelErrors()
+                Dim lrErrorChecker As Validation.ErrorChecker
 
-            For Each lrErrorChecker In Me.ErrorChecker
-                Call lrErrorChecker.CheckForErrors()
-            Next
+                Call Me.Model.ClearModelErrors()
 
-            Me.Model.TriggerFinishedErrorChecking()
+                For Each lrErrorChecker In Me.ErrorChecker
+                    Call lrErrorChecker.CheckForErrors()
+                Next
+
+                Me.Model.TriggerFinishedErrorChecking()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

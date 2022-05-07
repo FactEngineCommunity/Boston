@@ -675,6 +675,14 @@ Namespace FBM
 
         Public Sub NodeModified() Implements FBM.iPageObject.NodeModified
 
+            If Me.FactTypeReadingShape IsNot Nothing Then
+                If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                    Me.FactTypeReadingPoint = New Point(Me.FactTypeReadingShape.Shape.Bounds.X,
+                                                        Me.FactTypeReadingShape.Shape.Bounds.Y)
+                    Me.FactTypeReadingShape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y, True)
+                End If
+            End If
+
         End Sub
 
         Public Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
@@ -980,7 +988,7 @@ Namespace FBM
         ''' Adjusts the border height of the FactType in relation to the (number of) internal uniqueness constraints associated with the FactType.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub AdjustBorderHeight()
+        Public Sub AdjustBorderHeight(Optional ByVal abMoveFactTypeReadingShape As Boolean = False)
 
             Try
                 '-----------------------------------------------------------
@@ -1012,8 +1020,8 @@ Namespace FBM
                 End If
 
                 If Me.FactTypeReadingShape IsNot Nothing Then
-                    If Me.FactTypeReadingShape.Shape IsNot Nothing Then
-                        'Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                    If Me.FactTypeReadingShape.Shape IsNot Nothing And abMoveFactTypeReadingShape Then
+                        Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
                     End If
                 End If
 
@@ -2240,7 +2248,6 @@ Namespace FBM
                     Me.FactTable.Page = Me.Page
                     Call Me.FactTable.DisplayAndAssociate(Me, abDisplayFactTable)
 
-
                     '--------------------------------------------------------------------------
                     'Sort the FactTypeInstance.RoleGroup by SequenceNr before displaying the Roles.
                     '  NB Roles have SequenceNrs so that FactTypes with multiple Roles
@@ -2281,14 +2288,13 @@ Namespace FBM
                                 'CodeSafe; Do Nothing.
                             ElseIf lrRoleInstance.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
                                 Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
-                                    If lrValueTypeInstance.Shape IsNot Nothing Then
-                                        If lrValueTypeInstance.Shape.OutgoingLinks.Count = 0 Then
-                                            lrValueTypeInstance.Shape.Visible = False
-                                        End If
+                                If lrValueTypeInstance.Shape IsNot Nothing Then
+                                    If lrValueTypeInstance.Shape.OutgoingLinks.Count = 0 Then
+                                        lrValueTypeInstance.Shape.Visible = False
                                     End If
                                 End If
                             End If
-
+                        End If
                     Next
 
                     '---------------------------------

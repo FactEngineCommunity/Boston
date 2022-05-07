@@ -437,7 +437,7 @@ Namespace RDS
                     End If
                 End If
                 lsAttributeName = MakeCapCamelCase(lsAttributeName)
-                lsAttributeName = Me.Table.createUniqueColumnName(Me, lsAttributeName, 0)
+                lsAttributeName = Me.Table.createUniqueColumnName(lsAttributeName, Me, 0)
 
                 Return lsAttributeName
 

@@ -826,7 +826,7 @@ Namespace FBM
                     '--------------------------------------------------------------
                     'The EntityType is not already within the ORMModel so add it.
                     '--------------------------------------------------------------
-                    Me.Model.AddEntityType(lrEntityType, True, True, lrConceptInstance)
+                    Me.Model.AddEntityType(lrEntityType, True, True, lrConceptInstance, True)
                 End If
 
                 lrEntityTypeInstance = New FBM.EntityTypeInstance
@@ -890,6 +890,7 @@ Namespace FBM
 
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
+                        lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint = lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint.OrderBy(Function(x) x.IsPreferredIdentifier).ToList
                         For Each lrRoleConstraintInstance In lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint
 
                             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, lrRoleConstraintInstance.Id, pcenumConceptType.RoleConstraint)
@@ -1766,7 +1767,9 @@ Namespace FBM
         ''' <param name="abEmptySpaceFound">Set to TRUE if a blank space is found, else set to FALSE</param>
         ''' <returns>A PointF object that represents where a blank space exists on the canvas in relation to the given ModelObject.</returns>
         ''' <remarks></remarks>
-        Public Function FindBlankSpaceInRelationToModelObject(ByRef arModelObject As FBM.ModelObject, ByRef abEmptySpaceFound As Boolean) As PointF
+        Public Function FindBlankSpaceInRelationToModelObject(ByRef arModelObject As FBM.ModelObject,
+                                                              ByRef abEmptySpaceFound As Boolean,
+                                                              Optional ByVal aiMaxDistance As Integer = 50) As PointF
 
             Try
                 Dim lrPointF As New PointF(10, 10)
@@ -1788,7 +1791,7 @@ Namespace FBM
                     Throw New Exception("ModelObject with Id, " & arModelObject.Id & ", not found on Page, " & Me.Name & ".")
                 End If
 
-                Dim laiGrid(50, 50) As Integer 'The grid around the arModelObject in pixels.
+                Dim laiGrid(aiMaxDistance, aiMaxDistance) As Integer 'The grid around the arModelObject in pixels.
 
                 Dim loPageObject As FBM.iPageObject
                 loPageObject = lrTempCentreModelObject
@@ -1800,24 +1803,26 @@ Namespace FBM
                 Dim liX, liY As Integer
                 Dim liPaintX, liPaintY As Integer
 
+                Dim liMidDistance = CInt(aiMaxDistance / 2)
+                Dim liMaxDistanceMinusOne = aiMaxDistance - 1
 
                 For liX = 1 To 5
                     For liY = 1 To 5
-                        laiGrid(25 + liX, 25 + liY) = 1
+                        laiGrid(liMidDistance + liX, liMidDistance + liY) = 1
                     Next
                 Next
 
                 For Each loPageObject In Me.ValueTypeInstance
-                    If (loPageObject.X >= lrCentrePoint.X - 25) And (loPageObject.X <= lrCentrePoint.X + 25) Then
-                        If (loPageObject.Y >= lrCentrePoint.Y - 25) And (loPageObject.Y <= lrCentrePoint.Y + 25) Then
+                    If (loPageObject.X >= lrCentrePoint.X - liMidDistance) And (loPageObject.X <= lrCentrePoint.X + liMidDistance) Then
+                        If (loPageObject.Y >= lrCentrePoint.Y - liMidDistance) And (loPageObject.Y <= lrCentrePoint.Y + liMidDistance) Then
                             laiGrid(Math.Abs(lrCentrePoint.X - loPageObject.X), Math.Abs(lrCentrePoint.Y - loPageObject.Y)) += 1
                             For liX = 1 To 5
                                 For liY = 1 To 5
-                                    liPaintX = 25 + (loPageObject.X - lrCentrePoint.X) + liX
-                                    liPaintY = 25 + (loPageObject.Y - lrCentrePoint.Y) + liY
-                                    If liPaintX > 49 Then liPaintX = 49
+                                    liPaintX = liMidDistance + (loPageObject.X - lrCentrePoint.X) + liX
+                                    liPaintY = liMidDistance + (loPageObject.Y - lrCentrePoint.Y) + liY
+                                    If liPaintX > liMaxDistanceMinusOne Then liPaintX = liMaxDistanceMinusOne
                                     If liPaintX < 0 Then liPaintX = 0
-                                    If liPaintY > 49 Then liPaintY = 49
+                                    If liPaintY > liMaxDistanceMinusOne Then liPaintY = liMaxDistanceMinusOne
                                     If liPaintY < 0 Then liPaintY = 0
                                     laiGrid(liPaintX, liPaintY) += 1
                                 Next
@@ -1827,16 +1832,16 @@ Namespace FBM
                 Next
 
                 For Each loPageObject In Me.EntityTypeInstance
-                    If (loPageObject.X >= lrCentrePoint.X - 25) And (loPageObject.X <= lrCentrePoint.X + 25) Then
-                        If (loPageObject.Y >= lrCentrePoint.Y - 25) And (loPageObject.Y <= lrCentrePoint.Y + 25) Then
+                    If (loPageObject.X >= lrCentrePoint.X - liMidDistance) And (loPageObject.X <= lrCentrePoint.X + liMidDistance) Then
+                        If (loPageObject.Y >= lrCentrePoint.Y - liMidDistance) And (loPageObject.Y <= lrCentrePoint.Y + liMidDistance) Then
                             laiGrid(Math.Abs(lrCentrePoint.X - loPageObject.X), Math.Abs(lrCentrePoint.Y - loPageObject.Y)) += 1
                             For liX = 1 To 5
                                 For liY = 1 To 5
-                                    liPaintX = 25 + (loPageObject.X - lrCentrePoint.X) + liX
-                                    liPaintY = 25 + (loPageObject.Y - lrCentrePoint.Y) + liY
-                                    If liPaintX > 49 Then liPaintX = 49
+                                    liPaintX = liMidDistance + (loPageObject.X - lrCentrePoint.X) + liX
+                                    liPaintY = liMidDistance + (loPageObject.Y - lrCentrePoint.Y) + liY
+                                    If liPaintX > liMaxDistanceMinusOne Then liPaintX = liMaxDistanceMinusOne
                                     If liPaintX < 0 Then liPaintX = 0
-                                    If liPaintY > 49 Then liPaintY = 49
+                                    If liPaintY > liMaxDistanceMinusOne Then liPaintY = liMaxDistanceMinusOne
                                     If liPaintY < 0 Then liPaintY = 0
                                     laiGrid(liPaintX, liPaintY) += 1
                                 Next
@@ -1846,16 +1851,16 @@ Namespace FBM
                 Next
 
                 For Each loPageObject In Me.FactTypeInstance
-                    If (loPageObject.X >= lrCentrePoint.X - 25) And (loPageObject.X <= lrCentrePoint.X + 25) Then
-                        If (loPageObject.Y >= lrCentrePoint.Y - 25) And (loPageObject.Y <= lrCentrePoint.Y + 25) Then
+                    If (loPageObject.X >= lrCentrePoint.X - liMidDistance) And (loPageObject.X <= lrCentrePoint.X + liMidDistance) Then
+                        If (loPageObject.Y >= lrCentrePoint.Y - liMidDistance) And (loPageObject.Y <= lrCentrePoint.Y + liMidDistance) Then
                             laiGrid(Math.Abs(lrCentrePoint.X - loPageObject.X), Math.Abs(lrCentrePoint.Y - loPageObject.Y)) += 1
                             For liX = 1 To 5
                                 For liY = 1 To 5
-                                    liPaintX = 25 + (loPageObject.X - lrCentrePoint.X) + liX
-                                    liPaintY = 25 + (loPageObject.Y - lrCentrePoint.Y) + liY
-                                    If liPaintX > 49 Then liPaintX = 49
+                                    liPaintX = liMidDistance + (loPageObject.X - lrCentrePoint.X) + liX
+                                    liPaintY = liMidDistance + (loPageObject.Y - lrCentrePoint.Y) + liY
+                                    If liPaintX > liMaxDistanceMinusOne Then liPaintX = liMaxDistanceMinusOne
                                     If liPaintX < 0 Then liPaintX = 0
-                                    If liPaintY > 49 Then liPaintY = 49
+                                    If liPaintY > liMaxDistanceMinusOne Then liPaintY = liMaxDistanceMinusOne
                                     If liPaintY < 0 Then liPaintY = 0
                                     laiGrid(liPaintX, liPaintY) += 1
                                 Next
@@ -1864,12 +1869,80 @@ Namespace FBM
                     End If
                 Next
 
-                For liX = 49 To 0 Step -1
-                    For liY = 0 To 49
+                '+-------------+
+                '|             |
+                '|             |
+                '|   +--+      |
+                '|   |##|      |
+                '|   |##|      |
+                '|   +--+------+
+                '|      |######|
+                '|      |######|
+                '+------+------+
+                '
+                'Now I need an algorithm that returns the largest remaining rectangular spaces. (Ordered from top To bottom, Left to right.)
+                'Like this
+                '
+                '1                 2          3            4
+                '+-------------+   +----      -------+
+                '|#############|   |###        ######|
+                '|#############|   |###        ######|
+                '|   +--+      |   |###+      +######|
+                '                  |###|      |######|
+                '                  |###|      |######|
+                '                  |###+      +------|     |   +--+
+                '                  |###                    |######|
+                '                  |###                    |######|
+                '                  +----                   +------+
+
+                Dim lsGrid As String = ""
+
+                For liY = 0 To liMaxDistanceMinusOne
+                    For liX = 0 To liMaxDistanceMinusOne
+                        If laiGrid(liX, liY) = 0 Then
+                            lsGrid &= "O"
+                        Else
+                            lsGrid &= "*"
+                        End If
+                    Next
+                    lsGrid &= vbCrLf
+                Next
+
+                MsgBox(lsGrid)
+
+                Dim LargestRectangle As New List(Of Object)
+
+                For liY = 0 To liMaxDistanceMinusOne
+                    For liX = 0 To liMaxDistanceMinusOne
+                        If laiGrid(liX, liY) = 0 Then
+                            For liTestX = liMaxDistanceMinusOne To liX Step -1
+                                For liTestY = liMaxDistanceMinusOne To liY Step -1
+                                    If laiGrid(liTestX, liTestY) > 0 Then
+                                        LargestRectangle.Add(Tuple.Create(liX, liY, (liTestX - liX) * (liTestY - liY)))
+                                        GoTo NextTestX
+                                    End If
+                                Next
+NextTestX:
+                            Next
+                        Else
+                            GoTo NextY
+                        End If
+                    Next
+NextY:
+                Next
+
+                LargestRectangle = LargestRectangle.OrderByDescending(Function(x) x.item3).ToList
+
+                abEmptySpaceFound = True
+                Return New PointF(lrCentrePoint.X + (LargestRectangle(0).item1 - liMidDistance),
+                                  lrCentrePoint.Y + (LargestRectangle(0).item2 - liMidDistance))
+
+                For liX = liMaxDistanceMinusOne To 0 Step -1
+                    For liY = 0 To liMaxDistanceMinusOne
                         If laiGrid(liX, liY) = 0 Then
                             abEmptySpaceFound = True
-                            Return New PointF(lrCentrePoint.X + (liX - 25),
-                                               lrCentrePoint.Y + (liY - 25))
+                            Return New PointF(lrCentrePoint.X + (liX - liMidDistance),
+                                              lrCentrePoint.Y + (liY - liMidDistance))
                         End If
                     Next
                 Next

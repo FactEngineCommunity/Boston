@@ -3054,6 +3054,11 @@ SkipRegistrationChecking:
                     Exit Sub
                 End If
 
+                'CodeSafe: Make sure the Model of the Page has a ModelDictionary
+                If lrPage.Model.ModelDictionary Is Nothing Then
+                    lrPage.Model.ModelDictionary = New List(Of FBM.DictionaryEntry)
+                End If
+
                 If lrPage.CopiedModelId = prApplication.WorkingModel.ModelId And
                     lrPage.CopiedPageId = prApplication.WorkingPage.PageId Then
                     MsgBox("You cannot copy and paste to the same Model and Page")

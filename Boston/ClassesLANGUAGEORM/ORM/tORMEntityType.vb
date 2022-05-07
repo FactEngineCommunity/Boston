@@ -665,7 +665,7 @@ Namespace FBM
                             End If
 
                             lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                            lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+                            lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                             aarColumn.Add(New RDS.Column(arTable, lsColumnName, arResponsibleRole, lrActiveRole))
 
@@ -687,7 +687,7 @@ Namespace FBM
 
                                             lsColumnName = lrTopmostSupertypeEntityType.ReferenceModeValueType.Id
                                             lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                                            lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+                                            lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
                                         Else 'Is am ObjectifiedFactType
                                             Throw New NotImplementedException("Called EntityType.getCompoundReferenceSchemeColumns for an EntityType that has a Topmost Supertype that is an Objectified Fact Type. This is not implemented.")
                                         End If
@@ -702,7 +702,7 @@ Namespace FBM
 
                                     lsColumnName = lrEntityType.ReferenceModeValueType.Id
                                     lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                                    lsColumnName = arTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+                                    lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                                 End If
 

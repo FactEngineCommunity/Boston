@@ -839,7 +839,7 @@ Namespace FBM
                         lsColumnName = Viev.Strings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText, True)
                     End If
 
-                    lsColumnName = lrTable.createUniqueColumnName(Nothing, lsColumnName, 0)
+                    lsColumnName = lrTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                     Dim lrColumn As New RDS.Column(lrTable, lsColumnName, arFactType.RoleGroup(0), arFactType.RoleGroup(0), False)
                     lrColumn.FactType = arFactType

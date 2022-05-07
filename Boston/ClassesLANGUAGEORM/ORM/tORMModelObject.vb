@@ -26,7 +26,8 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized()>
+        '20220507-VM-Was. Was stopping FactData records from being deserialised.
+        '<NonSerialized()>
         <XmlIgnore()>
         <Browsable(False),
         [ReadOnly](True),

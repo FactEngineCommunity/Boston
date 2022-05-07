@@ -1051,7 +1051,7 @@ Namespace FBM
 
                             For Each lrNewColumn In arRole.getColumns(lrTable, lrColumn.Role)
 
-                                lrNewColumn.Name = lrColumn.Table.createUniqueColumnName(lrNewColumn, lrNewColumn.Name, 0)
+                                lrNewColumn.Name = lrColumn.Table.createUniqueColumnName(lrNewColumn.Name, lrNewColumn, 0)
                                 Call lrColumn.Table.addColumn(lrNewColumn)
                             Next
 
@@ -1069,7 +1069,7 @@ Namespace FBM
                     Dim lrTable As RDS.Table = arRole.FactType.getCorrespondingRDSTable()
 
                     For Each lrNewColumn In arRole.getColumns(lrTable, lrResponsibleRole)
-                        lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn, lrNewColumn.Name, 0)
+                        lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn.Name, lrNewColumn, 0)
                         lrNewColumn.Table.addColumn(lrNewColumn)
                     Next
 
@@ -2067,6 +2067,10 @@ Namespace FBM
 
                 For Each lrInternalUniquenessConstraint In Me.InternalUniquenessConstraint
                     Call lrInternalUniquenessConstraint.ChangeModel(arTargetModel, abAddToModel)
+                Next
+
+                For Each lrFact In Me.Fact
+                    Call lrFact.ChangeModel(arTargetModel)
                 Next
 
                 If Me.IsLinkFactType Then
@@ -3667,7 +3671,7 @@ Namespace FBM
 
                 '====================================================================
                 'RDS
-                If Me.IsManyTo1BinaryFactType Then
+                If Me.IsManyTo1BinaryFactType Or Me.Is1To1BinaryFactType Then
 
                     Dim lrTable As New RDS.Table(Me.Model.RDS, Me.Name, Me)
 
@@ -3691,7 +3695,7 @@ Namespace FBM
 
                     Dim lrColumn As RDS.Column
                     For Each lrColumn In larColumn
-                        lrColumn.Name = lrTable.createUniqueColumnName(Nothing, lrColumn.Name, 0)
+                        lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, Nothing, 0)
                         Call lrTable.addColumn(lrColumn)
                     Next
 
@@ -3716,7 +3720,7 @@ Namespace FBM
 
 
                 Else
-                        Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                    Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
                     If lrTable IsNot Nothing Then
 
@@ -3802,7 +3806,7 @@ Namespace FBM
                 '  but those Relations are no longer associated with the relative LinkFactType, but the FactType itself.
                 'Removing the LinkFactType from the Model will otherwise remove the Relations from the RDS Model.
                 'NB Different for ManyTo1BinaryFactType, as below.
-                If Me.IsManyTo1BinaryFactType Then
+                If Me.IsManyTo1BinaryFactType Or Me.Is1To1BinaryFactType Then
                     'Because the Relations are no longer for an RDSRelation Table, but the ModelObject/Table on the Many side of the FactType.
                     Call Me.Model.removeRDSRelationsForLinkFactTypesForFactType(Me)
                     Dim lrRole = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
@@ -3817,7 +3821,7 @@ Namespace FBM
                 Next
 
                 'RDS-Remove the RDSRelation Table if the FactType is a ManyTo1BinaryFactType
-                If Me.IsManyTo1BinaryFactType Then
+                If Me.IsManyTo1BinaryFactType Or Me.Is1To1BinaryFactType Then
                     Dim lrRDSRelationTable = Me.getCorrespondingRDSTable
                     Call Me.Model.RDS.removeTable(lrRDSRelationTable) 'Because is no longer needed for anything.
                 End If

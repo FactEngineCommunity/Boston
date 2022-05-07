@@ -4687,6 +4687,9 @@ Public Class frmDiagramORM
                         lo_role_instance.X = lo_role_instance.Shape.Bounds.X
                         lo_role_instance.Y = lo_role_instance.Shape.Bounds.Y
                     Next
+
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance = e.Node.Tag
+                    Call lrFactTypeInstance.NodeModified()
                 Case Is = pcenumConceptType.FactTypeReading
                     Dim lrFactTypeReading As FBM.FactTypeReadingInstance = e.Node.Tag
                     lrFactTypeReading.Shape.AttachTo(lrFactTypeReading.FactType.Shape, AttachToNode.MiddleRight)

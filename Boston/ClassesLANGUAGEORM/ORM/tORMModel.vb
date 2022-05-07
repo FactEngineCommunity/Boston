@@ -1335,7 +1335,7 @@ Namespace FBM
                                                 Dim lbFailed As Boolean = False
                                                 If Not lrTable.Column.Exists(Function(x) x.Role.Id = lrRole.Id And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Then
                                                     'There is no existing Column in the Table for lrColumn.
-                                                    lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                                    lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
                                                     If arRoleConstraint.Role.Contains(lrRole) Then
                                                         lrColumn.IsMandatory = True
                                                     End If
@@ -1356,7 +1356,7 @@ Namespace FBM
 
                                                             If larDownstreamColumn.Count > 1 Then
                                                                 'Add the Column anyway.
-                                                                lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                                                lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
                                                                 If arRoleConstraint.Role.Contains(lrRole) Then
                                                                     lrColumn.IsMandatory = True
                                                                 End If
@@ -1474,7 +1474,7 @@ Namespace FBM
 
                                         For Each lrColumn In larColumn
                                             'There is no Column in the Table for the Role.
-                                            lrColumn.Name = lrTable.createUniqueColumnName(lrColumn, lrColumn.Name, 0)
+                                            lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
                                             lrColumn.IsMandatory = lrRole.Mandatory
                                             lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                         Next
@@ -2739,33 +2739,44 @@ Namespace FBM
 
         Public Function CreateUniqueRoleConstraintName(ByVal asRootRoleConstraintName As String, ByVal aiCounter As Integer) As String
 
-            Dim lsTrialRoleConstraintName As String
-            If aiCounter = 0 Then
-                lsTrialRoleConstraintName = asRootRoleConstraintName
-            Else
-                lsTrialRoleConstraintName = asRootRoleConstraintName & CStr(aiCounter)
-            End If
+            Try
 
-            Dim lrRoleConstraint As New FBM.RoleConstraint(Me, lsTrialRoleConstraintName, True)
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lsTrialRoleConstraintName, pcenumConceptType.RoleConstraint)
-
-            CreateUniqueRoleConstraintName = lsTrialRoleConstraintName
-
-            If Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.EqualsByName) Or
-               TableRoleConstraint.ExistsRoleConstraint(lrRoleConstraint) Or
-               Me.ExistsModelElement(lsTrialRoleConstraintName) Or
-               Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
-
-                'Shortcut
-                Dim liCounter = Me.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asRootRoleConstraintName)).Count
-                If liCounter >= aiCounter Then
-                    aiCounter = liCounter + 1
+                Dim lsTrialRoleConstraintName As String
+                If aiCounter = 0 Then
+                    lsTrialRoleConstraintName = asRootRoleConstraintName
+                Else
+                    lsTrialRoleConstraintName = asRootRoleConstraintName & CStr(aiCounter)
                 End If
 
-                CreateUniqueRoleConstraintName = Me.CreateUniqueRoleConstraintName(asRootRoleConstraintName, aiCounter + 1)
-            Else
-                Return lsTrialRoleConstraintName
-            End If
+                Dim lrRoleConstraint As New FBM.RoleConstraint(Me, lsTrialRoleConstraintName, True)
+                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lsTrialRoleConstraintName, pcenumConceptType.RoleConstraint)
+
+                CreateUniqueRoleConstraintName = lsTrialRoleConstraintName
+
+                If Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.EqualsByName) Or
+                   TableRoleConstraint.ExistsRoleConstraint(lrRoleConstraint) Or
+                   Me.ExistsModelElement(lsTrialRoleConstraintName) Or
+                   Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
+
+                    'Shortcut
+                    Dim liCounter = Me.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asRootRoleConstraintName)).Count
+                    If liCounter >= aiCounter Then
+                        aiCounter = liCounter + 1
+                    End If
+
+                    CreateUniqueRoleConstraintName = Me.CreateUniqueRoleConstraintName(asRootRoleConstraintName, aiCounter + 1)
+                Else
+                    Return lsTrialRoleConstraintName
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Function
 
@@ -4243,23 +4254,34 @@ Namespace FBM
 
         Public Sub MakeDirty(Optional ByVal abGlobalBroadcast As Boolean = False, Optional abCheckForErrors As Boolean = True)
 
-            Me.IsDirty = True
+            Try
 
-            If abGlobalBroadcast Then
-                RaiseEvent ModelUpdated()
-            Else
-                '----------------------------
-                'Default is GlobalBroadcast
-                '----------------------------
-                'RaiseEvent ModelUpdated()
-            End If
+                Me.IsDirty = True
 
-            If abCheckForErrors And Me.AllowCheckForErrors Then
-                Dim lrValidator = New Validation.ModelValidator(Me)
-                Call lrValidator.CheckForErrors()
-            End If
+                If abGlobalBroadcast Then
+                    RaiseEvent ModelUpdated()
+                Else
+                    '----------------------------
+                    'Default is GlobalBroadcast
+                    '----------------------------
+                    'RaiseEvent ModelUpdated()
+                End If
 
-            RaiseEvent MadeDirty(abGlobalBroadcast)
+                If abCheckForErrors And Me.AllowCheckForErrors Then
+                    Dim lrValidator = New Validation.ModelValidator(Me)
+                    Call lrValidator.CheckForErrors()
+                End If
+
+                RaiseEvent MadeDirty(abGlobalBroadcast)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -4948,6 +4970,10 @@ Namespace FBM
 
             Try
                 ExistsModelElement = False
+
+                'CodeSafe: If Me.ModelDictionary is Nothing, then return False
+                '  When copying and pasting, Me (the model) may have no ModelDictionary when this method is called
+                If Me.ModelDictionary Is Nothing Then Return False
 
                 Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Trim(asModelElementName)))
 

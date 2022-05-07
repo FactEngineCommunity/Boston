@@ -372,7 +372,7 @@ Namespace FBM
 
                                     Dim lsColumnName As String
                                     For Each lrActiveRole In larActiveRole
-                                        lsColumnName = lrTable.createUniqueColumnName(Nothing, lrActiveRole.JoinedORMObject.Id, 0)
+                                        lsColumnName = lrTable.createUniqueColumnName(lrActiveRole.JoinedORMObject.Id, Nothing, 0)
                                         Dim lrColumn As New RDS.Column(lrTable, lsColumnName, lrRole, lrActiveRole, True)
                                         lrTable.addColumn(lrColumn)
                                         lrIndex = lrTable.getPrimaryKeyIndex
