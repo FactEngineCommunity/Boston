@@ -41,6 +41,7 @@ Namespace FBM
 
         <XmlAttribute()>
         <CategoryAttribute("Subtype Relationship"),
+        DisplayName("Provides Identification Path"),
         Browsable(True),
         [ReadOnly](False),
         DescriptionAttribute("True if the Primary Subtype Relationship for the Model Element."),

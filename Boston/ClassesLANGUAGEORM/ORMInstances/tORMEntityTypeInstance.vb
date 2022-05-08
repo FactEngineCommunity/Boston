@@ -1476,9 +1476,12 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & "Page.Id: " & Me.Page.PageId
                 lsMessage &= vbCrLf & "Page.Name: " & Me.Page.Name
                 lsMessage &= vbCrLf & "PreferredIdentifierRCId: " & Me.PreferredIdentifierRCId
-                If IsSomething(Me.ReferenceModeRoleConstraint) Then
-                    lsMessage &= vbCrLf & "FactType.Id: " & Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType.Id
-                End If
+                Try
+                    If IsSomething(Me.ReferenceModeRoleConstraint) Then
+                        lsMessage &= vbCrLf & "FactType.Id: " & Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType.Id
+                    End If
+                Catch
+                End Try
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 

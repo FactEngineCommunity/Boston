@@ -2100,6 +2100,7 @@ Namespace FBM
                                                   Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean Implements iModelObject.RemoveFromModel
 
             Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
+            Dim lsMessage As String
 
             Try
 
@@ -2117,15 +2118,32 @@ Namespace FBM
                         'Will only get here is an EntityType has a SimpleReferenceScheme and the 
                         ' PreferredIndentifierRCID of the EntityType is 'me' (the RoleConstraint).
                         '-------------------------------------------------------------------------------                        
-                        Call prApplication.ThrowErrorMessage("Error: Cannot remove a Role Constraint which identifies the Simple Reference Scheme of an Entity Type",
-                                                                     pcenumErrorType.Critical,
-                                                                     Nothing,
-                                                                     False)
-                        Return False
-                        Exit Function
+                        lsMessage = "Error: Cannot remove a Role Constraint which identifies the Simple Reference Scheme of an Entity Type"
+                        lsMessage.AppendDoubleLineBreak("Would you like to force the Role Constraint to be removed from the Model?")
+
+                        If prApplication.ThrowErrorMessage(lsMessage,
+                                                           pcenumErrorType.Critical,
+                                                           Nothing,
+                                                           False, ,, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                            GoTo RemoveAnyway
+                        Else
+
+                            'Organic Computing
+                            Try
+                                If Me.RoleConstraintRole.Count = 0 Then
+                                    Dim lrRole As FBM.Role = lrEntityType.ReferenceModeFactType.RoleGroup.Find(Function(x) x.JoinedORMObject IsNot lrEntityType)
+                                    Me.RoleConstraintRole.Add(New FBM.RoleConstraintRole(lrRole, Me,,,, True))
+                                End If
+                            Catch
+                                'Not a biggie.
+                            End Try
+
+                            Return False
+                            Exit Function
+                        End If
                     Next
                 End If
-
+RemoveAnyway:
                 lrModelDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrModelDictionaryEntry.Equals)
 
                 If abDoDatabaseProcessing Then
@@ -2167,7 +2185,6 @@ Namespace FBM
                 Return True
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

@@ -443,7 +443,7 @@ Namespace FBM
                     'The ValueType is already in the TargetModel
                     '----------------------------------------------
                 Else
-                    arTargetModel.AddValueType(Me)
+                    arTargetModel.AddValueType(Me,,,, True)
                 End If
 
                 Me.isDirty = True

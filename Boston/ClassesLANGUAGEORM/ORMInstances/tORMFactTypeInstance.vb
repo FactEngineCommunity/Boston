@@ -1224,48 +1224,58 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub Hide()
 
-            If Me.Page.Diagram IsNot Nothing Then
-                If Me.Shape IsNot Nothing Then
-                    Call Me.Shape.ZBottom()
-                    Me.Shape.Visible = False
-                    For Each lrRoleInstance In Me.RoleGroup
-                        Call lrRoleInstance.Link.ZBottom()
-                        lrRoleInstance.Shape.Visible = False
-                        lrRoleInstance.Link.Visible = False
-                    Next
-
-                    If Me.FactTypeReadingShape.Shape IsNot Nothing Then
-                        Call Me.FactTypeReadingShape.Shape.ZBottom()
-                        Me.FactTypeReadingShape.Shape.Visible = False
-                    End If
-
-                    For Each lrRoleConstraint In Me.InternalUniquenessConstraint
-                        Call lrRoleConstraint.Shape.ZBottom()
-                        For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
-                            lrRoleConstraintRole.Shape.Visible = False
+            Try
+                If Me.Page.Diagram IsNot Nothing Then
+                    If Me.Shape IsNot Nothing Then
+                        Call Me.Shape.ZBottom()
+                        Me.Shape.Visible = False
+                        For Each lrRoleInstance In Me.RoleGroup
+                            Call lrRoleInstance.Link.ZBottom()
+                            lrRoleInstance.Shape.Visible = False
+                            lrRoleInstance.Link.Visible = False
                         Next
-                    Next
 
-                    For Each lrRole In Me.RoleGroup
-                        If lrRole.Shape IsNot Nothing Then
-                            lrRole.RoleName.Shape.ZBottom()
-                            lrRole.RoleName.Shape.Visible = False
+                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                            Call Me.FactTypeReadingShape.Shape.ZBottom()
+                            Me.FactTypeReadingShape.Shape.Visible = False
                         End If
-                    Next
 
-                    Dim larRoleConstraintRole = From RoleConstraintInstance In Me.Page.RoleConstraintInstance _
-                                                From RoleConstraintRoleInstance In RoleConstraintInstance.RoleConstraintRole _
-                                                Where Me.RoleGroup.FindAll(Function(x) x.Id = RoleConstraintRoleInstance.Role.Id).Count > 0
-                                                Select RoleConstraintRoleInstance
+                        For Each lrRoleConstraint In Me.InternalUniquenessConstraint
+                            Call lrRoleConstraint.Shape.ZBottom()
+                            For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
+                                lrRoleConstraintRole.Shape.Visible = False
+                            Next
+                        Next
 
-                    For Each lrRoleConstraintRoleInstance In larRoleConstraintRole
-                        If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
-                            Me.Page.Diagram.Links.Remove(lrRoleConstraintRoleInstance.Link)
-                        End If
-                    Next
+                        For Each lrRole In Me.RoleGroup
+                            If lrRole.Shape IsNot Nothing Then
+                                lrRole.RoleName.Shape.ZBottom()
+                                lrRole.RoleName.Shape.Visible = False
+                            End If
+                        Next
 
+                        Dim larRoleConstraintRole = From RoleConstraintInstance In Me.Page.RoleConstraintInstance
+                                                    From RoleConstraintRoleInstance In RoleConstraintInstance.RoleConstraintRole
+                                                    Where Me.RoleGroup.FindAll(Function(x) x.Id = RoleConstraintRoleInstance.Role.Id).Count > 0
+                                                    Select RoleConstraintRoleInstance
+
+                        For Each lrRoleConstraintRoleInstance In larRoleConstraintRole
+                            If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
+                                Me.Page.Diagram.Links.Remove(lrRoleConstraintRoleInstance.Link)
+                            End If
+                        Next
+
+                    End If
                 End If
-            End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

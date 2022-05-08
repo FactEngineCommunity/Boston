@@ -114,6 +114,24 @@ Namespace FBM
         <XmlIgnore()>
         Public ObjectifiedFactType As FBM.FactType = Nothing
 
+        Public ReadOnly Property ReferenceSchemeRoleConstraint As FBM.RoleConstraint
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).ReferenceModeRoleConstraint
+                    Case Is = GetType(FBM.FactType)
+                        Dim lrFactType = CType(Me, FBM.FactType)
+                        If lrFactType.IsObjectified Then
+                            Return lrFactType.ObjectifyingEntityType.ReferenceModeRoleConstraint
+                        Else
+                            Return Nothing
+                        End If
+                    Case Else 'Value type
+                        Return Nothing
+                End Select
+            End Get
+        End Property
+
         <XmlIgnore()>
         Public ReadOnly Property DatabaseName As String
             Get

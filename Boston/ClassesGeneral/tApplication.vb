@@ -505,10 +505,11 @@ Public Class tApplication
 
                             If abAbortApplication Then asErrorMessage &= vbCrLf & vbCrLf & "This is a critical error. Boston will now close."
 
-                            MsgBox(asErrorMessage, MsgBoxStyle.Critical)
+                            Dim aiMessageResponse As MsgBoxResult = MsgBox(asErrorMessage, MsgBoxStyle.Critical + aiMessageBoxButtons)
 
                             If abAbortApplication Then Call Application.Exit()
 
+                            Return aiMessageResponse
                         End If
                     Case Is = pcenumErrorType.Warning
 

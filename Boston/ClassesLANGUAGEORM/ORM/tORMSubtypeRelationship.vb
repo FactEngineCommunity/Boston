@@ -214,12 +214,21 @@ Namespace FBM
             Try
 
                 If abIsPrimarySubtypeRelationship And Me.ModelElement.SubtypeRelationship.Count > 1 Then
+
                     Dim larSubtypeRelationship = From SubtypeRelationship In Me.ModelElement.SubtypeRelationship
                                                  Where SubtypeRelationship IsNot Me
                                                  Select SubtypeRelationship
 
                     For Each lrSubtypeReltionship In larSubtypeRelationship.ToList
-                        Call lrSubtypeReltionship.setIsPrimarySubtypeRelationship(False)
+
+                        If lrSubtypeReltionship.parentModelElement.HasPrimaryReferenceScheme And Me.parentModelElement.HasPrimaryReferenceScheme Then
+                            If lrSubtypeReltionship.parentModelElement.ReferenceSchemeRoleConstraint IsNot Me.parentModelElement.ReferenceSchemeRoleConstraint Then
+                                Call lrSubtypeReltionship.setIsPrimarySubtypeRelationship(False)
+                            End If
+                        Else
+                            Call lrSubtypeReltionship.setIsPrimarySubtypeRelationship(False)
+                        End If
+
                     Next
                 End If
 

@@ -411,7 +411,9 @@ Public Class frmToolboxORMVerbalisation
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseError(lsMessage)
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
         End Try
 
 

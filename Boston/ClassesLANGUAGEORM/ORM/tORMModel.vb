@@ -3546,6 +3546,9 @@ Namespace FBM
                 'RDS
                 '=====================================================================================
                 'RDS
+                'CodeSafe 
+                If arRoleConstraint.RoleConstraintRole.Count = 0 Then Exit Sub
+
                 If (Not arRoleConstraint.IsMDAModelElement) And Me.RDSCreated Then ' ContainsLanguage.Contains(pcenumLanguage.EntityRelationshipDiagram) Then 'For now, check this...because otherwise RDS may have no Tables.
 
                     If arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then

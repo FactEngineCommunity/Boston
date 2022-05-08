@@ -11228,10 +11228,15 @@ Public Class frmDiagramORM
 
     Private Sub ContextMenuStrip_SubtypeRelationship_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_SubtypeRelationship.Opening
 
-        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing
 
         Try
-            lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+            Try
+                lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+            Catch
+                Exit Sub
+            End Try
+
 
             If lrSubtypeRelationshipInstance.FactType.IsDisplayedAssociated Then
                 If lrSubtypeRelationshipInstance.FactType.RoleGroup(0).Shape.Visible = True Then
@@ -11392,7 +11397,11 @@ Public Class frmDiagramORM
         Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
 
         Try
-            lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+            Try
+                lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+            Catch
+                Exit Sub
+            End Try
 
             If lrSubtypeRelationshipInstance.FactType.Shape IsNot Nothing Then
                 lrSubtypeRelationshipInstance.FactType.Hide()
