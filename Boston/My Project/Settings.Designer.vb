@@ -353,10 +353,10 @@ Namespace My
                 Me("DisplayLanguageModel") = value
             End Set
         End Property
-
-        <Global.System.Configuration.UserScopedSettingAttribute(),
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property SilentPreConfiguration() As Boolean
             Get
                 Return CType(Me("SilentPreConfiguration"),Boolean)
@@ -831,6 +831,30 @@ Namespace My
             End Get
             Set
                 Me("UseAutomatedErrorReporting") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property DummySetting() As Boolean
+            Get
+                Return CType(Me("DummySetting"),Boolean)
+            End Get
+            Set
+                Me("DummySetting") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute(".\shapelibrary\propertygraphschema.shl")>  _
+        Public Property PGSShapeLibrary() As String
+            Get
+                Return CType(Me("PGSShapeLibrary"),String)
+            End Get
+            Set
+                Me("PGSShapeLibrary") = value
             End Set
         End Property
     End Class

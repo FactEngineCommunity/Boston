@@ -2147,7 +2147,6 @@ Namespace FBM
                     StringSize = Me.Page.Diagram.MeasureString(Trim(lsFactTypeName), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     StringSize.Height += 5
 
-
                     If Me.FactTypeName IsNot Nothing Then
                         loFactTypeName = Me.Page.Diagram.Factory.CreateShapeNode(Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height) 'Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height)
                     Else
@@ -2191,7 +2190,6 @@ Namespace FBM
                     End If
 
                     loFactTypeName.Visible = Me.ShowFactTypeName
-
 
                     '==========================================================================================================
                     'FactTypeDerivationText

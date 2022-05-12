@@ -12,7 +12,7 @@ Public Class frmAbout
 
         Dim ls_message As String = ""
 
-        ls_message = "Boston version: v" & prApplication.ApplicationVersionNr
+        ls_message = "Boston version: v" & prApplication.ApplicationVersionNr & " (Assembly: " & psAssemblyFileVersionNumber & ")"
         ls_message &= vbCrLf
         ls_message &= "Boston database version: v" & prApplication.DatabaseVersionNr
 

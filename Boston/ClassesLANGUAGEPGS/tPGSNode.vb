@@ -132,7 +132,7 @@ Namespace PGS
 
         End Function
 
-        Public Overrides Function ClonePGSNode(ByRef arPage As FBM.Page) As PGS.Node
+        Public Overrides Function ClonePGSNodeType(ByRef arPage As FBM.Page) As PGS.Node
 
             '-----------------------------------------------------
             'As in 'Entity' within an EntityRelationshipDiagram

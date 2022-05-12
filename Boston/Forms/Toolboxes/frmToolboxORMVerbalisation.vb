@@ -3152,7 +3152,7 @@ Public Class frmToolboxORMVerbalisation
             'Declare that the EntityType(Name) is an EntityType
             '------------------------------------------------------
             lrVerbaliser.VerbalisePredicateText(arNode.Data)
-            lrVerbaliser.VerbaliseQuantifier(" is a Node.")
+            lrVerbaliser.VerbaliseQuantifier(" is a Node Type.")
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 

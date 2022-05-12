@@ -24,6 +24,8 @@ Namespace FBM
         Public Shadows Property X As Integer Implements FBM.iPageObject.X
         Public Shadows Property Y As Integer Implements FBM.iPageObject.Y
 
+        Public Visible As Boolean = False
+
         Public Sub New()
             '---------------------
             'Default Constructor
@@ -105,7 +107,7 @@ Namespace FBM
 
 
                 If Not Me.FactTypeInstance.isPreferredReferenceMode Then
-                    loFactTable.Visible = abDisplayFactTable
+                    loFactTable.Visible = abDisplayFactTable Or Me.Visible
                 Else
                     loFactTable.Visible = False
                 End If

@@ -179,7 +179,7 @@ Public Class frmToolboxEnterpriseExplorer
                     'Limit the number of Models the user can work with to 3 Models if
                     '  they are using Boston Student
                     '------------------------------------------------------------------
-                    If (prApplication.SoftwareCategory = pcenumSoftwareCategory.Student) And (liModelCount = 3) Then
+                    If (prApplication.SoftwareCategory = pcenumSoftwareCategory.Student) And (liModelCount = 10) Then
                         Exit For
                     End If
 
@@ -1813,10 +1813,10 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lsMessage As String = ""
 
             If prApplication.SoftwareCategory = pcenumSoftwareCategory.Student Then
-                If Me.TreeView.Nodes(0).Nodes.Count >= 3 Then
-                    lsMessage = "Boston Student only supports 3 Models in the Model Explorer."
+                If Me.TreeView.Nodes(0).Nodes.Count >= 10 Then
+                    lsMessage = "Boston Student only supports 10 Models in the Model Explorer."
                     lsMessage &= vbCrLf & vbCrLf
-                    lsMessage &= "Upgrade to Boston Professional to work with unlimited Models."
+                    lsMessage &= "Upgrade to Boston Professional to work with unlimited Models, or remove some Models from the Model Explorer."
                     MsgBox(lsMessage)
 
                     Return Nothing

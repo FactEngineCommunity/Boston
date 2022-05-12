@@ -1639,6 +1639,45 @@ Namespace FBM
 
         End Sub
 
+        Sub DropPGSNodeTypeAtPoint(ByRef arNodeTypeInstance As PGS.Node, ByVal aoPointF As PointF)
+
+            Dim lsSQLQuery As String
+            Dim lrFactInstance As FBM.FactInstance
+
+            Try
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " (" & pcenumCMML.Element.ToString
+                lsSQLQuery &= " , " & pcenumCMML.ElementType.ToString & ")"
+                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= "'" & arNodeTypeInstance.Name & "'"
+                lsSQLQuery &= ",'" & pcenumCMML.Entity.ToString & "'"
+                lsSQLQuery &= ")"
+
+                lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                arNodeTypeInstance = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNodeType(Me)
+
+                arNodeTypeInstance.X = aoPointF.X
+                arNodeTypeInstance.Y = aoPointF.Y
+
+                Call arNodeTypeInstance.DisplayAndAssociate()
+
+                Call Me.MakeDirty()
+                Call Me.Save()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub DropExistingEntityAtPoint(ByRef arEntityInstance As ERD.Entity, ByVal aoPointF As PointF, Optional ByVal abSavePage As Boolean = True)
 
             Try
@@ -2618,7 +2657,7 @@ Namespace FBM
                             lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             Dim lrFactDataInstance As FBM.FactDataInstance = lrRecordset("Element")
-                            lrOriginatingNode = lrFactDataInstance.ClonePGSNode(Me)
+                            lrOriginatingNode = lrFactDataInstance.ClonePGSNodeType(Me)
                             lrOriginatingNode.RDSTable = lrTable
 
                             Me.ERDiagram.Entity.Add(lrOriginatingNode)

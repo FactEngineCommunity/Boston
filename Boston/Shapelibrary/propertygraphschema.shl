@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<shapes xmlns="http://mindfusion.org/flowchart">
+  <shape id="Node Type" fill-mode="Winding">
+    <outline>
+      <arc x="9" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#000000" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations/>
+    <textarea>
+    </textarea>
+  </shape>
+</shapes>

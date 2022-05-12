@@ -325,7 +325,7 @@ Public Class frmDiagramPGS
                 lrPGSNode = New PGS.Node
 
                 lrFactDataInstance = lrRecordset("Element")
-                lrPGSNode = lrFactDataInstance.ClonePGSNode(arPage)
+                lrPGSNode = lrFactDataInstance.ClonePGSNodeType(arPage)
 
                 lsSQLQuery = "SELECT COUNT(*)"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
@@ -791,14 +791,24 @@ Public Class frmDiagramPGS
 
     Sub SetToolbox()
 
-        Dim lsl_shape_library As ShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ERDShapeLibrary)
+        Try
+            Dim lsl_shape_library As ShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.PGSShapeLibrary)
 
-        Dim lrToolboxForm As frmToolbox
-        lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+            Dim lrToolboxForm As frmToolbox
+            lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-        If IsSomething(lrToolboxForm) Then
-            lrToolboxForm.ShapeListBox.Shapes = lsl_shape_library.Shapes
-        End If
+            If IsSomething(lrToolboxForm) Then
+                lrToolboxForm.ShapeListBox.Shapes = lsl_shape_library.Shapes
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1241,24 +1251,17 @@ Public Class frmDiagramPGS
         '--------------------------------------
         'Set the PropertiesGrid.SeletedObject
         '--------------------------------------
-        'Dim lrPropertyGridForm As frmToolboxProperties
+        Dim lrPropertyGridForm As frmToolboxProperties
 
-        'Dim lrERDTableNode As ERD.TableNode
-        'lrERDTableNode = e.Node.Tag.TableShape
+        Dim lrPGSNodeType As PGS.Node
+        lrPGSNodeType = e.Node.Tag
 
-        'Dim loMousePoint As PointF = Me.DiagramView.ClientToDoc(New Point(Me.DiagramView.PointToClient(Control.MousePosition).X, Me.DiagramView.PointToClient(Control.MousePosition).Y))
-
-
-
-        'If loMousePoint.X > lrERDTableNode.Bounds.Left And loMousePoint.X < lrERDTableNode.Bounds.Right _
-        '   And loMousePoint.Y > lrERDTableNode.Bounds.Top And loMousePoint.Y < (lrERDTableNode.Bounds.Y + lrERDTableNode.CaptionHeight) Then
-        '    lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-        '    If IsSomething(lrPropertyGridForm) Then
-        '        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-        '        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-        '        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
-        '    End If
-        'End If
+        lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+        If IsSomething(lrPropertyGridForm) Then
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+            lrPropertyGridForm.PropertyGrid.SelectedObject = lrPGSNodeType
+        End If
 
         '===========================================
         'Populate the Cypher Toolbox if it is open
@@ -1417,7 +1420,7 @@ Public Class frmDiagramPGS
 
                             Dim larEntityList = (From Entity In lrPage.ERDiagram.Entity
                                                  Where Entity.Name = lrAdditionalObject.Name
-                                                 Select Entity.ClonePGSNode(Me.zrPage))
+                                                 Select Entity.ClonePGSNodeType(Me.zrPage))
 
                             For Each lrNode In larEntityList
                                 'Will only be one, but saves coding if...then...
@@ -2024,85 +2027,120 @@ Public Class frmDiagramPGS
 
             Dim lrNode As PGS.Node
 
-            If loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
+            If loDraggedNode.Index >= 0 Then
 
-                Dim lrTable As RDS.Table
-                lrTable = loDraggedNode.Tag
+                Dim lrToolboxForm As frmToolbox
+                lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-                Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
-                If lrClashNode IsNot Nothing Then
-                    lrNode = lrClashNode
-                    'The Node is already on the Page.
-                    lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
-                    If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
-                        lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
-                    End If
-                    MsgBox(lsMessage)
-                    Exit Sub
+                If loDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
+
+                    Select Case lrToolboxForm.ShapeListBox.Shapes(loDraggedNode.Index).Id
+                        Case Is = "Node Type"
+                            '---------------------------------------------------------------
+                            'Establish a new EntityType and Entity for the dropped object.
+                            '---------------------------------------------------------------    
+
+                            Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
+                            lrEntityType = Me.zrPage.Model.CreateEntityType
+
+                            Dim lrTable As New RDS.Table(Me.zrPage.Model.RDS, lrEntityType.Id, lrEntityType)
+                            Call Me.zrPage.Model.RDS.addTable(lrTable)
+
+                            Dim lsNodeTypeName As String = Me.zrPage.Model.CreateUniqueEntityName(lrEntityType.Name)
+                            Dim lrNodeType As New PGS.Node(Me.zrPage, lsNodeTypeName)
+                            '=========================================================================================
+
+                            With New WaitCursor
+                                Call Me.zrPage.DropPGSNodeTypeAtPoint(lrNodeType, loPointF)
+                            End With
+
+                            'Leave at this point in the code.
+                            lrNodeType.RDSTable = lrTable
+
+                            Me.zrPage.ERDiagram.Entity.Add(lrNodeType)
+                            '=========================================================================================
+                    End Select
                 End If
 
+            ElseIf loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
 
-                '------------------
-                'Load the Entity.
-                '==================================================================================================================
-                Dim lsSQLQuery As String = ""
-                Dim lrRecordset As ORMQL.Recordset
-                Dim lrFactInstance As FBM.FactInstance
+                Dim lrTable As RDS.Table
+                    lrTable = loDraggedNode.Tag
 
-                lsSQLQuery = "SELECT *"
-                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
+                    Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
+                    If lrClashNode IsNot Nothing Then
+                        lrNode = lrClashNode
+                        'The Node is already on the Page.
+                        lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
+                        If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
+                            lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
+                        End If
+                        MsgBox(lsMessage)
+                        Exit Sub
+                    End If
 
-                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    '------------------
+                    'Load the Entity.
+                    '==================================================================================================================
+                    Dim lsSQLQuery As String = ""
+                    Dim lrRecordset As ORMQL.Recordset
+                    Dim lrFactInstance As FBM.FactInstance
 
-                lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
 
-                lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNode(Me.zrPage)
+                    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+                    lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNodeType(Me.zrPage)
                 '===================================================================================================================
                 lrNode.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code.
                 Call Me.zrPage.DropExistingPGSNodeAtPoint(lrNode, loPointF)
 
                 If lrNode.RDSTable.isPGSRelation And lrNode.RDSTable.Arity < 3 Then
-                    'Need to load the relation for the joined Nodes, not the PGSRelation.
-                    'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
+                        'Need to load the relation for the joined Nodes, not the PGSRelation.
+                        'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
 
-                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
+                        Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
 
-                    Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
+                        Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
 
-                    Dim larDestinationModelObjects = lrFactType.getDestinationModelObjects
+                        Dim larDestinationModelObjects = lrFactType.getDestinationModelObjects
 
-                    Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
-                                                                                      larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
+                        Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
+                                                                                          larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
 
-                    Dim lbAllFound As Boolean = True
-                    For Each lrModelObject In larDestinationModelObjects
-                        If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
-                            lbAllFound = False
+                        Dim lbAllFound As Boolean = True
+                        For Each lrModelObject In larDestinationModelObjects
+                            If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                                lbAllFound = False
+                            End If
+                        Next
+
+                        If lbAllFound Then
+                            If lrNode.RDSTable.isPGSRelation Then
+                                Call Me.zrPage.DisplayPGSRelationNodeLink(lrNode, lrRDSRelation)
+                                lrNode.Shape.Visible = False
+                                For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
+                                    lrEdge.Visible = False
+                                Next
+                            End If
                         End If
-                    Next
-
-                    If lbAllFound Then
-                        If lrNode.RDSTable.isPGSRelation Then
-                            Call Me.zrPage.displayPGSRelationNodeLink(lrNode, lrRDSRelation)
-                            lrNode.Shape.Visible = False
-                            For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
-                                lrEdge.Visible = False
-                            Next
-                        End If
+                    Else
+                        Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
+                        Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
                     End If
-                Else
-                    Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
-                    Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
+
                 End If
 
             End If
-
-        End If
 
     End Sub
 
@@ -2127,7 +2165,7 @@ Public Class frmDiagramPGS
                 lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
                 If (lrDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount) Then
                     Select Case lrDraggedNode.Tag.Id
-                        Case Is = "Entity"
+                        Case Is = "Node Type"
                             e.Effect = DragDropEffects.Copy
                         Case Else
                             e.Effect = DragDropEffects.None

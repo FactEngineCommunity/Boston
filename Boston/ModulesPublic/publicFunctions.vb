@@ -97,40 +97,43 @@ Namespace Richmond
                     lsDataProvider = lrSQLConnectionStringBuilder("Provider")
 
                     If Not System.IO.File.Exists(lsDatabaseLocation) Then
-
                         '-----------------------------------
                         'Try and find the database locally
                         '-----------------------------------
                         lsLocalDatabaseLocation = Richmond.MyPath & "\database\boston.vdb"
 
-                        lsMessage = "Cannot find the ORM Stuio database at the default/configured location:"
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= lsDatabaseLocation
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "If this is a new installation of Boston, Boston will try and locate the database at:"
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= lsLocalDatabaseLocation
-                        lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "If this is a not a new installation of Boston, contact FactEngine support."
+                        If Not My.Settings.SilentPreConfiguration Then
 
-                        If My.Settings.SilentPreConfiguration Then
-                            '-------------------------------------
-                            'Don't display anything to the user.
-                            '-------------------------------------
-                        Else
+                            lsMessage = "Cannot find the ORM Stuio database at the default/configured location:"
+                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
+                            lsMessage.AppendDoubleLineBreak("If this is a new installation of Boston, Boston will try and locate the database at:")
+                            lsMessage.AppendDoubleLineBreak(lsLocalDatabaseLocation)
+                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
+
                             MsgBox(lsMessage)
                         End If
+
+                        Try
+                            lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
+                            If lsDatabaseLocation IsNot Nothing Then
+                                If System.IO.File.Exists(lsDatabaseLocation) Then
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    lsConnectionString = My.Settings.DatabaseConnectionString
+                                    GoTo OpenConnection
+                                End If
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie.
+                        End Try
 
                         If System.IO.File.Exists(lsLocalDatabaseLocation) Then
                             lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
                             My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
                             lsMessage = "Saving the following as the Database Connection String for your installation of Boston."
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage &= lrSQLConnectionStringBuilder.ConnectionString
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage.AppendLine("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage &= "To make changes to the Boston database connection string, go to [Boston]->[Configuration]"
+                            lsMessage.AppendDoubleLineBreak(lrSQLConnectionStringBuilder.ConnectionString)
+                            lsMessage.AppendDoubleLineBreak("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
+                            lsMessage.AppendDoubleLineBreak("To make changes to the Boston database connection string, go to [Boston]->[Configuration]")
 
                             If Not My.Settings.SilentPreConfiguration Then
                                 MsgBox(lsMessage)
@@ -153,9 +156,21 @@ Namespace Richmond
                             frmCRUDBostonConfiguration.ShowDialog()
                             Return False
                         End If
-
                     End If
                 End If
+
+OpenConnection:
+                Dim regKey As Microsoft.Win32.RegistryKey
+                regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE", True)
+                regKey.CreateSubKey("Boston")
+                regKey.Close()
+                regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE\Boston", True)
+                regKey.SetValue("DatabaseLocation", lsDatabaseLocation)
+
+                Dim loConfiguration As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
+                regKey.SetValue("ConfigurationFileLocation", loConfiguration.FilePath)
+                'Below Failed...because no permissions.
+                'My.Computer.Registry.SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Boston\Variables", "DatabaseLocation", lsDatabaseLocation)
 
                 '------------------------------------------------
                 'Open the (database) connection

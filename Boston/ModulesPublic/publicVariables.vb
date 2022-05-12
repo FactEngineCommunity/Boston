@@ -22,6 +22,7 @@ Public Module publicVariables
 
     Public psApplicationApplicationVersionNr As String
     Public psApplicationDatabaseVersionNr As String
+    Public psAssemblyFileVersionNumber As String
 
     Public prThinfinity As New Cybele.Thinfinity.VirtualUI
 

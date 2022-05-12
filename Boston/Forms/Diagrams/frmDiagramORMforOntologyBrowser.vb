@@ -7777,7 +7777,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     Else
                         Dim larEntityList = (From Entity In lrPage.ERDiagram.Entity
                                              Where Entity.Name = lrAdditionalObject.Name
-                                             Select Entity.ClonePGSNode(lrPage)).ToList
+                                             Select Entity.ClonePGSNodeType(lrPage)).ToList
 
                         For Each lrNode In larEntityList.FindAll(Function(x) x.NodeType <> pcenumPGSEntityType.Relationship And x.PGSRelation Is Nothing)
                             Me.MorphVector.Add(New tMorphVector(lrAdditionalObject.X, lrAdditionalObject.Y, lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y, 40))

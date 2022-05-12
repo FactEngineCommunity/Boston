@@ -1248,6 +1248,14 @@ SkipValueTypeInstance:
                         End If
 
                     Next
+
+                    'FactTable
+                    Dim lrFactTableInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTable And x.Symbol = lrFactTypeInstance.Id)
+                    If lrFactTableInstance IsNot Nothing Then
+                        lrFactTypeInstance.FactTable.X = lrFactTableInstance.X
+                        lrFactTypeInstance.FactTable.Y = lrFactTableInstance.Y
+                        lrFactTypeInstance.FactTable.Visible = True
+                    End If
                 Next
 
                 '===============================================================================================

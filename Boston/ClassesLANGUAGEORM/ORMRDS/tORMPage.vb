@@ -215,7 +215,7 @@ Namespace FBM
 
                 lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNode(Me)
+                lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNodeType(Me)
                 '===================================================================================================================
                 lrNode.RDSTable = asTable 'IMPORTANT: Leave this at this point in the code.
 

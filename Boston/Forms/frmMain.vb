@@ -49,7 +49,6 @@ Public Class frmMain
     'NB See Main.Designer  Protected Overrides Sub Dispose(ByVal disposing As Boolean)
     Private Const ServiceEndpointUri As String = "http://localhost:9001/WCFServices/DuplexService"
 
-
     Private Sub frm_main_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Try
@@ -89,23 +88,54 @@ Public Class frmMain
             psApplicationDatabaseVersionNr = "1.33"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
-            Dim lsAssemblyFileVersionNumber As String
             Dim loAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
             Dim loFVI As System.Diagnostics.FileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(loAssembly.Location)
-            lsAssemblyFileVersionNumber = loFVI.FileVersion
+            psAssemblyFileVersionNumber = loFVI.FileVersion
 
             'Make sure the Config is up to date
-            If Not ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).HasFile Then
+            Dim loConfiguration As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
+            If Not loConfiguration.HasFile Then
+
+                Try
+                    Dim lsConfigurationFileLocation As String = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "ConfigurationFileLocation", Nothing)
+                    If lsConfigurationFileLocation IsNot Nothing Then
+                        loConfiguration = System.Configuration.ConfigurationManager.OpenExeConfiguration(lsConfigurationFileLocation)
+                        My.Settings.Save()
+                        loConfiguration.Save(ConfigurationSaveMode.Full, True)
+                        GoTo ConfigurationOK
+                    End If
+
+                    Dim lsPath = Path.GetDirectoryName(Richmond.GetConfigFileLocation)
+                    Dim lasAssemblyFileNumber As New List(Of String) From {"6.1.1.0", "6.1.0.0", "6.0.1.0", "4.0.0.0"}
+                    For Each lsAssemblyFileVersionNr In lasAssemblyFileNumber
+                        lsPath = lsPath.Replace("FactEngine", "Viev_Pty_Ltd").Replace(psAssemblyFileVersionNumber, lsAssemblyFileVersionNr) & "\user.config"
+                        If File.Exists(lsPath) Then
+                            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(Richmond.GetConfigFileLocation))
+                            File.Copy(lsPath, Richmond.GetConfigFileLocation)
+
+                            MsgBox("As part of this upgrade Boston needs to restart. Press [Ok] to close Boston and then restart Boston.")
+                            Me.Close()
+                            Me.Dispose()
+
+                        End If
+                    Next
+                Catch ex As Exception
+                    'Not a biggie
+                End Try
+
                 My.Settings.Upgrade()
                 My.Settings.Save()
+
             End If
+
+ConfigurationOK:
 
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
                 ltSplashThread.IsBackground = True
-                ltSplashThread.Start(lsAssemblyFileVersionNumber)
+                ltSplashThread.Start(psAssemblyFileVersionNumber)
             Else
-                Call Me.LoadSplashScreen(lsAssemblyFileVersionNumber)
+                Call Me.LoadSplashScreen(psAssemblyFileVersionNumber)
             End If
 
             '==============================================================================================================================
@@ -146,14 +176,14 @@ Public Class frmMain
                         'Create and initialize plugin
                         prApplication.Plugins(liInd).PluginObject = DirectCast(PluginServices.CreateInstance(prApplication.Plugins(liInd)), Viev.PluginFramework.IPlugin)
                         prApplication.PluginInterface.DockPanel = Me.DockPanel
-                        prApplication.Plugins(liInd).PluginObject.Initialize(prApplication.PluginInterface)                        
+                        prApplication.Plugins(liInd).PluginObject.Initialize(prApplication.PluginInterface)
                     Next
                 End If
             End If
             '===============================================================================
             '-------------------------------------------------------------------------------------------------------------
             '20170101-VM-Might pay to (first-use) copy the database to the following directory and set the user permissions to 
-            '  stop MS Access "An updatable query is required" errors, when the JetEngine can't access the database file.
+            '  stop MS Access "An updatable query Is required" errors, when the JetEngine can't access the database file.
             '  There's a problem storing the database in the C:\ProgramFiles\<ApplicationDirectory> because of hightened security 
             '  in later versions of MS Windows.
             'NB Initially, testing to see if changing the database directory security permissions can be done here (see below).          
@@ -274,7 +304,7 @@ Public Class frmMain
                         '--------------------------------------------------------------------------------------------------------------
                         lsMessage = "Contact FactEngine support. This installation of Boston requires a Database Version Number less than the one installed"
                         lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Database version required by software: " & prApplication.DatabaseVersionNr & vbCrLf
+                        lsMessage &= "Database version required by software:  " & prApplication.DatabaseVersionNr & vbCrLf
                         lsMessage &= "Required database version (Configuration): " & My.Settings.DatabaseVersionNumber & vbCrLf
                         lsMessage &= "Database version (actual database): " & lsDatabaseVersionNumber & vbCrLf
                         lsMessage &= vbCrLf & vbCrLf
@@ -450,7 +480,7 @@ SkipRegistrationChecking:
                 'Automatic Update Checker
                 '-------------------------
                 If My.Settings.UseAutoUpdateChecker And lbCanCheckForUpdates Then
-                    AutoUpdater.InstalledVersion = New Version(lsAssemblyFileVersionNumber)
+                    AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
                     AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
                 End If
 
@@ -466,14 +496,13 @@ SkipRegistrationChecking:
             End If
 
         Catch ex As Exception
-                Dim lsMessage1 As String
+            Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
-
 
     End Sub
 

@@ -1542,7 +1542,7 @@ Public Class frmDiagramERD
 
                         Dim larEntityList = (From Entity In lrPage.ERDiagram.Entity
                                              Where Entity.Name = lrAdditionalObject.Name
-                                             Select Entity.ClonePGSNode(Me.zrPage)).ToList
+                                             Select Entity.ClonePGSNodeType(Me.zrPage)).ToList
 
 
                         For Each lrNode In larEntityList.FindAll(Function(x) x.NodeType <> pcenumPGSEntityType.Relationship And x.PGSRelation Is Nothing)

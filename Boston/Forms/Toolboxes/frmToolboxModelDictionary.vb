@@ -864,7 +864,14 @@ Public Class frmToolboxModelDictionary
         Dim lrModelObject As FBM.ModelObject
 
         Try
-            lrModelObject = Me.TreeView1.SelectedNode.Tag
+            Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                Case Is = GetType(RDS.Table)
+                    Dim lrTable As RDS.Table = Me.TreeView1.SelectedNode.Tag
+                    lrModelObject = lrTable.FBMModelElement
+                Case Else
+                    lrModelObject = Me.TreeView1.SelectedNode.Tag
+            End Select
+
 
             lsMessage = "The " & lrModelObject.ConceptType.ToString & ", '" & lrModelObject.Name & "', will be removed from the Model and all Pages."
             lsMessage &= vbCrLf & vbCrLf
@@ -926,7 +933,7 @@ Public Class frmToolboxModelDictionary
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
                 Case Is = GetType(RDS.Table)
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
-                    Me.ToolStripMenuItemRemoveFromModel.Enabled = False
+                    Me.ToolStripMenuItemRemoveFromModel.Enabled = True
                     Me.ToolStripMenuItemViewOnPage.Enabled = True
                 Case Else
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
