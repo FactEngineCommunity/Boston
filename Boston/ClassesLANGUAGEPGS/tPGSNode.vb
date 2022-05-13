@@ -186,7 +186,6 @@ Namespace PGS
                 loDroppedNode.Pen.Width = 0.5
                 loDroppedNode.Pen.Color = Color.DeepSkyBlue
                 loDroppedNode.TextColor = Color.Black
-
                 loDroppedNode.Brush = New SolidBrush(Color.White)
                 loDroppedNode.ShadowColor = Color.LightGray
                 loDroppedNode.EnableStyledText = True
@@ -194,7 +193,26 @@ Namespace PGS
                 loDroppedNode.Obstacle = True
                 loDroppedNode.AllowIncomingLinks = True
                 loDroppedNode.AllowOutgoingLinks = True
+                loDroppedNode.EnabledHandles = AdjustmentHandles.Move
                 loDroppedNode.Text = Me.FactDataInstance.Data
+
+                '================================================================================
+                'Couldn't create links.
+                '
+                '   DiagramView
+                '     Behavior = DrawLinks
+                '
+                '   Shape
+                '     AllowOutgoinglinks = True
+                '     HandlesStyle = HandlesStyle.Invisible
+                '     EnabledHandles = AdjustmentHandles.Move
+                '
+                'Solved -Below
+                '    Diagram
+                '       AllowUnanchoredLinks = True
+                '       I also set 
+                '       AllowUnconnectedLinks = True
+                '================================================================================
 
                 loDroppedNode.Tag = Me
 

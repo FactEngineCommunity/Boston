@@ -2131,11 +2131,11 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Sub loadToolboxORMReadingEditor(ByRef arPage As FBM.Page,
-                                    ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
-                                    Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing)
+    Public Function loadToolboxORMReadingEditor(ByRef arPage As FBM.Page,
+                                        ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
+                                        Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As frmToolboxORMReadingEditor
 
-        Dim child As New frmToolboxORMReadingEditor
+        Dim child As frmToolboxORMReadingEditor = Nothing
 
         Try
             If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
@@ -2145,6 +2145,8 @@ SkipRegistrationChecking:
                 child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
                 child.zrPage = arPage
                 child.BringToFront()
+
+                Return child
             Else
                 '----------------------------------------------------------
                 'Create a new instance of the FactTypeReadingEditor form.
@@ -2157,6 +2159,8 @@ SkipRegistrationChecking:
 
                     prApplication.ToolboxForms(0).Focus()
                     lrPane = prApplication.ToolboxForms(0).Pane
+
+                    child = New frmToolboxORMReadingEditor
                     child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
 
                     child.DockTo(lrPane, DockStyle.Fill, 0)
@@ -2172,6 +2176,7 @@ SkipRegistrationChecking:
                     '--------------------------------------------------
                     'Add the ORMReadingEditor form to the bottom of the Page
                     '--------------------------------------------------
+                    child = New frmToolboxORMReadingEditor
                     child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
                     child.zrPage = arPage
                     If arFactTypeInstance IsNot Nothing Then
@@ -2179,10 +2184,13 @@ SkipRegistrationChecking:
                         child.zrFactType = arFactTypeInstance.FactType
                     End If
                     Call child.SetupForm()
-
                 End If
                 prApplication.ToolboxForms.Add(child)
+
+                Return child
             End If
+
+            Return Nothing
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -2191,9 +2199,11 @@ SkipRegistrationChecking:
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
-    End Sub
+    End Function
 
 
     Sub loadToolboxORMVerbalisationForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)

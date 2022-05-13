@@ -256,6 +256,8 @@ Partial Class frmDiagramORM
         Me.ToolStripSeparator26 = New System.Windows.Forms.ToolStripSeparator()
         Me.ReoveFromPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveFromPageAndModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator43 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItem16 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_InternalUniquenessConstraint = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ShowInModelDictionaryToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator38 = New System.Windows.Forms.ToolStripSeparator()
@@ -300,8 +302,6 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.ToolStripSeparator43 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripMenuItem16 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -1801,7 +1801,7 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStrip_FrequencyConstraint.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemModelErrorsFrequencyConstraint, Me.ToolStripSeparator26, Me.ReoveFromPageToolStripMenuItem, Me.RemoveFromPageAndModelToolStripMenuItem, Me.ToolStripSeparator43, Me.ToolStripMenuItem16})
         Me.ContextMenuStrip_FrequencyConstraint.Name = "ContextMenuStrip_FrequencyConstraint"
-        Me.ContextMenuStrip_FrequencyConstraint.Size = New System.Drawing.Size(236, 126)
+        Me.ContextMenuStrip_FrequencyConstraint.Size = New System.Drawing.Size(236, 104)
         '
         'ToolStripMenuItemModelErrorsFrequencyConstraint
         '
@@ -1825,6 +1825,18 @@ Partial Class frmDiagramORM
         Me.RemoveFromPageAndModelToolStripMenuItem.Name = "RemoveFromPageAndModelToolStripMenuItem"
         Me.RemoveFromPageAndModelToolStripMenuItem.Size = New System.Drawing.Size(235, 22)
         Me.RemoveFromPageAndModelToolStripMenuItem.Text = "&Remove from Page and Model"
+        '
+        'ToolStripSeparator43
+        '
+        Me.ToolStripSeparator43.Name = "ToolStripSeparator43"
+        Me.ToolStripSeparator43.Size = New System.Drawing.Size(232, 6)
+        '
+        'ToolStripMenuItem16
+        '
+        Me.ToolStripMenuItem16.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.ToolStripMenuItem16.Name = "ToolStripMenuItem16"
+        Me.ToolStripMenuItem16.Size = New System.Drawing.Size(235, 22)
+        Me.ToolStripMenuItem16.Text = "&Properties"
         '
         'ContextMenuStrip_InternalUniquenessConstraint
         '
@@ -2154,18 +2166,6 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.Size = New System.Drawing.Size(890, 549)
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ToolStripSeparator43
-        '
-        Me.ToolStripSeparator43.Name = "ToolStripSeparator43"
-        Me.ToolStripSeparator43.Size = New System.Drawing.Size(232, 6)
-        '
-        'ToolStripMenuItem16
-        '
-        Me.ToolStripMenuItem16.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
-        Me.ToolStripMenuItem16.Name = "ToolStripMenuItem16"
-        Me.ToolStripMenuItem16.Size = New System.Drawing.Size(235, 22)
-        Me.ToolStripMenuItem16.Text = "&Properties"
         '
         'frmDiagramORM
         '

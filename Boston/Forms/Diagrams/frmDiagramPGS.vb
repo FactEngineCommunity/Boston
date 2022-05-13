@@ -288,8 +288,6 @@ Public Class frmDiagramPGS
         Dim lrFactInstance As New FBM.FactInstance
         Dim lrPGSNode As New PGS.Node
 
-        Dim lrRecordset1 As ORMQL.Recordset
-
         Try
             '-------------------------------------------------------
             'Set the Caption/Title of the Page to the PageName
@@ -816,8 +814,6 @@ Public Class frmDiagramPGS
 
         Call SetToolbox()
 
-
-
     End Sub
 
     Private Sub ContextMenuStrip_Node_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Node.Opening
@@ -1004,9 +1000,6 @@ Public Class frmDiagramPGS
         End If
     End Sub
 
-    Private Sub Diagram_ActionUndone(sender As Object, e As UndoEventArgs) Handles Diagram.ActionUndone
-
-    End Sub
 
     Private Sub Diagram_CellClicked1(sender As Object, e As CellEventArgs) Handles Diagram.CellClicked
 
@@ -1056,58 +1049,45 @@ Public Class frmDiagramPGS
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
 
-        '-------------------------
-        'Create the ERD.Relation
-        '-------------------------
-        Dim lrRelation As New ERD.Relation
+        Try
+            Dim larModelElement As New List(Of FBM.ModelObject)
+            Dim lrModelElement As FBM.ModelObject = Nothing
+            Dim lsFactTypeName As String = ""
+            Dim lrFactType As FBM.FactType
 
-        lrRelation.OriginEntity = e.Link.Origin.Tag
-        lrRelation.DestinationEntity = e.Link.Destination.Tag
-        lrRelation.OriginMultiplicity = pcenumCMMLMultiplicity.One
-        lrRelation.DestinationMultiplicity = pcenumCMMLMultiplicity.One
-        lrRelation.OriginAttribute = lrRelation.OriginEntity.TableShape.Item(0, e.Link.OriginIndex).Tag
-        lrRelation.DestinationAttribute = lrRelation.DestinationEntity.TableShape.Item(0, e.Link.DestinationIndex).Tag
+            'CodeSafe
+            If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
+            If e.Link.Destination.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
 
-        Dim lsSQLQuery As String = ""
-        Dim lrFact As FBM.Fact
+            lrModelElement = e.Link.Origin.Tag.RDSTable.FBMModelElement
+            larModelElement.Add(lrModelElement)
+            lsFactTypeName.AppendString(lrModelElement.Id & "RelatesTo")
 
-        lsSQLQuery = "INSERT INTO ERDRelation (ModelObject, Relation)"
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " VALUES ("
-        lsSQLQuery &= "'" & lrRelation.OriginEntity.Name & "'"
-        lsSQLQuery &= ",'" & lrRelation.DestinationEntity.Name & "')"
+            lrModelElement = e.Link.Destination.Tag.RDSTable.FBMModelElement
+            larModelElement.Add(lrModelElement)
+            lsFactTypeName.AppendString(lrModelElement.Id)
 
-        lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Dim lrModel = Me.zrPage.Model
 
-        '-------------------------------
-        'Create a Concept for the Fact
-        '-------------------------------
-        Dim lrConcept As New FBM.Concept(lrFact.Id)
-        lrConcept.Save()
+            lrFactType = lrModel.CreateFactType(lsFactTypeName, larModelElement, False, True, False, Nothing, True, Nothing)
+            Dim larRole As New List(Of FBM.Role) From {lrFactType.RoleGroup(0)}
 
-        '-------------------------------------------------
-        'Create a new ModelDictionary entry for the Fact
-        '-------------------------------------------------
-        Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.zrPage.Model, lrFact.Id, pcenumConceptType.Fact, "ERDRelation")
-        lrDictionaryEntry = Me.zrPage.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-        lrDictionaryEntry.isFact = True
-        lrDictionaryEntry.Save()
+            lrFactType.CreateInternalUniquenessConstraint(larRole, False, True, True, False, Nothing, True)
 
-        lsSQLQuery = "INSERT INTO OriginMultiplicity (ERDRelation, Multiplicity)"
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " VALUES ("
-        lsSQLQuery &= "'" & lrFact.Id & "'"
-        lsSQLQuery &= ",'One')"
+            larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {"relates to", ""})
+            lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
 
-        Dim lrOriginMultiplicityFact As FBM.Fact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Me.zrPage.Diagram.Links.Remove(e.Link)
 
-        lsSQLQuery = "INSERT INTO DestinationMultiplicity (ERDRelation, Multiplicity)"
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " VALUES ("
-        lsSQLQuery &= "'" & lrFact.Id & "'"
-        lsSQLQuery &= ",'One')"
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        Dim lrDestinationMultiplicityFact As FBM.Fact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1723,9 +1703,69 @@ Public Class frmDiagramPGS
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.HiddenDiagramView.SendToBack()
         End Try
 
     End Sub
+
+    Public Sub ResetPropertiesGridToolbox(ByRef arObject As Object)
+
+        Try
+
+            If IsSomething(arObject) Then
+                Dim lrPropertyGridForm As frmToolboxProperties
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+                If IsSomething(lrPropertyGridForm) Then
+                    Dim lrModelObject As FBM.ModelObject
+                    lrModelObject = arObject
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                    Select Case lrModelObject.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                            lrEntityTypeInstance = lrModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeInstance
+                        Case Is = pcenumConceptType.EntityTypeName
+                            Dim lrEntityTypeName As FBM.EntityTypeName
+                            lrEntityTypeName = lrModelObject
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeName.EntityTypeInstance
+                        Case Is = pcenumConceptType.RoleConstraintRole
+                            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                            lrRoleConstraintRoleInstance = lrModelObject
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
+                        Case Is = pcenumConceptType.RoleConstraint
+
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            lrRoleConstraintInstance = lrModelObject
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
+                        Case Else
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
+                    End Select
+                End If
+            Else
+                Throw New Exception("No object passed as argument, 'arObject'")
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
 
     Public Sub morphToPGSDiagram(ByVal sender As Object, ByVal e As EventArgs)
 
@@ -2192,6 +2232,7 @@ Public Class frmDiagramPGS
         Dim loNode As DiagramNode = Nothing
 
         Try
+            'Me.DiagramView.Behavior = Behavior.DrawLinks
 
             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
 
@@ -2202,9 +2243,9 @@ Public Class frmDiagramPGS
             '--------------------------------------------------
             'Just to be sure...set the Richmond.WorkingProject
             '--------------------------------------------------
-            Call prApplication.setWorkingPage(Me.zrPage)
-
             loNode = Diagram.GetNodeAt(lo_point)
+
+            Call prApplication.setWorkingPage(Me.zrPage)
 
             If (ModifierKeys = (Keys.Control Or Keys.ShiftKey)) And My.Settings.SuperuserMode Then
                 For Each lrPGSRelationNode In Me.zrPage.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.isPGSRelation)
@@ -2954,89 +2995,99 @@ Public Class frmDiagramPGS
 
         Dim lrPGSLink As PGS.Link
 
-        lrPGSLink = e.Link.Tag
+        Try
 
-        If Me.GetCommonLinks(e.Link.Origin, e.Link.Destination).Count = 1 Then
-            'Straighten the Link
-            e.Link.SegmentCount = 2
-            e.Link.SegmentCount = 1
-        End If
+            lrPGSLink = e.Link.Tag
 
-        Call lrPGSLink.LinkSelected()
+            If Me.GetCommonLinks(e.Link.Origin, e.Link.Destination).Count = 1 Then
+                'Straighten the Link
+                e.Link.SegmentCount = 2
+                e.Link.SegmentCount = 1
+            End If
 
-        Me.zrPage.SelectedObject.Clear()
-        Me.zrPage.SelectedObject.Add(lrPGSLink.Relation)
+            Call lrPGSLink.LinkSelected()
 
-        '===================================================================================
-        'Draw the Properties of the Node
-        If lrPGSLink.Relation.IsPGSRelationNode Then
+            Me.zrPage.SelectedObject.Clear()
+            Me.zrPage.SelectedObject.Add(lrPGSLink.Relation)
 
-            If Me.PropertyTableNode IsNot Nothing Then
-                If Me.PropertyTableNode.Tag.Id <> lrPGSLink.Relation.ActualPGSNode.Id Then
-                    Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+            '===================================================================================
+            'Draw the Properties of the Node
+            If lrPGSLink.Relation.IsPGSRelationNode Then
+
+                If Me.PropertyTableNode IsNot Nothing Then
+                    If Me.PropertyTableNode.Tag.Id <> lrPGSLink.Relation.ActualPGSNode.Id Then
+                        Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+                    End If
+                End If
+
+                If Me.PropertyTableNode Is Nothing And (Control.ModifierKeys = Keys.Control Or Control.ModifierKeys = Keys.ControlKey) Then
+
+                    Dim liX As Integer = Math.Abs(lrPGSLink.Link.Bounds.X + (lrPGSLink.Link.Bounds.Width + 1) / 2)
+                    Dim liY As Integer = Math.Abs(lrPGSLink.Link.Bounds.Y + (lrPGSLink.Link.Bounds.Height + 1) / 2)
+
+                    Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(liX, liY, 30, 20, 1, 0)
+                    Me.PropertyTableNode.EnableStyledText = True
+                    Me.PropertyTableNode.Caption = "<B>" & " " & lrPGSLink.Relation.ActualPGSNode.Name & " "
+                    Me.PropertyTableNode.Tag = lrPGSLink.Relation.ActualPGSNode
+                    Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrPGSLink.Relation.ActualPGSNode.Id)
+
+                    For Each lrColumn In lrRDSTable.Column
+                        If lrColumn.isForeignKey And My.Settings.PGSShowForeignKeyProperties Then
+                            Me.PropertyTableNode.RowCount += 1
+                            Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                            Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                        ElseIf Not lrColumn.isForeignKey Then
+                            Me.PropertyTableNode.RowCount += 1
+                            Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                            Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                        End If
+
+                    Next
+                    Me.PropertyTableNode.ResizeToFitText(True)
+                    Me.PropertyTableNode.ZTop()
                 End If
             End If
 
-            If Me.PropertyTableNode Is Nothing And (Control.ModifierKeys = Keys.Control Or Control.ModifierKeys = Keys.ControlKey) Then
+            '---------------------------------------------------------------------------
+            'If the ORM(FactType)ReadingEditor is loaded, then
+            '  do the appropriate processing so that the data in the ReadingEditor grid
+            '  matches the selected FactType (if a FactType is selected by the user)
+            '---------------------------------------------------------------------------
+            Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+            lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                Dim liX As Integer = Math.Abs(lrPGSLink.Link.Bounds.X + (lrPGSLink.Link.Bounds.Width + 1) / 2)
-                Dim liY As Integer = Math.Abs(lrPGSLink.Link.Bounds.Y + (lrPGSLink.Link.Bounds.Height + 1) / 2)
+            If IsSomething(lrORMReadingEditor) Then
 
-                Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(liX, liY, 30, 20, 1, 0)
-                Me.PropertyTableNode.EnableStyledText = True
-                Me.PropertyTableNode.Caption = "<B>" & " " & lrPGSLink.Relation.ActualPGSNode.Name & " "
-                Me.PropertyTableNode.Tag = lrPGSLink.Relation.ActualPGSNode
-                Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrPGSLink.Relation.ActualPGSNode.Id)
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
 
-                For Each lrColumn In lrRDSTable.Column
-                    If lrColumn.isForeignKey And My.Settings.PGSShowForeignKeyProperties Then
-                        Me.PropertyTableNode.RowCount += 1
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
-                    ElseIf Not lrColumn.isForeignKey Then
-                        Me.PropertyTableNode.RowCount += 1
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
-                    End If
-
-                Next
-                Me.PropertyTableNode.ResizeToFitText(True)
-                Me.PropertyTableNode.ZTop()
-            End If
-        End If
-
-        '---------------------------------------------------------------------------
-        'If the ORM(FactType)ReadingEditor is loaded, then
-        '  do the appropriate processing so that the data in the ReadingEditor grid
-        '  matches the selected FactType (if a FactType is selected by the user)
-        '---------------------------------------------------------------------------
-        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
-        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
-
-        If IsSomething(lrORMReadingEditor) Then
-
-            Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
-
-            If IsSomething(lrPGSLink.Relation.RelationFactType) Then
-                If lrPGSLink.Relation.IsPGSRelationNode Then
-                    If lrPGSLink.Relation.RelationFactType.IsLinkFactType Then
-                        Dim lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
-                        lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                If IsSomething(lrPGSLink.Relation.RelationFactType) Then
+                    If lrPGSLink.Relation.IsPGSRelationNode Then
+                        If lrPGSLink.Relation.RelationFactType.IsLinkFactType Then
+                            Dim lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
+                            lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                        Else
+                            lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                        End If
                     Else
                         lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
                     End If
-                Else
-                    lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+
+                    lrORMReadingEditor.zrPage = Me.zrPage
+                    lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+
+                    Call lrORMReadingEditor.SetupForm()
                 End If
 
-                lrORMReadingEditor.zrPage = Me.zrPage
-                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
-
-                Call lrORMReadingEditor.SetupForm()
             End If
 
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -3354,16 +3405,26 @@ Public Class frmDiagramPGS
 
     Private Sub Diagram_LinkDeselected(sender As Object, e As LinkEventArgs) Handles Diagram.LinkDeselected
 
-        If e.Link.Origin Is e.Link.Destination Then
+        Try
+            If e.Link.Origin Is e.Link.Destination Then
 
-        Else
-            'e.Link.SegmentCount = 1
-        End If
+            Else
+                'e.Link.SegmentCount = 1
+            End If
 
-        e.Link.Pen.Color = Color.DeepSkyBlue
+            e.Link.Pen.Color = Color.DeepSkyBlue
 
-        Dim lrPGSLink As PGS.Link = e.Link.Tag
-        Call lrPGSLink.setPredicate()
+            Dim lrPGSLink As PGS.Link = e.Link.Tag
+            Call lrPGSLink.setPredicate()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -3501,10 +3562,6 @@ Public Class frmDiagramPGS
     Private Sub Diagram_LinkModified(sender As Object, e As LinkEventArgs) Handles Diagram.LinkModified
 
         'e.Link.SegmentCount = 1
-
-    End Sub
-
-    Private Sub Diagram_DefaultShapeChanged(sender As Object, e As EventArgs) Handles Diagram.DefaultShapeChanged
 
     End Sub
 
@@ -3753,4 +3810,76 @@ Public Class frmDiagramPGS
         End Try
 
     End Sub
+
+    Private Sub Diagram_LinkCreating(sender As Object, e As LinkValidationEventArgs) Handles Diagram.LinkCreating
+
+        '================================================================================
+        'Couldn't create links.
+        '
+        '   DiagramView
+        '     Behavior = DrawLinks
+        '
+        '   Shape
+        '     AllowOutgoinglinks = True
+        '     HandlesStyle = HandlesStyle.Invisible
+        '     EnabledHandles = AdjustmentHandles.Move
+        '
+        'Solved -Below
+        '    Diagram
+        '       AllowUnanchoredLinks = True
+        '       I also set 
+        '       AllowUnconnectedLinks = True
+        '================================================================================
+
+        Try
+            If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then
+                e.Cancel = True
+                Exit Sub
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemLinkViewReadingEditor_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemLinkViewReadingEditor.Click
+
+        Try
+            prApplication.WorkingPage = Me.zrPage
+            Dim lrORMReadingEditor = frmMain.loadToolboxORMReadingEditor(Me.zrPage, Me.DockPanel.ActivePane)
+
+            Dim lrFactType As FBM.FactType = Nothing
+
+            If Me.zrPage.SelectedObject.Count = 1 Then
+
+                Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+
+                lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
+
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(prApplication.WorkingPage, False)
+                lrORMReadingEditor.zrPage = prApplication.WorkingPage
+                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                prApplication.WorkingPage.SelectedObject.Clear()
+                prApplication.WorkingPage.SelectedObject.Add(lrFactTypeInstance)
+                Call lrORMReadingEditor.SetupForm()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class
