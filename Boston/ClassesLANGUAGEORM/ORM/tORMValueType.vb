@@ -231,6 +231,8 @@ Namespace FBM
         End Property
 
         <NonSerialized()>
+        Public Event ChangedToEntityType(ByRef arEntityType As FBM.EntityType)
+        <NonSerialized()>
         Public Event DataTypeChanged(ByVal aiNewDataType As pcenumORMDataType)
         <NonSerialized()>
         Public Event DataTypePrecisionChanged(ByVal aiNewDataTypePrecision As Integer)
@@ -1363,6 +1365,21 @@ Namespace FBM
                     Me.Instance.Add(asNewValue)
                 End If
 
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub TriggerChangedToEntityType(ByRef arEntityType As FBM.EntityType)
+
+            Try
+                RaiseEvent ChangedToEntityType(arEntityType)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

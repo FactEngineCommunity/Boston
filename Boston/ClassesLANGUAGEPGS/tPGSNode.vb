@@ -166,6 +166,25 @@ Namespace PGS
 
         End Function
 
+        Public Function CreateUniqueAttributeName(ByVal asAttributeName As String, ByVal aiCounter As Integer) As String
+
+            Dim lsAttributeName As String = ""
+
+            If aiCounter = 0 Then
+                lsAttributeName = asAttributeName
+            Else
+                lsAttributeName = asAttributeName & aiCounter.ToString
+            End If
+
+            Dim lrAttribute As New ERD.Attribute(lsAttributeName)
+
+            If IsSomething(Me.Attribute.Find(AddressOf lrAttribute.EqualsByName)) Then
+                lsAttributeName = Me.CreateUniqueAttributeName(asAttributeName, aiCounter + 1)
+            End If
+
+            Return lsAttributeName
+
+        End Function
 
         Public Sub DisplayAndAssociate()
 
@@ -195,6 +214,7 @@ Namespace PGS
                 loDroppedNode.AllowOutgoingLinks = True
                 loDroppedNode.EnabledHandles = AdjustmentHandles.Move
                 loDroppedNode.Text = Me.FactDataInstance.Data
+                loDroppedNode.Tag = Me
 
                 '================================================================================
                 'Couldn't create links.
@@ -232,23 +252,92 @@ Namespace PGS
 
         End Sub
 
+        Public Sub GetAttributesFromRDSColumns(Optional ByVal abAddToPage As Boolean = False)
+
+            Try
+                If Me.Attribute.Count > 0 Then
+                    Throw New Exception("Method called for Entity, '" & Me.Name & "', that already has Attributes loaded.")
+                ElseIf Me.Page Is Nothing Then
+                    Throw New Exception("Method called for Entity, '" & Me.Name & "', that has no Page.")
+                End If
+
+                Dim lrERAttribute As ERD.Attribute
+
+                For Each lrColumn In Me.RDSTable.Column
+
+                    lrERAttribute = New ERD.Attribute
+                    lrERAttribute.Column = lrColumn
+                    lrERAttribute.Model = Me.Page.Model
+                    lrERAttribute.Id = lrColumn.Id
+                    lrERAttribute.Entity = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = Me.Name)
+                    lrERAttribute.AttributeName = lrColumn.Name
+                    lrERAttribute.ResponsibleRole = lrColumn.Role
+                    lrERAttribute.ActiveRole = lrColumn.ActiveRole
+                    lrERAttribute.ResponsibleFactType = lrERAttribute.ResponsibleRole.FactType
+                    lrERAttribute.Mandatory = lrColumn.IsMandatory
+                    'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
+                    lrERAttribute.PartOfPrimaryKey = lrColumn.isPartOfPrimaryKey
+                    lrERAttribute.IsDerivationParameter = lrColumn.IsDerivationParameter
+                    lrERAttribute.Page = Me.Page
+
+                    lrERAttribute.Column = lrColumn
+                    lrERAttribute.SupertypeColumn = lrColumn.SupertypeColumn
+
+                    Me.Attribute.AddUnique(lrERAttribute)
+
+                    If abAddToPage Then
+                        Me.Page.ERDiagram.Attribute.Add(lrERAttribute)
+                    End If
+                Next
+
+                Dim liInd As Integer
+                Dim larSupertypeTable = Me.RDSTable.getSupertypeTables
+                If larSupertypeTable.Count > 0 Then
+                    larSupertypeTable.Reverse()
+                    larSupertypeTable.Add(Me.RDSTable)
+                    liInd = 0
+                    For Each lrSupertypeTable In larSupertypeTable
+                        For Each lrAttrubute In Me.Attribute.FindAll(Function(x) x.Column.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                            Me.Attribute.Remove(lrAttrubute)
+                            Try
+                                Me.Attribute.Insert(liInd, lrAttrubute)
+                            Catch ex As Exception
+                                Me.Attribute.Add(lrAttrubute)
+                            End Try
+                            liInd += 1
+                        Next
+                    Next
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Overrides Function getCorrespondingRDSTable() As RDS.Table
             Return Me.RDSTable
         End Function
 
-        Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
+        Public Overloads Sub MouseDown() Implements FBM.iPageObject.MouseDown
 
         End Sub
 
-        Public Sub MouseMove() Implements FBM.iPageObject.MouseMove
+        Public Overloads Sub MouseMove() Implements FBM.iPageObject.MouseMove
 
         End Sub
 
-        Public Sub MouseUp() Implements FBM.iPageObject.MouseUp
+        Public Overloads Sub MouseUp() Implements FBM.iPageObject.MouseUp
 
         End Sub
 
-        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+        Public Overloads Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY
@@ -522,6 +611,11 @@ Namespace PGS
         Public Overloads Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Public Sub ResetAttributeCellColours()
+
+        End Sub
+
     End Class
 
 End Namespace

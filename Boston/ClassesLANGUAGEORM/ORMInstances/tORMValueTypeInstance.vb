@@ -599,7 +599,8 @@ Namespace FBM
         End Function
 
 
-        Public Function RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean) As Boolean
+        Public Function RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean,
+                                       Optional ByVal abIgnoreJoinedRoles As Boolean = False) As Boolean
 
             Dim lsMessage As String = ""
             Dim liFactTypeInstanceCount As Integer = 0
@@ -607,14 +608,16 @@ Namespace FBM
             Try
                 RemoveFromPage = True
 
-                liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance _
-                                               From Role In FactType.RoleGroup _
-                                              Where Role.JoinedORMObject.Id = Me.Id _
+                If abIgnoreJoinedRoles Then GoTo RemoveAnyway
+
+                liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
+                                               From Role In FactType.RoleGroup
+                                              Where Role.JoinedORMObject.Id = Me.Id
                                                Into Count()
 
 
                 If liFactTypeInstanceCount = 0 Then
-
+RemoveAnyway:
                     Call Me.Page.RemoveValueTypeInstance(Me, abBroadcastInterfaceEvent)
 
                     Call Me.Page.MakeDirty()
@@ -1316,6 +1319,29 @@ Namespace FBM
                 End Try
             End If
         End Sub
+
+        Private Sub _ValueType_ChangedToEntityType(ByRef arEntityType As EntityType) Handles _ValueType.ChangedToEntityType
+
+            Try
+                Dim lrEntityTypeInstance As FBM.EntityTypeInstance = arEntityType.CloneInstance(Me.Page, True)
+                lrEntityTypeInstance.x = Me.X
+                lrEntityTypeInstance.y = Me.Y
+
+                Call lrEntityTypeInstance.DisplayAndAssociate()
+
+                Call Me.RemoveFromPage(True, True)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

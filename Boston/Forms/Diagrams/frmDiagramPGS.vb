@@ -362,6 +362,11 @@ Public Class frmDiagramPGS
                 lrRecordset.MoveNext()
             End While
 
+            Dim lrNodeType As PGS.Node
+            For Each lrNodeType In Me.zrPage.ERDiagram.Entity
+                Call lrNodeType.GetAttributesFromRDSColumns()
+            Next
+
             '=======================================================
             ' Map the Relations - Link the Nodes. From Model level
             '=======================================================
@@ -942,109 +947,91 @@ Public Class frmDiagramPGS
 
     End Sub
 
-    Private Sub Diagram_CellClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs)
+    Private Sub Diagram_CellClicked(sender As Object, e As CellEventArgs) Handles Diagram.CellClicked
 
-        Dim lrAttribute As ERD.Attribute
-        lrAttribute = e.Cell.Tag
+        Try
+            Dim lrColumn As RDS.Column
+            lrColumn = e.Cell.Tag
 
-        If e.MouseButton = MouseButton.Right Then
-            'ContextMenuStripAttribute.Show(Me.ERDDiagramView, New Point((e.Table.Bounds.X + e.MousePosition.X), (e.Table.Bounds.Y + e.MousePosition.Y)))
-
-            Me.ToolStripMenuItemIsMandatory.Checked = lrAttribute.Mandatory
-
-            ContextMenuStripAttribute.Show(Me.DiagramView, Me.DiagramView.DocToClient(e.MousePosition))
-            'Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Role
+            Dim lrNodeType As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrColumn.Table.Name)
+            Dim lrAttribute As ERD.Attribute = lrNodeType.Attribute.Find(Function(x) x.Column Is lrColumn)
 
             Me.zrPage.SelectedObject.Clear()
             Me.zrPage.SelectedObject.Add(lrAttribute)
-        Else
-            Dim lrTableNode As MindFusion.Diagramming.TableNode
 
-            e.Cell.TextColor = Color.White
-            e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-            Me.Diagram.Invalidate()
+            If e.MouseButton = MouseButton.Left Then
 
-            For Each lrTableNode In Me.Diagram.Nodes
-                Call lrTableNode.Tag.ResetAttributeCellColours()
-            Next
-
-            '-----------------------------------------------
-            'Paint the cell again. First is for GUI speed.
-            '-----------------------------------------------
-            e.Cell.TextColor = Color.White
-            e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-
-            '--------------------------------------------------------------------
-            'Highlight the Relationships (if any) associated with the Attribute
-            '--------------------------------------------------------------------
-            If IsSomething(lrAttribute.Relation) Then
-
-                lrAttribute.Relation.Link.Color = Color.Blue
+                e.Cell.TextColor = Color.White
+                e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
                 Me.Diagram.Invalidate()
-                Me.ERDiagram.Relation(0).Link.Color = Color.Blue
+
+                Call Me.resetAttributeCellColours()
+
+                '-----------------------------------------------
+                'Paint the cell again. First is for GUI speed.
+                '-----------------------------------------------
+                e.Cell.TextColor = Color.White
+                e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+
+                '----------------------------------------------------------------------------------------
+                For Each lrDiagramNode In Me.Diagram.Nodes
+                    If lrDiagramNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
+                        Call lrDiagramNode.Tag.ResetAttributeCellColours()
+                    End If
+                Next
+
+                e.Cell.TextColor = Color.White
+                e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                Me.Diagram.Invalidate()
+
+                '--------------------------------------------------------------------
+                'Highlight the Relationships (if any) associated with the Attribute
+                '--------------------------------------------------------------------
+                If IsSomething(lrAttribute.Relation) Then
+
+                    lrAttribute.Relation.Link.Color = Color.Blue
+                    Me.Diagram.Invalidate()
+                    Me.ERDiagram.Relation(0).Link.Color = Color.Blue
+                End If
+                '=========================================
+
+
+                '--------------------------------------
+                'Set the PropertiesGrid.SeletedObject
+                '--------------------------------------
+                Dim lrPropertyGridForm As frmToolboxProperties
+
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                If IsSomething(lrPropertyGridForm) Then
+                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = e.Cell.Tag
+                End If
+
+                '-------------------------------------------------------
+                'ORM Verbalisation
+                '-------------------------------------------------------
+                Dim lrToolboxForm As frmToolboxORMVerbalisation
+                lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                If IsSomething(lrToolboxForm) Then
+                    lrToolboxForm.zrModel = Me.zrPage.Model
+                    Select Case TypeOf (e.Cell.Tag) Is RDS.Column
+                        Case Is = pcenumConceptType.Actor
+                            Call lrToolboxForm.VerbaliseColumn(e.Cell.Tag)
+                    End Select
+                End If
+            ElseIf e.MouseButton = MouseButton.Right Then
+                ContextMenuStripAttribute.Show(Me.DiagramView, Me.DiagramView.DocToClient(e.MousePosition))
             End If
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            '--------------------------------------
-            'Set the PropertiesGrid.SeletedObject
-            '--------------------------------------
-            Dim lrPropertyGridForm As frmToolboxProperties
-
-            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            If IsSomething(lrPropertyGridForm) Then
-                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                lrPropertyGridForm.PropertyGrid.SelectedObject = e.Cell.Tag
-            End If
-
-        End If
-    End Sub
-
-
-    Private Sub Diagram_CellClicked1(sender As Object, e As CellEventArgs) Handles Diagram.CellClicked
-
-
-        If e.MouseButton = MouseButton.Left Then
-
-            e.Cell.TextColor = Color.White
-            e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-            Me.Diagram.Invalidate()
-
-            Call Me.resetAttributeCellColours()
-
-            '-----------------------------------------------
-            'Paint the cell again. First is for GUI speed.
-            '-----------------------------------------------
-            e.Cell.TextColor = Color.White
-            e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-
-            '--------------------------------------
-            'Set the PropertiesGrid.SeletedObject
-            '--------------------------------------
-            Dim lrPropertyGridForm As frmToolboxProperties
-
-            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            If IsSomething(lrPropertyGridForm) Then
-                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                lrPropertyGridForm.PropertyGrid.SelectedObject = e.Cell.Tag
-            End If
-
-            '-------------------------------------------------------
-            'ORM Verbalisation
-            '-------------------------------------------------------
-            Dim lrToolboxForm As frmToolboxORMVerbalisation
-            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
-                lrToolboxForm.zrModel = Me.zrPage.Model
-                Select Case TypeOf (e.Cell.Tag) Is RDS.Column
-                    Case Is = pcenumConceptType.Actor
-                        Call lrToolboxForm.VerbaliseColumn(e.Cell.Tag)
-                End Select
-            End If
-
-        End If
-
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
@@ -3869,6 +3856,41 @@ Public Class frmDiagramPGS
                 prApplication.WorkingPage.SelectedObject.Clear()
                 prApplication.WorkingPage.SelectedObject.Add(lrFactTypeInstance)
                 Call lrORMReadingEditor.SetupForm()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub AddAttributeToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AddAttributeToolStripMenuItem1.Click
+
+        Try
+            Dim lrAttribute As ERD.Attribute
+
+            lrAttribute = Me.zrPage.SelectedObject(0)
+            Dim lrModel As FBM.Model = Me.zrPage.Model
+            Dim lrNodeType As PGS.Node = lrAttribute.Entity
+
+            Dim lfrmAddAttributeForm = New frmCRUDAddAttributeNew
+
+            lfrmAddAttributeForm.zrAttribute = lrAttribute
+            lfrmAddAttributeForm.zrEntity = lrNodeType
+            lfrmAddAttributeForm.zrModel = lrModel
+            lfrmAddAttributeForm.zrModelObject = lrAttribute.Entity.RDSTable.FBMModelElement
+            Dim lsValueTypeName As String = lrModel.CreateUniqueValueTypeName("NewValueType", 0)
+            lfrmAddAttributeForm.zrValueType = lrModel.CreateValueType(lsValueTypeName, False,,,, False)
+
+            If lfrmAddAttributeForm.ShowDialog = DialogResult.OK Then
+
+
+
             End If
 
         Catch ex As Exception

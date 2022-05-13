@@ -12323,4 +12323,53 @@ Public Class frmDiagramORM
         End Try
 
     End Sub
+
+    Private Sub ChangeToEntityTypeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ChangeToEntityTypeToolStripMenuItem.Click
+
+        Dim lsMessage As String
+
+        Try
+            lsMessage = "Are you sure that you want to change this Value Type to an Entity Type?"
+            lsMessage.AppendDoubleLineBreak("This operation has no undo.")
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                Dim lrValueTypeInstance As FBM.ValueTypeInstance
+
+                Try
+                    lrValueTypeInstance = Me.zrPage.SelectedObject(0)
+
+                    Dim lrModel = Me.zrPage.Model
+
+                    Dim lrEntityType = lrModel.CreateEntityType(lrValueTypeInstance.Id, True, True)
+
+                    Dim larRole = From Role In lrModel.Role
+                                  Where Role.JoinedORMObject Is lrValueTypeInstance.ValueType
+                                  Select Role
+
+                    Call lrValueTypeInstance.ValueType.TriggerChangedToEntityType(lrEntityType)
+
+                    For Each lrRole In larRole
+                        Call lrRole.ReassignJoinedModelObject(lrEntityType, True, Nothing)
+                    Next
+
+                    Call lrValueTypeInstance.ValueType.RemoveFromModel()
+
+                Catch ex As Exception
+
+                End Try
+
+            End If
+
+        Catch ex As Exception
+
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

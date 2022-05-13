@@ -8,7 +8,7 @@ Namespace ERD
         Inherits FBM.FactDataInstance
         Implements IEquatable(Of ERD.Attribute)
 
-        Public Entity As ERD.Entity
+        Public Entity As Object
 
         <CategoryAttribute("Name"),
         [ReadOnly](False),

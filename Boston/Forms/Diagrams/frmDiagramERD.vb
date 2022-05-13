@@ -964,31 +964,54 @@ Public Class frmDiagramERD
 
                     If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
 
-                        Dim lrFactTypeInstance As FBM.FactTypeInstance
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+                        Dim lrFactType As FBM.FactType = Nothing
+
                         If lrAttribute.Column.FactType IsNot Nothing Then
+                            lrFactType = lrAttribute.Column.FactType
+                        Else
+                            lrFactType = lrAttribute.Column.Role.FactType
+                        End If
+
+                        If Control.ModifierKeys = Keys.Control And lrFactType.IsObjectified Then
+
+                            Dim larLinkFactType = From LinkFactType In lrFactType.getLinkFactTypes
+                                                  Where LinkFactType.LinkFactTypeRole Is lrAttribute.Column.Role
+                                                  Select LinkFactType
+
+                            If larLinkFactType.Count = 0 Then GoTo SkipORMReadingEditor
+
+                            lrFactTypeInstance = larLinkFactType(0).CloneInstance(Me.zrPage, False)
+
+
+                        ElseIf lrAttribute.Column.FactType IsNot Nothing Then
                             lrFactTypeInstance = lrAttribute.Column.FactType.CloneInstance(Me.zrPage, False)
                         Else
                             lrFactTypeInstance = lrAttribute.Column.Role.FactType.CloneInstance(Me.zrPage, False)
                         End If
 
-                        If lrAttribute.Column.FactType IsNot Nothing Then
-                            lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
-                            Call lrORMReadingEditor.SetupForm()
-                        Else
-                            '-------------------------------------------------------------------------
-                            'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
-                            '-------------------------------------------------------------------------
-                            lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance()
-                            lrORMReadingEditor.zrFactTypeInstance = Nothing
-                            lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
-                            lrORMReadingEditor.DataGrid_Readings.Refresh()
-                            lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
-                            lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
-                            lrORMReadingEditor.LabelFactTypeName.Text = "No Fact Type Selected"
-                        End If
-                    End If
+                        If lrFactTypeInstance Is Nothing Then GoTo SkipORMReadingEditor
 
-                End If
+                        If lrAttribute.Column.FactType IsNot Nothing Then
+                                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                                Call lrORMReadingEditor.SetupForm()
+                            Else
+                                '-------------------------------------------------------------------------
+                                'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                                '-------------------------------------------------------------------------
+                                lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance()
+                                lrORMReadingEditor.zrFactTypeInstance = Nothing
+                                lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                                lrORMReadingEditor.DataGrid_Readings.Refresh()
+                                lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                                lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                                lrORMReadingEditor.LabelFactTypeName.Text = "No Fact Type Selected"
+                            End If
+                        End If
+
+                    End If
+SkipORMReadingEditor:
 
                 '-------------------------------------------------------
                 'Verbalisation

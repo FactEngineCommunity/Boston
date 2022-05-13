@@ -2135,7 +2135,7 @@ SkipRegistrationChecking:
                                         ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
                                         Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As frmToolboxORMReadingEditor
 
-        Dim child As frmToolboxORMReadingEditor = Nothing
+        Dim child As New frmToolboxORMReadingEditor
 
         Try
             If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then

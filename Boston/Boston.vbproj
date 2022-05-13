@@ -1244,6 +1244,12 @@
     <Compile Include="Forms\CRUD\frmCRUDRoleInstance.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttributeNew.Designer.vb">
+      <DependentUpon>frmCRUDAddAttributeNew.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttributeNew.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttribute.Designer.vb">
       <DependentUpon>frmCRUDAddAttribute.vb</DependentUpon>
     </Compile>
@@ -2055,6 +2061,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\frmCRUDRoleInstance.resx">
       <DependentUpon>frmCRUDRoleInstance.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttributeNew.resx">
+      <DependentUpon>frmCRUDAddAttributeNew.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttribute.resx">
