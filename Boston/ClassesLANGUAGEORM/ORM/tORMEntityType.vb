@@ -1120,7 +1120,7 @@ Namespace FBM
                     Next
                 End If
 
-                Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, True, True, True)
+                Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, True, True, True, False)
 
 #Region "FactTypeReading"
                 Dim lsSentence As String = ""

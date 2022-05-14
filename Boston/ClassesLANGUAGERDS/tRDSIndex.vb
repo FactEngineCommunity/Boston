@@ -381,7 +381,7 @@ Namespace RDS
 
         End Sub
 
-        Private Sub ResponsibleRoleConstraint_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleRoleConstraint.RemovedFromModel
+        Private Sub ResponsibleRoleConstraint_RemoveIndex(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleRoleConstraint.RemoveIndex
 
             Call Me.Table.removeIndex(Me)
 

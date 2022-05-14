@@ -1274,6 +1274,12 @@
     <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditRelationship.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDIndexManager.Designer.vb">
+      <DependentUpon>frmCRUDIndexManager.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDIndexManager.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramERD.Designer.vb">
       <DependentUpon>frmDiagramERD.vb</DependentUpon>
     </Compile>
@@ -2082,6 +2088,9 @@
     <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDEditRelationship.resx">
       <DependentUpon>frmCRUDEditRelationship.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDIndexManager.resx">
+      <DependentUpon>frmCRUDIndexManager.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramERD.resx">
       <DependentUpon>frmDiagramERD.vb</DependentUpon>

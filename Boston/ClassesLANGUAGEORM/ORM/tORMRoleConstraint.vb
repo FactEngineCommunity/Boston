@@ -14,7 +14,7 @@ Namespace FBM
         Implements iMDAObject
         Implements FBM.iValidationErrorHandler
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Shadows Property Name() As String
             Get
                 Return _Name
@@ -24,8 +24,8 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean = False
         <XmlAttribute()>
         Public Overrides Property IsMDAModelElement() As Boolean Implements iMDAObject.IsMDAModelElement
@@ -37,10 +37,10 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _RoleConstraintType As pcenumRoleConstraintType
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Overridable Property RoleConstraintType() As pcenumRoleConstraintType
             Get
                 Return Me._RoleConstraintType
@@ -50,11 +50,11 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public _RingConstraintType As pcenumRingConstraintType
-        <XmlAttribute()> _
-        <Browsable(False), _
-        [ReadOnly](True)> _
+        <XmlAttribute()>
+        <Browsable(False),
+        [ReadOnly](True)>
         Public Overridable Property RingConstraintType() As pcenumRingConstraintType
             Get
                 Return Me._RingConstraintType
@@ -64,14 +64,14 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public LevelNr As Single = 1 'Only used on 'InternalUniquenessConstraints'. Must be at least 1
 
         ''' <summary>
         ''' Only used on FrequencyConstraints.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public CardinalityRangeType As pcenumCardinalityRangeType
 
         ''' <summary>
@@ -95,19 +95,19 @@ Namespace FBM
         ''' End Case
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Cardinality As Integer = 0
 
         ''' <summary>
         ''' Only used on 'FrequencyConstraints'.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _MinimumFrequencyCount As Integer = 0
-        <XmlAttribute()> _
-        <Browsable(False), _
-        [ReadOnly](True)> _
+        <XmlAttribute()>
+        <Browsable(False),
+        [ReadOnly](True)>
         Public Overridable Property MinimumFrequencyCount() As Integer
             Get
                 Return _MinimumFrequencyCount
@@ -121,8 +121,8 @@ Namespace FBM
         ''' Only used on 'FrequencyConstraints'.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _MaximumFrequencyCount As Integer = 0
         <XmlAttribute()>
         <Browsable(False),
@@ -175,14 +175,14 @@ Namespace FBM
         End Property
 
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsDeontic As Boolean
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsPreferredIdentifier As Boolean = False
-        <Browsable(False)> _
-        <XmlAttribute()> _
+        <Browsable(False)>
+        <XmlAttribute()>
         Public Overridable Property IsPreferredIdentifier() As Boolean
             Get
                 Return Me._IsPreferredIdentifier
@@ -192,9 +192,9 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public _Role As New List(Of FBM.Role)
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Property Role As List(Of FBM.Role)
             Get
                 Dim larRole As New List(Of FBM.Role)
@@ -230,24 +230,24 @@ Namespace FBM
         ''' List of Arguments for the RoleConstraint, if the RoleConstraint is of a type that has Arguments.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlElement()> _
+        <XmlElement()>
         Public Argument As New List(Of FBM.RoleConstraintArgument)
 
         ''' <summary>
         ''' Only used when creating a new Argument dynamically. Once the Argument is created, can be added to Me.Argument.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public CurrentArgument As FBM.RoleConstraintArgument  'See also: frmDiagramORM.DiagramView.MouseDown for saving CurrentArgument to a RoleConstraint
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public ReadOnly Property HasModelError() As Boolean Implements iValidationErrorHandler.HasModelError
             Get
                 Return Me.ModelError.Count > 0
             End Get
         End Property
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Private _ModelError As New List(Of FBM.ModelError)
         Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
@@ -315,6 +315,7 @@ Namespace FBM
 
         Public Event CardinalityChanged(ByVal aiNewCardinality As Integer)
         Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean) Implements iModelObject.RemovedFromModel
+        Public Event RemoveIndex(ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event RoleConstraintTypeChanged(ByVal aiNewRoleConstraintType As pcenumRoleConstraintType)
         Public Event RingConstraintTypeChanged(ByVal aiNewRingConstraintType As pcenumRingConstraintType)
         Public Event LevelNrChanged(ByVal aiNewLevelNr As Integer)
@@ -1141,8 +1142,8 @@ Namespace FBM
 
             Try
 
-                Dim larEntityType = From EntityType In Me.Model.EntityType _
-                                    Where EntityType.PreferredIdentifierRCId = Me.Id _
+                Dim larEntityType = From EntityType In Me.Model.EntityType
+                                    Where EntityType.PreferredIdentifierRCId = Me.Id
                                     Select EntityType
 
                 If larEntityType.Count > 0 Then
@@ -1167,7 +1168,7 @@ Namespace FBM
             If Not Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                 Return False
             ElseIf Me.RoleConstraintRole.Count > 0 Then
-                Return Me.Role(0).FactType.IsSubtypeRelationshipFactType                
+                Return Me.Role(0).FactType.IsSubtypeRelationshipFactType
             Else
                 Return False
             End If
@@ -1290,8 +1291,8 @@ Namespace FBM
 
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
 
-                    Dim larColumn = From Column In lrTable.Column _
-                                    Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id _
+                    Dim larColumn = From Column In lrTable.Column
+                                    Where Column.Role.Id = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id).Id
                                     Select Column
 
                     For Each lrColumn In larColumn
@@ -1418,8 +1419,8 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function Clone(ByRef arModel As FBM.Model, _
-                                      Optional abAddToModel As Boolean = False, _
+        Public Shadows Function Clone(ByRef arModel As FBM.Model,
+                                      Optional abAddToModel As Boolean = False,
                                       Optional ByVal abIsMDAModelElement As Boolean = False) As Object 'Implements ICloneable.Clone
 
             Dim lrRole As FBM.Role
@@ -1508,7 +1509,7 @@ Namespace FBM
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
                 Select Case Me.RoleConstraintType
-                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint, _
+                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint,
                               pcenumRoleConstraintType.ExternalUniquenessConstraint
                         lrRoleConstraintInstance = New FBM.tUniquenessConstraint
                     Case Is = pcenumRoleConstraintType.RingConstraint
@@ -2094,10 +2095,11 @@ Namespace FBM
         ''' Removes the RoleConstraint from the Model.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
+        Public Shadows Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
-                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean Implements iModelObject.RemoveFromModel
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
+                                                  Optional ByVal abRemoveIndex As Boolean = True) As Boolean
 
             Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
             Dim lsMessage As String
@@ -2173,8 +2175,9 @@ RemoveAnyway:
                 Next
 
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
+                If abRemoveIndex Then RaiseEvent RemoveIndex(abDoDatabaseProcessing)
 
-                Me.Model.RemoveRoleConstraint(Me, abCheckForErrors, abDoDatabaseProcessing)
+                Me.Model.RemoveRoleConstraint(Me, abCheckForErrors, abDoDatabaseProcessing,, abRemoveIndex)
 
                 Me.Model.MakeDirty(False, False)
 
@@ -2274,7 +2277,7 @@ RemoveAnyway:
 
             Select Case Me.RoleConstraintType
                 Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint,
-                          pcenumRoleConstraintType.ExternalUniquenessConstraint,                         
+                          pcenumRoleConstraintType.ExternalUniquenessConstraint,
                           pcenumRoleConstraintType.InclusiveORConstraint,
                           pcenumRoleConstraintType.ExclusiveORConstraint
                     Return False
@@ -2767,6 +2770,9 @@ RemoveAnyway:
 
         End Sub
 
+        Private Function iModelObject_RemoveFromModel(Optional abForceRemoval As Boolean = False, Optional abCheckForErrors As Boolean = True, Optional abDoDatabaseProcessing As Boolean = True, Optional abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean Implements iModelObject.RemoveFromModel
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

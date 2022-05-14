@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmDiagramPGS
     Inherits WeifenLuo.WinFormsUI.Docking.DockContent
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class frmDiagramPGS
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDiagramPGS))
@@ -55,6 +55,7 @@ Partial Class frmDiagramPGS
         Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripAttribute = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.AddAttributeToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
@@ -82,7 +83,7 @@ Partial Class frmDiagramPGS
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.AddAttributeToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.IndexManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -92,9 +93,9 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Node
         '
-        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(176, 132)
+        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(181, 176)
         '
         'MorphToToolStripMenuItem
         '
@@ -140,7 +141,7 @@ Partial Class frmDiagramPGS
         '
         Me.AddAttributeToolStripMenuItem.Image = CType(resources.GetObject("AddAttributeToolStripMenuItem.Image"), System.Drawing.Image)
         Me.AddAttributeToolStripMenuItem.Name = "AddAttributeToolStripMenuItem"
-        Me.AddAttributeToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.AddAttributeToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.AddAttributeToolStripMenuItem.Text = "Add &Attribute/s"
         Me.AddAttributeToolStripMenuItem.Visible = False
         '
@@ -286,7 +287,13 @@ Partial Class frmDiagramPGS
         Me.ContextMenuStripAttribute.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddAttributeToolStripMenuItem1, Me.EditAttributeToolStripMenuItem, Me.DeleteAttributeToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey, Me.ToolStripSeparator6, Me.MoveUpToolStripMenuItem, Me.MoveDownToolStripMenuItem})
         Me.ContextMenuStripAttribute.Name = "ContextMenuStripAttribute"
-        Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(195, 248)
+        Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(195, 226)
+        '
+        'AddAttributeToolStripMenuItem1
+        '
+        Me.AddAttributeToolStripMenuItem1.Name = "AddAttributeToolStripMenuItem1"
+        Me.AddAttributeToolStripMenuItem1.Size = New System.Drawing.Size(194, 30)
+        Me.AddAttributeToolStripMenuItem1.Text = "&Add Attribute"
         '
         'EditAttributeToolStripMenuItem
         '
@@ -486,11 +493,11 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'AddAttributeToolStripMenuItem1
+        'IndexManagerToolStripMenuItem
         '
-        Me.AddAttributeToolStripMenuItem1.Name = "AddAttributeToolStripMenuItem1"
-        Me.AddAttributeToolStripMenuItem1.Size = New System.Drawing.Size(194, 30)
-        Me.AddAttributeToolStripMenuItem1.Text = "&Add Attribute"
+        Me.IndexManagerToolStripMenuItem.Name = "IndexManagerToolStripMenuItem"
+        Me.IndexManagerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.IndexManagerToolStripMenuItem.Text = "&Index Manager"
         '
         'frmDiagramPGS
         '
@@ -570,4 +577,5 @@ Partial Class frmDiagramPGS
     Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
     Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents AddAttributeToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents IndexManagerToolStripMenuItem As ToolStripMenuItem
 End Class

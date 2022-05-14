@@ -3935,4 +3935,31 @@ Public Class frmDiagramPGS
 
     End Sub
 
+    Private Sub IndexManagerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IndexManagerToolStripMenuItem.Click
+
+        Try
+            Dim lrfrmCRUDIndexManager As New frmCRUDIndexManager
+
+            Dim lrTable As RDS.Table
+            Try
+                lrTable = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = Me.zrPage.SelectedObject(0).name)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+
+            lrfrmCRUDIndexManager.mrTable = lrTable
+            Call lrfrmCRUDIndexManager.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

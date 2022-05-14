@@ -3508,7 +3508,8 @@ FinishedProcessing:
         Public Sub RemoveRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint,
                                         ByVal abCheckForErrors As Boolean,
                                         ByVal abBroadcastInterfaceEvent As Boolean,
-                                        Optional ByVal abReplacingRoleConstraint As Boolean = False)
+                                        Optional ByVal abReplacingRoleConstraint As Boolean = False,
+                                        Optional ByVal abRemoveIndex As Boolean = True)
 
             Try
                 If Me.RoleConstraint.Contains(arRoleConstraint) Then
