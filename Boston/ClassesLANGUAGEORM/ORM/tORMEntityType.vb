@@ -243,10 +243,12 @@ Namespace FBM
             End Get
         End Property
 
+        Public Event ChangingToFactType(ByRef arFactType As FBM.FactType)
         Public Event DataTypeChanged(ByVal aiNewDataType As pcenumORMDataType)
         Public Event DataTypePrecisionChanged(ByVal aiNewDataTypePrecision As Integer)
         Public Event DataTypeLengthChanged(ByVal aiDataTypeLength As Integer)
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
+        Public Event ExpandReferenceScheme()
         Public Event IsDatabaseReservedWordChanged(ByVal abIsDatabaseReservedWord As Boolean)
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
@@ -473,60 +475,72 @@ Namespace FBM
         ''' <param name="arValueType"></param>
         ''' <param name="aiRelationMultiplicityValue"></param>
         ''' <remarks></remarks>
-        Public Function AddBinaryRelationToValueType(ByRef arValueType As FBM.ValueType, ByVal aiRelationMultiplicityValue As pcenumBinaryRelationMultiplicityType) As FBM.FactType
+        Public Function AddBinaryRelationToValueType(ByRef arValueType As FBM.ValueType,
+                                                     ByVal aiRelationMultiplicityValue As pcenumBinaryRelationMultiplicityType,
+                                                     Optional ByVal abAddToModel As Boolean = False) As FBM.FactType
 
-            '------------------------------------------------------------------------------
-            'Add the ValueType to the Model if it does not already exist within the Model
-            '------------------------------------------------------------------------------
-            If IsSomething(Me.Model.ValueType.Find(AddressOf arValueType.Equals)) Then
-                '-------------------------------------------
-                'ValueType already exists within the Model
-                '-------------------------------------------
-            Else
-                Me.Model.AddValueType(arValueType)
-            End If
+            Try
+                '------------------------------------------------------------------------------
+                'Add the ValueType to the Model if it does not already exist within the Model
+                '------------------------------------------------------------------------------
+                If IsSomething(Me.Model.ValueType.Find(AddressOf arValueType.Equals)) Then
+                    '-------------------------------------------
+                    'ValueType already exists within the Model
+                    '-------------------------------------------
+                Else
+                    Me.Model.AddValueType(arValueType)
+                End If
 
-            '---------------------------------------
-            'Create the FactType for the relation.
-            '---------------------------------------
-            Dim lrFactType As New FBM.FactType
-            Dim larModelObject As New List(Of FBM.ModelObject)
-            Dim lsFactTypeName As String = Me.Name & arValueType.Name
-            Dim larRole As New List(Of FBM.Role)
+                '---------------------------------------
+                'Create the FactType for the relation.
+                '---------------------------------------
+                Dim lrFactType As New FBM.FactType
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim lsFactTypeName As String = Me.Name & arValueType.Name
+                Dim larRole As New List(Of FBM.Role)
 
-            '---------------------------------------------------------------------
-            'Create the list of ModelObjects referenced by Roles in the FactType
-            '---------------------------------------------------------------------
-            larModelObject.Add(Me)
-            larModelObject.Add(arValueType)
-            '---------------------
-            'Create the FactType
-            '---------------------
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject)
+                '---------------------------------------------------------------------
+                'Create the list of ModelObjects referenced by Roles in the FactType
+                '---------------------------------------------------------------------
+                larModelObject.Add(Me)
+                larModelObject.Add(arValueType)
+                '---------------------
+                'Create the FactType
+                '---------------------
+                lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True,,, abAddToModel)
 
-            '-----------------------------------------------------------------------------------
-            'Create the InternalUniquenessConstraint (MultiplicityConstraint) for the FactType
-            '-----------------------------------------------------------------------------------
-            Select Case aiRelationMultiplicityValue
-                Case Is = pcenumBinaryRelationMultiplicityType.OneToOne
-                    larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
-                    larRole.Clear()
-                    larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
-                Case Is = pcenumBinaryRelationMultiplicityType.OneToMany
-                    larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
-                Case Is = pcenumBinaryRelationMultiplicityType.ManyToOne
-                    larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
-                Case Is = pcenumBinaryRelationMultiplicityType.ManyToMany
-                    larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
-                    larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole)
-            End Select
+                '-----------------------------------------------------------------------------------
+                'Create the InternalUniquenessConstraint (MultiplicityConstraint) for the FactType
+                '-----------------------------------------------------------------------------------
+                Select Case aiRelationMultiplicityValue
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                        larRole.Clear()
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                End Select
 
-            Return lrFactType
+                Return lrFactType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Function
 
@@ -1055,6 +1069,95 @@ Namespace FBM
             End Try
 
         End Function
+
+        ''' <summary>
+        ''' Converts an appropriate EntityType to a FactType
+        ''' </summary>
+        Public Sub ConvertToFactType()
+
+            Try
+                If Not Me.HasPrimaryReferenceScheme Then
+                    MsgBox("This Entity Type cannot be converted to a Fact Type. Create a Primary Reference Scheme for the Entity Type.")
+                    Exit Sub
+                End If
+
+                Dim larModelElement As New List(Of FBM.ModelObject)
+
+                For Each lrRole In Me.ReferenceModeRoleConstraint.Role
+                    larModelElement.Add(lrRole.JoinedORMObject)
+                Next
+
+                Dim lbHasSimpleReferenceScheme As Boolean = Me.HasSimpleReferenceScheme
+
+                If lbHasSimpleReferenceScheme Then
+                    Call Me.TriggerExpandReferenceScheme()
+                End If
+
+                Dim lrFactType = Me.Model.CreateFactType(Me.Id, larModelElement, False, True, False, Nothing, True, Nothing, False)
+
+                Call lrFactType.CreateInternalUniquenessConstraint(lrFactType.RoleGroup, True, True, True, False, Nothing, True, True)
+
+                Call Me.TriggerChangingToFactType(lrFactType)
+
+                lrFactType.Objectify(True, False)
+                lrFactType.ObjectifyingEntityType = Me
+
+                If lbHasSimpleReferenceScheme Then
+                    Call lrFactType.RoleGroup(0).ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+                    Me.ReferenceModeFactType.SetIsLinkFactType(True)
+                    Me.ReferenceModeFactType.LinkFactTypeRole = lrFactType.RoleGroup(0)
+                    Me.ReferenceModeFactType.makeDirty()
+                Else
+                    For Each lrRole In lrFactType.RoleGroup
+                        For Each lrPRSRoleConstraintRole In Me.ReferenceModeRoleConstraint.Role
+                            Dim lrOtherRole = lrPRSRoleConstraintRole.FactType.GetOtherRoleOfBinaryFactType(lrPRSRoleConstraintRole.Id)
+                            Call lrOtherRole.ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+
+                            lrPRSRoleConstraintRole.FactType.SetIsLinkFactType(True)
+                            lrPRSRoleConstraintRole.FactType.SetLinkFactTypeRole(lrRole)
+                            lrPRSRoleConstraintRole.FactType.makeDirty()
+                        Next
+                    Next
+                End If
+
+                Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, True, True, True)
+
+#Region "FactTypeReading"
+                Dim lsSentence As String = ""
+                For Each lrRole In lrFactType.RoleGroup
+                    lsSentence &= lrRole.JoinedORMObject.Id
+                    If Not lrRole Is lrFactType.RoleGroup(lrFactType.RoleGroup.Count - 1) Then
+                        lsSentence &= " has "
+                    End If
+                Next
+
+                Dim lrSentence As New Language.Sentence(lsSentence)
+                For Each lrRole In lrFactType.RoleGroup
+                    If Not lrRole Is lrFactType.RoleGroup(lrFactType.RoleGroup.Count - 1) Then
+                        lsSentence &= " has "
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                    Else
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                    End If
+
+                Next
+
+                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
+                Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+#End Region
+
+                Call Me.TriggerChangedToFactType(lrFactType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         ''' <summary>
         ''' Creates a ReferenceMode where there is none. Sets up ReferenceModeFactType, ReferenceModeValueType, ReferenceModeRoleConstraint, PreferredIdentifierRCId.
@@ -3173,6 +3276,14 @@ SkipSettingReferenceModeObjects:
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub TriggerExpandReferenceScheme()
+            RaiseEvent ExpandReferenceScheme()
+        End Sub
+
+        Private Sub TriggerChangingToFactType(ByRef arFactType As FBM.FactType)
+            RaiseEvent ChangingToFactType(arFactType)
         End Sub
 
     End Class

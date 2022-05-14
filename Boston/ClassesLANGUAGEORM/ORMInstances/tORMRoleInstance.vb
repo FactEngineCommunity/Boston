@@ -1235,6 +1235,9 @@ Namespace FBM
 
             Try
                 Select Case arModelObject.ConceptType
+                    Case Is = pcenumConceptType.FactType
+                        Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
+
                     Case Is = pcenumConceptType.EntityType
                         Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(AddressOf arModelObject.Equals)
 
@@ -1316,9 +1319,6 @@ Namespace FBM
                                 End If
                             End If
                         End If
-
-                    Case Is = pcenumConceptType.FactType
-                        Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
                 End Select
 
                 Call Me.ResetLink()

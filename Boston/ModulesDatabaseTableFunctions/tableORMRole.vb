@@ -166,10 +166,6 @@ Namespace TableRole
                         End If
 
                         Select Case lREcordset("TypeOfJoin").Value
-                            Case Is = pcenumRoleJoinType.EntityType
-                                lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(Function(x) x.Id = lsId)
-                            Case Is = pcenumRoleJoinType.ValueType
-                                lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(Function(x) x.Id = lsId)
                             Case Is = pcenumRoleJoinType.FactType
                                 lrRole.JoinedORMObject = arFactType.Model.FactType.Find(Function(x) x.Id = lsId)
                                 '202020514-VM-Original pattern for the above as well
@@ -183,6 +179,10 @@ Namespace TableRole
                                     lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lsId, True) ' Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
                                     TableFactType.GetFactTypeDetailsByModel(lrRole.JoinsFactType, True)
                                 End If
+                            Case Is = pcenumRoleJoinType.EntityType
+                                lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(Function(x) x.Id = lsId)
+                            Case Is = pcenumRoleJoinType.ValueType
+                                lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(Function(x) x.Id = lsId)
                         End Select
 
                         lrRole.Mandatory = lREcordset("IsMandatory").Value

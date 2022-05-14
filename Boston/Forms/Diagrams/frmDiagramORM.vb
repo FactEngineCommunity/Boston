@@ -10509,6 +10509,8 @@ Public Class frmDiagramORM
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
             lrModel = lrEntityType.Model
 
+            Me.ToolStripMenuItemConvertToFactType.Enabled = lrEntityType.HasPrimaryReferenceScheme
+
             If lrEntityType.HasSimpleReferenceScheme And Trim(lrEntityType.ReferenceMode) <> "" Then
                 If lrEntityTypeInstance.ExpandReferenceMode = True Then
                     Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = False
@@ -12363,6 +12365,26 @@ Public Class frmDiagramORM
 
         Catch ex As Exception
 
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemConvertToFactType_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemConvertToFactType.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            With New WaitCursor
+                Call lrEntityTypeInstance.EntityType.ConvertToFactType()
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

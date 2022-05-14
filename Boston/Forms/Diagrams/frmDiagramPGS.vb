@@ -3750,16 +3750,30 @@ Public Class frmDiagramPGS
 
     Private Sub ViewPropertiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewPropertiesToolStripMenuItem.Click
 
-        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
-        Dim lrNode As New PGS.Node
+        'CodeSage
+        If Me.Diagram.Selection.Items(0).GetType <> GetType(MindFusion.Diagramming.ShapeNode) Then Exit Sub
 
         Try
-            ''---------------------------------------------------------
-            ''Get the EntityType represented by the (selected) Entity
-            ''---------------------------------------------------------
-            lrNode = lrShapeNode.Tag
-            Call Me.ShowPropertiesForNode(lrNode)
-        Catch
+
+            Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
+            Dim lrNode As New PGS.Node
+
+            Try
+                ''---------------------------------------------------------
+                ''Get the EntityType represented by the (selected) Entity
+                ''---------------------------------------------------------
+                lrNode = lrShapeNode.Tag
+                Call Me.ShowPropertiesForNode(lrNode)
+            Catch
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
@@ -3880,17 +3894,34 @@ Public Class frmDiagramPGS
 
             Dim lfrmAddAttributeForm = New frmCRUDAddAttributeNew
 
-            lfrmAddAttributeForm.zrAttribute = lrAttribute
             lfrmAddAttributeForm.zrEntity = lrNodeType
             lfrmAddAttributeForm.zrModel = lrModel
-            lfrmAddAttributeForm.zrModelObject = lrAttribute.Entity.RDSTable.FBMModelElement
+
+            Dim lrModelElement As FBM.ModelObject = lrAttribute.Entity.RDSTable.FBMModelElement
+            lfrmAddAttributeForm.zrModelObject = lrModelElement
+
             Dim lsValueTypeName As String = lrModel.CreateUniqueValueTypeName("NewValueType", 0)
-            lfrmAddAttributeForm.zrValueType = lrModel.CreateValueType(lsValueTypeName, False,,,, False)
+            Dim lrValueType As FBM.ValueType = lrModel.CreateValueType(lsValueTypeName, True,,,, False)
+            lfrmAddAttributeForm.zrValueType = lrValueType
+
+            '----------------------------------------------------------------------------------------------------------------
+            'Establish a dummy FactType for the new Attribute.
+            '  NB If the User clicks [Cancel] then the FactType and ValueType must be removed from the Model.
+            '-------------------------------------------------------------------
+            Dim lrFactType As FBM.FactType = Nothing
+            If lrModelElement.ConceptType = pcenumConceptType.EntityType Then
+                Dim lrEntityType As FBM.EntityType = lrModelElement
+                lrFactType = lrEntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+            Else
+                Throw New Exception("Not implemented yet")
+            End If
+            lfrmAddAttributeForm.zrFactType = lrFactType
 
             If lfrmAddAttributeForm.ShowDialog = DialogResult.OK Then
-
-
-
+                lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
+            Else
+                Call lrFactType.RemoveFromModel(True, False)
+                Call lrValueType.RemoveFromModel(True, False)
             End If
 
         Catch ex As Exception

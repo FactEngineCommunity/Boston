@@ -2513,6 +2513,10 @@ Namespace FBM
                 Me.FactTypeNameShape.Text = Chr(34) & Me.Name & Chr(34)
                 Me.FactTypeNameShape.Visible = Me.ShowFactTypeName
 
+                If Me.IsLinkFactType Then
+
+                End If
+
                 If Me.Shape IsNot Nothing Then
 
                     If Me.ShowFactTypeName Then
@@ -3691,6 +3695,79 @@ Namespace FBM
                 End Try
             End If
         End Sub
+
+        Public Shadows Function getLinkFactTypes() As List(Of FBM.FactTypeInstance)
+
+            Try
+                Dim larLinkFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                              Where FactTypeInstance.IsLinkFactType = True
+                                              Where Me.RoleGroup.Contains(FactTypeInstance.LinkFactTypeRole)
+                                              Select FactTypeInstance
+
+                Return larLinkFactTypeInstance.ToList
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+
+            End Try
+
+        End Function
+
+
+        Private Sub _FactType_IsLinkFactTypeChanged() Handles _FactType.IsLinkFactTypeChanged
+
+            Try
+                Me.IsLinkFactType = Me.FactType.IsLinkFactType
+
+                'CodeSafe
+                If Me.Shape Is Nothing Then Exit Sub
+
+                For Each lrRoleInstance In Me.RoleGroup
+                    If Me.IsLinkFactType Then
+                        If Me.FactType.IsLinkFactType Then
+                            lrRoleInstance.Shape.Pen.DashPattern = New Single() {4, 3, 4, 3}
+                        End If
+                    End If
+                    Call lrRoleInstance.ResetLink()
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub _FactType_LinkFactTypeRoleChanged(ByRef arRole As Role) Handles _FactType.LinkFactTypeRoleChanged
+
+            Try
+                Dim lsRoleId = arRole.Id
+                Dim lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lsRoleId)
+
+                Me.LinkFactTypeRole = lrRoleInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

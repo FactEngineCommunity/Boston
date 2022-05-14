@@ -1236,6 +1236,8 @@ Namespace FBM
                         For Each lrRole In larRole
                             lrRole.makeDirty()
                             lrRole.FactType.makeDirty()
+                            Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lrRole.FactType.Id)
+                            Call lrModelDictionaryEntry.Save()
                             lrRole.FactType.Save()
                         Next
                     End If

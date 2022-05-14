@@ -2549,10 +2549,14 @@ NextY:
                     End If
                 End If
 
+                Dim lrConceptInstance As New FBM.ConceptInstance
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
-                    Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactType)
+                    lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactType)
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageRemovePageObject, arFactTypeInstance, lrConceptInstance)
                 End If
+
+                lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
+                Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2829,6 +2833,7 @@ NextY:
             Try
                 'CodeSafe:
                 If Not Me.Model.Page.Contains(Me) Then
+                    Exit Sub
                     Throw New Exception("Page is not in the Model.")
                 End If
 

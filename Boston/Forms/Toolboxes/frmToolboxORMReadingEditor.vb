@@ -4,15 +4,12 @@ Imports System.Reflection
 
 Public Class frmToolboxORMReadingEditor
 
-
     Public zrPage As FBM.Page
 
     '---------------------------------------------
     'EnterpriseAware (Intellisense like) code
     '---------------------------------------------
-
     Public ziCurrentTagStart As Integer = 0
-
 
     Private zrHashList As New Hashtable
     Private zrTermList As New List(Of String) 'List of ORMObjectTypes within the FactType for which the reading is being created.
@@ -853,18 +850,30 @@ Public Class frmToolboxORMReadingEditor
 
         Dim lrFactTypeReading As FBM.FactTypeReading
 
-        If e.KeyCode = Keys.Delete Then
-            If Me.DataGrid_Readings.SelectedRows.Count > 0 Then
+        Try
+            If e.KeyCode = Keys.Delete Then
+                If Me.DataGrid_Readings.SelectedRows.Count > 0 Then
 
-                lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
+                    lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
 
-                Call lrFactTypeReading.RemoveFromModel(False, True, True)
+                    Call lrFactTypeReading.RemoveFromModel(False, True, True)
 
-                Call Me.PopulateDataGridWithFactTypeReadings()
-                Call Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
-                Call Me.zrPage.MakeDirty()
+                    Call Me.PopulateDataGridWithFactTypeReadings()
+                    Call Me.zrPage.MakeDirty()
+                    If Me.zrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        Call Me.zrFactTypeInstance.FactTypeReadingShape.RefreshShape()
+                    End If
+                End If
             End If
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

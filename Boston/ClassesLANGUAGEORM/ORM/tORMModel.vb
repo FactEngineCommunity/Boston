@@ -738,13 +738,15 @@ Namespace FBM
         '''   NB Adds a Dictionary Entry for the Role Constraint to the Model's Model Dictionary.
         ''' </summary>
         ''' <param name="arRoleConstraint">The Role Constraint to be added to the Model.</param>
+        ''' <param name="abIgnoreRDSProcessing">True if converting an EntityType to a FactType, because Columns/Table already exists.</param>
         ''' <remarks>Use this method if it known that the Role Constraint is unique to the model, otherwise use tORMModel.CreateRoleConstraint.</remarks>
         Public Sub AddRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint,
                                      Optional ByVal abMakeModelDirty As Boolean = False,
                                      Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                      Optional arConceptInstance As FBM.ConceptInstance = Nothing,
                                      Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
-                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing)
+                                     Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing,
+                                     Optional ByVal abIgnoreRDSProcessing As Boolean = False)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
@@ -822,6 +824,8 @@ Namespace FBM
                     '    If arRoleConstraint.Role(0).FactType.IsDerived Then lbRoleConstraintFactTypeIsDerived = True
                     'End If
                     'And Not (arRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And lbRoleConstraintFactTypeIsDerived)
+
+                    If abIgnoreRDSProcessing Then GoTo FinishedProcessing
 
                     If (Not arRoleConstraint.IsMDAModelElement) _
                         And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
@@ -1548,6 +1552,7 @@ Namespace FBM
                         End If 'Is Internal Uniqueness Constraint
                     End If
 
+FinishedProcessing:
                     '=====================================================================================
                     'Broadcast the addition to the DuplexServer
                     If My.Settings.UseClientServer _
@@ -2520,14 +2525,17 @@ Namespace FBM
                                        Optional ByVal abIsLinkFactType As Boolean = False,
                                        Optional ByVal arLinkFactTypeRole As FBM.Role = Nothing,
                                        Optional ByVal abAddtoModel As Boolean = True,
-                                       Optional ByRef arPage As FBM.Page = Nothing) As FBM.FactType
+                                       Optional ByRef arPage As FBM.Page = Nothing,
+                                       Optional ByVal abCreateUniqueName As Boolean = True) As FBM.FactType
 
             Try
                 Dim lrModelObject As FBM.ModelObject
+                Dim lsNewUniqueName As String = asFactTypeName
                 Dim lrFactType As New FBM.FactType(Me, asFactTypeName, True)
-                Dim lsNewUniqueName As String = ""
 
-                lsNewUniqueName = Me.CreateUniqueFactTypeName(lrFactType.Name, 0)
+                If abCreateUniqueName Then
+                    lsNewUniqueName = Me.CreateUniqueFactTypeName(lrFactType.Name, 0)
+                End If
 
                 '--------------------------------------------------------------------
                 'Create the FBM.FactType to return (with the lsNewUniqueName)

@@ -2133,10 +2133,12 @@ Namespace FBM
         ''' NB The name of the FactType of the Role must be modified to reflect the new relation.
         ''' </summary>
         ''' <param name="arNewJoinedModelObject"></param>
+        ''' <param name="abIgnoreRDSProcessing">True when converting an EntityType to a FactType, because the Columns already exist on the table</param>
         ''' <remarks></remarks>
         Public Sub ReassignJoinedModelObject(ByRef arNewJoinedModelObject As FBM.ModelObject,
                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                             Optional arConceptInstance As FBM.ConceptInstance = Nothing)
+                                             Optional arConceptInstance As FBM.ConceptInstance = Nothing,
+                                             Optional abIgnoreRDSProcessing As Boolean = False)
 
             Try
                 '==========================================================================================
@@ -2187,6 +2189,8 @@ Namespace FBM
                     End If
 
                     Me.JoinedORMObject = arNewJoinedModelObject
+
+                    If abIgnoreRDSProcessing Then GoTo FinishedProcessing
 
                     If lrOriginallyJoinedTable IsNot Nothing Then
 
@@ -2610,16 +2614,17 @@ SkipMakingNewColumn:
 #End Region
                     End If
 
-                        RaiseEvent RoleJoinModified(Me.JoinedORMObject)
+FinishedProcessing:
+                    RaiseEvent RoleJoinModified(Me.JoinedORMObject)
 
-                        If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
-                            'Likely creating a new binary FactType from the Toolbox, and still has a Role that is unjoined.
-                        Else
-                            Call Me.Model.Save()
-                        End If
+                    If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
+                        'Likely creating a new binary FactType from the Toolbox, and still has a Role that is unjoined.
+                    Else
+                        Call Me.Model.Save()
+                    End If
 
 
-                    End If 'Not joined back to what it originally joined to.
+                End If 'Not joined back to what it originally joined to.
 
             Catch ex As Exception
                 Dim lsMessage As String

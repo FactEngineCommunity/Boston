@@ -1516,6 +1516,7 @@ Namespace FBM
                     liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
                                                    From Role In FactType.RoleGroup
                                                   Where Role.JoinedORMObject IsNot Nothing
+                                                  Where Role.JoinedORMObject.GetType = GetType(FBM.EntityTypeInstance)
                                                   Where Role.JoinedORMObject.Id = Me.Id
                                                    Into Count()
                 End If
@@ -2813,6 +2814,66 @@ Namespace FBM
             Me._DBName = asDBName
 
         End Sub
+
+        Private Sub _EntityType_ExpandReferenceScheme() Handles _EntityType.ExpandReferenceScheme
+
+            Try
+                Call Me.ExpandTheReferenceScheme()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Private Sub _EntityType_ChangedToFactType(ByRef arFactType As FactType) Handles _EntityType.ChangedToFactType
+
+            Try
+                'CodeSafe
+                If Me.Shape Is Nothing Then Exit Sub
+                If Me.Page.Diagram Is Nothing Then Exit Sub
+
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.Id)
+
+                For Each lrFactType In lrFactTypeInstance.getLinkFactTypes
+                    For Each lrRoleInstance In lrFactType.RoleGroup
+                        Call lrRoleInstance.ResetLink()
+                    Next
+                Next
+
+                Call Me.RemoveFromPage(True)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub _EntityType_ChangingToFactType(ByRef arFactType As FactType) Handles _EntityType.ChangingToFactType
+
+            Try
+                Call Me.Page.DropFactTypeAtPoint(arFactType, New PointF(Me.X, Me.Y), False, False, True, False, True)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

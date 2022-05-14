@@ -113,7 +113,6 @@ Namespace FBM
                 End If
 
                 Call Me.MakeDirty()
-                Call Me.Save()
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -2803,6 +2802,10 @@ Namespace FBM
                             Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
 
                             Dim lrRelation As ERD.Relation
+
+                            'CodeSafe
+                            Me.ERDiagram.Relation.RemoveAll(Function(x) x Is Nothing)
+
                             If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lsRelationId).Count = 0 Then
                                 lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOriginNode, lrDestinationNode, False)
                                 Me.ERDiagram.Relation.Add(lrRelation)

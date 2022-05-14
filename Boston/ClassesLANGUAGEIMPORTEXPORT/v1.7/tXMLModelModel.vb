@@ -1646,9 +1646,21 @@ SkipValueTypeInstance:
                     lrRole.Mandatory = lrXMLRole.Mandatory
 
                     lrModelElement = arFactType.Model.EntityType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId)
+
                     If lrModelElement IsNot Nothing Then
+                        If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
+                            lrModelElement = arFactType.Model.FactType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId)
+                            If lrModelElement IsNot Nothing Then
+                                lrRole.JoinedORMObject = lrModelElement
+                                GoTo FoundModelElement
+                            End If
+                            GoTo KeepLooking
+                        End If
                         lrRole.JoinedORMObject = lrModelElement
-                    ElseIf IsSomething(arFactType.Model.ValueType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId), lrModelElement) Then
+                        GoTo FoundModelElement
+                    End If
+KeepLooking:
+                    If IsSomething(arFactType.Model.ValueType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId), lrModelElement) Then
                         lrRole.JoinedORMObject = lrModelElement
                     Else
                         lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
@@ -1657,7 +1669,7 @@ SkipValueTypeInstance:
                             Me.GetFactTypeDetails(lrRole.JoinsFactType)
                         End If
                     End If
-
+FoundModelElement:
                     '--------------------------------------------------
                     'Add the Role to the Model (list of Role) as well
                     '--------------------------------------------------

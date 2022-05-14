@@ -35,7 +35,12 @@ Public Class frmToolboxErrorList
             If mbShowCoreModelErrors Then
                 DataGrid_ErrorList.DataSource = Me.zrModel.ModelError
             Else
-                DataGrid_ErrorList.DataSource = Me.zrModel.ModelError.FindAll(Function(x) x.ModelObject.IsMDAModelElement = False)
+                Dim larModelError = From ModelError In Me.zrModel.ModelError
+                                    Where ModelError.ModelObject IsNot Nothing
+                                    Where ModelError.ModelObject.IsMDAModelElement = False
+                                    Select ModelError
+
+                DataGrid_ErrorList.DataSource = larModelError.ToList
             End If
 
             Me.cManager = CType(DataGrid_ErrorList.BindingContext(Me.zrModel.ModelError), CurrencyManager)

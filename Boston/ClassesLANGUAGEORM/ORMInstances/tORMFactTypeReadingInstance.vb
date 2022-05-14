@@ -270,7 +270,8 @@ Namespace FBM
 
                     Me.Shape.Text &= Me.GetDottedReadingText
                     Me.Shape.ResizeToFitText(FitSize.KeepRatio)
-                    Me.Page.Diagram.Invalidate()
+
+                    If Me.Page.Diagram IsNot Nothing Then Me.Page.Diagram.Invalidate()
                 End If
 
             Catch ex As Exception

@@ -7,7 +7,7 @@ Imports System.Runtime.CompilerServices
 Imports Newtonsoft.Json
 
 Namespace FBM
-    <Serializable()> _
+    <Serializable()>
     Public Class FactType
         Inherits FBM.ModelObject
         Implements IEquatable(Of FBM.FactType)
@@ -328,10 +328,12 @@ Namespace FBM
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         Public Event IsIndependentChanged(ByVal abNewIsIndependent As Boolean) Implements iFBMIndependence.IsIndependentChanged
         Public Event IsObjectifiedChanged(ByVal abNewIsObjectified As Boolean)
+        Public Event IsLinkFactTypeChanged()
         Public Event IsStoredChanged(ByVal abIsStored As Boolean)
         Public Event IsSubtypeStateControllingChanged(ByVal abIsSubtypeStateControlling As Boolean)
         Public Event IsPreferredReferenceModeChanged(ByVal abNewIsPreferrdReferenceMode As Boolean)
         Public Event IsSubtypeRelationshipFactTypeChanged(ByVal abNewIsSubtypeRelationshipFactType As Boolean)
+        Public Event LinkFactTypeRoleChanged(ByRef arRole As FBM.Role)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         Public Event Objectified() 'When the FactType is changed to an ObjectifiedFactType
         Public Event ObjectifyingEntityTypeChanged(ByRef arNewObjectifyingEntityType As FBM.EntityType)
@@ -476,8 +478,8 @@ Namespace FBM
 
         End Function
 
-        Public Overloads Function Clone(ByRef arModel As FBM.Model, _
-                                        Optional ByVal abAddToModel As Boolean = False, _
+        Public Overloads Function Clone(ByRef arModel As FBM.Model,
+                                        Optional ByVal abAddToModel As Boolean = False,
                                         Optional ByVal abIsMDAModelElement As Boolean = False) As Object
 
             Dim lrFactType As New FBM.FactType
@@ -724,8 +726,8 @@ Namespace FBM
             Next
 
             For Each lrModelObject In larModelObject
-                Dim liMaxJoinedObjectCount = Aggregate Role In Me.RoleGroup _
-                                             Where Role.JoinedORMObject.Id = lrModelObject.Id _
+                Dim liMaxJoinedObjectCount = Aggregate Role In Me.RoleGroup
+                                             Where Role.JoinedORMObject.Id = lrModelObject.Id
                                              Into Count()
 
                 If liMaxJoinedObjectCount >= 2 Then
@@ -819,10 +821,10 @@ Namespace FBM
 
             Dim lrPredicatePartCount As Integer
 
-            lrPredicatePartCount = From FactTypeReading In Me.FactTypeReading _
-                                   From PredicatePart In FactTypeReading.PredicatePart _
+            lrPredicatePartCount = From FactTypeReading In Me.FactTypeReading
+                                   From PredicatePart In FactTypeReading.PredicatePart
                                    Where FactTypeReading.Id = arFactTypeReading.Id _
-                                   And PredicatePart.RoleId = asRoleId _
+                                   And PredicatePart.RoleId = asRoleId
                                    Select PredicatePart Distinct.Count
 
             Return lrPredicatePartCount > 0
@@ -1042,7 +1044,7 @@ Namespace FBM
                     If larUpstreamResponsibleColumns.Count > 0 Then
 
                         Dim lrColumn As RDS.Column
-                        Dim larTable = From Column In larUpstreamResponsibleColumns _
+                        Dim larTable = From Column In larUpstreamResponsibleColumns
                                        Select Column.Table Distinct
 
                         For Each lrTable In larTable
@@ -1077,10 +1079,10 @@ Namespace FBM
 
                     'Relation  
                     If arRole.FactType.IsObjectified Then
-                        Dim larLinkFactTypeRole = From FactType In Me.Model.FactType _
-                                                 Where FactType.IsLinkFactType = True _
-                                                 And FactType.LinkFactTypeRole Is lrRole _
-                                                 Select FactType.RoleGroup(0)
+                        Dim larLinkFactTypeRole = From FactType In Me.Model.FactType
+                                                  Where FactType.IsLinkFactType = True _
+                                                  And FactType.LinkFactTypeRole Is lrRole
+                                                  Select FactType.RoleGroup(0)
 
                         For Each lrLinkFactTypeRole In larLinkFactTypeRole
                             Call Me.Model.generateRelationForManyTo1BinaryFactType(lrLinkFactTypeRole)
@@ -1616,8 +1618,8 @@ Namespace FBM
                     Dim lrFactTypeReading As New FBM.FactTypeReading(Me, Me.Id)
                     FindSuitableFactTypeReading = Me.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByFactTypesRoles)
 
-                    If (FindSuitableFactTypeReading Is Nothing) And _
-                       (Me.Arity = 2) And _
+                    If (FindSuitableFactTypeReading Is Nothing) And
+                       (Me.Arity = 2) And
                        (Me.FactTypeReading.Count > 0) Then
                         FindSuitableFactTypeReading = Me.FactTypeReading(0)
                     End If
@@ -1667,9 +1669,9 @@ Namespace FBM
                 If IsSomething(Me.FactTypeReading) Then
                     FindSuitableFactTypeReadingByRoles = Me.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByRoles)
 
-                    If (FindSuitableFactTypeReadingByRoles Is Nothing) And _
-                       (Me.Arity = 2) And _
-                       (Me.FactTypeReading.Count > 0) And _
+                    If (FindSuitableFactTypeReadingByRoles Is Nothing) And
+                       (Me.Arity = 2) And
+                       (Me.FactTypeReading.Count > 0) And
                        Not abBeStrict Then
                         FindSuitableFactTypeReadingByRoles = Me.FactTypeReading(0)
                     End If
@@ -1917,7 +1919,8 @@ Namespace FBM
                                                            Optional ByVal abAddToModel As Boolean = True,
                                                            Optional ByVal abIsSubtypeRelationshipSubtypeRole As Boolean = False,
                                                            Optional ByRef arTopmostSupertypeModelObject As FBM.ModelObject = Nothing,
-                                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.RoleConstraint
+                                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                           Optional ByVal abIgnoreRDSProcessing As Boolean = False) As FBM.RoleConstraint
 
             Try
                 '---------------------------------
@@ -1943,7 +1946,7 @@ Namespace FBM
                 Me.AddInternalUniquenessConstraint(lrRoleConstraint)
 
                 If abAddToModel Then
-                    Call Me.Model.AddRoleConstraint(lrRoleConstraint, abMakeModelDirty, abBroadcastInterfaceEvent, Nothing, abIsSubtypeRelationshipSubtypeRole, arTopmostSupertypeModelObject)
+                    Call Me.Model.AddRoleConstraint(lrRoleConstraint, abMakeModelDirty, abBroadcastInterfaceEvent, Nothing, abIsSubtypeRelationshipSubtypeRole, arTopmostSupertypeModelObject, abIgnoreRDSProcessing)
                 End If
 
                 Return lrRoleConstraint
@@ -2411,8 +2414,8 @@ Namespace FBM
                     Throw New Exception("Function called for Fact Type with no Internal Uniqueness Constraint.")
                 End If
 
-                Dim larRole = From RoleConstraint In Me.InternalUniquenessConstraint _
-                              From RoleConstraintRole In RoleConstraint.RoleConstraintRole _
+                Dim larRole = From RoleConstraint In Me.InternalUniquenessConstraint
+                              From RoleConstraintRole In RoleConstraint.RoleConstraintRole
                               Select RoleConstraintRole.Role
 
                 If larRole.Count = 0 Then
@@ -2663,9 +2666,9 @@ Namespace FBM
                 End If
 
                 If aiPosition = 0 Then
-                    Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading _
-                                           From PredicatePart In FactTypeReading.PredicatePart _
-                                           Where PredicatePart.Role.JoinedORMObject.Id = lsModelObjectId _
+                    Dim larPredicatePart = From FactTypeReading In Me.FactTypeReading
+                                           From PredicatePart In FactTypeReading.PredicatePart
+                                           Where PredicatePart.Role.JoinedORMObject.Id = lsModelObjectId
                                            Select PredicatePart
 
                     For Each lrPredicatePart In larPredicatePart
@@ -2994,9 +2997,9 @@ Namespace FBM
 
             If Me.Arity = 1 Then Return False
 
-            Dim lrJoinedORMObject = From Role In Me.RoleGroup _
-                                    Select Role.JoinedORMObject _
-                                    Group By JoinedORMObject Into Group _
+            Dim lrJoinedORMObject = From Role In Me.RoleGroup
+                                    Select Role.JoinedORMObject
+                                    Group By JoinedORMObject Into Group
                                     Where Group.Count > 1
 
             If lrJoinedORMObject.Count = 0 Then
@@ -3190,11 +3193,11 @@ Namespace FBM
 
         End Function
 
-        Function IsManyToOneByRoleOrder(aarRole As List(Of FBM.Role)) As Boolean
+        Function IsManyToOneByRoleOrder(ByRef aarRole As List(Of FBM.Role)) As Boolean
 
             Try
                 If aarRole.Count <> 2 Then
-                    Throw New ApplicationException("Validating Role count must equal 2 (two).")
+                    Return False
                 End If
 
                 If Not Me.IsManyTo1BinaryFactType Then
@@ -3207,9 +3210,9 @@ Namespace FBM
 
                 Dim lrSecondRole As FBM.Role = aarRole(1)
 
-                Dim larRolesInInternalUniquenessConstraints = From IUC In Me.InternalUniquenessConstraint _
-                                                              From RCR In IUC.RoleConstraintRole _
-                                                              Where RCR.Role.Id = lrSecondRole.Id _
+                Dim larRolesInInternalUniquenessConstraints = From IUC In Me.InternalUniquenessConstraint
+                                                              From RCR In IUC.RoleConstraintRole
+                                                              Where RCR.Role.Id = lrSecondRole.Id
                                                               Select RCR.Role
 
                 If larRolesInInternalUniquenessConstraints.Count <> 0 Then
@@ -3267,12 +3270,12 @@ Namespace FBM
 
         End Function
 
-        Function getLinkFactTypes() As List(Of FBM.FactType)
+        Public Overridable Function getLinkFactTypes() As List(Of FBM.FactType)
 
             Try
-                Dim larLinkFactType = From FactType In Me.Model.FactType _
+                Dim larLinkFactType = From FactType In Me.Model.FactType
                                       Where FactType.IsLinkFactType = True _
-                                      And Me.RoleGroup.Contains(FactType.LinkFactTypeRole) _
+                                      And Me.RoleGroup.Contains(FactType.LinkFactTypeRole)
                                       Select FactType
 
                 Return larLinkFactType.ToList
@@ -3593,8 +3596,8 @@ Namespace FBM
                 '  relative Relation/s must be removed from the RDS Model.
                 If (Me.Arity = 2) And (Me.InternalUniquenessConstraint.Count = 0) Then
 
-                    Dim larRelation = From Relation In Me.Model.RDS.Relation _
-                                      Where Relation.ResponsibleFactType.Id = Me.Id _
+                    Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                      Where Relation.ResponsibleFactType.Id = Me.Id
                                       Select Relation
 
                     For Each lrRelation In larRelation.ToList
@@ -3653,7 +3656,7 @@ Namespace FBM
         ''' Objectifies the FactType
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub Objectify(Optional ByVal abSuppressSave As Boolean = False)
+        Public Sub Objectify(Optional ByVal abSuppressSave As Boolean = False, Optional ByVal abCreateLinkFactTypes As Boolean = True)
 
             Try
                 Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Nothing, False)
@@ -3661,7 +3664,7 @@ Namespace FBM
                 Me.ObjectifyingEntityType.ObjectifiedFactType = Me
                 Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
 
-                Call Me.CreateLinkFactTypes(True)
+                If abCreateLinkFactTypes Then Me.CreateLinkFactTypes(True)
 
                 Call Me.SetIsObjectified(True, True)
 
@@ -4164,13 +4167,13 @@ Namespace FBM
 
                         If Me.IsManyTo1BinaryFactType Then
 
-                            Dim larRole = From Role In Me.RoleGroup _
-                                          Where Role.HasInternalUniquenessConstraint _
+                            Dim larRole = From Role In Me.RoleGroup
+                                          Where Role.HasInternalUniquenessConstraint
                                           Select Role
 
                             Dim lrRole As FBM.Role = larRole(0)
 
-                            Dim larRelation = From Relation In Me.Model.RDS.Relation _
+                            Dim larRelation = From Relation In Me.Model.RDS.Relation
                                               Where Relation.ResponsibleFactType.Id = Me.Id
                                               Select Relation
 
@@ -4557,6 +4560,39 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub SetIsLinkFactType(ByVal abIsLinkFactType As Boolean)
+
+            Try
+                Me.IsLinkFactType = abIsLinkFactType
+                RaiseEvent IsLinkFactTypeChanged()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetLinkFactTypeRole(ByRef arRole As FBM.Role)
+
+            Try
+                Me.LinkFactTypeRole = arRole
+
+                RaiseEvent LinkFactTypeRoleChanged(arRole)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
     End Class

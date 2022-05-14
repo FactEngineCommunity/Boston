@@ -445,6 +445,8 @@ Namespace FBM
         Public NORMAReferenceId As String = ""
 
         <NonSerialized()>
+        Public Event ChangedToFactType(ByRef arFactType As FBM.FactType)
+        <NonSerialized()>
         Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)
         <NonSerialized()>
         Public Event DBNameChanged(ByVal asDBName As String)
@@ -1482,6 +1484,10 @@ Namespace FBM
 
             RaiseEvent NameChanged(asNewName)
 
+        End Sub
+
+        Public Sub TriggerChangedToFactType(ByRef arFactType As FBM.FactType)
+            RaiseEvent ChangedToFactType(arFactType)
         End Sub
 
     End Class

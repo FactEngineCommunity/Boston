@@ -273,6 +273,9 @@ Namespace ERD
                 Dim lsPartOfPrimaryKey As String = ""
                 Dim lsMandatory As String = ""
 
+                'CodeSafe
+                If Me.Cell Is Nothing Then Exit Sub
+
                 If Me.Entity.RDSTable.HasPrimaryKeyIndex Then
                     If Me.Column.isPartOfPrimaryKey Then
                         lsPartOfPrimaryKey = "#"
@@ -389,6 +392,9 @@ Namespace ERD
         End Sub
 
         Private Sub ResonsibleFactType_RemovedFromModel() Handles ResponsibleFactType.RemovedFromModel
+
+            'CodeSafe
+            If Me.Entity.TableShape Is Nothing Then Exit Sub
 
             Me.Entity.TableShape.DeleteRow(Me.OrdinalPosition - 1)
 
@@ -527,7 +533,9 @@ Namespace ERD
 
             Me.AttributeName = asNewName
 
-            Call Me.RefreshShape()
+            If Me.Cell IsNot Nothing Then
+                Call Me.RefreshShape()
+            End If
 
         End Sub
 

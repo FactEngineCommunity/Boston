@@ -61,15 +61,18 @@ Namespace FBM
             '---------
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, _
-                       ByRef arFactTypeReading As FBM.FactTypeReading, _
+        Public Sub New(ByRef arModel As FBM.Model,
+                       ByRef arFactTypeReading As FBM.FactTypeReading,
                        Optional ByRef arRole As FBM.Role = Nothing,
-                       Optional ByVal abMakeDirty As Boolean = False)
+                       Optional ByVal abMakeDirty As Boolean = False,
+                       Optional ByVal aiSequenceNr As Integer = 1
+                       )
 
             Me.Model = arModel
             Me.FactTypeReading = arFactTypeReading
             Me.Role = arRole
             Me.isDirty = abMakeDirty
+            Me.SequenceNr = aiSequenceNr
 
         End Sub
 

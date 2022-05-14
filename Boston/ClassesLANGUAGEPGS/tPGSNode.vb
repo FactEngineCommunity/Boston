@@ -596,7 +596,7 @@ Namespace PGS
         End Sub
 
         Private Sub RDSTable_ColumnAdded(ByRef arColumn As Column) Handles RDSTable.ColumnAdded
-            Call Me.Page.AddAttributeToEntity(arColumn)
+            'Call Me.Page.AddAttributeToEntity(arColumn)
         End Sub
 
         Private Sub RDSTable_NameChanged(asNewName As String) Handles RDSTable.NameChanged

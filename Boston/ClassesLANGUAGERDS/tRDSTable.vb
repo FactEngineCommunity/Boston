@@ -1865,6 +1865,23 @@ Namespace RDS
             RaiseEvent SubtypeRelationshipRemoved()
         End Sub
 
+        Private Sub FBMModelElement_ChangedToFactType(ByRef arFactType As FactType) Handles FBMModelElement.ChangedToFactType
+
+            Try
+                Me.FBMModelElement = arFactType
+                Call Me.setIsPGSRelation(False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace
