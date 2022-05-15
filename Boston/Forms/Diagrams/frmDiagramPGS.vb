@@ -2092,82 +2092,27 @@ Public Class frmDiagramPGS
             ElseIf loDraggedNode.Tag.GetType Is GetType(RDS.Table) Then
 
                 Dim lrTable As RDS.Table
-                    lrTable = loDraggedNode.Tag
+                lrTable = loDraggedNode.Tag
 
-                    Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
-                    If lrClashNode IsNot Nothing Then
-                        lrNode = lrClashNode
-                        'The Node is already on the Page.
-                        lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
-                        If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
-                            lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
-                        End If
-                        MsgBox(lsMessage)
-                        Exit Sub
+                Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
+                If lrClashNode IsNot Nothing Then
+                    lrNode = lrClashNode
+                    'The Node is already on the Page.
+                    lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
+                    If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
+                        lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
                     End If
-
-
-                    '------------------
-                    'Load the Entity.
-                    '==================================================================================================================
-                    Dim lsSQLQuery As String = ""
-                    Dim lrRecordset As ORMQL.Recordset
-                    Dim lrFactInstance As FBM.FactInstance
-
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                    lsSQLQuery &= " WHERE Element = '" & lrTable.Name & "'"
-
-                    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-                    lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNodeType(Me.zrPage)
-                '===================================================================================================================
-                lrNode.RDSTable = lrTable 'IMPORTANT: Leave this at this point in the code.
-                Call Me.zrPage.DropExistingPGSNodeAtPoint(lrNode, loPointF)
-
-                If lrNode.RDSTable.isPGSRelation And lrNode.RDSTable.Arity < 3 Then
-                        'Need to load the relation for the joined Nodes, not the PGSRelation.
-                        'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
-
-                        Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
-
-                        Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
-
-                        Dim larDestinationModelObjects = lrFactType.getDestinationModelObjects
-
-                        Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
-                                                                                          larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
-
-                        Dim lbAllFound As Boolean = True
-                        For Each lrModelObject In larDestinationModelObjects
-                            If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
-                                lbAllFound = False
-                            End If
-                        Next
-
-                        If lbAllFound Then
-                            If lrNode.RDSTable.isPGSRelation Then
-                                Call Me.zrPage.DisplayPGSRelationNodeLink(lrNode, lrRDSRelation)
-                                lrNode.Shape.Visible = False
-                                For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
-                                    lrEdge.Visible = False
-                                Next
-                            End If
-                        End If
-                    Else
-                        Call Me.zrPage.loadRelationsForPGSNode(lrNode, False)
-                        Call Me.zrPage.loadPropertyRelationsForPGSNode(lrNode, False)
-                    End If
-
+                    MsgBox(lsMessage)
+                    Exit Sub
                 End If
 
+                '------------------
+                'Load the PGS Node from the RDS.Table.
+                '==================================================================================================================
+                Call Me.zrPage.LoadPGSNodeTypeFromRDSTable(lrTable, loPointF)
             End If
+
+        End If
 
     End Sub
 
@@ -2561,273 +2506,6 @@ Public Class frmDiagramPGS
                     End If
                 End If
         End Select
-
-    End Sub
-
-    Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click
-
-        Dim lrAddAttributeForm As New frmCRUDAddAttribute
-        Dim lrEntityType As FBM.EntityType
-        Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
-        Dim lrEntity As New ERD.Entity
-        Dim lrFactInstanceAttribute As FBM.FactInstance
-        Dim lrFactInstanceRelation As FBM.FactInstance = Nothing
-        Dim lsSQLQuery As String = ""
-
-        '---------------------------------------------------------
-        'Get the EntityType represented by the (selected) Entity
-        '---------------------------------------------------------
-        lrEntity = lrTableNode.Tag '(above) = Me.Diagram.Selection.Items(0)
-
-        lrEntityType = New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel, lrEntity.Name, Nothing, True)
-        lrEntityType = Me.zrPage.Model.EntityType.Find(AddressOf lrEntityType.Equals)
-
-        lrAddAttributeForm.zrModel = Me.zrPage.Model
-        lrAddAttributeForm.zrModelObject = lrEntityType
-        lrAddAttributeForm.zrEntity = lrEntity
-        lrAddAttributeForm.zarEntity = Me.ERDiagram.Entity
-
-        lrAddAttributeForm.StartPosition = FormStartPosition.CenterParent
-
-        If lrAddAttributeForm.ShowDialog = Windows.Forms.DialogResult.OK Then
-
-            Dim lrERAttribute As ERD.Attribute
-
-            '----------------------------------------------------------------------------
-            'Relationship processing.
-            '  NB Do this first, because we need lrFactInstanceRelation for when 
-            '  mapping the relationship between an Attribute and its associated Relation.
-            '----------------------------------------------------------------------------
-            If IsSomething(lrAddAttributeForm.zrReferencesModelObject) Then
-
-                Dim lrLink As ERD.Link
-
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
-                lsSQLQuery &= " (Relation, FactType)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
-                lsSQLQuery &= ",'" & lrAddAttributeForm.zrFactType.Name & "'"
-                lsSQLQuery &= " )"
-
-                'Must Fix
-                'lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreERDRelation.ToString
-                lsSQLQuery &= " (ModelObject, Relation)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrEntity.Name & "'"
-                lsSQLQuery &= ",'" & lrAddAttributeForm.zrReferencesModelObject.Name & "'"
-                lsSQLQuery &= " )"
-
-                lrFactInstanceRelation = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                If lrAddAttributeForm.zrRelation.OriginMandatory Then
-                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
-                    lsSQLQuery &= " (" & pcenumCMMLRelations.CoreOriginIsMandatory.ToString & ")"
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
-                    lsSQLQuery &= " )"
-
-                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString
-                lsSQLQuery &= " (ERDRelation, Multiplicity)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
-                lsSQLQuery &= ",'" & lrAddAttributeForm.zrRelation.OriginMultiplicity.ToString & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                If lrAddAttributeForm.zrRelation.DestinationMandatory Then
-                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
-                    lsSQLQuery &= " (" & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString & ")"
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
-                    lsSQLQuery &= " )"
-
-                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
-                lsSQLQuery &= " (ERDRelation, Multiplicity)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
-                lsSQLQuery &= ",'" & lrAddAttributeForm.zrRelation.DestinationMultiplicity.ToString & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                If lrAddAttributeForm.zrRelation.OriginContributesToPrimaryKey Then
-                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
-                    lsSQLQuery &= " (" & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & ")"
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
-                    lsSQLQuery &= " )"
-
-                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                lrLink = New ERD.Link(Me.zrPage, _
-                                      lrFactInstanceRelation, _
-                                      lrEntity, _
-                                      lrAddAttributeForm.zrReferencesModelObject, _
-                                      Nothing, _
-                                      Nothing, _
-                                      lrAddAttributeForm.zrRelation)
-                lrLink.Relation = lrAddAttributeForm.zrRelation
-
-                lrLink.DisplayAndAssociate()
-
-            End If
-
-            '===================================================
-            'Process the Attribute/s
-            '===================================================
-            For Each lrERAttribute In lrAddAttributeForm.zarAttribute
-
-                '---------------------------------------------------
-                'The String put in the TableNode for the Attribute
-                '---------------------------------------------------
-                Dim lsAttribute As String = ""
-
-                lsSQLQuery = "INSERT INTO ERDAttribute"
-                lsSQLQuery &= " (ModelObject, Attribute)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrEntity.Name & "'"
-                lsSQLQuery &= ",'" & lrERAttribute.Name & "'"
-                lsSQLQuery &= " )"
-
-                lrFactInstanceAttribute = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                '--------------------------------------------------
-                'Set the Ordinal Position of the Attribute
-                '--------------------------------------------------
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " (Property, Position)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrFactInstanceAttribute.Id & "'"
-                lsSQLQuery &= ",'" & (lrEntity.Attribute.Count + 1).ToString & "'"
-                lsSQLQuery &= " )"
-
-                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                Dim lrFactDataInstance As FBM.FactDataInstance
-                lrFactDataInstance = lrFactInstanceAttribute.GetFactDataInstanceByRoleName("Attribute")
-
-                lrERAttribute = lrFactDataInstance.CloneAttribute(Me.zrPage)
-
-                'lrERAttribute.OrdinalPosition = lrEntity.Attribute.Count + 1
-                lrERAttribute.Entity = New ERD.Entity
-                lrERAttribute.Entity = lrEntity
-                lrEntity.Attribute.Add(lrERAttribute)
-
-                If lrAddAttributeForm.zbAttributeIsMandatory And lrAddAttributeForm.zbAttributeIsPartOfPrimaryKey Then
-                    lsAttribute = "# * " & lrERAttribute.Name
-                    lrERAttribute.Mandatory = True
-                    lrERAttribute.PartOfPrimaryKey = True
-                    lrEntity.PrimaryKey.Add(lrERAttribute)
-                ElseIf lrAddAttributeForm.zbAttributeIsMandatory Then
-                    lsAttribute = "* " & lrERAttribute.Name
-                    lrERAttribute.Mandatory = True
-                Else
-                    lsAttribute = "o " & lrERAttribute.Name
-                End If
-
-                lrTableNode.AddRow()
-                lrTableNode.Item(0, lrTableNode.RowCount - 1).Text = " " & lsAttribute
-
-                lrTableNode.Item(0, lrTableNode.RowCount - 1).Tag = lrERAttribute
-                lrERAttribute.Cell = lrTableNode.Item(0, lrTableNode.RowCount - 1)
-                lrTableNode.ResizeToFitText(False)
-
-                If lrERAttribute.Mandatory Then
-
-                    lsSQLQuery = "INSERT INTO IsMandatory"
-                    lsSQLQuery &= " (IsMandatory)"
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & lrFactInstanceAttribute.Id & "'"
-                    lsSQLQuery &= " )"
-
-                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                '==========================================================
-                'Part of PrimaryKey
-
-                lsSQLQuery = "SELECT *"
-                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexIsForEntity.ToString
-                lsSQLQuery &= " WHERE Entity = '" & lrEntity.Id & "'"
-
-                Dim lrRecordset As ORMQL.Recordset
-                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                Dim lrFactInstance As FBM.FactInstance
-
-                Dim lsIndexName As String = ""
-                lsIndexName = Viev.Strings.RemoveWhiteSpace(lrEntity.Id & "PK")
-
-                If lrERAttribute.PartOfPrimaryKey Then
-
-                    If lrRecordset.Facts.Count = 0 Then
-                        '-------------------------------------------------
-                        'Must create a Primary Identifier for the Entity
-                        '-------------------------------------------------
-                        lsSQLQuery = "INSERT INTO "
-                        lsSQLQuery &= pcenumCMMLRelations.CoreIndexIsForEntity.ToString
-                        lsSQLQuery &= " (Entity, Index)"
-                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                        lsSQLQuery &= " VALUES ("
-                        lsSQLQuery &= "'" & lrEntity.Id & "'"
-                        lsSQLQuery &= ",'" & lsIndexName & "'"
-                        lsSQLQuery &= ")"
-
-                        lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    End If
-
-                    '-------------------------------------
-                    'Add the Attribute to the PrimaryKey
-                    '-------------------------------------
-                    lsSQLQuery = "INSERT INTO "
-                    lsSQLQuery &= pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString
-                    lsSQLQuery &= " (Index, Property)"
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & lsIndexName & "'"
-                    lsSQLQuery &= ",'" & lrERAttribute.Name & "'"
-                    lsSQLQuery &= ")"
-
-                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-                '==========================================================
-
-                If IsSomething(lrAddAttributeForm.zrReferencesModelObject) Then
-                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelation.ToString
-                    lsSQLQuery &= " (Attribute, Relation)"
-                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & lrFactInstanceAttribute.Id & "'"
-                    lsSQLQuery &= ",'" & lrFactInstanceRelation.Id & "'"
-                    lsSQLQuery &= " )"
-
-                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-            Next
-
-        End If
-
-        lrAddAttributeForm.Dispose()
 
     End Sub
 
@@ -3883,58 +3561,6 @@ Public Class frmDiagramPGS
 
     End Sub
 
-    Private Sub AddAttributeToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AddAttributeToolStripMenuItem1.Click
-
-        Try
-            Dim lrAttribute As ERD.Attribute
-
-            lrAttribute = Me.zrPage.SelectedObject(0)
-            Dim lrModel As FBM.Model = Me.zrPage.Model
-            Dim lrNodeType As PGS.Node = lrAttribute.Entity
-
-            Dim lfrmAddAttributeForm = New frmCRUDAddAttributeNew
-
-            lfrmAddAttributeForm.zrEntity = lrNodeType
-            lfrmAddAttributeForm.zrModel = lrModel
-
-            Dim lrModelElement As FBM.ModelObject = lrAttribute.Entity.RDSTable.FBMModelElement
-            lfrmAddAttributeForm.zrModelObject = lrModelElement
-
-            Dim lsValueTypeName As String = lrModel.CreateUniqueValueTypeName("NewValueType", 0)
-            Dim lrValueType As FBM.ValueType = lrModel.CreateValueType(lsValueTypeName, True,,,, False)
-            lfrmAddAttributeForm.zrValueType = lrValueType
-
-            '----------------------------------------------------------------------------------------------------------------
-            'Establish a dummy FactType for the new Attribute.
-            '  NB If the User clicks [Cancel] then the FactType and ValueType must be removed from the Model.
-            '-------------------------------------------------------------------
-            Dim lrFactType As FBM.FactType = Nothing
-            If lrModelElement.ConceptType = pcenumConceptType.EntityType Then
-                Dim lrEntityType As FBM.EntityType = lrModelElement
-                lrFactType = lrEntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
-            Else
-                Throw New Exception("Not implemented yet")
-            End If
-            lfrmAddAttributeForm.zrFactType = lrFactType
-
-            If lfrmAddAttributeForm.ShowDialog = DialogResult.OK Then
-                lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
-            Else
-                Call lrFactType.RemoveFromModel(True, False)
-                Call lrValueType.RemoveFromModel(True, False)
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
     Private Sub IndexManagerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IndexManagerToolStripMenuItem.Click
 
         Try
@@ -3961,5 +3587,419 @@ Public Class frmDiagramPGS
         End Try
 
     End Sub
+
+    Private Sub ConvertToFactTypeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConvertToFactTypeToolStripMenuItem.Click
+
+        Try
+            Dim lrPGSNodeType As PGS.Node
+            Dim lrModelElement As FBM.ModelObject = Nothing
+
+            Try
+                lrPGSNodeType = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            lrModelElement = lrPGSNodeType.FBMModelElement
+
+            If lrModelElement.GetType = GetType(FBM.EntityType) Then
+
+                Call CType(lrModelElement, FBM.EntityType).ConvertToFactType()
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' Called when [Add Property] menu option selected on Node Type or Edge Type.
+    ''' </summary>
+    Private Sub AddPropertyToEntity()
+
+        Try
+            Dim lrNodeType As PGS.Node
+            Dim lrRelation As ERD.Relation
+
+            Dim lrModelElement As FBM.ModelObject
+
+            Dim lfrmAddAttributeForm = New frmCRUDAddAttributeNew
+
+            Select Case Me.zrPage.SelectedObject(0).GetType
+                Case Is = GetType(PGS.Node)
+                    lrNodeType = Me.zrPage.SelectedObject(0)
+                    lfrmAddAttributeForm.zrEntity = lrNodeType
+                    lrModelElement = lrNodeType.RDSTable.FBMModelElement
+                Case Is = GetType(ERD.Relation)
+                    lrRelation = Me.zrPage.SelectedObject(0)
+                    Dim lrRelationFactType As FBM.FactType = Nothing
+                    If lrRelation.RelationFactType.IsLinkFactType Then
+                        lrModelElement = lrRelation.RelationFactType.LinkFactTypeRole.FactType
+                    Else
+                        lrModelElement = lrRelation.RelationFactType
+                    End If
+                    lrRelationFactType = lrModelElement
+                    If Not lrRelationFactType.IsObjectified Then
+                        Call lrRelation.RelationFactType.Objectify()
+                    End If
+                    lfrmAddAttributeForm.zrEntity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRelationFactType.Id)
+
+                Case Else
+                    Exit Sub
+            End Select
+
+
+            Dim lrModel As FBM.Model = Me.zrPage.Model
+
+            lfrmAddAttributeForm.zrModel = lrModel
+            lfrmAddAttributeForm.zrModelObject = lrModelElement
+
+            Dim lsValueTypeName As String = lrModel.CreateUniqueValueTypeName("NewValueType", 0)
+            Dim lrValueType As FBM.ValueType = lrModel.CreateValueType(lsValueTypeName, True,,,, False)
+            lfrmAddAttributeForm.zrValueType = lrValueType
+
+            '----------------------------------------------------------------------------------------------------------------
+            'Establish a dummy FactType for the new Attribute.
+            '  NB If the User clicks [Cancel] then the FactType and ValueType must be removed from the Model.
+            '-------------------------------------------------------------------
+            Dim lrFactType As FBM.FactType = Nothing
+            If lrModelElement.ConceptType = pcenumConceptType.EntityType Then
+                Dim lrEntityType As FBM.EntityType = lrModelElement
+                lrFactType = lrEntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+
+            ElseIf lrModelElement.ConceptType = pcenumConceptType.FactType Then
+                Dim lrSelectedFactType As FBM.FactType = lrModelElement
+
+                If Not lrSelectedFactType.IsObjectified Then
+                    lrSelectedFactType.Objectify()
+                End If
+                lrFactType = lrSelectedFactType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+            Else
+                Throw New NotImplementedException("Not implemented.")
+            End If
+
+            lfrmAddAttributeForm.zrFactType = lrFactType
+
+            Dim lsUniqueAttributeName = lfrmAddAttributeForm.zrEntity.CreateUniqueAttributeName("NewAttribute", 0)
+
+            If lfrmAddAttributeForm.ShowDialog(lsUniqueAttributeName) = DialogResult.OK Then
+                lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
+            Else
+                Call lrFactType.RemoveFromModel(True, False)
+                Call lrValueType.RemoveFromModel(True, False)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Private Sub AddAttributeToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles AddAttributeToolStripMenuItem1.Click
+
+        Try
+            Call Me.AddPropertyToEntity()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Private Sub ToolStripMenuItem1_Click_1(sender As Object, e As EventArgs) Handles ToolStripMenuItem1.Click
+
+        Try
+            Call Me.AddPropertyToEntity()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    'Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click
+
+    '        Dim lrAddAttributeForm As New frmCRUDAddAttribute
+    '        Dim lrEntityType As FBM.EntityType
+    '        Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+    '        Dim lrEntity As New ERD.Entity
+    '        Dim lrFactInstanceAttribute As FBM.FactInstance
+    '        Dim lrFactInstanceRelation As FBM.FactInstance = Nothing
+    '        Dim lsSQLQuery As String = ""
+
+    '        '---------------------------------------------------------
+    '        'Get the EntityType represented by the (selected) Entity
+    '        '---------------------------------------------------------
+    '        lrEntity = lrTableNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+
+    '        lrEntityType = New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel, lrEntity.Name, Nothing, True)
+    '        lrEntityType = Me.zrPage.Model.EntityType.Find(AddressOf lrEntityType.Equals)
+
+    '        lrAddAttributeForm.zrModel = Me.zrPage.Model
+    '        lrAddAttributeForm.zrModelObject = lrEntityType
+    '        lrAddAttributeForm.zrEntity = lrEntity
+    '        lrAddAttributeForm.zarEntity = Me.ERDiagram.Entity
+
+    '        lrAddAttributeForm.StartPosition = FormStartPosition.CenterParent
+
+    '        If lrAddAttributeForm.ShowDialog = Windows.Forms.DialogResult.OK Then
+
+    '            Dim lrERAttribute As ERD.Attribute
+
+    '            '----------------------------------------------------------------------------
+    '            'Relationship processing.
+    '            '  NB Do this first, because we need lrFactInstanceRelation for when 
+    '            '  mapping the relationship between an Attribute and its associated Relation.
+    '            '----------------------------------------------------------------------------
+    '            If IsSomething(lrAddAttributeForm.zrReferencesModelObject) Then
+
+    '                Dim lrLink As ERD.Link
+
+    '                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+    '                lsSQLQuery &= " (Relation, FactType)"
+    '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                lsSQLQuery &= " VALUES ("
+    '                lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
+    '                lsSQLQuery &= ",'" & lrAddAttributeForm.zrFactType.Name & "'"
+    '                lsSQLQuery &= " )"
+
+    '                'Must Fix
+    '                'lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreERDRelation.ToString
+    '                lsSQLQuery &= " (ModelObject, Relation)"
+    '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                lsSQLQuery &= " VALUES ("
+    '                lsSQLQuery &= "'" & lrEntity.Name & "'"
+    '                lsSQLQuery &= ",'" & lrAddAttributeForm.zrReferencesModelObject.Name & "'"
+    '                lsSQLQuery &= " )"
+
+    '                lrFactInstanceRelation = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                If lrAddAttributeForm.zrRelation.OriginMandatory Then
+    '                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
+    '                    lsSQLQuery &= " (" & pcenumCMMLRelations.CoreOriginIsMandatory.ToString & ")"
+    '                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                    lsSQLQuery &= " VALUES ("
+    '                    lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
+    '                    lsSQLQuery &= " )"
+
+    '                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                End If
+
+    '                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString
+    '                lsSQLQuery &= " (ERDRelation, Multiplicity)"
+    '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                lsSQLQuery &= " VALUES ("
+    '                lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
+    '                lsSQLQuery &= ",'" & lrAddAttributeForm.zrRelation.OriginMultiplicity.ToString & "'"
+    '                lsSQLQuery &= " )"
+
+    '                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                If lrAddAttributeForm.zrRelation.DestinationMandatory Then
+    '                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
+    '                    lsSQLQuery &= " (" & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString & ")"
+    '                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                    lsSQLQuery &= " VALUES ("
+    '                    lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
+    '                    lsSQLQuery &= " )"
+
+    '                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                End If
+
+    '                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
+    '                lsSQLQuery &= " (ERDRelation, Multiplicity)"
+    '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                lsSQLQuery &= " VALUES ("
+    '                lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
+    '                lsSQLQuery &= ",'" & lrAddAttributeForm.zrRelation.DestinationMultiplicity.ToString & "'"
+    '                lsSQLQuery &= " )"
+
+    '                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                If lrAddAttributeForm.zrRelation.OriginContributesToPrimaryKey Then
+    '                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString
+    '                    lsSQLQuery &= " (" & pcenumCMMLRelations.CoreContributesToPrimaryKey.ToString & ")"
+    '                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                    lsSQLQuery &= " VALUES ("
+    '                    lsSQLQuery &= "'" & lrFactInstanceRelation.Id & "'"
+    '                    lsSQLQuery &= " )"
+
+    '                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                End If
+
+    '                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                lrLink = New ERD.Link(Me.zrPage,
+    '                                      lrFactInstanceRelation,
+    '                                      lrEntity,
+    '                                      lrAddAttributeForm.zrReferencesModelObject,
+    '                                      Nothing,
+    '                                      Nothing,
+    '                                      lrAddAttributeForm.zrRelation)
+    '                lrLink.Relation = lrAddAttributeForm.zrRelation
+
+    '                lrLink.DisplayAndAssociate()
+
+    '            End If
+
+    '            '===================================================
+    '            'Process the Attribute/s
+    '            '===================================================
+    '            For Each lrERAttribute In lrAddAttributeForm.zarAttribute
+
+    '                '---------------------------------------------------
+    '                'The String put in the TableNode for the Attribute
+    '                '---------------------------------------------------
+    '                Dim lsAttribute As String = ""
+
+    '                lsSQLQuery = "INSERT INTO ERDAttribute"
+    '                lsSQLQuery &= " (ModelObject, Attribute)"
+    '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                lsSQLQuery &= " VALUES ("
+    '                lsSQLQuery &= "'" & lrEntity.Name & "'"
+    '                lsSQLQuery &= ",'" & lrERAttribute.Name & "'"
+    '                lsSQLQuery &= " )"
+
+    '                lrFactInstanceAttribute = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                '--------------------------------------------------
+    '                'Set the Ordinal Position of the Attribute
+    '                '--------------------------------------------------
+    '                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+    '                lsSQLQuery &= " (Property, Position)"
+    '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                lsSQLQuery &= " VALUES ("
+    '                lsSQLQuery &= "'" & lrFactInstanceAttribute.Id & "'"
+    '                lsSQLQuery &= ",'" & (lrEntity.Attribute.Count + 1).ToString & "'"
+    '                lsSQLQuery &= " )"
+
+    '                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                Dim lrFactDataInstance As FBM.FactDataInstance
+    '                lrFactDataInstance = lrFactInstanceAttribute.GetFactDataInstanceByRoleName("Attribute")
+
+    '                lrERAttribute = lrFactDataInstance.CloneAttribute(Me.zrPage)
+
+    '                'lrERAttribute.OrdinalPosition = lrEntity.Attribute.Count + 1
+    '                lrERAttribute.Entity = New ERD.Entity
+    '                lrERAttribute.Entity = lrEntity
+    '                lrEntity.Attribute.Add(lrERAttribute)
+
+    '                If lrAddAttributeForm.zbAttributeIsMandatory And lrAddAttributeForm.zbAttributeIsPartOfPrimaryKey Then
+    '                    lsAttribute = "# * " & lrERAttribute.Name
+    '                    lrERAttribute.Mandatory = True
+    '                    lrERAttribute.PartOfPrimaryKey = True
+    '                    lrEntity.PrimaryKey.Add(lrERAttribute)
+    '                ElseIf lrAddAttributeForm.zbAttributeIsMandatory Then
+    '                    lsAttribute = "* " & lrERAttribute.Name
+    '                    lrERAttribute.Mandatory = True
+    '                Else
+    '                    lsAttribute = "o " & lrERAttribute.Name
+    '                End If
+
+    '                lrTableNode.AddRow()
+    '                lrTableNode.Item(0, lrTableNode.RowCount - 1).Text = " " & lsAttribute
+
+    '                lrTableNode.Item(0, lrTableNode.RowCount - 1).Tag = lrERAttribute
+    '                lrERAttribute.Cell = lrTableNode.Item(0, lrTableNode.RowCount - 1)
+    '                lrTableNode.ResizeToFitText(False)
+
+    '                If lrERAttribute.Mandatory Then
+
+    '                    lsSQLQuery = "INSERT INTO IsMandatory"
+    '                    lsSQLQuery &= " (IsMandatory)"
+    '                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                    lsSQLQuery &= " VALUES ("
+    '                    lsSQLQuery &= "'" & lrFactInstanceAttribute.Id & "'"
+    '                    lsSQLQuery &= " )"
+
+    '                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                End If
+
+    '                '==========================================================
+    '                'Part of PrimaryKey
+
+    '                lsSQLQuery = "SELECT *"
+    '                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexIsForEntity.ToString
+    '                lsSQLQuery &= " WHERE Entity = '" & lrEntity.Id & "'"
+
+    '                Dim lrRecordset As ORMQL.Recordset
+    '                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+    '                Dim lrFactInstance As FBM.FactInstance
+
+    '                Dim lsIndexName As String = ""
+    '                lsIndexName = Viev.Strings.RemoveWhiteSpace(lrEntity.Id & "PK")
+
+    '                If lrERAttribute.PartOfPrimaryKey Then
+
+    '                    If lrRecordset.Facts.Count = 0 Then
+    '                        '-------------------------------------------------
+    '                        'Must create a Primary Identifier for the Entity
+    '                        '-------------------------------------------------
+    '                        lsSQLQuery = "INSERT INTO "
+    '                        lsSQLQuery &= pcenumCMMLRelations.CoreIndexIsForEntity.ToString
+    '                        lsSQLQuery &= " (Entity, Index)"
+    '                        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                        lsSQLQuery &= " VALUES ("
+    '                        lsSQLQuery &= "'" & lrEntity.Id & "'"
+    '                        lsSQLQuery &= ",'" & lsIndexName & "'"
+    '                        lsSQLQuery &= ")"
+
+    '                        lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                    End If
+
+    '                    '-------------------------------------
+    '                    'Add the Attribute to the PrimaryKey
+    '                    '-------------------------------------
+    '                    lsSQLQuery = "INSERT INTO "
+    '                    lsSQLQuery &= pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString
+    '                    lsSQLQuery &= " (Index, Property)"
+    '                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                    lsSQLQuery &= " VALUES ("
+    '                    lsSQLQuery &= "'" & lsIndexName & "'"
+    '                    lsSQLQuery &= ",'" & lrERAttribute.Name & "'"
+    '                    lsSQLQuery &= ")"
+
+    '                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                End If
+    '                '==========================================================
+
+    '                If IsSomething(lrAddAttributeForm.zrReferencesModelObject) Then
+    '                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelation.ToString
+    '                    lsSQLQuery &= " (Attribute, Relation)"
+    '                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+    '                    lsSQLQuery &= " VALUES ("
+    '                    lsSQLQuery &= "'" & lrFactInstanceAttribute.Id & "'"
+    '                    lsSQLQuery &= ",'" & lrFactInstanceRelation.Id & "'"
+    '                    lsSQLQuery &= " )"
+
+    '                    Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+    '                End If
+    '            Next
+
+    '        End If
+
+    '        lrAddAttributeForm.Dispose()
+
+    '    End Sub
 
 End Class

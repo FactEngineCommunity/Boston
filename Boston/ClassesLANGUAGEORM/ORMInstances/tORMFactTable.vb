@@ -289,7 +289,7 @@ Namespace FBM
 
             Dim liInd As Integer
             Dim liRowNr As Integer = 0
-            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactInstance As FBM.FactInstance
             Dim lrFactDataInstance As New FBM.FactDataInstance
             Dim lsMessage As String = ""
 

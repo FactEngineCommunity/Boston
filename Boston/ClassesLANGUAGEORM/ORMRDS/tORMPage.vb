@@ -9,6 +9,12 @@ Namespace FBM
         <NonSerialized()>
         Public WithEvents RDSModel As New RDS.Model
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arOriginatingNode"></param>
+        ''' <param name="arRelation"></param>
+        ''' <param name="arFactType">To be sure...point to the actual FactType</param>
         Public Sub DisplayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node,
                                               ByRef arRelation As RDS.Relation)
 

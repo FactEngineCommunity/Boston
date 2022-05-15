@@ -127,6 +127,41 @@ Namespace RDS
 
         End Sub
 
+        Public Function Clone(ByRef arTable As RDS.Table) As RDS.Index
+
+            Dim lrIndex As New RDS.Index(arTable, "DummyIndexName")
+
+            Try
+                With Me
+                    lrIndex.Model = arTable.Model
+                    lrIndex.Name = .Name
+                    lrIndex.IndexQualifier = .IndexQualifier
+                    lrIndex.IgnoresNulls = .IgnoresNulls
+                    lrIndex.AscendingOrDescending = .AscendingOrDescending
+                    lrIndex.IsPrimaryKey = .IsPrimaryKey
+                    lrIndex.Unique = .Unique
+
+                    For Each lrOldColumn In Me.Column
+                        lrIndex.Column.Add(arTable.Column.Find(Function(x) x.Id = lrOldColumn.Id))
+                    Next
+
+                End With
+
+                Return lrIndex
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrIndex
+            End Try
+
+        End Function
+
         Public Shadows Function Equals(other As Index) As Boolean Implements IEquatable(Of Index).Equals
 
             Try

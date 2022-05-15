@@ -15,13 +15,13 @@ Namespace PGS
 
         Public Shadows WithEvents FactData As New FBM.FactData
 
-        <CategoryAttribute("Entity"),
+        <CategoryAttribute("Node Type"),
          Browsable(True),
          [ReadOnly](False),
          BindableAttribute(True),
          DefaultValueAttribute(""),
          DesignOnly(False),
-         DescriptionAttribute("The name of the Entity")>
+         DescriptionAttribute("The name of the Node Type")>
         Public Overrides Property Name() As String
             Get
                 Return Me._Name
@@ -32,6 +32,47 @@ Namespace PGS
                 Me.Id = Value
             End Set
         End Property
+
+        Public ReadOnly Property FBMModelElement
+            Get
+                Return Me.RDSTable.FBMModelElement
+            End Get
+        End Property
+
+
+        Private _ReferenceMode As String = ""
+
+
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
+         DescriptionAttribute("The 'Reference Mode' for the Entity Type"),
+         TypeConverter(GetType(tMyConverter))>
+        Public Shadows Property ReferenceMode() As String
+            Get
+                Dim TempString As String = ""
+                'Holds our selected option for return
+
+                If Me.FBMModelElement.ReferenceMode = Nothing Then
+                    'If an option has not already been selected
+                    If tGlobalForTypeConverter.OptionStringArray.GetUpperBound(0) > 0 Then
+                        'If there is more than 1 option
+                        'Sort them alphabetically
+                        Array.Sort(tGlobalForTypeConverter.OptionStringArray)
+                    End If
+                    TempString = tGlobalForTypeConverter.OptionStringArray(0)
+                    'Choose the first option (or the empty one)
+                Else 'Otherwise, if the option is already selected
+                    'Choose the already selected value                    
+                    TempString = Me.FBMModelElement.ReferenceMode
+                End If
+
+                Return TempString
+            End Get
+            Set(ByVal Value As String)
+                Me._ReferenceMode = Value
+            End Set
+        End Property
+
 
         Public WithEvents RDSTable As RDS.Table  'The Table may be a RDSRelation, within a Property Graph Schema. If the Table is a PGSRelation then has the ability to switch to a Node, and visa-versa, 
         ' if And when there are changes to Table as a result of changes to the Table's responsible FactType. 
@@ -394,6 +435,17 @@ Namespace PGS
                             'Me.FactData.Data = Me.Name
                             Call Me.RDSTable.FBMModelElement.setName(Me.Name)
                             Call Me.Model.Save()
+                        Case Is = "ReferenceMode"
+                            If Me.FBMModelElement.GetTopmostNonAbsorbedSupertype Is Me.FBMModelElement Then
+                                With New WaitCursor
+                                    Call Me.FBMModelElement.SetReferenceMode(Trim(Me._ReferenceMode))
+                                End With
+                            Else
+                                Dim lsMessage = "It makes no sense to have a Primary Reference Schema for a Model Element that is is absorbed into a supertype."
+                                lsMessage &= vbCrLf & vbCrLf & "Reverting Reference Model for this Entity Type to ' '."
+                                Me.ReferenceMode = " "
+                                MsgBox(lsMessage)
+                            End If
                     End Select
                 End If
 
@@ -449,7 +501,11 @@ Namespace PGS
                 If abNewValue = False Then
                     Call Me.DisplayAndAssociate() 'Because what was a PGSRelation is now a Node. Results from a change to the relations to the underlying ObjectifiedFactType.
 
-                    Me.Page.Diagram.Links.Remove(Me.PGSRelation.Link.Link) 'Remove the existing PGSRelation Link before loading new links because the process of loading changes the nature of the Links on the Page.
+                    Try
+                        Me.Page.Diagram.Links.Remove(Me.PGSRelation.Link.Link) 'Remove the existing PGSRelation Link before loading new links because the process of loading changes the nature of the Links on the Page.
+                    Catch ex As Exception
+                        'Not a biggie
+                    End Try
 
                     Call Me.Page.loadRelationsForPGSNode(Me)
                     Call Me.Page.loadPropertyRelationsForPGSNode(Me)
@@ -612,7 +668,29 @@ Namespace PGS
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub ResetAttributeCellColours()
+        Private Sub RDSTable_JoinedFactTypeObjectified(ByRef arFactType As FBM.FactType) Handles RDSTable.JoinedFactTypeObjectified
+
+            Try
+                Dim lrFactType As FBM.FactType = arFactType
+
+                Dim larPGSNodeType = From NodeType In Me.Page.ERDiagram.Entity
+                                     Where lrFactType.RoleGroup.Select(Function(x) x.JoinedORMObject.Id).Contains(NodeType.Name)
+                                     Where NodeType.Name <> Me.Name
+                                     Select NodeType
+
+                Dim lrPGSNodeType As PGS.Node = Nothing
+                If larPGSNodeType.Count = 1 Then
+                    Call Me.Page.LoadPGSNodeTypeFromRDSTable(arFactType.getCorrespondingRDSTable, New PointF(10, 10))
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

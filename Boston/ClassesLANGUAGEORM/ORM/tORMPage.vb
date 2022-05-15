@@ -2037,7 +2037,7 @@ NextY:
             Dim liInd As Integer = 0
             Dim lrFactData As FBM.FactData
 
-            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactInstance As FBM.FactInstance
 
             Try
                 '---------------------------------------------
@@ -2275,6 +2275,7 @@ NextY:
             End Try
 
         End Sub
+
 
         Public Shadows Sub MakeDirty()
 

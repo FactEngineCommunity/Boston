@@ -700,6 +700,81 @@ Namespace FBM
             Me.Instance.AddUnique(asDataInstance)
         End Sub
 
+        ''' <summary>
+        ''' Adds a BinaryFactType relation between the EntityType and a ValueType. Adds the ValueType to the Model if it does not already exist.
+        ''' </summary>
+        ''' <param name="arValueType"></param>
+        ''' <param name="aiRelationMultiplicityValue"></param>
+        ''' <remarks></remarks>
+        Public Function AddBinaryRelationToValueType(ByRef arValueType As FBM.ValueType,
+                                                     ByVal aiRelationMultiplicityValue As pcenumBinaryRelationMultiplicityType,
+                                                     Optional ByVal abAddToModel As Boolean = False) As FBM.FactType
+
+            Try
+                '------------------------------------------------------------------------------
+                'Add the ValueType to the Model if it does not already exist within the Model
+                '------------------------------------------------------------------------------
+                If IsSomething(Me.Model.ValueType.Find(AddressOf arValueType.Equals)) Then
+                    '-------------------------------------------
+                    'ValueType already exists within the Model
+                    '-------------------------------------------
+                Else
+                    Me.Model.AddValueType(arValueType)
+                End If
+
+                '---------------------------------------
+                'Create the FactType for the relation.
+                '---------------------------------------
+                Dim lrFactType As New FBM.FactType
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim lsFactTypeName As String = Me.Name & arValueType.Name
+                Dim larRole As New List(Of FBM.Role)
+
+                '---------------------------------------------------------------------
+                'Create the list of ModelObjects referenced by Roles in the FactType
+                '---------------------------------------------------------------------
+                larModelObject.Add(Me)
+                larModelObject.Add(arValueType)
+                '---------------------
+                'Create the FactType
+                '---------------------
+                lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True,,, abAddToModel)
+
+                '-----------------------------------------------------------------------------------
+                'Create the InternalUniquenessConstraint (MultiplicityConstraint) for the FactType
+                '-----------------------------------------------------------------------------------
+                Select Case aiRelationMultiplicityValue
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                        larRole.Clear()
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                End Select
+
+                Return lrFactType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Overridable Function CanSafelyRemoveFromModel() As Boolean
             Return False
         End Function

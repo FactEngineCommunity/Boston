@@ -758,6 +758,41 @@ Namespace FBM
 
         End Sub
 
+        Public Function CanSafelyRemoveFromPage() As Boolean
+
+            Try
+                Dim liFactTypeInstanceCount As Integer = 0
+
+                If Me.HasSimpleReferenceScheme And Me.EntityType.ReferenceModeFactType IsNot Nothing Then
+                    liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
+                                                   From Role In FactType.RoleGroup
+                                                  Where Role.JoinedORMObject IsNot Nothing
+                                                  Where Role.JoinedORMObject.Id = Me.Id _
+                                                    And FactType.Id <> Me.EntityType.ReferenceModeFactType.Id
+                                                   Into Count()
+                Else
+                    liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
+                                                   From Role In FactType.RoleGroup
+                                                  Where Role.JoinedORMObject IsNot Nothing
+                                                  Where Role.JoinedORMObject.GetType = GetType(FBM.EntityTypeInstance)
+                                                  Where Role.JoinedORMObject.Id = Me.Id
+                                                   Into Count()
+                End If
+
+                Return liFactTypeInstanceCount = 0
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Sub DisplayAndAssociate()
 
             Dim loDroppedNode As New ShapeNode
@@ -1494,7 +1529,7 @@ Namespace FBM
 
         End Function
 
-        Public Sub RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Sub RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean, Optional ByVal abForceRemoval As Boolean = False)
 
             Dim lsMessage As String
 
@@ -1521,8 +1556,31 @@ Namespace FBM
                                                    Into Count()
                 End If
 
-                If liFactTypeInstanceCount = 0 Then
+                If liFactTypeInstanceCount = 0 Or abForceRemoval Then
                     'EntityTypeInstances have 3 shapes
+                    If abForceRemoval Then
+                        Call TableEntityTypeInstance.delete_entity_type_instance(Me)
+                        If Me.ReferenceModeFactType IsNot Nothing Then
+                            Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
+
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
+                                TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
+                                Me.Page.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
+                            Next
+
+                            Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
+                            Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
+
+                            Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                        End If
+
+                        If Me.ReferenceModeValueType IsNot Nothing Then
+                            Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
+
+                            Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent, True)
+                        End If
+                    End If
 
                     If Me.Shape IsNot Nothing Then
                         Me.Page.Diagram.Nodes.Remove(Me.Shape)
@@ -1548,6 +1606,7 @@ Namespace FBM
                             Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
                         End If
                     End If
+
                 Else
                     lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
                     Dim lrApplicationException As New ApplicationException(lsMessage)

@@ -31,10 +31,14 @@ Partial Class frmDiagramPGS
         Me.ERDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
         Me.ViewPropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.AddAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddAttributeToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
+        Me.IndexManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem_RemoveFromPage = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ConvertToFactTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.HiddenDiagram = New MindFusion.Diagramming.Diagram()
         Me.MorphTimer = New System.Windows.Forms.Timer(Me.components)
@@ -55,7 +59,6 @@ Partial Class frmDiagramPGS
         Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripAttribute = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.AddAttributeToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteAttributeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
@@ -83,7 +86,8 @@ Partial Class frmDiagramPGS
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.IndexManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -93,16 +97,16 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Node
         '
-        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(181, 176)
+        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 188)
         '
         'MorphToToolStripMenuItem
         '
         Me.MorphToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PGSDiagramToolStripMenuItem, Me.ORMDiagramToolStripMenuItem, Me.ERDiagramToolStripMenuItem})
         Me.MorphToToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Morphing16x16
         Me.MorphToToolStripMenuItem.Name = "MorphToToolStripMenuItem"
-        Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
         Me.MorphToToolStripMenuItem.Text = "&Morph To ..."
         '
         'PGSDiagramToolStripMenuItem
@@ -129,44 +133,68 @@ Partial Class frmDiagramPGS
         'ToolStripSeparator4
         '
         Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-        Me.ToolStripSeparator4.Size = New System.Drawing.Size(172, 6)
+        Me.ToolStripSeparator4.Size = New System.Drawing.Size(179, 6)
         '
         'ViewPropertiesToolStripMenuItem
         '
+        Me.ViewPropertiesToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Attribute
         Me.ViewPropertiesToolStripMenuItem.Name = "ViewPropertiesToolStripMenuItem"
-        Me.ViewPropertiesToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.ViewPropertiesToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
         Me.ViewPropertiesToolStripMenuItem.Text = "View &Properties"
         '
-        'AddAttributeToolStripMenuItem
+        'AddAttributeToolStripMenuItem1
         '
-        Me.AddAttributeToolStripMenuItem.Image = CType(resources.GetObject("AddAttributeToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.AddAttributeToolStripMenuItem.Name = "AddAttributeToolStripMenuItem"
-        Me.AddAttributeToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.AddAttributeToolStripMenuItem.Text = "Add &Attribute/s"
-        Me.AddAttributeToolStripMenuItem.Visible = False
+        Me.AddAttributeToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.AddAttribute16x16
+        Me.AddAttributeToolStripMenuItem1.Name = "AddAttributeToolStripMenuItem1"
+        Me.AddAttributeToolStripMenuItem1.Size = New System.Drawing.Size(182, 22)
+        Me.AddAttributeToolStripMenuItem1.Text = "Add P&roperty"
+        '
+        'ToolStripSeparator12
+        '
+        Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(179, 6)
+        '
+        'IndexManagerToolStripMenuItem
+        '
+        Me.IndexManagerToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Index
+        Me.IndexManagerToolStripMenuItem.Name = "IndexManagerToolStripMenuItem"
+        Me.IndexManagerToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.IndexManagerToolStripMenuItem.Text = "&Index Manager"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(172, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(179, 6)
         Me.ToolStripSeparator2.Visible = False
         '
         'ToolStripMenuItem_RemoveFromPage
         '
         Me.ToolStripMenuItem_RemoveFromPage.Name = "ToolStripMenuItem_RemoveFromPage"
-        Me.ToolStripMenuItem_RemoveFromPage.Size = New System.Drawing.Size(175, 22)
+        Me.ToolStripMenuItem_RemoveFromPage.Size = New System.Drawing.Size(182, 22)
         Me.ToolStripMenuItem_RemoveFromPage.Text = "&Remove from Page"
         '
         'ToolStripSeparator9
         '
         Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-        Me.ToolStripSeparator9.Size = New System.Drawing.Size(172, 6)
+        Me.ToolStripSeparator9.Size = New System.Drawing.Size(179, 6)
+        '
+        'ConvertToFactTypeToolStripMenuItem
+        '
+        Me.ConvertToFactTypeToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Convert16x16
+        Me.ConvertToFactTypeToolStripMenuItem.Name = "ConvertToFactTypeToolStripMenuItem"
+        Me.ConvertToFactTypeToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.ConvertToFactTypeToolStripMenuItem.Text = "&Convert to Fact Type"
+        '
+        'ToolStripSeparator11
+        '
+        Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(179, 6)
         '
         'PropertiesToolStripMenuItem1
         '
         Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(175, 22)
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(182, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'HiddenDiagram
@@ -284,74 +312,67 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStripAttribute
         '
-        Me.ContextMenuStripAttribute.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddAttributeToolStripMenuItem1, Me.EditAttributeToolStripMenuItem, Me.DeleteAttributeToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey, Me.ToolStripSeparator6, Me.MoveUpToolStripMenuItem, Me.MoveDownToolStripMenuItem})
+        Me.ContextMenuStripAttribute.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EditAttributeToolStripMenuItem, Me.DeleteAttributeToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemIsMandatory, Me.ToolStripMenuItemIsPartOfPrimaryKey, Me.ToolStripSeparator6, Me.MoveUpToolStripMenuItem, Me.MoveDownToolStripMenuItem})
         Me.ContextMenuStripAttribute.Name = "ContextMenuStripAttribute"
-        Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(195, 226)
-        '
-        'AddAttributeToolStripMenuItem1
-        '
-        Me.AddAttributeToolStripMenuItem1.Name = "AddAttributeToolStripMenuItem1"
-        Me.AddAttributeToolStripMenuItem1.Size = New System.Drawing.Size(194, 30)
-        Me.AddAttributeToolStripMenuItem1.Text = "&Add Attribute"
+        Me.ContextMenuStripAttribute.Size = New System.Drawing.Size(187, 148)
         '
         'EditAttributeToolStripMenuItem
         '
         Me.EditAttributeToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.edit16x16
         Me.EditAttributeToolStripMenuItem.Name = "EditAttributeToolStripMenuItem"
-        Me.EditAttributeToolStripMenuItem.Size = New System.Drawing.Size(194, 30)
+        Me.EditAttributeToolStripMenuItem.Size = New System.Drawing.Size(186, 22)
         Me.EditAttributeToolStripMenuItem.Text = "&Edit Attribute"
         '
         'DeleteAttributeToolStripMenuItem
         '
         Me.DeleteAttributeToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.deleteround16x16
         Me.DeleteAttributeToolStripMenuItem.Name = "DeleteAttributeToolStripMenuItem"
-        Me.DeleteAttributeToolStripMenuItem.Size = New System.Drawing.Size(194, 30)
+        Me.DeleteAttributeToolStripMenuItem.Size = New System.Drawing.Size(186, 22)
         Me.DeleteAttributeToolStripMenuItem.Text = "D&elete Attribute"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(183, 6)
         '
         'ToolStripMenuItemIsMandatory
         '
         Me.ToolStripMenuItemIsMandatory.Image = CType(resources.GetObject("ToolStripMenuItemIsMandatory.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemIsMandatory.Name = "ToolStripMenuItemIsMandatory"
-        Me.ToolStripMenuItemIsMandatory.Size = New System.Drawing.Size(194, 30)
+        Me.ToolStripMenuItemIsMandatory.Size = New System.Drawing.Size(186, 22)
         Me.ToolStripMenuItemIsMandatory.Text = "&Is Mandatory"
         '
         'ToolStripMenuItemIsPartOfPrimaryKey
         '
         Me.ToolStripMenuItemIsPartOfPrimaryKey.Image = CType(resources.GetObject("ToolStripMenuItemIsPartOfPrimaryKey.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemIsPartOfPrimaryKey.Name = "ToolStripMenuItemIsPartOfPrimaryKey"
-        Me.ToolStripMenuItemIsPartOfPrimaryKey.Size = New System.Drawing.Size(194, 30)
+        Me.ToolStripMenuItemIsPartOfPrimaryKey.Size = New System.Drawing.Size(186, 22)
         Me.ToolStripMenuItemIsPartOfPrimaryKey.Text = "&Is Part of Primary Key"
         '
         'ToolStripSeparator6
         '
         Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-        Me.ToolStripSeparator6.Size = New System.Drawing.Size(191, 6)
+        Me.ToolStripSeparator6.Size = New System.Drawing.Size(183, 6)
         '
         'MoveUpToolStripMenuItem
         '
         Me.MoveUpToolStripMenuItem.Image = CType(resources.GetObject("MoveUpToolStripMenuItem.Image"), System.Drawing.Image)
         Me.MoveUpToolStripMenuItem.Name = "MoveUpToolStripMenuItem"
-        Me.MoveUpToolStripMenuItem.Size = New System.Drawing.Size(194, 30)
+        Me.MoveUpToolStripMenuItem.Size = New System.Drawing.Size(186, 22)
         Me.MoveUpToolStripMenuItem.Text = "Move &Up"
         '
         'MoveDownToolStripMenuItem
         '
         Me.MoveDownToolStripMenuItem.Image = CType(resources.GetObject("MoveDownToolStripMenuItem.Image"), System.Drawing.Image)
         Me.MoveDownToolStripMenuItem.Name = "MoveDownToolStripMenuItem"
-        Me.MoveDownToolStripMenuItem.Size = New System.Drawing.Size(194, 30)
+        Me.MoveDownToolStripMenuItem.Size = New System.Drawing.Size(186, 22)
         Me.MoveDownToolStripMenuItem.Text = "Move &Down"
         '
         'ContextMenuStrip_Relation
         '
-        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItemRelationRemoveFromPage, Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation})
+        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.ToolStripMenuItemRelationRemoveFromPage, Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(180, 126)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(181, 176)
         '
         'MorphToToolStripMenuItem1
         '
@@ -493,11 +514,17 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'IndexManagerToolStripMenuItem
+        'ToolStripMenuItem1
         '
-        Me.IndexManagerToolStripMenuItem.Name = "IndexManagerToolStripMenuItem"
-        Me.IndexManagerToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.IndexManagerToolStripMenuItem.Text = "&Index Manager"
+        Me.ToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.AddAttribute16x16
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem1.Text = "Add P&roperty"
+        '
+        'ToolStripSeparator13
+        '
+        Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
+        Me.ToolStripSeparator13.Size = New System.Drawing.Size(177, 6)
         '
         'frmDiagramPGS
         '
@@ -532,7 +559,6 @@ Partial Class frmDiagramPGS
     Friend WithEvents ToolboxToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ModelDictionaryToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CopyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents AddAttributeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator2 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ContextMenuStripAttribute As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents EditAttributeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
@@ -576,6 +602,11 @@ Partial Class frmDiagramPGS
     Friend WithEvents ToolStripSeparator10 As ToolStripSeparator
     Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
     Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
-    Friend WithEvents AddAttributeToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents IndexManagerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ConvertToFactTypeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator11 As ToolStripSeparator
+    Friend WithEvents AddAttributeToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator12 As ToolStripSeparator
+    Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator13 As ToolStripSeparator
 End Class

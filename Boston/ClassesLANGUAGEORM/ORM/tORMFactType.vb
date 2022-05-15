@@ -3720,7 +3720,14 @@ Namespace FBM
                     lrColumn = lrOriginalTable.Column.Find(Function(x) x.Role Is lrResponsibleRole)
                     Call lrOriginalTable.removeColumn(lrColumn)
 
-
+                    For Each lrRole In Me.RoleGroup
+                        Select Case lrRole.TypeOfJoin
+                            Case Is = pcenumRoleJoinType.ValueType
+                                'Do nothing
+                            Case Else
+                                Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(Me)
+                        End Select
+                    Next
 
                 Else
                     Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)

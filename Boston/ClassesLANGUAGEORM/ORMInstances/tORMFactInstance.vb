@@ -30,6 +30,15 @@ Namespace FBM
             End Set
         End Property
 
+        Public Overrides Property Model As FBM.Model
+            Get
+                Return Me._Model
+            End Get
+            Set(value As FBM.Model)
+                Me._Model = value
+            End Set
+        End Property
+
         <XmlIgnore()>
         Public FactInstance As FBM.FactInstance 'Used to refer to original object when cloned for convenience.
         'e.g. If working with a CMML.StartState object (as a clone of a tFactInstance object), this 'FactInstance'
@@ -95,6 +104,7 @@ Namespace FBM
         Public Sub New(ByRef arFactTypeInstance As FBM.FactTypeInstance)
 
             Me.New()
+            Me.Model = arFactTypeInstance.Model
             Me.Page = arFactTypeInstance.Page
             Me.FactType = arFactTypeInstance
 
@@ -119,6 +129,7 @@ Namespace FBM
         Public Sub New(ByRef arFact As FBM.Fact, ByRef arFactTypeInstance As FBM.FactTypeInstance)
 
             Me.Id = arFact.Id
+            Me.Model = arFact.Model
             Me.Symbol = Trim(arFact.Symbol)
             Me.Page = arFactTypeInstance.Page
             Me.FactType = arFactTypeInstance
@@ -247,9 +258,19 @@ Namespace FBM
 
         Public Function CloneConceptInstance() As FBM.ConceptInstance
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+            Try
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
 
-            Return lrConceptInstance
+                Return lrConceptInstance
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
 
         End Function
 

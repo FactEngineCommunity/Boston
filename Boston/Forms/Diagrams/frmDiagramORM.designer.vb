@@ -131,6 +131,8 @@ Partial Class frmDiagramORM
         Me.ToolStripSeparator30 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemCopy = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator40 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemConvertToFactType = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator45 = New System.Windows.Forms.ToolStripSeparator()
         Me.ExpandTheReferenceSchemeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideTheReferenceSchemeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator32 = New System.Windows.Forms.ToolStripSeparator()
@@ -304,8 +306,6 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.ToolStripMenuItemConvertToFactType = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator45 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -1023,6 +1023,18 @@ Partial Class frmDiagramORM
         '
         Me.ToolStripSeparator40.Name = "ToolStripSeparator40"
         Me.ToolStripSeparator40.Size = New System.Drawing.Size(230, 6)
+        '
+        'ToolStripMenuItemConvertToFactType
+        '
+        Me.ToolStripMenuItemConvertToFactType.Image = Global.Boston.My.Resources.Resources.Convert16x16
+        Me.ToolStripMenuItemConvertToFactType.Name = "ToolStripMenuItemConvertToFactType"
+        Me.ToolStripMenuItemConvertToFactType.Size = New System.Drawing.Size(233, 22)
+        Me.ToolStripMenuItemConvertToFactType.Text = "Convert to &FactType"
+        '
+        'ToolStripSeparator45
+        '
+        Me.ToolStripSeparator45.Name = "ToolStripSeparator45"
+        Me.ToolStripSeparator45.Size = New System.Drawing.Size(230, 6)
         '
         'ExpandTheReferenceSchemeToolStripMenuItem
         '
@@ -2181,17 +2193,6 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.Size = New System.Drawing.Size(890, 549)
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ToolStripMenuItemConvertToFactType
-        '
-        Me.ToolStripMenuItemConvertToFactType.Name = "ToolStripMenuItemConvertToFactType"
-        Me.ToolStripMenuItemConvertToFactType.Size = New System.Drawing.Size(233, 22)
-        Me.ToolStripMenuItemConvertToFactType.Text = "Convert to &FactType"
-        '
-        'ToolStripSeparator45
-        '
-        Me.ToolStripSeparator45.Name = "ToolStripSeparator45"
-        Me.ToolStripSeparator45.Size = New System.Drawing.Size(230, 6)
         '
         'frmDiagramORM
         '

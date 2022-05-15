@@ -154,6 +154,9 @@
   <data name="Print16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Print16x16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Index" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Index.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Refresh-16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Refresh-16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -178,8 +181,8 @@
   <data name="Table" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Table.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="preferred_uniqueness_p" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Shapelibrary\ORMShapes\preferred_uniqueness_p.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Convert16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Convert16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ModelAdd16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\ModelAdd16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -195,9 +198,6 @@
   </data>
   <data name="StarIcon16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\StarIcon16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="CQL16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\MenuImages\CQL16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SaveAll16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\SaveAll16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -235,6 +235,9 @@
   <data name="Glossary16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Glossary16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="CQL16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\CQL16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="About16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\About16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -247,14 +250,20 @@
   <data name="Layout16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Layout16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Copy16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\MenuImages\Copy16x16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="XML16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\XML16x16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Copy16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Copy16x16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CopyToClipboard16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\CopyToClipboard16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Notification16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Notification16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="preferred_uniqueness_p" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Shapelibrary\ORMShapes\preferred_uniqueness_p.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Paste16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Paste16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -277,7 +286,10 @@
   <data name="PGS16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\PGS16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="CopyToClipboard16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\MenuImages\CopyToClipboard16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Attribute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Attribute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="AddAttribute16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\AddAttribute16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

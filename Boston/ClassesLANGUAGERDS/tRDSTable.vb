@@ -209,6 +209,7 @@ Namespace RDS
         Public Event IndexColumnAdded(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
         Public Event IsPGSRelationChanged(ByVal abNewValue As Boolean)
+        Public Event JoinedFactTypeObjectified(ByRef arFactType As FBM.FactType) 'Only called when/if the underlying FactType is objectified...if Table is for FactType.
         Public Event NameChanged(ByVal asNewName As String)
         Public Event SubtypeRelationshipAdded()
         Public Event SubtypeRelationshipRemoved()
@@ -238,6 +239,17 @@ Namespace RDS
             Try
                 With Me
                     lrTable.Name = .Name
+
+                    For Each lrColumn In Me.Column
+                        Dim lrNewColumn = lrColumn.Clone(lrTable, Nothing, False, False)
+                        lrTable.Column.Add(lrNewColumn)
+                    Next
+
+                    For Each lrIndex In Me.Index
+                        Dim lrNewIndex = lrIndex.Clone(lrTable)
+                        lrTable.Index.Add(lrNewIndex)
+                    Next
+
                 End With
 
                 Return lrTable
@@ -1880,6 +1892,20 @@ Namespace RDS
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub TriggerJoinedFactTpeObjectified(ByRef arFactType As FBM.FactType)
+
+            Try
+                RaiseEvent JoinedFactTypeObjectified(arFactType)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
     End Class

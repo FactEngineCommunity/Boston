@@ -562,6 +562,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMModelObjectInstance.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintRoleValueConstraint.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMRoleConstraintValueConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMPGS\tORMPage.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
     <Compile Include="ClassesLANGUAGERDS\TypeDBSpecific\tRDSPlays.vb" />
@@ -2981,6 +2982,8 @@
     <EmbeddedResource Include="Glossary\glossary.div.header.txt" />
     <EmbeddedResource Include="Glossary\glossary.homelabellink.txt" />
     <None Include="Images\MenuImages\Add16x16.png" />
+    <None Include="Images\MenuImages\Attribute.png" />
+    <None Include="Images\MenuImages\AddAttribute16x16.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />
@@ -2992,6 +2995,7 @@
     <None Include="Images\MenuImages\Configuration16x16.jpg" />
     <None Include="Images\MenuImages\CQL16x16.png" />
     <None Include="Images\MenuImages\CopyToClipboard16x16.png" />
+    <None Include="Images\MenuImages\Convert16x16.jpg" />
     <Content Include="Images\MenuImages\dictionary16x16.png" />
     <None Include="Images\MenuImages\edit16x16.jpg" />
     <None Include="Images\MenuImages\empty16x16.jpg" />
@@ -3015,6 +3019,7 @@
     <None Include="Images\MenuImages\Import16x16.png" />
     <None Include="Images\MenuImages\ImportExport16x16.png" />
     <None Include="Images\MenuImages\Home16x16.jpg" />
+    <None Include="Images\MenuImages\Index.png" />
     <Content Include="Images\MenuImages\Layout16x16.png" />
     <None Include="Images\MenuImages\PageAdd16x16.png" />
     <None Include="Images\MenuImages\Paste16x16.jpg" />

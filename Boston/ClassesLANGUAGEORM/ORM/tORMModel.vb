@@ -3372,6 +3372,42 @@ FinishedProcessing:
 
         End Sub
 
+        Public Sub RemoveEntitTypeFromPages(ByRef arEntityType As FBM.EntityType, ByVal abCheckIfCanRemove As Boolean)
+
+            Try
+                Dim lsEntityTypeId = arEntityType.Id
+
+                If abCheckIfCanRemove Then
+                    Dim larEntityTypeInstance = From Page In Me.Page
+                                                From EntityTypeInstance In Page.EntityTypeInstance
+                                                Where EntityTypeInstance.Id = lsEntityTypeId
+                                                Where EntityTypeInstance.CanSafelyRemoveFromPage
+                                                Select EntityTypeInstance
+
+                    For Each lrEntityTypeInstance In larEntityTypeInstance.ToList
+                        Call lrEntityTypeInstance.RemoveFromPage(True, True)
+                    Next
+                Else
+                    Dim larEntityTypeInstance = From Page In Me.Page
+                                                From EntityTypeInstance In Page.EntityTypeInstance
+                                                Select EntityTypeInstance
+
+                    For Each lrEntityTypeInstance In larEntityTypeInstance.ToList
+                        Call lrEntityTypeInstance.RemoveFromPage(True, True)
+                    Next
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub RemoveValueType(ByRef arValueType As FBM.ValueType, ByVal abBroadcastInterfaceEvent As Boolean)
 
 
