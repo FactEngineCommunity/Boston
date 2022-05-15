@@ -4664,12 +4664,12 @@ FinishedProcessing:
                     lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsModelObjectName))
 
                     If lrDictionaryEntry IsNot Nothing Then
-                        If lrDictionaryEntry.isValueType Then
+                        If lrDictionaryEntry.isFactType Then
+                            Return Me.FactType.Find(Function(x) x.Id = lsModelObjectName)
+                        ElseIf lrDictionaryEntry.isValueType Then
                             Return Me.ValueType.Find(Function(x) x.Id = lsModelObjectName)
                         ElseIf lrDictionaryEntry.isEntityType Then
                             Return Me.EntityType.Find(Function(x) x.Id = lsModelObjectName)
-                        ElseIf lrDictionaryEntry.isFactType Then
-                            Return Me.FactType.Find(Function(x) x.Id = lsModelObjectName)
                         ElseIf lrDictionaryEntry.isRoleConstraint Then
                             Return Me.RoleConstraint.Find(Function(x) x.Id = lsModelObjectName)
                         ElseIf abIgnoreErrorIfNotInModel Then
@@ -4686,12 +4686,12 @@ FinishedProcessing:
                         lrFactType = New FBM.FactType(Me, lsModelObjectName, True)
                         lrRoleConstraint = New FBM.RoleConstraint(Me, lsModelObjectName, True)
 
-                        If Me.ValueType.Exists(AddressOf lrValueType.Equals) Then
+                        If Me.FactType.Exists(AddressOf lrFactType.Equals) Then
+                            Return Me.FactType.Find(AddressOf lrFactType.Equals)
+                        ElseIf Me.ValueType.Exists(AddressOf lrValueType.Equals) Then
                             Return Me.ValueType.Find(AddressOf lrValueType.Equals)
                         ElseIf Me.EntityType.Exists(AddressOf lrEntityType.Equals) Then
                             Return Me.EntityType.Find(AddressOf lrEntityType.Equals)
-                        ElseIf Me.FactType.Exists(AddressOf lrFactType.Equals) Then
-                            Return Me.FactType.Find(AddressOf lrFactType.Equals)
                         ElseIf Me.RoleConstraint.Exists(AddressOf lrRoleConstraint.Equals) Then
                             Return Me.RoleConstraint.Find(AddressOf lrRoleConstraint.Equals)
                         Else

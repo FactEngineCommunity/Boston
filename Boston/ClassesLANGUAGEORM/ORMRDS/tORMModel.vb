@@ -1875,7 +1875,6 @@ Namespace FBM
                         Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
                     End If
 
-
                     lrTable = New RDS.Table(Me.RDS, lrORMRecordset("Element").Data, lrModelElement)
                     Me.RDS.Table.Add(lrTable)
 

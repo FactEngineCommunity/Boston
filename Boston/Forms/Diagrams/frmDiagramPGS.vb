@@ -3735,6 +3735,45 @@ Public Class frmDiagramPGS
 
     End Sub
 
+    Private Sub MakeManytoManyRelationshipToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MakeManytoManyRelationshipToolStripMenuItem.Click
+
+        Try
+            Dim lrPGSRelation As ERD.Relation
+
+            lrPGSRelation = Me.zrPage.SelectedObject(0)
+
+            If Not lrPGSRelation.RelationFactType.IsLinkFactType Then
+
+                'CodeSafe
+                If Not (lrPGSRelation.RelationFactType.IsManyTo1BinaryFactType Or lrPGSRelation.RelationFactType.Is1To1BinaryFactType) Then Exit Sub
+
+                For Each lrInternalUniquenessConstraint In lrPGSRelation.RelationFactType.InternalUniquenessConstraint.ToArray
+                    Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
+                Next
+                Dim larRole As List(Of FBM.Role) = lrPGSRelation.RelationFactType.RoleGroup.ToList
+                Call lrPGSRelation.RelationFactType.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
+                Call lrPGSRelation.RelationFactType.Objectify()
+                For Each lrRole In lrPGSRelation.RelationFactType.RoleGroup
+
+                    Select Case lrRole.TypeOfJoin
+                        Case Is = pcenumRoleJoinType.ValueType
+                        Case Else
+                            Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(lrPGSRelation.RelationFactType)
+                    End Select
+                Next
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     'Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click
 
     '        Dim lrAddAttributeForm As New frmCRUDAddAttribute

@@ -574,7 +574,9 @@ Namespace FBM
 
         End Function
 
-        Public Sub getCompoundReferenceSchemeColumns(ByRef arTable As RDS.Table, ByRef arResponsibleRole As FBM.Role, ByRef aarColumn As List(Of RDS.Column))
+        Public Sub getCompoundReferenceSchemeColumns(ByRef arTable As RDS.Table,
+                                                     ByRef arResponsibleRole As FBM.Role,
+                                                     ByRef aarColumn As List(Of RDS.Column))
 
             Try
                 If Not Me.HasCompoundReferenceMode Then
@@ -585,6 +587,21 @@ Namespace FBM
                 Dim lsColumnName As String = ""
                 Dim larRole As List(Of FBM.Role)
                 Dim lrFactTypeReading As FBM.FactTypeReading
+
+                Dim larIndex = From Table In Me.Model.RDS.Table
+                               From Index In Table.Index
+                               Where Index.ResponsibleRoleConstraint Is Me.ReferenceModeRoleConstraint
+                               Select Index
+
+                If larIndex.Count > 0 Then
+                    Dim lrIndex = larIndex.First
+
+                    For Each lrColumn In lrIndex.Column
+                        lsColumnName = arTable.createUniqueColumnName(lrColumn.Name, Nothing, 0)
+                        aarColumn.Add(New RDS.Column(arTable, lsColumnName, arResponsibleRole, lrColumn.ActiveRole))
+                    Next
+                    Exit Sub
+                End If
 
                 For Each lrRoleConstraintRole In Me.ReferenceModeRoleConstraint.RoleConstraintRole
 
