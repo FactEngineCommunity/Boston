@@ -114,6 +114,8 @@ Namespace FBM
         <XmlIgnore()>
         Public ObjectifiedFactType As FBM.FactType = Nothing
 
+
+
         Public ReadOnly Property ReferenceSchemeRoleConstraint As FBM.RoleConstraint
             Get
                 Select Case Me.GetType
@@ -1422,6 +1424,17 @@ Namespace FBM
             Me.isDirty = True
             Me.Model.MakeDirty(False, False)
         End Sub
+
+        ''' <summary>
+        ''' Sets the CompoundReferenceScheme.RoleConstraint for the EntityType.
+        ''' NB Precondition: EntityType has no ReferenceMode (SimpleReferenceScheme), else throws exception.
+        ''' </summary>
+        ''' <param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
+        ''' <remarks></remarks>
+        Public Overridable Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
+
+        End Sub
+
 
         Public Sub SetDBName(ByVal asDBName As String)
 

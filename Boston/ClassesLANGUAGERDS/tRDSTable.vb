@@ -75,8 +75,17 @@ Namespace RDS
 
         <XmlIgnore()>
         <NonSerialized()>
-        Public WithEvents FBMModelElement As FBM.ModelObject 'The ModelElement that the Table relates to. Could be an EntityType or a FactType.
+        Private WithEvents _FBMModelElement As FBM.ModelObject
 
+        <XmlIgnore()>
+        Public Property FBMModelElement As FBM.ModelObject 'The ModelElement that the Table relates to. Could be an EntityType or a FactType.
+            Get
+                Return Me._FBMModelElement
+            End Get
+            Set(value As FBM.ModelObject)
+                Me._FBMModelElement = value
+            End Set
+        End Property
         Public ReadOnly Property isAbsorbed As Boolean
             Get
                 Return Me.FBMModelElement.IsAbsorbed
@@ -1174,7 +1183,7 @@ Namespace RDS
 
         End Function
 
-        Private Sub FBMModelElement_NameChanged(ByVal asNewName As String) Handles FBMModelElement.NameChanged
+        Private Sub FBMModelElement_NameChanged(ByVal asNewName As String) Handles _FBMModelElement.NameChanged
 
             'For database synchronisation
             Dim lrTempTable = Me.Clone
@@ -1877,7 +1886,7 @@ Namespace RDS
             RaiseEvent SubtypeRelationshipRemoved()
         End Sub
 
-        Private Sub FBMModelElement_ChangedToFactType(ByRef arFactType As FactType) Handles FBMModelElement.ChangedToFactType
+        Private Sub FBMModelElement_ChangedToFactType(ByRef arFactType As FactType) Handles _FBMModelElement.ChangedToFactType
 
             Try
                 Me.FBMModelElement = arFactType

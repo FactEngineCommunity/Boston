@@ -9044,16 +9044,29 @@ Public Class frmDiagramORM
 
             lrFactTypeInstance = Me.zrPage.SelectedObject(0)
 
-            If lrFactTypeInstance.FactType.UserCanSafelyRemoveFromModel Then
+            If Not lrFactTypeInstance.FactType.UserCanSafelyRemoveFromModel Then
 
-                Using loWaitCursor As New WaitCursor
-                    Call lrFactTypeInstance.FactType.RemoveFromModel(True, , True)
-                End Using
-            Else
                 Dim lsMessage As String = "You cannot remove the Fact Type while there are other Fact Types that join the Fact Type."
                 lsMessage.AppendDoubleLineBreak("Check the Fact Type in the Diagram Spy to see what other Fact Types join to the Fact Type.")
-                MsgBox(lsMessage)
+
+                Dim lrCustomMessageBox As New frmCustomMessageBox
+                lrCustomMessageBox.Message = lsMessage
+                lrCustomMessageBox.ButtonText.Add("Remove from Model anyway")
+                lrCustomMessageBox.ButtonText.Add("OK")
+
+                Select Case lrCustomMessageBox.ShowDialog
+                    Case Is = "Remove from Model anyway"
+                    Case Else
+                        GoTo SkipRemovalFromModel
+                End Select
+
             End If
+
+            Using loWaitCursor As New WaitCursor
+                Call lrFactTypeInstance.FactType.RemoveFromModel(True, , True)
+            End Using
+
+SkipRemovalFromModel:
 
         Catch ex As Exception
 

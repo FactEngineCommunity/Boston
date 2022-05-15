@@ -4111,6 +4111,30 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Overrides Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
+
+            Try
+                If Me.IsObjectified Then
+
+                    Me.ObjectifyingEntityType.ReferenceModeRoleConstraint = arRoleConstraint
+                    Me.makeDirty()
+                    Me.ObjectifyingEntityType.makeDirty()
+                    Me.Model.MakeDirty(False, False)
+                Else
+                    prApplication.ThrowErrorMessage("Can't call this method for Fact Types that are not objectified.", pcenumErrorType.Warning, False, False, False, True)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub SetDerivationText(ByVal asDerivationText As String, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.DerivationText = asDerivationText

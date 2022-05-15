@@ -1602,6 +1602,9 @@ SkipValueTypeInstance:
                 arFactType.IsLinkFactType = lrXMLFactType.IsLinkFactType
                 If lrXMLFactType.IsLinkFactType Then
                     arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = lrXMLFactType.LinkFactTypeRoleId)
+                    If arFactType.LinkFactTypeRole Is Nothing Then
+                        arFactType.IsLinkFactType = False
+                    End If
                 End If
                 arFactType.IsMDAModelElement = lrXMLFactType.IsMDAModelElement
                 arFactType.IsSubtypeStateControlling = lrXMLFactType.IsSubtypeStateControlling

@@ -2763,53 +2763,6 @@ Namespace FBM
 
         End Sub
 
-
-
-        ''' <summary>
-        ''' Sets the CompoundReferenceScheme.RoleConstraint for the EntityType.
-        ''' NB Precondition: EntityType has no ReferenceMode (SimpleReferenceScheme), else throws exception.
-        ''' </summary>
-        ''' <param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
-        ''' <remarks></remarks>
-        Public Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
-
-            Dim lsMessage As String
-
-            Try
-                If Me.HasSimpleReferenceScheme Then
-                    lsMessage = "Entity Type: " & Me.Id & vbCrLf
-                    lsMessage &= "Tried to set a CompoundReferenceMode for an EntityType that already has a SimpleReferenceScheme." & vbCrLf
-                    lsMessage &= "This process requires that the SimpleReferenceScheme for an EntityType has been removed before assigning the RoleConstraint for a CompoundReferenceScheme"
-                    Throw New Exception(lsMessage)
-                Else
-                    '-----------------------------------------------------------------------------------------------------------------
-                    'CodeSafe: Do double checking to make sure the EntityType is primed for receipt of a RoleConstraint defining the 
-                    '  CompoundReferenceScheme for the EntityType.
-                    '-----------------------------------------------------------------------------------------------------------------
-                    If IsSomething(Me.ReferenceModeFactType) Or IsSomething(Me.ReferenceModeValueType) Then
-                        lsMessage = "EntityType has no ReferenceMode (does not have a SimpleReferenceScheme) but either of the following are set for the EntityType:"
-                        lsMessage &= vbCrLf & "ReferenceModeFactType and/or ReferenceModeValueType"
-                        lsMessage &= vbCrLf & "EntityType.Id: " & Me.Id
-                        Throw New Exception(lsMessage)
-                    End If
-
-                    Me.ReferenceModeRoleConstraint = arRoleConstraint
-                    Me.isDirty = True
-                    Me.Model.MakeDirty()
-                    RaiseEvent ReferenceModeRoleConstraintChanged(arRoleConstraint)
-                End If
-
-
-            Catch ex As Exception
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-            End Try
-
-        End Sub
-
         Public Sub SetDerivationText(ByVal asDerivationText As String, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.DerivationText = asDerivationText
@@ -3045,6 +2998,51 @@ SkipSettingReferenceModeObjects:
             Dim liDummyCodeInd As Integer = 0
 
         End Sub
+
+        ''' <summary>
+        ''' Sets the CompoundReferenceScheme.RoleConstraint for the EntityType.
+        ''' NB Precondition: EntityType has no ReferenceMode (SimpleReferenceScheme), else throws exception.
+        ''' </summary>
+        ''' <param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
+        ''' <remarks></remarks>
+        Public Overrides Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
+
+            Dim lsMessage As String
+
+            Try
+                If Me.HasSimpleReferenceScheme Then
+                    lsMessage = "Entity Type: " & Me.Id & vbCrLf
+                    lsMessage &= "Tried to set a CompoundReferenceMode for an EntityType that already has a SimpleReferenceScheme." & vbCrLf
+                    lsMessage &= "This process requires that the SimpleReferenceScheme for an EntityType has been removed before assigning the RoleConstraint for a CompoundReferenceScheme"
+                    Throw New Exception(lsMessage)
+                Else
+                    '-----------------------------------------------------------------------------------------------------------------
+                    'CodeSafe: Do double checking to make sure the EntityType is primed for receipt of a RoleConstraint defining the 
+                    '  CompoundReferenceScheme for the EntityType.
+                    '-----------------------------------------------------------------------------------------------------------------
+                    If IsSomething(Me.ReferenceModeFactType) Or IsSomething(Me.ReferenceModeValueType) Then
+                        lsMessage = "EntityType has no ReferenceMode (does not have a SimpleReferenceScheme) but either of the following are set for the EntityType:"
+                        lsMessage &= vbCrLf & "ReferenceModeFactType and/or ReferenceModeValueType"
+                        lsMessage &= vbCrLf & "EntityType.Id: " & Me.Id
+                        Throw New Exception(lsMessage)
+                    End If
+
+                    Me.ReferenceModeRoleConstraint = arRoleConstraint
+                    Me.isDirty = True
+                    Me.Model.MakeDirty()
+                    RaiseEvent ReferenceModeRoleConstraintChanged(arRoleConstraint)
+                End If
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
         Public Sub setIsDatabaseReservedWord(ByVal abIsDatabaseReservedWord As Boolean)
             Me.IsDatabaseReservedWord = abIsDatabaseReservedWord
