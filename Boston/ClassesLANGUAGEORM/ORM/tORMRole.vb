@@ -2616,6 +2616,7 @@ SkipMakingNewColumn:
 
 FinishedProcessing:
                     RaiseEvent RoleJoinModified(Me.JoinedORMObject)
+                    Me.makeDirty()
 
                     If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
                         'Likely creating a new binary FactType from the Toolbox, and still has a Role that is unjoined.

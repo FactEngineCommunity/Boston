@@ -35,8 +35,7 @@ Namespace FBM
         ''' </summary>
         Public IsNewFact As Boolean = False
 
-        Private _ModelError As New List(Of FBM.ModelError)
-        Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
+        Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
                 Return Me._ModelError
             End Get

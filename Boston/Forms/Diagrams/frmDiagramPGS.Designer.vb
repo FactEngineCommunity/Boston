@@ -93,6 +93,8 @@ Partial Class frmDiagramPGS
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
+        Me.ToolStripMenuItemEntityTypeModelErrors = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -102,9 +104,9 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Node
         '
-        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator15, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 188)
+        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 238)
         '
         'MorphToToolStripMenuItem
         '
@@ -118,21 +120,21 @@ Partial Class frmDiagramPGS
         '
         Me.PGSDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.PGS16x16
         Me.PGSDiagramToolStripMenuItem.Name = "PGSDiagramToolStripMenuItem"
-        Me.PGSDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.PGSDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.PGSDiagramToolStripMenuItem.Text = "PGS Diagram"
         '
         'ORMDiagramToolStripMenuItem
         '
         Me.ORMDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
-        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'ERDiagramToolStripMenuItem
         '
         Me.ERDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ERD16x16
         Me.ERDiagramToolStripMenuItem.Name = "ERDiagramToolStripMenuItem"
-        Me.ERDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+        Me.ERDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ERDiagramToolStripMenuItem.Text = "&ER Diagram"
         '
         'ToolStripSeparator4
@@ -547,6 +549,17 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ToolStripMenuItemEntityTypeModelErrors
+        '
+        Me.ToolStripMenuItemEntityTypeModelErrors.Name = "ToolStripMenuItemEntityTypeModelErrors"
+        Me.ToolStripMenuItemEntityTypeModelErrors.Size = New System.Drawing.Size(182, 22)
+        Me.ToolStripMenuItemEntityTypeModelErrors.Text = "Model &Errors"
+        '
+        'ToolStripSeparator15
+        '
+        Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
+        Me.ToolStripSeparator15.Size = New System.Drawing.Size(179, 6)
+        '
         'frmDiagramPGS
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -635,4 +648,6 @@ Partial Class frmDiagramPGS
     Friend WithEvents Diagram4 As MindFusion.Diagramming.Diagram
     Friend WithEvents ToolStripSeparator14 As ToolStripSeparator
     Friend WithEvents DisplayAsNodeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemEntityTypeModelErrors As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator15 As ToolStripSeparator
 End Class

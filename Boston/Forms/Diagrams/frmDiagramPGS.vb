@@ -828,123 +828,150 @@ Public Class frmDiagramPGS
         Dim lrModel As FBM.Model
         Dim lrNode As New PGS.Node
 
-        Me.ContextMenuStrip_Node.ImageScalingSize = New Drawing.Size(16, 16)
+        Try
+            Me.ContextMenuStrip_Node.ImageScalingSize = New Drawing.Size(16, 16)
 
-        If Me.zrPage.SelectedObject.Count = 0 Then
-            Exit Sub
-        End If
-
-        '-------------------------------------
-        'Check that selected object is Actor
-        '-------------------------------------
-        If Me.zrPage.SelectedObject(0).GetType Is lrNode.GetType Then
-            '----------
-            'All good
-            '----------
-        Else
-            '--------------------------------------------------------
-            'Sometimes the MouseDown/NodeSelected gets it wrong
-            '  and this sub receives invocation before an Actor is 
-            '  properly selected. The user may try and click again.
-            '  If it's a bug, then this can be removed obviously.
-            '--------------------------------------------------------
-            Exit Sub
-        End If
-
-
-        lrNode = Me.zrPage.SelectedObject(0)
-
-        lrModel = lrNode.Model
-
-        '---------------------------------------------------------------------------------------------
-        'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
-        '  shape, and to/into another diagram starts at the MorphVector.
-        '---------------------------------------------------------------------------------------------
-        Me.MorphVector.Clear()
-        'Me.MorphVector.Add(New tMorphVector(lrNode.X, lrNode.Y, 0, 0, 40))
-        Me.MorphVector.Add(New tMorphVector(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y, 0, 0, 40))
-
-        '====================================================
-        'Load the ORMDiagrams that relate to the EntityType
-        '  as selectable menuOptions
-        '====================================================
-        '--------------------------------------------------------------
-        'Clear the list of ORMDiagrams that may relate to the EntityType
-        '--------------------------------------------------------------
-        Me.ORMDiagramToolStripMenuItem.DropDownItems.Clear()
-        Me.ERDiagramToolStripMenuItem.DropDownItems.Clear()
-        Me.PGSDiagramToolStripMenuItem.DropDownItems.Clear()
-
-        Dim loMenuOption As ToolStripItem
-        '--------------------------------------------------------------------------------------------------------
-        'Get the ORM Diagrams for the selected Node.
-        larPage_list = prApplication.CMML.getORMDiagramPagesForPGSNode(lrNode)
-
-        For Each lrPage In larPage_list
-            '---------------------------------------------------------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is not added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
-
-            If IsSomething(lr_enterprise_view) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                loMenuOption = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                Exit Sub
             End If
-        Next
 
-        '--------------------------------------------------------------------------------------------------------
-        'Get the ER Diagrams for the selected Node.
-        larPage_list = prApplication.CMML.getERDiagramPagesForNode(lrNode)
-
-        For Each lrPage In larPage_list
-            '---------------------------------------------------------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is not added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
-
-            If IsSomething(lr_enterprise_view) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                loMenuOption = Me.ERDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
+            '-------------------------------------
+            'Check that selected object is Actor
+            '-------------------------------------
+            If Me.zrPage.SelectedObject(0).GetType Is lrNode.GetType Then
+                '----------
+                'All good
+                '----------
+            Else
+                '--------------------------------------------------------
+                'Sometimes the MouseDown/NodeSelected gets it wrong
+                '  and this sub receives invocation before an Actor is 
+                '  properly selected. The user may try and click again.
+                '  If it's a bug, then this can be removed obviously.
+                '--------------------------------------------------------
+                Exit Sub
             End If
-        Next
 
-        '--------------------------------------------------------------------------------------------------------
-        'Get the PGS Diagrams for the selected Node.
-        larPage_list = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrNode.Model, lrNode.Id)
+            lrNode = Me.zrPage.SelectedObject(0)
 
-        For Each lrPage In larPage_list
-            '---------------------------------------------------------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is not added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+            lrModel = lrNode.Model
 
-            If IsSomething(lr_enterprise_view) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                loMenuOption = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+            '---------------------------------------------------------------------------------------------
+            'Model Errors
+            '-----------------------------------
+            Me.ToolStripMenuItemEntityTypeModelErrors.DropDownItems.Clear()
+            Dim lrModelError As FBM.ModelError
+            Dim lrModelElement As FBM.ModelObject = lrNode.RDSTable.FBMModelElement
+            Dim lo_menu_option As ToolStripItem
+            If lrModelElement.ModelError.Count > 0 Then
+                For Each lrModelError In lrModelElement.ModelError
+                    lo_menu_option = Me.ToolStripMenuItemEntityTypeModelErrors.DropDownItems.Add(lrModelError.Description)
+                    lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                Next
+                ToolStripMenuItemEntityTypeModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
+            Else
+                Me.ToolStripMenuItemEntityTypeModelErrors.Image = My.Resources.MenuImages.Cloud216x16
+                lo_menu_option = Me.ToolStripMenuItemEntityTypeModelErrors.DropDownItems.Add("There are no Model Errors for this Node Type.")
+                lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
             End If
-        Next
 
+            '---------------------------------------------------------------------------------------------
+            'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
+            '  shape, and to/into another diagram starts at the MorphVector.
+            '---------------------------------------------------------------------------------------------
+            Me.MorphVector.Clear()
+            'Me.MorphVector.Add(New tMorphVector(lrNode.X, lrNode.Y, 0, 0, 40))
+            Me.MorphVector.Add(New tMorphVector(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y, 0, 0, 40))
+
+            '====================================================
+            'Load the ORMDiagrams that relate to the EntityType
+            '  as selectable menuOptions
+            '====================================================
+            '--------------------------------------------------------------
+            'Clear the list of ORMDiagrams that may relate to the EntityType
+            '--------------------------------------------------------------
+            Me.ORMDiagramToolStripMenuItem.DropDownItems.Clear()
+            Me.ERDiagramToolStripMenuItem.DropDownItems.Clear()
+            Me.PGSDiagramToolStripMenuItem.DropDownItems.Clear()
+
+            Dim loMenuOption As ToolStripItem
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ORM Diagrams for the selected Node.
+            larPage_list = prApplication.CMML.getORMDiagramPagesForPGSNode(lrNode)
+
+            For Each lrPage In larPage_list
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lr_enterprise_view) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+                End If
+            Next
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ER Diagrams for the selected Node.
+            larPage_list = prApplication.CMML.getERDiagramPagesForNode(lrNode)
+
+            For Each lrPage In larPage_list
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lr_enterprise_view) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ERDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
+                End If
+            Next
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the PGS Diagrams for the selected Node.
+            larPage_list = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrNode.Model, lrNode.Id)
+
+            For Each lrPage In larPage_list
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lr_enterprise_view) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+                End If
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub Diagram_CellClicked(sender As Object, e As CellEventArgs) Handles Diagram.CellClicked

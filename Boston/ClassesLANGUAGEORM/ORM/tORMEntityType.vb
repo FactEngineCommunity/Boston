@@ -227,8 +227,7 @@ Namespace FBM
             End Set
         End Property
 
-        Private _ModelError As New List(Of FBM.ModelError)
-        Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
+        Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
                 Return Me._ModelError
             End Get
@@ -1061,6 +1060,17 @@ Namespace FBM
                         Next
                     Next
                 End If
+
+                Dim larRole = From FactType In Me.Model.FactType
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject IsNot Nothing
+                              Where Role.JoinedORMObject.Id = Me.Id
+                              Where Role.TypeOfJoin = pcenumRoleJoinType.EntityType
+                              Select Role
+
+                For Each lrRole In larRole
+                    Call lrRole.ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+                Next
 
                 Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, True, True, True, False)
 

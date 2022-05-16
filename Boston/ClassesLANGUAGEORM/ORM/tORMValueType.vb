@@ -183,10 +183,9 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized()>
-        Private _ModelError As New List(Of FBM.ModelError)
+
         <XmlIgnore()>
-        Public Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
+        Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
                 'CodeSafe-Because does not serialise _ModelError
                 If Me._ModelError Is Nothing Then Me._ModelError = New List(Of FBM.ModelError)

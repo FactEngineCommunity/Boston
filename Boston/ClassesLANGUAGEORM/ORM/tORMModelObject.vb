@@ -35,6 +35,19 @@ Namespace FBM
         Public WithEvents Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
 
         <XmlIgnore()>
+        <NonSerialized()>
+        Public _ModelError As New List(Of FBM.ModelError)
+
+        Public Overridable Property ModelError As List(Of FBM.ModelError)
+            Get
+                Return _ModelError
+            End Get
+            Set(value As List(Of FBM.ModelError))
+                Me._ModelError = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ConceptType As pcenumConceptType
 

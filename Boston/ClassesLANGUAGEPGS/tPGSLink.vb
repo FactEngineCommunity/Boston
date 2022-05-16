@@ -262,7 +262,11 @@ Namespace PGS
 
                             If lrOriginNode Is Nothing Or lrDestinationNode Is Nothing Then Exit Sub
 
-                            If Me.OriginModelElement.Name = lrOriginNode.Name Then
+                            If lrFactType.HasTotalRoleConstraint Then
+                                Me.Link.BaseShape = ArrowHead.PointerArrow
+                                Me.Link.HeadShape = ArrowHead.PointerArrow
+
+                            ElseIf Me.OriginModelElement.Name = lrOriginNode.Name Then
                                 Me.Link.BaseShape = ArrowHead.None
                                 Me.Link.HeadShape = ArrowHead.PointerArrow
                             Else
@@ -276,8 +280,8 @@ Namespace PGS
                                 Me.Link.BaseShapeSize = 1.5
                             End If
                             Me.Link.BaseShape = ArrowHead.PointerArrow
-
                             Me.Link.HeadShape = ArrowHead.PointerArrow
+
                         End If
 
                     ElseIf Me.Relation.IsPGSRelationNode Then
