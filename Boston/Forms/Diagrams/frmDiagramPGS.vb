@@ -2390,7 +2390,12 @@ Public Class frmDiagramPGS
             For liInd = 1 To Diagram.Nodes.Count
                 Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
                     Case Is = pcenumConceptType.PGSNode
-                        Diagram.Nodes(liInd - 1).Pen.Color = Color.DeepSkyBlue
+                        Dim lrPGSNode As PGS.Node = Diagram.Nodes(liInd - 1).Tag
+                        If CType(lrPGSNode.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
+                            lrPGSNode.Shape.Pen.Color = Color.Red
+                        Else
+                            lrPGSNode.Shape.Pen.Color = Color.DeepSkyBlue
+                        End If
                     Case Else
                         Diagram.Nodes(liInd - 1).Pen.Color = Color.Black
                 End Select

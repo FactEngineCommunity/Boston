@@ -77,6 +77,7 @@ Partial Class frmDiagramPGS
         Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
+        Me.DisplayAsNodeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MakeManytoManyRelationshipToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator14 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemRelationRemoveFromPage = New System.Windows.Forms.ToolStripMenuItem()
@@ -92,7 +93,6 @@ Partial Class frmDiagramPGS
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
-        Me.DisplayAsNodeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -170,7 +170,6 @@ Partial Class frmDiagramPGS
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
         Me.ToolStripSeparator2.Size = New System.Drawing.Size(179, 6)
-        Me.ToolStripSeparator2.Visible = False
         '
         'ToolStripMenuItem_RemoveFromPage
         '
@@ -377,7 +376,7 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 226)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 204)
         '
         'MorphToToolStripMenuItem1
         '
@@ -436,6 +435,12 @@ Partial Class frmDiagramPGS
         '
         Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
         Me.ToolStripSeparator13.Size = New System.Drawing.Size(252, 6)
+        '
+        'DisplayAsNodeToolStripMenuItem
+        '
+        Me.DisplayAsNodeToolStripMenuItem.Name = "DisplayAsNodeToolStripMenuItem"
+        Me.DisplayAsNodeToolStripMenuItem.Size = New System.Drawing.Size(255, 22)
+        Me.DisplayAsNodeToolStripMenuItem.Text = "Display as &Node"
         '
         'MakeManytoManyRelationshipToolStripMenuItem
         '
@@ -541,12 +546,6 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.Size = New System.Drawing.Size(938, 524)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'DisplayAsNodeToolStripMenuItem
-        '
-        Me.DisplayAsNodeToolStripMenuItem.Name = "DisplayAsNodeToolStripMenuItem"
-        Me.DisplayAsNodeToolStripMenuItem.Size = New System.Drawing.Size(255, 22)
-        Me.DisplayAsNodeToolStripMenuItem.Text = "Display as &Node"
         '
         'frmDiagramPGS
         '

@@ -449,6 +449,12 @@ Namespace PGS
                     End Select
                 End If
 
+                If CType(Me.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
+                    Me.Shape.Pen.Color = Color.Red
+                Else
+                    Me.Shape.Pen.Color = Color.DeepSkyBlue
+                End If
+
             Catch ex As Exception
 
             End Try
