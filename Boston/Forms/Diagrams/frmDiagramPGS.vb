@@ -2644,6 +2644,8 @@ Public Class frmDiagramPGS
         If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
             If Me.Diagram.Selection.Items.Count > 0 Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
@@ -3433,11 +3435,12 @@ Public Class frmDiagramPGS
 
     Private Sub ViewPropertiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewPropertiesToolStripMenuItem.Click
 
-        'CodeSage
+
+        'CodeSafe
+        If Me.Diagram Is Nothing Then Exit Sub
         If Me.Diagram.Selection.Items(0).GetType <> GetType(MindFusion.Diagramming.ShapeNode) Then Exit Sub
 
         Try
-
             Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
             Dim lrNode As New PGS.Node
 

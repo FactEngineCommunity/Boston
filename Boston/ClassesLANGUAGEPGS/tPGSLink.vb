@@ -223,6 +223,9 @@ Namespace PGS
         Public Sub setHeadShapes()
 
             Try
+                'CodeSaf
+                If Me.Link Is Nothing Then Exit Sub
+
                 Me.Link.HeadShapeSize = 4
                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
 
@@ -260,14 +263,14 @@ Namespace PGS
                             If lrOriginNode Is Nothing Or lrDestinationNode Is Nothing Then Exit Sub
 
                             If Me.OriginModelElement.Name = lrOriginNode.Name Then
-                                    Me.Link.BaseShape = ArrowHead.None
-                                    Me.Link.HeadShape = ArrowHead.PointerArrow
-                                Else
-                                    Me.Link.BaseShape = ArrowHead.PointerArrow
-                                    Me.Link.HeadShape = ArrowHead.None
-                                End If
+                                Me.Link.BaseShape = ArrowHead.None
+                                Me.Link.HeadShape = ArrowHead.PointerArrow
                             Else
-                                If lrFactType.HasTotalRoleConstraint Then
+                                Me.Link.BaseShape = ArrowHead.PointerArrow
+                                Me.Link.HeadShape = ArrowHead.None
+                            End If
+                        Else
+                            If lrFactType.HasTotalRoleConstraint Then
                                 Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
                             Else
                                 Me.Link.BaseShapeSize = 1.5
@@ -306,6 +309,9 @@ Namespace PGS
         Public Sub setPredicate()
 
             Try
+                'CodeSafe
+                If Me.Link Is Nothing Then Exit Sub
+
                 If Me.Link.Visible = False Then Exit Sub
 
                 '20200902-VM-This should not happen, but if it does then at least get the predicate from the Relation.
