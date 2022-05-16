@@ -3774,6 +3774,33 @@ Public Class frmDiagramPGS
 
     End Sub
 
+    Private Sub DisplayAsNodeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DisplayAsNodeToolStripMenuItem.Click
+
+        Dim lrPGSRelation As ERD.Relation
+
+        Try
+            lrPGSRelation = Me.zrPage.SelectedObject(0)
+            lrPGSRelation.ActualPGSNode.NodeType = pcenumPGSEntityType.Node
+
+            Call lrPGSRelation.ActualPGSNode.RDSTable.setIsPGSRelation(False)
+
+            Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
+
+            Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+            Call Me.zrPage.loadPropertyRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     'Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click
 
     '        Dim lrAddAttributeForm As New frmCRUDAddAttribute

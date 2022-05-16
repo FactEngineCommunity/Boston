@@ -2813,6 +2813,7 @@ Namespace FBM
                                 lrRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lsRelationId)
                             End If
 
+
                             If abAddToPage Then Me.addRDSRelation(lrRDSRelation)
 
                             Dim lrLink As PGS.Link

@@ -1253,7 +1253,6 @@ Namespace FBM
                                     lrTable = New RDS.Table(Me.RDS, lsTableName, lrFactType)
 
                                     Me.RDS.addTable(lrTable)
-
                                 End If
 
                                 If (lrFactType.Arity = 2 Or lrFactType.Arity = 3) _
