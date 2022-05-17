@@ -40,6 +40,7 @@
         RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations
         RDSRelationsThatHaveNoOriginColumnsRemoveRelation
         RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
+        RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
     End Enum
 
 End Module

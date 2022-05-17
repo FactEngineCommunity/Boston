@@ -1523,6 +1523,35 @@ Namespace FBM
 
         End Sub
 
+        Public Sub updateORSetCMMLPropertyRole(ByRef arColumn As RDS.Column)
+
+            Dim lsSQLQuery As String = ""
+            Dim lrRecordset As ORMQL.Recordset
+
+            lsSQLQuery = "SELECT * "
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+            lsSQLQuery &= " WHERE Property = '" & arColumn.Id & "'"
+
+            lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            If lrRecordset.EOF Then
+                lsSQLQuery = "INSERT INTO CorePropertyIsForRole (Property, Role)"
+                lsSQLQuery &= " VALUES ("
+                lsSQLQuery &= " '" & arColumn.Id & "'"
+                lsSQLQuery &= " ,'" & arColumn.Role.Id & "'"
+                lsSQLQuery &= " )"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Else
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                lsSQLQuery &= " SET Role = '" & arColumn.Role.Id & "'"
+                lsSQLQuery &= " WHERE Property = '" & arColumn.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            End If
+
+        End Sub
+
         Public Sub updateRelationDestinationPredicate(ByRef arRelation As RDS.Relation, ByVal asDestinationPredicate As String)
 
             Try

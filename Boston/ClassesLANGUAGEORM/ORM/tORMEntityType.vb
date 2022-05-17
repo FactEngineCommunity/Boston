@@ -1049,15 +1049,54 @@ Namespace FBM
                     Me.ReferenceModeFactType.LinkFactTypeRole = lrFactType.RoleGroup(0)
                     Me.ReferenceModeFactType.makeDirty()
                 Else
-                    For Each lrRole In lrFactType.RoleGroup
-                        For Each lrPRSRoleConstraintRole In Me.ReferenceModeRoleConstraint.Role
-                            Dim lrOtherRole = lrPRSRoleConstraintRole.FactType.GetOtherRoleOfBinaryFactType(lrPRSRoleConstraintRole.Id)
-                            Call lrOtherRole.ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+                    Dim larLinkFactType As New List(Of FBM.FactType)
 
-                            lrPRSRoleConstraintRole.FactType.SetIsLinkFactType(True)
-                            lrPRSRoleConstraintRole.FactType.SetLinkFactTypeRole(lrRole)
-                            lrPRSRoleConstraintRole.FactType.makeDirty()
-                        Next
+                    For Each lrPRSRoleConstraintRole In Me.ReferenceModeRoleConstraint.Role
+                        Dim lrOtherRole = lrPRSRoleConstraintRole.FactType.GetOtherRoleOfBinaryFactType(lrPRSRoleConstraintRole.Id)
+                        Call lrOtherRole.ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+                        lrPRSRoleConstraintRole.FactType.SetIsLinkFactType(True)
+                        larLinkFactType.AddUnique(lrPRSRoleConstraintRole.FactType)
+                        lrPRSRoleConstraintRole.FactType.makeDirty()
+                    Next
+
+                    For Each lrRole In lrFactType.RoleGroup
+                        larLinkFactType = larLinkFactType.ToList
+
+                        Dim lrLinkFactType = (From LinkFactType In larLinkFactType
+                                              From LFTRole In LinkFactType.RoleGroup
+                                              Where LinkFactType.LinkFactTypeRole Is Nothing
+                                              Where LFTRole.JoinedORMObject.Id <> lrFactType.Id
+                                              Select New With {Key .FactType = LinkFactType, Key .Role = LFTRole}).First
+
+
+                        lrLinkFactType.FactType.SetLinkFactTypeRole(lrRole)
+                        lrLinkFactType.FactType.makeDirty()
+                    Next
+
+                    '===================================================
+                    'RDS
+                    Dim larProcessedColumn As New List(Of RDS.Column)
+                    For Each lrRole In lrFactType.RoleGroup.ToArray
+
+                        Dim lrLinkFactType = (From FactType In larLinkFactType
+                                              Where FactType.LinkFactTypeRole.Id = lrRole.Id
+                                              Select FactType).First
+
+                        Dim lrLFKRole = (From Role In lrLinkFactType.RoleGroup
+                                         Where Role.JoinedORMObject.Id <> lrFactType.Id
+                                         Select Role).First
+
+                        Dim lrModelElement = lrLFKRole.JoinedORMObject
+
+                        Dim larColumn = From Column In lrFactType.getCorrespondingRDSTable.Column
+                                        Where Column.FactType.Id = lrLinkFactType.Id
+                                        Where Not larProcessedColumn.Contains(Column)
+                                        Select Column
+
+                        Dim lrColumn = larColumn.First
+                        lrColumn.setRole(lrRole)
+                        lrColumn.setActiveRole(lrRole)
+                        larProcessedColumn.Add(lrColumn)
                     Next
                 End If
 

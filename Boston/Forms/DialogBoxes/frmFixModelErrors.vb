@@ -83,6 +83,9 @@ Public Class frmFixModelErrors
                                                                   "RDS Relations that have an origin table but no destination table, and vice versa. Remove from Model.",
                                                                   pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa))
 
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount,
+                                                                              "RDS Relations, where Origin Column count <> Destination Column count.",
+                                                                              pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

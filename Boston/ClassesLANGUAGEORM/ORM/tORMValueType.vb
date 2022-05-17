@@ -1105,6 +1105,8 @@ Namespace FBM
                 Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateValueType, Me, Nothing)
             End If
 
+            Me.ModelError.RemoveAll(Function(x) x.ErrorId = 127)
+
             Me.isDirty = True
             Me.Model.Save()
 

@@ -30,6 +30,8 @@ Partial Class frmDiagramPGS
         Me.ORMDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ERDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemEntityTypeModelErrors = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
         Me.ViewPropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddAttributeToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
@@ -93,8 +95,13 @@ Partial Class frmDiagramPGS
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripMenuItemEntityTypeModelErrors = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemConvert = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LanguageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertyGraphSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EntityRelationshipDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator16 = New System.Windows.Forms.ToolStripSeparator()
+        Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -106,7 +113,7 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator15, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 238)
+        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 216)
         '
         'MorphToToolStripMenuItem
         '
@@ -120,27 +127,38 @@ Partial Class frmDiagramPGS
         '
         Me.PGSDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.PGS16x16
         Me.PGSDiagramToolStripMenuItem.Name = "PGSDiagramToolStripMenuItem"
-        Me.PGSDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.PGSDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.PGSDiagramToolStripMenuItem.Text = "PGS Diagram"
         '
         'ORMDiagramToolStripMenuItem
         '
         Me.ORMDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
-        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'ERDiagramToolStripMenuItem
         '
         Me.ERDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ERD16x16
         Me.ERDiagramToolStripMenuItem.Name = "ERDiagramToolStripMenuItem"
-        Me.ERDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ERDiagramToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
         Me.ERDiagramToolStripMenuItem.Text = "&ER Diagram"
         '
         'ToolStripSeparator4
         '
         Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
         Me.ToolStripSeparator4.Size = New System.Drawing.Size(179, 6)
+        '
+        'ToolStripMenuItemEntityTypeModelErrors
+        '
+        Me.ToolStripMenuItemEntityTypeModelErrors.Name = "ToolStripMenuItemEntityTypeModelErrors"
+        Me.ToolStripMenuItemEntityTypeModelErrors.Size = New System.Drawing.Size(182, 22)
+        Me.ToolStripMenuItemEntityTypeModelErrors.Text = "Model &Errors"
+        '
+        'ToolStripSeparator15
+        '
+        Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
+        Me.ToolStripSeparator15.Size = New System.Drawing.Size(179, 6)
         '
         'ViewPropertiesToolStripMenuItem
         '
@@ -218,9 +236,9 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Diagram
         '
-        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator5, Me.AutoLayoutToolStripMenuItem, Me.CopyToolStripMenuItem})
+        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator5, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator16, Me.AutoLayoutToolStripMenuItem, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 98)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 126)
         '
         'ViewToolStripMenuItem
         '
@@ -549,16 +567,77 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'ToolStripMenuItemEntityTypeModelErrors
+        'ToolStripMenuItemConvert
         '
-        Me.ToolStripMenuItemEntityTypeModelErrors.Name = "ToolStripMenuItemEntityTypeModelErrors"
-        Me.ToolStripMenuItemEntityTypeModelErrors.Size = New System.Drawing.Size(182, 22)
-        Me.ToolStripMenuItemEntityTypeModelErrors.Text = "Model &Errors"
+        Me.ToolStripMenuItemConvert.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LanguageToolStripMenuItem})
+        Me.ToolStripMenuItemConvert.Image = CType(resources.GetObject("ToolStripMenuItemConvert.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItemConvert.Name = "ToolStripMenuItemConvert"
+        Me.ToolStripMenuItemConvert.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemConvert.Text = "Con&vert Page..."
         '
-        'ToolStripSeparator15
+        'LanguageToolStripMenuItem
         '
-        Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
-        Me.ToolStripSeparator15.Size = New System.Drawing.Size(179, 6)
+        Me.LanguageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem})
+        Me.LanguageToolStripMenuItem.Image = CType(resources.GetObject("LanguageToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem"
+        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.LanguageToolStripMenuItem.Text = "To &Language..."
+        '
+        'PropertyGraphSchemaToolStripMenuItem
+        '
+        Me.PropertyGraphSchemaToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
+        Me.PropertyGraphSchemaToolStripMenuItem.Name = "PropertyGraphSchemaToolStripMenuItem"
+        Me.PropertyGraphSchemaToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
+        Me.PropertyGraphSchemaToolStripMenuItem.Text = "Object-Role Model"
+        '
+        'EntityRelationshipDiagramToolStripMenuItem
+        '
+        Me.EntityRelationshipDiagramToolStripMenuItem.Image = CType(resources.GetObject("EntityRelationshipDiagramToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.EntityRelationshipDiagramToolStripMenuItem.Name = "EntityRelationshipDiagramToolStripMenuItem"
+        Me.EntityRelationshipDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
+        Me.EntityRelationshipDiagramToolStripMenuItem.Text = "&Entity Relationship Diagram"
+        Me.EntityRelationshipDiagramToolStripMenuItem.Visible = False
+        '
+        'ToolStripSeparator16
+        '
+        Me.ToolStripSeparator16.Name = "ToolStripSeparator16"
+        Me.ToolStripSeparator16.Size = New System.Drawing.Size(204, 6)
+        '
+        'BackgroundWorker
+        '
+        Me.BackgroundWorker.WorkerReportsProgress = True
+        '
+        'CircularProgressBar
+        '
+        Me.CircularProgressBar.AnimationFunction = Nothing
+        Me.CircularProgressBar.AnimationSpeed = 100
+        Me.CircularProgressBar.BackColor = System.Drawing.Color.White
+        Me.CircularProgressBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CircularProgressBar.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.CircularProgressBar.InnerColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.CircularProgressBar.InnerMargin = 2
+        Me.CircularProgressBar.InnerWidth = -1
+        Me.CircularProgressBar.Location = New System.Drawing.Point(444, 237)
+        Me.CircularProgressBar.MarqueeAnimationSpeed = 1000
+        Me.CircularProgressBar.Name = "CircularProgressBar"
+        Me.CircularProgressBar.OuterColor = System.Drawing.Color.LightGray
+        Me.CircularProgressBar.OuterMargin = -25
+        Me.CircularProgressBar.OuterWidth = 26
+        Me.CircularProgressBar.ProgressColor = System.Drawing.Color.SteelBlue
+        Me.CircularProgressBar.ProgressWidth = 6
+        Me.CircularProgressBar.SecondaryFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CircularProgressBar.Size = New System.Drawing.Size(50, 50)
+        Me.CircularProgressBar.StartAngle = 270
+        Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-5, -27, 0, 0)
+        Me.CircularProgressBar.SubscriptText = ""
+        Me.CircularProgressBar.SuperscriptColor = System.Drawing.Color.FromArgb(CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer))
+        Me.CircularProgressBar.SuperscriptMargin = New System.Windows.Forms.Padding(12, 25, 0, 0)
+        Me.CircularProgressBar.SuperscriptText = ""
+        Me.CircularProgressBar.TabIndex = 16
+        Me.CircularProgressBar.Text = "0"
+        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(2, 2, 0, 0)
+        Me.CircularProgressBar.Value = 68
         '
         'frmDiagramPGS
         '
@@ -567,6 +646,7 @@ Partial Class frmDiagramPGS
         Me.ClientSize = New System.Drawing.Size(938, 524)
         Me.Controls.Add(Me.DiagramView)
         Me.Controls.Add(Me.HiddenDiagramView)
+        Me.Controls.Add(Me.CircularProgressBar)
         Me.Name = "frmDiagramPGS"
         Me.TabPageContextMenuStrip = Me.ContextMenuStripTab
         Me.TabText = "Property Graph Schema Diagram"
@@ -650,4 +730,11 @@ Partial Class frmDiagramPGS
     Friend WithEvents DisplayAsNodeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemEntityTypeModelErrors As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator15 As ToolStripSeparator
+    Friend WithEvents ToolStripMenuItemConvert As ToolStripMenuItem
+    Friend WithEvents LanguageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PropertyGraphSchemaToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EntityRelationshipDiagramToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator16 As ToolStripSeparator
+    Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
+    Friend WithEvents CircularProgressBar As CircularProgressBar.CircularProgressBar
 End Class

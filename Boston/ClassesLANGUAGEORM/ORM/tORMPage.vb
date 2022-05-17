@@ -958,7 +958,8 @@ Namespace FBM
                                             Optional ByVal abCloneFactType As Boolean = True,
                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
                                             Optional ByVal abExpandIfReferenceModeFactType As Boolean = False,
-                                            Optional ByVal abForceDropOfRelatedModelElements As Boolean = False) As FBM.FactTypeInstance
+                                            Optional ByVal abForceDropOfRelatedModelElements As Boolean = False,
+                                            Optional ByVal abDropLinkFactTypes As Boolean = True) As FBM.FactTypeInstance
 
             Dim lrRoleInstance As New FBM.RoleInstance
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -2399,19 +2400,24 @@ NextY:
 
         End Function
 
-        Public Function GetMidPointOfModelObjects(ByRef aarModelObject As List(Of FBM.ModelObject)) As PointF
+        Public Function GetMidPointOfModelObjects(ByRef aarModelObject As List(Of FBM.ModelObject), Optional ByRef abFoundObjects As Boolean = True) As PointF
 
             Dim liXTotal As Integer = 0
             Dim liYTotal As Integer = 0
 
             For Each lrModelObject In aarModelObject
 
-                Dim lrPageObject = From PageObject In Me.GetAllPageObjects
-                                   Where PageObject.Id = lrModelObject.Id
-                                   Select PageObject
+                Dim larPageObject = From PageObject In Me.GetAllPageObjects
+                                    Where PageObject.Id = lrModelObject.Id
+                                    Select PageObject
 
-                liXTotal += lrPageObject(0).X
-                liYTotal += lrPageObject(0).Y
+                If larPageObject.Count = 0 Then
+                    abFoundObjects = False
+                    Return Nothing
+                End If
+
+                liXTotal += larPageObject(0).X
+                liYTotal += larPageObject(0).Y
 
             Next
 
@@ -3056,6 +3062,28 @@ NextY:
 
 
         End Sub
+
+        Public Function CreateObjectRoleModel(ByRef aoBackgroundWorker As BackgroundWorker)
+
+            Try
+                Select Case Me.Language
+                    Case Is = pcenumLanguage.PropertyGraphSchema
+                        Return Me.CreateObjectRoleModelFromPropertyGraphSchema(aoBackgroundWorker)
+                End Select
+
+                Return Nothing
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Private Sub TableCellClickedHandler(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs) Handles _Diagram.CellClicked
             RaiseEvent TableCellClicked(sender, e)

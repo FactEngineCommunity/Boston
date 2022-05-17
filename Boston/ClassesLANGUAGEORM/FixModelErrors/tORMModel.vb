@@ -45,12 +45,11 @@ Namespace FBM
                                 Call Me.RDSRelationsThatHaveNoOriginColumnsRemoveRelation()
                             Case Is = pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
                                 Call Me.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa()
+                            Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
+                                Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
                         End Select
 
                     Next
-
-
-
 
                 End With
 
@@ -609,6 +608,41 @@ SkipColumn2:
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount()
+
+            Try
+
+                Dim larRDSRelation = From Relation In Me.RDS.Relation
+                                     Where Relation.OriginColumns.Count < Relation.DestinationColumns.Count
+                                     Select Relation
+
+                For Each lrRDSRelation In larRDSRelation.ToArray
+
+                    For Each lrDestinationColumn In lrRDSRelation.DestinationColumns
+                        If lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) Is Nothing Then
+                            Dim lrActualColumn = (From Column In lrRDSRelation.OriginTable.Column
+                                                  Where Not lrRDSRelation.OriginColumns.Contains(Column)
+                                                  Select Column).First
+                            'lrRDSRelation.OriginTable.Column.Find(Function(x) x.Name = lrDestinationColumn.Name)
+                            If lrActualColumn IsNot Nothing Then
+                                Call lrRDSRelation.AddOriginColumn(lrActualColumn)
+                            End If
+                        End If
+                    Next
+
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         Private Sub RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa()

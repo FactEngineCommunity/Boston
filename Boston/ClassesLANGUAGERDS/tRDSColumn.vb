@@ -779,6 +779,16 @@ Namespace RDS
 
         End Sub
 
+        Public Sub setRole(ByRef arRole As FBM.Role)
+
+            Me.Role = arRole
+
+            Call Me.Model.Model.updateORSetCMMLPropertyRole(Me)
+
+            RaiseEvent ActiveRoleChanged()
+
+        End Sub
+
         Public Sub setIsDerivationParameter(ByVal abIsDerivationParameter As Boolean)
 
             Try

@@ -308,7 +308,6 @@ SkipJoiningRole:
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
-
         End Sub
 
     End Module

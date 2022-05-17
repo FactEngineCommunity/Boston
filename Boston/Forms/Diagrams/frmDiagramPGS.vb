@@ -3725,7 +3725,16 @@ Public Class frmDiagramPGS
             Dim lsUniqueAttributeName = lfrmAddAttributeForm.zrEntity.CreateUniqueAttributeName("NewAttribute", 0)
 
             If lfrmAddAttributeForm.ShowDialog(lsUniqueAttributeName) = DialogResult.OK Then
-                lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
+                With New WaitCursor
+                    lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
+                    lrValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+                    lrFactType.RoleGroup(0).SetMandatory(lfrmAddAttributeForm.zbAttributeIsMandatory, True)
+                    Dim larRole As New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {"has", ""})
+                    lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                    Dim lsNewName As String = lrFactType.MakeNameFromFactTypeReadings()
+                    Call lrFactType.setName(lsNewName, True)
+                End With
             Else
                 Call lrFactType.RemoveFromModel(True, False)
                 Call lrValueType.RemoveFromModel(True, False)
@@ -3824,6 +3833,100 @@ Public Class frmDiagramPGS
             Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
             Call Me.zrPage.loadPropertyRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
 
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub PropertyGraphSchemaToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PropertyGraphSchemaToolStripMenuItem.Click
+
+        Dim lsMessage As String
+
+        Try
+
+            ''====================================================================================
+            ''Check to see that there are no Entity Types on this Page with no Reference Scheme
+            'Dim larEntityTypeInstance As New List(Of FBM.EntityTypeInstance)
+            'If Me.zrPage.hasEntityTypeInstancessWithoutReferenceScheme(larEntityTypeInstance) Then
+            '    lsMessage = "There are Entity Types on this Page that have no Reference Scheme."
+            '    lsMessage &= vbCrLf & vbCrLf & "Create a Reference Scheme for the following Entity Types before convertinng this page to a Property Graph Schema:" & vbCrLf
+            '    For Each lrEntityTypeInstance In larEntityTypeInstance
+            '        lsMessage &= vbCrLf & " - " & lrEntityTypeInstance.Id
+            '    Next
+            '    MsgBox(lsMessage)
+            '    Exit Sub
+            'End If
+
+            With New WaitCursor
+                Call Me.createObjectRoleModelFromCurrentPage(sender, e)
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub createObjectRoleModelFromCurrentPage(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+        '============================
+        Dim lrPage As FBM.Page
+
+        Try
+
+            frmMain.Cursor = Cursors.WaitCursor
+            Me.zrPage.Model.AllowCheckForErrors = False
+
+            Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
+            Me.CircularProgressBar.BringToFront()
+            Me.CircularProgressBar.Value = 1
+            Me.CircularProgressBar.Invalidate()
+            Me.Invalidate()
+            Me.BackgroundWorker.ReportProgress(0)
+
+            lrPage = Me.zrPage.CreateObjectRoleModel(Me.BackgroundWorker)
+
+            If lrPage Is Nothing Then
+                Throw New Exception("Failed to create the Object-Role Model.")
+            End If
+
+            lrPage.Loaded = True
+            lrPage.Save(False, True)
+
+            Me.CircularProgressBar.Value = 0
+            Me.CircularProgressBar.Text = "0%"
+            Me.CircularProgressBar.Invalidate()
+            Me.CircularProgressBar.SendToBack()
+
+
+            Me.zrPage.Model.AllowCheckForErrors = True
+            frmMain.Cursor = Cursors.Default
+
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+            If IsSomething(lrPage) Then
+                lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                MsgBox("Added the new Property Graph Schema Page, '" & lrPage.Name & "', to the Model.")
+
+                Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+
+                If loToolStripItem.Tag = True Then
+                    Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                    Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
+                End If
+
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

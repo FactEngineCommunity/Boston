@@ -23,11 +23,11 @@ Partial Class frmFixModelErrors
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.LabelModelName = New System.Windows.Forms.Label()
+        Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.LabelPromptWhatToDo = New System.Windows.Forms.Label()
         Me.ButtonFixModelErrors = New System.Windows.Forms.Button()
         Me.CheckedListBoxFixTypes = New System.Windows.Forms.CheckedListBox()
-        Me.LabelPromptModel = New System.Windows.Forms.Label()
-        Me.LabelModelName = New System.Windows.Forms.Label()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -46,6 +46,24 @@ Partial Class frmFixModelErrors
         Me.GroupBox1.Size = New System.Drawing.Size(962, 486)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
+        '
+        'LabelModelName
+        '
+        Me.LabelModelName.AutoSize = True
+        Me.LabelModelName.Location = New System.Drawing.Point(51, 16)
+        Me.LabelModelName.Name = "LabelModelName"
+        Me.LabelModelName.Size = New System.Drawing.Size(90, 13)
+        Me.LabelModelName.TabIndex = 4
+        Me.LabelModelName.Text = "LabelModelName"
+        '
+        'LabelPromptModel
+        '
+        Me.LabelPromptModel.AutoSize = True
+        Me.LabelPromptModel.Location = New System.Drawing.Point(6, 16)
+        Me.LabelPromptModel.Name = "LabelPromptModel"
+        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptModel.TabIndex = 3
+        Me.LabelPromptModel.Text = "Model:"
         '
         'LabelPromptWhatToDo
         '
@@ -78,29 +96,11 @@ Partial Class frmFixModelErrors
                 "ins nothing.", "Relational Data Structure, Tables where the number of PrimaryKey columns does not" &
                 " match the number of Roles in the PreferredIdentifier. Fix that.", "Duplicate Facts. Remove duplicates.", "RDS Tables and PGS Nodes (Nodes/Tables of ObjectifiedFactTypes) that are missing " &
                 "Relations. Add the relations.", "RDS Tables with more than one relation for the same FactType/Join. Prune extra re" &
-                "lations.", "RDS Relations, that have no OriginColumns. Try and create the OriginColumns."})
+                "lations.", "RDS Relations, that have no OriginColumns. Try and create the OriginColumns.", "RDS Relations, where Origin Column count <> Destination Column count."})
         Me.CheckedListBoxFixTypes.Location = New System.Drawing.Point(6, 70)
         Me.CheckedListBoxFixTypes.Name = "CheckedListBoxFixTypes"
         Me.CheckedListBoxFixTypes.Size = New System.Drawing.Size(950, 409)
         Me.CheckedListBoxFixTypes.TabIndex = 0
-        '
-        'LabelPromptModel
-        '
-        Me.LabelPromptModel.AutoSize = True
-        Me.LabelPromptModel.Location = New System.Drawing.Point(6, 16)
-        Me.LabelPromptModel.Name = "LabelPromptModel"
-        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
-        Me.LabelPromptModel.TabIndex = 3
-        Me.LabelPromptModel.Text = "Model:"
-        '
-        'LabelModelName
-        '
-        Me.LabelModelName.AutoSize = True
-        Me.LabelModelName.Location = New System.Drawing.Point(51, 16)
-        Me.LabelModelName.Name = "LabelModelName"
-        Me.LabelModelName.Size = New System.Drawing.Size(90, 13)
-        Me.LabelModelName.TabIndex = 4
-        Me.LabelModelName.Text = "LabelModelName"
         '
         'frmFixModelErrors
         '
