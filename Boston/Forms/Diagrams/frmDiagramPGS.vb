@@ -3786,23 +3786,42 @@ Public Class frmDiagramPGS
 
             lrPGSRelation = Me.zrPage.SelectedObject(0)
 
-            If Not lrPGSRelation.RelationFactType.IsLinkFactType Then
+            Dim lrFactType As FBM.FactType = Nothing
+            Dim lbGoForward As Boolean = True
+            If lrPGSRelation.RelationFactType.IsLinkFactType Then
 
-                'CodeSafe
-                If Not (lrPGSRelation.RelationFactType.IsManyTo1BinaryFactType Or lrPGSRelation.RelationFactType.Is1To1BinaryFactType) Then Exit Sub
+                Try
+                    lrFactType = lrPGSRelation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
 
-                For Each lrInternalUniquenessConstraint In lrPGSRelation.RelationFactType.InternalUniquenessConstraint.ToArray
+                    lbGoForward = lrFactType.getCorrespondingRDSTable.isPGSRelation
+                    GoTo FinishedPretesting
+                Catch ex As Exception
+                    lbGoForward = False
+                    GoTo FinishedPretesting
+                End Try
+            Else
+                lrFactType = lrPGSRelation.RelationFactType
+            End If
+
+            'CodeSafe
+            If Not (lrFactType.IsManyTo1BinaryFactType Or lrFactType.Is1To1BinaryFactType) Then Exit Sub
+
+FinishedPretesting:
+            If lbGoForward Then
+
+
+                For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint.ToArray
                     Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
                 Next
-                Dim larRole As List(Of FBM.Role) = lrPGSRelation.RelationFactType.RoleGroup.ToList
-                Call lrPGSRelation.RelationFactType.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
-                Call lrPGSRelation.RelationFactType.Objectify()
-                For Each lrRole In lrPGSRelation.RelationFactType.RoleGroup
+                Dim larRole As List(Of FBM.Role) = lrFactType.RoleGroup.ToList
+                Call lrFactType.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
+                Call lrFactType.Objectify()
+                For Each lrRole In lrFactType.RoleGroup
 
                     Select Case lrRole.TypeOfJoin
                         Case Is = pcenumRoleJoinType.ValueType
                         Case Else
-                            Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(lrPGSRelation.RelationFactType)
+                            Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(lrFactType)
                     End Select
                 Next
             End If

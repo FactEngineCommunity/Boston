@@ -79,6 +79,10 @@ Namespace RDS
         Public Sub New()
         End Sub
 
+        Public Sub New(ByVal asRelationId As String)
+            Me.Id = asRelationId
+        End Sub
+
         Public Sub New(ByVal asRelationId As String,
                        ByRef arOriginTable As RDS.Table,
                        ByVal aiOriginMultiplicity As pcenumCMMLMultiplicity,

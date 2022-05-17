@@ -1,3 +1,5 @@
+Imports System.Reflection
+
 Namespace TableRole
 
     Public Module TableRole
@@ -119,6 +121,7 @@ Namespace TableRole
             Dim lREcordset As New ADODB.Recordset
             Dim lsMessage As String = ""
             Dim lsId As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             Try
                 '-----------------------------
@@ -146,6 +149,8 @@ Namespace TableRole
                         lrRole._Symbol = lrRole.Id
                         lrRole.Name = Viev.NullVal(lREcordset("RoleName").Value, "")
                         lrRole.SequenceNr = lREcordset("SequenceNr").Value
+                        lrRole.Mandatory = lREcordset("IsMandatory").Value
+                        lrRole.IsArray = lREcordset("IsArray").Value
                         lrRole.FactType = arFactType
 
                         lsId = Trim(Viev.NullVal(lREcordset("JoinsModelElementId").Value, ""))
@@ -177,7 +182,21 @@ Namespace TableRole
                                 If lrRole.JoinedORMObject Is Nothing Then
                                     If lrRole.FactType.Id = lsId Then Exit Select
                                     lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lsId, True) ' Trim(Viev.NullVal(lREcordset("JoinsNestedFactTypeId").Value, "")), True)
-                                    TableFactType.GetFactTypeDetailsByModel(lrRole.JoinsFactType, True)
+                                    Dim lrFactType = TableFactType.GetFactTypeDetailsByModel(lrRole.JoinsFactType, True)
+                                    If lrFactType Is Nothing Then
+                                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                                        lsMessage.AppendDoubleLineBreak("Could not find linked Fact Type for Role on Fact Type, " & arFactType.Id & ".")
+                                        lsMessage.AppendDoubleLineBreak("Click [Yes] if you would like Boston to try and remove this Fact Type from the Model.")
+                                        Dim liMessageResponse As MsgBoxResult
+                                        liMessageResponse = prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, , False, False, True, MessageBoxButtons.YesNo)
+
+                                        If liMessageResponse = MsgBoxResult.Yes Then
+                                            If arFactType.CanSafelyRemoveFromModel() Then
+                                                Call TableFactType.DeleteFactType(arFactType)
+                                                GoTo ContinueThoughFaulty
+                                            End If
+                                        End If
+                                    End If
                                 End If
                             Case Is = pcenumRoleJoinType.EntityType
                                 lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(Function(x) x.Id = lsId)
@@ -185,8 +204,7 @@ Namespace TableRole
                                 lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(Function(x) x.Id = lsId)
                         End Select
 
-                        lrRole.Mandatory = lREcordset("IsMandatory").Value
-                        lrRole.IsArray = lREcordset("IsArray").Value
+ContinueThoughFaulty:
                         lrRole.isDirty = False
 
                         If (lrRole.JoinedORMObject Is Nothing) And Not (lrRole.TypeOfJoin = pcenumRoleJoinType.FactType) Then

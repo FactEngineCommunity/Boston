@@ -466,6 +466,8 @@ Public Class tApplication
                 End Select
             ElseIf My.Settings.DebugMode = pcenumDebugMode.DebugCriticalErrorsOnly.ToString Then
 
+                Dim aiMessageResponse As MsgBoxResult
+
                 Select Case aiMessageType
                     Case Is = pcenumErrorType.Information
                         If pbLogStartup Then
@@ -505,7 +507,7 @@ Public Class tApplication
 
                             If abAbortApplication Then asErrorMessage &= vbCrLf & vbCrLf & "This is a critical error. Boston will now close."
 
-                            Dim aiMessageResponse As MsgBoxResult = MsgBox(asErrorMessage, MsgBoxStyle.Critical + aiMessageBoxButtons)
+                            aiMessageResponse = MsgBox(asErrorMessage, MsgBoxStyle.Critical + aiMessageBoxButtons)
 
                             If abAbortApplication Then Call Application.Exit()
 
@@ -516,7 +518,9 @@ Public Class tApplication
                         Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
 
                         If abThrowtoMSGBox Then
-                            MsgBox(asErrorMessage, MsgBoxStyle.Exclamation)
+                            aiMessageResponse = MsgBox(asErrorMessage, aiMessageBoxButtons)
+
+                            Return aiMessageResponse
                         End If
                 End Select
 

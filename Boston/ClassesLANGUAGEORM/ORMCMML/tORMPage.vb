@@ -2715,8 +2715,9 @@ Namespace FBM
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
             Dim lrRecordset1 As ORMQL.Recordset
-
+            Dim lsMessage As String = Nothing
             Dim lrFactInstance As New FBM.FactInstance
+            Dim mb As MethodBase
 
             Try
                 'List of the Relations loaded onto the Page. Used so that a relation that links an Node to itself is not loaded twice.
@@ -2784,13 +2785,52 @@ Namespace FBM
 
                             'CodeSafe
                             Try
+                                lrOriginNode.Symbol = "<Nothing Delete This Relation>"
                                 lrOriginNode.Symbol = lrRecordset1("Entity").Data
                                 lrOriginNode = Me.ERDiagram.Entity.Find(AddressOf lrOriginNode.EqualsBySymbol)
                             Catch ex As Exception
-                                lrOriginNode = Nothing
-                                prApplication.ThrowErrorMessage("Couldn't find Origin Node in CoreRelationIsForEntity for Relation with Id: " & lsRelationId,
-                                                                pcenumErrorType.Warning,
-                                                                ex.StackTrace, True, False, My.Settings.ThrowWarningDebugMessagesToScreen)
+
+                                lsMessage = "Couldn't find Origin Node in CoreRelationIsForEntity for Relation/Edge with Id: " & lsRelationId
+                                lsMessage.AppendLine("Origin Node Name: " & lrOriginNode.Symbol)
+                                lsMessage.AppendDoubleLineBreak("Boston will put the Node Type on the Page if it can find information for the Node Type.")
+                                lsMessage.AppendDoubleLineBreak("Click [Yes] if you would prefer Boston to simply delete the relation and not try to fix the problem.")
+#Region "Error management for missing Origin Node Type."
+                                Dim liMessageResponse As MsgBoxResult
+                                liMessageResponse = prApplication.ThrowErrorMessage(lsMessage,
+                                                                                    pcenumErrorType.Warning,
+                                                                                    ex.StackTrace, False, False, True, MessageBoxButtons.YesNo)
+
+                                Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = lrOriginNode.Symbol)
+
+                                Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                                  Where Relation.Id = lsRelationId
+                                                  Select Relation
+
+                                If lrTable IsNot Nothing Then
+                                    lrOriginNode = Me.LoadPGSNodeTypeFromRDSTable(lrTable, New PointF(20, 20))
+                                Else
+                                    If larRelation.Count = 0 Then
+                                        lsMessage = "Could not find inforation for a Node Type, " & lrOriginNode.Symbol & "."
+                                        If liMessageResponse = MsgBoxResult.Yes Then
+                                            Call Me.Model.removeCMMLRelation(New RDS.Relation(lsRelationId))
+                                        Else
+                                            lsMessage.AppendDoubleLineBreak("Consider removing the Relation/Edge between " & lrOriginNode.Symbol & " and " & lrDestinationNode.Symbol & ".")
+                                            MsgBox(lsMessage)
+                                        End If
+                                    Else
+                                        Dim lrRelation = larRelation(0)
+                                        If lrRelation.OriginTable IsNot Nothing Then
+                                            Me.Model.updateRelationOriginTable(larRelation(0), lrRelation.OriginTable)
+                                            Me.LoadPGSNodeTypeFromRDSTable(lrRelation.OriginTable, New PointF(20, 20))
+                                        Else
+                                            MsgBox("Removing the relation from the Model.")
+                                            Call Me.Model.RDS.removeRelation(lrRelation)
+                                        End If
+                                    End If
+                                    lrOriginNode = Nothing
+
+                                End If
+#End Region
                             End Try
 
                         End If
@@ -2836,7 +2876,7 @@ Namespace FBM
 
             Catch ex As Exception
                 Dim lsMessage1 As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                mb = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message

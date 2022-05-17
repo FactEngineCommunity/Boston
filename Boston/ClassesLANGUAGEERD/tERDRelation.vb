@@ -222,7 +222,9 @@ Namespace ERD
 
                 Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link.Link
 
-                lrDiagramingLink.Dispose()
+                If lrDiagramingLink IsNot Nothing Then
+                    lrDiagramingLink.Dispose()
+                End If
 
                 Me.Page.ERDiagram.Relation.Remove(Me)
 

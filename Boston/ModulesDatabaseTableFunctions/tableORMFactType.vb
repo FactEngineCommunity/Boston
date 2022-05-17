@@ -190,8 +190,9 @@ Namespace TableFactType
         ''' <param name="abAddFactTypeToModel">True if the FactType is to be added to the Model.</param>
         ''' <param name="abDynamicallyLoadRelatedModelElements">As used by the Unified Ontology Browser so the whole Model doesn't have to be loaded at once.</param>
         Public Function GetFactTypeDetailsByModel(ByRef arFactType As FBM.FactType,
-                                             Optional ByVal abAddFactTypeToModel As Boolean = False,
-                                             Optional ByVal abDynamicallyLoadRelatedModelElements As Boolean = False) As FBM.FactType
+                                                  Optional ByVal abAddFactTypeToModel As Boolean = False,
+                                                  Optional ByVal abDynamicallyLoadRelatedModelElements As Boolean = False,
+                                                  Optional ByRef abAborted As Boolean = False) As FBM.FactType
 
             Dim lsMessage As String
             Dim lsSQLQuery As String = ""
@@ -314,13 +315,22 @@ Namespace TableFactType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                lsMessage.AppendDoubleLineBreak("Click [Yes] if you would like Boston to try and remove this Fact Type from the Model.")
+                Dim liMessageResponse As MsgBoxResult
+                liMessageResponse = prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False, False, True, MessageBoxButtons.YesNo)
 
+                If liMessageResponse = MsgBoxResult.Yes Then
+                    If arFactType.CanSafelyRemoveFromModel() Then
+                        Call TableFactType.DeleteFactType(arFactType)
+                        abAborted = True
+                        Return Nothing
+                    End If
+                End If
                 If abAddFactTypeToModel Then
                     arFactType.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(arFactType.Model, arFactType.Id, pcenumConceptType.FactType))
                     arFactType.Model.AddFactType(arFactType, False, False)
                 End If
-
+FinishAnyway:
                 Return arFactType
 
             End Try
@@ -402,14 +412,16 @@ Namespace TableFactType
                         lrFactType.Model = arModel
                         lrFactType.Id = lREcordset("FactTypeId").Value
 
-                        Call TableFactType.GetFactTypeDetailsByModel(lrFactType, abAddToModel)
+                        Dim abAborted = False
+                        TableFactType.GetFactTypeDetailsByModel(lrFactType, abAddToModel,, abAborted)
+                        If abAborted Then GoTo MoveNext
 
                         GetFactTypesByModel.Add(lrFactType)
 
                         If abAddToModel Then
                             arModel.AddFactType(lrFactType, False, False, Nothing)
                         End If
-
+MoveNext:
                         lREcordset.MoveNext()
                     End While
                 Else

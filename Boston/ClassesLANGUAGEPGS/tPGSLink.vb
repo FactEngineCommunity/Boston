@@ -336,20 +336,24 @@ Namespace PGS
                     Dim lsDestinationPredicate As String = ""
 
                     Dim larRole As New List(Of FBM.Role)
-                    Dim lrFactType As FBM.FactType
+                    Dim lrFactType As FBM.FactType = Nothing
+                    Dim lrFactTypeReading As FBM.FactTypeReading = Nothing
+                    Dim lsPredicate As String = Nothing
 
-                    If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                        If Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                            lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                    Try
+                        If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            If Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                                lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                            Else
+                                lrFactType = Me.RDSRelation.ResponsibleFactType
+                            End If
                         Else
                             lrFactType = Me.RDSRelation.ResponsibleFactType
                         End If
-                    Else
-                        lrFactType = Me.RDSRelation.ResponsibleFactType
-                    End If
-
-                    Dim lrFactTypeReading As FBM.FactTypeReading = Nothing
-                    Dim lsPredicate As String = Nothing
+                    Catch ex As Exception
+                        lsPredicate = "Error finding Fact Type for Relation"
+                        GoTo SetPredicateNoMatterWhat
+                    End Try
 
                     If lrFactType.FactTypeReading.Count = 0 Then
                         'There is no predicate to set.
@@ -414,7 +418,7 @@ Namespace PGS
                         End If
                         '============================================================
                     Next
-
+SetPredicateNoMatterWhat:
                     Me.Link.Text = lsPredicate
 
 
@@ -485,8 +489,11 @@ Namespace PGS
                 Me.Page.Diagram.Links.Remove(Me.Link)
 
                 Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link
-                Me.Page.Diagram.Links.Remove(lrDiagramingLink)
-                lrDiagramingLink.Dispose()
+                If lrDiagramingLink IsNot Nothing Then
+                    Me.Page.Diagram.Links.Remove(lrDiagramingLink)
+                    lrDiagramingLink.Dispose()
+                End If
+
                 Me.Page.Diagram.Invalidate()
 
             Catch ex As Exception

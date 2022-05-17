@@ -862,6 +862,7 @@ Namespace FBM
         Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
 
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
+            Dim lsMessage As String
 
             Try
 
@@ -896,7 +897,21 @@ Namespace FBM
                     lrFactTypeInstance.DerivationText = .DerivationText
                     lrFactTypeInstance.IsLinkFactType = .IsLinkFactType
                     If .IsLinkFactType Then
-                        lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = .LinkFactTypeRole.Id)
+                        Dim lrPage = arPage
+                        If .LinkFactTypeRole IsNot Nothing Then
+                            lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = .LinkFactTypeRole.Id)
+                        Else
+                            lrFactTypeInstance.LinkFactTypeRole = Nothing
+                            lrFactTypeInstance.IsLinkFactType = False
+                            lsMessage = lrFactTypeInstance.Id & " was listed as a Link Fact Type, but had no Link Fact Type Role."
+                            lsMessage.AppendDoubleLineBreak("Do you want to flag the Fact Type for removal from the Model (recommended)?")
+                            lsMessage.AppendDoubleLineBreak("Boston will change the Fact Type to a regular Fact Type if you don't, so you can decide whether to remove the Fact Type from Model from within the Model Dictionary toolbox.")
+                            If prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                TableFactType.DeleteFactType(lrFactTypeInstance.FactType)
+                            Else
+                                lrFactTypeInstance.IsLinkFactType = False
+                            End If
+                        End If
                     End If
 
                     If abAddToPage Then
@@ -966,7 +981,6 @@ Namespace FBM
                 Return lrFactTypeInstance
 
             Catch ex As Exception
-                Dim lsMessage As String
                 lsMessage = "Error: tFactType.CloneInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
