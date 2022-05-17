@@ -1673,12 +1673,12 @@ Namespace FBM
                     OutputList.Add(lrValueTypeInstance)
                 Next
 
-                For Each lrEntityTypeInstance In Me.EntityTypeInstance
-                    OutputList.Add(lrEntityTypeInstance)
-                Next
-
                 For Each lrFactTypeInstance In Me.FactTypeInstance
                     OutputList.Add(lrFactTypeInstance)
+                Next
+
+                For Each lrEntityTypeInstance In Me.EntityTypeInstance
+                    OutputList.Add(lrEntityTypeInstance)
                 Next
 
                 If abGetRoleConstraints Then

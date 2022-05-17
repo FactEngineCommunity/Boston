@@ -361,7 +361,6 @@ Namespace PGS
 
         End Sub
 
-
         Public Overrides Function getCorrespondingRDSTable() As RDS.Table
             Return Me.RDSTable
         End Function
@@ -394,29 +393,36 @@ Namespace PGS
 
         End Sub
 
-        Public Sub Moved() Implements FBM.iPageObject.Moved
+        Public Overloads Sub Moved() Implements FBM.iPageObject.Moved
 
         End Sub
 
-        Public Sub NodeDeleting() Implements FBM.iPageObject.NodeDeleting
+        Public Overloads Sub NodeDeleting() Implements FBM.iPageObject.NodeDeleting
 
         End Sub
 
-        Public Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
+        Public Overloads Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
 
             Me.Shape.Image = My.Resources.ORMShapes.Blank
             Me.Shape.Pen.Color = Color.DeepSkyBlue
 
         End Sub
 
-        Public Sub NodeModified() Implements FBM.iPageObject.NodeModified
+        Public Overloads Sub NodeModified() Implements FBM.iPageObject.NodeModified
 
         End Sub
 
-        Public Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
+        Public Overloads Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
+
 
             If Me.Shape IsNot Nothing Then
-                Me.Shape.Pen.Color = Color.Blue
+                If Me.Shape.Selected Then
+                    Me.Shape.Pen.Color = Color.Blue
+                ElseIf Me.ModelError.Count > 0 Then
+                    Me.Shape.Pen.Color = Color.Red
+                Else
+                    Me.Shape.Pen.Color = Color.DeepSkyBlue
+                End If
             End If
 
         End Sub
@@ -451,6 +457,8 @@ Namespace PGS
 
                 If CType(Me.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
                     Me.Shape.Pen.Color = Color.Red
+                ElseIf Me.Shape.Selected Then
+                    Me.Shape.Pen.Color = Color.Blue
                 Else
                     Me.Shape.Pen.Color = Color.DeepSkyBlue
                 End If

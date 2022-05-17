@@ -1160,13 +1160,16 @@ Public Class frmDiagramPGS
     Private Sub Diagram_NodeSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeSelected
 
         Dim lrNode As Object
+        Dim lrPGSNodeType As PGS.Node
 
         lrNode = e.Node.Tag
         lrNode.shape.Image = My.Resources.ORMShapes.Blank
 
         Select Case e.Node.Tag.ConceptType
             Case Is = pcenumConceptType.PGSNode
+                lrPGSNodeType = lrNode
                 e.Node.Pen.Color = Color.Blue
+                Call lrPGSNodeType.NodeSelected()
             Case Else
                 'Do nothing
         End Select
@@ -1246,9 +1249,6 @@ Public Class frmDiagramPGS
         'Set the PropertiesGrid.SeletedObject
         '--------------------------------------
         Dim lrPropertyGridForm As frmToolboxProperties
-
-        Dim lrPGSNodeType As PGS.Node
-        lrPGSNodeType = e.Node.Tag
 
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         If IsSomething(lrPropertyGridForm) Then
@@ -2364,15 +2364,6 @@ Public Class frmDiagramPGS
 
                 'Me.Diagram.AllowUnconnectedLinks = False
 
-                '------------------------------------------------------------------------------
-                'Clear the 'InPlaceEdit' on principal.
-                '  i.e. Is only allowed for 'Processes' and the user clicked on the Canvas,
-                '  so disable the 'InPlaceEdit'.
-                '  NB See Diagram.DoubleClick where if a 'Process' is DoubleClicked on,
-                '  then 'InPlaceEdit' is temporarily allowed.
-                '------------------------------------------------------------------------------
-                Me.DiagramView.AllowInplaceEdit = False
-
                 Call Me.resetNodeAndLinkColors()
             End If
 
@@ -2420,6 +2411,8 @@ Public Class frmDiagramPGS
                         Dim lrPGSNode As PGS.Node = Diagram.Nodes(liInd - 1).Tag
                         If CType(lrPGSNode.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
                             lrPGSNode.Shape.Pen.Color = Color.Red
+                        ElseIf lrPGSNode.Shape.Selected Then
+                            lrPGSNode.Shape.Pen.Color = Color.Blue
                         Else
                             lrPGSNode.Shape.Pen.Color = Color.DeepSkyBlue
                         End If
@@ -3946,6 +3939,109 @@ FinishedPretesting:
                 End If
 
             End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub Diagram_NodeTextEdited(sender As Object, e As EditNodeTextEventArgs) Handles Diagram.NodeTextEdited
+
+        Try
+            Dim lrNodeType As PGS.Node
+            Dim lrModelObject As New FBM.ModelObject
+
+
+            lrNodeType = e.Node.Tag
+            lrModelObject = lrNodeType.RDSTable.FBMModelElement
+
+            'Check Nodes/Tables first before looking at the ORM level.
+            If Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = e.NewText) IsNot Nothing Then
+                If e.NewText = e.OldText Then Exit Sub
+                MsgBox("The name, '" & e.NewText & "', conflicts with a Node Type of the same name in the Model, '" & e.NewText & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                lrNodeType.Shape.Text = e.OldText
+                Exit Sub
+            End If
+
+            Select Case lrModelObject.ConceptType
+                Case Is = pcenumConceptType.EntityType
+
+                    Dim lrEntityType As FBM.EntityType = lrModelObject
+
+                    '------------------------------------------------
+                    'Set the values in the underlying Model.EntityType
+                    '------------------------------------------------
+                    If e.NewText = lrEntityType.Name Then
+                        '------------------------------------------------------------
+                        'Nothing to do. Name of the EntityType has not been changed.
+                        '------------------------------------------------------------
+                    Else
+                        Dim lrEntityTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityType.Model, e.NewText, pcenumConceptType.EntityType)
+                        Dim lrValueTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityType.Model, e.NewText, pcenumConceptType.ValueType)
+                        Dim lrFactTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityType.Model, e.NewText, pcenumConceptType.FactType)
+                        Dim lrRoleConstraintDictionaryEntry As New FBM.DictionaryEntry(lrEntityType.Model, e.NewText, pcenumConceptType.RoleConstraint)
+
+                        If lrEntityType.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("An Entity Type with the name, '" & lrEntityTypeDictionaryEntry.Symbol & "', already exists in the Model, '" & lrEntityType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        ElseIf lrEntityType.Model.ModelDictionary.Exists(AddressOf lrValueTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Value Type of the same name in the Model, '" & lrEntityType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        ElseIf lrEntityType.Model.ModelDictionary.Exists(AddressOf lrFactTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Fact Type of the same name in the Model, '" & lrEntityType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        ElseIf lrEntityType.Model.ModelDictionary.Exists(AddressOf lrRoleConstraintDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & lrEntityType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        Else
+                            If Not lrEntityType.SetName(e.NewText) Then
+                                lrNodeType.Shape.Text = e.OldText
+                            End If
+                        End If
+                    End If
+
+                Case Is = pcenumConceptType.FactType
+                    Dim lrFactType As FBM.FactType
+
+                    lrFactType = lrModelObject
+
+                    If e.NewText = lrFactType.Id Then
+                        '------------------------------------------------------------
+                        'Nothing to do. Name of the FactType has not been changed.
+                        '------------------------------------------------------------
+                    Else
+                        Dim lrEntityTypeDictionaryEntry As New FBM.DictionaryEntry(lrFactType.Model, e.NewText, pcenumConceptType.EntityType)
+                        Dim lrFactTypeDictionaryEntry As New FBM.DictionaryEntry(lrFactType.Model, e.NewText, pcenumConceptType.FactType)
+                        Dim lrValueTypeDictionaryEntry As New FBM.DictionaryEntry(lrFactType.Model, e.NewText, pcenumConceptType.ValueType)
+                        Dim lrRoleConstraintDictionaryEntry As New FBM.DictionaryEntry(lrFactType.Model, e.NewText, pcenumConceptType.RoleConstraint)
+
+                        If lrFactType.Model.ModelDictionary.Exists(AddressOf lrFactTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("A Fact Type with the name, '" & lrFactTypeDictionaryEntry.Symbol & "', already exists in the Model, '" & lrFactType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        ElseIf lrFactType.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Entity Type of the same name in the Model, '" & lrFactType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        ElseIf lrFactType.Model.ModelDictionary.Exists(AddressOf lrValueTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Fact Type of the same name in the Model, '" & lrFactType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        ElseIf lrFactType.Model.ModelDictionary.Exists(AddressOf lrRoleConstraintDictionaryEntry.EqualsByConceptTypeOnly) Then
+                            MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & lrFactType.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
+                            lrNodeType.Shape.Text = e.OldText
+                        Else
+                            If Not lrFactType.setName(e.NewText) Then
+                                lrNodeType.Shape.Text = e.OldText
+                            End If
+                        End If
+                    End If
+            End Select
+
+            Me.Diagram.Invalidate()
 
         Catch ex As Exception
             Dim lsMessage As String

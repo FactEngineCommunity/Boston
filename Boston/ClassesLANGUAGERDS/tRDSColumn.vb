@@ -654,7 +654,7 @@ Namespace RDS
                     ElseIf Me.Role.JoinedORMObject.Id = Me.Table.Name Then
                         lrTable = Me.Table
                     ElseIf Me.Role.FactType.Id = Me.Table.Name Then
-                        lrTable = Me.FactType.getCorrespondingRDSTable
+                        lrTable = Me.Role.FactType.getCorrespondingRDSTable
                     Else
                         'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
                         If Me.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then

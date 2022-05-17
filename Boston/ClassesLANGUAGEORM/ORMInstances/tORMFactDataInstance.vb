@@ -64,7 +64,7 @@ Namespace FBM
         <JsonIgnore()>
         <NonSerialized(),
         XmlIgnore()>
-        Public _Shape As ShapeNode
+        Public WithEvents _Shape As ShapeNode
 
         <JsonIgnore()>
         <XmlIgnore()>

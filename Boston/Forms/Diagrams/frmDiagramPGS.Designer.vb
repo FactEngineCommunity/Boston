@@ -58,6 +58,11 @@ Partial Class frmDiagramPGS
         Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuOption_ViewGrid = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemConvert = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LanguageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertyGraphSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EntityRelationshipDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator16 = New System.Windows.Forms.ToolStripSeparator()
         Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripAttribute = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -95,11 +100,6 @@ Partial Class frmDiagramPGS
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripMenuItemConvert = New System.Windows.Forms.ToolStripMenuItem()
-        Me.LanguageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PropertyGraphSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.EntityRelationshipDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator16 = New System.Windows.Forms.ToolStripSeparator()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.ContextMenuStrip_Node.SuspendLayout()
@@ -320,6 +320,42 @@ Partial Class frmDiagramPGS
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
         Me.ToolStripSeparator5.Size = New System.Drawing.Size(204, 6)
         '
+        'ToolStripMenuItemConvert
+        '
+        Me.ToolStripMenuItemConvert.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LanguageToolStripMenuItem})
+        Me.ToolStripMenuItemConvert.Image = CType(resources.GetObject("ToolStripMenuItemConvert.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItemConvert.Name = "ToolStripMenuItemConvert"
+        Me.ToolStripMenuItemConvert.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemConvert.Text = "Con&vert Page..."
+        '
+        'LanguageToolStripMenuItem
+        '
+        Me.LanguageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem})
+        Me.LanguageToolStripMenuItem.Image = CType(resources.GetObject("LanguageToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem"
+        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.LanguageToolStripMenuItem.Text = "To &Language..."
+        '
+        'PropertyGraphSchemaToolStripMenuItem
+        '
+        Me.PropertyGraphSchemaToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
+        Me.PropertyGraphSchemaToolStripMenuItem.Name = "PropertyGraphSchemaToolStripMenuItem"
+        Me.PropertyGraphSchemaToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
+        Me.PropertyGraphSchemaToolStripMenuItem.Text = "Object-Role Model"
+        '
+        'EntityRelationshipDiagramToolStripMenuItem
+        '
+        Me.EntityRelationshipDiagramToolStripMenuItem.Image = CType(resources.GetObject("EntityRelationshipDiagramToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.EntityRelationshipDiagramToolStripMenuItem.Name = "EntityRelationshipDiagramToolStripMenuItem"
+        Me.EntityRelationshipDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
+        Me.EntityRelationshipDiagramToolStripMenuItem.Text = "&Entity Relationship Diagram"
+        Me.EntityRelationshipDiagramToolStripMenuItem.Visible = False
+        '
+        'ToolStripSeparator16
+        '
+        Me.ToolStripSeparator16.Name = "ToolStripSeparator16"
+        Me.ToolStripSeparator16.Size = New System.Drawing.Size(204, 6)
+        '
         'AutoLayoutToolStripMenuItem
         '
         Me.AutoLayoutToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
@@ -531,6 +567,7 @@ Partial Class frmDiagramPGS
         'DiagramView
         '
         Me.DiagramView.AllowDrop = True
+        Me.DiagramView.AllowInplaceEdit = True
         Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
         Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
         Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.MoveOnly
@@ -538,6 +575,7 @@ Partial Class frmDiagramPGS
         Me.DiagramView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
         Me.DiagramView.Diagram = Me.Diagram
         Me.DiagramView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DiagramView.InplaceEditAcceptOnEnter = True
         Me.DiagramView.Location = New System.Drawing.Point(0, 0)
         Me.DiagramView.Margin = New System.Windows.Forms.Padding(2)
         Me.DiagramView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
@@ -566,42 +604,6 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.Size = New System.Drawing.Size(938, 524)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ToolStripMenuItemConvert
-        '
-        Me.ToolStripMenuItemConvert.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LanguageToolStripMenuItem})
-        Me.ToolStripMenuItemConvert.Image = CType(resources.GetObject("ToolStripMenuItemConvert.Image"), System.Drawing.Image)
-        Me.ToolStripMenuItemConvert.Name = "ToolStripMenuItemConvert"
-        Me.ToolStripMenuItemConvert.Size = New System.Drawing.Size(207, 22)
-        Me.ToolStripMenuItemConvert.Text = "Con&vert Page..."
-        '
-        'LanguageToolStripMenuItem
-        '
-        Me.LanguageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem})
-        Me.LanguageToolStripMenuItem.Image = CType(resources.GetObject("LanguageToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem"
-        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.LanguageToolStripMenuItem.Text = "To &Language..."
-        '
-        'PropertyGraphSchemaToolStripMenuItem
-        '
-        Me.PropertyGraphSchemaToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
-        Me.PropertyGraphSchemaToolStripMenuItem.Name = "PropertyGraphSchemaToolStripMenuItem"
-        Me.PropertyGraphSchemaToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
-        Me.PropertyGraphSchemaToolStripMenuItem.Text = "Object-Role Model"
-        '
-        'EntityRelationshipDiagramToolStripMenuItem
-        '
-        Me.EntityRelationshipDiagramToolStripMenuItem.Image = CType(resources.GetObject("EntityRelationshipDiagramToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.EntityRelationshipDiagramToolStripMenuItem.Name = "EntityRelationshipDiagramToolStripMenuItem"
-        Me.EntityRelationshipDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
-        Me.EntityRelationshipDiagramToolStripMenuItem.Text = "&Entity Relationship Diagram"
-        Me.EntityRelationshipDiagramToolStripMenuItem.Visible = False
-        '
-        'ToolStripSeparator16
-        '
-        Me.ToolStripSeparator16.Name = "ToolStripSeparator16"
-        Me.ToolStripSeparator16.Size = New System.Drawing.Size(204, 6)
         '
         'BackgroundWorker
         '

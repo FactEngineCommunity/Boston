@@ -2562,6 +2562,10 @@ SkipRegistrationChecking:
                 If TypeOf (lrForm) Is frmDiagramORM Then
                     Dim lrfrmORMModel As frmDiagramORM
                     lrfrmORMModel = lrForm
+
+                    'CodeSafe
+                    If lrfrmORMModel.DiagramView Is Nothing Then Exit Sub
+
                     lrfrmORMModel.DiagramView.ZoomFactor = ToolStripComboBox_zoom.SelectedItem.itemdata
                     lrfrmORMModel.Diagram.Invalidate()
                     For Each loShapeNode In lrfrmORMModel.Diagram.Nodes
