@@ -3721,6 +3721,8 @@ Public Class frmDiagramPGS
                 With New WaitCursor
                     lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
                     lrValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+                    lrValueType.SetDataTypeLength(lfrmAddAttributeForm.ziDataTypeLength, True)
+                    lrValueType.SetDataTypePrecision(lfrmAddAttributeForm.ziDataTypePrecision, True)
                     lrFactType.RoleGroup(0).SetMandatory(lfrmAddAttributeForm.zbAttributeIsMandatory, True)
                     Dim larRole As New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {"has", ""})

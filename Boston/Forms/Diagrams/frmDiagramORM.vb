@@ -7971,7 +7971,7 @@ Public Class frmDiagramORM
                 Dim lrAdditionalShapeNode As ShapeNode = Nothing
                 Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
 
-                For Each lrAdditionalObject In Me.zrPage.GetAllPageObjects.FindAll(Function(x) larConceptTypes.Contains(x.ConceptType))
+                For Each lrAdditionalObject In Me.zrPage.GetAllPageObjects.FindAll(Function(x) larConceptTypes.Contains(x.ConceptType) And x.Shape IsNot Nothing)
                     If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
                         '---------------------------------------------------------------------------------------------
                         'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
@@ -8070,6 +8070,9 @@ Public Class frmDiagramORM
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.HiddenDiagramView.SendToBack()
+            Me.CircularProgressBar.SendToBack()
         End Try
 
     End Sub
@@ -8187,7 +8190,7 @@ Public Class frmDiagramORM
                 Dim lrAdditionalShapeNode As ShapeNode = Nothing
                 Dim larConceptTypes = {pcenumConceptType.EntityType, pcenumConceptType.FactType}
 
-                For Each lrAdditionalObject In Me.zrPage.GetAllPageObjects.FindAll(Function(x) larConceptTypes.Contains(x.ConceptType))
+                For Each lrAdditionalObject In Me.zrPage.GetAllPageObjects.FindAll(Function(x) larConceptTypes.Contains(x.ConceptType) And x.Shape IsNot Nothing)
                     If lrAdditionalObject.Id = Me.zrPage.SelectedObject(0).Id Then
                         '---------------------------------------------------------------------------------------------
                         'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded

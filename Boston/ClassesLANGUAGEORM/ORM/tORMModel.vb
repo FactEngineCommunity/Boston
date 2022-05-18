@@ -3683,7 +3683,7 @@ FinishedProcessing:
                                            Where Index.ResponsibleRoleConstraint Is lrResponsibleRoleConstraint
                                            Select Index.Table
 
-                            For Each lrTable In larTable
+                            For Each lrTable In larTable.ToArray
                                 '---------------------------------------------------------------
                                 'Remove the Index first, because finds the Index by the Column
                                 Call lrTable.removeIndexByRoleConstraint(arRoleConstraint)

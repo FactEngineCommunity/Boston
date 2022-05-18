@@ -252,8 +252,10 @@ Namespace RDS
 
                 Select Case lrModelObject.ConceptType
                     Case Is = pcenumConceptType.EntityType
-                        'Responsible Role Constraint is either the PrimaryReferenceScheme Role Constraint
-                        '  OR an External Uniqueness Constraint joined to Roles of Fact Types joined to the Entity Type.
+                        'Responsible Role Constraint is either:
+                        '  * the PrimaryReferenceScheme Role Constraint, or
+                        '  * External Uniqueness Constraint joined to Roles of Fact Types joined to the Entity Type, or
+                        '  * The far side of a 1:1 BinaryFactType.
                         Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
                         lrReferenceModeRoleConstraint = CType(lrEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeRoleConstraint
 
@@ -261,9 +263,13 @@ Namespace RDS
                             Dim lrTopmostSupertype = CType(lrEntityType.GetTopmostSupertype, FBM.EntityType)
                             lrReferenceModeRoleConstraint = lrTopmostSupertype.ReferenceModeRoleConstraint
                         End If
-                        If lrEntityType.HasSimpleReferenceScheme Then
+
+                        If lrEntityType.HasSimpleReferenceScheme And Me.Column.Count = 1 Then
                             'PSEUDOCODE
                             ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
+
+                            If Not Me.Column(0).FactType.IsPreferredReferenceMode Then GoTo KeepChecking1
+
                             Dim liMatch = (From IdxColumn In Me.Column
                                            From Role In lrReferenceModeRoleConstraint.Role
                                            Where Role.FactType.RoleGroup.Contains(IdxColumn.Role)
@@ -273,6 +279,8 @@ Namespace RDS
                                 Return lrReferenceModeRoleConstraint
                             End If
                         End If
+
+KeepChecking1:
                         If lrEntityType.HasCompoundReferenceMode Then
                             'PSEUDOCODE
                             ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
@@ -297,7 +305,12 @@ Namespace RDS
                                                Select RoleConstraint Distinct
 
                         If loRoleConstraint.Count > 0 Then
-                            Return loRoleConstraint.First
+                            If loRoleConstraint.Count = 2 And Me.Column(0).FactType.Is1To1BinaryFactType Then
+                                Return loRoleConstraint(1)
+                            Else
+                                Return loRoleConstraint.First
+                            End If
+
                         End If
 
                     'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
