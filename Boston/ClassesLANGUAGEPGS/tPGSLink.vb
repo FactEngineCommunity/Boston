@@ -486,6 +486,10 @@ SetPredicateNoMatterWhat:
         Private Sub RDSRelation_RemovedFromModel() Handles RDSRelation.RemovedFromModel
 
             Try
+                'CodeSafe
+                If Me.Page Is Nothing Then Exit Sub
+                If Me.Page.Diagram Is Nothing Then Exit Sub
+
                 Me.Page.Diagram.Links.Remove(Me.Link)
 
                 Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link

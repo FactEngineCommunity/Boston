@@ -1380,7 +1380,8 @@ Namespace FBM
         Public Overridable Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                     Optional ByVal abCheckForErrors As Boolean = True,
                                                     Optional ByVal abDoDatabaseProcessing As Boolean = True,
-                                                    Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
+                                                    Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
+                                                    Optional ByVal abRemoveIndex As Boolean = True) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
             '----------------------------------------------------
             'Shadowed in tEntityType, tValueType, FBM.tFactType etc
             '----------------------------------------------------

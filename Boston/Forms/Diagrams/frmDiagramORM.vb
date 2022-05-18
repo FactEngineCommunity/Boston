@@ -11960,14 +11960,17 @@ SkipRemovalFromModel:
 
             For Each lrFactTypeReading In lrFactTypeInstance.FactType.getOutgoingFactTypeReadings
 
-                If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
+                If Not lrFactTypeReading.FactType.IsLinkFactType Then
+                    If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
 
-                    Call Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                        Call Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                    End If
                 End If
+
 
             Next
 
-            Call Me.AutoLayout()
+            'Call Me.AutoLayout()
 
         Catch ex As Exception
             Dim lsMessage1 As String

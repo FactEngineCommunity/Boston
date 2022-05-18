@@ -2647,7 +2647,8 @@ FinishedProcessing:
         Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
-                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
+                                                  Optional ByVal abRemoveIndex As Boolean = True
                                                   ) As Boolean
 
             Try

@@ -196,14 +196,28 @@ Namespace ERD
 
         Private Sub RDSRelation_RemovedFromModel() Handles RDSRelation.RemovedFromModel
 
-            If Me.Link Is Nothing Then Exit Sub
-            Me.Page.Diagram.Links.Remove(Me.Link.Link)
-            Me.Page.ERDiagram.Relation.Remove(Me)
+            Try
 
-            Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link.Link
-            lrDiagramingLink.Dispose()
+                If Me.Link Is Nothing Then Exit Sub
+                Me.Page.Diagram.Links.Remove(Me.Link.Link)
+                Me.Page.ERDiagram.Relation.Remove(Me)
 
-            Me.Page.Diagram.Invalidate()
+                Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link.Link
+
+                If lrDiagramingLink IsNot Nothing Then
+                    lrDiagramingLink.Dispose()
+                End If
+
+                Me.Page.Diagram.Invalidate()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

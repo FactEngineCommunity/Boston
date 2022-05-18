@@ -3147,99 +3147,109 @@ Public Class frmDiagramPGS
             '  shape, and to/into another diagram starts at the MorphVector.
             '---------------------------------------------------------------------------------------------
             Me.MorphVector.Clear()
-            Me.MorphVector.Add(New tMorphVector(lrRelation.Link.Link.Bounds.X, lrRelation.Link.Link.Bounds.Y, 0, 0, 40))
+            Dim liX = 10
+            Dim liY = 10
+            Try
+                liX = lrRelation.Link.Link.Bounds.X
+                liY = lrRelation.Link.Link.Bounds.Y
+            Catch
+                liX = 0
+                liY = 0
+            End Try
 
-            '====================================================
-            '--------------------------------------------------------------
-            'Clear the list of ORMDiagrams that may relate to the EntityType
-            '--------------------------------------------------------------
-            Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
-            Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
-            Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
+            Me.MorphVector.Add(New tMorphVector(liX, liY, 0, 0, 40))
 
-            Dim loMenuOption As ToolStripItem
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                '====================================================
+                '--------------------------------------------------------------
+                'Clear the list of ORMDiagrams that may relate to the EntityType
+                '--------------------------------------------------------------
+                Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
+                Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
+                Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
 
-            '--------------------------------------------------------------------------------------------------------
-            'Get the ORM Diagrams for the selected Node.
-            If lrRelation.IsPGSRelationNode Then
-                lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-            Else
-                lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
-            End If
+                Dim loMenuOption As ToolStripItem
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-            For Each lrPage In lrPageList
-                '---------------------------------------------------------------------------------------------------------
-                'Try and find the Page within the EnterpriseView.TreeView
-                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-                '  is not added for those hidden Pages.
-                '----------------------------------------------------------
-                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
-
-                If IsSomething(lrEnterpriseView) Then
-                    '---------------------------------------------------
-                    'Add the Page(Name) to the MenuOption.DropDownItems
-                    '---------------------------------------------------
-                    loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
-                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+                '--------------------------------------------------------------------------------------------------------
+                'Get the ORM Diagrams for the selected Node.
+                If lrRelation.IsPGSRelationNode Then
+                    lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+                Else
+                    lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
                 End If
-            Next
 
-            '--------------------------------------------------------------------------------------------------------
-            'Get the ER Diagrams for the selected Node.
-            If lrRelation.IsPGSRelationNode Then
-                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-            Else
-                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
-            End If
+                For Each lrPage In lrPageList
+                    '---------------------------------------------------------------------------------------------------------
+                    'Try and find the Page within the EnterpriseView.TreeView
+                    '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                    '  is not added for those hidden Pages.
+                    '----------------------------------------------------------
+                    lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-            For Each lrPage In lrPageList
-                '---------------------------------------------------------------------------------------------------------
-                'Try and find the Page within the EnterpriseView.TreeView
-                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-                '  is not added for those hidden Pages.
-                '----------------------------------------------------------
-                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+                    If IsSomething(lrEnterpriseView) Then
+                        '---------------------------------------------------
+                        'Add the Page(Name) to the MenuOption.DropDownItems
+                        '---------------------------------------------------
+                        loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
+                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                        AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+                    End If
+                Next
 
-                If IsSomething(lrEnterpriseView) Then
-                    '---------------------------------------------------
-                    'Add the Page(Name) to the MenuOption.DropDownItems
-                    '---------------------------------------------------
-                    loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
-                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
+                '--------------------------------------------------------------------------------------------------------
+                'Get the ER Diagrams for the selected Node.
+                If lrRelation.IsPGSRelationNode Then
+                    lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+                Else
+                    lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
                 End If
-            Next
 
-            '--------------------------------------------------------------------------------------------------------
-            'Get the PGS Diagrams for the selected Node.
-            If lrRelation.IsPGSRelationNode Then
-                lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-            Else
-                lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
-            End If
+                For Each lrPage In lrPageList
+                    '---------------------------------------------------------------------------------------------------------
+                    'Try and find the Page within the EnterpriseView.TreeView
+                    '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                    '  is not added for those hidden Pages.
+                    '----------------------------------------------------------
+                    lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-            For Each lrPage In lrPageList
-                '---------------------------------------------------------------------------------------------------------
-                'Try and find the Page within the EnterpriseView.TreeView
-                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-                '  is not added for those hidden Pages.
-                '----------------------------------------------------------
-                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+                    If IsSomething(lrEnterpriseView) Then
+                        '---------------------------------------------------
+                        'Add the Page(Name) to the MenuOption.DropDownItems
+                        '---------------------------------------------------
+                        loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
+                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                        AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
+                    End If
+                Next
 
-                If IsSomething(lrEnterpriseView) Then
-                    '---------------------------------------------------
-                    'Add the Page(Name) to the MenuOption.DropDownItems
-                    '---------------------------------------------------
-                    loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
-                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+                '--------------------------------------------------------------------------------------------------------
+                'Get the PGS Diagrams for the selected Node.
+                If lrRelation.IsPGSRelationNode Then
+                    lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+                Else
+                    lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
                 End If
-            Next
 
-        Catch ex As Exception
-            Dim lsMessage As String
+                For Each lrPage In lrPageList
+                    '---------------------------------------------------------------------------------------------------------
+                    'Try and find the Page within the EnterpriseView.TreeView
+                    '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                    '  is not added for those hidden Pages.
+                    '----------------------------------------------------------
+                    lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                    If IsSomething(lrEnterpriseView) Then
+                        '---------------------------------------------------
+                        'Add the Page(Name) to the MenuOption.DropDownItems
+                        '---------------------------------------------------
+                        loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
+                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                        AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             Me.Cursor = Cursors.Default
@@ -3779,47 +3789,50 @@ Public Class frmDiagramPGS
         Try
             Dim lrPGSRelation As ERD.Relation
 
-            lrPGSRelation = Me.zrPage.SelectedObject(0)
+            With New WaitCursor
+                lrPGSRelation = Me.zrPage.SelectedObject(0)
 
-            Dim lrFactType As FBM.FactType = Nothing
-            Dim lbGoForward As Boolean = True
-            If lrPGSRelation.RelationFactType.IsLinkFactType Then
+                Dim lrFactType As FBM.FactType = Nothing
+                Dim lbGoForward As Boolean = True
+                If lrPGSRelation.RelationFactType.IsLinkFactType Then
 
-                Try
-                    lrFactType = lrPGSRelation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                    Try
+                        lrFactType = lrPGSRelation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
 
-                    lbGoForward = lrFactType.getCorrespondingRDSTable.isPGSRelation
-                    GoTo FinishedPretesting
-                Catch ex As Exception
-                    lbGoForward = False
-                    GoTo FinishedPretesting
-                End Try
-            Else
-                lrFactType = lrPGSRelation.RelationFactType
-            End If
+                        lbGoForward = lrFactType.getCorrespondingRDSTable.isPGSRelation
+                        GoTo FinishedPretesting
+                    Catch ex As Exception
+                        lbGoForward = False
+                        GoTo FinishedPretesting
+                    End Try
+                Else
+                    lrFactType = lrPGSRelation.RelationFactType
+                End If
 
-            'CodeSafe
-            If Not (lrFactType.IsManyTo1BinaryFactType Or lrFactType.Is1To1BinaryFactType) Then Exit Sub
+                'CodeSafe
+                If Not (lrFactType.IsManyTo1BinaryFactType Or lrFactType.Is1To1BinaryFactType) Then Exit Sub
 
 FinishedPretesting:
-            If lbGoForward Then
+                If lbGoForward Then
 
 
-                For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint.ToArray
-                    Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
-                Next
-                Dim larRole As List(Of FBM.Role) = lrFactType.RoleGroup.ToList
-                Call lrFactType.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
-                Call lrFactType.Objectify()
-                For Each lrRole In lrFactType.RoleGroup
+                    For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint.ToArray
+                        Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
+                    Next
+                    Dim larRole As List(Of FBM.Role) = lrFactType.RoleGroup.ToList
+                    Call lrFactType.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
+                    Call lrFactType.Objectify()
+                    For Each lrRole In lrFactType.RoleGroup
 
-                    Select Case lrRole.TypeOfJoin
-                        Case Is = pcenumRoleJoinType.ValueType
-                        Case Else
-                            Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(lrFactType)
-                    End Select
-                Next
-            End If
+                        Select Case lrRole.TypeOfJoin
+                            Case Is = pcenumRoleJoinType.ValueType
+                            Case Else
+                                Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(lrFactType)
+                        End Select
+                    Next
+                End If
+
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String

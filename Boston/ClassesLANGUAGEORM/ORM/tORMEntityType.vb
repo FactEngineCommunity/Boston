@@ -1089,7 +1089,7 @@ Namespace FBM
                         Dim lrModelElement = lrLFKRole.JoinedORMObject
 
                         Dim larColumn = From Column In lrFactType.getCorrespondingRDSTable.Column
-                                        Where Column.FactType.Id = lrLinkFactType.Id
+                                        Where Column.Role.FactType.Id = lrLinkFactType.Id
                                         Where Not larProcessedColumn.Contains(Column)
                                         Select Column
 
@@ -2193,7 +2193,8 @@ Namespace FBM
         Public Overrides Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
-                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True) As Boolean
+                                                  Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
+                                                  Optional ByVal abRemoveIndex As Boolean = True) As Boolean
 
             Dim lrEntityType As FBM.EntityType
             Dim lrSubtype As FBM.tSubtypeRelationship

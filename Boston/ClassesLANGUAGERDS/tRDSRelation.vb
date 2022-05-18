@@ -410,9 +410,19 @@ Namespace RDS
 
         Private Sub ResponsibleFactType_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleFactType.RemovedFromModel
 
-            Me.Model.Relation.Remove(Me)
+            Try
 
-            RaiseEvent RemovedFromModel()
+                Me.Model.Relation.Remove(Me)
+
+                RaiseEvent RemovedFromModel()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
