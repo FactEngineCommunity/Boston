@@ -403,7 +403,7 @@ Namespace PGS
                         lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
                     End If
 
-                    For Each lrColumn In lrRDSTable.Column
+                    For Each lrColumn In lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
                         '============================================================
                         'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
                         '    'Don't show the Column
@@ -507,6 +507,21 @@ SetPredicateNoMatterWhat:
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelation_ResponsibleFactTypeFactTypeReadingModified() Handles RDSRelation.ResponsibleFactTypeFactTypeReadingModified
+
+            Try
+                Call Me.setPredicate()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

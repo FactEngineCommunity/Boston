@@ -831,12 +831,23 @@ Namespace FBM
 
         Public Overridable Function RemoveFromPage() As Boolean
 
-            Me.Fact.Data.Remove(Me)
+            Try
+                Me.Fact.Data.Remove(Me)
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
-            TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Data, pcenumConceptType.Value)
+                TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
 
-            Return True
+                Return True
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
 
         End Function
 

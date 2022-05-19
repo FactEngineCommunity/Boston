@@ -1,69 +1,71 @@
 ﻿Imports System.Reflection
 Imports System.Xml.Serialization
+Imports Boston.FBM
 
 Namespace RDS
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Relation
         Implements IEquatable(Of RDS.Relation)
 
         Public Model As RDS.Model
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Id As String = System.Guid.NewGuid.ToString
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public OriginTable As RDS.Table
 
         Public OriginColumns As New List(Of RDS.Column)
         Public ReverseOriginColumns As New List(Of RDS.Column) 'For 1:1 Binary Relations
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public OriginMultiplicity As pcenumCMMLMultiplicity
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public RelationOriginIsMandatory As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public OriginPredicate As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ContributesToPrimaryKey As Boolean = False
 
         <XmlIgnore()>
         <NonSerialized()>
         Public WithEvents DestinationTable As RDS.Table
 
-        <XmlElement()> _
+        <XmlElement()>
         Public DestinationColumns As New List(Of RDS.Column)
         Public ReverseDestinationColumns As New List(Of RDS.Column) 'For 1:1 Binary Relations
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public DestinationMultiplicity As pcenumCMMLMultiplicity
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public RelationDestinationIsMandatory As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public DestinationPredicate As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public EnforceReferentialIntegrity As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public CascadingDelete As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public CascadingUpdate As Boolean = False
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public WithEvents ResponsibleFactType As FBM.FactType
 
         Public Event DestinationMandatoryChanged(ByVal abDestinationIsMandatory As Boolean)
         Public Event DestinationMultiplicityChanged(ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity)
         Public Event ResponsibleFactTypeChanged(ByRef arNewResponsibleFactType As FBM.FactType)
+        Public Event ResponsibleFactTypeFactTypeReadingModified()
         Public Event DestinationPredicateChanged(ByVal asPredicate As String)
         Public Event DestinationTableChanged(ByRef arTable As RDS.Table)
         Public Event OriginMandatoryChanged(ByVal abOriginIsMandatory As Boolean)
@@ -690,6 +692,13 @@ Namespace RDS
             End Try
 
         End Sub
+
+        Private Sub ResponsibleFactType_FactTypeReadingModified(ByRef arFactTypeReading As FactTypeReading) Handles ResponsibleFactType.FactTypeReadingModified
+
+            RaiseEvent ResponsibleFactTypeFactTypeReadingModified()
+
+        End Sub
+
     End Class
 
 End Namespace

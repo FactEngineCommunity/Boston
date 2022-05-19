@@ -682,6 +682,35 @@ Namespace PGS
             Throw New NotImplementedException()
         End Sub
 
+        Public Overrides Function RemoveFromPage() As Boolean
+
+            Try
+
+                Call MyBase.RemoveFromPage()
+
+                If Me.Shape IsNot Nothing Then
+
+                    'CodeSafe
+                    If Me.Page.Diagram Is Nothing Then Return False
+
+                    Call Me.Page.Diagram.Nodes.Remove(Me.Shape)
+                End If
+
+                Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Private Sub RDSTable_JoinedFactTypeObjectified(ByRef arFactType As FBM.FactType) Handles RDSTable.JoinedFactTypeObjectified
 
             Try
@@ -689,12 +718,19 @@ Namespace PGS
 
                 Dim larPGSNodeType = From NodeType In Me.Page.ERDiagram.Entity
                                      Where lrFactType.RoleGroup.Select(Function(x) x.JoinedORMObject.Id).Contains(NodeType.Name)
-                                     Where NodeType.Name <> Me.Name
+                                     Where NodeType.Name = Me.Name
                                      Select NodeType
 
-                Dim lrPGSNodeType As PGS.Node = Nothing
+
                 If larPGSNodeType.Count = 1 Then
-                    Call Me.Page.LoadPGSNodeTypeFromRDSTable(arFactType.getCorrespondingRDSTable, New PointF(10, 10))
+                    'Check to see if the Node for the Table of the FactType is on the Page
+                    Dim lrTable = arFactType.getCorrespondingRDSTable
+
+                    If lrTable IsNot Nothing Then
+                        If Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name) Is Nothing Then
+                            Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrTable, New PointF(10, 10))
+                        End If
+                    End If
                 End If
 
             Catch ex As Exception

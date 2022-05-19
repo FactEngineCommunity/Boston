@@ -3715,22 +3715,23 @@ FinishedProcessing:
                                 Dim larIncomingRelations As New List(Of RDS.Relation)
                                 larIncomingRelations = lrTable.getIncomingRelations()
 
-                                For Each lrRelation In larIncomingRelations
-                                    Call Me.RDS.removeRelation(lrRelation)
-                                Next
+                                If lrTable.Column.Count = 0 Then
+                                    For Each lrRelation In larIncomingRelations
+                                        Call Me.RDS.removeRelation(lrRelation)
+                                    Next
 
-                                Dim larOutgoingRelations As New List(Of RDS.Relation)
-                                larOutgoingRelations = lrTable.getOutgoingRelations()
+                                    Dim larOutgoingRelations As New List(Of RDS.Relation)
+                                    larOutgoingRelations = lrTable.getOutgoingRelations()
 
-                                For Each lrRelation In larOutgoingRelations
-                                    Call Me.RDS.removeRelation(lrRelation)
-                                Next
+                                    For Each lrRelation In larOutgoingRelations
+                                        Call Me.RDS.removeRelation(lrRelation)
+                                    Next
 
-                                Call Me.RDS.removeTable(lrTable)
-
+                                    Call Me.RDS.removeTable(lrTable)
+                                End If
                             ElseIf lrFactType.Arity = 2 And Not abReplacingRoleConstraint Then
 
-                                Dim lrResponsibleRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
+                                    Dim lrResponsibleRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
                                 Dim larColumn = From Table In Me.RDS.Table
                                                 From Column In Table.Column

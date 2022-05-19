@@ -503,10 +503,16 @@ Namespace RDS
 
         Public Function CountNonValueTypeColumns() As Integer
 
+            'NB May be Fundamentally flawed. Will always return Valuetype Columns
+
             Try
-                Return Me.Column.FindAll(Function(x) Not x.ActiveRole.HasInternalUniquenessConstraint _
-                                                     And x.ActiveRole.JoinedORMObject.GetType = GetType(FBM.ValueType) _
-                                                     And x.Role.FactType Is x.ActiveRole.FactType).Count
+                Dim larColumn = From Column In Me.Column
+                                Where Column.ActiveRole.HasInternalUniquenessConstraint
+                                Where Column.ActiveRole.JoinedORMObject IsNot Nothing
+                                Where Column.ActiveRole.JoinedORMObject.GetType = GetType(FBM.ValueType)
+                                Where Column.Role.FactType Is Column.ActiveRole.FactType
+
+                Return larColumn.Count
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -515,6 +521,8 @@ Namespace RDS
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return 0
             End Try
 
         End Function

@@ -3739,6 +3739,8 @@ Public Class frmDiagramPGS
                     lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
                     Dim lsNewName As String = lrFactType.MakeNameFromFactTypeReadings()
                     Call lrFactType.setName(lsNewName, True)
+
+                    Call Me.resetNodeAndLinkColors()
                 End With
             Else
                 Call lrFactType.RemoveFromModel(True, False)
@@ -3815,7 +3817,6 @@ Public Class frmDiagramPGS
 FinishedPretesting:
                 If lbGoForward Then
 
-
                     For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint.ToArray
                         Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
                     Next
@@ -3831,6 +3832,8 @@ FinishedPretesting:
                         End Select
                     Next
                 End If
+
+                Call Me.resetNodeAndLinkColors()
 
             End With
 
