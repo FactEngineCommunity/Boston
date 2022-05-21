@@ -971,7 +971,7 @@ Namespace FBM
 
                     For Each lrRoleConstraint In Me.InternalUniquenessConstraint
 
-                        lrRoleConstraintInstance = lrRoleConstraint.CloneUniquenessConstraintInstance(arPage, abAddToPage)
+                        lrRoleConstraintInstance = lrRoleConstraint.CloneUniquenessConstraintInstance(arPage, abAddToPage, lrFactTypeInstance)
 
                         lrFactTypeInstance.InternalUniquenessConstraint.AddUnique(lrRoleConstraintInstance)
                     Next

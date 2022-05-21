@@ -881,6 +881,30 @@ Namespace My
                 Me("KeywordExtractionStopListLocation") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute(".Id")>  _
+        Public Property DefaultReferenceMode() As String
+            Get
+                Return CType(Me("DefaultReferenceMode"),String)
+            End Get
+            Set
+                Me("DefaultReferenceMode") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property UseDefaultReferenceModeNewEntityTypes() As Boolean
+            Get
+                Return CType(Me("UseDefaultReferenceModeNewEntityTypes"),Boolean)
+            End Get
+            Set
+                Me("UseDefaultReferenceModeNewEntityTypes") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

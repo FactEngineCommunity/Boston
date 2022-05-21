@@ -15,6 +15,8 @@ Public Class frmKeywordExtraction
 
 	Private lvwColumnSorter As ListViewColumnSorter
 	Public zrModel As FBM.Model
+	Dim mfrmFindDialog As New frmTextboxFind()
+
 	''' <summary>
 	''' Changed with the user clicks on a keyword.
 	''' </summary>
@@ -138,14 +140,14 @@ Public Class frmKeywordExtraction
 
 
 	Private Sub StandardizationButton_Click(sender As Object, e As EventArgs) Handles StandardizationButton.Click
-		CloseButton()
+		CloseButtons()
 		MyData.TheDoc = MyFun.DocStandardization(MyData.TheDoc)
 		StatusLabel.Text = "Document standardization process has been completed."
 		OpenButton()
 	End Sub
 
 	Private Sub RemoveStopButton_Click(sender As Object, e As EventArgs) Handles RemoveStopButton.Click
-		CloseButton()
+		CloseButtons()
 		MessageBox.Show("Tip: If the document is longer, it may take you few minutes, please be patient ...", "Prompt", 0, MessageBoxIcon.Asterisk)
 		MyData.TheDoc = MyFun.RemoveStop(MyData.TheDoc)
 		StatusLabel.Text = "Remove stop-words has been completed."
@@ -160,7 +162,7 @@ Public Class frmKeywordExtraction
 
 	Private Sub DoWork()
 		SyncLock Me
-			CloseButton()
+			CloseButtons()
 
 			Dim dt1 As DateTime = DateTime.Now
 
@@ -237,7 +239,7 @@ Public Class frmKeywordExtraction
 		KeywordExtractionNormalButton.Enabled = True
 	End Sub
 
-	Private Sub CloseButton()
+	Private Sub CloseButtons()
 		SelectFileButton.Enabled = False
 		SaveButton.Enabled = False
 		StandardizationButton.Enabled = False
@@ -335,7 +337,7 @@ Public Class frmKeywordExtraction
 
 	Private Sub DoWork_Normal()
 		SyncLock Me
-			CloseButton()
+			CloseButtons()
 
 			Dim dt1 As DateTime = DateTime.Now
 
@@ -543,7 +545,103 @@ Public Class frmKeywordExtraction
 			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
+	End Sub
 
+	Private Sub TextRichTextBox_MouseDown(sender As Object, e As MouseEventArgs) Handles TextRichTextBox.MouseDown
+
+		Try
+			Me.TextRichTextBox.ContextMenuStrip = Me.ContextMenuStripTextbox
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
 
 	End Sub
+
+	Private Sub FindToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FindToolStripMenuItem.Click
+
+		Try
+			If mfrmFindDialog Is Nothing Then mfrmFindDialog = New frmTextboxFind()
+			mfrmFindDialog.mRichTextBox = Me.TextRichTextBox
+			Me.TextRichTextBox.HideSelection = False
+			mfrmFindDialog.ShowDialog()
+			Me.TextRichTextBox.Focus()
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItemAddAsEntityType_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAddAsEntityType.Click
+
+		Try
+			With New WaitCursor
+				If Me.zrSelectedModelElement IsNot Nothing Then
+					MsgBox(Me.zrSelectedModelElement.Id & " is already within the Model.")
+					Exit Sub
+				End If
+
+				Dim liIndex As Integer = Me.ResultListView.SelectedItems(0).Index
+				Dim lsEntityTypeName As String = Me.ResultListView.SelectedItems(0).SubItems(1).Text
+				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
+
+				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+				Dim liDataTypeLength As Integer = 50
+				Dim liDataTypePrecision As Integer = 0
+
+				Dim lrEntityType As FBM.EntityType
+				lrEntityType = Me.zrModel.CreateEntityType(lsEntityTypeName, True, True)
+
+				If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+
+					Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode, False, Nothing, True, liDataType, False, False)
+
+					If lrEntityType.getDataType = pcenumORMDataType.DataTypeNotSet Then
+						Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType)
+					End If
+
+					Call lrEntityType.ReferenceModeValueType.SetDataTypeLength(liDataTypeLength)
+					Call lrEntityType.ReferenceModeValueType.SetDataTypePrecision(liDataTypePrecision)
+
+				End If
+
+				MyData.WordsFre(liIndex).IsInModel = True
+				Dim loFont = New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
+				Me.ResultListView.SelectedItems(0).Font = loFont
+				Me.ResultListView.SelectedItems(0).ForeColor = Color.RoyalBlue
+
+				'-------------------------------------------------------
+				'ORM Verbalisation
+				'-------------------------------------------------------
+				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+
+				If IsSomething(lrToolboxForm) Then
+					lrToolboxForm.zrModel = Me.zrModel
+					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
+				End If
+			End With
+
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
 End Class

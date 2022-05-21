@@ -209,5 +209,11 @@
     <Setting Name="KeywordExtractionStopListLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\keywordextraction\StopList.txt</Value>
     </Setting>
+    <Setting Name="DefaultReferenceMode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.Id</Value>
+    </Setting>
+    <Setting Name="UseDefaultReferenceModeNewEntityTypes" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

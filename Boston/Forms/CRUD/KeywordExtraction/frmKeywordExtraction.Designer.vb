@@ -45,7 +45,10 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemAddAsEntityType = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemAddAsValueType = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemViewInORMVerbaliser = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ContextMenuStripTextbox = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.FindToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripKeyword.SuspendLayout()
+        Me.ContextMenuStripTextbox.SuspendLayout()
         Me.SuspendLayout()
         '
         'HelpButton
@@ -219,7 +222,7 @@ Partial Class frmKeywordExtraction
         'ToolStripMenuItemAddAsValueType
         '
         Me.ToolStripMenuItemAddAsValueType.Name = "ToolStripMenuItemAddAsValueType"
-        Me.ToolStripMenuItemAddAsValueType.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemAddAsValueType.Size = New System.Drawing.Size(154, 22)
         Me.ToolStripMenuItemAddAsValueType.Text = "...as Value Type"
         '
         'ToolStripMenuItemViewInORMVerbaliser
@@ -227,6 +230,19 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemViewInORMVerbaliser.Name = "ToolStripMenuItemViewInORMVerbaliser"
         Me.ToolStripMenuItemViewInORMVerbaliser.Size = New System.Drawing.Size(195, 22)
         Me.ToolStripMenuItemViewInORMVerbaliser.Text = "View in ORM &Verbaliser"
+        '
+        'ContextMenuStripTextbox
+        '
+        Me.ContextMenuStripTextbox.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FindToolStripMenuItem})
+        Me.ContextMenuStripTextbox.Name = "ContextMenuStripTextbox"
+        Me.ContextMenuStripTextbox.Size = New System.Drawing.Size(138, 26)
+        '
+        'FindToolStripMenuItem
+        '
+        Me.FindToolStripMenuItem.Name = "FindToolStripMenuItem"
+        Me.FindToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
+        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.FindToolStripMenuItem.Text = "&Find"
         '
         'frmKeywordExtraction
         '
@@ -249,6 +265,7 @@ Partial Class frmKeywordExtraction
         Me.Name = "frmKeywordExtraction"
         Me.Text = "Keyword Extraction"
         Me.ContextMenuStripKeyword.ResumeLayout(False)
+        Me.ContextMenuStripTextbox.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -276,4 +293,6 @@ Partial Class frmKeywordExtraction
     Friend WithEvents ToolStripMenuItemAddAsEntityType As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAddAsValueType As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemViewInORMVerbaliser As ToolStripMenuItem
+    Friend WithEvents ContextMenuStripTextbox As ContextMenuStrip
+    Friend WithEvents FindToolStripMenuItem As ToolStripMenuItem
 End Class

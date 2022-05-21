@@ -1319,6 +1319,12 @@
     <Compile Include="Forms\Diagrams\frmDiagramSTD.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\frmTextboxFind.Designer.vb">
+      <DependentUpon>frmTextboxFind.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmTextboxFind.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DialogBoxes\frmDialogSelectValueTypeState.Designer.vb">
       <DependentUpon>frmDialogSelectValueTypeState.vb</DependentUpon>
     </Compile>
@@ -2130,6 +2136,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramSTD.resx">
       <DependentUpon>frmDiagramSTD.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmTextboxFind.resx">
+      <DependentUpon>frmTextboxFind.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmDialogSelectValueTypeState.resx">
       <DependentUpon>frmDialogSelectValueTypeState.vb</DependentUpon>

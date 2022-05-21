@@ -1707,7 +1707,9 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneUniquenessConstraintInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As tUniquenessConstraint
+        Public Function CloneUniquenessConstraintInstance(ByRef arPage As FBM.Page,
+                                                          Optional ByVal abAddToPage As Boolean = False,
+                                                          Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As tUniquenessConstraint
 
             Dim lrRoleConstraintInstance As New tUniquenessConstraint
 
@@ -1750,7 +1752,7 @@ Namespace FBM
                         '--------------------------------------------------------------------
                         Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, Me)
                         lrRoleConstraintRole = Me.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.Equals)
-                        lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(arPage, lrRoleConstraintInstance) 'New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
+                        lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(arPage, lrRoleConstraintInstance, abAddToPage, arFactTypeInstance) 'New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
                         lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
                     Next
 

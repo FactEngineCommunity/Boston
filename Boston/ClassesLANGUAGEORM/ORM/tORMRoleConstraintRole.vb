@@ -139,7 +139,10 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal arRoleConstraintInstance As FBM.RoleConstraintInstance = Nothing) As FBM.RoleConstraintRoleInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page,
+                                              Optional ByRef arRoleConstraintInstance As FBM.RoleConstraintInstance = Nothing,
+                                              Optional ByVal abAddToPage As Boolean = False,
+                                              Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As FBM.RoleConstraintRoleInstance
 
             Dim lrRoleConstraintRoleInstance As New FBM.RoleConstraintRoleInstance
 
@@ -159,9 +162,18 @@ Namespace FBM
 
                     Dim lrRoleInstance As New FBM.RoleInstance(.Model, arPage)
                     lrRoleInstance.Id = Me.Role.Id
-                    lrRoleConstraintRoleInstance.Role = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
 
-                    lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                    If abAddToPage Then
+                        lrRoleConstraintRoleInstance.Role = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                        lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                    ElseIf arFactTypeInstance IsNot Nothing Then
+                        lrRoleConstraintRoleInstance.Role = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleInstance.Id)
+                        lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                    Else
+                        'Last Resort
+                        lrRoleConstraintRoleInstance.Role = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                        lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                    End If
 
                     Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance()
                     lrRoleConstraintInstance.Id = .RoleConstraint.Id
