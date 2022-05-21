@@ -1503,7 +1503,6 @@ Namespace FBM
                                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
 
             Try
-
                 Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
 
                 lrSubtypeRelationship.Model = Me.Model

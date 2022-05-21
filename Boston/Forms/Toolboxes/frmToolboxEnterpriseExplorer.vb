@@ -4721,4 +4721,29 @@ Public Class frmToolboxEnterpriseExplorer
         End Try
 
     End Sub
+
+    Private Sub KeywordExtractionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles KeywordExtractionToolStripMenuItem.Click
+
+        Dim lrModel As FBM.Model
+
+        Try
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = New FBM.Model
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            Call frmMain.LoadKeywordExtractionTool(lrModel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

@@ -27,6 +27,8 @@ Namespace RDS
                 Else
                     If Me.FBMModelElement.IsDatabaseReservedWord Then
                         Return "[" & Me.FBMModelElement.DatabaseName & "]"
+                    ElseIf My.Settings.UseSquareBracketsSQL And Me.FBMModelElement.DatabaseName.Contains(" ") Then
+                        Return "[" & Me.FBMModelElement.DatabaseName & "]"
                     Else
                         Return Me.FBMModelElement.DatabaseName
                     End If

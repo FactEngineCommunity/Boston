@@ -75,7 +75,6 @@ Public Class frmFactEngine
 
     End Sub
 
-
     Public Function KeyCodeToUnicode(ByVal key As Keys) As String
         Dim keyboardState As Byte() = New Byte(254) {}
         Dim keyboardStateStatus As Boolean = GetKeyboardState(keyboardState)
@@ -1445,6 +1444,8 @@ Public Class frmFactEngine
 
                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(lrLastModelElementNameParseNode.Token.Text))
 
+                Dim liCurrentContext As FEQL.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
+
                 If lrModelElement Is Nothing Then
                     'Nothing to do here
                 Else
@@ -1571,7 +1572,13 @@ Public Class frmFactEngine
                                     lrPredicateModelObject = lrlastModelElement
                                 End If
 
-                                Dim larFactTypeReading2 = lrModelElement.getPartialFactTypeReadings()
+                                Dim larFactTypeReading2 As List(Of FBM.FactTypeReading)
+
+                                If liCurrentContext = FEQL.TokenType.KEYWDTHAT Then
+                                    larFactTypeReading2 = lrModelElement.getOutgoingFactTypeReadings
+                                Else
+                                    larFactTypeReading2 = lrModelElement.getPartialFactTypeReadings()
+                                End If
 
                                 larPredicatePart = From FactTypeReading In larFactTypeReading2
                                                    From PredicatePart In FactTypeReading.PredicatePart
@@ -1584,23 +1591,25 @@ Public Class frmFactEngine
                                     Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, True)
                                 Next
 
-                                larFactTypeReading2 = lrFirstModelElement.getOutgoingFactTypeReadings()
+                                If Not liCurrentContext = FEQL.TokenType.KEYWDTHAT Then
+                                    larFactTypeReading2 = lrFirstModelElement.getOutgoingFactTypeReadings()
 
-                                larPredicatePart = From FactTypeReading In larFactTypeReading2
-                                                   From PredicatePart In FactTypeReading.PredicatePart
-                                                   Where PredicatePart.Role.JoinedORMObject.Id = lrFirstModelElement.Id
-                                                   Where PredicatePart.SequenceNr < FactTypeReading.PredicatePart.Count
-                                                   Select PredicatePart
+                                    larPredicatePart = From FactTypeReading In larFactTypeReading2
+                                                       From PredicatePart In FactTypeReading.PredicatePart
+                                                       Where PredicatePart.Role.JoinedORMObject.Id = lrFirstModelElement.Id
+                                                       Where PredicatePart.SequenceNr < FactTypeReading.PredicatePart.Count
+                                                       Select PredicatePart
 
-                                For Each lrPredicatePart In larPredicatePart
-                                    Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
-                                    If lrPredicatePart.PredicatePartText.StartsWith(Me.zsIntellisenseBuffer) Then
-                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, True, True)
-                                    Else
-                                        Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
-                                    End If
+                                    For Each lrPredicatePart In larPredicatePart
+                                        Dim lrNextPredicatePart = lrPredicatePart.FactTypeReading.PredicatePart(lrPredicatePart.SequenceNr)
+                                        If lrPredicatePart.PredicatePartText.StartsWith(Me.zsIntellisenseBuffer) Then
+                                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, True, True)
+                                        Else
+                                            Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, FEQL.TokenType.PREDICATE, False, lrNextPredicatePart.Role.JoinedORMObject.Id, False)
+                                        End If
 
-                                Next
+                                    Next
+                                End If
 
                                 If lrPredicateModelObject IsNot Nothing Then
 

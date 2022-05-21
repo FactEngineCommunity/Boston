@@ -857,6 +857,30 @@ Namespace My
                 Me("PGSShapeLibrary") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property UseSquareBracketsSQL() As Boolean
+            Get
+                Return CType(Me("UseSquareBracketsSQL"),Boolean)
+            End Get
+            Set
+                Me("UseSquareBracketsSQL") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute(".\keywordextraction\StopList.txt")>  _
+        Public Property KeywordExtractionStopListLocation() As String
+            Get
+                Return CType(Me("KeywordExtractionStopListLocation"),String)
+            End Get
+            Set
+                Me("KeywordExtractionStopListLocation") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

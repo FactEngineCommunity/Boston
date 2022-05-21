@@ -120,7 +120,8 @@ Namespace FBM
                     lrFactTypeInstance.Id = .FactType.Id
                     lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
                     If lrFactTypeInstance Is Nothing Then
-                        lrFactTypeInstance = .FactType.CloneInstance(arPage, abAddToPage)
+                        lrFactTypeInstance = .FactType.CloneInstance(arPage, True)
+                        lrFactTypeInstance.Hide()
                     End If
                     lrSubtypeRelationshipInstance.FactType = lrFactTypeInstance
                     lrSubtypeRelationshipInstance.FactType.SubtypeRelationshipInstance = lrSubtypeRelationshipInstance

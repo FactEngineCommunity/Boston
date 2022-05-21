@@ -1006,7 +1006,16 @@ Namespace FactEngine
                                     loFieldValue = ""
                                 End If
                             Case Is = GetType(DateTime)
-                                loFieldValue = lrSQLiteDataReader.GetDateTime(liInd).ToString(Me.DateTimeFormat)
+                                Try
+                                    loFieldValue = lrSQLiteDataReader.GetDateTime(liInd).ToString(Me.DateTimeFormat)
+                                Catch ex As Exception
+                                    Try
+                                        loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                                    Catch ex1 As Exception
+                                        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
+                                        loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                                    End Try
+                                End Try
                             Case Else
                                 Try
                                     loFieldValue = lrSQLiteDataReader.GetValue(liInd)

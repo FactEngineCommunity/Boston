@@ -1531,6 +1531,18 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadKeywordExtractionTool(ByRef arModel As FBM.Model)
+
+        Dim child As New frmKeywordExtraction
+
+        child.MdiParent = Me
+
+        child.zrModel = arModel
+
+        child.Show(Me.DockPanel)
+
+    End Sub
+
     Public Sub LoadCRUDModel(ByRef arModel As FBM.Model)
 
         Dim child As New frmCRUDModel
@@ -2206,7 +2218,7 @@ SkipRegistrationChecking:
     End Function
 
 
-    Sub loadToolboxORMVerbalisationForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+    Public Function loadToolboxORMVerbalisationForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxORMVerbalisation
 
         Dim child As New frmToolboxORMVerbalisation
 
@@ -2219,6 +2231,7 @@ SkipRegistrationChecking:
                 'child.Show()
                 child.BringToFront()
 
+                Return child
             Else
                 '----------------------------------------------
                 'Create a new instance of the ErrorList form.
@@ -2249,8 +2262,11 @@ SkipRegistrationChecking:
                     child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
                     prApplication.ToolboxForms.Add(child)
                 End If
+
+                Return child
             End If
 
+            Return Nothing
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2258,9 +2274,11 @@ SkipRegistrationChecking:
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
-    End Sub
+    End Function
 
     Public Function loadToolboxTableDataForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxTableData
 

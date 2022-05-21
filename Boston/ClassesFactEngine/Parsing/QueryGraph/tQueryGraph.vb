@@ -1103,6 +1103,7 @@
                 'Derived Fact Type Parameters
                 'The QueryEdge.FBMFactType is derived, the Column for the QueryNode IsDerivationParameter
                 Dim larDerivationNodes = (From Node In larFromNodes
+                                          Where Node.QueryEdge IsNot Nothing
                                           Where Node.QueryEdge.FBMFactType IsNot Nothing
                                           Where Node.QueryEdge.FBMFactType.IsDerived
                                           Select Node).ToList

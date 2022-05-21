@@ -1711,50 +1711,63 @@ Namespace FBM
 
             Dim lrRoleConstraintInstance As New tUniquenessConstraint
 
-            With Me
-                lrRoleConstraintInstance.Model = arPage.Model
-                lrRoleConstraintInstance.Page = arPage
-                lrRoleConstraintInstance.RoleConstraint = Me
-                lrRoleConstraintInstance.Id = .Id
-                lrRoleConstraintInstance.Name = .Name
-                lrRoleConstraintInstance.ConceptType = .ConceptType
-                lrRoleConstraintInstance.RoleConstraintType = .RoleConstraintType
-                lrRoleConstraintInstance.LevelNr = .LevelNr
-                lrRoleConstraintInstance.MinimumFrequencyCount = .MinimumFrequencyCount
-                lrRoleConstraintInstance.MaximumFrequencyCount = .MaximumFrequencyCount
-                lrRoleConstraintInstance.IsDeontic = .IsDeontic
-                lrRoleConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
-                lrRoleConstraintInstance.Cardinality = .Cardinality
-                lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
+            Try
 
-                If abAddToPage Then
-                    arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
-                End If
+                With Me
+                    lrRoleConstraintInstance.Model = arPage.Model
+                    lrRoleConstraintInstance.Page = arPage
+                    lrRoleConstraintInstance.RoleConstraint = Me
+                    lrRoleConstraintInstance.Id = .Id
+                    lrRoleConstraintInstance.Name = .Name
+                    lrRoleConstraintInstance.ConceptType = .ConceptType
+                    lrRoleConstraintInstance.RoleConstraintType = .RoleConstraintType
+                    lrRoleConstraintInstance.LevelNr = .LevelNr
+                    lrRoleConstraintInstance.MinimumFrequencyCount = .MinimumFrequencyCount
+                    lrRoleConstraintInstance.MaximumFrequencyCount = .MaximumFrequencyCount
+                    lrRoleConstraintInstance.IsDeontic = .IsDeontic
+                    lrRoleConstraintInstance.IsPreferredIdentifier = .IsPreferredIdentifier
+                    lrRoleConstraintInstance.Cardinality = .Cardinality
+                    lrRoleConstraintInstance.CardinalityRangeType = .CardinalityRangeType
 
-                '-------------------------------------------------------------------------
-                'Associate the RoleInstances to which the RoleConstraintInstance relates
-                '-------------------------------------------------------------------------
-                Dim lrRole As FBM.Role
-                Dim lrRoleInstance As FBM.RoleInstance
-                Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-                For Each lrRole In Me.Role
-                    lrRoleInstance = New FBM.RoleInstance(.Model, arPage)
-                    lrRoleInstance.Id = lrRole.Id
-                    lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-                    lrRoleConstraintInstance.Role.Add(lrRoleInstance)
+                    If abAddToPage Then
+                        arPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                    End If
 
-                    '--------------------------------------------------------------------
-                    'Create a RoleConstraintRoleInstance for the RoleConstraintInstance
-                    '--------------------------------------------------------------------
-                    Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, Me)
-                    lrRoleConstraintRole = Me.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.Equals)
-                    lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
-                    lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
-                Next
+                    '-------------------------------------------------------------------------
+                    'Associate the RoleInstances to which the RoleConstraintInstance relates
+                    '-------------------------------------------------------------------------
+                    Dim lrRole As FBM.Role
+                    Dim lrRoleInstance As FBM.RoleInstance
+                    Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                    For Each lrRole In Me.Role
+                        lrRoleInstance = New FBM.RoleInstance(.Model, arPage)
+                        lrRoleInstance.Id = lrRole.Id
+                        lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                        lrRoleConstraintInstance.Role.Add(lrRoleInstance)
 
-            End With
+                        '--------------------------------------------------------------------
+                        'Create a RoleConstraintRoleInstance for the RoleConstraintInstance
+                        '--------------------------------------------------------------------
+                        Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrRole, Me)
+                        lrRoleConstraintRole = Me.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.Equals)
+                        lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(arPage, lrRoleConstraintInstance) 'New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
+                        lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                    Next
 
-            Return lrRoleConstraintInstance
+                End With
+
+                Return lrRoleConstraintInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrRoleConstraintInstance
+            End Try
 
         End Function
 

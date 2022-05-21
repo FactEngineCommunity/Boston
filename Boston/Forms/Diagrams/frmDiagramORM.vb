@@ -2130,6 +2130,13 @@ Public Class frmDiagramORM
 
         Try
             lrModelObject = e.Link.Tag
+
+            'CodeSafe
+            If lrModelObject Is Nothing Then
+                Me.Diagram.Links.Remove(e.Link)
+                Exit Sub
+            End If
+
             lrTargetModelObject = e.Link.Destination.Tag
             lrOriginModelObject = e.Link.Origin.Tag
 
@@ -2577,6 +2584,7 @@ Public Class frmDiagramORM
         Try
             Select Case e.Link.Tag.ConceptType
                 Case Is = pcenumConceptType.SubtypeRelationship
+                    Me.zrPage.SelectedObject.Clear()
                     Me.zrPage.SelectedObject.Add(e.Link.Tag)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_SubtypeRelationship
             End Select
@@ -11285,7 +11293,11 @@ SkipRemovalFromModel:
         Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
 
         Try
-            lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+            Try
+                lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
 
             If lrSubtypeRelationshipInstance.FactType.IsDisplayedAssociated Then
                 Call lrSubtypeRelationshipInstance.FactType.Show()

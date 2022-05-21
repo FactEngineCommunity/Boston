@@ -717,6 +717,17 @@ Namespace FBM
                         If Me.Role.Count > 0 Then
                             Call Me.DisplayAndAssociateAsInternalUniquenessConstraint()
                         Else
+                            Try
+                                For Each lrRoleConstraintRole In Me.RoleConstraint.RoleConstraintRole
+                                    If Me.RoleConstraintRole.Count > 0 Then
+                                        Dim lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(Me.Page, Me.RoleConstraint)
+                                        Call Me.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                    End If
+                                Next
+                                Call Me.DisplayAndAssociateAsInternalUniquenessConstraint()
+                            Catch ex As Exception
+                                'Throw error anyay
+                            End Try
                             lsMessage = "Tried to DisplayAndAssociate RoleConstraintInstance of RoleConstraintType: InternalUniquenessConstraint, where there are no Roles associated with the RoleConstraintInstance (i.e. RoleConstraint.Role.Count = 0):"
                             lsMessage &= vbCrLf & "RoleConstraint.Id: " & Me.Id
                             Throw New Exception(lsMessage)

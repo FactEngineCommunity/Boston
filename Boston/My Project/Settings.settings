@@ -203,5 +203,11 @@
     <Setting Name="PGSShapeLibrary" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\shapelibrary\propertygraphschema.shl</Value>
     </Setting>
+    <Setting Name="UseSquareBracketsSQL" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="KeywordExtractionStopListLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\keywordextraction\StopList.txt</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
