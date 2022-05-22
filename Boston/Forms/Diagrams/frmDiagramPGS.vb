@@ -1089,6 +1089,14 @@ Public Class frmDiagramPGS
             larModelElement.Add(lrModelElement)
             lsFactTypeName.AppendString(lrModelElement.Id)
 
+            If Not lrModelElement.HasPrimaryReferenceScheme Then  'ModelError.Find(Function(x) x.ErrorId = "105") IsNot Nothing Then
+                lsMessage = "You need to create a Primary Reference Scheme for the Node Type, " & lrModelElement.Id & "."
+                lsMessage.AppendDoubleLineBreak("Linking to a Node Type without a Primary Reference Scheme is like referencing a Table without a Primary Key, or a graph database Node Type without a unique identifier for Nodes at the data level.")
+                MsgBox(lsMessage)
+                Me.zrPage.Diagram.Links.Remove(e.Link)
+                Exit Sub
+            End If
+
             Dim lrModel = Me.zrPage.Model
 
             lrFactType = lrModel.CreateFactType(lsFactTypeName, larModelElement, False, True, False, Nothing, True, Nothing)
@@ -1169,147 +1177,159 @@ Public Class frmDiagramPGS
         Dim lrNode As Object
         Dim lrPGSNodeType As PGS.Node
 
-        lrNode = e.Node.Tag
-        lrNode.shape.Image = My.Resources.ORMShapes.Blank
+        Try
 
-        Select Case e.Node.Tag.ConceptType
-            Case Is = pcenumConceptType.PGSNode
-                lrPGSNodeType = lrNode
-                e.Node.Pen.Color = Color.Blue
-                Call lrPGSNodeType.NodeSelected()
-            Case Else
-                'Do nothing
-        End Select
+            lrNode = e.Node.Tag
 
-        '===================================================================================
-        'Draw the Properties of the Node
-        If Me.PropertyTableNode IsNot Nothing Then
-            If Me.PropertyTableNode.Tag.Id <> lrNode.Id Then
-                Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+            Select Case lrNode.GetType
+                Case Is = GetType(PGS.Node)
+                    lrPGSNodeType = lrNode
+                    If e.Node.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
+                        e.Node.Pen.Color = Color.Blue
+                        lrNode.shape.Image = My.Resources.ORMShapes.Blank
+                        Call lrPGSNodeType.NodeSelected()
+                    End If
+                Case Else
+                    'Do nothing
+            End Select
+
+            '===================================================================================
+            'Draw the Properties of the Node
+            If Me.PropertyTableNode IsNot Nothing Then
+                If Me.PropertyTableNode.Tag.Id <> lrNode.Id Then
+                    Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+                End If
             End If
-        End If
 
-        If Not TypeOf (e.Node) Is TableNode Then
-            If Me.PropertyTableNode Is Nothing And
-                ((Control.ModifierKeys = Keys.Control) Or (Control.ModifierKeys = Keys.ControlKey)) Then
+            If Not TypeOf (e.Node) Is TableNode Then
+                If Me.PropertyTableNode Is Nothing And
+                    ((Control.ModifierKeys = Keys.Control) Or (Control.ModifierKeys = Keys.ControlKey)) Then
 
-                Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(e.Node.Bounds.X, e.Node.Bounds.Y + 25, 30, 20, 1, 0)
-                Me.PropertyTableNode.EnableStyledText = True
-                Me.PropertyTableNode.Caption = "<B>" & " " & lrNode.Name & " "
-                Me.PropertyTableNode.Tag = lrNode
+                    Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(e.Node.Bounds.X, e.Node.Bounds.Y + 25, 30, 20, 1, 0)
+                    Me.PropertyTableNode.EnableStyledText = True
+                    Me.PropertyTableNode.Caption = "<B>" & " " & lrNode.Name & " "
+                    Me.PropertyTableNode.Tag = lrNode
 
-                Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.Id)
+                    Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.Id)
 
-                Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
+                    Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
 
-                '--------------------------------------------------------------------
-                'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
-                Dim liInd As Integer
-                Dim larSupertypeTable = lrRDSTable.getSupertypeTables
-                If larSupertypeTable.Count > 0 Then
-                    larSupertypeTable.Reverse()
-                    larSupertypeTable.Add(lrRDSTable)
-                    liInd = 0
-                    For Each lrSupertypeTable In larSupertypeTable
-                        For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
-                            larColumn.Remove(lrColumn)
-                            larColumn.Insert(liInd, lrColumn)
-                            liInd += 1
+                    '--------------------------------------------------------------------
+                    'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
+                    Dim liInd As Integer
+                    Dim larSupertypeTable = lrRDSTable.getSupertypeTables
+                    If larSupertypeTable.Count > 0 Then
+                        larSupertypeTable.Reverse()
+                        larSupertypeTable.Add(lrRDSTable)
+                        liInd = 0
+                        For Each lrSupertypeTable In larSupertypeTable
+                            For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                                larColumn.Remove(lrColumn)
+                                larColumn.Insert(liInd, lrColumn)
+                                liInd += 1
+                            Next
                         Next
+                    End If
+
+                    For Each lrColumn In larColumn
+
+                        '============================================================
+                        'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
+                        '    'Don't show the Column
+                        'Else
+
+                        '20200326-VM-Removed for demo purposes.
+                        'If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
+                        '    'ForeignKey. Don't show the Column
+                        'Else
+                        Me.PropertyTableNode.RowCount += 1
+
+                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                        'End If
+                        '============================================================
                     Next
+                    Me.PropertyTableNode.ResizeToFitText(True)
+                End If
+            End If
+
+
+            '----------------------------------------------------
+            'Set the ContextMenuStrip menu for the selected item
+            '----------------------------------------------------
+            Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+                Case Is = pcenumConceptType.Entity
+                    Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Node
+            End Select
+
+            Me.zrPage.SelectedObject.Add(e.Node.Tag)
+
+            '--------------------------------------
+            'Set the PropertiesGrid.SeletedObject
+            '--------------------------------------
+            Dim lrPropertyGridForm As frmToolboxProperties
+
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            If IsSomething(lrPropertyGridForm) Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                lrPropertyGridForm.PropertyGrid.SelectedObject = lrPGSNodeType
+            End If
+
+            '===========================================
+            'Populate the Cypher Toolbox if it is open
+            '===========================================
+            Dim lrToolboxCypher As frmToolboxCypher
+            lrToolboxCypher = prApplication.GetToolboxForm(frmToolboxCypher.Name)
+            If IsSomething(lrToolboxCypher) Then
+                lrToolboxCypher.zrModel = Me.zrPage.Model
+                lrToolboxCypher.zrPage = Me.zrPage
+                Call lrToolboxCypher.DevelopCypherText()
+            End If
+
+            '-------------------------------------------------------
+            'ORM Verbalisation
+            '-------------------------------------------------------
+            Dim lrToolboxForm As frmToolboxORMVerbalisation
+            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+            If IsSomething(lrToolboxForm) Then
+                lrToolboxForm.zrModel = Me.zrPage.Model
+                Call lrToolboxForm.VerbalisePGSNode(lrNode)
+            End If
+
+            '---------------------------------------------------------------------------
+            'ORM(FactType) Reading Editor
+            'For if the Node represents a FactType.        
+            '  matches the selected FactType (if a FactType is selected by the user)
+            '---------------------------------------------------------------------------
+            Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+            lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+            If IsSomething(lrORMReadingEditor) And lrNode.GetType = GetType(PGS.Node) Then
+
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+                Dim lrPGSNode As PGS.Node = CType(lrNode, PGS.Node)
+
+                If lrPGSNode.RDSTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
+                    Dim lrFactType As FBM.FactType = lrPGSNode.RDSTable.FBMModelElement
+                    lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+
+                    lrORMReadingEditor.zrPage = Me.zrPage
+                    lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+
+                    Call lrORMReadingEditor.SetupForm()
                 End If
 
-                For Each lrColumn In larColumn
-
-                    '============================================================
-                    'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
-                    '    'Don't show the Column
-                    'Else
-
-                    '20200326-VM-Removed for demo purposes.
-                    'If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
-                    '    'ForeignKey. Don't show the Column
-                    'Else
-                    Me.PropertyTableNode.RowCount += 1
-
-                    Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
-                    Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
-                    'End If
-                    '============================================================
-                Next
-                Me.PropertyTableNode.ResizeToFitText(True)
-            End If
-        End If
-
-
-        '----------------------------------------------------
-        'Set the ContextMenuStrip menu for the selected item
-        '----------------------------------------------------
-        Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
-            Case Is = pcenumConceptType.Entity
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Node
-        End Select
-
-        Me.zrPage.SelectedObject.Add(e.Node.Tag)
-
-        '--------------------------------------
-        'Set the PropertiesGrid.SeletedObject
-        '--------------------------------------
-        Dim lrPropertyGridForm As frmToolboxProperties
-
-        lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-        If IsSomething(lrPropertyGridForm) Then
-            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            lrPropertyGridForm.PropertyGrid.SelectedObject = lrPGSNodeType
-        End If
-
-        '===========================================
-        'Populate the Cypher Toolbox if it is open
-        '===========================================
-        Dim lrToolboxCypher As frmToolboxCypher
-        lrToolboxCypher = prApplication.GetToolboxForm(frmToolboxCypher.Name)
-        If IsSomething(lrToolboxCypher) Then
-            lrToolboxCypher.zrModel = Me.zrPage.Model
-            lrToolboxCypher.zrPage = Me.zrPage
-            Call lrToolboxCypher.DevelopCypherText()
-        End If
-
-        '-------------------------------------------------------
-        'ORM Verbalisation
-        '-------------------------------------------------------
-        Dim lrToolboxForm As frmToolboxORMVerbalisation
-        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
-            lrToolboxForm.zrModel = Me.zrPage.Model
-            Call lrToolboxForm.VerbalisePGSNode(lrNode)
-        End If
-
-        '---------------------------------------------------------------------------
-        'ORM(FactType) Reading Editor
-        'For if the Node represents a FactType.        
-        '  matches the selected FactType (if a FactType is selected by the user)
-        '---------------------------------------------------------------------------
-        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
-        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
-
-        If IsSomething(lrORMReadingEditor) And lrNode.GetType = GetType(PGS.Node) Then
-
-            Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
-            Dim lrPGSNode As PGS.Node = CType(lrNode, PGS.Node)
-
-            If lrPGSNode.RDSTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
-                Dim lrFactType As FBM.FactType = lrPGSNode.RDSTable.FBMModelElement
-                lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
-
-                lrORMReadingEditor.zrPage = Me.zrPage
-                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
-
-                Call lrORMReadingEditor.SetupForm()
             End If
 
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Public Sub mapSubtypeRelationships()
@@ -2252,16 +2272,24 @@ Public Class frmDiagramPGS
                     '-------------------------------------------------------------------------------
 
                     Me.zrPage.SelectedObject.Clear()
-                    Me.Diagram.Selection.Clear()
+                    Try
+                        Me.Diagram.Selection.Clear()
+                    Catch ex As Exception
+                        'Not a biggie. Can't work out why if fails however.
+                    End Try
+
                     '----------------------------------------------------
                     'Select the ShapeNode/ORMObject just clicked on
                     '  Updates the Me.zrPage.SelectedObject collection.
                     '----------------------------------------------------                 
-                    loNode.Selected = True
+                    If loNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
+                        loNode.Selected = True
+                    End If
 
                 End If
 
                 Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
+
 
                 '----------------------------
                 'Mouse is over an ShapeNode
@@ -2427,8 +2455,8 @@ Public Class frmDiagramPGS
             'Reset the border colors of the ShapeNodes (to what they were before being selected
             '------------------------------------------------------------------------------------
             For liInd = 1 To Diagram.Nodes.Count
-                Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
-                    Case Is = pcenumConceptType.PGSNode
+                Select Case Diagram.Nodes(liInd - 1).GetType
+                    Case Is = GetType(MindFusion.Diagramming.ShapeNode)
                         Dim lrPGSNode As PGS.Node = Diagram.Nodes(liInd - 1).Tag
                         If CType(lrPGSNode.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
                             lrPGSNode.Shape.Pen.Color = Color.Red
@@ -2721,6 +2749,7 @@ Public Class frmDiagramPGS
             Call lrPGSLink.LinkSelected()
 
             Me.zrPage.SelectedObject.Clear()
+            lrPGSLink.Relation.Link = lrPGSLink 'Leave here. Can't find bug where it's not set properly.
             Me.zrPage.SelectedObject.Add(lrPGSLink.Relation)
 
             '===================================================================================
@@ -3118,7 +3147,10 @@ Public Class frmDiagramPGS
             e.Link.Pen.Color = Color.DeepSkyBlue
 
             Dim lrPGSLink As PGS.Link = e.Link.Tag
-            Call lrPGSLink.setPredicate()
+
+            If lrPGSLink IsNot Nothing Then
+                Call lrPGSLink.setPredicate()
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -3426,17 +3458,23 @@ Public Class frmDiagramPGS
 
     End Sub
 
-    Private Sub ShowPropertiesForNode(ByRef arNode As PGS.Node)
+    Private Sub ShowPropertiesForNode(ByRef arNode As PGS.Node, Optional ByRef arERDRelation As ERD.Relation = Nothing)
 
         Try
             Dim lrNode As PGS.Node = arNode
 
-            Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y + 25, 30, 20, 1, 0)
+            If arERDRelation IsNot Nothing Then
+                Dim lrPGSLink As PGS.Link = arERDRelation.Link
+                Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y + 25, 30, 20, 1, 0)
+            Else
+                Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y + 25, 30, 20, 1, 0)
+            End If
+
             Me.PropertyTableNode.EnableStyledText = True
             Me.PropertyTableNode.Caption = "<B>" & " " & arNode.Name & " "
             Me.PropertyTableNode.Tag = arNode
 
-            Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.ID)
+            Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.Id)
 
             Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
 
@@ -3571,10 +3609,11 @@ Public Class frmDiagramPGS
         '================================================================================
 
         Try
-            If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then
-                e.Cancel = True
-                Exit Sub
-            End If
+            Select Case e.Link.Origin.GetType
+                Case Is = GetType(MindFusion.Diagramming.DummyNode), GetType(MindFusion.Diagramming.TableNode)
+                    e.Cancel = True
+                    Exit Sub
+            End Select
 
 
         Catch ex As Exception
@@ -3691,6 +3730,9 @@ Public Class frmDiagramPGS
             Dim lrModelElement As FBM.ModelObject
 
             Dim lfrmAddAttributeForm = New frmCRUDAddAttributeNew
+
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
 
             Select Case Me.zrPage.SelectedObject(0).GetType
                 Case Is = GetType(PGS.Node)
@@ -4294,6 +4336,36 @@ ErrorOut:
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
+    End Sub
+
+    Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
+
+        Try
+            Dim lrERDRelation As ERD.Relation
+            Dim lrFactType As FBM.FactType = Nothing
+
+            Try
+                lrERDRelation = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                MsgBox("Oops. Something went wrong. Click on the canvas and select the Edge Type again.")
+                Exit Sub
+            End Try
+
+            If lrERDRelation.RDSRelation.UltimateFactType.IsObjectified And lrERDRelation.IsPGSRelationNode Then
+                Dim lrNodeType As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrERDRelation.RDSRelation.UltimateFactType.Id)
+                Call Me.ShowPropertiesForNode(lrNodeType, lrERDRelation)
+            End If
+
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     'Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click

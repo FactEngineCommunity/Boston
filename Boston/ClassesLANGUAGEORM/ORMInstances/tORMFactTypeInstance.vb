@@ -2169,7 +2169,7 @@ Namespace FBM
 
                     'CodeSafe-User Experience
                     If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 40 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 40 Then
-                        Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 17)
+                        Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 10)
                     End If
 
                     '---------------------------------------------------------------------------

@@ -32,7 +32,15 @@ Namespace ERD
         Public IsPGSRelationNode As Boolean = False
         Public ActualPGSNode As PGS.Node
 
-        Public Link As Object 'ERD.Link
+        Private _Link As Object
+        Public Property Link As Object 'ERD.Link
+            Get
+                Return Me._Link
+            End Get
+            Set(value As Object)
+                Me._Link = value
+            End Set
+        End Property
 
         Public WithEvents RDSRelation As RDS.Relation
 

@@ -307,11 +307,41 @@ Partial Public Class tBrain
 
                     larRole = New List(Of FBM.Role)
                     For Each lrPredicatePart In lrSentence.PredicatePart
-                        Dim lrPredicateRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrPredicatePart.ObjectName)
+                        Dim lrPredicateRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrPredicatePart.ObjectName _
+                                                                                    And Not larRole.Contains(x))
                         larRole.Add(lrPredicateRole)
                     Next
                     lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
-                    Call lrFactType.AddFactTypeReading(lrFactTypeReading, False, abBroadcastInterfaceEvent)
+
+                    If lrFactType.ExistsFactTypeReadingByRoleSequence(lrFactTypeReading) Then
+
+                        lrFactTypeReading.TypedPredicateId = lrFactType.GetTypedPredicateIdByRoleSequence(lrFactTypeReading)
+
+                        lrFactTypeReading.IsPreferredForPredicate = (lrFactType.FactTypeReading.FindAll(AddressOf lrFactTypeReading.EqualsByRoleSequence).Count = 0)
+
+                        '---------------------------------------------------------------------------------------------
+                        'Check to see whether the Fact Type has more than one Role referencing the same Object Type.
+                        '---------------------------------------------------------------------------------------------
+                        If lrFactType.HasMoreThanOneRoleReferencingTheSameModelObject Then
+                            '---------------------------------------------------------------------------------------------------
+                            'Need to check to see whether an alternate sequence of Roles (within the FTR) is possible for the 
+                            '  FactType. It may well be that each possible combination of FTR Role Sequences has been filled
+                            '  for the Fact Type, which is a good scenario. If this is the case, then simply ther is no new
+                            '  FTR to apply to the Fact Type.
+                            '  Otherwise, the algorithm is to select an unused FTR/Role Sequence combination and apply that
+                            '  automatically for the Fact Type.
+                            '---------------------------------------------------------------------------------------------------
+                            If lrFactTypeReading.FactType.ExistsAvailablePermutation(lrFactTypeReading) Then
+                                lrFactTypeReading = lrFactTypeReading.FactType.TransformFactTypeReadingToAvailablePermutation(lrFactTypeReading)
+                                lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                            End If
+                        Else
+                            lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                        End If
+                    Else
+                        lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                    End If
                 Next
             End If
 

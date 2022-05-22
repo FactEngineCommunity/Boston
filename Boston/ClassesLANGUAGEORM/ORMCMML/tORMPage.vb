@@ -2849,7 +2849,7 @@ Namespace FBM
 
                             If Me.ERDiagram.Relation.FindAll(Function(x) x.Id = lsRelationId).Count = 0 Then
                                 lrRelation = Me.loadCMMLRelation(lrRDSRelation, lrOriginNode, lrDestinationNode, False)
-                                Me.ERDiagram.Relation.Add(lrRelation)
+                                Me.ERDiagram.Relation.AddUnique(lrRelation)
                             Else
                                 lrRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lsRelationId)
                             End If

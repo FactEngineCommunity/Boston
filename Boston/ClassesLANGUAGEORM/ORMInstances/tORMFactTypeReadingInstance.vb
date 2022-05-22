@@ -217,7 +217,7 @@ Namespace FBM
                         End If
                     Next
 
-                    GetDottedReadingText = lsFirstReadingText & " / " & lsSecondReadingText
+                    GetDottedReadingText = Trim(lsFirstReadingText) & " / " & Trim(lsSecondReadingText)
                 Else
                     If (Me.FactType.RoleGroup(0).Id <> Me.PredicatePart(0).RoleId) Then
                         GetDottedReadingText = Chr(171)

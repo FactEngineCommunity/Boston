@@ -176,7 +176,6 @@ Namespace FBM
 
                     Call lrLink.setPredicate() '20200725-VM-Remove the following if all seems okay....Text = lrERDRelation.ActualPGSNode.Id
                     Call lrLink.setHeadShapes()
-                    lrLink.Relation.Link = lrLink
                     lrERDRelation.Link = lrLink
 
                     ERDiagram.Relation.AddUnique(lrERDRelation)

@@ -19,13 +19,22 @@ Namespace PGS
         Public OriginModelElement As PGS.Node
         Public DestinationModelElement As PGS.Node
 
-        Public WithEvents Relation As ERD.Relation
+        Public Shadows WithEvents Relation As ERD.Relation
 
         Public WithEvents RDSRelation As RDS.Relation
 
         Public SentData As New List(Of String)
 
-        Public Link As MindFusion.Diagramming.DiagramLink
+        Private Shadows _Link As MindFusion.Diagramming.DiagramLink
+        Public Shadows Property Link As MindFusion.Diagramming.DiagramLink
+            Get
+                Return Me._Link
+            End Get
+            Set(value As MindFusion.Diagramming.DiagramLink)
+                Me._Link = value
+            End Set
+        End Property
+
         Public Color As System.Drawing.Color = Color.Black
 
         Public HasBeenMoved As Boolean = False 'Used in AutoLayout (see DFD ResetNodeAndLinkColours)
@@ -60,7 +69,6 @@ Namespace PGS
             End If
 
             If IsSomething(arRelation) Then
-                Me.Relation = New ERD.Relation
                 Me.Relation = arRelation
                 Me.Relation.Link = Me
             End If
@@ -90,26 +98,28 @@ Namespace PGS
             Try
                 If Me.OriginModelElement.Shape Is Nothing Then Exit Sub
 
-                Dim lrPGSLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.Shape, Me.DestinationModelElement.Shape)
+                Dim lrDiagramLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.Shape, Me.DestinationModelElement.Shape)
 
-                lrPGSLink.Style = LinkStyle.Bezier
-                lrPGSLink.Pen.Width = 0.1
-                lrPGSLink.HeadPen.Width = 0.1
+                lrDiagramLink.Style = LinkStyle.Bezier
+                lrDiagramLink.Pen.Width = 0.1
+                lrDiagramLink.HeadPen.Width = 0.1
 
-                lrPGSLink.SnapToNodeBorder = True
-                lrPGSLink.ShadowColor = Color.White
-                lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
-                lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
-                lrPGSLink.Text = Me.SentData(0)
-                lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
-                lrPGSLink.AutoRoute = False
+                lrDiagramLink.SnapToNodeBorder = True
+                lrDiagramLink.ShadowColor = Color.White
+                lrDiagramLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
+                lrDiagramLink.Pen.Color = Drawing.Color.DeepSkyBlue
+                lrDiagramLink.Text = Me.SentData(0)
+                lrDiagramLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
+                lrDiagramLink.AutoRoute = False
 
-                lrPGSLink.Tag = Me
-                Me.Link = lrPGSLink
+                lrDiagramLink.Tag = Me
+                Me.Relation.Link = Me
+                Me.Relation.Link.Link = lrDiagramLink
+                Me.Link = lrDiagramLink
 
                 Call Me.setHeadShapes()
 
-                Me.Page.Diagram.Links.Add(lrPGSLink)
+                Me.Page.Diagram.Links.Add(lrDiagramLink)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -194,11 +204,21 @@ Namespace PGS
 
         Public Overridable Sub LinkSelected() Implements iLinkObject.LinkSelected
 
-            Me.Link.Style = LinkStyle.Bezier
+            Try
 
-            If IsSomething(Me.Link) Then
-                Me.Link.Pen.Color = Color.Blue
-            End If
+                If IsSomething(Me.Link) Then
+                    Me.Link.Style = LinkStyle.Bezier
+                    Me.Link.Pen.Color = Color.Blue
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         Public Sub MouseDown() Implements iLinkObject.MouseDown

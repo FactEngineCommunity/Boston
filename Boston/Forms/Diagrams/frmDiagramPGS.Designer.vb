@@ -39,6 +39,8 @@ Partial Class frmDiagramPGS
         Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
         Me.IndexManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.DisplayAsEdgeTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator18 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem_RemoveFromPage = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
         Me.ConvertToFactTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -84,6 +86,7 @@ Partial Class frmDiagramPGS
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemLinkViewReadingEditor = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
         Me.DisplayAsNodeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -97,16 +100,8 @@ Partial Class frmDiagramPGS
         Me.CloseAllButThisPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
-        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram3 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram4 = New MindFusion.Diagramming.Diagram()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram5 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram6 = New MindFusion.Diagramming.Diagram()
-        Me.DisplayAsEdgeTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator18 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -118,7 +113,7 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator15, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator17, Me.RenameToolStripMenuItem, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.DisplayAsEdgeTypeToolStripMenuItem, Me.ToolStripSeparator18, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 294)
+        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(183, 272)
         '
         'MorphToToolStripMenuItem
         '
@@ -206,6 +201,17 @@ Partial Class frmDiagramPGS
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
         Me.ToolStripSeparator2.Size = New System.Drawing.Size(179, 6)
+        '
+        'DisplayAsEdgeTypeToolStripMenuItem
+        '
+        Me.DisplayAsEdgeTypeToolStripMenuItem.Name = "DisplayAsEdgeTypeToolStripMenuItem"
+        Me.DisplayAsEdgeTypeToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.DisplayAsEdgeTypeToolStripMenuItem.Text = "Display as E&dge Type"
+        '
+        'ToolStripSeparator18
+        '
+        Me.ToolStripSeparator18.Name = "ToolStripSeparator18"
+        Me.ToolStripSeparator18.Size = New System.Drawing.Size(179, 6)
         '
         'ToolStripMenuItem_RemoveFromPage
         '
@@ -349,7 +355,7 @@ Partial Class frmDiagramPGS
         Me.LanguageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem})
         Me.LanguageToolStripMenuItem.Image = CType(resources.GetObject("LanguageToolStripMenuItem.Image"), System.Drawing.Image)
         Me.LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem"
-        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
         Me.LanguageToolStripMenuItem.Text = "To &Language..."
         '
         'PropertyGraphSchemaToolStripMenuItem
@@ -446,9 +452,9 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Relation
         '
-        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.RemoveFromPageAndModelToolStripMenuItem})
+        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItem2, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.RemoveFromPageAndModelToolStripMenuItem})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 182)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 226)
         '
         'MorphToToolStripMenuItem1
         '
@@ -495,6 +501,13 @@ Partial Class frmDiagramPGS
         Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
         Me.ToolStripSeparator10.Size = New System.Drawing.Size(252, 6)
         Me.ToolStripSeparator10.Visible = False
+        '
+        'ToolStripMenuItem2
+        '
+        Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.Attribute
+        Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(255, 22)
+        Me.ToolStripMenuItem2.Text = "View &Properties"
         '
         'ToolStripMenuItem1
         '
@@ -649,17 +662,6 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'DisplayAsEdgeTypeToolStripMenuItem
-        '
-        Me.DisplayAsEdgeTypeToolStripMenuItem.Name = "DisplayAsEdgeTypeToolStripMenuItem"
-        Me.DisplayAsEdgeTypeToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
-        Me.DisplayAsEdgeTypeToolStripMenuItem.Text = "Display as E&dge Type"
-        '
-        'ToolStripSeparator18
-        '
-        Me.ToolStripSeparator18.Name = "ToolStripSeparator18"
-        Me.ToolStripSeparator18.Size = New System.Drawing.Size(179, 6)
-        '
         'frmDiagramPGS
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -755,12 +757,7 @@ Partial Class frmDiagramPGS
     Friend WithEvents ToolStripSeparator17 As ToolStripSeparator
     Friend WithEvents RenameToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RemoveFromPageAndModelToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram4 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram5 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram6 As MindFusion.Diagramming.Diagram
     Friend WithEvents DisplayAsEdgeTypeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator18 As ToolStripSeparator
+    Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
 End Class
