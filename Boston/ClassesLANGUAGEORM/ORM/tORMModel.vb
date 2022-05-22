@@ -618,7 +618,9 @@ Namespace FBM
                 'RDS
                 If Not arEntityType.IsMDAModelElement And Not arEntityType.IsObjectifyingEntityType Then
                     Dim lrTable As New RDS.Table(Me.RDS, arEntityType.Id, arEntityType)
-                    Me.RDS.Table.AddUnique(lrTable)
+                    Call Me.RDS.addTable(lrTable)
+                    '20220522-Was the below. Was not adding to CMML
+                    'Me.RDS.Table.AddUnique(lrTable)
                 End If
 
                 ''=====================================================================================
@@ -2103,7 +2105,8 @@ FinishedProcessing:
         ''' <remarks></remarks>
         Public Function CreateEntityType(Optional ByVal asEntityTypeName As String = Nothing,
                                          Optional ByVal abAddToModel As Boolean = True,
-                                         Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.EntityType
+                                         Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                         Optional ByVal abCheckForErrors As Boolean = True) As FBM.EntityType
 
             Dim lrEntityType As FBM.EntityType
 
@@ -2135,7 +2138,7 @@ FinishedProcessing:
                 '-----------------------------------------
                 If abAddToModel Then
                     Me.AddEntityType(lrEntityType, False, abBroadcastInterfaceEvent)
-                    Call Me.MakeDirty()
+                    Call Me.MakeDirty(False, abCheckForErrors)
                 End If
 
                 Return lrEntityType

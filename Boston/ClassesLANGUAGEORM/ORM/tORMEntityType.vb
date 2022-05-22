@@ -2812,6 +2812,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub SetDataType(ByVal aiORMDataType As pcenumORMDataType,
+                               Optional ByVal aiDataTypeLength As Integer = Nothing,
+                               Optional ByVal aiDataTypePrecision As Integer = Nothing,
+                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+
+            Try
+                If Me.ReferenceModeValueType IsNot Nothing Then
+                    Call Me.ReferenceModeValueType.SetDataType(aiORMDataType, aiDataTypeLength, aiDataTypePrecision, abBroadcastInterfaceEvent)
+                Else
+                    prApplication.ThrowErrorMessage("The Entity Type, " & Me.Id & ", does not have a Reference Mode Value Type to set its data type.", pcenumErrorType.Warning,, False,, True)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub SetDerivationText(ByVal asDerivationText As String, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Me.DerivationText = asDerivationText

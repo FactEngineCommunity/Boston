@@ -1063,6 +1063,8 @@ Public Class frmDiagramPGS
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
 
+        Dim lsMessage As String
+
         Try
             Dim larModelElement As New List(Of FBM.ModelObject)
             Dim lrModelElement As FBM.ModelObject = Nothing
@@ -1076,6 +1078,12 @@ Public Class frmDiagramPGS
             lrModelElement = e.Link.Origin.Tag.RDSTable.FBMModelElement
             larModelElement.Add(lrModelElement)
             lsFactTypeName.AppendString(lrModelElement.Id & "RelatesTo")
+
+            If lrModelElement.ModelError.Find(Function(x) x.ErrorId = "105") IsNot Nothing Then
+                lsMessage = "You should create a Primary Reference Scheme for the Node Type, " & lrModelElement.Id & ", as soon as possible."
+                lsMessage.AppendDoubleLineBreak("A Node Type without a Primary Reference Scheme is like a Table without a Primary Key, or a graph database Node Type without a unique identifier for Nodes at the data level.")
+                MsgBox(lsMessage)
+            End If
 
             lrModelElement = e.Link.Destination.Tag.RDSTable.FBMModelElement
             larModelElement.Add(lrModelElement)
@@ -1095,7 +1103,6 @@ Public Class frmDiagramPGS
             Me.zrPage.Diagram.Links.Remove(e.Link)
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -2094,24 +2101,38 @@ Public Class frmDiagramPGS
                             'Establish a new EntityType and Entity for the dropped object.
                             '---------------------------------------------------------------    
 
-                            Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
-                            lrEntityType = Me.zrPage.Model.CreateEntityType
-
-                            Dim lrTable As New RDS.Table(Me.zrPage.Model.RDS, lrEntityType.Id, lrEntityType)
-                            Call Me.zrPage.Model.RDS.addTable(lrTable)
-
-                            Dim lsNodeTypeName As String = Me.zrPage.Model.CreateUniqueEntityName(lrEntityType.Name)
-                            Dim lrNodeType As New PGS.Node(Me.zrPage, lsNodeTypeName)
-                            '=========================================================================================
-
                             With New WaitCursor
-                                Call Me.zrPage.DropPGSNodeTypeAtPoint(lrNodeType, loPointF)
+                                Dim lrEntityType As FBM.EntityType
+                                Dim lsNodeTypeName As String = Me.zrPage.Model.CreateUniqueEntityName("New Node Type")
+                                lrEntityType = Me.zrPage.Model.CreateEntityType(lsNodeTypeName, True, True, False)
+
+                                If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+                                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
+                                    Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                                Else
+                                    Dim lsErrorMessage As String = "Entity Type Requires Reference Scheme Error - Entity Type '" & lrEntityType.Id & "'."
+                                    Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,
+                                                                    lsErrorMessage,
+                                                                    Nothing,
+                                                                    lrEntityType)
+                                    Call lrEntityType.AddModelError(New FBM.ModelError(105, lrEntityType))
+                                End If
+
+                                '20220522-Was below...but the creation of the EntityType should have created the RDS.Table.
+                                'Dim lrTable As New RDS.Table(Me.zrPage.Model.RDS, lrEntityType.Id, lrEntityType)
+                                'Call Me.zrPage.Model.RDS.addTable(lrTable)
+                                Dim lrTable As RDS.Table = lrEntityType.getCorrespondingRDSTable
+
+                                '=========================================================================================
+                                Dim lrNodeType As PGS.Node = Me.zrPage.LoadPGSNodeTypeFromRDSTable(lrTable, loPointF)
+                                'Call Me.zrPage.DropPGSNodeTypeAtPoint(lrNodeType, loPointF)
+
+                                'Leave at this point in the code.
+                                lrNodeType.RDSTable = lrTable
+
+
+                                Me.zrPage.ERDiagram.Entity.AddUnique(lrNodeType)
                             End With
-
-                            'Leave at this point in the code.
-                            lrNodeType.RDSTable = lrTable
-
-                            Me.zrPage.ERDiagram.Entity.Add(lrNodeType)
                             '=========================================================================================
                     End Select
                 End If
@@ -3079,16 +3100,6 @@ Public Class frmDiagramPGS
 
     End Sub
 
-    Private Sub ToolStripMenuItemEditRelation_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemEditRelation.Click
-
-        Dim lfrmEditRelationship As New frmCRUDEditRelationship
-
-        If lfrmEditRelationship.ShowDialog = Windows.Forms.DialogResult.OK Then
-
-        End If
-
-    End Sub
-
     Private Sub CypherToolboxToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CypherToolboxToolStripMenuItem.Click
 
         Call frmMain.loadToolboxCypher(Me.DockPanel.ActivePane)
@@ -3135,8 +3146,6 @@ Public Class frmDiagramPGS
 
             lrRelation = Me.zrPage.SelectedObject(0)
 
-            Me.ToolStripMenuItemDeleteRelation.Visible = My.Settings.SuperuserMode
-            Me.ToolStripMenuItemEditRelation.Visible = My.Settings.SuperuserMode
             Me.ToolStripSeparator8.Visible = My.Settings.SuperuserMode
             Me.ToolStripMenuItemRelationRemoveFromPage.Visible = lrRelation.IsPGSRelationNode
 
@@ -3319,67 +3328,72 @@ Public Class frmDiagramPGS
 
     Private Sub ToolStripMenuItem_RemoveFromPage_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem_RemoveFromPage.Click
 
-        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Me.Diagram.Selection.Items(0)
+        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode
         Dim lsSQLQuery As String
         Dim lrNode As PGS.Node
 
-        Me.Cursor = Cursors.WaitCursor
-
         Try
-            ''---------------------------------------------------------
-            ''Get the EntityType represented by the (selected) Entity
-            ''---------------------------------------------------------
-            lrNode = lrShapeNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+            Try
+                lrShapeNode = Me.Diagram.Selection.Items(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
 
-            '------------
-            'Relations
-            Call Me.zrPage.removeRelationsForEntity(lrNode)
+            With New WaitCursor
 
-            '------------
-            'Attributes
-            For Each lrERDAttribute In lrNode.Attribute
-                Call Me.zrPage.removeCMMLAttribute(lrERDAttribute)
-            Next
+                ''---------------------------------------------------------
+                ''Get the EntityType represented by the (selected) Entity
+                ''---------------------------------------------------------
+                lrNode = lrShapeNode.Tag '(above) = Me.Diagram.Selection.Items(0)
 
-            '-------------------------------------------------------------------------
-            'Remove the Entity from the Page
-            '---------------------------------
-            lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " WHERE Element = '" & lrNode.Name & "'"
+                '------------
+                'Relations
+                Call Me.zrPage.removeRelationsForEntity(lrNode)
 
-            Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                '------------
+                'Attributes
+                For Each lrERDAttribute In lrNode.Attribute
+                    Call Me.zrPage.removeCMMLAttribute(lrERDAttribute)
+                Next
 
-            Dim larLinkToRemove As New List(Of DiagramLink)
-            For Each lrLink In lrShapeNode.IncomingLinks
-                larLinkToRemove.Add(lrLink)
-            Next
+                '-------------------------------------------------------------------------
+                'Remove the Entity from the Page
+                '---------------------------------
+                lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & lrNode.Name & "'"
 
-            For Each lrLink In lrShapeNode.OutgoingLinks
-                larLinkToRemove.Add(lrLink)
-            Next
+                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            For Each lrLink In larLinkToRemove
-                Me.Diagram.Links.Remove(lrLink)
-            Next
+                Dim larLinkToRemove As New List(Of DiagramLink)
+                For Each lrLink In lrShapeNode.IncomingLinks
+                    larLinkToRemove.Add(lrLink)
+                Next
 
-            '----------------------------------------------------------------------------------------------------------
-            'Remove the TableNode that represents the Entity from the Diagram on the Page.
-            '-------------------------------------------------------------------------------
-            Me.Diagram.Nodes.Remove(lrShapeNode)
-            Me.zrPage.ERDiagram.Entity.Remove(lrNode)
+                For Each lrLink In lrShapeNode.OutgoingLinks
+                    larLinkToRemove.Add(lrLink)
+                Next
 
-            Me.Cursor = Cursors.Default
+                For Each lrLink In larLinkToRemove
+                    Me.Diagram.Links.Remove(lrLink)
+                Next
 
-            Me.zrPage.SelectedObject.Remove(lrNode)
-            Me.Diagram.Selection.RemoveItem(lrShapeNode)
+                '----------------------------------------------------------------------------------------------------------
+                'Remove the TableNode that represents the Entity from the Diagram on the Page.
+                '-------------------------------------------------------------------------------
+                Me.Diagram.Nodes.Remove(lrShapeNode)
+                Me.zrPage.ERDiagram.Entity.Remove(lrNode)
+
+                Me.zrPage.SelectedObject.Remove(lrNode)
+                Me.Diagram.Selection.RemoveItem(lrShapeNode)
+            End With
 
         Catch ex As Exception
 
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Me.Cursor = Cursors.Default
+
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
@@ -3495,17 +3509,25 @@ Public Class frmDiagramPGS
 
     Private Sub ToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemRelationRemoveFromPage.Click
 
+        Dim lsMessage As String
+
         Try
             Dim lrPGSRelation As ERD.Relation
             Dim lsSQLQuery As String
 
-            lrPGSRelation = Me.zrPage.SelectedObject(0)
+            Try
+                lrPGSRelation = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                lsMessage = "Oops. Something went wrong. Click on the canvas then the Edge Type again."
+                MsgBox(lsMessage)
+                Exit Sub
+            End Try
 
             If lrPGSRelation.IsPGSRelationNode Then
 
                 Me.Diagram.Nodes.Remove(lrPGSRelation.ActualPGSNode.Shape)
                 Me.Diagram.Links.Remove(lrPGSRelation.Link.Link)
-
+                Me.zrPage.ERDiagram.Entity.Remove(lrPGSRelation.ActualPGSNode)
                 '-------------------------------------------------------------------------
                 'Remove the Entity from the Page
                 '---------------------------------
@@ -3518,7 +3540,7 @@ Public Class frmDiagramPGS
             End If
 
         Catch ex As Exception
-            Dim lsMessage As String
+
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -3851,21 +3873,30 @@ FinishedPretesting:
     Private Sub DisplayAsNodeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DisplayAsNodeToolStripMenuItem.Click
 
         Dim lrPGSRelation As ERD.Relation
+        Dim lsMessage As String
 
         Try
             lrPGSRelation = Me.zrPage.SelectedObject(0)
+
+            If lrPGSRelation.ActualPGSNode Is Nothing Then
+                lsMessage = "This particular Edge Type cannot be displayed as a Node Type."
+                lsMessage.AppendDoubleLineBreak("Only Edge Types that represent Objectified Fact Types at the Object-Role Model level can be displayed as Node Types.")
+                MsgBox(lsMessage)
+                Exit Sub
+            End If
+
             lrPGSRelation.ActualPGSNode.NodeType = pcenumPGSEntityType.Node
 
             Call lrPGSRelation.ActualPGSNode.RDSTable.setIsPGSRelation(False)
 
-            Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
+            '20220522-Was...but was displaying the node twice.
+            'Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
 
-            Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+            'Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
             Call Me.zrPage.loadPropertyRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
 
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -3947,13 +3978,13 @@ FinishedPretesting:
             If IsSomething(lrPage) Then
                 lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
-                MsgBox("Added the new Property Graph Schema Page, '" & lrPage.Name & "', to the Model.")
+                MsgBox("Added the new Object-Role Model Page, '" & lrPage.Name & "', to the Model.")
 
                 Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
 
                 If loToolStripItem.Tag = True Then
                     Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
-                    Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
+                    Call Me.morphToORMDiagram(lrToolstripItem, lrEnterpriseView)
                 End If
 
             End If
@@ -4063,6 +4094,199 @@ FinishedPretesting:
 
         Catch ex As Exception
             Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RenameToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RenameToolStripMenuItem.Click
+
+        Dim lrShapeNode As MindFusion.Diagramming.ShapeNode
+
+        Try
+            Try
+                lrShapeNode = Me.Diagram.Selection.Items(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            If Me.Diagram IsNot Nothing Then
+                Call Me.DiagramView.BeginEdit(lrShapeNode)
+            End If
+
+        Catch ex As Exception
+
+        End Try
+
+
+    End Sub
+
+    Private Sub RemoveFromPageAndModelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveFromPageAndModelToolStripMenuItem.Click
+
+        Dim lrPGSRelation As ERD.Relation
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+                Try
+                    lrPGSRelation = Me.zrPage.SelectedObject(0)
+                Catch ex As Exception
+                    Exit Sub
+                End Try
+
+                If lrPGSRelation.RDSRelation.UltimateFactType.IsObjectified Then
+                    'Not implemented yet.
+                    Dim larFactType As New List(Of FBM.FactType)
+                    If lrPGSRelation.RDSRelation.UltimateFactType.hasAssociatedFactTypes(larFactType) Then
+                        lsMessage = "First remove any Fact Types associated with the Objectified Fact Type for this Edge Type at the Object-Role Modeling level before trying to remove this Edge Type from the Model."
+                        lsMessage.AppendDoubleLineBreak("Associated Fact Types include:")
+                        lsMessage.AppendLine("")
+                        For Each lrFactType In larFactType
+                            lsMessage.AppendLine(vbTab & "-" & lrFactType.Id)
+                        Next
+                        lsMessage.AppendLine("")
+                        lsMessage.AppendLine("Hint: You can convert this Page to an ORM Diagram and work from that diagram.")
+                        MsgBox(lsMessage)
+                    Else
+                        lrPGSRelation.RDSRelation.UltimateFactType.RemoveFromModel(True, True,,,)
+                    End If
+                Else
+                    lrPGSRelation.RDSRelation.UltimateFactType.RemoveFromModel(True, True,,,)
+                End If
+
+
+            End With
+
+        Catch ex As Exception
+
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub DisplayAsEdgeTypeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DisplayAsEdgeTypeToolStripMenuItem.Click
+
+        Dim lrPGSNodeType As PGS.Node
+        Dim lsMessage As String
+        Dim lsSQLQuery As String = ""
+        Dim lrFactType As FBM.FactType
+
+        Try
+            lrPGSNodeType = Me.zrPage.SelectedObject(0)
+
+            Dim lbCanConvert As Boolean = False
+            Dim lrModelElement = lrPGSNodeType.RDSTable.FBMModelElement
+            If lrModelElement.GetType = GetType(FBM.FactType) Then
+                lrFactType = CType(lrModelElement, FBM.FactType)
+
+                If lrFactType.IsObjectified Then
+
+                    If lrFactType.RoleGroup.Count = 2 Then
+                        lbCanConvert = True
+                        GoTo MoveForward
+                    End If
+
+                    If lrFactType.RoleGroup.Contains(lrFactType.ReferenceSchemeRoleConstraint.Role(0)) Then
+                        If lrFactType.ReferenceSchemeRoleConstraint.Role.Count = 2 Then
+                            lbCanConvert = True
+                            GoTo MoveForward
+                        End If
+                    End If
+
+                    GoTo ErrorOut
+                End If
+
+            End If
+
+MoveForward:
+
+            If Not lbCanConvert Then
+ErrorOut:
+                lsMessage = "This particular Edge Type cannot be displayed as an Edge Type."
+                lsMessage.AppendDoubleLineBreak("Only Edge Types that represent Objectified Fact Types and have a Preferred Identifier accross two Roles at the Object-Role Model level can be displayed as Edge Types.")
+                MsgBox(lsMessage)
+                Exit Sub
+            End If
+
+            lrPGSNodeType.NodeType = pcenumPGSEntityType.Relationship
+
+            Call lrPGSNodeType.RDSTable.setIsPGSRelation(True)
+
+#Region "Do transition"
+            '------------
+            'Relations
+            'Call Me.zrPage.removeRelationsForEntity(lrPGSNodeType)
+
+            Dim larLinkToRemove As New List(Of DiagramLink)
+            For Each lrLink In lrPGSNodeType.Shape.IncomingLinks
+                larLinkToRemove.Add(lrLink)
+            Next
+
+            For Each lrLink In lrPGSNodeType.Shape.OutgoingLinks
+                larLinkToRemove.Add(lrLink)
+            Next
+
+            For Each lrLink In larLinkToRemove
+                Me.Diagram.Links.Remove(lrLink)
+            Next
+
+            '----------------------------------------------------------------------------------------------------------
+            'Remove the TableNode that represents the Entity from the Diagram on the Page.
+            '-------------------------------------------------------------------------------
+            Me.Diagram.Nodes.Remove(lrPGSNodeType.Shape)
+
+            Me.zrPage.SelectedObject.Remove(lrPGSNodeType)
+            Me.Diagram.Selection.RemoveItem(lrPGSNodeType.Shape)
+
+            '==============================================================================================================================================
+            Call Me.zrPage.loadRelationsForPGSNode(lrPGSNodeType, False)
+
+            lrFactType = lrPGSNodeType.RDSTable.FBMModelElement
+
+            Dim larDestinationModelObjects = lrFactType.getDestinationModelObjects
+
+            Dim lrRDSRelation = Me.zrPage.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrPGSNodeType.Name And
+                                                                                      larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
+
+            Dim lbAllFound As Boolean = True
+            For Each lrModelObject In larDestinationModelObjects
+                If lrModelObject.GetType <> GetType(FBM.ValueType) Then
+                    If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrModelObject.Id) Is Nothing Then
+                        lbAllFound = False
+                    End If
+                End If
+            Next
+
+            If lbAllFound Then
+                If lrPGSNodeType.RDSTable.isPGSRelation Then
+                    Call Me.zrPage.DisplayPGSRelationNodeLink(lrPGSNodeType, lrRDSRelation)
+                    If lrPGSNodeType.Shape IsNot Nothing Then
+                        lrPGSNodeType.Shape.Visible = False
+                        For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrPGSNodeType.Shape.OutgoingLinks
+                            lrEdge.Visible = False
+                        Next
+                    End If
+                End If
+            End If
+
+            '==============================================================================================================================================
+
+#End Region
+
+            'Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
+
+            'Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+            'Call Me.zrPage.loadPropertyRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+
+        Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

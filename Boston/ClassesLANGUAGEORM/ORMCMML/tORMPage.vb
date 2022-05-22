@@ -1661,6 +1661,7 @@ Namespace FBM
                 arNodeTypeInstance.Y = aoPointF.Y
 
                 Call arNodeTypeInstance.DisplayAndAssociate()
+                Call arNodeTypeInstance.RefreshShape()
 
                 Call Me.MakeDirty()
                 Call Me.Save()

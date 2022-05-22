@@ -804,7 +804,8 @@ Namespace FBM
 
                 'CodeSafe: Check to see if the FactType is already on the Page
                 If Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) IsNot Nothing Then
-                    Return Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
+                    lrEntityTypeInstance = Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
+                    Call lrEntityTypeInstance.Move(ao_pt.X, ao_pt.Y, abBroadcastInterfaceEvent)
                 End If
 
                 '----------------------------------------------------------------------------------------
@@ -1909,7 +1910,7 @@ Namespace FBM
                     lsGrid &= vbCrLf
                 Next
 
-                MsgBox(lsGrid)
+                'MsgBox(lsGrid)
 
                 Dim LargestRectangle As New List(Of Object)
 

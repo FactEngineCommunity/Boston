@@ -344,6 +344,9 @@ Namespace PGS
                         If Me.RDSRelation.ResponsibleFactType.IsObjectified Or Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
                             If Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
                                 lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                                If Not lrFactType.getCorrespondingRDSTable().isPGSRelation Then
+                                    GoTo SimplePredicate
+                                End If
                             Else
                                 lrFactType = Me.RDSRelation.ResponsibleFactType
                             End If
@@ -469,6 +472,7 @@ SetPredicateNoMatterWhat:
                     '    End If
                     'End If
                 Else
+SimplePredicate:
                     Me.Link.Text = Me.RDSRelation.DestinationPredicate
                 End If
 

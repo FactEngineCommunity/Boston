@@ -100,6 +100,10 @@ Public Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked = My.Settings.ReverseEngineeringKeepDatabaseColumnNames
         Me.TextBoxReverseEngineeringDefaultReferenceMode.Text = Trim(My.Settings.ReverseEngineeringDefaultReferenceMode)
 
+        'Modelling
+        Me.CheckBoxUseDefaultReferenceMode.Checked = My.Settings.UseDefaultReferenceModeNewEntityTypes
+        Me.TextBoxDefaultReferenceMode.Text = Trim(My.Settings.DefaultReferenceMode)
+
     End Sub
 
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -120,59 +124,73 @@ Public Class frmCRUDBostonConfiguration
 
         Dim lsReturnString As String = ""
 
-        If Not Me.ErrorProvider.IsValid Then
-            Dim lrInvalidControl As Control = Me.ErrorProvider.getInvalidControl
-            lrInvalidControl.Show()
-            lrInvalidControl.Focus()
-            Me.ErrorProvider.SetError(Me.button_okay, "Invalid value in one field. Check each tab for errors.")
-            Exit Sub
-        End If
+        Try
 
-        If check_fields(lsReturnString) Then
+            If Not Me.ErrorProvider.IsValid Then
+                Dim lrInvalidControl As Control = Me.ErrorProvider.getInvalidControl
+                lrInvalidControl.Show()
+                lrInvalidControl.Focus()
+                Me.ErrorProvider.SetError(Me.button_okay, "Invalid value in one field. Check each tab for errors.")
+                Exit Sub
+            End If
 
-            My.Settings.DebugMode = ComboBoxDebugMode.SelectedItem
-            My.Settings.DatabaseType = Me.ComboBoxDatabaseType.SelectedItem.ToString
-            My.Settings.DatabaseConnectionString = Me.TextBoxDatabaseConnectionString.Text
-            My.Settings.DisplayBrianaVirtualAnalyst = Me.CheckBoxVirtualAnalystDisplayBriana.Checked
-            My.Settings.StartVirtualAnalystInQuietMode = Me.CheckBoxStartVirtualAnalystInQuietMode.Checked
-            My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked
-            My.Settings.ThrowInformationDebugMessagesToScreen = Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked
-            My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
-            My.Settings.RequireLoginAtStartup = Me.CheckBoxEnableClientServer.Checked
-            My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
-            My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
-            My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
-            My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
-            My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
-            My.Settings.AutoCompleteSingleClickSelects = Me.CheckBoxAutoCompleteSingleClickSelects.Checked
-            My.Settings.ReverseEngineeringKeepDatabaseColumnNames = Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked
-            My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
-            My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
-            My.Settings.UseAutoUpdateChecker = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
-            My.Settings.UseAutomatedErrorReporting = Me.CheckBoxAutomaticallyReportErrorEvents.Checked
+            If check_fields(lsReturnString) Then
 
-            'Superuser Mode          
-            My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked
+                My.Settings.DebugMode = ComboBoxDebugMode.SelectedItem
+                My.Settings.DatabaseType = Me.ComboBoxDatabaseType.SelectedItem.ToString
+                My.Settings.DatabaseConnectionString = Me.TextBoxDatabaseConnectionString.Text
+                My.Settings.DisplayBrianaVirtualAnalyst = Me.CheckBoxVirtualAnalystDisplayBriana.Checked
+                My.Settings.StartVirtualAnalystInQuietMode = Me.CheckBoxStartVirtualAnalystInQuietMode.Checked
+                My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked
+                My.Settings.ThrowInformationDebugMessagesToScreen = Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked
+                My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
+                My.Settings.RequireLoginAtStartup = Me.CheckBoxEnableClientServer.Checked
+                My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
+                My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
+                My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
+                My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
+                My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
+                My.Settings.AutoCompleteSingleClickSelects = Me.CheckBoxAutoCompleteSingleClickSelects.Checked
+                My.Settings.ReverseEngineeringKeepDatabaseColumnNames = Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked
+                My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
+                My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
+                My.Settings.UseAutoUpdateChecker = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
+                My.Settings.UseAutomatedErrorReporting = Me.CheckBoxAutomaticallyReportErrorEvents.Checked
+                'Modelling
+                My.Settings.UseDefaultReferenceModeNewEntityTypes = Me.CheckBoxUseDefaultReferenceMode.Checked
+                My.Settings.DefaultReferenceMode = Trim(Me.TextBoxDefaultReferenceMode.Text)
 
-            Try
-                If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
-                    My.Settings.FactEngineDefaultQueryResultLimit = 0
-                Else
-                    My.Settings.FactEngineDefaultQueryResultLimit = CInt(Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text)
-                End If
-            Catch ex As Exception
+                'Superuser Mode          
+                My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked
 
-            End Try
+                Try
+                    If Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite" Then
+                        My.Settings.FactEngineDefaultQueryResultLimit = 0
+                    Else
+                        My.Settings.FactEngineDefaultQueryResultLimit = CInt(Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text)
+                    End If
+                Catch ex As Exception
 
-            My.Settings.Save()
-            Me.Hide()
-            Me.Close()
-            Me.Dispose()
+                End Try
 
-            Call prApplication.triggerConfigurationChanged()
-        Else
-            MsgBox(lsReturnString)
-        End If
+                My.Settings.Save()
+                Me.Hide()
+                Me.Close()
+                Me.Dispose()
+
+                Call prApplication.triggerConfigurationChanged()
+            Else
+                MsgBox(lsReturnString)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

@@ -2705,7 +2705,7 @@ Namespace FBM
                 'If the FactType of the IUC is not on the Page, do not add to Page.
                 Dim lbAddToPage As Boolean = Me.Page.FactTypeInstance.Contains(Me)
 
-                lrRoleConstraintInstance = arRoleConstraint.CloneUniquenessConstraintInstance(Me.Page, lbAddToPage)
+                lrRoleConstraintInstance = arRoleConstraint.CloneUniquenessConstraintInstance(Me.Page, lbAddToPage, Me)
 
                 Me.InternalUniquenessConstraint.Add(lrRoleConstraintInstance)
 

@@ -62,6 +62,28 @@ Namespace RDS
         <NonSerialized()>
         Public WithEvents ResponsibleFactType As FBM.FactType
 
+        ''' <summary>
+        ''' Used with PGS Links. A PGS Link may be a LinkFactType but its UltimateFactType is its ObjectifiedFactType
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore()>
+        Public ReadOnly Property UltimateFactType As FBM.FactType
+            Get
+                Dim lrFactType As FBM.FactType = Nothing
+                If Me.ResponsibleFactType.IsObjectified Or Me.ResponsibleFactType.IsLinkFactType Then
+                    If Me.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = Me.ResponsibleFactType.LinkFactTypeRole.FactType
+                    Else
+                        lrFactType = Me.ResponsibleFactType
+                    End If
+                Else
+                    lrFactType = Me.ResponsibleFactType
+                End If
+
+                Return lrFactType
+            End Get
+        End Property
+
         Public Event DestinationMandatoryChanged(ByVal abDestinationIsMandatory As Boolean)
         Public Event DestinationMultiplicityChanged(ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity)
         Public Event ResponsibleFactTypeChanged(ByRef arNewResponsibleFactType As FBM.FactType)
