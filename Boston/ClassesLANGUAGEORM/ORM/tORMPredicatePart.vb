@@ -129,6 +129,8 @@ Namespace FBM
 
         Public Sub makeDirty()
             Me.isDirty = True
+            Me.FactTypeReading.isDirty = True
+            Call Me.FactTypeReading.FactType.makeDirty()
         End Sub
 
         ''' <summary>
@@ -163,6 +165,17 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Public Sub SetPredicateText(ByVal asPredicateText As String,
+                                    Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+
+            Me.PredicatePartText = asPredicateText
+
+            Call Me.FactTypeReading.FactType.SetFactTypeReading(Me.FactTypeReading, abBroadcastInterfaceEvent)
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty()
         End Sub
 
     End Class

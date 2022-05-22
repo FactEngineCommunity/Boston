@@ -717,6 +717,8 @@ Namespace RDS
 
         Private Sub ResponsibleFactType_FactTypeReadingModified(ByRef arFactTypeReading As FactTypeReading) Handles ResponsibleFactType.FactTypeReadingModified
 
+            Call Me.setDestinationPredicate(arFactTypeReading.PredicatePart(0).PredicatePartText)
+
             RaiseEvent ResponsibleFactTypeFactTypeReadingModified()
 
         End Sub

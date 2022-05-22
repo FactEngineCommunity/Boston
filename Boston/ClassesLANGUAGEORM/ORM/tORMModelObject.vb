@@ -1355,7 +1355,6 @@ Namespace FBM
         Public Overridable Sub makeDirty()
             Call Me.Model.MakeDirty(False, False)
             Me.isDirty = True
-
         End Sub
 
         ''' <summary>

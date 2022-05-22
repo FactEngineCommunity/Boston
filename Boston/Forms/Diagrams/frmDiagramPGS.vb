@@ -4368,6 +4368,155 @@ ErrorOut:
         End Try
     End Sub
 
+    Private Sub Diagram_LinkTextEdited(sender As Object, e As EditLinkTextEventArgs) Handles Diagram.LinkTextEdited
+
+        Try
+            Dim lrPGSLink As PGS.Link = e.Link.Tag
+
+            'CodeSafe
+            If e.NewText = "" Then e.Link.Text = e.OldText
+            'CodeSafe
+            If lrPGSLink.RDSRelation IsNot Nothing Then
+                If lrPGSLink.RDSRelation.ResponsibleFactType Is Nothing Then
+                    lrPGSLink.Link.Text = e.OldText
+                    Exit Sub
+                End If
+            Else
+                Exit Sub
+            End If
+            'CodeSafe
+            If Trim(e.NewText) = Trim(e.OldText) Then Exit Sub
+
+            Dim lrFactType As FBM.FactType = Nothing
+            Dim lrFactTypeReading As FBM.FactTypeReading = Nothing
+            Dim larRole As New List(Of FBM.Role)
+
+            '--------------------------------------------------------------------------------------------------
+            'Find the FactType for the Link
+            Try
+                If lrPGSLink.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                    If lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                        If Not lrFactType.getCorrespondingRDSTable().isPGSRelation Then
+                            GoTo SimplePredicate
+                        End If
+                    Else
+                        lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType
+                    End If
+                Else
+                    lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType
+                End If
+            Catch ex As Exception
+                e.Link.Text = e.OldText
+                Exit Sub
+            End Try
+
+            '==================================================================================================
+            If lrPGSLink.Relation.IsPGSRelationNode Or lrPGSLink.RDSRelation.ResponsibleFactType.isRDSTable Then
+
+                Dim lrRDSTable As RDS.Table
+                If Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id) Is Nothing Then
+                    Try
+                        lrRDSTable = lrFactTypeReading.FactType.getCorrespondingRDSTable(Nothing, True)
+                    Catch ex As Exception
+                        e.Link.Text = e.OldText
+                        Exit Sub
+                    End Try
+                    If lrRDSTable Is Nothing Then
+                        e.Link.Text = e.OldText
+                        Exit Sub
+                    End If
+                Else
+                    lrRDSTable = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
+                End If
+
+                'Check to see if the Link has Properties. Can't set the predicate from the Link if has Properties, must use the FactTypeReading editor.
+                If lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Count = 0 Then
+                    '============================================================
+                    'Can set the PrediatePart.PredicateText                    
+                    'All Okay
+                Else
+                    e.Link.Text = e.OldText
+                    Exit Sub
+                End If
+            Else
+SimplePredicate:
+            End If
+
+            'CodeSafe
+            If lrFactType Is Nothing Then
+                e.Link.Text = e.OldText
+                Exit Sub
+            End If
+
+            If lrFactType.FactTypeReading.Count = 0 Then
+                'Create a new FactTypeReading
+                larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {Trim(e.NewText), ""})
+                lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+            ElseIf lrFactType.FactTypeReading.Count = 1 Then
+                'Great...set the Predicate for the FactTypeReading's first PredicatePart
+                lrFactTypeReading = lrFactType.FactTypeReading(0)
+                If lrFactTypeReading.RoleList(0).JoinedORMObject.Id = e.Link.Origin.Tag.RDSTable.Name Then
+                    lrFactTypeReading = lrFactType.FactTypeReading(0)
+                    lrFactTypeReading.PredicatePart(0).SetPredicateText(Trim(e.NewText), True)
+                Else
+                    'Create a new FactTypeReading
+                    larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {Trim(e.NewText), ""})
+                    lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                End If
+            Else
+                lrFactTypeReading = lrFactType.FactTypeReading(0)
+                If lrFactTypeReading.RoleList(0).JoinedORMObject.Id = e.Link.Origin.Tag.RDSTable.Name Then
+                    lrFactTypeReading = lrFactType.FactTypeReading(0)
+                    lrFactTypeReading.PredicatePart(0).SetPredicateText(Trim(e.NewText), True)
+                Else
+                    'Create a new FactTypeReading
+                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                             From PredicatePart In FactTypeReading.PredicatePart
+                                             Where PredicatePart.Role.JoinedORMObject.Id = e.Link.Origin.Tag.RDSTable.Name
+                                             Select FactTypeReading
+
+                    If larFactTypeReading.Count = 0 Then
+                        'Create a new FactTypeReading
+                        larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+                        lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {Trim(e.NewText), ""})
+                        lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                    Else
+                        lrFactTypeReading = larFactTypeReading.First
+                        lrFactTypeReading.PredicatePart(0).SetPredicateText(Trim(e.NewText), True)
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub Diagram_LinkTextEditing(sender As Object, e As LinkValidationEventArgs) Handles Diagram.LinkTextEditing
+
+        Try
+            Dim lrPGSLink As PGS.Link = e.Link.Tag
+
+            Call lrPGSLink.setPredicate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
     'Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click
 
     '        Dim lrAddAttributeForm As New frmCRUDAddAttribute
