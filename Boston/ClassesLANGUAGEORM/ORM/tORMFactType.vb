@@ -1905,6 +1905,36 @@ Namespace FBM
 
         End Sub
 
+        Public Function ContainsAllRoles(ByVal aarRole As List(Of FBM.Role)) As Boolean
+
+            Try
+                For Each lrRole In Me.RoleGroup
+
+                    Dim larRole = From Role In aarRole
+                                  Where Role.Id = lrRole.Id
+                                  Select Role
+
+                    If larRole.Count = 0 Then
+                        Return False
+                    End If
+
+                Next
+
+                Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Function CountReferencesToModelObject(ByRef arModelObject As FBM.ModelObject) As Integer
 
             Try
