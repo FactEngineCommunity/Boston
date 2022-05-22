@@ -792,7 +792,6 @@ Namespace FBM
                     Me.Diagram.Invalidate()
                 End If
 
-
                 '----------------------------------------------------------------------
                 'Clone the EntityType so that it is established for the target Model.
                 '----------------------------------------------------------------------
@@ -960,7 +959,8 @@ Namespace FBM
                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
                                             Optional ByVal abExpandIfReferenceModeFactType As Boolean = False,
                                             Optional ByVal abForceDropOfRelatedModelElements As Boolean = False,
-                                            Optional ByVal abDropLinkFactTypes As Boolean = True) As FBM.FactTypeInstance
+                                            Optional ByVal abDropLinkFactTypes As Boolean = True,
+                                            Optional ByVal abShowFactTypeName As Boolean = False) As FBM.FactTypeInstance
 
             Dim lrRoleInstance As New FBM.RoleInstance
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -1142,6 +1142,10 @@ Namespace FBM
                             Call lrEntityTypeInstance.ExpandTheReferenceScheme()
                         End If
                     End If
+                End If
+
+                If abShowFactTypeName Then
+                    Call lrFactTypeInstance.FactType.SetShowFactTypeName(True, Me)
                 End If
 
                 Return lrFactTypeInstance
