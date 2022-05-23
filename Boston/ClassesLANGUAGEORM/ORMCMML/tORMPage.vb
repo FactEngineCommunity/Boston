@@ -2429,7 +2429,7 @@ Namespace FBM
 
                             lrRelation.RDSRelation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
 
-                            Me.ERDiagram.Relation.Add(lrRelation)
+                            Me.ERDiagram.Relation.AddUnique(lrRelation)
 
                             Dim lrLink As New ERD.Link(arEntity.Page, lrFactInstance, lrOrigingEREntity, lrDestinationgEREntity, Nothing, Nothing, lrRelation)
                             lrLink.DisplayAndAssociate()
@@ -2689,7 +2689,7 @@ Namespace FBM
                             lrLink.DisplayAndAssociate()
                             lrLink.Link.Text = lrRelation.ActualPGSNode.Id
 
-                            Me.ERDiagram.Relation.Add(lrRelation)
+                            Me.ERDiagram.Relation.AddUnique(lrRelation)
 
                         End If
 
@@ -2709,6 +2709,12 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' Used for both PGSRelation Node Types, and normal PGS relations.
+        ''' </summary>
+        ''' <param name="arPGSNode"></param>
+        ''' <param name="abAddToPage"></param>
+        ''' <param name="aasLoadedRelationIds"></param>
         Public Sub loadRelationsForPGSNode(ByRef arPGSNode As PGS.Node,
                                            Optional ByVal abAddToPage As Boolean = False,
                                            Optional ByRef aasLoadedRelationIds As List(Of String) = Nothing)
@@ -2854,15 +2860,24 @@ Namespace FBM
                                 lrRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lsRelationId)
                             End If
 
-
                             If abAddToPage Then Me.addRDSRelation(lrRDSRelation)
+
+                            'CodeSafe: Abort DisplayAssociate if the link has already been drawn by another process.
+                            Try
+                                If lrRelation.Link IsNot Nothing Then
+                                    If lrRelation.Link.Link IsNot Nothing Then
+                                        GoTo MoveOn
+                                    End If
+                                End If
+                            Catch ex As Exception
+                                GoTo MoveOn
+                            End Try
 
                             Dim lrLink As PGS.Link
                             lrLink = New PGS.Link(Me, lrFactInstance, lrOriginNode, lrDestinationNode, Nothing, Nothing, lrRelation)
                             lrLink.DisplayAndAssociate()
-
                         End If
-
+MoveOn:
                         lrRecordset.MoveNext()
                     End While
 

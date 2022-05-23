@@ -326,7 +326,13 @@ KeepChecking1:
                                                Select RoleConstraint Distinct
 
                         If loRoleConstraint.Count > 0 Then
-                            If loRoleConstraint.Count = 2 And Me.Column(0).FactType.Is1To1BinaryFactType Then
+                            Dim lrFactType As FBM.FactType = Nothing
+                            If Me.Column(0).FactType Is Nothing Then
+                                lrFactType = Me.Column(0).Role.FactType
+                            Else
+                                lrFactType = Me.Column(0).FactType
+                            End If
+                            If loRoleConstraint.Count = 2 And lrFactType.Is1To1BinaryFactType Then
                                 Return loRoleConstraint(1)
                             Else
                                 Return loRoleConstraint.First

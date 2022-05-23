@@ -515,6 +515,7 @@ Namespace FBM
             Dim lrPGSNode As New PGS.Node
 
             With Me
+                lrPGSNode.Fact = .Fact
                 lrPGSNode.Model = .Model
                 lrPGSNode.Page = arPage
                 lrPGSNode.FactData = Me.FactData

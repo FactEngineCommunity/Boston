@@ -80,14 +80,34 @@ Public Class frmToolboxModelDictionary
                 Me.LabelModelName.Text = Me.zrORMModel.Name
             End If
 
-            Select Case ailanguage
+            Dim liLanguage As pcenumLanguage = pcenumLanguage.ORMModel
+
+            Select Case Me.ComboBox1.SelectedIndex
+                Case Is = 0
+                    liLanguage = pcenumLanguage.ORMModel
+                Case Is = 1
+                    liLanguage = pcenumLanguage.EntityRelationshipDiagram
+                Case Is = 2
+                    liLanguage = pcenumLanguage.PropertyGraphSchema
+            End Select
+
+            If ailanguage <> liLanguage Then
+                liLanguage = ailanguage
+            End If
+
+            RemoveHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
+            Select Case liLanguage
                 Case Is = pcenumLanguage.ORMModel
                     Call Me.LoadORMModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 0
                 Case Is = pcenumLanguage.EntityRelationshipDiagram
                     Call Me.LoadERDModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 1
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 2
             End Select
+            AddHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
 
             Me.ziLoadedLanguage = ailanguage
 
@@ -1238,4 +1258,29 @@ Public Class frmToolboxModelDictionary
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
+
+    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+
+        Try
+            Call Me.TreeView1.Nodes.Clear()
+            Select Case Me.ComboBox1.SelectedIndex
+                Case Is = 0
+                    Call Me.LoadORMModelDictionary()
+                Case Is = 1
+                    Call Me.LoadERDModelDictionary()
+                Case Is = 2
+                    Call Me.LoadPGSModelDictionary()
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

@@ -10,11 +10,10 @@ Namespace FBM
         Public WithEvents RDSModel As New RDS.Model
 
         ''' <summary>
-        ''' 
+        ''' Displays the relation for a PGSRelation Node Type. E.g. ObjectifiedFactTypes that are PGSRelations. I.e. Don't show the Node Type, show the relation
         ''' </summary>
         ''' <param name="arOriginatingNode"></param>
-        ''' <param name="arRelation"></param>
-        ''' <param name="arFactType">To be sure...point to the actual FactType</param>
+        ''' <param name="arRelation"></param>        
         Public Sub DisplayPGSRelationNodeLink(ByRef arOriginatingNode As PGS.Node,
                                               ByRef arRelation As RDS.Relation)
 
@@ -331,6 +330,7 @@ Namespace FBM
                                 lrLink = New PGS.Link(Me, New FBM.FactInstance, lrOriginEntity, lrDestinationEntity, Nothing, Nothing, lrERDRelation)
                                 lrLink.RDSRelation = arRelation
                                 lrLink.DisplayAndAssociate()
+                                Call Me.ERDiagram.Relation.AddUnique(lrLink.Relation)
                                 Call lrLink.setPredicate()
                                 Call lrLink.setHeadShapes()
 

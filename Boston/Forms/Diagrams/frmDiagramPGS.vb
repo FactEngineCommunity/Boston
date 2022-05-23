@@ -251,19 +251,38 @@ Public Class frmDiagramPGS
     Private Function GetCommonLinks(ByVal node1 As DiagramNode, ByVal node2 As DiagramNode) As DiagramLinkCollection
         Dim commonLinks As New DiagramLinkCollection()
 
-        For Each link As DiagramLink In node1.OutgoingLinks
-            If link.Destination.Tag.Name = node2.Tag.Name Then
-                commonLinks.Add(link)
-            End If
-        Next
+        Try
 
-        For Each link As DiagramLink In node1.IncomingLinks
-            If link.Origin.Tag.Name = node2.Tag.Name Then
-                commonLinks.Add(link)
-            End If
-        Next
+            For Each link As DiagramLink In node1.OutgoingLinks
 
-        Return commonLinks
+                'CodeSafe
+                If link.Destination.Tag Is Nothing Then
+                    Return commonLinks
+                End If
+
+                If link.Destination.Tag.Name = node2.Tag.Name Then
+                    commonLinks.Add(link)
+                End If
+            Next
+
+            For Each link As DiagramLink In node1.IncomingLinks
+                If link.Origin.Tag.Name = node2.Tag.Name Then
+                    commonLinks.Add(link)
+                End If
+            Next
+
+            Return commonLinks
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return commonLinks
+        End Try
 
     End Function
 
@@ -475,6 +494,7 @@ Public Class frmDiagramPGS
             Next
 
 #Region "Vitage Map Relations, based on CMML Page Instances"
+            '20220523-VM-Get rid of after a while. Has been fine for a long time.
             ''=======================================
             '' Map the Relations - Link the Nodes
             ''=======================================
@@ -2745,6 +2765,11 @@ Public Class frmDiagramPGS
 
             lrPGSLink = e.Link.Tag
 
+            'CodeSafe
+            If lrPGSLink Is Nothing Then
+                Exit Sub
+            End If
+
             If Me.GetCommonLinks(e.Link.Origin, e.Link.Destination).Count = 1 Then
                 'Straighten the Link
                 e.Link.SegmentCount = 2
@@ -3411,8 +3436,15 @@ Public Class frmDiagramPGS
                     larLinkToRemove.Add(lrLink)
                 Next
 
+                Dim lrPGSLink As PGS.Link
                 For Each lrLink In larLinkToRemove
                     Me.Diagram.Links.Remove(lrLink)
+                    lrPGSLink = lrLink.Tag
+                    Call Me.zrPage.ERDiagram.Relation.RemoveAll(AddressOf lrPGSLink.Relation.Equals)
+                    If lrPGSLink.Relation.ActualPGSNode IsNot Nothing Then
+                        Call lrPGSLink.Relation.ActualPGSNode.RemoveFromPage()
+                    End If
+
                 Next
 
                 '----------------------------------------------------------------------------------------------------------
@@ -3932,6 +3964,11 @@ FinishedPretesting:
                 Exit Sub
             End If
 
+            'Remove Link
+            If lrPGSRelation.Link.Link IsNot Nothing Then
+                Call Me.Diagram.Links.Remove(lrPGSRelation.Link.Link)
+            End If
+
             lrPGSRelation.ActualPGSNode.NodeType = pcenumPGSEntityType.Node
 
             Call lrPGSRelation.ActualPGSNode.RDSTable.setIsPGSRelation(False)
@@ -4294,7 +4331,7 @@ ErrorOut:
             Me.Diagram.Selection.RemoveItem(lrPGSNodeType.Shape)
 
             '==============================================================================================================================================
-            Call Me.zrPage.loadRelationsForPGSNode(lrPGSNodeType, False)
+            'Call Me.zrPage.loadRelationsForPGSNode(lrPGSNodeType, False)
 
             lrFactType = lrPGSNodeType.RDSTable.FBMModelElement
 

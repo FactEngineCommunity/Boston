@@ -97,6 +97,7 @@ Namespace PGS
 
             Try
                 If Me.OriginModelElement.Shape Is Nothing Then Exit Sub
+                If Me.Link IsNot Nothing Then Exit Sub
 
                 Dim lrDiagramLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.Shape, Me.DestinationModelElement.Shape)
 

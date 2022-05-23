@@ -208,7 +208,8 @@ Namespace ERD
 
                 If Me.Link Is Nothing Then Exit Sub
                 Me.Page.Diagram.Links.Remove(Me.Link.Link)
-                Me.Page.ERDiagram.Relation.Remove(Me)
+                '20220523-VM-Was .Remove(Me). But there were times when the ERDRelation was in the list more than once.
+                Me.Page.ERDiagram.Relation.RemoveAll(AddressOf Me.Equals)
 
                 Dim lrDiagramingLink As MindFusion.Diagramming.DiagramLink = Me.Link.Link
 
@@ -248,7 +249,8 @@ Namespace ERD
                     lrDiagramingLink.Dispose()
                 End If
 
-                Me.Page.ERDiagram.Relation.Remove(Me)
+                '20220523-VM-Was .Remove(Me). Changed to capture all instances if more than one.
+                Me.Page.ERDiagram.Relation.RemoveAll(AddressOf Me.Equals)
 
                 Me.Page.Diagram.Invalidate()
 

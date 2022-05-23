@@ -309,7 +309,7 @@ Public Class frmDiagramERD
                         'RDS
                         lrERRelation.RDSRelation = lrRDSRelation
 
-                        Me.zrPage.ERDiagram.Relation.Add(lrERRelation)
+                        Me.zrPage.ERDiagram.Relation.AddUnique(lrERRelation)
 
                         Dim lrLink As ERD.Link
                         lrLink = New ERD.Link(Me.zrPage, New FBM.FactInstance, lrOrigingEREntity, lrDestinationEREntity, Nothing, Nothing, lrERRelation)

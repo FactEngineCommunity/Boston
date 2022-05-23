@@ -404,7 +404,14 @@ Namespace PGS
         Public Overloads Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
 
             Me.Shape.Image = My.Resources.ORMShapes.Blank
-            Me.Shape.Pen.Color = Color.DeepSkyBlue
+
+            If CType(Me.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
+                Me.Shape.Pen.Color = Color.Red
+            ElseIf Me.Shape.Selected Then
+                Me.Shape.Pen.Color = Color.Blue
+            Else
+                Me.Shape.Pen.Color = Color.DeepSkyBlue
+            End If
 
         End Sub
 
@@ -517,6 +524,19 @@ Namespace PGS
 
                     Try
                         Me.Page.Diagram.Links.Remove(Me.PGSRelation.Link.Link) 'Remove the existing PGSRelation Link before loading new links because the process of loading changes the nature of the Links on the Page.
+                        'Relations
+                        Call Me.Page.ERDiagram.Relation.Remove(Me.PGSRelation)
+                        Dim lrERDRelation As ERD.Relation
+                        For Each lrDiagramLink In Me.Shape.OutgoingLinks
+                            lrERDRelation = lrDiagramLink.Tag
+                            If lrERDRelation IsNot Nothing Then
+                                Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
+                            End If
+                        Next
+                        'CodeSafe
+                        For Each lrERDRelation In Me.Page.ERDiagram.Relation.FindAll(Function(x) x.OriginEntity.Name = Me.Name)
+                            Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
+                        Next
                     Catch ex As Exception
                         'Not a biggie
                     End Try
@@ -541,6 +561,19 @@ Namespace PGS
                     End If
 
                     Me.Page.Diagram.Nodes.Remove(Me.Shape)
+
+                    'Relations
+                    Dim lrERDRelation As ERD.Relation
+                    For Each lrDiagramLink In Me.Shape.OutgoingLinks
+                        lrERDRelation = lrDiagramLink.Tag
+                        If lrERDRelation IsNot Nothing Then
+                            Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
+                        End If
+                    Next
+                    'CodeSafe
+                    For Each lrERDRelation In Me.Page.ERDiagram.Relation.FindAll(Function(x) x.OriginEntity.Name = Me.Name)
+                        Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
+                    Next
 
                     'CMML
                     Dim lsSQLQuery As String = ""
@@ -650,7 +683,7 @@ Namespace PGS
 
                     lrLink.Relation.Link = lrLink
 
-                    Me.Page.ERDiagram.Relation.Add(lrRelation)
+                    Me.Page.ERDiagram.Relation.AddUnique(lrRelation)
 
                 End If
 
@@ -695,6 +728,8 @@ Namespace PGS
 
                     Call Me.Page.Diagram.Nodes.Remove(Me.Shape)
                 End If
+
+                Me.Page.ERDiagram.Entity.RemoveAll(AddressOf Me.Equals)
 
                 Return True
 
