@@ -795,48 +795,64 @@ SkipRegistrationChecking:
 
                 Call Me.loadToolboxErrorListForm(prApplication.ActivePages(0).Pane)
 
-                If TypeOf (prApplication.ActivePages(0)) Is frmDiagramORM Then
-                    Dim lrORMDiagram As frmDiagramORM
-                    lrORMDiagram = prApplication.ActivePages(0)
-                    Call Me.loadToolboxDescriptions(prApplication.ActivePages(0).Pane)
-                    Call Me.loadToolboxRichmondBrainBox(lrORMDiagram.zrPage, prApplication.ActivePages(0).Pane)
-                    Call Me.loadToolboxORMReadingEditor(lrORMDiagram.zrPage, prApplication.ActivePages(0).Pane)
-                    Call Me.loadToolboxORMVerbalisationForm(lrORMDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
-                    Call Me.LoadToolboxModelDictionary()
-                    Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
-                    If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
-                        Call Me.LoadToolbox()
-                        Dim lfrmToolboxForm As frmToolbox
-                        lfrmToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
-                        lfrmToolboxForm.Focus()
-                        lfrmToolboxForm.ShapeListBox.Update()
-                    End If
+                Select Case prApplication.ActivePages(0).GetType
+                    Case Is = GetType(frmDiagramORM)
+                        Dim lrORMDiagram As frmDiagramORM
+                        lrORMDiagram = prApplication.ActivePages(0)
+                        Call Me.loadToolboxDescriptions(prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxRichmondBrainBox(lrORMDiagram.zrPage, prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxORMReadingEditor(lrORMDiagram.zrPage, prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxORMVerbalisationForm(lrORMDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
+                        Call Me.LoadToolboxModelDictionary()
+                        Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                        If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
+                            Call Me.LoadToolbox()
+                            Dim lfrmToolboxForm As frmToolbox
+                            lfrmToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+                            lfrmToolboxForm.Focus()
+                            lfrmToolboxForm.ShapeListBox.Update()
+                        End If
+                    Case Is = GetType(frmDiagramPGS)
 
-                ElseIf TypeOf (prApplication.ActivePages(0)) Is frmDiagramERD Then
-                    Dim lfrmERDiagram As frmDiagramERD
-                    lfrmERDiagram = prApplication.ActivePages(0)
-                    Call Me.loadToolboxORMReadingEditor(lfrmERDiagram.zrPage, prApplication.ActivePages(0).Pane)
-                    Call Me.loadToolboxORMVerbalisationForm(lfrmERDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
-                    Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
-                    Call Me.LoadToolboxModelDictionary()
+                        Dim lfrmPGSDiagram As frmDiagramPGS
+                        lfrmPGSDiagram = prApplication.ActivePages(0)
+                        Call Me.loadToolboxORMReadingEditor(lfrmPGSDiagram.zrPage, prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxORMVerbalisationForm(lfrmPGSDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
+                        Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                        Call Me.LoadToolboxModelDictionary()
+                        If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
+                            Call Me.LoadToolbox()
+                            Dim lfrmToolboxForm As frmToolbox
+                            lfrmToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+                            lfrmToolboxForm.Focus()
+                            lfrmToolboxForm.ShapeListBox.Update()
+                        End If
+                    Case Is = GetType(frmDiagramERD)
 
-                ElseIf TypeOf prApplication.ActivePages(0) Is frmStateTransitionDiagram Then
+                        Dim lfrmERDiagram As frmDiagramERD
+                        lfrmERDiagram = prApplication.ActivePages(0)
+                        Call Me.loadToolboxORMReadingEditor(lfrmERDiagram.zrPage, prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxORMVerbalisationForm(lfrmERDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
+                        Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                        Call Me.LoadToolboxModelDictionary()
 
-                    Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                    Case Is = GetType(frmStateTransitionDiagram)
 
-                    If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
-                        Call Me.LoadToolbox()
-                        Dim lfrmToolboxForm As frmToolbox
-                        lfrmToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
-                        lfrmToolboxForm.Focus()
+                        Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
 
-                        lfrmToolboxForm.ShapeListBox.Shapes = MindFusion.Diagramming.ShapeLibrary.LoadFrom(My.Settings.StateTransitionShapeLibrary).Shapes
+                        If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
+                            Call Me.LoadToolbox()
+                            Dim lfrmToolboxForm As frmToolbox
+                            lfrmToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+                            lfrmToolboxForm.Focus()
 
-                        lfrmToolboxForm.ShapeListBox.Update()
-                    End If
+                            lfrmToolboxForm.ShapeListBox.Shapes = MindFusion.Diagramming.ShapeLibrary.LoadFrom(My.Settings.StateTransitionShapeLibrary).Shapes
 
+                            lfrmToolboxForm.ShapeListBox.Update()
+                        End If
+
+                End Select
                 End If
-            End If
 
         Catch ex As Exception
             Dim lsMessage1 As String

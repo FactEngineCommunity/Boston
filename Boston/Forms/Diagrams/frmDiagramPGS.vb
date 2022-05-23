@@ -1110,6 +1110,9 @@ Public Class frmDiagramPGS
 
             Me.zrPage.Diagram.Links.Remove(e.Link)
 
+            Dim lrPGSNodeType As PGS.Node = e.Link.Origin.Tag
+            Call Me.zrPage.loadRelationsForPGSNode(lrPGSNodeType, True)
+
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
@@ -2667,6 +2670,8 @@ Public Class frmDiagramPGS
         If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
             If Me.Diagram.Selection.Items.Count > 0 Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else

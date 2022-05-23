@@ -316,6 +316,23 @@ KeepChecking1:
                     'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
                     Case Is = pcenumConceptType.FactType
 
+                        '---------------------------------------------------------------
+                        'Try and find the RoleConstraint in the FBM Model
+                        Dim loRoleConstraint = From RoleConstraint In Me.Model.Model.RoleConstraint
+                                               From RoleConstraintRole In RoleConstraint.RoleConstraintRole
+                                               From Column In Me.Column
+                                               Where RoleConstraintRole.Role.FactType Is Column.Role.FactType
+                                               Where RoleConstraint.RoleConstraintRole.Count = Me.Column.Count
+                                               Select RoleConstraint Distinct
+
+                        If loRoleConstraint.Count > 0 Then
+                            If loRoleConstraint.Count = 2 And Me.Column(0).FactType.Is1To1BinaryFactType Then
+                                Return loRoleConstraint(1)
+                            Else
+                                Return loRoleConstraint.First
+                            End If
+
+                        End If
                 End Select
 
                 Return Nothing

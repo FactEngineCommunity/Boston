@@ -1910,9 +1910,16 @@ Namespace FBM
 
             Try
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+                If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                    Try
+                        lrFactTypeInstance = Me.RoleConstraintRole(0).Role.FactType
+                    Catch ex As Exception
+                        'Because might not have a RoleConstraintRole
+                    End Try
+                End If
 
-
-                lrRoleConstraintRoleInstance = arRoleConstraintRole.CloneInstance(Me.Page)
+                lrRoleConstraintRoleInstance = arRoleConstraintRole.CloneInstance(Me.Page, Me, False, lrFactTypeInstance)
                 Me.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
 
                 Dim lrRoleInstance As FBM.RoleInstance = lrRoleConstraintRoleInstance.Role
@@ -1998,7 +2005,9 @@ Namespace FBM
                 End If
 
                 If lrRoleConstraintRoleInstanceToRemove.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                    Me.Page.Diagram.Nodes.Remove(lrRoleConstraintRoleInstanceToRemove.Shape)
+                    If Me.Page.Diagram IsNot Nothing Then
+                        Me.Page.Diagram.Nodes.Remove(lrRoleConstraintRoleInstanceToRemove.Shape)
+                    End If
                 End If
 
                 Me.RoleConstraintRole.Remove(lrRoleConstraintRoleInstanceToRemove)
@@ -2007,7 +2016,9 @@ Namespace FBM
                     lrRoleConstraintRoleInstance.SequenceNr -= 1
                 Next
 
-                Me.Page.Diagram.Invalidate()
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Invalidate()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

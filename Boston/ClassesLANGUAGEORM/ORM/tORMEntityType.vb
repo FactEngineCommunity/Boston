@@ -1040,8 +1040,7 @@ Namespace FBM
 
                 Call Me.TriggerChangingToFactType(lrFactType)
 
-                lrFactType.Objectify(True, False)
-                lrFactType.ObjectifyingEntityType = Me
+                lrFactType.Objectify(True, False, Me)
 
                 If lbHasSimpleReferenceScheme Then
                     Call lrFactType.RoleGroup(0).ReassignJoinedModelObject(lrFactType, True, Nothing, True)
@@ -1095,7 +1094,9 @@ Namespace FBM
 
                         Dim lrColumn = larColumn.First
                         lrColumn.setRole(lrRole)
-                        lrColumn.setActiveRole(lrRole)
+                        lrColumn.FactType = lrFactType
+                        '20220523-vm-was but wrong.
+                        'lrColumn.setActiveRole(lrRole)
                         larProcessedColumn.Add(lrColumn)
                     Next
                 End If
@@ -2193,7 +2194,8 @@ Namespace FBM
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
                                                   Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
-                                                  Optional ByVal abRemoveIndex As Boolean = True) As Boolean
+                                                  Optional ByVal abRemoveIndex As Boolean = True,
+                                                  Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False) As Boolean
 
             Dim lrEntityType As FBM.EntityType
             Dim lrSubtype As FBM.tSubtypeRelationship
@@ -2956,6 +2958,16 @@ Namespace FBM
                     Next
                 End If
 
+                '==============================================================================================
+                'ReferenceModeFactTypeName if one exists
+                If Me.HasSimpleReferenceScheme Then
+                    Dim lsValueTypeName = Me.MakeReferenceModeName
+                    Call Me.ReferenceModeValueType.SetName(lsValueTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
+                    Dim lsFactTypeName As String = Me.Id & "Has" & Me.ReferenceModeValueType.Id
+                    Call Me.ReferenceModeFactType.setName(lsFactTypeName, abBroadcastInterfaceEvent)
+                End If
+                '==============================================================================================
+
                 '-------------------------------------------------------------
                 'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
                 If Not abSuppressModelSave Then
@@ -3126,9 +3138,14 @@ SkipSettingReferenceModeObjects:
         ''' </summary>
         ''' <param name="abIsObjectifyingEntityType"></param>
         ''' <remarks></remarks>
-        Public Sub SetIsObjectifyingEntityType(ByVal abIsObjectifyingEntityType As Boolean)
+        Public Sub SetIsObjectifyingEntityType(ByVal abIsObjectifyingEntityType As Boolean, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
             Me.IsObjectifyingEntityType = abIsObjectifyingEntityType
+
             RaiseEvent IsObjectifyingEntityTypeChanged(abIsObjectifyingEntityType)
+
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateEntityType, Me, Nothing)
+            End If
 
             Me.isDirty = True
             Me.Model.MakeDirty(False)

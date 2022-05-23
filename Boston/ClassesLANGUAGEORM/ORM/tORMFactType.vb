@@ -1905,20 +1905,28 @@ Namespace FBM
 
         End Sub
 
-        Public Function ContainsAllRoles(ByVal aarRole As List(Of FBM.Role)) As Boolean
+        Public Function ContainsAllRoles(ByVal aarRole As List(Of FBM.Role), Optional ByVal abCheckAll As Boolean = False) As Boolean
 
             Try
-                For Each lrRole In Me.RoleGroup
+                Dim lbFlagFalse As Boolean = False
 
-                    Dim larRole = From Role In aarRole
+                For Each lrRole In aarRole
+
+                    Dim larRole = From Role In Me.RoleGroup
                                   Where Role.Id = lrRole.Id
                                   Select Role
 
                     If larRole.Count = 0 Then
-                        Return False
-                    End If
+                        If abCheckAll Then
+                            lbFlagFalse = True
+                        Else
+                            Return False
+                        End If
 
+                    End If
                 Next
+
+                If lbFlagFalse Then Return False
 
                 Return True
 
@@ -3540,7 +3548,8 @@ Namespace FBM
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
                                                   Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
-                                                  Optional ByVal abRemoveIndex As Boolean = True) As Boolean
+                                                  Optional ByVal abRemoveIndex As Boolean = True,
+                                                  Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False) As Boolean
 
             Dim liInd As Integer = 0
             Dim lrRole As FBM.Role
@@ -3548,6 +3557,7 @@ Namespace FBM
             Dim lrFactTypeReading As FBM.FactTypeReading
 
             Try
+                Dim lbIsPreferredReferenceMode = Me.IsPreferredReferenceMode
 
                 If Me.IsPreferredReferenceMode Then
                     Dim larEntityType = From Role In Me.RoleGroup
@@ -3584,7 +3594,7 @@ Namespace FBM
                 Next
 
                 For Each lrRoleConstraint In Me.InternalUniquenessConstraint.ToArray
-                    Call lrRoleConstraint.RemoveFromModel(True, False, abDoDatabaseProcessing)
+                    Call lrRoleConstraint.RemoveFromModel(True, False, abDoDatabaseProcessing,,, lbIsPreferredReferenceMode)
                 Next
 
                 '20180425-VM-Was before removing FactTypeReadings, but that caused bugs. Instances of RoleInstance removed before RoleConstraints associated with those RoleInstances.
@@ -3701,13 +3711,21 @@ Namespace FBM
         ''' Objectifies the FactType
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub Objectify(Optional ByVal abSuppressSave As Boolean = False, Optional ByVal abCreateLinkFactTypes As Boolean = True)
+        Public Sub Objectify(Optional ByVal abSuppressSave As Boolean = False,
+                             Optional ByVal abCreateLinkFactTypes As Boolean = True,
+                             Optional ByVal arObjectifyingEntityType As FBM.EntityType = Nothing)
 
             Try
-                Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Nothing, False)
-                Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                Me.ObjectifyingEntityType.ObjectifiedFactType = Me
-                Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
+                If arObjectifyingEntityType Is Nothing Then
+                    Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Me.Id, False)
+                    Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                    Me.ObjectifyingEntityType.ObjectifiedFactType = Me
+                    Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
+                Else
+                    Me.ObjectifyingEntityType = arObjectifyingEntityType
+                    Me.ObjectifyingEntityType.SetIsObjectifyingEntityType(True)
+                    Me.ObjectifyingEntityType.SetObjectifiedFactType(Me)
+                End If
 
                 If abCreateLinkFactTypes Then Me.CreateLinkFactTypes(True)
 

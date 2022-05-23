@@ -2113,7 +2113,8 @@ Namespace FBM
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
                                                   Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
-                                                  Optional ByVal abRemoveIndex As Boolean = True) As Boolean
+                                                  Optional ByVal abRemoveIndex As Boolean = True,
+                                                  Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False) As Boolean
 
             Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.RoleConstraint)
             Dim lsMessage As String
@@ -2191,7 +2192,7 @@ RemoveAnyway:
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
                 If abRemoveIndex Then RaiseEvent RemoveIndex(abDoDatabaseProcessing)
 
-                Me.Model.RemoveRoleConstraint(Me, abCheckForErrors, abDoDatabaseProcessing,, abRemoveIndex)
+                Me.Model.RemoveRoleConstraint(Me, abCheckForErrors, abDoDatabaseProcessing,, abRemoveIndex, abIsPartOfSimpleReferenceScheme)
 
                 Me.Model.MakeDirty(False, False)
 

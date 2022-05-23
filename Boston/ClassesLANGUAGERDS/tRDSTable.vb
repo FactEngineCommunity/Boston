@@ -1485,10 +1485,12 @@ Namespace RDS
         ''' <remarks></remarks>
         Public Sub removeColumn(ByRef arColumn As RDS.Column,
                                 Optional abRemoveFromDatabase As Boolean = False,
-                                Optional abRemoveResidualCMML As Boolean = True)
+                                Optional abRemoveResidualCMML As Boolean = True,
+                                Optional abIsReferenceModeColumn As Boolean = False)
 
             Try
                 Dim lrColumn As RDS.Column = arColumn
+
                 Me.Column.Remove(arColumn)
 
                 Dim lrRemovedColumn As RDS.Column = arColumn
@@ -1531,7 +1533,7 @@ Namespace RDS
                     End If
                 End If
 
-                If Me.Column.Count = 0 Then
+                If Me.Column.Count = 0 And Not abIsReferenceModeColumn Then
                     Call Me.Model.removeTable(Me)
                 End If
 

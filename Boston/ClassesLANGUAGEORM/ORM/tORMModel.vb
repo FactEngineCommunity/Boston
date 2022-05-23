@@ -3547,7 +3547,8 @@ FinishedProcessing:
                                         ByVal abCheckForErrors As Boolean,
                                         ByVal abBroadcastInterfaceEvent As Boolean,
                                         Optional ByVal abReplacingRoleConstraint As Boolean = False,
-                                        Optional ByVal abRemoveIndex As Boolean = True)
+                                        Optional ByVal abRemoveIndex As Boolean = True,
+                                        Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False)
 
             Try
                 If Me.RoleConstraint.Contains(arRoleConstraint) Then
@@ -3628,7 +3629,7 @@ FinishedProcessing:
                                     larColumn = lrTable.Column.FindAll(Function(x) x.Role.Id = lrRole.Id)
 
                                     For Each lrColumn In larColumn.ToList
-                                        Call lrTable.removeColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                        Call lrTable.removeColumn(lrColumn, Me.IsDatabaseSynchronised,, abIsPartOfSimpleReferenceScheme)
 
                                         Dim larRelation = lrTable.getOutgoingRelations.FindAll(Function(x) x.OriginColumns.Contains(lrColumn)) 'Origin
                                         larRelation.AddRange(lrTable.getOutgoingRelations.FindAll(Function(x) x.ReverseDestinationColumns.Contains(lrColumn)))
@@ -3734,7 +3735,7 @@ FinishedProcessing:
                                 End If
                             ElseIf lrFactType.Arity = 2 And Not abReplacingRoleConstraint Then
 
-                                    Dim lrResponsibleRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
+                                Dim lrResponsibleRole As FBM.Role = arRoleConstraint.RoleConstraintRole(0).Role
 
                                 Dim larColumn = From Table In Me.RDS.Table
                                                 From Column In Table.Column

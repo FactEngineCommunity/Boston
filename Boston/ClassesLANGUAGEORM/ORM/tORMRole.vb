@@ -2648,7 +2648,8 @@ FinishedProcessing:
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
                                                   Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
-                                                  Optional ByVal abRemoveIndex As Boolean = True
+                                                  Optional ByVal abRemoveIndex As Boolean = True,
+                                                  Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False
                                                   ) As Boolean
 
             Try

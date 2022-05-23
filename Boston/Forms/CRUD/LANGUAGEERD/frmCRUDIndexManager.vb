@@ -225,6 +225,8 @@ Public Class frmCRUDIndexManager
 
     Private Sub ButtonApply_Click(sender As Object, e As EventArgs) Handles ButtonApply.Click
 
+        Dim lsMessage As String
+
         Try
             If Me.DataGridViewIndexes.SelectedRows.Count = 1 Or Me.DataGridViewIndexes.CurrentCell IsNot Nothing Then
 
@@ -238,24 +240,198 @@ Public Class frmCRUDIndexManager
 
                 Dim lrIndex As RDS.Index = Me.DataGridViewIndexes.Rows(liRowNr).Tag
 
+                '--------------------------------------------------------------------------------
+                'Get the Actual Index...if it exists. NB lrActualIndex might be Nothing
+                Dim lsNewIndexName = Me.DataGridViewIndexes.Rows(liRowNr).Cells(0).Value
+                Dim lrActualIndex = Me.mrTable.Index.Find(Function(x) x.Name = lsNewIndexName)
+
+#Region "Prechecks"
                 If lrIndex.Column.Count = 0 Then
                     MsgBox("The Index must contain at least one Column/Property.")
                     Me.ButtonApply.Enabled = False
                     Exit Sub
                 End If
+#End Region
+                If lrActualIndex Is Nothing Then
+                    GoTo ProcessNewIndex
+                Else
+                    GoTo ProcessExistingIndex
+                End If
 
+                Dim larRole As New List(Of FBM.Role)
+                Dim lrRoleConstraint As FBM.RoleConstraint
+                Dim liRoleConstraintType As pcenumRoleConstraintType
+                Dim lsRoleConstraintName As String = Nothing
+
+ProcessExistingIndex:
+#Region "Process Existing Index"
+
+                Select Case Me.mrTable.FBMModelElement.GetType
+                    Case Is = GetType(FBM.EntityType)
+#Region "Existing Index - Entity Type"
+                        Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
+                        larRole = New List(Of FBM.Role)
+                        Dim lrFactType As FBM.FactType = Nothing
+
+                        For Each lrColumn In lrIndex.Column
+                            lrFactType = lrColumn.FactType
+                            If lrColumn.FactType Is Nothing Then
+                                lrFactType = lrColumn.Role.FactType
+                            End If
+                            Dim lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrColumn.Role.Id)
+                            larRole.AddUnique(lrRole)
+                        Next
+
+                        lrRoleConstraint = lrActualIndex.getResponsibleRoleConstraintFromORMModel()
+
+                        If lrRoleConstraint IsNot Nothing Then
+                            If lrRoleConstraint.IsPreferredIdentifier Then
+                                lsMessage = "Use the Properties Grid toolbox to remove a Preferred Identifier (Reference Mode) for a model element."
+                                Call Me.RevertToActualIndex(lrActualIndex)
+                                Exit Sub
+                            Else
+                                Dim lrNewIndex = lrIndex.Clone(Me.mrTable)
+
+                                If larRole.Count = 0 Then
+                                    '==========================================================================
+                                    'Removing a 1:1 RoleConstraint on the far side of a FactType.
+                                    Call lrRoleConstraint.RemoveFromModel(True, True, True,,, False)
+                                ElseIf larRole.Count = 1 Then
+                                    'CodeSafe
+                                    If lrActualIndex.Column.Find(Function(x) x.Role.FactType Is lrFactType) IsNot Nothing Then
+                                        'Not changing the index at all.
+                                        MsgBox("No changes made to the Index.")
+                                        GoTo EndProcessing
+                                    Else
+                                        'Remove existing, add new.
+                                        Call lrRoleConstraint.RemoveFromModel(True, True, True,,, False)
+                                        lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole, lrNewIndex.IsPrimaryKey, True, True, False, Nothing, True, False)
+                                    End If
+                                Else
+                                    For Each lrColumn In lrActualIndex.Column.ToArray
+                                        If lrIndex.Column.Find(Function(x) x.Id = lrColumn.Id) Is Nothing Then
+                                            'Remove the Column from the Original/Actual Index.
+                                            Dim lrRoleConstraintRole As FBM.RoleConstraintRole = lrRoleConstraint.RoleConstraintRole.Find(Function(x) x.Role Is lrColumn.Role)
+                                            Call lrRoleConstraint.RemoveRoleConstraintRole(lrRoleConstraintRole)
+                                            Call lrActualIndex.removeColumn(lrColumn)
+                                        End If
+                                    Next
+
+                                    For Each lrColumn In lrIndex.Column.ToArray
+                                        If lrActualIndex.Column.Find(Function(x) x.Id = lrColumn.Id) Is Nothing Then
+                                            'Add the Table's corresponding Column to the Original/Actual Index.
+                                            Dim lrNewColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Id = lrColumn.Id)
+                                            Call lrActualIndex.addColumn(lrColumn)
+                                            Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrColumn.Role, lrRoleConstraint,,,, True)
+                                            Call lrRoleConstraint.AddRoleConstraintRole(lrRoleConstraintRole)
+                                        End If
+                                    Next
+                                End If
+
+                            End If
+                        End If
+#End Region
+                    Case Is = GetType(FBM.FactType)
+#Region "Existing Index - Fact Type"
+                        '--------------------------------------------------
+                        'Check list of Roles are all within same FactType etc
+                        Dim lrFactType As FBM.FactType = Me.mrTable.FBMModelElement
+                        Dim lrTable As RDS.Table = lrFactType.getCorrespondingRDSTable
+                        larRole = New List(Of FBM.Role)
+
+                        Dim lrRole As FBM.Role
+                        For Each lrColumn In lrIndex.Column
+                            Dim lrColumnFactType As FBM.FactType = lrColumn.FactType
+
+                            If lrColumn.FactType IsNot Nothing Then
+                                If lrColumn.FactType.IsLinkFactType Then
+                                    'Shouldn't get here because Node Types converted to FactTypes (from EntityType) should move the Role/FactType.
+                                    Try
+                                        lrColumnFactType = lrColumn.Role.FactType.LinkFactTypeRole.FactType
+                                    Catch ex As Exception
+                                        lrColumnFactType = lrColumn.Role.FactType
+                                    End Try
+                                Else
+                                    lrColumnFactType = lrColumn.Role.FactType
+                                End If
+                            ElseIf lrColumn.FactType Is Nothing Then
+                                lrColumnFactType = lrColumn.Role.FactType
+                            End If
+                            If lrColumnFactType.Id = lrFactType.Id And Not lrColumn.Role.FactType.IsLinkFactType Then
+                                If lrColumn.FactType Is Nothing Then
+                                    lrRole = lrColumn.Role.FactType.LinkFactTypeRole
+                                Else
+                                    lrRole = lrColumn.Role
+                                End If
+                            Else
+                                lrRole = lrColumnFactType.GetOtherRoleOfBinaryFactType(lrColumn.Role.Id)
+                            End If
+
+                            larRole.AddUnique(lrRole)
+                        Next
+
+#Region "Prechecking - Existing Index - Fact Type"
+                        If lrFactType.ContainsAllRoles(larRole) And larRole.Count < lrFactType.Arity - 1 Then
+                            lsMessage = "All of the Columns for the Index," & lrIndex.Name & ", are within the Fact Type for the Table/Node Type, but less than the number of Roles in the Fact Type minus 1."
+                            lsMessage.AppendDoubleLineBreak("What this means is that you need to do one of the following from an ORM Diagram view:")
+                            lsMessage.AppendLine(vbTab & "1. Add at least one more Column to this pre-existing Index. The Index requires at least " & (lrFactType.Arity - 1).ToString & " Columns, and a maximum of " & lrFactType.Arity.ToString & " Columns; or")
+                            lsMessage.AppendLine(vbTab & "2. Remove a Role from the Fact Type.")
+                            MsgBox(lsMessage)
+                            Me.ButtonApply.Enabled = False
+                            Exit Sub
+                        End If
+
+                        If Not lrFactType.ContainsAllRoles(larRole, True) Then
+                            lsMessage = "Some of the Columns for the Index," & lrIndex.Name & ", are for Roles within the Fact Type for the Table/Node Type, but not all. This does not make sense from an Object-Role Modeling perspective."
+                            lsMessage.AppendDoubleLineBreak("What this means is that you need to have one of the following:")
+                            lsMessage.AppendLine(vbTab & "1. Include only Columns that are only for Roles within the Fact Type for the Table/Node Type, within the Object-Role Modeling view; or")
+                            lsMessage.AppendLine(vbTab & "2. Include only Columns that are for Roles that are outside the Fact Type for the Table/Node Type, within the Object-Role Modeling view.")
+                            MsgBox(lsMessage)
+                            Me.ButtonApply.Enabled = False
+                            Exit Sub
+                        End If
+#End Region
+
+                        lrRoleConstraint = lrActualIndex.getResponsibleRoleConstraintFromORMModel()
+
+                        If lrRoleConstraint IsNot Nothing Then
+
+                            For Each lrColumn In lrActualIndex.Column.ToArray
+                                If lrIndex.Column.Find(Function(x) x.Id = lrColumn.Id) Is Nothing Then
+                                    'Remove the Column from the Original/Actual Index.
+                                    Dim lrRoleConstraintRole As FBM.RoleConstraintRole = lrRoleConstraint.RoleConstraintRole.Find(Function(x) x.Role Is lrColumn.Role)
+                                    Call lrRoleConstraint.RemoveRoleConstraintRole(lrRoleConstraintRole)
+                                    Call lrActualIndex.removeColumn(lrColumn)
+                                End If
+                            Next
+
+                            For Each lrColumn In lrIndex.Column.ToArray
+                                If lrActualIndex.Column.Find(Function(x) x.Id = lrColumn.Id) Is Nothing Then
+                                    'Add the Table's corresponding Column to the Original/Actual Index.
+                                    Dim lrNewColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Id = lrColumn.Id)
+                                    Call lrActualIndex.addColumn(lrColumn)
+                                    Dim lrRoleConstraintRole As New FBM.RoleConstraintRole(lrColumn.Role, lrRoleConstraint,,,, True)
+                                    Call lrRoleConstraint.AddRoleConstraintRole(lrRoleConstraintRole)
+                                End If
+                            Next
+                        End If
+#End Region
+                End Select
+
+                GoTo EndProcessing
+#End Region
+
+
+ProcessNewIndex:
+#Region "Process New Index"
                 If lrIndex IsNot Nothing Then
                     Dim lrNewIndex = lrIndex.Clone(Me.mrTable)
-                    Dim larRole As New List(Of FBM.Role)
 
                     larRole = New List(Of FBM.Role)
-                    Dim lrRoleConstraint As FBM.RoleConstraint
-                    Dim liRoleConstraintType As pcenumRoleConstraintType
-                    Dim lsRoleConstraintName As String = Nothing
 
                     Select Case Me.mrTable.FBMModelElement.GetType
                         Case Is = GetType(FBM.EntityType)
-
+#Region "New Index - Entity Type"
                             Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
 
                             For Each lrColumn In lrIndex.Column
@@ -290,7 +466,9 @@ Public Class frmCRUDIndexManager
                             Else
                                 lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole, lrNewIndex.IsPrimaryKey, True, True, False, Nothing, True, False)
                             End If
+#End Region
                         Case Is = GetType(FBM.FactType)
+#Region "New Index - Fact Type"
                             '--------------------------------------------------
                             'Check list of Roles are all within same FactType
                             Dim lrFactType As FBM.FactType = Me.mrTable.FBMModelElement
@@ -343,14 +521,18 @@ Public Class frmCRUDIndexManager
                                     Call lrFactType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
                                 End If
                             End If
-
+#End Region
                     End Select
                 End If
 
+EndProcessing:
+                Me.ButtonApply.Enabled = False
+                Me.ButtonRevert.Enabled = False
+
             End If
+#End Region
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -571,6 +753,30 @@ EnableRevert:
 
     End Sub
 
+    Private Sub RevertToActualIndex(ByRef arActualIndex As RDS.Index)
+
+        Try
+            Dim lrColumn As RDS.Column
+
+            For Each lrRow In Me.DataGridViewColumns.Rows
+                lrColumn = lrRow.Tag
+                lrRow.Cells(0).Value = arActualIndex.Column.Find(Function(x) x.Id = lrColumn.Id) IsNot Nothing
+            Next
+
+            Me.ButtonApply.Enabled = False
+            Me.ButtonRevert.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Sub DataGridViewIndexes_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridViewIndexes.CellBeginEdit
 
         Try
@@ -595,6 +801,7 @@ EnableRevert:
         Try
             If e.ColumnIndex = 0 Then
 
+                Dim lrCandidateIndex = Me.DataGridViewIndexes.Rows(e.RowIndex).Tag
                 Dim lsNewIndexName = Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
                 Dim lrActualIndex = Me.mrTable.Index.Find(Function(x) x.Name = lsNewIndexName)
 
@@ -610,7 +817,6 @@ EnableRevert:
                     Exit Sub
                 End If
 
-                Dim lrCandidateIndex = Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(e.ColumnIndex).Tag
                 lrCandidateIndex.Name = lsNewIndexName
 
             End If

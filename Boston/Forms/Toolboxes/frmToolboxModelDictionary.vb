@@ -1207,14 +1207,25 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
+    ''' <summary>
+    ''' 20220523-VM-Fixed so caters for ERD and PGS view as well. See main Select Case clause.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub ViewInGlossaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewInGlossaryToolStripMenuItem.Click
 
         Try
-            Dim lrModelObject As FBM.ModelObject
+            Dim lrModelObject As FBM.ModelObject = Nothing
 
             If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
 
-            lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+            Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                Case Is = GetType(RDS.Table)
+                    Dim lrTable As RDS.Table = Me.TreeView1.SelectedNode.Tag
+                    lrModelObject = lrTable.FBMModelElement
+                Case Else
+                    lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+            End Select
 
             Call frmMain.LoadGlossaryForm(lrModelObject)
 
