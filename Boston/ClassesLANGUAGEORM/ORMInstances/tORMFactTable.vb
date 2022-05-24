@@ -304,6 +304,20 @@ Namespace FBM
                 Me.TableShape.ColumnCount = Me.FactTypeInstance.Arity
                 Me.TableShape.RowCount = Me.FactTypeInstance.Fact.Count
 
+                '=====================================================
+                'CodeSafe: Make sure all Facts have Data count equal to the Arity of the FactTypeInstance
+#Region "CodeSafe"
+                Dim larFactInstance = From FactInstance In Me.FactTypeInstance.Fact
+                                      Where FactInstance.Data.Count <> Me.FactTypeInstance.Arity
+                                      Select FactInstance
+
+                For Each lrFactInstance In larFactInstance.ToArray
+                    MsgBox("Found a FactInstance in FactTypeInstance, " & Me.FactTypeInstance.Id & ", where Fact.Data.Count <> the Arity of the FactTypeInstance. Removing the FactInstance")
+                    Call Me.FactTypeInstance.Fact.Remove(lrFactInstance)
+                Next
+#End Region
+                '=====================================================
+
                 For Each lrFactInstance In Me.FactTypeInstance.Fact
                     For liInd = 0 To (Me.FactTypeInstance.Arity - 1)
                         '---------------------------------------------------------------------------------------------

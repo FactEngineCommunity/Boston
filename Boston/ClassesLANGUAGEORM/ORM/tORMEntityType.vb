@@ -1114,6 +1114,8 @@ Namespace FBM
 
                 Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, True, True, True, False)
 
+
+
 #Region "FactTypeReading"
                 Dim lsSentence As String = ""
                 For Each lrRole In lrFactType.RoleGroup
@@ -1139,8 +1141,6 @@ Namespace FBM
 #End Region
 
                 Call Me.TriggerChangedToFactType(lrFactType)
-
-                Call Me.Model.RemoveEntitTypeFromPages(Me, True)
 
             Catch ex As Exception
                 Dim lsMessage As String

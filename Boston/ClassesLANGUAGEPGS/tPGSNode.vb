@@ -519,23 +519,34 @@ Namespace PGS
         Private Sub RDSTable_IsPGSRelationChanged(abNewValue As Boolean) Handles RDSTable.IsPGSRelationChanged
 
             Try
+
                 If abNewValue = False Then
                     Call Me.DisplayAndAssociate() 'Because what was a PGSRelation is now a Node. Results from a change to the relations to the underlying ObjectifiedFactType.
+
+                    'Associated PGSRelationNode links.
+                    Dim larPGSNode As New List(Of PGS.Node)
 
                     Try
                         Me.Page.Diagram.Links.Remove(Me.PGSRelation.Link.Link) 'Remove the existing PGSRelation Link before loading new links because the process of loading changes the nature of the Links on the Page.
                         'Relations
                         Call Me.Page.ERDiagram.Relation.Remove(Me.PGSRelation)
+
                         Dim lrERDRelation As ERD.Relation
                         For Each lrDiagramLink In Me.Shape.OutgoingLinks
                             lrERDRelation = lrDiagramLink.Tag
                             If lrERDRelation IsNot Nothing Then
                                 Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
                             End If
+                            larPGSNode.Add(lrERDRelation.OriginEntity)
                         Next
+
                         'CodeSafe
+                        larPGSNode = New List(Of PGS.Node)
                         For Each lrERDRelation In Me.Page.ERDiagram.Relation.FindAll(Function(x) x.OriginEntity.Name = Me.Name)
                             Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
+                            If lrERDRelation.IsPGSRelationNode Then
+                                larPGSNode.Add(lrERDRelation.ActualPGSNode)
+                            End If
                         Next
                     Catch ex As Exception
                         'Not a biggie
@@ -543,6 +554,11 @@ Namespace PGS
 
                     Call Me.Page.loadRelationsForPGSNode(Me)
                     Call Me.Page.loadPropertyRelationsForPGSNode(Me)
+
+                    For Each lrPGSNode In larPGSNode
+                        Call Me.Page.loadRelationsForPGSNode(lrPGSNode)
+                        Call Me.Page.loadPropertyRelationsForPGSNode(lrPGSNode)
+                    Next
 
                 Else
                     If Me.PGSRelation Is Nothing Then

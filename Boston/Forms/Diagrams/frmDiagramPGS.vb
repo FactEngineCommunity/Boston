@@ -1093,7 +1093,10 @@ Public Class frmDiagramPGS
 
             'CodeSafe
             If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
-            If e.Link.Destination.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
+            If e.Link.Destination.GetType = GetType(MindFusion.Diagramming.DummyNode) Then
+                Call Me.Diagram.Links.Remove(e.Link)
+                Exit Sub
+            End If
 
             lrModelElement = e.Link.Origin.Tag.RDSTable.FBMModelElement
             larModelElement.Add(lrModelElement)
@@ -2185,7 +2188,7 @@ Public Class frmDiagramPGS
                 Dim lrTable As RDS.Table
                 lrTable = loDraggedNode.Tag
 
-                Dim lrClashNode = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
+                Dim lrClashNode As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
                 If lrClashNode IsNot Nothing Then
                     lrNode = lrClashNode
                     'The Node is already on the Page.
@@ -2193,7 +2196,27 @@ Public Class frmDiagramPGS
                     If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
                         lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
                     End If
-                    MsgBox(lsMessage)
+
+                    Dim lrCustomMessageBox As New frmCustomMessageBox
+
+                    lrCustomMessageBox.Message = lsMessage
+                    lrCustomMessageBox.ButtonText.Add("Ok")
+                    lrCustomMessageBox.ButtonText.Add("Display as PGS Node")
+                    lrCustomMessageBox.ButtonText.Add("Display Anyway")
+
+                    Select Case lrCustomMessageBox.ShowDialog
+                        Case Is = "Display as PGS Node"
+                            Call lrClashNode.RDSTable.setIsPGSRelation(False)
+
+                            '20220522-Was...but was displaying the node twice.
+                            'Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
+
+                            'Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+                            Call Me.zrPage.loadPropertyRelationsForPGSNode(lrClashNode)
+                        Case Is = "Display Anyway"
+                            Call Me.zrPage.LoadPGSNodeTypeFromRDSTable(lrTable, loPointF, True)
+                    End Select
+
                     Exit Sub
                 End If
 
@@ -2342,6 +2365,7 @@ Public Class frmDiagramPGS
 
                 Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
 
+                If lrPGSRelation Is Nothing Then Exit Sub
 
                 lrPGSRelation.Link.TextStyle = LinkTextStyle.Rotate
                 If lrPGSRelation.Link.Origin Is lrPGSRelation.Link.Destination Then
@@ -2445,7 +2469,7 @@ Public Class frmDiagramPGS
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage = "Error:  " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
@@ -3340,15 +3364,30 @@ Public Class frmDiagramPGS
 
     Private Sub DiagramView_MouseUp(sender As Object, e As MouseEventArgs) Handles DiagramView.MouseUp
 
-        Dim lo_point As System.Drawing.PointF
-        lo_point = Me.DiagramView.ClientToDoc(e.Location)
+        Try
 
-        If IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
-            Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
-            lrPGSRelation.Link.Text = ""
-            Call lrPGSRelation.setPredicate()
-            'lrPGSRelation.Link.Text = ""
-        End If
+            Dim lo_point As System.Drawing.PointF
+            lo_point = Me.DiagramView.ClientToDoc(e.Location)
+
+            If IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
+                Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
+
+                'CodeSafe
+                If lrPGSRelation Is Nothing Then Exit Sub
+
+                lrPGSRelation.Link.Text = ""
+                Call lrPGSRelation.setPredicate()
+                'lrPGSRelation.Link.Text = ""
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -4023,6 +4062,68 @@ FinishedPretesting:
 
     End Sub
 
+    Private Sub createEntityRelationshipDiagramFromCurrentPage(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+        '============================
+        Dim lrPage As FBM.Page
+
+        Try
+
+            frmMain.Cursor = Cursors.WaitCursor
+            Me.zrPage.Model.AllowCheckForErrors = False
+
+            Me.CircularProgressBar.Left = (Me.Width / 2) - (Me.CircularProgressBar.Size.Width / 2)
+            Me.CircularProgressBar.BringToFront()
+            Me.CircularProgressBar.Value = 1
+            Me.CircularProgressBar.Invalidate()
+            Me.Invalidate()
+            Me.BackgroundWorker.ReportProgress(10)
+
+            lrPage = Me.zrPage.CreateEntityRelationshipDiagramCMML(Me.BackgroundWorker)
+
+            If lrPage Is Nothing Then
+                Throw New Exception("Failed to create the Entity-Relationship Diagram.")
+            End If
+
+            lrPage.Loaded = True
+            lrPage.Save(False, True)
+
+            Me.CircularProgressBar.Value = 0
+            Me.CircularProgressBar.Text = "0%"
+            Me.CircularProgressBar.Invalidate()
+            Me.CircularProgressBar.SendToBack()
+
+
+            Me.zrPage.Model.AllowCheckForErrors = True
+            frmMain.Cursor = Cursors.Default
+
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+            If IsSomething(lrPage) Then
+                lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                MsgBox("Added the new Entity-Relationship Diagram Page, '" & lrPage.Name & "', to the Model.")
+
+                Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+
+                If loToolStripItem.Tag = True Then
+                    Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                    Call Me.morphToERDiagram(lrToolstripItem, lrEnterpriseView)
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
     Private Sub createObjectRoleModelFromCurrentPage(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         '============================
@@ -4557,6 +4658,25 @@ SimplePredicate:
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+    End Sub
+
+    Private Sub EntityRelationshipDiagramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EntityRelationshipDiagramToolStripMenuItem.Click
+
+        Try
+            With New WaitCursor
+                Call Me.createEntityRelationshipDiagramFromCurrentPage(sender, e)
+            End With
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
     End Sub
 
     'Private Sub AddAttributeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddAttributeToolStripMenuItem.Click

@@ -3068,6 +3068,28 @@ NextY:
 
         End Sub
 
+        Public Function CreateEntityRelationshipDiagramCMML(ByRef aoBackgroundWorker As BackgroundWorker)
+
+            Try
+                Select Case Me.Language
+                    Case Is = pcenumLanguage.PropertyGraphSchema
+                        Return Me.CreateEntityRelationshipDiagramFromPropertyGraphSchema(aoBackgroundWorker)
+                End Select
+
+                Return Nothing
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function CreateObjectRoleModel(ByRef aoBackgroundWorker As BackgroundWorker)
 
             Try

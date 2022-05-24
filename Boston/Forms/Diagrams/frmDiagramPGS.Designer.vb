@@ -371,7 +371,6 @@ Partial Class frmDiagramPGS
         Me.EntityRelationshipDiagramToolStripMenuItem.Name = "EntityRelationshipDiagramToolStripMenuItem"
         Me.EntityRelationshipDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
         Me.EntityRelationshipDiagramToolStripMenuItem.Text = "&Entity Relationship Diagram"
-        Me.EntityRelationshipDiagramToolStripMenuItem.Visible = False
         '
         'ToolStripSeparator16
         '
@@ -454,7 +453,7 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItem2, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.RemoveFromPageAndModelToolStripMenuItem})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 226)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 204)
         '
         'MorphToToolStripMenuItem1
         '
@@ -552,7 +551,6 @@ Partial Class frmDiagramPGS
         '
         'Diagram
         '
-        Me.Diagram.AllowUnconnectedLinks = True
         Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         Me.Diagram.DefaultShape = MindFusion.Diagramming.Shape.FromId("Ellipse")
         Me.Diagram.DynamicLinks = True

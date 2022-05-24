@@ -290,6 +290,22 @@ Namespace FBM
 
                 If Not lrRecordset.EOF Then
 
+                    '====================================================================================================
+                    'CodeSafe...check to see is not already on Page.
+                    lsSQLQuery = " SELECT *"
+                    lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    lsSQLQuery &= " WHERE Element = '" & arTable.Name & "'"
+
+                    Dim lrRecordsetIsAlreadyOnPage As ORMQL.Recordset
+                    lrRecordsetIsAlreadyOnPage = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordsetIsAlreadyOnPage.Facts.Count > 0 Then
+                        GoTo SkipAdding
+                    End If
+
+                    '====================================================================================================
+
                     lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
                     lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                     lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
@@ -321,7 +337,7 @@ Namespace FBM
                 Else
                     Throw New Exception("Couldn't find CoreElement for, '" & arTable.Name & "'.")
                 End If
-
+SkipAdding:
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2608,8 +2624,14 @@ Namespace FBM
 
                     lrOriginatingNode = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name)
 
-                    If lrOriginatingNode Is Nothing Then
+                    Dim lbLoadAnyway = False
+                    Try
+                        lbLoadAnyway = Not Me.Diagram.Links.Contains(lrOriginatingNode.PGSRelation.Link.link)
+                    Catch ex As Exception
+                        'Not a biggie.20220523.
+                    End Try
 
+                    If lrOriginatingNode Is Nothing Or lbLoadAnyway Then
                         'Need to add the RelationNode to the Page
 
                         lsSQLQuery = "SELECT *"
@@ -2646,7 +2668,7 @@ Namespace FBM
 
                         If (lrNode1 IsNot Nothing) And (lrNode2 IsNot Nothing) And (lrNode1 Is arPGSNode Or lrNode2 Is arPGSNode) Then
 
-                            Call Me.addRDSTableToPage(lrTable) 'Because we want this Table on this Page going forward.
+                            Call Me.addRDSTableToPage(lrTable) 'Because we want this Table on this Page going forward. Won't add twice. Has precheck.
 
                             lsSQLQuery = "SELECT *"
                             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
@@ -2660,18 +2682,18 @@ Namespace FBM
                             lrOriginatingNode = lrFactDataInstance.ClonePGSNodeType(Me)
                             lrOriginatingNode.RDSTable = lrTable
 
-                            Me.ERDiagram.Entity.Add(lrOriginatingNode)
+                            Me.ERDiagram.Entity.AddUnique(lrOriginatingNode)
 
                             Dim lrRelation As New ERD.Relation(Me.Model,
-                                                               Me,
-                                                               lsRelationId,
-                                                               lrNode1,
-                                                               pcenumCMMLMultiplicity.One,
-                                                               False,
-                                                               False,
-                                                               lrNode2,
-                                                               pcenumCMMLMultiplicity.One,
-                                                               False)
+                                                                   Me,
+                                                                   lsRelationId,
+                                                                   lrNode1,
+                                                                   pcenumCMMLMultiplicity.One,
+                                                                   False,
+                                                                   False,
+                                                                   lrNode2,
+                                                                   pcenumCMMLMultiplicity.One,
+                                                                   False)
 
                             lrRelation.IsPGSRelationNode = True
                             lrRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
@@ -2681,15 +2703,18 @@ Namespace FBM
                             Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
                             lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
 
-                            If abAddToPage Then Call Me.addRDSRelation(lrRDSRelation)
+                            If Not Me.ERDiagram.Relation.Contains(lrRelation) Then
+
+                                If abAddToPage Then Call Me.addRDSRelation(lrRDSRelation)
+
+                                Me.ERDiagram.Relation.AddUnique(lrRelation)
+                            End If
 
                             Dim lrLink As PGS.Link
                             lrLink = New PGS.Link(Me, New FBM.FactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
                             lrLink.RDSRelation = lrRDSRelation
                             lrLink.DisplayAndAssociate()
                             lrLink.Link.Text = lrRelation.ActualPGSNode.Id
-
-                            Me.ERDiagram.Relation.AddUnique(lrRelation)
 
                         End If
 
@@ -2866,7 +2891,10 @@ Namespace FBM
                             Try
                                 If lrRelation.Link IsNot Nothing Then
                                     If lrRelation.Link.Link IsNot Nothing Then
-                                        GoTo MoveOn
+                                        If Me.Diagram.Links.Contains(lrRelation.Link.Link) Then
+                                            GoTo MoveOn
+                                        End If
+
                                     End If
                                 End If
                             Catch ex As Exception

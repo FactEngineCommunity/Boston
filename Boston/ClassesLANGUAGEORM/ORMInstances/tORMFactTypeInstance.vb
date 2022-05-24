@@ -1688,10 +1688,12 @@ Namespace FBM
                 End If
 
                 If Me.IsLinkFactType Then
-                    Me.Page.RoleInstance.Find(Function(x) x.Id = Me.LinkFactTypeRole.Id).Shape.Brush = _
-                        New MindFusion.Drawing.SolidBrush(Color.FromArgb( _
-                                                          [Enum].Parse(GetType(pcenumColourWheel), [Enum].GetName(GetType(pcenumColourWheel), pcenumColourWheel.LightPurple)) _
+                    If Me.LinkFactTypeRole IsNot Nothing Then
+                        Me.Page.RoleInstance.Find(Function(x) x.Id = Me.LinkFactTypeRole.Id).Shape.Brush =
+                        New MindFusion.Drawing.SolidBrush(Color.FromArgb(
+                                                          [Enum].Parse(GetType(pcenumColourWheel), [Enum].GetName(GetType(pcenumColourWheel), pcenumColourWheel.LightPurple))
                                                           ))
+                    End If
                 End If
 
                 For Each lrRoleInstance In Me.RoleGroup
@@ -3756,6 +3758,34 @@ Namespace FBM
                 Dim lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lsRoleId)
 
                 Me.LinkFactTypeRole = lrRoleInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' Want to set to new ObjectifyingEntityType(Instance), especially if is on the Page.
+        ''' </summary>
+        ''' <param name="arNewObjectifyingEntityType"></param>
+        Private Sub _FactType_ObjectifyingEntityTypeChanged(ByRef arNewObjectifyingEntityType As EntityType) Handles _FactType.ObjectifyingEntityTypeChanged
+
+            Try
+                Dim lsObjectifyingEntityTypeId = arNewObjectifyingEntityType.Id
+
+                Dim lrObjectifyingEntityTypeInstance = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lsObjectifyingEntityTypeId)
+
+                If lrObjectifyingEntityTypeInstance Is Nothing Then
+                    lrObjectifyingEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(arNewObjectifyingEntityType, New PointF(10, 10), True)
+                End If
+
+                Me.ObjectifyingEntityType = lrObjectifyingEntityTypeInstance
 
             Catch ex As Exception
                 Dim lsMessage As String

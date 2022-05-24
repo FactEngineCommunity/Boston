@@ -3727,6 +3727,8 @@ Namespace FBM
                     Me.ObjectifyingEntityType.SetObjectifiedFactType(Me)
                 End If
 
+                RaiseEvent ObjectifyingEntityTypeChanged(Me.ObjectifyingEntityType)
+
                 If abCreateLinkFactTypes Then Me.CreateLinkFactTypes(True)
 
                 Call Me.SetIsObjectified(True, True)

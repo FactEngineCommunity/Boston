@@ -700,7 +700,8 @@ EnableRevert:
 
                 End Select
 
-                Call Me.mrTable.Model.Model.RemoveRoleConstraint(lrRoleConstaint, True, True, False, True)
+                Call lrRoleConstaint.RemoveFromModel(True, True, True, True, True, lrRoleConstaint.IsPreferredIdentifier)
+                'Call Me.mrTable.Model.Model.RemoveRoleConstraint(lrRoleConstaint, True, True, False, True)
             End If
 
         Catch ex As Exception

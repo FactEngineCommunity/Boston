@@ -2889,6 +2889,11 @@ Namespace FBM
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Don't remove from Page, because FactType.Objectify changes the EntityType to being an ObjectifyingEntityType and subsequent event handlers hide the EntityTypeInstance.
+        '''   Need the EntityTypeInstances on the Page for the new FactTypeInstance.
+        ''' </summary>
+        ''' <param name="arFactType"></param>
         Private Sub _EntityType_ChangedToFactType(ByRef arFactType As FactType) Handles _EntityType.ChangedToFactType
 
             Try
@@ -2903,8 +2908,6 @@ Namespace FBM
                         Call lrRoleInstance.ResetLink()
                     Next
                 Next
-
-                Call Me.RemoveFromPage(True)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2933,6 +2936,33 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' When the underlying EntitType is switched to a ObjectifyingEntityType, we want to hide the EntityType.
+        ''' Don't want to remove it from the Page because the FactTypeInstance for the EntityTypeInstance may be on the Page and may need to refer to it's ObjectifyingEntityType(Instance).
+        '''   See EntityType.ConvertToFactType, lrFactType.Objectify for instance.
+        ''' </summary>
+        ''' <param name="abNewIsObjectifyingEntityType"></param>
+        Private Sub _EntityType_IsObjectifyingEntityTypeChanged(abNewIsObjectifyingEntityType As Boolean) Handles _EntityType.IsObjectifyingEntityTypeChanged
+
+            Try
+                'Double check is on the Page.
+                If Me.Page.EntityTypeInstance.Contains(Me) Then
+                    'Is on the Page.
+                    If Me.Shape IsNot Nothing Then
+                        Me.Shape.Visible = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

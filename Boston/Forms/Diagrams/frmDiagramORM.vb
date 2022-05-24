@@ -4228,6 +4228,18 @@ Public Class frmDiagramORM
                             Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", lrFactTypeInstance.IsObjectified)
                             Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", lrFactTypeInstance.IsObjectified)
                             If lrFactTypeInstance.IsObjectified Then
+
+                                'CodeSafe 
+                                If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
+                                    'Try and find the ObjectifyingEntityType
+                                    lrFactTypeInstance.ObjectifyingEntityType = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id)
+
+                                    If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
+                                        Call Me.zrPage.DropEntityTypeAtPoint(lrFactTypeInstance.FactType.ObjectifyingEntityType, New PointF(10, 10), True)
+                                    End If
+                                End If
+
+
                                 If lrFactTypeInstance.ObjectifyingEntityType.EntityType.HasSimpleReferenceScheme Then
                                     Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", True)
                                     Select Case lrFactTypeInstance.ObjectifyingEntityType.DataType
@@ -8666,6 +8678,8 @@ Public Class frmDiagramORM
         lr_model = lrFactType.Model
 
         Me.ToolStripMenuItemAddRole.Enabled = Not lrFactType.IsLinkFactType
+        If lrFactTypeInstance.ShowFactTypeName Then Me.ToolStripMenuItemShowFactTypesName.Checked = True
+
 
         '----------------------------------------------------------------------------------------------
         'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,
@@ -12413,6 +12427,26 @@ SkipRemovalFromModel:
             With New WaitCursor
                 Call lrEntityTypeInstance.EntityType.ConvertToFactType()
             End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemShowFactTypesName_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemShowFactTypesName.Click
+
+        Try
+            Dim lrFactTypeInstance As FBM.FactTypeInstance = Me.zrPage.SelectedObject(0)
+
+            Me.ToolStripMenuItemShowFactTypesName.Checked = Not Me.ToolStripMenuItemShowFactTypesName.Checked
+
+            Call lrFactTypeInstance.FactType.SetShowFactTypeName(Me.ToolStripMenuItemShowFactTypesName.Checked, Me.zrPage)
 
         Catch ex As Exception
             Dim lsMessage As String
