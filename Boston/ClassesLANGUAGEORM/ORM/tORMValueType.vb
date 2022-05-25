@@ -901,7 +901,9 @@ Namespace FBM
 
                 Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType)
                 lrModelDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrModelDictionaryEntry.Equals)
-                lrModelDictionaryEntry.removeConceptType(pcenumConceptType.ValueType)
+                If lrModelDictionaryEntry IsNot Nothing Then
+                    lrModelDictionaryEntry.removeConceptType(pcenumConceptType.ValueType)
+                End If
 
                 If abDoDatabaseProcessing Then
                     Call TableValueType.DeleteValueType(Me)

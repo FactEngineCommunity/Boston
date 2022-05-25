@@ -660,13 +660,18 @@ EnableRevert:
 
     Private Sub DataGridViewIndexes_UserDeletingRow(sender As Object, e As DataGridViewRowCancelEventArgs) Handles DataGridViewIndexes.UserDeletingRow
 
+        Dim lsMessage As String
+
         Try
             If Me.DataGridViewIndexes.SelectedRows.Count > 1 Then
                 e.Cancel = True
                 Exit Sub
             End If
 
-            e.Cancel = MessageBox.Show("Do you really want to delete this index?", "", MessageBoxButtons.YesNo) = DialogResult.No
+            If MessageBox.Show("Do you really want to delete this index?", "", MessageBoxButtons.YesNo) = DialogResult.No Then
+                e.Cancel = True
+                Exit Sub
+            End If
 
             Dim lrIndex As RDS.Index = e.Row.Tag
             Me.mrApplyTable.Index.Remove(lrIndex)
@@ -678,6 +683,20 @@ EnableRevert:
             Dim lrRoleConstaint As FBM.RoleConstraint = lrActualIndex.ResponsibleRoleConstraint
 
             If lrRoleConstaint IsNot Nothing Then
+
+                'Prechecking
+                If Me.mrTable.FBMModelElement.GetType = GetType(FBM.EntityType) And lrRoleConstaint.IsPreferredIdentifier Then
+                    'Tryin to delete the ReferenceMode of an EntityType. Don't allow. Direct to PropertiesGrid toolbox.
+                    e.Cancel = True
+
+                    lsMessage = "Please use to Properties Grid Toolbox to remove the Reference Mode of the '" & Me.mrTable.Name & "' Node Type."
+                    lsMessage.AppendDoubleLineBreak("You cannot delete the Reference Mode/Primary Uniqueness Constraint for a Node Type that is an effective ORM Entity Type with a Reference Mode from this form.")
+                    lsMessage.AppendDoubleLineBreak("I.e. The Node Type, " & Me.mrTable.Name & ", is an Entity Type in the Object-Role Model view that has a Reference Mode.")
+                    lsMessage.AppendDoubleLineBreak("Right click on the Node Type and select the [Properties] menu item. Set the reference mode to the first item in the list (a blank space).")
+                    MsgBox(lsMessage)
+                    Exit Sub
+                End If
+
                 Select Case Me.mrTable.FBMModelElement.GetType
                     Case Is = GetType(FBM.FactType)
 
@@ -705,7 +724,6 @@ EnableRevert:
             End If
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

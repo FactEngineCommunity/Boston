@@ -3799,6 +3799,7 @@ Public Class frmDiagramPGS
     ''' </summary>
     Private Sub AddPropertyToEntity()
 
+        Dim lsMessage As String
         Try
             Dim lrNodeType As PGS.Node
             Dim lrRelation As ERD.Relation
@@ -3869,10 +3870,50 @@ Public Class frmDiagramPGS
 
             If lfrmAddAttributeForm.ShowDialog(lsUniqueAttributeName) = DialogResult.OK Then
                 With New WaitCursor
-                    lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
-                    lrValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
-                    lrValueType.SetDataTypeLength(lfrmAddAttributeForm.ziDataTypeLength, True)
-                    lrValueType.SetDataTypePrecision(lfrmAddAttributeForm.ziDataTypePrecision, True)
+
+                    Dim lrTempValueType As FBM.ValueType = Me.zrPage.Model.GetModelObjectByName(lfrmAddAttributeForm.zsValueTypeName, True)
+                    If lrTempValueType IsNot Nothing Then
+                        'Setting the Property/Attribute to an existing Value Type.
+                        Call lrFactType.RoleGroup(1).ReassignJoinedModelObject(lrTempValueType, True, Nothing, False)
+                        lrValueType.RemoveFromModel(True, False, True,, True, False)
+
+                        Dim lsSubMessage = ""
+                        If lrTempValueType.DataTypeLength <> lrValueType.DataTypeLength Then
+                            lsSubMessage = "Length"
+                        End If
+
+                        If lrTempValueType.DataTypePrecision <> lrValueType.DataTypePrecision Then
+                            If lsSubMessage <> "" Then lsSubMessage.AppendString(" and ")
+                            lsSubMessage.AppendString("Precision")
+                        End If
+
+                        If lsSubMessage <> "" Then
+                            lsMessage = "You are reusing the ORM level Value Type, " & lrValueType.Id & ", for this Property/Attribute."
+                            lsMessage.AppendDoubleLineBreak("Do you want to change it's " & lsSubMessage & " to the new value you have set?")
+                            Select Case MsgBox(lsMessage, MsgBoxStyle.YesNoCancel)
+                                Case Is = MsgBoxResult.Yes
+                                    lrTempValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+                                    lrTempValueType.SetDataTypeLength(lfrmAddAttributeForm.ziDataTypeLength, True)
+                                    lrTempValueType.SetDataTypePrecision(lfrmAddAttributeForm.ziDataTypePrecision, True)
+                                Case Is = MsgBoxResult.Cancel
+                                    Dim lfrmFlashCard As New frmFlashCard
+                                    lfrmFlashCard.ziIntervalMilliseconds = 1500
+                                    lfrmFlashCard.zsText = "Aborting addition of new Property."
+                                    lfrmFlashCard.Show(frmMain)
+
+                                    GoTo Aborted
+                            End Select
+                        End If
+
+                        lrValueType = lrTempValueType
+
+                    Else
+                        lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
+                        lrValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+                        lrValueType.SetDataTypeLength(lfrmAddAttributeForm.ziDataTypeLength, True)
+                        lrValueType.SetDataTypePrecision(lfrmAddAttributeForm.ziDataTypePrecision, True)
+                    End If
+
                     lrFactType.RoleGroup(0).SetMandatory(lfrmAddAttributeForm.zbAttributeIsMandatory, True)
                     Dim larRole As New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {"has", ""})
@@ -3883,12 +3924,12 @@ Public Class frmDiagramPGS
                     Call Me.resetNodeAndLinkColors()
                 End With
             Else
+Aborted:
                 Call lrFactType.RemoveFromModel(True, False)
                 Call lrValueType.RemoveFromModel(True, False)
             End If
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -4528,7 +4569,7 @@ ErrorOut:
                 Exit Sub
             End If
             'CodeSafe
-            If Trim(e.NewText) = Trim(e.OldText) Then Exit Sub
+            If LCase(Trim(e.NewText)) = LCase(Trim(e.OldText)) Then Exit Sub
 
             Dim lrFactType As FBM.FactType = Nothing
             Dim lrFactTypeReading As FBM.FactTypeReading = Nothing
@@ -4592,28 +4633,30 @@ SimplePredicate:
                 Exit Sub
             End If
 
+            Dim lsPredicate As String = LCase(Trim(e.NewText))
+
             If lrFactType.FactTypeReading.Count = 0 Then
                 'Create a new FactTypeReading
                 larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
-                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {Trim(e.NewText), ""})
+                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {lsPredicate, ""})
                 lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
             ElseIf lrFactType.FactTypeReading.Count = 1 Then
                 'Great...set the Predicate for the FactTypeReading's first PredicatePart
                 lrFactTypeReading = lrFactType.FactTypeReading(0)
                 If lrFactTypeReading.RoleList(0).JoinedORMObject.Id = e.Link.Origin.Tag.RDSTable.Name Then
                     lrFactTypeReading = lrFactType.FactTypeReading(0)
-                    lrFactTypeReading.PredicatePart(0).SetPredicateText(Trim(e.NewText), True)
+                    lrFactTypeReading.PredicatePart(0).SetPredicateText(lsPredicate, True)
                 Else
                     'Create a new FactTypeReading
                     larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
-                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {Trim(e.NewText), ""})
+                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {lsPredicate, ""})
                     lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
                 End If
             Else
                 lrFactTypeReading = lrFactType.FactTypeReading(0)
                 If lrFactTypeReading.RoleList(0).JoinedORMObject.Id = e.Link.Origin.Tag.RDSTable.Name Then
                     lrFactTypeReading = lrFactType.FactTypeReading(0)
-                    lrFactTypeReading.PredicatePart(0).SetPredicateText(Trim(e.NewText), True)
+                    lrFactTypeReading.PredicatePart(0).SetPredicateText(lsPredicate, True)
                 Else
                     'Create a new FactTypeReading
                     Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
@@ -4624,11 +4667,11 @@ SimplePredicate:
                     If larFactTypeReading.Count = 0 Then
                         'Create a new FactTypeReading
                         larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
-                        lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {Trim(e.NewText), ""})
+                        lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {lsPredicate, ""})
                         lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
                     Else
                         lrFactTypeReading = larFactTypeReading.First
-                        lrFactTypeReading.PredicatePart(0).SetPredicateText(Trim(e.NewText), True)
+                        lrFactTypeReading.PredicatePart(0).SetPredicateText(lsPredicate, True)
                     End If
                 End If
             End If

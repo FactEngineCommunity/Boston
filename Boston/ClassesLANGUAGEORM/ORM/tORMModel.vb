@@ -3430,11 +3430,13 @@ FinishedProcessing:
                     Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
                 Else
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                    If lrDictionaryEntry.Realisations.Count <= 1 Then
-                        Me.RemoveDictionaryEntry(lrDictionaryEntry, abBroadcastInterfaceEvent)
-                    Else
-                        Dim lrConcept As New FBM.Concept(arValueType.Id)
-                        lrDictionaryEntry.Realisations.Remove(pcenumConceptType.ValueType)
+                    If lrDictionaryEntry IsNot Nothing Then
+                        If lrDictionaryEntry.Realisations.Count <= 1 Then
+                            Me.RemoveDictionaryEntry(lrDictionaryEntry, abBroadcastInterfaceEvent)
+                        Else
+                            Dim lrConcept As New FBM.Concept(arValueType.Id)
+                            lrDictionaryEntry.Realisations.Remove(pcenumConceptType.ValueType)
+                        End If
                     End If
                 End If
 
