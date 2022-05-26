@@ -809,7 +809,7 @@ Partial Public Class tBrain
                 '=================================================================================================================
 
                 If Me.Page IsNot Nothing Then
-                    Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+                    Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
                     Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
                     Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, abBroadcastInterfaceEvent)

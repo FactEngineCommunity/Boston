@@ -51,6 +51,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GenerateDocumentationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CodeGenerationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FactEngineToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.KeywordExtractionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.AddPageToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPastePage = New System.Windows.Forms.ToolStripMenuItem()
@@ -91,7 +92,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New Boston.BostonTreeView()
-        Me.KeywordExtractionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -337,6 +337,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.FactEngineToolStripMenuItem.Name = "FactEngineToolStripMenuItem"
         Me.FactEngineToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.FactEngineToolStripMenuItem.Text = "&Fact Engine"
+        '
+        'KeywordExtractionToolStripMenuItem
+        '
+        Me.KeywordExtractionToolStripMenuItem.Enabled = False
+        Me.KeywordExtractionToolStripMenuItem.Name = "KeywordExtractionToolStripMenuItem"
+        Me.KeywordExtractionToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.KeywordExtractionToolStripMenuItem.Text = "&Keyword Extraction Tool"
         '
         'ToolStripSeparator7
         '
@@ -590,12 +597,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
-        '
-        'KeywordExtractionToolStripMenuItem
-        '
-        Me.KeywordExtractionToolStripMenuItem.Name = "KeywordExtractionToolStripMenuItem"
-        Me.KeywordExtractionToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.KeywordExtractionToolStripMenuItem.Text = "&Keyword Extraction Tool"
         '
         'frmToolboxEnterpriseExplorer
         '

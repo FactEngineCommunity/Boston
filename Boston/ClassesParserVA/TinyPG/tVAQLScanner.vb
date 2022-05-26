@@ -277,11 +277,11 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDDATATYPEDATE, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEDATE)
 
-            regex = new Regex("DateTime", RegexOptions.Compiled)
+            regex = new Regex("TemporalDateTime", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPEDATETIME, regex)
             Tokens.Add(TokenType.KEYWDDATATYPEDATETIME)
 
-            regex = new Regex("Time", RegexOptions.Compiled)
+            regex = new Regex("TemporalTime", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDDATATYPETIME, regex)
             Tokens.Add(TokenType.KEYWDDATATYPETIME)
 

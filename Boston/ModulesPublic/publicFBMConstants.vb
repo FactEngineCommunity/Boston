@@ -100,8 +100,8 @@ Public Module publicFBMConstants
         <DataType("RawDataPicture")> <Description("Raw Data: Picture")> RawDataPicture
         <DataType("VariableLength")> <Description("Raw Data: Variable Length")> RawDataVariableLength
         <DataType("AutoTimestamp")> <Description("Temporal: Auto Timestamp")> TemporalAutoTimestamp
-        <DataType("Date")> <Description("Temporal: Date")> TemporalDate
-        <DataType("DateTime")> <Description("Temporal: Date & Time")> TemporalDateAndTime
+        <DataType("TemporalDate")> <Description("Temporal: Date")> TemporalDate
+        <DataType("TemporalDateTime")> <Description("Temporal: Date & Time")> TemporalDateAndTime
         <DataType("Time")> <Description("Temporal: Time")> TemporalTime
         <DataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLength
         <DataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLength

@@ -2341,9 +2341,12 @@ Namespace FBM
 
                     Me.FactTypeNameShape.Visible = True
 
-                    If IsSomething(Me.FactTypeReadingShape.shape) Then
-                        Me.FactTypeReadingShape.shape.Visible = True
+                    If Me.FactTypeReadingShape IsNot Nothing Then
+                        If IsSomething(Me.FactTypeReadingShape.Shape) Then
+                            Me.FactTypeReadingShape.Shape.Visible = True
+                        End If
                     End If
+
                     Dim lrRoleInstance As FBM.RoleInstance
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance

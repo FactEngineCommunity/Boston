@@ -427,7 +427,7 @@ Namespace PGS
                         lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
                     End If
 
-                    For Each lrColumn In lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                    For Each lrColumn In lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey Or x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType))
                         '============================================================
                         'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
                         '    'Don't show the Column
