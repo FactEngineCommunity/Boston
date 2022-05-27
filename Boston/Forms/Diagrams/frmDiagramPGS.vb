@@ -1771,6 +1771,7 @@ Public Class frmDiagramPGS
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
+            Me.CircularProgressBar.SendToBack()
             Me.HiddenDiagramView.SendToBack()
         End Try
 
@@ -2195,27 +2196,27 @@ Public Class frmDiagramPGS
                     lsMessage = "This Page already contains a Node with the name, '" & lrTable.Name & "'."
                     If lrClashNode.getCorrespondingRDSTable.isPGSRelation Then
                         lsMessage &= vbCrLf & vbCrLf & "If the existing Node is not visible it is because it is represented by an Edge/Relation."
+
+                        Dim lrCustomMessageBox As New frmCustomMessageBox
+
+                        lrCustomMessageBox.Message = lsMessage
+                        lrCustomMessageBox.ButtonText.Add("Ok")
+                        lrCustomMessageBox.ButtonText.Add("Display as PGS Node")
+                        lrCustomMessageBox.ButtonText.Add("Display Anyway")
+
+                        Select Case lrCustomMessageBox.ShowDialog
+                            Case Is = "Display as PGS Node"
+                                Call lrClashNode.RDSTable.setIsPGSRelation(False)
+
+                                '20220522-Was...but was displaying the node twice.
+                                'Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
+
+                                'Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
+                                Call Me.zrPage.loadPropertyRelationsForPGSNode(lrClashNode)
+                            Case Is = "Display Anyway"
+                                Call Me.zrPage.LoadPGSNodeTypeFromRDSTable(lrTable, loPointF, True)
+                        End Select
                     End If
-
-                    Dim lrCustomMessageBox As New frmCustomMessageBox
-
-                    lrCustomMessageBox.Message = lsMessage
-                    lrCustomMessageBox.ButtonText.Add("Ok")
-                    lrCustomMessageBox.ButtonText.Add("Display as PGS Node")
-                    lrCustomMessageBox.ButtonText.Add("Display Anyway")
-
-                    Select Case lrCustomMessageBox.ShowDialog
-                        Case Is = "Display as PGS Node"
-                            Call lrClashNode.RDSTable.setIsPGSRelation(False)
-
-                            '20220522-Was...but was displaying the node twice.
-                            'Call Me.zrPage.DropExistingPGSNodeAtPoint(lrPGSRelation.ActualPGSNode, New PointF(20, 20))
-
-                            'Call Me.zrPage.loadRelationsForPGSNode(lrPGSRelation.ActualPGSNode)
-                            Call Me.zrPage.loadPropertyRelationsForPGSNode(lrClashNode)
-                        Case Is = "Display Anyway"
-                            Call Me.zrPage.LoadPGSNodeTypeFromRDSTable(lrTable, loPointF, True)
-                    End Select
 
                     Exit Sub
                 End If
@@ -2440,6 +2441,12 @@ Public Class frmDiagramPGS
                     End If
                 End If
             Else
+                Call prApplication.setWorkingPage(Me.zrPage)
+
+                If prApplication.ToolboxForms.FindAll(Function(x) x.Name = frmToolboxBrainBox.Name).Count > 0 Then
+                    prApplication.Brain.Page = Me.zrPage
+                End If
+
                 '------------------------------------------------
                 'User Left-Clicked on the Canvas
                 '------------------------------------------------
@@ -2781,8 +2788,6 @@ Public Class frmDiagramPGS
 
     Private Sub Diagram_LinkSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkSelected
 
-        'Exit Sub
-
         Dim lrPGSLink As PGS.Link
 
         Try
@@ -2849,6 +2854,8 @@ Public Class frmDiagramPGS
             '  do the appropriate processing so that the data in the ReadingEditor grid
             '  matches the selected FactType (if a FactType is selected by the user)
             '---------------------------------------------------------------------------
+            Dim lrFactType As FBM.FactType
+
             Dim lrORMReadingEditor As frmToolboxORMReadingEditor
             lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
@@ -2859,7 +2866,7 @@ Public Class frmDiagramPGS
                 If IsSomething(lrPGSLink.Relation.RelationFactType) Then
                     If lrPGSLink.Relation.IsPGSRelationNode Then
                         If lrPGSLink.Relation.RelationFactType.IsLinkFactType Then
-                            Dim lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
+                            lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
                             lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
                         Else
                             lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
@@ -2875,6 +2882,27 @@ Public Class frmDiagramPGS
                 End If
 
             End If
+
+#Region "Verbalisation"
+
+            Dim lfrmORMVerbalisationView As frmToolboxORMVerbalisation = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+
+            If lfrmORMVerbalisationView IsNot Nothing Then
+                If lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                    If lrPGSLink.Relation.ActualPGSNode Is Nothing And lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
+                    ElseIf lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                    Else
+                        lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
+                    End If
+                Else
+                    lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
+                End If
+
+                Call lfrmORMVerbalisationView.VerbaliseFactType(lrFactType)
+            End If
+#End Region
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -4710,6 +4738,169 @@ SimplePredicate:
                 Call Me.createEntityRelationshipDiagramFromCurrentPage(sender, e)
             End With
 
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub Diagram_LinkDeleting(sender As Object, e As LinkValidationEventArgs) Handles Diagram.LinkDeleting
+
+        Dim lrPGSLink As PGS.Link
+        Dim lsMessage As String
+
+        Try
+
+            lrPGSLink = e.Link.Tag
+
+            'CodeSafe
+            If lrPGSLink Is Nothing Then
+                Exit Sub
+            End If
+
+            lsMessage = "Are you sure you want to remove this Edge Type from the Model?"
+            lsMessage.AppendDoubleLineBreak("All Edge Types are either a Fact Type or a Link Fact Type at the Object-Role Model level.")
+            lsMessage.AppendDoubleLineBreak("You might not be able to remove the Fact Type from this view.")
+
+            Dim lrFactType As FBM.FactType
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2) = MsgBoxResult.Yes Then
+
+                If lrPGSLink.Relation.ActualPGSNode IsNot Nothing Then
+#Region "ActualPGSNode"
+                    Try
+                        If lrPGSLink.Relation.ActualPGSNode.RDSTable.FBMModelElement.CanSafelyRemoveFromModel Then
+                            lrFactType = lrPGSLink.Relation.ActualPGSNode.RDSTable.FBMModelElement
+                            Call lrFactType.RemoveFromModel(False, True, True, True, True, False)
+                            GoTo EndProcessing
+                        Else
+                            lsMessage = "Sorry, you can't remove this Edge Type from the Property Graph Schema view. Morph to an Object-Role Model view and remove the Fact Type from there."
+                            lsMessage.AppendDoubleLineBreak("The responsible Fact Type is called: " & lrPGSLink.Relation.ActualPGSNode.RDSTable.FBMModelElement.Id)
+                            lsMessage.AppendDoubleLineBreak("Reasons for this message includes that if the Edge Type has Properties they must be removed from the Object-Role Model level.")
+                            MsgBox(lsMessage)
+                            Exit Sub
+                        End If
+
+                    Catch ex As Exception
+                        Throw New Exception("Couldn't remove Actual PGS Node for Edge Type" & vbCrLf & ex.Message)
+                    End Try
+#End Region
+                ElseIf Not lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType And lrPGSLink.RDSRelation.ResponsibleFactType.CanSafelyRemoveFromModel Then
+#Region "Not LinkFactType and can safely remove from the Model"
+                    lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType
+                    Call lrFactType.RemoveFromModel(False, True, True, True, True, False)
+                    GoTo EndProcessing
+#End Region
+                ElseIf lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType And lrPGSLink.RDSRelation.ResponsibleFactType.CanSafelyRemoveFromModel Then
+#Region "Not is LinkFactType"
+                    lsMessage = "Sorry, you can't remove Edge Types that are Link Fact Types from the Property Graph Schema view. Morph to an Object-Role Model view and remove the Fact Type from there."
+                    MsgBox(lsMessage)
+                    Exit Sub
+#End Region
+                End If
+            Else
+                e.Cancel = True
+                Exit Sub
+            End If
+EndProcessing:
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ViewVerbalisationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewVerbalisationToolStripMenuItem.Click
+
+        Try
+            prApplication.WorkingPage = Me.zrPage
+            Dim lrfrmVerbalisationView = frmMain.loadToolboxORMVerbalisationForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+            Dim lrFactType As FBM.FactType = Nothing
+
+            If Me.zrPage.SelectedObject.Count = 1 Then
+
+                Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+
+                If lrERDRelation.RDSRelation.ResponsibleFactType.IsObjectified Or lrERDRelation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                    If lrERDRelation.ActualPGSNode Is Nothing And lrERDRelation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
+                    ElseIf lrERDRelation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                    Else
+                        lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
+                    End If
+                Else
+                        lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
+                End If
+
+                Call lrfrmVerbalisationView.VerbaliseFactType(lrFactType)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ORMVerbalisationViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ORMVerbalisationViewToolStripMenuItem.Click
+
+        Try
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
+
+            Call frmMain.loadToolboxORMVerbalisationForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ErrorListToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ErrorListToolStripMenuItem.Click
+
+        Try
+            Call frmMain.loadToolboxErrorListForm(Me.DockPanel.ActivePane)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RichmondBrainBoxToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RichmondBrainBoxToolStripMenuItem.Click
+
+        Try
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
+
+            frmMain.Cursor = Cursors.WaitCursor
+            Call frmMain.loadToolboxRichmondBrainBox(Me.zrPage, Me.DockPanel.ActivePane)
+            frmMain.Cursor = Cursors.Default
 
         Catch ex As Exception
             Dim lsMessage As String

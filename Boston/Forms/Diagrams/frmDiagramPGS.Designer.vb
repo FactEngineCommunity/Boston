@@ -85,6 +85,7 @@ Partial Class frmDiagramPGS
         Me.ToolStripMenuItemERDDiagram1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemLinkViewReadingEditor = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewVerbalisationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
@@ -102,6 +103,9 @@ Partial Class frmDiagramPGS
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.ORMVerbalisationViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ErrorListToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RichmondBrainBoxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -260,11 +264,11 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator5, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator16, Me.AutoLayoutToolStripMenuItem, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 126)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 148)
         '
         'ViewToolStripMenuItem
         '
-        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolboxToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.CypherToolboxToolStripMenuItem, Me.ToolStripSeparator7, Me.ToolStripMenuItemEdgeReadingEditor, Me.PageAsORMMetamodelToolStripMenuItem})
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolboxToolStripMenuItem, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator3, Me.CypherToolboxToolStripMenuItem, Me.ToolStripSeparator7, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItemEdgeReadingEditor, Me.ORMVerbalisationViewToolStripMenuItem, Me.RichmondBrainBoxToolStripMenuItem, Me.PageAsORMMetamodelToolStripMenuItem})
         Me.ViewToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
         Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
@@ -334,7 +338,7 @@ Partial Class frmDiagramPGS
         '
         Me.mnuOption_ViewGrid.Image = Global.Boston.My.Resources.MenuImages.Paste16x16
         Me.mnuOption_ViewGrid.Name = "mnuOption_ViewGrid"
-        Me.mnuOption_ViewGrid.Size = New System.Drawing.Size(96, 22)
+        Me.mnuOption_ViewGrid.Size = New System.Drawing.Size(180, 22)
         Me.mnuOption_ViewGrid.Text = "&Grid"
         '
         'ToolStripSeparator5
@@ -451,9 +455,9 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Relation
         '
-        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ToolStripSeparator10, Me.ToolStripMenuItem2, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.RemoveFromPageAndModelToolStripMenuItem})
+        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ViewVerbalisationToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItem2, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.RemoveFromPageAndModelToolStripMenuItem})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 204)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 226)
         '
         'MorphToToolStripMenuItem1
         '
@@ -491,15 +495,22 @@ Partial Class frmDiagramPGS
         '
         'ToolStripMenuItemLinkViewReadingEditor
         '
+        Me.ToolStripMenuItemLinkViewReadingEditor.Image = Global.Boston.My.Resources.Resources.FactTypeReading16x16
         Me.ToolStripMenuItemLinkViewReadingEditor.Name = "ToolStripMenuItemLinkViewReadingEditor"
         Me.ToolStripMenuItemLinkViewReadingEditor.Size = New System.Drawing.Size(255, 22)
         Me.ToolStripMenuItemLinkViewReadingEditor.Text = "&View Reading Editor"
+        '
+        'ViewVerbalisationToolStripMenuItem
+        '
+        Me.ViewVerbalisationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Verbalisation16x16
+        Me.ViewVerbalisationToolStripMenuItem.Name = "ViewVerbalisationToolStripMenuItem"
+        Me.ViewVerbalisationToolStripMenuItem.Size = New System.Drawing.Size(255, 22)
+        Me.ViewVerbalisationToolStripMenuItem.Text = "View Verbalisation"
         '
         'ToolStripSeparator10
         '
         Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
         Me.ToolStripSeparator10.Size = New System.Drawing.Size(252, 6)
-        Me.ToolStripSeparator10.Visible = False
         '
         'ToolStripMenuItem2
         '
@@ -660,6 +671,27 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ORMVerbalisationViewToolStripMenuItem
+        '
+        Me.ORMVerbalisationViewToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Verbalisation16x16
+        Me.ORMVerbalisationViewToolStripMenuItem.Name = "ORMVerbalisationViewToolStripMenuItem"
+        Me.ORMVerbalisationViewToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.ORMVerbalisationViewToolStripMenuItem.Text = "ORM &Verbalisation View"
+        '
+        'ErrorListToolStripMenuItem
+        '
+        Me.ErrorListToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ErrorList
+        Me.ErrorListToolStripMenuItem.Name = "ErrorListToolStripMenuItem"
+        Me.ErrorListToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.ErrorListToolStripMenuItem.Text = "&Error List"
+        '
+        'RichmondBrainBoxToolStripMenuItem
+        '
+        Me.RichmondBrainBoxToolStripMenuItem.Image = CType(resources.GetObject("RichmondBrainBoxToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.RichmondBrainBoxToolStripMenuItem.Name = "RichmondBrainBoxToolStripMenuItem"
+        Me.RichmondBrainBoxToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.RichmondBrainBoxToolStripMenuItem.Text = "&Virtual Analyst"
+        '
         'frmDiagramPGS
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -758,4 +790,8 @@ Partial Class frmDiagramPGS
     Friend WithEvents DisplayAsEdgeTypeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator18 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
+    Friend WithEvents ViewVerbalisationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ORMVerbalisationViewToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ErrorListToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RichmondBrainBoxToolStripMenuItem As ToolStripMenuItem
 End Class

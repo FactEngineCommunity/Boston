@@ -70,6 +70,9 @@ Namespace FBM
         Public Sub RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
+                'CodeSafe 
+                If Me.Model Is Nothing Or Me.Page Is Nothing Then Exit Sub
+
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactTypeInstance.Name, pcenumConceptType.FactTypeName)
 
                 If abBroadcastInterfaceEvent Then

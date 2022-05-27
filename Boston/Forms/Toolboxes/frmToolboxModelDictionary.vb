@@ -1214,7 +1214,74 @@ Public Class frmToolboxModelDictionary
     Private Sub PropertiesToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem1.Click
 
         Try
-            Call frmMain.LoadToolboxPropertyWindow(frmMain.DockPanel.ActivePane)
+
+            Dim lrModelObject As FBM.ModelObject
+
+            Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                Case Is = GetType(RDS.Table)
+                    lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Name, True)
+                Case Is = GetType(FBM.ValueType),
+                              GetType(FBM.EntityType),
+                              GetType(FBM.FactType),
+                              GetType(FBM.RoleConstraint)
+                    lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id, True)
+                Case Else
+                    Exit Sub
+            End Select
+
+
+            'CodeSafe 
+            If lrModelObject Is Nothing Then Exit Sub
+
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrLoadedModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            Try
+                If frmMain.IsDiagramSpyFormLoaded Then
+                    Dim larDiagramSpyPage = From ActivePage In prApplication.ActivePages.ToArray
+                                            Where ActivePage.Tag IsNot Nothing
+                                            Where ActivePage.Tag.GetType Is GetType(FBM.DiagramSpyPage)
+                                            Select ActivePage
+
+                    For Each lfrmDiagramSpyPage In larDiagramSpyPage.ToArray
+                        Call lfrmDiagramSpyPage.Close()
+                    Next
+                End If
+
+                lrModelObject = frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            Call frmMain.LoadToolboxPropertyWindow(frmMain.DockPanel.ActivePane, lrModelObject)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Public Sub setLanguage(ByVal aiLanguage As pcenumLanguage)
+
+        Try
+            Me.TreeView1.Nodes.Clear()
+            RemoveHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
+            Select Case aiLanguage
+                Case Is = pcenumLanguage.ORMModel
+                    Call Me.LoadORMModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 0
+                Case Is = pcenumLanguage.EntityRelationshipDiagram
+                    Call Me.LoadERDModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 1
+                Case Is = pcenumLanguage.PropertyGraphSchema
+                    Call Me.LoadPGSModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 2
+            End Select
+            AddHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
 
         Catch ex As Exception
             Dim lsMessage As String

@@ -73,6 +73,24 @@ Namespace FBM
 
         Private _IsDatabaseReservedWord As Boolean = False
 
+        Private _IsObjectifyingEntityType As Boolean = False
+
+        <XmlElementAttribute()>
+        <CategoryAttribute("IsObjectifyingEntityType"),
+         Browsable(True),
+         [ReadOnly](True),
+         DesignOnly(False),
+         DescriptionAttribute("True if the Entity Type is a Objectifying Entity Type.")>
+        Public Shadows Property IsObjectifyingEntityType As Boolean
+            Get
+                Return Me._IsObjectifyingEntityType
+            End Get
+            Set(value As Boolean)
+                Me._IsObjectifyingEntityType = value
+            End Set
+        End Property
+
+
         '<XmlElementAttribute()>
         '<CategoryAttribute("FactEngine"),
         ' Browsable(True),
@@ -1092,6 +1110,9 @@ Namespace FBM
                 'Hide the FactType/ValueType representing the ReferenceMode for the EntityType
                 '----------------------------------------------------------------------------------------
                 For Each lrFactTypeInstance In larFactTypeInstance
+
+                    If lrFactTypeInstance.Shape Is Nothing Then GoTo MoveOn
+
                     lrFactTypeInstance.Shape.Visible = False
                     lrFactTypeInstance.FactTable.TableShape.Visible = False
                     lrFactTypeInstance.FactTypeNameShape.Visible = False
@@ -1121,7 +1142,7 @@ Namespace FBM
                         Next
                     Next
                 Next
-
+MoveOn:
                 If Me.ValueConstraintInstance IsNot Nothing Then
                     If Me.ValueConstraintInstance.Shape IsNot Nothing Then
                         Me.ValueConstraintInstance.Shape.Visible = True
@@ -1583,9 +1604,12 @@ Namespace FBM
                     End If
 
                     If Me.Shape IsNot Nothing Then
-                        Me.Page.Diagram.Nodes.Remove(Me.Shape)
-                        Me.Page.Diagram.Nodes.Remove(Me.EntityTypeNameShape)
-                        Me.Page.Diagram.Nodes.Remove(Me.ReferenceModeShape)
+
+                        If Me.Page.Diagram IsNot Nothing Then
+                            Me.Page.Diagram.Nodes.Remove(Me.Shape)
+                            Me.Page.Diagram.Nodes.Remove(Me.EntityTypeNameShape)
+                            Me.Page.Diagram.Nodes.Remove(Me.ReferenceModeShape)
+                        End If
                         Me.Page.EntityTypeInstance.Remove(Me)
                         Call TableEntityTypeInstance.delete_entity_type_instance(Me)
 
@@ -1593,21 +1617,21 @@ Namespace FBM
                         And Me.ReferenceModeFactType IsNot Nothing _
                         And abBroadcastInterfaceEvent Then
 
-                            Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
-                            Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
-                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                            For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
-                                TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
-                                Me.Page.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
-                            Next
-                            Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
-                            Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
-                            Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
-                            Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
+                                Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
+                                Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
+                                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                                For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
+                                    TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
+                                    Me.Page.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
+                                Next
+                                Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
+                                Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
+                                Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                                Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
+                            End If
                         End If
-                    End If
 
-                Else
+                    Else
                     lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
                     Dim lrApplicationException As New ApplicationException(lsMessage)
                     lrApplicationException.Data.Add("ErrorType", 100)
@@ -2123,7 +2147,9 @@ Namespace FBM
                             'Call Me.ReferenceModeValueType.SetName(Me.MakeReferenceModeName)
                             If IsSomething(Me.Shape) Then
                                 Me.ReferenceModeValueType.DisplayAndAssociate()
-                                Me.ReferenceModeValueType.Shape.Visible = False
+                                If Me.ReferenceModeValueType.Shape IsNot Nothing Then
+                                    Me.ReferenceModeValueType.Shape.Visible = False
+                                End If
                             End If
                         End If
 
@@ -2142,13 +2168,15 @@ Namespace FBM
                                 Me.ReferenceModeFactType.Shape.Visible = False
                             End If
                         Else
-                                Me.ReferenceModeFactType = Me.EntityType.ReferenceModeFactType.CloneInstance(Me.Page, True)
+                            Me.ReferenceModeFactType = Me.EntityType.ReferenceModeFactType.CloneInstance(Me.Page, True)
                             If IsSomething(Me.Shape) Then
                                 Me.ReferenceModeFactType.DisplayAndAssociate()
-                                Me.ReferenceModeFactType.Shape.Visible = False
-                                For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
-                                    lrRoleConstraintInstance.DisplayAndAssociate()
-                                Next
+                                If Me.ReferenceModeFactType.Shape IsNot Nothing Then
+                                    Me.ReferenceModeFactType.Shape.Visible = False
+                                    For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
+                                        lrRoleConstraintInstance.DisplayAndAssociate()
+                                    Next
+                                End If
                             End If
                         End If
 
@@ -2172,9 +2200,8 @@ Namespace FBM
                             Call Me.HideTheReferenceScheme()
                         End If
 
-
                     End If
-                    End If
+                End If
 
                 Me.Page.Invalidate()
 

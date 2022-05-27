@@ -1,5 +1,6 @@
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
+Imports System.Reflection
 
 Namespace FBM
     <Serializable()> _
@@ -234,11 +235,24 @@ Namespace FBM
 
         Public Sub RemoveFromPage(ByVal abBroadcastInterfaceEvent As Boolean)
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactTypeInstance.Id, pcenumConceptType.FactTable)
+            Try
+                'CodeSafe
+                If Me.Model Is Nothing Or Me.Page Is Nothing Then Exit Sub
 
-            If abBroadcastInterfaceEvent Then
-                Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
-            End If
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactTypeInstance.Id, pcenumConceptType.FactTable)
+
+                If abBroadcastInterfaceEvent Then
+                    Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
 
         End Sub
 

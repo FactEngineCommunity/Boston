@@ -204,11 +204,27 @@ Partial Public Class tBrain
 
         lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
 
-        If Me.Page IsNot Nothing Then
-            lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+        If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+            Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
+            Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+        Else
+            Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
+        End If
 
-            Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+        If Me.Page IsNot Nothing Then
+
+            Select Case Me.Page.Language
+                Case Is = pcenumLanguage.ORMModel
+                    lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+                    Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                    Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+                Case Is = pcenumLanguage.PropertyGraphSchema
+
+                    Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)
+
+            End Select
+
 
             If Me.AutoLayoutOn Then
                 Me.Page.Form.AutoLayout()
@@ -227,6 +243,7 @@ Partial Public Class tBrain
         Dim lrValueType As FBM.ValueType = Nothing
         Dim lrJoinedFactType As FBM.FactType = Nothing
         Dim larModelObject As New List(Of FBM.ModelObject)
+        Dim lsMessage As String
 
         Try
             Me.Model = prApplication.WorkingModel
@@ -247,7 +264,7 @@ Partial Public Class tBrain
                         If lrJoinedFactType.IsObjectified Then
                             larModelObject.Add(lrJoinedFactType)
                         Else
-                            Dim lsMessage As String = ""
+                            lsMessage = ""
                             lsMessage = "The Fact Type, '" & lrJoinedFactType.Name & "', must be objectified before it can be involved in other Fact Types."
                             lsMessage &= vbCrLf & "Objectify the Fact Type and try again."
                             Me.OutputBuffer = lsMessage
@@ -362,50 +379,70 @@ Partial Public Class tBrain
             If Me.Page Is Nothing Then
                 Me.Model.AddFactType(lrFactType, True, abBroadcastInterfaceEvent, Nothing)
             Else
-                Dim lbAllObjectsOnPage As Boolean = True
-                For Each lrRole In lrFactType.RoleGroup
-                    If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
-                        lbAllObjectsOnPage = False
-                    End If
-                Next
+                Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        Dim lbAllObjectsOnPage As Boolean = True
+                        For Each lrRole In lrFactType.RoleGroup
+                            If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
+                                lbAllObjectsOnPage = False
+                            End If
+                        Next
 
-                If lbAllObjectsOnPage Then
-                    loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
-                Else
-                    loPointF = New PointF(100, 100)
-                End If
+                        If lbAllObjectsOnPage Then
+                            loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
+                        Else
+                            loPointF = New PointF(100, 100)
+                        End If
 
-                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, abBroadcastInterfaceEvent)
-                lrFactTypeInstance.Visible = True
+                        lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, abBroadcastInterfaceEvent)
+                        lrFactTypeInstance.Visible = True
 
-                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(0, abBroadcastInterfaceEvent)
+                        Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(0, abBroadcastInterfaceEvent)
 
-                Dim loPoint As New PointF(100, 100)
-                If lrFactTypeInstance.Arity = 2 Then
-                    Dim lrFirstModelObject, lrSecondModelObject As Object
+                        Dim loPoint As New PointF(100, 100)
+                        If lrFactTypeInstance.Arity = 2 Then
+                            Dim lrFirstModelObject, lrSecondModelObject As Object
 
-                    lrFirstModelObject = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
-                    lrSecondModelObject = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
+                            lrFirstModelObject = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
+                            lrSecondModelObject = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
 
-                    loPoint.X = (lrFirstModelObject.X + lrSecondModelObject.X) / 2
-                    loPoint.Y = (lrFirstModelObject.y + lrSecondModelObject.Y) / 2
+                            loPoint.X = (lrFirstModelObject.X + lrSecondModelObject.X) / 2
+                            loPoint.Y = (lrFirstModelObject.y + lrSecondModelObject.Y) / 2
 
-                    lrFactTypeInstance.Move(loPoint.X, loPoint.Y, abBroadcastInterfaceEvent)
-                End If
+                            lrFactTypeInstance.Move(loPoint.X, loPoint.Y, abBroadcastInterfaceEvent)
+                        End If
+
+                        Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                        Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
+
+                    Case Is = pcenumLanguage.PropertyGraphSchema
+
+                        Me.Model.AddFactType(lrFactType, True, abBroadcastInterfaceEvent, Nothing)
+
+                        If lrFactType.Arity > 2 Then
+                            Call lrFactType.CreateInternalUniquenessConstraint(lrFactType.RoleGroup, True, True, True, False, Nothing, True, False)
+                            Call lrFactType.Objectify(False, True)
+                            Dim lrTable = lrFactType.getCorrespondingRDSTable(Nothing, True)
+                            If lrTable IsNot Nothing Then
+                                Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrFactType.getCorrespondingRDSTable, loPointF)
+                            End If
+                        Else
+                            lsMessage = "NB The new Fact Type has no Internal Uniqueness Constraint, and so no Edge Type will appear for the Fact Type."
+                            lsMessage.AppendLine("Edit the Fact Type in an Object-Role Model view to add an Internal Uniqueness Constraint to the Fact Type.")
+                            lsMessage.AppendLine("Hint: In the future use something like:" & lrFactType.RoleGroup(0).JoinedORMObject.Id & " has ONE " & lrFactType.RoleGroup(1).JoinedORMObject.Id)
+                            Call Me.send_data(lsMessage)
+                        End If
+                End Select
 
                 If Me.AutoLayoutOn Then
                     Me.Page.Form.AutoLayout()
                 End If
 
-                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
-
             End If
-
+EndProcessing:
             Me.OutputChannel.Focus()
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -509,26 +546,29 @@ Partial Public Class tBrain
             '===========================
 
             If Me.Page IsNot Nothing Then
-                Dim lrFactTypeInstance As FBM.FactTypeInstance
-                Dim loPointF As PointF
+                Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance
+                        Dim loPointF As PointF
 
-                Dim lbAllObjectsOnPage As Boolean = True
-                For Each lrRole In lrFactType.RoleGroup
-                    If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
-                        lbAllObjectsOnPage = False
-                    End If
-                Next
+                        Dim lbAllObjectsOnPage As Boolean = True
+                        For Each lrRole In lrFactType.RoleGroup
+                            If Not Me.Page.ContainsModelElement(lrRole.JoinedORMObject) Then
+                                lbAllObjectsOnPage = False
+                            End If
+                        Next
 
-                If lbAllObjectsOnPage Then
-                    loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
-                Else
-                    loPointF = New PointF(100, 100)
-                End If
+                        If lbAllObjectsOnPage Then
+                            loPointF = Me.Page.GetMidPointOfModelObjects(lrFactType.GetModelObjects)
+                        Else
+                            loPointF = New PointF(100, 100)
+                        End If
 
-                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, abBroadcastInterfaceEvent)
+                        lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, loPointF, False, False, abBroadcastInterfaceEvent)
 
-                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
+                        Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                        Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
+                End Select
 
                 If Me.AutoLayoutOn Then
                     Me.Page.Form.AutoLayout()
@@ -702,11 +742,36 @@ Partial Public Class tBrain
                 'Have already checked to see wither it is okay to create the EntityType above.
                 Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True, abBroadcastInterfaceEvent)
 
-                If Me.Page IsNot Nothing Then
-                    Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+                If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
+                    Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                Else
+                    Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
+                End If
 
-                    Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                    Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, abBroadcastInterfaceEvent)
+                Try
+                    Select Case prApplication.WorkingPage.Language
+                        Case Is = pcenumLanguage.ORMModel,
+                                  pcenumLanguage.PropertyGraphSchema
+                            Me.Page = prApplication.WorkingPage
+                    End Select
+                Catch ex As Exception
+                    'Not a biggie if left as is
+                End Try
+
+                If Me.Page IsNot Nothing Then
+
+                    Select Case Me.Page.Language
+                        Case Is = pcenumLanguage.ORMModel
+                            Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+                            Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, abBroadcastInterfaceEvent)
+                            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+                        Case Is = pcenumLanguage.PropertyGraphSchema
+
+                            Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)
+
+                    End Select
 
                     If Me.AutoLayoutOn Then
                         Me.Page.Form.AutoLayout()

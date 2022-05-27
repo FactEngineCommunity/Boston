@@ -39,6 +39,7 @@ Partial Class frmToolboxErrorList
         Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.ContextMenuStripShowCoreModelErrors = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemShowCoreModelErrors = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.DataGrid_ErrorList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripHelp.SuspendLayout()
         Me.ContextMenuStripShowCoreModelErrors.SuspendLayout()
@@ -64,20 +65,20 @@ Partial Class frmToolboxErrorList
         'ContextMenuStripHelp
         '
         Me.ContextMenuStripHelp.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStripHelp.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HelpToolStripMenuItem, Me.ToolStripMenuItemShowInDiagram})
+        Me.ContextMenuStripHelp.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HelpToolStripMenuItem, Me.ToolStripMenuItemShowInDiagram, Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem})
         Me.ContextMenuStripHelp.Name = "ContextMenuStripHelp"
-        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(181, 70)
+        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(334, 92)
         '
         'HelpToolStripMenuItem
         '
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(333, 22)
         Me.HelpToolStripMenuItem.Text = "&Help"
         '
         'ToolStripMenuItemShowInDiagram
         '
         Me.ToolStripMenuItemShowInDiagram.Name = "ToolStripMenuItemShowInDiagram"
-        Me.ToolStripMenuItemShowInDiagram.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemShowInDiagram.Size = New System.Drawing.Size(333, 22)
         Me.ToolStripMenuItemShowInDiagram.Text = "&Show in Diagram..."
         '
         'ButtonRefresh
@@ -100,6 +101,12 @@ Partial Class frmToolboxErrorList
         Me.ToolStripMenuItemShowCoreModelErrors.Name = "ToolStripMenuItemShowCoreModelErrors"
         Me.ToolStripMenuItemShowCoreModelErrors.Size = New System.Drawing.Size(201, 22)
         Me.ToolStripMenuItemShowCoreModelErrors.Text = "Show &Core Model errors"
+        '
+        'ShowTheModelElementInTheModelDictionaryToolStripMenuItem
+        '
+        Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Name = "ShowTheModelElementInTheModelDictionaryToolStripMenuItem"
+        Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(333, 22)
+        Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Text = "Show the model element in the &Model Dictionary"
         '
         'frmToolboxErrorList
         '
@@ -125,4 +132,5 @@ Partial Class frmToolboxErrorList
     Friend WithEvents ButtonRefresh As Button
     Friend WithEvents ContextMenuStripShowCoreModelErrors As ContextMenuStrip
     Friend WithEvents ToolStripMenuItemShowCoreModelErrors As ToolStripMenuItem
+    Friend WithEvents ShowTheModelElementInTheModelDictionaryToolStripMenuItem As ToolStripMenuItem
 End Class

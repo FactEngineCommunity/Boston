@@ -298,6 +298,7 @@ Namespace FBM
                     'Is already Displayed and Associated
                     Exit Sub
                 End If
+                If Me.Page.Diagram Is Nothing Then Exit Sub
 
                 loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
                 loDroppedNode.Shape = Shapes.RoundRect

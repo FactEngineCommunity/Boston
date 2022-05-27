@@ -2106,6 +2106,9 @@ Namespace FBM
                     'Is a SubtypeRelationshipFactType, which are hidden.
                     '----------------------------------------------------------------
                 Else
+                    'CodeSafe
+                    If Me.Page.Diagram Is Nothing Then Exit Sub
+
                     loFactTypeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 12, 12 + ((Me.GetHighestConstraintLevel - 1) * 1.6), Shapes.RoundRect)
 
                     loFactTypeNode.HandlesStyle = HandlesStyle.InvisibleMove

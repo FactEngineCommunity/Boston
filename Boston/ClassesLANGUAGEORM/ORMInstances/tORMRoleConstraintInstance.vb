@@ -1768,7 +1768,9 @@ Namespace FBM
 
                 Call Me.Page.RemoveRoleConstraintInstance(Me, abBroadcastInterfaceEvent)
 
-                Me.Page.MakeDirty()
+                If Me.Page IsNot Nothing Then
+                    Me.Page.MakeDirty()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

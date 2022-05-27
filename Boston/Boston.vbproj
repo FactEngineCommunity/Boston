@@ -3086,6 +3086,7 @@
     <None Include="Images\ORMShapes\value_comparison_not_equal.png" />
     <None Include="Images\ORMShapes\symmetric_transitive.png" />
     <None Include="Images\ORMShapes\acyclic_strongly_intransitive.png" />
+    <None Include="Images\MenuImages\Verbalisation16x16.png" />
     <Content Include="Images\Splash\Splash.png" />
     <Content Include="Images\Splash\Splash.png" />
     <None Include="Images\Viev\VievLogoMedium.jpg" />

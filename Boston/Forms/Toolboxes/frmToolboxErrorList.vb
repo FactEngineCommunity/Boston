@@ -333,5 +333,73 @@ Public Class frmToolboxErrorList
 
     End Sub
 
+    Private Sub ShowTheModelElementInTheModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Click
+
+        Dim lrModelError As FBM.ModelError = Nothing
+
+        Try
+
+            If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
+                ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
+                lrModelError = Me.DataGrid_ErrorList.SelectedRows(0).DataBoundItem 'Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
+            ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
+                ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
+                lrModelError = Me.DataGrid_ErrorList.CurrentRow.DataBoundItem '.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
+            Else
+                ziSelectedErrorNumber = 0
+            End If
+
+            '==========================================================================================================
+            If lrModelError IsNot Nothing Then
+
+                Dim lfrmModelDictionary As New frmToolboxModelDictionary
+                Dim lrModelObject As FBM.ModelObject
+
+                lrModelObject = lrModelError.ModelObject
+
+                'CodeSafe 
+                If lrModelObject Is Nothing Then Exit Sub
+
+                Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+                Try
+                    If frmMain.IsDiagramSpyFormLoaded Then
+                        Dim larDiagramSpyPage = From ActivePage In prApplication.ActivePages.ToArray
+                                                Where ActivePage.Tag IsNot Nothing
+                                                Where ActivePage.Tag.GetType Is GetType(FBM.DiagramSpyPage)
+                                                Select ActivePage
+
+                        For Each lfrmDiagramSpyPage In larDiagramSpyPage.ToArray
+                            Call lfrmDiagramSpyPage.Close()
+                        Next
+                    End If
+
+                    lrModelObject = frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+                Catch ex As Exception
+                    Exit Sub
+                End Try
+
+                If prApplication.RightToolboxForms.FindAll(AddressOf lfrmModelDictionary.EqualsByName).Count = 0 Then
+                    Call frmMain.LoadToolboxModelDictionary()
+                End If
+
+                lfrmModelDictionary = prApplication.RightToolboxForms.Find(AddressOf lfrmModelDictionary.EqualsByName)
+                lfrmModelDictionary.Show()
+
+                Call lfrmModelDictionary.setLanguage(pcenumLanguage.ORMModel)
+                Call lfrmModelDictionary.FindTreeNode(lrModelObject.Id)
+
+
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 
 End Class

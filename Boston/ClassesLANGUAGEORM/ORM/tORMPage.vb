@@ -2285,10 +2285,21 @@ NextY:
 
         Public Shadows Sub MakeDirty()
 
-            Me.IsDirty = True
-            Me.Model.MakeDirty(False, False)
-            RaiseEvent PageUpdated()
-            'Call Me.Model.ReviewModelErrors()
+            Try
+                Me.IsDirty = True
+                If Me.Model IsNot Nothing Then
+                    Me.Model.MakeDirty(False, False)
+                End If
+                RaiseEvent PageUpdated()
+                'Call Me.Model.ReviewModelErrors()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -2567,8 +2578,10 @@ NextY:
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageRemovePageObject, arFactTypeInstance, lrConceptInstance)
                 End If
 
-                lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
-                Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+                If Me.Model IsNot Nothing Then
+                    lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
+                    Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
