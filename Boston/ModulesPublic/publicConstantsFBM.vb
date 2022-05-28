@@ -11,6 +11,7 @@
         EntityRelationshipDiagram = 9
         PropertyGraphSchema = 22
         StateTransitionDiagram = 10
+        BPMN = 11
     End Enum
 
     <Serializable()>

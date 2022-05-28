@@ -2888,17 +2888,22 @@ Public Class frmDiagramPGS
             Dim lfrmORMVerbalisationView As frmToolboxORMVerbalisation = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
 
             If lfrmORMVerbalisationView IsNot Nothing Then
-                If lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                    If lrPGSLink.Relation.ActualPGSNode Is Nothing And lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                        lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
-                    ElseIf lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                        lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                Try
+                    If lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        If lrPGSLink.Relation.ActualPGSNode Is Nothing And lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
+                        ElseIf lrPGSLink.Relation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                        Else
+                            lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
+                        End If
                     Else
                         lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
                     End If
-                Else
-                    lrFactType = lrPGSLink.Relation.RDSRelation.ResponsibleFactType
-                End If
+
+                Catch ex As Exception
+                    'Not a biggie
+                End Try
 
                 Call lfrmORMVerbalisationView.VerbaliseFactType(lrFactType)
             End If

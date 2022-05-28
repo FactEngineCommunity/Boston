@@ -7,6 +7,7 @@ Partial Public Class tBrain
         Dim lsMessage As String
         Dim lsReferenceMode As String
         Dim lsUnabatedReferenceMode As String
+        Dim lrPGSNodeType As PGS.Node = Nothing
 
         Try
             Me.Model = prApplication.WorkingModel
@@ -43,8 +44,15 @@ Partial Public Class tBrain
                 End If
                 lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
 
+
                 If Me.Page IsNot Nothing Then
-                    lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
+                    Select Case Me.Page.Language
+                        Case Is = pcenumLanguage.ORMModel
+                            lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100))
+                        Case Is = pcenumLanguage.PropertyGraphSchema
+                            lrPGSNodeType = Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)
+                    End Select
+
                 End If
 
                 'Call lrEntityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
@@ -128,8 +136,16 @@ Partial Public Class tBrain
             End If
 
             If Me.Page IsNot Nothing Then
-                If Me.Page.Form.GetType = GetType(frmDiagramORM) And lrEntityTypeInstance IsNot Nothing Then
-                    Call lrEntityTypeInstance.SetAppropriateColour()
+                If lrEntityTypeInstance IsNot Nothing Then
+                    Select Case Me.Page.Language
+                        Case Is = pcenumLanguage.ORMModel
+                            Call lrEntityTypeInstance.SetAppropriateColour()
+                    End Select
+                ElseIf lrPGSNodeType IsNot Nothing Then
+                    Select Case Me.Page.Language
+                        Case Is = pcenumLanguage.PropertyGraphSchema
+                            Call lrPGSNodeType.SetAppropriateColour()
+                    End Select
                 End If
             End If
 
@@ -568,6 +584,9 @@ EndProcessing:
 
                         Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
                         Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
+                    Case Else
+                        'NA for ERD and PGS Pages, because will automatically look to create new links (Foreign Key References, Edge Types).
+
                 End Select
 
                 If Me.AutoLayoutOn Then
@@ -631,11 +650,21 @@ EndProcessing:
 
             If Me.Page IsNot Nothing Then
 
-                Dim lrFactTypeInstance As New FBM.FactTypeInstance
-                lrFactTypeInstance = lrFactType.CloneInstance(Me.Page, False)
-                lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        Dim lrFactTypeInstance As New FBM.FactTypeInstance
+                        lrFactTypeInstance = lrFactType.CloneInstance(Me.Page, False)
+                        lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
 
-                Call lrFactTypeInstance.SetSuitableFactTypeReading()
+                        If lrFactTypeInstance IsNot Nothing Then
+                            Call lrFactTypeInstance.SetSuitableFactTypeReading()
+                        End If
+                    Case Is = pcenumLanguage.PropertyGraphSchema
+
+                        Call Me.Page.Form.ResetNodeAndLinkColors
+
+                End Select
+
             End If
 
         Catch ex As Exception

@@ -475,11 +475,19 @@ Namespace PGS
             End Try
         End Sub
 
-        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements FBM.iPageObject.RepellNeighbouringPageObjects
+        Public Overloads Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements FBM.iPageObject.RepellNeighbouringPageObjects
 
         End Sub
 
-        Public Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
+        Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
+
+            If CType(Me.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
+                Me.Shape.Pen.Color = Color.Red
+            ElseIf Me.Shape.Selected Then
+                Me.Shape.Pen.Color = Color.Blue
+            Else
+                Me.Shape.Pen.Color = Color.DeepSkyBlue
+            End If
 
         End Sub
 

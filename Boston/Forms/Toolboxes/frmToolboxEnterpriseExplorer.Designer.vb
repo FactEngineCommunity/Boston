@@ -62,6 +62,8 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.AddERDPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StateTransitionDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddSTDPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BusinessProcessModellingNotationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddBPMNPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemEmptyModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -366,7 +368,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ToolStripMenuItemLanguage
         '
-        Me.ToolStripMenuItemLanguage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem, Me.StateTransitionDiagramToolStripMenuItem})
+        Me.ToolStripMenuItemLanguage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem, Me.StateTransitionDiagramToolStripMenuItem, Me.BusinessProcessModellingNotationToolStripMenuItem})
         Me.ToolStripMenuItemLanguage.Image = CType(resources.GetObject("ToolStripMenuItemLanguage.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemLanguage.Name = "ToolStripMenuItemLanguage"
         Me.ToolStripMenuItemLanguage.Size = New System.Drawing.Size(207, 22)
@@ -377,8 +379,8 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.PropertyGraphSchemaToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddPGSPageToolStripMenuItem})
         Me.PropertyGraphSchemaToolStripMenuItem.Image = CType(resources.GetObject("PropertyGraphSchemaToolStripMenuItem.Image"), System.Drawing.Image)
         Me.PropertyGraphSchemaToolStripMenuItem.Name = "PropertyGraphSchemaToolStripMenuItem"
-        Me.PropertyGraphSchemaToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
-        Me.PropertyGraphSchemaToolStripMenuItem.Text = "Property Graph Schema"
+        Me.PropertyGraphSchemaToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
+        Me.PropertyGraphSchemaToolStripMenuItem.Text = "&Property Graph Schema"
         '
         'AddPGSPageToolStripMenuItem
         '
@@ -392,7 +394,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.EntityRelationshipDiagramToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddERDPageToolStripMenuItem})
         Me.EntityRelationshipDiagramToolStripMenuItem.Image = CType(resources.GetObject("EntityRelationshipDiagramToolStripMenuItem.Image"), System.Drawing.Image)
         Me.EntityRelationshipDiagramToolStripMenuItem.Name = "EntityRelationshipDiagramToolStripMenuItem"
-        Me.EntityRelationshipDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
+        Me.EntityRelationshipDiagramToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
         Me.EntityRelationshipDiagramToolStripMenuItem.Text = "&Entity Relationship Diagram"
         '
         'AddERDPageToolStripMenuItem
@@ -406,7 +408,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.StateTransitionDiagramToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddSTDPageToolStripMenuItem})
         Me.StateTransitionDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.StateTransitionDiagram_16x16
         Me.StateTransitionDiagramToolStripMenuItem.Name = "StateTransitionDiagramToolStripMenuItem"
-        Me.StateTransitionDiagramToolStripMenuItem.Size = New System.Drawing.Size(220, 22)
+        Me.StateTransitionDiagramToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
         Me.StateTransitionDiagramToolStripMenuItem.Text = "&State Transition Diagram"
         '
         'AddSTDPageToolStripMenuItem
@@ -414,6 +416,21 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
         Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
+        '
+        'BusinessProcessModellingNotationToolStripMenuItem
+        '
+        Me.BusinessProcessModellingNotationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddBPMNPageToolStripMenuItem})
+        Me.BusinessProcessModellingNotationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.BPMN16x16
+        Me.BusinessProcessModellingNotationToolStripMenuItem.Name = "BusinessProcessModellingNotationToolStripMenuItem"
+        Me.BusinessProcessModellingNotationToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
+        Me.BusinessProcessModellingNotationToolStripMenuItem.Text = "&Business Process Modelling Notation"
+        '
+        'AddBPMNPageToolStripMenuItem
+        '
+        Me.AddBPMNPageToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.BPMNAdd16x16
+        Me.AddBPMNPageToolStripMenuItem.Name = "AddBPMNPageToolStripMenuItem"
+        Me.AddBPMNPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.AddBPMNPageToolStripMenuItem.Text = "&Add BPMN Page"
         '
         'ToolStripSeparator1
         '
@@ -685,4 +702,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents UnhideASelectedModelToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ImportormNORMAFileToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents KeywordExtractionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BusinessProcessModellingNotationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddBPMNPageToolStripMenuItem As ToolStripMenuItem
 End Class

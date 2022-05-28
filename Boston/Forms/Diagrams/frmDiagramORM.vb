@@ -5134,7 +5134,7 @@ Public Class frmDiagramORM
 
     End Sub
 
-    Public Sub DisplayORMModelPage(ByRef arPage As FBM.Page)
+    Public Sub LoadORMModelPage(ByRef arPage As FBM.Page)
 
         '------------------------------------------------------------------------
         ' Displays an ORM Diagram based on the input parameters
@@ -5254,7 +5254,7 @@ Public Class frmDiagramORM
             'Display the RoleConstraints
             '-----------------------------
             'CodeSafe
-            Call Me.zrPage.removeRoleConstraintInstancesNoLongerInModel
+            Call Me.zrPage.RemoveRoleConstraintInstancesNoLongerInModel()
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
@@ -5301,7 +5301,7 @@ Public Class frmDiagramORM
             '-------------------------------------------------------------------
             'Load any State Transitions that relate to EntityTypes on the Page
             '-------------------------------------------------------------------
-            Call Me.loadStateTransitions
+            Call Me.loadStateTransitions()
 
             '------------------------------------------------------------------
             'Set the PropertiesGrid.SeletedObject to the ORMModel.Page itself

@@ -142,6 +142,7 @@ Namespace FBM
                         lrERDRelation.OriginEntity = lrNode1
                     End If
 
+                    lrERDRelation.RDSRelation = arRelation
                     lrERDRelation.IsPGSRelationNode = True
                     Dim lrOriginatingNode = arOriginatingNode
                     lrERDRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)

@@ -217,11 +217,17 @@
   <data name="Camera16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Camera16x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="folder16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\folder16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Help16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Help16x16.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Properties216x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Properties216x16.jpg;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BPMN16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\BPMN16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="VirtualAnalyst16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\VirtualAnalyst16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -283,8 +289,8 @@
   <data name="deontic_external_uniqueness" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Shapelibrary\ORMShapes\deontic_external_uniqueness.bmp;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="folder16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\MenuImages\folder16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Verbalisation16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Verbalisation16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Morphing16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Morphing16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -295,7 +301,7 @@
   <data name="Attribute" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\Attribute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Verbalisation16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\MenuImages\Verbalisation16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="BPMNAdd16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\BPMNAdd16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
