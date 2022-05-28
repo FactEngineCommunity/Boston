@@ -25,7 +25,7 @@ Namespace My.Resources
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0"),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute()>  _
-    Friend Class CMML
+    Public Class CMML
         
         Private Shared resourceMan As Global.System.Resources.ResourceManager
         
@@ -40,7 +40,7 @@ Namespace My.Resources
         '''  Returns the cached ResourceManager instance used by this class.
         '''</summary>
         <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-        Friend Shared ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
+        Public Shared ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
             Get
                 If Object.ReferenceEquals(resourceMan, Nothing) Then
                     Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("Boston.CMML", GetType(CMML).Assembly)
@@ -55,7 +55,7 @@ Namespace My.Resources
         '''  resource lookups using this strongly typed resource class.
         '''</summary>
         <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-        Friend Shared Property Culture() As Global.System.Globalization.CultureInfo
+        Public Shared Property Culture() As Global.System.Globalization.CultureInfo
             Get
                 Return resourceCulture
             End Get
@@ -67,7 +67,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property actor() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property actor() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("actor", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)

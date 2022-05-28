@@ -1754,7 +1754,7 @@ SkipRegistrationChecking:
             '-----------------
             'Display the Page
             '-----------------
-            Call child.DisplayORMModelPage(arPage)
+            Call child.LoadORMModelPage(arPage)
 
             If arFocalModelObject Is Nothing Then
                 '--------------------------------------
@@ -1890,7 +1890,7 @@ SkipRegistrationChecking:
             prApplication.ThrowErrorMessage("About to load the ORM Model Page", pcenumErrorType.Information)
 
 
-            Call child.DisplayORMModelPage(arPage)
+            Call child.LoadORMModelPage(arPage)
 
             If abLoadToolboxes Then
                 Call Me.ShowHideToolboxes(True)
