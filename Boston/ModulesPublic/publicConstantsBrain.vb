@@ -63,6 +63,17 @@
         Off
     End Enum
 
+    <Serializable()>
+    Enum pcenumExpectedResponseType
+        Break = -1
+        None = 0
+        YesNo = 1
+        ATMOSTONEONEMANYTOMANY = 2
+    End Enum
+
+    ''' <summary>
+    ''' See also: pcenumExpectedResponseType
+    ''' </summary>
     <Serializable()> _
     Enum pcenumQuestionType
         CopyFactType
@@ -74,6 +85,7 @@
         CreateFactType
         CreateFactTypePredetermined
         CreateFactTypeReading
+        CreateInternalUniquenessConstraint
         CreateSubtypeRelationship
         CreateValueType
         ForgetAskedToAbortPlan 'i.e. If a user restates an aborted Sentence/Plan, the Brain asks if the user wants to forget that it was asked to abort that Sentence/Plan.
@@ -85,6 +97,7 @@
         CreateEntityType
         CreateFactType
         CreateFactTypeReading
+        CreateInternalUniquenessConstraint
         CreateRoleConstraint
         CreateSubtypeRelationship
         FindOrCreateEntityTypeORFactType 'e.g. In a Statement of type 'Person has AT MOST ONE FirstName' the first ModelElement is an EntityType or a FactType.

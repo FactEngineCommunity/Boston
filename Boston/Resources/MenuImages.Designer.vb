@@ -25,7 +25,7 @@ Namespace My.Resources
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0"),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute()>  _
-    Friend Class MenuImages
+    Public Class MenuImages
         
         Private Shared resourceMan As Global.System.Resources.ResourceManager
         
@@ -40,7 +40,7 @@ Namespace My.Resources
         '''  Returns the cached ResourceManager instance used by this class.
         '''</summary>
         <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-        Friend Shared ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
+        Public Shared ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
             Get
                 If Object.ReferenceEquals(resourceMan, Nothing) Then
                     Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("Boston.MenuImages", GetType(MenuImages).Assembly)
@@ -55,7 +55,7 @@ Namespace My.Resources
         '''  resource lookups using this strongly typed resource class.
         '''</summary>
         <Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
-        Friend Shared Property Culture() As Global.System.Globalization.CultureInfo
+        Public Shared Property Culture() As Global.System.Globalization.CultureInfo
             Get
                 Return resourceCulture
             End Get
@@ -67,7 +67,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Boston32x32() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Boston32x32() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Boston32x32", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -77,7 +77,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Camera16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Camera16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Camera16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -87,7 +87,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Cloud216x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Cloud216x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Cloud216x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -97,7 +97,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Copy16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Copy16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Copy16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -107,7 +107,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property core16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property core16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("core16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -117,7 +117,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Database16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Database16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Database16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -127,7 +127,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property DatabaseAdd16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property DatabaseAdd16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("DatabaseAdd16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -137,7 +137,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property delete16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property delete16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("delete16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -147,7 +147,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property deleteround16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property deleteround16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("deleteround16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -157,7 +157,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property dictionary16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property dictionary16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("dictionary16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -167,7 +167,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property edit16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property edit16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("edit16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -177,7 +177,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property empty16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property empty16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("empty16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -187,7 +187,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property ERD16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property ERD16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ERD16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -197,7 +197,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property ErrorList() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property ErrorList() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ErrorList", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -207,7 +207,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Export16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Export16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Export16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -217,7 +217,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property FactTables16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property FactTables16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("FactTables16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -227,7 +227,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property FactTypeObjectified16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property FactTypeObjectified16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("FactTypeObjectified16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -237,7 +237,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property FactTypeReading16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property FactTypeReading16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("FactTypeReading16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -247,7 +247,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property FactTypeRemoveUniquenessConstraints16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property FactTypeRemoveUniquenessConstraints16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("FactTypeRemoveUniquenessConstraints16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -257,7 +257,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Grid() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Grid() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Grid", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -267,7 +267,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property HelpTips16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property HelpTips16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("HelpTips16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -277,7 +277,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Import16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Import16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Import16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -287,7 +287,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property ImportExport16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property ImportExport16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ImportExport16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -297,7 +297,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Layout16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Layout16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Layout16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -307,7 +307,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property ORM16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property ORM16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ORM16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -317,7 +317,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property PageAdd16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property PageAdd16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("PageAdd16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -327,7 +327,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property PageAddPGS16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property PageAddPGS16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("PageAddPGS16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -337,7 +337,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property PagePGS16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property PagePGS16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("PagePGS16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -347,7 +347,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Paste16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Paste16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Paste16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -357,7 +357,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property PGS16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property PGS16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("PGS16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -367,7 +367,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Project16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Project16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Project16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -377,7 +377,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Properties216x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Properties216x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Properties216x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -387,7 +387,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property RainCloudRed16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property RainCloudRed16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("RainCloudRed16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -397,7 +397,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Remove16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Remove16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Remove16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -407,7 +407,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Tick_16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Tick_16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Tick_16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -417,7 +417,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Toolbox16x16B_W() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property Toolbox16x16B_W() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Toolbox16x16B_W", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
@@ -427,7 +427,7 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property XML16x16() As System.Drawing.Bitmap
+        Public Shared ReadOnly Property XML16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("XML16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)

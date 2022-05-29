@@ -65,8 +65,18 @@ Public Class frmToolboxBrainBox
 
     Private Sub frmToolboxBrainBox_Leave(sender As Object, e As EventArgs) Handles Me.Leave
 
-        'Call Me.AutoComplete.Hide()
-        Me.TextBoxInput.Text = ""
+        Try
+            'Call Me.AutoComplete.Hide()
+            Me.TextBoxInput.Text = ""
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -75,77 +85,98 @@ Public Class frmToolboxBrainBox
         '----------------------------------------------------------------
         'Rregister the Input and Output channels with the Richmond.Brain
         '----------------------------------------------------------------
-        prApplication.Brain = New tBrain
-        prApplication.Brain.Page = prApplication.WorkingPage
-        prApplication.Brain.Model = prApplication.WorkingModel
-        prApplication.Brain.VAQL = New VAQL.Processor(prApplication.WorkingModel)
+        Try
 
-        Dim thread As New Thread(AddressOf prApplication.Brain.VAQL.setDynamicObjects)
-        thread.Start()
+            prApplication.Brain = New tBrain
+            prApplication.Brain.Page = prApplication.WorkingPage
+            prApplication.Brain.Model = prApplication.WorkingModel
+            prApplication.Brain.VAQL = New VAQL.Processor(prApplication.WorkingModel)
 
-        prApplication.Brain.InputChannel = Me.TextBoxInput
-        prApplication.Brain.OutputChannel = Me.TextBox_Output
-        prApplication.Brain.EchoInput = True
-        prApplication.Brain.IncludeSenderInOutput = True
-        prApplication.Brain.PressForAnswer = True
+            Dim thread As New Thread(AddressOf prApplication.Brain.VAQL.setDynamicObjects)
+            thread.Start()
 
-        '=================================
-        'Make Briana visible
-        '====================
-        If My.Settings.DisplayBrianaVirtualAnalyst Then
-            prApplication.Brain.Page.Form.Briana.Visible = True
-        End If
+            prApplication.Brain.InputChannel = Me.TextBoxInput
+            prApplication.Brain.OutputChannel = Me.TextBox_Output
+            prApplication.Brain.EchoInput = True
+            prApplication.Brain.IncludeSenderInOutput = True
+            prApplication.Brain.PressForAnswer = True
 
-        '------------------------------------------------
-        'Check for Quiet Mode
-        '----------------------
-        Me.ToolStripMenuItemQuietMode.Checked = My.Settings.StartVirtualAnalystInQuietMode
-        prApplication.Brain.QuietMode = My.Settings.StartVirtualAnalystInQuietMode
+            '=================================
+            'Make Briana visible
+            '====================
+            If My.Settings.DisplayBrianaVirtualAnalyst Then
+                prApplication.Brain.Page.Form.Briana.Visible = True
+            End If
 
-        Select Case My.Settings.DefaultBrainMode
-            Case Is = pcenumBrainMode.NaturalLanguage.ToString
-                prApplication.Brain.ThoughtMode = pcenumBrainMode.NaturalLanguage
-            Case Else
-                prApplication.Brain.ThoughtMode = pcenumBrainMode.ORMQL
-        End Select
+            '------------------------------------------------
+            'Check for Quiet Mode
+            '----------------------
+            Me.ToolStripMenuItemQuietMode.Checked = My.Settings.StartVirtualAnalystInQuietMode
+            prApplication.Brain.QuietMode = My.Settings.StartVirtualAnalystInQuietMode
 
-        Call Me.LoadEnterpriseAwareListbox()
-        Me.TextBoxInput.Focus()
+            Select Case My.Settings.DefaultBrainMode
+                Case Is = pcenumBrainMode.NaturalLanguage.ToString
+                    prApplication.Brain.ThoughtMode = pcenumBrainMode.NaturalLanguage
+                Case Else
+                    prApplication.Brain.ThoughtMode = pcenumBrainMode.ORMQL
+            End Select
 
-        Me.StatusLabelMain.Text = ""
+            Call Me.LoadEnterpriseAwareListbox()
+            Me.TextBoxInput.Focus()
 
-        '-------------------------------------------------------
-        'Setup the Parser etc
-        '---------------------
-        zrScanner = New VAQL.Scanner
-        zrParser = New VAQL.Parser(zrScanner)
+            Me.StatusLabelMain.Text = ""
 
-        Me.zrTextHighlighter = New VAQL.TextHighlighter(
-                               Me.TextBoxInput,
-                               Me.zrScanner,
-                               Me.zrParser)
+            '-------------------------------------------------------
+            'Setup the Parser etc
+            '---------------------
+            zrScanner = New VAQL.Scanner
+            zrParser = New VAQL.Parser(zrScanner)
 
-        'Me.TextMarker = New TinyPG.Controls.TextMarker(Me.TextBoxQuery)
+            Me.zrTextHighlighter = New VAQL.TextHighlighter(
+                                   Me.TextBoxInput,
+                                   Me.zrScanner,
+                                   Me.zrParser)
 
-        Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
-        Me.AutoComplete.mbSpaceActionEqualsTabAction = True
+            'Me.TextMarker = New TinyPG.Controls.TextMarker(Me.TextBoxQuery)
 
-        '==============================================================
-        'Make the Brain useful/user-friendly
-        prApplication.Brain.send_data("Type in a Fact Type Reading, like 'Person has first-Name'")
-        prApplication.Brain.send_data("...and I will help you create the ORM diagram.")
+            Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
+            Me.AutoComplete.mbSpaceActionEqualsTabAction = True
+
+            '==============================================================
+            'Make the Brain useful/user-friendly
+            prApplication.Brain.send_data("Type in a Fact Type Reading, like 'Person has first-Name'")
+            prApplication.Brain.send_data("...and I will help you create the ORM diagram.")
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Public Sub setup(ByRef arPage As FBM.Page)
 
-        prApplication.Brain.Page = arPage
+        Try
+            prApplication.Brain.Page = arPage
 
-        If arPage IsNot Nothing Then
-            prApplication.Brain.Model = arPage.Model
-        End If
+            If arPage IsNot Nothing Then
+                prApplication.Brain.Model = arPage.Model
+            End If
 
-        Me.TextBoxInput.Focus()
+            Me.TextBoxInput.Focus()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -155,218 +186,259 @@ Public Class frmToolboxBrainBox
         box.AppendText(text)
         Dim li_end As Integer = box.TextLength
 
-        ' Textbox may transform chars, so (end-start) != text.Length
-        box.Select(start, li_end - start)
+        Try
+            ' Textbox may transform chars, so (end-start) != text.Length
+            box.Select(start, li_end - start)
 
-        box.SelectionColor = color
-        ' could set box.SelectionBackColor, box.SelectionFont too.
+            box.SelectionColor = color
+            ' could set box.SelectionBackColor, box.SelectionFont too.
 
-        box.SelectionLength = 0 ' // clear
+            box.SelectionLength = 0 ' // clear
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
     End Sub
 
     Private Sub TextBox_Input_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBoxInput.Enter
 
-        prApplication.Brain.Page = prApplication.WorkingPage
-        prApplication.Brain.Model = prApplication.WorkingModel
+        Try
+            prApplication.Brain.Page = prApplication.WorkingPage
+            prApplication.Brain.Model = prApplication.WorkingModel
 
-        Call Me.SetThoughtModeCursor()
+            Call Me.SetThoughtModeCursor()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub TextBox_Input_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBoxInput.GotFocus
 
-        Select Case prApplication.Brain.ThoughtMode
-            Case Is = pcenumBrainMode.ORMQL
-                If Trim(Replace(Me.TextBoxInput.Text, "ORMQL:", "")).Length = 0 Then
-                    Call Me.SetThoughtModeCursor()
-                End If
-            Case Is = pcenumBrainMode.NaturalLanguage
-                If Trim(Replace(Me.TextBoxInput.Text, "NL:", "")).Length = 0 Then
-                    Call Me.SetThoughtModeCursor()
-                End If
-        End Select
+        Try
+            Select Case prApplication.Brain.ThoughtMode
+                Case Is = pcenumBrainMode.ORMQL
+                    If Trim(Replace(Me.TextBoxInput.Text, "ORMQL:", "")).Length = 0 Then
+                        Call Me.SetThoughtModeCursor()
+                    End If
+                Case Is = pcenumBrainMode.NaturalLanguage
+                    If Trim(Replace(Me.TextBoxInput.Text, "NL:", "")).Length = 0 Then
+                        Call Me.SetThoughtModeCursor()
+                    End If
+            End Select
 
-        If Me.TextBoxInput.Text.Last = " " Then
-            Me.zsIntellisenseBuffer = ""
-        End If
+            If Me.TextBoxInput.Text.Last = " " Then
+                Me.zsIntellisenseBuffer = ""
+            End If
 
-        Me.TextBoxInput.Focus()
+            Me.TextBoxInput.Focus()
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub SetThoughtModeCursor()
 
-        Select Case prApplication.Brain.ThoughtMode
-            Case Is = pcenumBrainMode.ORMQL
-                If Me.TextBoxInput.Find("ORMQL: ") = -1 Then
-                    Me.TextBoxInput.Text &= "ORMQL: "
-                    Me.TextBoxInput.Find("ORMQL: ")
-                    Me.TextBoxInput.SelectionColor = Color.Blue
-                    Me.TextBoxInput.SelectionProtected = True
+        Try
+            Select Case prApplication.Brain.ThoughtMode
+                Case Is = pcenumBrainMode.ORMQL
+                    If Me.TextBoxInput.Find("ORMQL: ") = -1 Then
+                        Me.TextBoxInput.Text &= "ORMQL: "
+                        Me.TextBoxInput.Find("ORMQL: ")
+                        Me.TextBoxInput.SelectionColor = Color.Blue
+                        Me.TextBoxInput.SelectionProtected = True
+                        Me.TextBoxInput.DeselectAll()
+                        Me.TextBoxInput.Select("ORMQL: ".Length, 0)
+                        Me.TextBoxInput.DeselectAll()
+                    End If
+                Case Is = pcenumBrainMode.NaturalLanguage
+                    If Me.TextBoxInput.Find("NL: ") = -1 Then
+                        Me.TextBoxInput.Text = "NL: "
+                        Me.TextBoxInput.Find("NL: ")
+                        Me.TextBoxInput.DeselectAll()
+                        Me.TextBoxInput.SelectionColor = Color.Blue
+                        Me.TextBoxInput.Select(0, "NL: ".Length)
+                        'Me.TextBoxInput.SelectionProtected = True
+                        Me.TextBoxInput.DeselectAll()
+                    End If
+
+
+                    Me.TextBoxInput.Select(0, Me.TextBoxInput.Text.Length)
+                    Me.TextBoxInput.SelectionColor = Color.SteelBlue
+                    Me.TextBoxInput.SelectionProtected = False
                     Me.TextBoxInput.DeselectAll()
-                    Me.TextBoxInput.Select("ORMQL: ".Length, 0)
-                    Me.TextBoxInput.DeselectAll()
-                End If
-            Case Is = pcenumBrainMode.NaturalLanguage
-                If Me.TextBoxInput.Find("NL: ") = -1 Then
-                    Me.TextBoxInput.Text = "NL: "
-                    Me.TextBoxInput.Find("NL: ")
-                    Me.TextBoxInput.DeselectAll()
-                    Me.TextBoxInput.SelectionColor = Color.Blue
+
                     Me.TextBoxInput.Select(0, "NL: ".Length)
+                    Me.TextBoxInput.SelectionColor = Color.Blue
                     'Me.TextBoxInput.SelectionProtected = True
-                    Me.TextBoxInput.DeselectAll()
-                End If
 
 
-                Me.TextBoxInput.Select(0, Me.TextBoxInput.Text.Length)
-                Me.TextBoxInput.SelectionColor = Color.SteelBlue
-                Me.TextBoxInput.SelectionProtected = False
-                Me.TextBoxInput.DeselectAll()
+                    '------------------------------------
+                    'Set cursor position to end of text
+                    '  NB Have to use Select method
+                    '------------------------------------
+                    Me.TextBoxInput.Select(Me.TextBoxInput.Text.Length, 0)
+                    Me.TextBoxInput.SelectionColor = Color.SteelBlue
 
-                Me.TextBoxInput.Select(0, "NL: ".Length)
-                Me.TextBoxInput.SelectionColor = Color.Blue
-                'Me.TextBoxInput.SelectionProtected = True
+            End Select
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                '------------------------------------
-                'Set cursor position to end of text
-                '  NB Have to use Select method
-                '------------------------------------
-                Me.TextBoxInput.Select(Me.TextBoxInput.Text.Length, 0)
-                Me.TextBoxInput.SelectionColor = Color.SteelBlue
-
-        End Select
-
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub TextBox_Input_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles TextBoxInput.KeyDown
 
-        Select Case e.KeyCode
-            Case Is = Keys.Up, Keys.Down
-                If Me.ToolStripMenuItemDictationMode.Checked Then
-                    Me.zbDictationMode = False
-                    Me.StatusLabelMain.Text = "Dictation: Suspended"
-                Else
-                    Me.StatusLabelMain.Text = "Dictation: Off"
-                End If
-            Case Is = Keys.Enter
-                If Me.ToolStripMenuItemDictationMode.Checked Then
-                    Me.zbDictationMode = True
-                    Me.StatusLabelMain.Text = "Dictation: On"
-                Else
-                    Me.StatusLabelMain.Text = "Dictation: Off"
-                End If
-            Case Else
-                If Me.ToolStripMenuItemDictationMode.Checked Then
-                    Me.zbDictationMode = False
-                    Me.StatusLabelMain.Text = "Dictation: Suspended"
-                Else
-                    Me.StatusLabelMain.Text = "Dictation: Off"
-                End If
-        End Select
+        Try
 
-        Select Case e.KeyCode
-            Case Is = Keys.Back
-                If zsIntellisenseBuffer.Length > 0 Then
-                    zsIntellisenseBuffer = zsIntellisenseBuffer.Substring(0, zsIntellisenseBuffer.Length - 1)
-                End If
-            Case Is = Keys.Up 'UpArrow
-                If Me.inputbuffer.Count > 0 Then
-                    If Me.inputbuffer_pointer >= Me.inputbuffer.Count Then Me.inputbuffer_pointer = 0
-                    Me.inputbuffer_pointer += 1
-                    Me.TextBoxInput.Text = ""
-                    Call Me.SetThoughtModeCursor()
-                    Select Case Trim(Me.inputbuffer(Me.inputbuffer.Count - Me.inputbuffer_pointer).ToLower)
-                        Case Is = "yes", "no"
-                            If Me.inputbuffer_pointer + 1 <= Me.inputbuffer.Count Then
-                                Me.inputbuffer_pointer += 1
-                            End If
-                    End Select
-                    Me.TextBoxInput.AppendText(LTrim(Me.inputbuffer(Me.inputbuffer.Count - Me.inputbuffer_pointer)))
-                Else
-                    'Me.TextBoxInput.Clear()
-                End If
-                e.Handled = True
-            Case Is = Keys.Down  'DownArrow
-                '============================================
-                'If Optionals exist, then show AutoComplete
+            Select Case e.KeyCode
+                Case Is = Keys.Up, Keys.Down
+                    If Me.ToolStripMenuItemDictationMode.Checked Then
+                        Me.zbDictationMode = False
+                        Me.StatusLabelMain.Text = "Dictation: Suspended"
+                    Else
+                        Me.StatusLabelMain.Text = "Dictation: Off"
+                    End If
+                Case Is = Keys.Enter
+                    If Me.ToolStripMenuItemDictationMode.Checked Then
+                        Me.zbDictationMode = True
+                        Me.StatusLabelMain.Text = "Dictation: On"
+                    Else
+                        Me.StatusLabelMain.Text = "Dictation: Off"
+                    End If
+                Case Else
+                    If Me.ToolStripMenuItemDictationMode.Checked Then
+                        Me.zbDictationMode = False
+                        Me.StatusLabelMain.Text = "Dictation: Suspended"
+                    Else
+                        Me.StatusLabelMain.Text = "Dictation: Off"
+                    End If
+            End Select
 
-                Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text)
-                If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
-                    Call Me.ProcessAutoComplete()
+            Select Case e.KeyCode
+                Case Is = Keys.Back
+                    If zsIntellisenseBuffer.Length > 0 Then
+                        zsIntellisenseBuffer = zsIntellisenseBuffer.Substring(0, zsIntellisenseBuffer.Length - 1)
+                    End If
+                Case Is = Keys.Up 'UpArrow
+                    If Me.inputbuffer.Count > 0 Then
+                        If Me.inputbuffer_pointer >= Me.inputbuffer.Count Then Me.inputbuffer_pointer = 0
+                        Me.inputbuffer_pointer += 1
+                        Me.TextBoxInput.Text = ""
+                        Call Me.SetThoughtModeCursor()
+                        Select Case Trim(Me.inputbuffer(Me.inputbuffer.Count - Me.inputbuffer_pointer).ToLower)
+                            Case Is = "yes", "no"
+                                If Me.inputbuffer_pointer + 1 <= Me.inputbuffer.Count Then
+                                    Me.inputbuffer_pointer += 1
+                                End If
+                        End Select
+                        Me.TextBoxInput.AppendText(LTrim(Me.inputbuffer(Me.inputbuffer.Count - Me.inputbuffer_pointer)))
+                    Else
+                        'Me.TextBoxInput.Clear()
+                    End If
                     e.Handled = True
-                    Exit Sub
-                End If
+                Case Is = Keys.Down  'DownArrow
+                    '============================================
+                    'If Optionals exist, then show AutoComplete
 
-                '======================================
-                If Me.inputbuffer.Count > 0 Then
-                    Me.inputbuffer_pointer -= 1
-                    If Me.inputbuffer_pointer < 0 Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
-                    'CodeSafe
-                    If Me.inputbuffer_pointer = Me.inputbuffer.Count Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
-                    Me.TextBoxInput.Text = ""
-                    Call Me.SetThoughtModeCursor()
-                    Select Case Trim(Me.inputbuffer(Me.inputbuffer_pointer).ToLower)
-                        Case Is = "yes", "no"
-                            If Me.inputbuffer_pointer - 1 <= 0 Then
-                                Me.inputbuffer_pointer -= 1
-                            End If
+                    Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text)
+                    If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
+                        Call Me.ProcessAutoComplete()
+                        e.Handled = True
+                        Exit Sub
+                    End If
+
+                    '======================================
+                    If Me.inputbuffer.Count > 0 Then
+                        Me.inputbuffer_pointer -= 1
+                        If Me.inputbuffer_pointer < 0 Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
+                        'CodeSafe
+                        If Me.inputbuffer_pointer = Me.inputbuffer.Count Then Me.inputbuffer_pointer = Me.inputbuffer.Count - 1
+                        Me.TextBoxInput.Text = ""
+                        Call Me.SetThoughtModeCursor()
+                        Select Case Trim(Me.inputbuffer(Me.inputbuffer_pointer).ToLower)
+                            Case Is = "yes", "no"
+                                If Me.inputbuffer_pointer - 1 <= 0 Then
+                                    Me.inputbuffer_pointer -= 1
+                                End If
+                        End Select
+                        Me.TextBoxInput.AppendText(LTrim(Me.inputbuffer(Me.inputbuffer_pointer)))
+                    Else
+                        'Me.TextBoxInput.Clear()
+                    End If
+                    e.Handled = True
+                Case Is = Keys.Enter 'Enter
+
+                    Me.AutoComplete.Hide()
+
+                    '--------------------------------------------
+                    'Firstly, strip away the ThoughtMode prompt
+                    '--------------------------------------------
+                    Select Case prApplication.Brain.ThoughtMode
+                        Case Is = pcenumBrainMode.ORMQL
+                            Me.TextBoxInput.Text = Replace(Me.TextBoxInput.Text, "ORMQL:", "")
+                        Case Is = pcenumBrainMode.NaturalLanguage
+                            Me.TextBoxInput.Text = Replace(Me.TextBoxInput.Text, "NL:", "")
                     End Select
-                    Me.TextBoxInput.AppendText(LTrim(Me.inputbuffer(Me.inputbuffer_pointer)))
-                Else
-                    'Me.TextBoxInput.Clear()
-                End If
-                e.Handled = True
-            Case Is = Keys.Enter 'Enter
 
-                Me.AutoComplete.Hide()
+                    '----------------------------------
+                    'Check for BrainBox reserved words
+                    '----------------------------------
+                    Select Case LCase(Trim(Me.TextBoxInput.Text))
+                        Case Is = "clear"
+                            Me.TextBoxInput.Clear()
+                            Me.TextBox_Output.Clear()
+                            e.SuppressKeyPress = True
+                            Exit Sub
+                        Case Is = "exit"
+                            Call Me.HideBriana()
 
-                '--------------------------------------------
-                'Firstly, strip away the ThoughtMode prompt
-                '--------------------------------------------
-                Select Case prApplication.Brain.ThoughtMode
-                    Case Is = pcenumBrainMode.ORMQL
-                        Me.TextBoxInput.Text = Replace(Me.TextBoxInput.Text, "ORMQL:", "")
-                    Case Is = pcenumBrainMode.NaturalLanguage
-                        Me.TextBoxInput.Text = Replace(Me.TextBoxInput.Text, "NL:", "")
-                End Select
+                            prApplication.Brain = New tBrain
+                            Me.Close()
+                            frmMain.zfrm_Brain_box = Nothing
+                            Exit Sub
+                    End Select
 
-                '----------------------------------
-                'Check for BrainBox reserved words
-                '----------------------------------
-                Select Case LCase(Trim(Me.TextBoxInput.Text))
-                    Case Is = "clear"
-                        Me.TextBoxInput.Clear()
-                        Me.TextBox_Output.Clear()
-                        e.SuppressKeyPress = True
-                        Exit Sub
-                    Case Is = "exit"
-                        Call Me.HideBriana()
+                    '----------------------------------
+                    'Send data to the Richmond.Brain
+                    '----------------------------------
+                    Me.inputbuffer.Add(Me.TextBoxInput.Text)
+                    If Me.inputbuffer.Count >= 10 Then
+                        Me.inputbuffer.RemoveAt(0)
+                    End If
 
-                        prApplication.Brain = New tBrain
-                        Me.Close()
-                        frmMain.zfrm_Brain_box = Nothing
-                        Exit Sub
-                End Select
+                    If CheckIfModelPageSelected() Then
+                        prApplication.Brain.receive_data(Trim(Me.TextBoxInput.Text))
+                    End If
 
-                '----------------------------------
-                'Send data to the Richmond.Brain
-                '----------------------------------
-                Me.inputbuffer.Add(Me.TextBoxInput.Text)
-                If Me.inputbuffer.Count >= 10 Then
-                    Me.inputbuffer.RemoveAt(0)
-                End If
+                    Me.TextBoxInput.Clear()
+                    Call Me.SetThoughtModeCursor()
+                    e.SuppressKeyPress = True
 
-                If CheckIfModelPageSelected() Then
-                    prApplication.Brain.receive_data(Trim(Me.TextBoxInput.Text))
-                End If
-
-                Me.TextBoxInput.Clear()
-                Call Me.SetThoughtModeCursor()
-                e.SuppressKeyPress = True
-
-                Me.zsIntellisenseBuffer = ""
+                    Me.zsIntellisenseBuffer = ""
                 'Case Is = Keys.OemPeriod  '(e.KeyChar = ".") Then
                 '    '-------------------------------------------------------------------------------------
                 '    'User wants to view the EnterpriseAware listbox. Has hit the '.' key on their keypad
@@ -393,165 +465,259 @@ Public Class frmToolboxBrainBox
 
                 '    e.Handled = True
                 '    e.SuppressKeyPress = True
-            Case Is = Keys.Shift, Keys.ShiftKey
+                Case Is = Keys.Shift, Keys.ShiftKey
                 'Do nothing
-            Case Is = Keys.Space, Keys.OemMinus
+                Case Is = Keys.Space, Keys.OemMinus
 
-                Me.zsIntellisenseBuffer = ""
-            Case Else
-                zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
-        End Select
+                    Me.zsIntellisenseBuffer = ""
+                Case Else
+                    zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
+            End Select
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Function CheckIfModelPageSelected() As Boolean
 
-        If IsNothing(prApplication.Brain.Model) Then
-            '-----------------------------------------------
-            'Try and set the Model from the EnterpriseTree
-            '-----------------------------------------------
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                If IsSomething(frmMain.zfrmModelExplorer.TreeView.SelectedNode) Then
-                    Dim lrMenu As tEnterpriseEnterpriseView
-                    lrMenu = frmMain.zfrmModelExplorer.TreeView.SelectedNode.Tag
-                    Select Case lrMenu.MenuType
-                        Case Is = pcenumMenuType.pageORMModel
-                            Dim lrPage As FBM.Page = lrMenu.Tag
-                            prApplication.WorkingModel = lrPage.Model
-                            prApplication.Brain.Model = lrPage.Model
-                            prApplication.WorkingPage = prApplication.WorkingModel.Page.Find(AddressOf lrPage.Equals)
-                            Return True
-                        Case Else
-                            Return False
-                    End Select
+        Try
+            If IsNothing(prApplication.Brain.Model) Then
+                '-----------------------------------------------
+                'Try and set the Model from the EnterpriseTree
+                '-----------------------------------------------
+                If IsSomething(frmMain.zfrmModelExplorer) Then
+                    If IsSomething(frmMain.zfrmModelExplorer.TreeView.SelectedNode) Then
+                        Dim lrMenu As tEnterpriseEnterpriseView
+                        lrMenu = frmMain.zfrmModelExplorer.TreeView.SelectedNode.Tag
+                        Select Case lrMenu.MenuType
+                            Case Is = pcenumMenuType.pageORMModel
+                                Dim lrPage As FBM.Page = lrMenu.Tag
+                                prApplication.WorkingModel = lrPage.Model
+                                prApplication.Brain.Model = lrPage.Model
+                                prApplication.WorkingPage = prApplication.WorkingModel.Page.Find(AddressOf lrPage.Equals)
+                                Return True
+                            Case Else
+                                Return False
+                        End Select
+                    Else
+                        Return False
+                    End If
                 Else
                     Return False
                 End If
             Else
-                Return False
+                Return True
             End If
-        Else
-            Return True
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
+        End Try
 
     End Function
 
     Private Sub TextBox_Output_GotFocus(sender As Object, e As EventArgs) Handles TextBox_Output.GotFocus
 
-        Me.TextBoxInput.Focus()
+        Try
+            Me.TextBoxInput.Focus()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub TextBox_Output_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles TextBox_Output.MouseDown
 
-        Me.TextBoxInput.Focus()
+        Try
+            Me.TextBoxInput.Focus()
 
-        If e.Button = Windows.Forms.MouseButtons.Right Then
-            Me.TextBox_Output.ContextMenuStrip = Me.ContextMenuStripBrainBox
-        End If
+            If e.Button = Windows.Forms.MouseButtons.Right Then
+                Me.TextBox_Output.ContextMenuStrip = Me.ContextMenuStripBrainBox
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub TextBox_Output_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextBox_Output.TextChanged
 
-        Me.TextBox_Output.ScrollToCaret()
+        Try
+            Me.TextBox_Output.ScrollToCaret()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub TextBoxInput_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles TextBoxInput.KeyUp
 
-        If (e.KeyCode = Keys.Down Or Trim(Me.TextBoxInput.Text) <> "NL:") And Not e.KeyCode = Keys.Space Then
-            Call Me.ProcessAutoComplete(e)
-        End If
+        Try
 
-        If e.KeyCode = Keys.Escape Then
-            Me.AutoComplete.Hide()
-        End If
+            If (e.KeyCode = Keys.Down Or Trim(Me.TextBoxInput.Text) <> "NL:") And Not e.KeyCode = Keys.Space Then
+                Call Me.ProcessAutoComplete(e)
+            End If
 
-        e.Handled = True
+            If e.KeyCode = Keys.Escape Then
+                Me.AutoComplete.Hide()
+            End If
+
+            e.Handled = True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub TextBox_Input_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles TextBoxInput.MouseDown
 
-        If e.Button = Windows.Forms.MouseButtons.Right Then
-            Me.TextBoxInput.ContextMenuStrip = Me.ContextMenuVirtualAnalyst
-        End If
+        Try
+            If e.Button = Windows.Forms.MouseButtons.Right Then
+                Me.TextBoxInput.ContextMenuStrip = Me.ContextMenuVirtualAnalyst
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub DictationModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemDictationMode.Click
 
-        Me.ToolStripMenuItemDictationMode.Checked = Not Me.ToolStripMenuItemDictationMode.Checked
+        Try
+            Me.ToolStripMenuItemDictationMode.Checked = Not Me.ToolStripMenuItemDictationMode.Checked
 
-        Me.zbDictationMode = Me.ToolStripMenuItemDictationMode.Checked
+            Me.zbDictationMode = Me.ToolStripMenuItemDictationMode.Checked
 
-        If Me.zbDictationMode Then
-            Me.StatusLabelMain.Text = "Dictation: On"
-        Else
-            Me.StatusLabelMain.Text = "Dictation: Off"
-        End If
+            If Me.zbDictationMode Then
+                Me.StatusLabelMain.Text = "Dictation: On"
+            Else
+                Me.StatusLabelMain.Text = "Dictation: Off"
+            End If
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub TimerInput_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TimerInput.Tick
 
         Dim lsText As String = ""
 
-        Me.TimerInput.Stop()
+        Try
+            Me.TimerInput.Stop()
 
-        If Me.zbDictationMode Then
-            If Me.TextBoxInput.Text <> "" Then
+            If Me.zbDictationMode Then
+                If Me.TextBoxInput.Text <> "" Then
 
-                Select Case prApplication.Brain.ThoughtMode
-                    Case Is = pcenumBrainMode.ORMQL
-                        lsText = Trim(Replace(Me.TextBoxInput.Text, "ORMQL:", ""))
-                    Case Is = pcenumBrainMode.NaturalLanguage
-                        lsText = Trim(Replace(Me.TextBoxInput.Text, "NL:", ""))
-                End Select
-
-                Me.zbSentence = New Language.Sentence(Trim(lsText))
-
-                Call Language.AnalyseSentence(Me.zbSentence)
-                Call Language.ProcessSentence(Me.zbSentence)
-                If Me.zbSentence.AreAllWordsResolved Then
-                    Call Language.ResolveSentence(Me.zbSentence)
-                End If
-
-                If Me.zbSentence.POStaggingResolved Then
-                    '----------------------------------
-                    'Send data to the Richmond.Brain
-                    '----------------------------------
-                    Select Case lsText
-                        Case Is = "yes", "no"
-                            Me.inputbuffer.Add(Me.zbSentence.Sentence)
-                            If Me.inputbuffer.Count >= 10 Then
-                                Me.inputbuffer.RemoveAt(0)
-                            End If
-
-                            If CheckIfModelPageSelected() Then
-                                prApplication.Brain.receive_data(Trim(Me.zbSentence.Sentence))
-                            End If
-
-                            Me.TextBoxInput.Clear()
-                            Call Me.SetThoughtModeCursor()
+                    Select Case prApplication.Brain.ThoughtMode
+                        Case Is = pcenumBrainMode.ORMQL
+                            lsText = Trim(Replace(Me.TextBoxInput.Text, "ORMQL:", ""))
+                        Case Is = pcenumBrainMode.NaturalLanguage
+                            lsText = Trim(Replace(Me.TextBoxInput.Text, "NL:", ""))
                     End Select
+
+                    Me.zbSentence = New Language.Sentence(Trim(lsText))
+
+                    Call Language.AnalyseSentence(Me.zbSentence)
+                    Call Language.ProcessSentence(Me.zbSentence)
+                    If Me.zbSentence.AreAllWordsResolved Then
+                        Call Language.ResolveSentence(Me.zbSentence)
+                    End If
+
+                    If Me.zbSentence.POStaggingResolved Then
+                        '----------------------------------
+                        'Send data to the Richmond.Brain
+                        '----------------------------------
+                        Select Case lsText
+                            Case Is = "yes", "no"
+                                Me.inputbuffer.Add(Me.zbSentence.Sentence)
+                                If Me.inputbuffer.Count >= 10 Then
+                                    Me.inputbuffer.RemoveAt(0)
+                                End If
+
+                                If CheckIfModelPageSelected() Then
+                                    prApplication.Brain.receive_data(Trim(Me.zbSentence.Sentence))
+                                End If
+
+                                Me.TextBoxInput.Clear()
+                                Call Me.SetThoughtModeCursor()
+                        End Select
+                    End If
+
                 End If
-
             End If
-        End If
 
-        Me.TextBoxInput.Focus()
+            Me.TextBoxInput.Focus()
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub TextBox_Input_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBoxInput.TextChanged
 
-        If Me.zbDictationMode Then
-            Me.TimerInput.Start()
-        End If
+        Try
+            If Me.zbDictationMode Then
+                Me.TimerInput.Start()
+            End If
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub ListBoxEnterpriseAware_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles ListBoxEnterpriseAware.KeyUp
@@ -682,42 +848,77 @@ Public Class frmToolboxBrainBox
 
     Private Sub QuietModeToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemQuietMode.Click
 
-        Me.ToolStripMenuItemQuietMode.Checked = Not Me.ToolStripMenuItemQuietMode.Checked
+        Try
+            Me.ToolStripMenuItemQuietMode.Checked = Not Me.ToolStripMenuItemQuietMode.Checked
 
-        prApplication.Brain.QuietMode = Me.ToolStripMenuItemQuietMode.Checked
+            prApplication.Brain.QuietMode = Me.ToolStripMenuItemQuietMode.Checked
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub GetMODELELEMENTParseNodes(ByRef arParseNode As VAQL.ParseNode, ByRef aarParseNode As List(Of VAQL.ParseNode))
 
         Dim lrParseNode As VAQL.ParseNode
 
-        If arParseNode.Token.Type = VAQL.TokenType.MODELELEMENTNAME Then
-            aarParseNode.Add(arParseNode)
-        End If
+        Try
+            If arParseNode.Token.Type = VAQL.TokenType.MODELELEMENTNAME Then
+                aarParseNode.Add(arParseNode)
+            End If
 
-        For Each lrParseNode In arParseNode.Nodes
-            Call GetMODELELEMENTParseNodes(lrParseNode, aarParseNode)
-        Next
+            For Each lrParseNode In arParseNode.Nodes
+                Call GetMODELELEMENTParseNodes(lrParseNode, aarParseNode)
+            Next
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Public Sub CheckStartProductions(ByRef arParseTree As VAQL.ParseTree)
 
-        'If (arParseTree.Depth(0) = 3) And (arParseTree.Count(1) <= 5) Then
-        If Trim(Me.TextBoxInput.Text) = "NL:" Then
-            'arParseTree.Optionals.Add(New VAQL.ParseError("Start Production", &H1001, 0, 0, 0, 0, "KEYWDREADING"))
-        End If
+        Try
+            'If (arParseTree.Depth(0) = 3) And (arParseTree.Count(1) <= 5) Then
+            If Trim(Me.TextBoxInput.Text) = "NL:" Then
+                'arParseTree.Optionals.Add(New VAQL.ParseError("Start Production", &H1001, 0, 0, 0, 0, "KEYWDREADING"))
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Function CheckIfCanDisplayEnterpriseAwareBox()
 
-        If Me.AutoComplete.ListBox.Items.Count > 0 Then
-            Return True
-        Else
+        Try
+            If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                Return True
+            Else
+                Return False
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
             Return False
-        End If
+        End Try
 
     End Function
 
@@ -725,11 +926,20 @@ Public Class frmToolboxBrainBox
 
         Dim lrListItem As tComboboxItem
 
-        lrListItem = New tComboboxItem(asEAItem, asEAItem, aoTagObject)
+        Try
+            lrListItem = New tComboboxItem(asEAItem, asEAItem, aoTagObject)
 
-        If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
-            Me.AutoComplete.ListBox.Items.Add(lrListItem)
-        End If
+            If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
+                Me.AutoComplete.ListBox.Items.Add(lrListItem)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -737,25 +947,35 @@ Public Class frmToolboxBrainBox
 
         Dim lrPredicatePart As FBM.PredicatePart
 
-        '--------------------------------------------------
-        'Code Safe/Smart
-        '----------------
-        If aarPredicatePart.Count = 0 Then
-            Exit Sub
-        End If
+        Try
+            '--------------------------------------------------
+            'Code Safe/Smart
+            '----------------
+            If aarPredicatePart.Count = 0 Then
+                Exit Sub
+            End If
 
-        Me.AutoComplete.ListBox.Sorted = True
+            Me.AutoComplete.ListBox.Sorted = True
 
-        For Each lrPredicatePart In aarPredicatePart
-            Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, VAQL.TokenType.PREDICATEPART)
-        Next
+            For Each lrPredicatePart In aarPredicatePart
+                Call Me.AddEnterpriseAwareItem(lrPredicatePart.PredicatePartText, VAQL.TokenType.PREDICATEPART)
+            Next
 
-        'Me.AutoComplete.Show()
-        Me.AutoComplete.Owner = Me
-        Me.AutoComplete.ListBox.Focus()
-        If aarPredicatePart.Count > 0 Then
-            Me.AutoComplete.ListBox.SelectedIndex = 0
-        End If
+            'Me.AutoComplete.Show()
+            Me.AutoComplete.Owner = Me
+            Me.AutoComplete.ListBox.Focus()
+            If aarPredicatePart.Count > 0 Then
+                Me.AutoComplete.ListBox.SelectedIndex = 0
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -765,15 +985,16 @@ Public Class frmToolboxBrainBox
         Dim lsToken As String = ""
         Dim liTokenType As VAQL.TokenType
 
-        For Each lrParseError In aarParseErrors
-            liTokenType = DirectCast([Enum].Parse(GetType(VAQL.TokenType), lrParseError.ExpectedToken), VAQL.TokenType)
-            Select Case liTokenType
-                Case Is = VAQL.TokenType.BROPEN
-                    Call Me.AddEnterpriseAwareItem("(", liTokenType)
-                Case Is = VAQL.TokenType.PREDICATEPART
-                    'Dim lrModelElement As FBM.ModelObject
-                    Dim lsModelElementName As String
-                    lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
+        Try
+            For Each lrParseError In aarParseErrors
+                liTokenType = DirectCast([Enum].Parse(GetType(VAQL.TokenType), lrParseError.ExpectedToken), VAQL.TokenType)
+                Select Case liTokenType
+                    Case Is = VAQL.TokenType.BROPEN
+                        Call Me.AddEnterpriseAwareItem("(", liTokenType)
+                    Case Is = VAQL.TokenType.PREDICATEPART
+                        'Dim lrModelElement As FBM.ModelObject
+                        Dim lsModelElementName As String
+                        lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
                     ''lrModelElement = prApplication.WorkingModel.GetModelElementByName(lsModelElementName)
                     'If IsSomething(lrModelElement) Then
                     '    Call Me.AddPredicatePartsToEnterpriseAware(prBradfordApplication.Database.MetaDataManager.GetPredicatePartsForModelObject(lrModelElement))
@@ -786,29 +1007,38 @@ Public Class frmToolboxBrainBox
                     '        Call Me.AddPredicatePartsToEnterpriseAware(prBradfordApplication.Database.MetaDataManager.GetPredicatePartsForModelObject(lrModelElement))
                     '    End If
                     'End If
-                Case Is = VAQL.TokenType.UNARYPREDICATEPART
+                    Case Is = VAQL.TokenType.UNARYPREDICATEPART
                     'Do Nothing
-                Case Is = VAQL.TokenType.MODELELEMENTNAME
-                    '----------------------------------------------------
-                    '20180311-Sometimes is not triggered when half way through writing a ModelElementName...esp when at beginning of a FactTypeReading.
-                    Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
-                Case Is = VAQL.TokenType.PREBOUNDREADINGTEXT, _
-                          VAQL.TokenType.POSTBOUNDREADINGTEXT, _
-                          VAQL.TokenType.FOLLOWINGREADINGTEXT, _
-                          VAQL.TokenType.FRONTREADINGTEXT
-                    '------------
-                    'Do nothing
-                    '------------
-                Case Else
-                    If Me.zrScanner.Patterns(liTokenType).ToString.ToLower.StartsWith(zsIntellisenseBuffer) Then
-                        Call Me.AddEnterpriseAwareItem(Me.zrScanner.Patterns(liTokenType).ToString, liTokenType)
-                    End If
-            End Select
-        Next
+                    Case Is = VAQL.TokenType.MODELELEMENTNAME
+                        '----------------------------------------------------
+                        '20180311-Sometimes is not triggered when half way through writing a ModelElementName...esp when at beginning of a FactTypeReading.
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
+                    Case Is = VAQL.TokenType.PREBOUNDREADINGTEXT,
+                              VAQL.TokenType.POSTBOUNDREADINGTEXT,
+                              VAQL.TokenType.FOLLOWINGREADINGTEXT,
+                              VAQL.TokenType.FRONTREADINGTEXT
+                        '------------
+                        'Do nothing
+                        '------------
+                    Case Else
+                        If Me.zrScanner.Patterns(liTokenType).ToString.ToLower.StartsWith(zsIntellisenseBuffer) Then
+                            Call Me.AddEnterpriseAwareItem(Me.zrScanner.Patterns(liTokenType).ToString, liTokenType)
+                        End If
+                End Select
+            Next
 
-        If Me.AutoComplete.ListBox.Items.Count > 0 Then
-            Me.AutoComplete.Enabled = True
-        End If
+            If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                Me.AutoComplete.Enabled = True
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -828,38 +1058,49 @@ Public Class frmToolboxBrainBox
         '        zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
         'End Select
 
-        Dim lbStartsWith As Boolean = False
-        lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
+        Try
 
-        For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrValueType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
+            Dim lbStartsWith As Boolean = False
+            lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
+
+            For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lrValueType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
+                        Call Me.AddEnterpriseAwareItem(lrValueType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                    End If
+                Else
                     Call Me.AddEnterpriseAwareItem(lrValueType.Name, VAQL.TokenType.MODELELEMENTNAME)
                 End If
-            Else
-                Call Me.AddEnterpriseAwareItem(lrValueType.Name, VAQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
 
-        For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrEntityType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
-                    Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
+            For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lrEntityType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
+                        Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                    End If
+                Else
+                    'Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
                 End If
-            Else
-                'Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
 
-        For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsMDAModelElement = False And x.IsObjectified = True)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrFactType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
-                    Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
+            For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsMDAModelElement = False And x.IsObjectified = True)
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lrFactType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
+                        Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                    End If
+                Else
+                    'Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
                 End If
-            Else
-                'Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1144,35 +1385,60 @@ Public Class frmToolboxBrainBox
 
     Private Sub ShowAutoCompleteTool()
 
-        Me.AutoComplete.Owner = Me
-        'Me.AutoComplete.Show()
+        Try
+            Me.AutoComplete.Owner = Me
+            'Me.AutoComplete.Show()
 
-        Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
-        lo_point.X += Me.TextBoxInput.Bounds.X
-        lo_point.Y += Me.TextBoxInput.Bounds.Y
-        lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 13
-        Me.AutoComplete.Location = PointToScreen(lo_point)
+            Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
+            lo_point.X += Me.TextBoxInput.Bounds.X
+            lo_point.Y += Me.TextBoxInput.Bounds.Y
+            lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 13
+            Me.AutoComplete.Location = PointToScreen(lo_point)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
 
     Private Sub zrTextHighlighter_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles zrTextHighlighter.KeyDown
 
-        If (e.KeyCode = Keys.Down Or Trim(Me.TextBoxInput.Text) <> "NL:") Then 'And Not e.KeyCode = Keys.Space Then
-            'Call Me.ProcessAutoComplete(e)
-        End If
+        Try
+            If (e.KeyCode = Keys.Down Or Trim(Me.TextBoxInput.Text) <> "NL:") Then 'And Not e.KeyCode = Keys.Space Then
+                'Call Me.ProcessAutoComplete(e)
+            End If
 
-    End Sub
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-    Private Sub frmToolboxBrainBox_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
-
-        'Call Me.AutoComplete.Hide()
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub CopyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CopyToolStripMenuItem.Click
 
-        Me.TextBox_Output.Copy()
+        Try
+
+            Me.TextBox_Output.Copy()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

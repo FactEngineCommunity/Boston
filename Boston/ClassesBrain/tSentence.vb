@@ -170,11 +170,22 @@ Namespace Language
 
         Public Sub ClearWordListQualifications()
 
-            Dim lrWordQualification As Language.WordQualification
+            Try
 
-            For Each lrWordQualification In Me.WordListQualification
-                lrWordQualification.Sense.Clear()
-            Next
+                Dim lrWordQualification As Language.WordQualification
+
+                For Each lrWordQualification In Me.WordListQualification
+                    lrWordQualification.Sense.Clear()
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

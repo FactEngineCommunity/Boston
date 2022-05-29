@@ -1,15 +1,32 @@
-﻿Public Class tQuestion
+﻿Imports System.Reflection
+
+Public Class tQuestion
     Implements IEquatable(Of tQuestion)
 
     Public QuestionId As String = System.Guid.NewGuid.ToString
     Public Question As String = ""
-    Public ExpectingYesNoResponse As Boolean = False
+
+    Private _ExpectedResponseType As Object = 0
+    Public Property ExpectedResponseType As Object 'pcenumExpectedResponseType = pcenumExpectedResponseType.None
+        Get
+            Return Me._ExpectedResponseType
+        End Get
+        Set(value As Object)
+            Me._ExpectedResponseType = value
+        End Set
+    End Property
+
     Public Symbol As New List(Of String)
     Public ModelObject As New List(Of FBM.ModelObject)
     Public ValueType As New List(Of FBM.ValueType)
     Public QuestionType As pcenumQuestionType
     Public ObjectType As New FBM.ModelObject
     Public GeneralText As String = "" 'For general text that the question can use for anything (defined when the question is created).
+
+    ''' <summary>
+    ''' Also set in Brain.QuestionIsResolved
+    ''' </summary>
+    Public IsResolved As Boolean = False
 
     ''' <summary>
     ''' The Plan that this Question forms part of.
@@ -45,7 +62,7 @@
 
     Public Sub New(ByVal asQuestion As String,
                    ByVal aiQuestionType As pcenumQuestionType,
-                   ByVal abExpectingYesNoResponse As Boolean,
+                   ByVal aiExpectedResponseType As Object, 'pcenumExpectedResponseType
                    Optional ByVal aasSymbol As List(Of String) = Nothing,
                    Optional ByVal arSentence As Language.Sentence = Nothing,
                    Optional ByVal aoObjectType As FBM.ModelObject = Nothing,
@@ -56,55 +73,66 @@
 
         Dim lsString As String = ""
 
-        Me.Question = asQuestion
-        Me.ExpectingYesNoResponse = abExpectingYesNoResponse
-        Me.QuestionType = aiQuestionType
+        Try
 
-        Select Case Me.QuestionType
-            Case Is = pcenumQuestionType.CopyFactType
-                Me.ObjectType = New FBM.FactType
-                Me.ObjectType = aoObjectType
-            Case Else
-                Me.ObjectType = aoObjectType
-        End Select
+            Me.Question = asQuestion
+            Me.ExpectedResponseType = aiExpectedResponseType
+            Me.QuestionType = aiQuestionType
 
-        For Each lsString In Me.Question.Split
-            Me.Symbol.Add(lsString)
-        Next
+            Select Case Me.QuestionType
+                Case Is = pcenumQuestionType.CopyFactType
+                    Me.ObjectType = New FBM.FactType
+                    Me.ObjectType = aoObjectType
+                Case Else
+                    Me.ObjectType = aoObjectType
+            End Select
 
-        Me.ModelObject = New List(Of FBM.ModelObject)
-
-        If IsSomething(aasSymbol) Then
-            For Each lsString In aasSymbol
-                Select Case aiQuestionType
-                    Case Is = pcenumQuestionType.CreateValueType
-                        Dim lrDummyValueType As New FBM.ValueType(Nothing, pcenumLanguage.ORMModel, lsString, True)
-                        lrDummyValueType.Id = lsString
-                        Me.ValueType.Add(lrDummyValueType)
-                    Case Is = pcenumQuestionType.CreateEntityType
-                        Dim lrDummyEntityType As New FBM.EntityType(Nothing, pcenumLanguage.ORMModel, lsString, Nothing, True)
-                        lrDummyEntityType.Id = lsString
-                        Me.ModelObject.Add(lrDummyEntityType)
-                End Select
+            For Each lsString In Me.Question.Split
+                Me.Symbol.Add(lsString)
             Next
-        End If
 
-        Me.FocalSymbol = aasSymbol
+            Me.ModelObject = New List(Of FBM.ModelObject)
 
-        If IsSomething(arSentence) Then
-            Me.sentence = arSentence
-        End If
+            If IsSomething(aasSymbol) Then
+                For Each lsString In aasSymbol
+                    Select Case aiQuestionType
+                        Case Is = pcenumQuestionType.CreateValueType
+                            Dim lrDummyValueType As New FBM.ValueType(Nothing, pcenumLanguage.ORMModel, lsString, True)
+                            lrDummyValueType.Id = lsString
+                            Me.ValueType.Add(lrDummyValueType)
+                        Case Is = pcenumQuestionType.CreateEntityType
+                            Dim lrDummyEntityType As New FBM.EntityType(Nothing, pcenumLanguage.ORMModel, lsString, Nothing, True)
+                            lrDummyEntityType.Id = lsString
+                            Me.ModelObject.Add(lrDummyEntityType)
+                    End Select
+                Next
+            End If
 
-        Me.Plan = arPlan
-        Me.PlanStep = arStep
-        Me.Plan.Step.AddUnique(arStep)
-        If IsSomething(arStep) Then
-            arStep.Question = Me
-        End If
+            Me.FocalSymbol = aasSymbol
 
-        Me.GeneralText = asGeneralText
+            If IsSomething(arSentence) Then
+                Me.sentence = arSentence
+            End If
 
-        Me.AdditionalSentence = aarAdditionalSentence
+            Me.Plan = arPlan
+            Me.PlanStep = arStep
+            Me.Plan.Step.AddUnique(arStep)
+            If IsSomething(arStep) Then
+                arStep.Question = Me
+            End If
+
+            Me.GeneralText = asGeneralText
+
+            Me.AdditionalSentence = aarAdditionalSentence
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

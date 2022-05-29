@@ -386,10 +386,17 @@ Partial Public Class tBrain
                 End If
             End If
 
+            If lrFactType.RoleGroup.Select(Function(x) x.IsMDAModelElement).Count > 0 Then
+                lrFactType.IsMDAModelElement = True
+            End If
 
             'Create a Column for unary FactTypes. Is an exception because does not have a RoleConstraint
             If lrFactType.RoleGroup.Count = 1 Then
                 Call Me.Model.createColumnForUnaryFactType(lrFactType)
+            End If
+
+            If lrFactType.Arity = 2 Then
+                Call Me.FormulateQuestionCreateInternalUniquenessConstraint(lrFactType, lrFactTypeReading)
             End If
 
             If Me.Page Is Nothing Then
@@ -455,6 +462,7 @@ Partial Public Class tBrain
                 End If
 
             End If
+
 EndProcessing:
             Me.OutputChannel.Focus()
 
@@ -928,6 +936,31 @@ EndProcessing:
 
     End Sub
 
+    Public Sub executeStatementAddInternalUniquenessConstraint(ByRef arQuestion As tQuestion, ByVal asInputBuffer As String)
+
+        Try
+            Dim lrFactType As FBM.FactType = arQuestion.ModelObject(0)
+
+            Select Case LCase(asInputBuffer)
+                Case Is = "one"
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(0)}, False, True, True, False, Nothing, True, False)
+                    Call lrFactType.RoleGroup(0).SetMandatory(True, True)
+                Case Is = "at most one"
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(0)}, False, True, True, False, Nothing, True, False)
+                Case Is = "many to many"
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}, False, True, True, False, Nothing, True, False)
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 
     Private Sub ProcessStatementCreateSubtypeRelationship(ByRef arQuestion As tQuestion,
                                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
@@ -1009,7 +1042,7 @@ EndProcessing:
 
                     lrQuestion = New tQuestion("Would you like me to create an Value Type for '" & asModelObjectName & "'?",
                                                          pcenumQuestionType.CreateValueType,
-                                                         True,
+                                                         pcenumExpectedResponseType.YesNo,
                                                          lasSymbol,
                                                          Nothing,
                                                          Nothing,
@@ -1024,7 +1057,7 @@ EndProcessing:
 
                     lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & asModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
                                                          pcenumQuestionType.CreateEntityType,
-                                                         True,
+                                                         pcenumExpectedResponseType.YesNo,
                                                          lasSymbol,
                                                          Nothing,
                                                          Nothing,
