@@ -2024,13 +2024,24 @@ Namespace FBM
 
         Public Overrides Function HasPrimaryReferenceScheme() As Boolean
 
-            If Me.IsObjectifyingEntityType Then
-                Return True 'Because the Objectified Fact Type has a Primary Reference Scheme by default (or should).
-            ElseIf (Me.HasSimpleReferenceScheme Or Me.HasCompoundReferenceMode) Then
-                Return True
-            Else
+            Try
+                If Me.IsObjectifyingEntityType Then
+                    Return True 'Because the Objectified Fact Type has a Primary Reference Scheme by default (or should).
+                ElseIf (Me.HasSimpleReferenceScheme Or Me.HasCompoundReferenceMode) Then
+                    Return True
+                Else
+                    Return False
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
                 Return False
-            End If
+            End Try
 
         End Function
 
@@ -2573,6 +2584,8 @@ Namespace FBM
 
                         lrValueType.RemoveFromModel()
                         Me.ReferenceModeValueType = Nothing
+
+                        Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, "", Nothing, Me, True)
                     Else
                         lrValueType.SetName(Me.MakeReferenceModeName)
                     End If
@@ -3112,7 +3125,7 @@ SkipSettingReferenceModeObjects:
 
                     Me.ReferenceModeRoleConstraint = arRoleConstraint
                     Me.isDirty = True
-                    Me.Model.MakeDirty()
+                    Me.Model.MakeDirty(True, True)
                     RaiseEvent ReferenceModeRoleConstraintChanged(arRoleConstraint)
                 End If
 

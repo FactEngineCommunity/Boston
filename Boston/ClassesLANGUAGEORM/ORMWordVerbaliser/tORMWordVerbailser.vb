@@ -330,7 +330,7 @@ Namespace FBM
                                 Case Is = pcenumLanguage.EntityRelationshipDiagram
                                     lrForm = frmMain.loadERDiagramView(lrPage, Nothing)
                                 Case Is = pcenumLanguage.PropertyGraphSchema
-                                    lrForm = frmMain.load_PGS_diagram_view(lrPage, Nothing)
+                                    lrForm = frmMain.loadPGSDiagramView(lrPage, Nothing)
                             End Select
 
                             Dim lsProgramDataDirectory As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\documentationfiles"
@@ -524,7 +524,7 @@ Namespace FBM
                         Case Is = pcenumLanguage.EntityRelationshipDiagram
                             lrForm = frmMain.loadERDiagramView(lrPage, Nothing)
                         Case Is = pcenumLanguage.PropertyGraphSchema
-                            lrForm = frmMain.load_PGS_diagram_view(lrPage, Nothing)
+                            lrForm = frmMain.loadPGSDiagramView(lrPage, Nothing)
                     End Select
 
                     Dim lsProgramDataDirectory As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\documentationfiles"

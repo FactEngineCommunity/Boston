@@ -3801,19 +3801,24 @@ Public Class frmDiagramPGS
         Try
             Dim lrPGSNodeType As PGS.Node
             Dim lrModelElement As FBM.ModelObject = Nothing
-
             Try
-                lrPGSNodeType = Me.zrPage.SelectedObject(0)
-            Catch ex As Exception
-                Exit Sub
-            End Try
+                    lrPGSNodeType = Me.zrPage.SelectedObject(0)
+                Catch ex As Exception
+                    Exit Sub
+                End Try
 
-            lrModelElement = lrPGSNodeType.FBMModelElement
+                lrModelElement = lrPGSNodeType.FBMModelElement
 
             If lrModelElement.GetType = GetType(FBM.EntityType) Then
 
-                Call CType(lrModelElement, FBM.EntityType).ConvertToFactType()
+                If CType(lrModelElement, FBM.EntityType).HasSimpleReferenceScheme Then
+                    MsgBox("You cannot convert Node Types that represent ORM Entity Types with a Simple Reference Scheme (Reference Mode) to a Fact Type.")
+                    Exit Sub
+                End If
 
+                If MsgBox("Are you sure you want to convert the model element for this Node Type to a Fact Type?", MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2) = MsgBoxResult.Yes Then
+                    Call CType(lrModelElement, FBM.EntityType).ConvertToFactType()
+                End If
             End If
 
         Catch ex As Exception

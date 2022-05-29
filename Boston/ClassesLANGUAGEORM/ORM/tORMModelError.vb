@@ -47,13 +47,24 @@ Namespace FBM
 
         End Sub
 
-        Public Sub New(ByVal asErrorId As String, _
-                       ByVal asErrorDescription As String, _
-                       Optional ByRef arDictionaryEntry As FBM.DictionaryEntry = Nothing, _
-                       Optional ByRef arModelObject As FBM.ModelObject = Nothing)
+        Public Sub New(ByVal asErrorId As String,
+                       ByVal asErrorDescription As String,
+                       Optional ByRef arDictionaryEntry As FBM.DictionaryEntry = Nothing,
+                       Optional ByRef arModelObject As FBM.ModelObject = Nothing,
+                       Optional ByVal abAddToModelElementAndModel As Boolean = False)
 
             Me._error_id = asErrorId
             Me._error_description = asErrorDescription
+
+            '20220530-VM-Eventually can get rid of Me._error_description = asErrorDescription, above. Try/Catch for now
+            Try
+                Select Case asErrorId
+                    Case Is = "105"
+                        Me._error_description = "Entity Type Requires Reference Scheme Error - "
+                        Me._error_description &= "Entity Type: '" & arModelObject.Id & "'."
+                End Select
+            Catch
+            End Try
 
             If IsSomething(arDictionaryEntry) Then
                 Me.DictionaryEntry = arDictionaryEntry
@@ -61,6 +72,11 @@ Namespace FBM
 
             If IsSomething(arModelObject) Then
                 Me.ModelObject = arModelObject
+            End If
+
+            If abAddToModelElementAndModel Then
+                arModelObject.ModelError.Add(Me)
+                arModelObject.Model.ModelError.Add(Me)
             End If
 
         End Sub

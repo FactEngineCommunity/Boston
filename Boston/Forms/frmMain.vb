@@ -1628,7 +1628,7 @@ SkipRegistrationChecking:
 
     End Function
 
-    Public Function load_PGS_diagram_view(ByRef arPage As FBM.Page,
+    Public Function loadPGSDiagramView(ByRef arPage As FBM.Page,
                                           ByVal ao_tree_node As TreeNode,
                                           Optional ByVal asSelectModelElementId As String = Nothing,
                                           Optional ByVal abLoadToolboxes As Boolean = True) As Object
@@ -1638,6 +1638,9 @@ SkipRegistrationChecking:
         child.MdiParent = Me
 
         zfrm_PGS_diagram_view = child
+
+        'Model Check Errors...so that Node Types with errors show red
+        Call arPage.Model.checkForErrors()
 
         '---------------------------------------------------------------
         'Reference the Form back from the Page.

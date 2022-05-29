@@ -313,6 +313,12 @@ KeepChecking1:
 
                         End If
 
+                        If lrReferenceModeRoleConstraint IsNot Nothing Then
+                            If Me.IsPrimaryKey Then
+                                Return lrReferenceModeRoleConstraint
+                            End If
+                        End If
+
                     'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
                     Case Is = pcenumConceptType.FactType
 

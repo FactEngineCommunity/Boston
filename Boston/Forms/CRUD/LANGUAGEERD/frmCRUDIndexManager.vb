@@ -272,7 +272,7 @@ ProcessExistingIndex:
                 Select Case Me.mrTable.FBMModelElement.GetType
                     Case Is = GetType(FBM.EntityType)
 #Region "Existing Index - Entity Type"
-
+                        Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
 #Region "Prechecks"
                         'Check doesn't clash with an existing Index.
                         Dim larIndex = From Index In Me.mrTable.Index
@@ -281,14 +281,19 @@ ProcessExistingIndex:
                                        Select Index
 
                         If larIndex.Count > 0 Then
-                            lsMessage = "Use the Properties Grid toolbox to remove a Preferred Identifier (Reference Mode) for a model element."
+                            lsMessage = "An Index already exists for the Column/Properties selected."
+
+                            If lrEntityType.HasSimpleReferenceScheme Then
+                                lsMessage.AppendDoubleLineBreak("Use the Properties Grid toolbox to remove a Preferred Identifier (Reference Mode) for a model element.")
+                            End If
+                            MsgBox(lsMessage)
                             Call Me.RevertToActualIndex(lrActualIndex)
                             Exit Sub
                         End If
 #End Region
 
 
-                        Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
+
                         larRole = New List(Of FBM.Role)
                         Dim lrFactType As FBM.FactType = Nothing
 
@@ -494,10 +499,11 @@ ProcessNewIndex:
 
                                 If lrNewIndex.IsPrimaryKey Then
                                     Call lrRoleConstraint.SetIsPreferredIdentifier(True)
-                                    Call Me.mrTable.FBMModelElement.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
+                                    Call lrEntityType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
                                 End If
                             Else
                                 lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole, lrNewIndex.IsPrimaryKey, True, True, False, Nothing, True, False)
+                                Call Me.mrTable.Model.Model.MakeDirty(True, True)
                             End If
 #End Region
                         Case Is = GetType(FBM.FactType)
@@ -722,18 +728,19 @@ EnableRevert:
             End If
 
             Dim lrIndex As RDS.Index = e.Row.Tag
-            Me.mrApplyTable.Index.Remove(lrIndex)
 
             Dim lrActualIndex = Me.mrTable.Index.Find(Function(x) x.Name = lrIndex.Name)
 
             If lrActualIndex Is Nothing Then Exit Sub
 
-            Dim lrRoleConstaint As FBM.RoleConstraint = lrActualIndex.ResponsibleRoleConstraint
+            Dim lrRoleConstaint As FBM.RoleConstraint = lrActualIndex.getResponsibleRoleConstraintFromORMModel
 
             If lrRoleConstaint IsNot Nothing Then
 
+                Me.mrApplyTable.Index.Remove(lrIndex)
+
                 'Prechecking
-                If Me.mrTable.FBMModelElement.GetType = GetType(FBM.EntityType) And lrRoleConstaint.IsPreferredIdentifier Then
+                If Me.mrTable.FBMModelElement.GetType = GetType(FBM.EntityType) And lrRoleConstaint.IsPreferredIdentifier And lrRoleConstaint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                     'Tryin to delete the ReferenceMode of an EntityType. Don't allow. Direct to PropertiesGrid toolbox.
                     e.Cancel = True
 
@@ -768,7 +775,10 @@ EnableRevert:
                 End Select
 
                 Call lrRoleConstaint.RemoveFromModel(True, True, True, True, True, lrRoleConstaint.IsPreferredIdentifier)
+                Call lrRoleConstaint.Model.MakeDirty(True, True)
                 'Call Me.mrTable.Model.Model.RemoveRoleConstraint(lrRoleConstaint, True, True, False, True)
+            Else
+                MsgBox("Boston could not find the responsible Role Constraint for this Index.")
             End If
 
         Catch ex As Exception

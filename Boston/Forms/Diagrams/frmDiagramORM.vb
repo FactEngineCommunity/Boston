@@ -10550,6 +10550,7 @@ SkipRemovalFromModel:
             Me.ToolStripMenuItemConvertToFactType.Enabled = lrEntityType.HasPrimaryReferenceScheme
 
             If lrEntityType.HasSimpleReferenceScheme And Trim(lrEntityType.ReferenceMode) <> "" Then
+                Me.ExpandTheReferenceSchemeToolStripMenuItem.Text = "&Expand the Reference Scheme"
                 If lrEntityTypeInstance.ExpandReferenceMode = True Then
                     Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = False
                     Me.HideTheReferenceSchemeToolStripMenuItem.Visible = True
@@ -10557,6 +10558,8 @@ SkipRemovalFromModel:
                     Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = True
                     Me.HideTheReferenceSchemeToolStripMenuItem.Visible = False
                 End If
+            ElseIf lrEntityType.HasCompoundReferenceMode Then
+                Me.ExpandTheReferenceSchemeToolStripMenuItem.Text = "&Show the Reference Scheme"
             End If
 
             '--------------------------------------------------------------------
@@ -11473,13 +11476,32 @@ SkipRemovalFromModel:
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-            If lrEntityTypeInstance.ExpandReferenceMode Then
+            'CodeSafe
+            If lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint Is Nothing Then
+                MsgBox("The Entity Type does not have a Reference Scheme.")
                 Exit Sub
+            End If
+
+            If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
+
+                If lrEntityTypeInstance.ExpandReferenceMode Then
+                    Exit Sub
+                Else
+                    Call lrEntityTypeInstance.ExpandTheReferenceScheme()
+                    lrEntityTypeInstance.SetExpandReferenceMode(True)
+                    Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = False
+                    Me.HideTheReferenceSchemeToolStripMenuItem.Visible = True
+                End If
             Else
-                Call lrEntityTypeInstance.ExpandTheReferenceScheme()
-                lrEntityTypeInstance.SetExpandReferenceMode(True)
-                Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = False
-                Me.HideTheReferenceSchemeToolStripMenuItem.Visible = True
+
+                Dim larRoleConstraint = From RoleConstraint In Me.zrPage.RoleConstraintInstance
+                                        Where RoleConstraint.Id = lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint.Id
+                                        Select RoleConstraint
+
+                If larRoleConstraint.Count = 0 Then
+                    Call Me.zrPage.DropRoleConstraintAtPoint(lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint, New PointF(50, 50), False)
+                End If
+
             End If
 
         Catch ex As Exception
@@ -12424,9 +12446,16 @@ SkipRemovalFromModel:
         Try
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-            With New WaitCursor
-                Call lrEntityTypeInstance.EntityType.ConvertToFactType()
-            End With
+            If Not lrEntityTypeInstance.EntityType.HasCompoundReferenceMode Then
+                MsgBox("You can only convert Entity Types that have a Compound Reference Scheme to a Fact Type.")
+                Exit Sub
+            End If
+
+            If MsgBox("Are you sure you want to convert the Entity Type to a Fact Type?", MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2) = MsgBoxResult.Yes Then
+                With New WaitCursor
+                    Call lrEntityTypeInstance.EntityType.ConvertToFactType()
+                End With
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

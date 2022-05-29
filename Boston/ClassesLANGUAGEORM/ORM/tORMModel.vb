@@ -5527,7 +5527,8 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
         Public Sub LoadFromDatabase(Optional ByVal abLoadPages As Boolean = False,
                                     Optional ByVal abUseThreading As Boolean = True,
-                                    Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+                                    Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                                    Optional ByVal abCheckForErrors As Boolean = False)
 
             Try
                 '-------------------------------------------------------
@@ -5725,6 +5726,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                 Me.AllowCheckForErrors = True
                 Call Me.checkIfCanCheckForErrors()
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

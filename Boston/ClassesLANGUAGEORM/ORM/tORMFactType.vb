@@ -2579,8 +2579,9 @@ Namespace FBM
         ''' <summary>
         ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
         ''' </summary>
+        ''' <param name="arModelObject">Function can be called for other ModelElements.</param>
+        ''' <param name="abSuppressErrorMessage"></param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
         Public Shadows Function getCorrespondingRDSTable(Optional ByVal arModelObject As FBM.ModelObject = Nothing,
                                                          Optional ByVal abSuppressErrorMessage As Boolean = False) As RDS.Table
 
@@ -3171,6 +3172,32 @@ Namespace FBM
             End If
 
         End Function
+
+        Public Overrides Function HasPrimaryReferenceScheme() As Boolean
+
+            Try
+                Dim lrTable As RDS.Table = Me.getCorrespondingRDSTable(Nothing, True)
+
+                If Me.ObjectifyingEntityType IsNot Nothing Then
+                    Return True 'Because the Objectified Fact Type has a Primary Reference Scheme by default (or should).
+                ElseIf lrTable IsNot Nothing Then
+                    Return lrTable.HasPrimaryKeyIndex
+                Else
+                    Return False
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
 
 
         Function Is1To1BinaryFactType() As Boolean

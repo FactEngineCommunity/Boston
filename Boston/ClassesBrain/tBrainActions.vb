@@ -800,6 +800,7 @@ EndProcessing:
                     Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
                 Else
                     Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
+                    Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, "", Nothing, lrEntityType, True)
                 End If
 
                 Try

@@ -147,9 +147,10 @@ Namespace FBM
                 Dim lo_Diagram As MindFusion.Diagramming.Diagram
                 Dim StringSize As New SizeF
 
-                If Me.Page.Diagram Is Nothing Then
-                    Exit Sub
-                End If
+                'CodeSafe
+                If Me.Page.Diagram Is Nothing Then Exit Sub
+                If Me.Shape Is Nothing Then Exit Sub
+
 
                 lo_Diagram = Me.Shape.Parent
 
