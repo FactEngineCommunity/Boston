@@ -202,13 +202,16 @@ Public Class frmCRUDIndexManager
         Try
 
             Me.DataGridViewIndexes.Rows.Add()
-            Me.DataGridViewIndexes.Rows(Me.DataGridViewIndexes.Rows.Count - 1).Cells(0).Value = Trim("UC")
+
+            Dim lsNewIndexName As String = Me.mrTable.Model.createUniqueIndexName(Me.mrTable.Name & "_UC", 0)
+
+            Dim lrIndex As New RDS.Index(Me.mrTable, lsNewIndexName)
+            lrIndex.IndexQualifier = Me.mrTable.generateUniqueQualifier("UC")
+            lrIndex.IsPrimaryKey = False
+
+            Me.DataGridViewIndexes.Rows(Me.DataGridViewIndexes.Rows.Count - 1).Cells(0).Value = Trim(lsNewIndexName)
             Dim liIndexType As IndexType = IndexType.Unique
             Me.DataGridViewIndexes.Rows(Me.DataGridViewIndexes.Rows.Count - 1).Cells(1).Value = liIndexType
-
-            Dim lrIndex As New RDS.Index(Me.mrTable, "Unique Key")
-            lrIndex.IndexQualifier = "UC"
-            lrIndex.IsPrimaryKey = False
             Me.DataGridViewIndexes.Rows(Me.DataGridViewIndexes.Rows.Count - 1).Tag = lrIndex
 
             Me.mrSelectedIndex = lrIndex
@@ -269,6 +272,22 @@ ProcessExistingIndex:
                 Select Case Me.mrTable.FBMModelElement.GetType
                     Case Is = GetType(FBM.EntityType)
 #Region "Existing Index - Entity Type"
+
+#Region "Prechecks"
+                        'Check doesn't clash with an existing Index.
+                        Dim larIndex = From Index In Me.mrTable.Index
+                                       Where Index.EqualsByColumns(lrIndex)
+                                       Where Not Index Is lrIndex
+                                       Select Index
+
+                        If larIndex.Count > 0 Then
+                            lsMessage = "Use the Properties Grid toolbox to remove a Preferred Identifier (Reference Mode) for a model element."
+                            Call Me.RevertToActualIndex(lrActualIndex)
+                            Exit Sub
+                        End If
+#End Region
+
+
                         Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
                         larRole = New List(Of FBM.Role)
                         Dim lrFactType As FBM.FactType = Nothing
@@ -432,6 +451,20 @@ ProcessNewIndex:
                     Select Case Me.mrTable.FBMModelElement.GetType
                         Case Is = GetType(FBM.EntityType)
 #Region "New Index - Entity Type"
+#Region "Prechecks"
+                            'Check doesn't clash with an existing Index.
+                            Dim larIndex = From Index In Me.mrTable.Index
+                                           Where Index.EqualsByColumns(lrNewIndex)
+                                           Where Not Index Is lrNewIndex
+                                           Select Index
+
+                            If larIndex.Count > 0 Then
+                                lsMessage = "A unique Index already exists for those Columns/Properties: " & larIndex(0).Name
+                                MsgBox(lsMessage)
+                                Exit Sub
+                            End If
+#End Region
+
                             Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
 
                             For Each lrColumn In lrIndex.Column
@@ -469,6 +502,21 @@ ProcessNewIndex:
 #End Region
                         Case Is = GetType(FBM.FactType)
 #Region "New Index - Fact Type"
+
+#Region "Prechecks"
+                            'Check doesn't clash with an existing Index.
+                            Dim larIndex = From Index In Me.mrTable.Index
+                                           Where Index.EqualsByColumns(lrIndex)
+                                           Where Not Index Is lrIndex
+                                           Select Index
+
+                            If larIndex.Count > 0 Then
+                                lsMessage = "A unique Index already exists for those Columns/Properties: " & larIndex(0).Name
+                                MsgBox(lsMessage)
+                                Exit Sub
+                            End If
+#End Region
+
                             '--------------------------------------------------
                             'Check list of Roles are all within same FactType
                             Dim lrFactType As FBM.FactType = Me.mrTable.FBMModelElement
@@ -750,7 +798,13 @@ EnableRevert:
                 Dim lrColumn As RDS.Column
                 Dim lrActualIndex = Me.mrTable.Index.Find(Function(x) x.Name = lrIndex.Name)
 
-                If lrActualIndex Is Nothing Then Exit Sub
+                '20220529-VM-Probably not needed. Remove if need be.
+                If lrActualIndex Is Nothing Then
+                    MsgBox("Couldn't find the orginal Index against the table, with name: " & lrIndex.Name)
+                    Me.ButtonApply.Enabled = False
+                    Me.ButtonRevert.Enabled = False
+                    Exit Sub
+                End If
 
                 For Each lrRow In Me.DataGridViewColumns.Rows
                     lrColumn = lrRow.Tag

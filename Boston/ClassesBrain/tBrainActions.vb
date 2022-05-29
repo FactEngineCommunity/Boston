@@ -691,63 +691,79 @@ EndProcessing:
 
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
-        Dim lsOldValueTypeName As String = ""
-        Dim lsValueTypeName As String = ""
+        Try
 
-        Me.Timeout.Stop()
+            Dim lsOldValueTypeName As String = ""
+            Dim lsValueTypeName As String = ""
 
-        Me.Model = prApplication.WorkingModel
+            Me.Timeout.Stop()
 
-        Dim lrValueType As FBM.ValueType
+            Me.Model = prApplication.WorkingModel
 
-        If arQuestion.ObjectType IsNot Nothing Then
-            lrValueType = Me.CurrentQuestion.ObjectType
-        Else
+            Dim lrValueType As FBM.ValueType
 
-            Dim lrDummyValueType As FBM.ValueType = arQuestion.ValueType(0)
-            lsOldValueTypeName = arQuestion.ValueType(0).Id
-            lsValueTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ValueType(0).Id)
+            If arQuestion.ObjectType IsNot Nothing Then
+                lrValueType = Me.CurrentQuestion.ObjectType
+            Else
 
-            If arQuestion.sentence IsNot Nothing Then
-                arQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
-                arQuestion.sentence.ResetSentence()
+                Dim lrDummyValueType As FBM.ValueType = arQuestion.ValueType(0)
+                lsOldValueTypeName = arQuestion.ValueType(0).Id
+                lsValueTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ValueType(0).Id)
 
-                'Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
-                Call Language.ProcessSentence(arQuestion.sentence)
-                If arQuestion.sentence.AreAllWordsResolved Then
-                    Call Language.ResolveSentence(arQuestion.sentence)
+                If arQuestion.sentence IsNot Nothing Then
+                    arQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
+                    arQuestion.sentence.ResetSentence()
+
+                    'Call Language.AnalyseSentence(Me.CurrentQuestion.sentence, Me.Model)
+                    Call Language.ProcessSentence(arQuestion.sentence)
+                    If arQuestion.sentence.AreAllWordsResolved Then
+                        Call Language.ResolveSentence(arQuestion.sentence)
+                    End If
                 End If
+
+                lrValueType = Me.Model.CreateValueType(lsValueTypeName,
+                                                       False,
+                                                       lrDummyValueType.DataType,
+                                                       lrDummyValueType.DataTypeLength,
+                                                       lrDummyValueType.DataTypePrecision,
+                                                       abBroadcastInterfaceEvent)
+
             End If
 
-            lrValueType = Me.Model.CreateValueType(lsValueTypeName,
-                                                   False,
-                                                   lrDummyValueType.DataType,
-                                                   lrDummyValueType.DataTypeLength,
-                                                   lrDummyValueType.DataTypePrecision,
-                                                   abBroadcastInterfaceEvent)
+            'Add Error to ValueType because does not have a DataType
+            Call lrValueType.CheckForErrors()
 
-        End If
-
-        'Add Error to ValueType because does not have a DataType
-        Call lrValueType.CheckForErrors()
-
-        If Me.Page IsNot Nothing Then
-
-            lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
-
-            If Me.Page.Diagram IsNot Nothing Then
-                Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
-
-                If Me.AutoLayoutOn Then
-                    Me.Page.Form.AutoLayout()
-                End If
-            End If
-        Else
             Me.Model.AddValueType(lrValueType, True, True, Nothing, True)
-        End If
 
-        Me.Timeout.Start()
+            If Me.Page IsNot Nothing Then
+
+                Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
+
+                        If Me.Page.Diagram IsNot Nothing Then
+                            Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+
+                            If Me.AutoLayoutOn Then
+                                Me.Page.Form.AutoLayout()
+                            End If
+                        End If
+                End Select
+            End If
+
+            Me.Timeout.Start()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.Timeout.Start()
+        End Try
 
     End Sub
 
