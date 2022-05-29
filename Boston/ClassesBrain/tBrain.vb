@@ -143,6 +143,9 @@ Public Class tBrain
             Me.CommandList.Add("how many questions do you have")
             Me.CommandList.Add("yes")
             Me.CommandList.Add("no")
+            Me.CommandList.Add("one")
+            Me.CommandList.Add("at most one")
+            Me.CommandList.Add("many to many")
             Me.CommandList.Add("what can i say")
             Me.CommandList.Add("speed it up")
             Me.CommandList.Add("slow it down")
@@ -953,6 +956,15 @@ SkipOutputChannel:
             Select Case LCase(Trim(as_string))
                 Case Is = "start", "reboot"
                     Me.AskQuestions = True
+
+                    Dim larQuestion = From Question In Me.Question
+                                      Where Not Question.IsResolved
+                                      Select Question
+
+                    If larQuestion.Count > 0 Then
+                        Me.AwaitingQuestionResponse = False
+                    End If
+
                     check_reboot = True
                     Me.Timeout.Start()
             End Select
@@ -2721,60 +2733,66 @@ SkipOutputChannel:
                     End If
 
                 ElseIf (Not Me.CurrentSentence.POStaggingResolved) And Not Me.AwaitingQuestionResponse Then
-                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), "I didn't understand that.")
-                    '20220529-VM-No fallback to NLP
-                    '-------------------------------------------------------------------------------------------------------------------
-                    'Fallback re-analyse the Sentence for POSTagging.
-                    'Call Me.CurrentSentence.ClearWordListQualifications()
-                    'Call Language.AnalyseSentence(Me.CurrentSentence, Me.Model)
-                    'Call Me.ProcessCurrentSentence() 'Reprocesses Token/Sense analysis            
-                    'If Me.CurrentSentence.AreAllWordsResolved Then
-                    '    Call Language.ResolveSentence(Me.CurrentSentence)
-                    'End If
+                    If Not Me.CommandList.Contains(Me.CurrentSentence.OriginalSentence) Then
+                        Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), "I didn't understand that.")
+                        '20220529-VM-No fallback to NLP
+                        '-------------------------------------------------------------------------------------------------------------------
+                        'Fallback re - analyse the Sentence for POSTagging.
+#Region "NLP"
+                        Call Me.CurrentSentence.ClearWordListQualifications()
+                        Call Language.AnalyseSentence(Me.CurrentSentence, Me.Model)
+                        Call Me.ProcessCurrentSentence() 'Reprocesses Token/Sense analysis            
+                        If Me.CurrentSentence.AreAllWordsResolved Then
+                            Call Language.ResolveSentence(Me.CurrentSentence)
+                        End If
 
-                    'If Me.CurrentSentence.POStaggingResolved Then
-                    '    Call Language.ResolveSentence(Me.CurrentSentence)
-                    '    Me.OutstandingSentences.Remove(Me.CurrentSentence)
-                    '    If Me.ConfirmActions Then
-                    '        Me.OutputBuffer = "I resolved the current sentence"
-                    '        Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
-                    '    End If
-                    '    Me.Timeout.Start()
-                    'Else
-                    '    Me.OutputBuffer = "I couldn't resolve the current sentence"
-                    '    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
-                    '    If Me.CurrentSentence.WordListQualification.FindAll(Function(x) x.Sense.Count = 0).Count > 0 Then
-                    '        Dim lsMessage As String = ""
-                    '        Dim lsUnknownWord As String = ""
-                    '        Dim lrWordQualification As Language.WordQualification
+                        If Me.CurrentSentence.POStaggingResolved Then
+                            Call Language.ResolveSentence(Me.CurrentSentence)
+                            Me.OutstandingSentences.Remove(Me.CurrentSentence)
+                            If Me.ConfirmActions Then
+                                Me.OutputBuffer = "I resolved the current sentence"
+                                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                            End If
+                            Me.Timeout.Start()
+                        Else
+                            Me.OutputBuffer = "I couldn't resolve the current sentence"
+                            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                            If Me.CurrentSentence.WordListQualification.FindAll(Function(x) x.Sense.Count = 0).Count > 0 Then
+                                Dim lsMessage As String = ""
+                                Dim lsUnknownWord As String = ""
+                                Dim lrWordQualification As Language.WordQualification
 
-                    '        For Each lrWordQualification In Me.CurrentSentence.WordListQualification.FindAll(Function(x) x.Sense.Count = 0)
+                                For Each lrWordQualification In Me.CurrentSentence.WordListQualification.FindAll(Function(x) x.Sense.Count = 0)
 
-                    '            lsUnknownWord = lrWordQualification.OriginalWord
+                                    lsUnknownWord = lrWordQualification.OriginalWord
 
-                    '            lsMessage = "I don't know what a '" & lsUnknownWord & "' is."
-                    '            Me.OutputBuffer = lsMessage
-                    '            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                                    lsMessage = "I don't know what a '" & lsUnknownWord & "' is."
+                                    Me.OutputBuffer = lsMessage
+                                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
 
-                    '            lsMessage = "Perhaps '" & lsUnknownWord & "' is a Value Type (a named list of Values rather like PersonId)?"
-                    '            Me.OutputBuffer = lsMessage
-                    '            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                                    lsMessage = "Perhaps '" & lsUnknownWord & "' is a Value Type (a named list of Values rather like PersonId)?"
+                                    Me.OutputBuffer = lsMessage
+                                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
 
-                    '            Dim lrValueType As New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsUnknownWord, True)
+                                    Dim lrValueType As New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lsUnknownWord, True)
 
-                    '            Call Me.AskQuestionCreateValueType(lrValueType, Me.CurrentSentence)
+                                    Call Me.AskQuestionCreateValueType(lrValueType, Me.CurrentSentence)
 
-                    '            Exit For
-                    '        Next
+                                    Exit For
+                                Next
 
-                    '        Me.OutstandingSentences.Add(Me.CurrentSentence)
-                    '    Else
-                    '        Me.OutputBuffer = "Type 'breakdown current sentence' and send a screenshot to support@factengine.ai to improve the Virtual Analyst."
-                    '        Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
-                    '        Me.OutputBuffer = "FactEngine will respond to your mail with new language rules that you can load into Boston."
-                    '        Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
-                    '    End If
-                    'End If
+                                Me.OutstandingSentences.Add(Me.CurrentSentence)
+                            Else
+
+                                Me.OutputBuffer = "Type 'breakdown current sentence' and send a screenshot to support@factengine.ai to improve the Virtual Analyst."
+                                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                                Me.OutputBuffer = "FactEngine will respond to your mail with new language rules that you can load into Boston."
+                                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                            End If
+                        End If
+                    End If
+#End Region
+                    '==========================================================================================================================================================
                 ElseIf Not Me.AwaitingQuestionResponse Then
                     If Me.OutstandingSentences.Count > 0 Then
                         Me.CurrentSentence = Me.OutstandingSentences(0)
@@ -3380,10 +3398,14 @@ SkipOutputChannel:
                         Exit For
                     End If
                 Next
-                lsMessage = "It is better to use a capital first letter for Entity Types, Value Types and Objectified Fact Types (e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
-                '20220529-VM-was. Remove if comment out if not needed.
-                'Me.send_data(lsMessage)
-                Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), lsMessage, False, False, pcenumExpectedResponseType.None)
+
+                If Not Me.CurrentSentence.Sentence.All(Function(c) Char.IsLower(c) Or c = " ") Then
+
+                    lsMessage = "Remember to type a valid command and to use a capital first letter for Entity Types, Value Types and Objectified Fact Types (e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
+                    '20220529-VM-was. Remove if comment out if not needed.
+                    'Me.send_data(lsMessage)
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), lsMessage, False, False, pcenumExpectedResponseType.None)
+                End If
             End If
 
             Call Language.ProcessSentence(Me.CurrentSentence)
@@ -3798,26 +3820,26 @@ SkipOutputChannel:
 
                 '====================================================================================================================
                 '20220529-VM-Removed. NLP processing not needed in current version of Boston.
-                Me.CurrentSentence.POStaggingResolved = True 'Stop gap untile NLP reintroduced.
-                ''---------------------------------------------------------------------------------------------------------
-                ''Check if the Sentence is a Statement
-                ''  Particularly if the sentence is of a format that will allow a FactType to be created for the Sentence
-                ''  NB Language.AnalyseSentence does part of speech tagging 
-                ''---------------------------------------------------------------------------------------------------------
-                'Call Language.AnalyseSentence(Me.CurrentSentence, Me.Model)
+                'Add back if comment out again. Me.CurrentSentence.POStaggingResolved = True 'Stop gap untile NLP reintroduced.
+                '---------------------------------------------------------------------------------------------------------
+                'Check if the Sentence is a Statement
+                '  Particularly if the sentence is of a format that will allow a FactType to be created for the Sentence
+                '  NB Language.AnalyseSentence does part of speech tagging 
+                '---------------------------------------------------------------------------------------------------------
+                Call Language.AnalyseSentence(Me.CurrentSentence, Me.Model)
 
-                'Call Me.ProcessCurrentSentence()
-                'If Me.CurrentSentence.AreAllWordsResolved Then
-                '    Call Language.ResolveSentence(Me.CurrentSentence)
-                'End If
+                Call Me.ProcessCurrentSentence()
+                If Me.CurrentSentence.AreAllWordsResolved Then
+                    Call Language.ResolveSentence(Me.CurrentSentence)
+                End If
 
-                'If Me.CurrentSentence.POStaggingResolved Then
-                '    '--------------------------------------------------------------------------------
-                '    'Populates Me.CurrentSentence.ModelElement and Me.CurrentSentence.PredicatePart 
-                '    '  if the sentence is a Fact Type declaration (i.e. a valid Fact Type Reading).
-                '    '--------------------------------------------------------------------------------
-                '    Call Me.ValidateIfCurrentSentenceIsAFactType()
-                'End If
+                If Me.CurrentSentence.POStaggingResolved Then
+                    '--------------------------------------------------------------------------------
+                    'Populates Me.CurrentSentence.ModelElement and Me.CurrentSentence.PredicatePart 
+                    '  if the sentence is a Fact Type declaration (i.e. a valid Fact Type Reading).
+                    '--------------------------------------------------------------------------------
+                    Call Me.ValidateIfCurrentSentenceIsAFactType()
+                End If
                 '====================================================================================================================
 
                 '------------------------------------------------------
@@ -3852,6 +3874,8 @@ SkipOutputChannel:
                     Dim lsMessage As String = ""
                     lsMessage = "Sorry, I don't know what you are talking about."
                     Me.send_data(lsMessage)
+                    lsMessage = "Remember to use a capital first letter for Entity Types, Value Types and Objectified Fact Types." '(e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), lsMessage, False, False, pcenumExpectedResponseType.None)
                     Me.CurrentSentence.ResolutionType = pcenumSentenceResolutionType.Unresolved
                     Me.Sentence.Add(Me.CurrentSentence)
                     Me.CurrentSentence = Nothing
