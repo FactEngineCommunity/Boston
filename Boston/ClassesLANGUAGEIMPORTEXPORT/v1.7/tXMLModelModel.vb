@@ -1617,27 +1617,30 @@ SkipValueTypeInstance:
                     Dim lsEntityTypeId As String = ""
                     lsEntityTypeId = lrXMLFactType.ObjectifyingEntityTypeId
                     arFactType.ObjectifyingEntityType = arFactType.Model.EntityType.Find(Function(x) x.Id = lsEntityTypeId)
-                    arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
-                    arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
-                    arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                    If arFactType.ObjectifyingEntityType IsNot Nothing Then
+                        arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                        '20220530-VM-Commented out. Remove if not needed.
+                        'arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
+                        arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
+                    End If
 
                     If IsSomething(arFactType.ObjectifyingEntityType) Then
-                        '---------------------------------------------
-                        'Okay, have found the ObjectifyingEntityType
-                        '---------------------------------------------
-                    Else
-                        lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                        lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
-                        lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
-                        lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
-                        Throw New Exception(lsMessage)
+                            '---------------------------------------------
+                            'Okay, have found the ObjectifyingEntityType
+                            '---------------------------------------------
+                        Else
+                            lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
+                            lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                            lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
+                            lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+                            Throw New Exception(lsMessage)
+                        End If
                     End If
-                End If
 
-                '-----------------------------------------------------
-                'Get the Roles within the RoleGroup for the FactType
-                '-----------------------------------------------------                
-                Dim lrModelElement As FBM.ModelObject
+                    '-----------------------------------------------------
+                    'Get the Roles within the RoleGroup for the FactType
+                    '-----------------------------------------------------                
+                    Dim lrModelElement As FBM.ModelObject
                 For Each lrXMLRole In lrXMLFactType.RoleGroup
 
                     lrRole = New FBM.Role

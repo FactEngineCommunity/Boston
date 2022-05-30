@@ -47,13 +47,15 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemViewInORMVerbaliser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripTextbox = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.FindToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LabelPromptModel = New System.Windows.Forms.Label()
+        Me.LabelModelName = New System.Windows.Forms.Label()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.SuspendLayout()
         '
         'HelpButton
         '
-        Me.HelpButton.Location = New System.Drawing.Point(743, 30)
+        Me.HelpButton.Location = New System.Drawing.Point(742, 36)
         Me.HelpButton.Name = "HelpButton"
         Me.HelpButton.Size = New System.Drawing.Size(75, 25)
         Me.HelpButton.TabIndex = 50
@@ -72,7 +74,7 @@ Partial Class frmKeywordExtraction
         '
         'SaveButton
         '
-        Me.SaveButton.Location = New System.Drawing.Point(662, 30)
+        Me.SaveButton.Location = New System.Drawing.Point(661, 36)
         Me.SaveButton.Name = "SaveButton"
         Me.SaveButton.Size = New System.Drawing.Size(75, 25)
         Me.SaveButton.TabIndex = 42
@@ -82,7 +84,7 @@ Partial Class frmKeywordExtraction
         'progressBar1
         '
         Me.progressBar1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.progressBar1.Location = New System.Drawing.Point(30, 446)
+        Me.progressBar1.Location = New System.Drawing.Point(16, 446)
         Me.progressBar1.Name = "progressBar1"
         Me.progressBar1.Size = New System.Drawing.Size(809, 25)
         Me.progressBar1.TabIndex = 47
@@ -155,7 +157,7 @@ Partial Class frmKeywordExtraction
         '
         'SelectFileButton
         '
-        Me.SelectFileButton.Location = New System.Drawing.Point(595, 30)
+        Me.SelectFileButton.Location = New System.Drawing.Point(594, 36)
         Me.SelectFileButton.Margin = New System.Windows.Forms.Padding(2)
         Me.SelectFileButton.Name = "SelectFileButton"
         Me.SelectFileButton.Size = New System.Drawing.Size(62, 25)
@@ -168,15 +170,15 @@ Partial Class frmKeywordExtraction
         Me.TextRichTextBox.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextRichTextBox.Location = New System.Drawing.Point(30, 81)
+        Me.TextRichTextBox.Location = New System.Drawing.Point(16, 81)
         Me.TextRichTextBox.Name = "TextRichTextBox"
-        Me.TextRichTextBox.Size = New System.Drawing.Size(523, 321)
+        Me.TextRichTextBox.Size = New System.Drawing.Size(537, 321)
         Me.TextRichTextBox.TabIndex = 46
         Me.TextRichTextBox.Text = ""
         '
         'PathTextBox
         '
-        Me.PathTextBox.Location = New System.Drawing.Point(144, 32)
+        Me.PathTextBox.Location = New System.Drawing.Point(143, 38)
         Me.PathTextBox.Name = "PathTextBox"
         Me.PathTextBox.Size = New System.Drawing.Size(437, 20)
         Me.PathTextBox.TabIndex = 41
@@ -184,7 +186,7 @@ Partial Class frmKeywordExtraction
         'PathLabel
         '
         Me.PathLabel.AutoSize = True
-        Me.PathLabel.Location = New System.Drawing.Point(14, 35)
+        Me.PathLabel.Location = New System.Drawing.Point(13, 41)
         Me.PathLabel.Name = "PathLabel"
         Me.PathLabel.Size = New System.Drawing.Size(124, 13)
         Me.PathLabel.TabIndex = 40
@@ -194,7 +196,7 @@ Partial Class frmKeywordExtraction
         '
         Me.StatusLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.StatusLabel.AutoSize = True
-        Me.StatusLabel.Location = New System.Drawing.Point(27, 422)
+        Me.StatusLabel.Location = New System.Drawing.Point(13, 421)
         Me.StatusLabel.Name = "StatusLabel"
         Me.StatusLabel.Size = New System.Drawing.Size(35, 13)
         Me.StatusLabel.TabIndex = 51
@@ -204,7 +206,7 @@ Partial Class frmKeywordExtraction
         '
         Me.ContextMenuStripKeyword.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToModelToolStripMenuItem, Me.ToolStripMenuItemViewInORMVerbaliser})
         Me.ContextMenuStripKeyword.Name = "ContextMenuStripKeyword"
-        Me.ContextMenuStripKeyword.Size = New System.Drawing.Size(196, 70)
+        Me.ContextMenuStripKeyword.Size = New System.Drawing.Size(196, 48)
         '
         'AddToModelToolStripMenuItem
         '
@@ -216,7 +218,7 @@ Partial Class frmKeywordExtraction
         'ToolStripMenuItemAddAsEntityType
         '
         Me.ToolStripMenuItemAddAsEntityType.Name = "ToolStripMenuItemAddAsEntityType"
-        Me.ToolStripMenuItemAddAsEntityType.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemAddAsEntityType.Size = New System.Drawing.Size(154, 22)
         Me.ToolStripMenuItemAddAsEntityType.Text = "...as Entity Type"
         '
         'ToolStripMenuItemAddAsValueType
@@ -241,14 +243,34 @@ Partial Class frmKeywordExtraction
         '
         Me.FindToolStripMenuItem.Name = "FindToolStripMenuItem"
         Me.FindToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(137, 22)
         Me.FindToolStripMenuItem.Text = "&Find"
+        '
+        'LabelPromptModel
+        '
+        Me.LabelPromptModel.AutoSize = True
+        Me.LabelPromptModel.Location = New System.Drawing.Point(16, 13)
+        Me.LabelPromptModel.Name = "LabelPromptModel"
+        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptModel.TabIndex = 53
+        Me.LabelPromptModel.Text = "Model:"
+        '
+        'LabelModelName
+        '
+        Me.LabelModelName.AutoSize = True
+        Me.LabelModelName.Location = New System.Drawing.Point(62, 12)
+        Me.LabelModelName.Name = "LabelModelName"
+        Me.LabelModelName.Size = New System.Drawing.Size(90, 13)
+        Me.LabelModelName.TabIndex = 54
+        Me.LabelModelName.Text = "LabelModelName"
         '
         'frmKeywordExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1022, 564)
+        Me.Controls.Add(Me.LabelModelName)
+        Me.Controls.Add(Me.LabelPromptModel)
         Me.Controls.Add(Me.HelpButton)
         Me.Controls.Add(Me.KeywordExtractionNormalButton)
         Me.Controls.Add(Me.SaveButton)
@@ -263,7 +285,7 @@ Partial Class frmKeywordExtraction
         Me.Controls.Add(Me.PathLabel)
         Me.Controls.Add(Me.StatusLabel)
         Me.Name = "frmKeywordExtraction"
-        Me.Text = "Keyword Extraction"
+        Me.Text = "Keyword Extraction (beta)"
         Me.ContextMenuStripKeyword.ResumeLayout(False)
         Me.ContextMenuStripTextbox.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -295,4 +317,6 @@ Partial Class frmKeywordExtraction
     Friend WithEvents ToolStripMenuItemViewInORMVerbaliser As ToolStripMenuItem
     Friend WithEvents ContextMenuStripTextbox As ContextMenuStrip
     Friend WithEvents FindToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents LabelPromptModel As Label
+    Friend WithEvents LabelModelName As Label
 End Class

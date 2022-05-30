@@ -84,7 +84,7 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "6.1"
+            psApplicationApplicationVersionNr = "6.2"
             psApplicationDatabaseVersionNr = "1.33"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
@@ -1853,6 +1853,8 @@ SkipRegistrationChecking:
 
             child.MdiParent = Me
 
+            Call arPage.Model.checkIfCanCheckForErrors()
+
             zrORMModel_view = child
 
             '----------------------------------------------------
@@ -3037,7 +3039,7 @@ SkipRegistrationChecking:
                     'Dim lrModel As Clipbrd.ClipboardModel = prApplication.WorkingPage.Model.CloneClipboard
                     'Dim lrPage As New Clipbrd.ClipboardPage(lrModel, System.Guid.NewGuid.ToString, prApplication.WorkingPage.Name, pcenumLanguage.ORMModel)
 
-                    Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, System.Guid.NewGuid.ToString, True)
+                    Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, System.Guid.NewGuid.ToString, True,, True)
                     lrModel.OriginModelId = prApplication.WorkingModel.ModelId 'Used for differentiation when Pasting.
 
                     Dim lrPage As New FBM.Page(lrModel, "ClipboardPage", "ClipboardPage", prApplication.WorkingPage.Language)
@@ -3331,9 +3333,39 @@ SkipRegistrationChecking:
                 End If
 
                 'CodeSafe: Make sure the Model of the Page has a ModelDictionary
+                '=================================================================================
                 If lrPage.Model.ModelDictionary Is Nothing Then
                     lrPage.Model.ModelDictionary = New List(Of FBM.DictionaryEntry)
                 End If
+#Region "Clean ModelError sets"
+                For Each lrValueTypeInstance In lrPage.ValueTypeInstance
+                    lrValueTypeInstance.ValueType.ModelError = New List(Of FBM.ModelError)
+                    lrValueTypeInstance.ModelError = New List(Of FBM.ModelError)
+                Next
+                For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
+                    lrEntityTypeInstance.EntityType.ModelError = New List(Of FBM.ModelError)
+                    lrEntityTypeInstance.ModelError = New List(Of FBM.ModelError)
+                Next
+                For Each lrFactTypeInstance In lrPage.FactTypeInstance
+                    lrFactTypeInstance.FactType.ModelError = New List(Of FBM.ModelError)
+                    lrFactTypeInstance.ModelError = New List(Of FBM.ModelError)
+                Next
+                For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+                    lrRoleConstraintInstance.RoleConstraint.ModelError = New List(Of FBM.ModelError)
+                    lrRoleConstraintInstance.ModelError = New List(Of FBM.ModelError)
+                Next
+
+                Dim larFact = From FactType In lrPage.Model.FactType
+                              From Fact In FactType.Fact
+                              Select Fact
+
+                For Each lrFact In larFact
+                    lrFact.ModelError = New List(Of FBM.ModelError)
+                Next
+
+#End Region
+                '=================================================================================
+
 
                 If lrPage.CopiedModelId = prApplication.WorkingModel.ModelId And
                     lrPage.CopiedPageId = prApplication.WorkingPage.PageId Then

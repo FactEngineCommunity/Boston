@@ -37,7 +37,7 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemEntityIndexEditor = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemEntityModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemIndexManager = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveFromPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.ViewTableDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -87,6 +87,8 @@ Partial Class frmDiagramERD
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
+        Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemAddAttribute = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -103,9 +105,9 @@ Partial Class frmDiagramERD
         '
         'ContextMenuStrip_Entity
         '
-        Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.AddRelatedEntitiesToThisPageToolStripMenuItem, Me.ToolStripMenuItemDisplayDataIndexRelationInformation, Me.ToolStripMenuItemEntityIndexEditor, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.ToolStripMenuItem3, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ViewTableDataToolStripMenuItem, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.AddRelatedEntitiesToThisPageToolStripMenuItem, Me.ToolStripMenuItemDisplayDataIndexRelationInformation, Me.ToolStripMenuItemEntityIndexEditor, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.ToolStripMenuItemAddAttribute, Me.ToolStripMenuItemIndexManager, Me.ToolStripSeparator9, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ViewTableDataToolStripMenuItem, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Entity.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(315, 248)
+        Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(315, 298)
         '
         'MorphToToolStripMenuItem
         '
@@ -167,7 +169,7 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemEntityIndexEditor.Image = CType(resources.GetObject("ToolStripMenuItemEntityIndexEditor.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemEntityIndexEditor.Name = "ToolStripMenuItemEntityIndexEditor"
         Me.ToolStripMenuItemEntityIndexEditor.Size = New System.Drawing.Size(314, 22)
-        Me.ToolStripMenuItemEntityIndexEditor.Text = "&Index Editor"
+        Me.ToolStripMenuItemEntityIndexEditor.Text = "&Index Editor (Superuser)"
         Me.ToolStripMenuItemEntityIndexEditor.Visible = False
         '
         'ToolStripMenuItemEntityModelErrors
@@ -181,13 +183,12 @@ Partial Class frmDiagramERD
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
         Me.ToolStripSeparator8.Size = New System.Drawing.Size(311, 6)
         '
-        'ToolStripMenuItem3
+        'ToolStripMenuItemIndexManager
         '
-        Me.ToolStripMenuItem3.Image = CType(resources.GetObject("ToolStripMenuItem3.Image"), System.Drawing.Image)
-        Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(314, 22)
-        Me.ToolStripMenuItem3.Text = "&Index Editor"
-        Me.ToolStripMenuItem3.Visible = False
+        Me.ToolStripMenuItemIndexManager.Image = Global.Boston.My.Resources.Resources.Index
+        Me.ToolStripMenuItemIndexManager.Name = "ToolStripMenuItemIndexManager"
+        Me.ToolStripMenuItemIndexManager.Size = New System.Drawing.Size(314, 22)
+        Me.ToolStripMenuItemIndexManager.Text = "&Index Manager"
         '
         'RemoveFromPageToolStripMenuItem
         '
@@ -434,14 +435,14 @@ Partial Class frmDiagramERD
         '
         Me.ToolStripMenuItemEditRelation.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ToolStripMenuItemEditRelation.Name = "ToolStripMenuItemEditRelation"
-        Me.ToolStripMenuItemEditRelation.Size = New System.Drawing.Size(188, 30)
+        Me.ToolStripMenuItemEditRelation.Size = New System.Drawing.Size(161, 30)
         Me.ToolStripMenuItemEditRelation.Text = "&Edit Relation"
         '
         'ToolStripMenuItemDeleteRelation
         '
         Me.ToolStripMenuItemDeleteRelation.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ToolStripMenuItemDeleteRelation.Name = "ToolStripMenuItemDeleteRelation"
-        Me.ToolStripMenuItemDeleteRelation.Size = New System.Drawing.Size(188, 30)
+        Me.ToolStripMenuItemDeleteRelation.Size = New System.Drawing.Size(161, 30)
         Me.ToolStripMenuItemDeleteRelation.Text = "&Delete Relation"
         '
         'ContextMenuStripTab
@@ -499,6 +500,17 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView.Size = New System.Drawing.Size(938, 524)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
+        '
+        'ToolStripSeparator9
+        '
+        Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
+        Me.ToolStripSeparator9.Size = New System.Drawing.Size(311, 6)
+        '
+        'ToolStripMenuItemAddAttribute
+        '
+        Me.ToolStripMenuItemAddAttribute.Name = "ToolStripMenuItemAddAttribute"
+        Me.ToolStripMenuItemAddAttribute.Size = New System.Drawing.Size(314, 22)
+        Me.ToolStripMenuItemAddAttribute.Text = "Add &Attribute"
         '
         'frmDiagramERD
         '
@@ -581,5 +593,7 @@ Partial Class frmDiagramERD
     Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
     Friend WithEvents Diagram4 As MindFusion.Diagramming.Diagram
     Friend WithEvents ToolStripMenuItemEntityIndexEditor As ToolStripMenuItem
-    Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemIndexManager As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemAddAttribute As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
 End Class

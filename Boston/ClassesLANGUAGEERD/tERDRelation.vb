@@ -184,8 +184,22 @@ Namespace ERD
 
         Private Sub RDSRelation_OriginMandatoryChanged(abOriginIsMandatory As Boolean) Handles RDSRelation.OriginMandatoryChanged
 
-            Me.OriginMandatory = abOriginIsMandatory
-            Call Me.Page.Diagram.Invalidate()
+            Try
+                Me.OriginMandatory = abOriginIsMandatory
+
+                If Me.Page IsNot Nothing Then
+                    If Me.Page.Diagram IsNot Nothing Then
+                        Call Me.Page.Diagram.Invalidate()
+                    End If
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

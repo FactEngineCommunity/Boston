@@ -124,6 +124,8 @@ Public Class frmKeywordExtraction
 
 	Private Sub KeywordExtractionForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
+		Call Me.SetupForm
+
 		' Create an instance of a ListView column sorter and assign it to the ListView control.
 		lvwColumnSorter = New ListViewColumnSorter()
 		Me.ResultListView.ListViewItemSorter = lvwColumnSorter
@@ -138,6 +140,21 @@ Public Class frmKeywordExtraction
 		MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
 	End Sub
 
+	Private Sub SetupForm()
+
+		Try
+			Me.LabelModelName.Text = Me.zrModel.Name
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
 
 	Private Sub StandardizationButton_Click(sender As Object, e As EventArgs) Handles StandardizationButton.Click
 		CloseButtons()
@@ -148,10 +165,19 @@ Public Class frmKeywordExtraction
 
 	Private Sub RemoveStopButton_Click(sender As Object, e As EventArgs) Handles RemoveStopButton.Click
 		CloseButtons()
-		MessageBox.Show("Tip: If the document is longer, it may take you few minutes, please be patient ...", "Prompt", 0, MessageBoxIcon.Asterisk)
-		MyData.TheDoc = MyFun.RemoveStop(MyData.TheDoc)
-		StatusLabel.Text = "Remove stop-words has been completed."
-		OpenButton()
+		'MessageBox.Show("Tip: If the document is longer, it may take you few minutes, please be patient ...", "Prompt", 0, MessageBoxIcon.Asterisk)
+
+		Try
+			With New WaitCursor
+				MyData.TheDoc = MyFun.RemoveStop(MyData.TheDoc, Me.progressBar1)
+				StatusLabel.Text = "Remove stop-words has been completed."
+				OpenButton()
+			End With
+
+		Catch ex As Exception
+			OpenButton()
+		End Try
+
 	End Sub
 
 	Private Sub KeywordExtractionButton_Click(sender As Object, e As EventArgs) Handles KeywordExtractionMaxButton.Click
@@ -193,6 +219,15 @@ Public Class frmKeywordExtraction
 				lvi(i) = New ListViewItem()
 				lvi(i).SubItems(0).Text = (i + 1).ToString()
 				lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
+
+				If Me.zrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+					MyData.WordsFre(i).IsInModel = True
+					Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+					lvi(i).SubItems(1).Font = loFont
+					lvi(i).ForeColor = Color.RoyalBlue
+					'lvi(i).BackColor = Color.Beige
+				End If
+
 				lvi(i).SubItems.Add(MyData.WordsFre(i).ED.ToString())
 				lvi(i).SubItems.Add(MyData.WordsFre(i).Frequency.ToString())
 			Next
@@ -339,55 +374,61 @@ Public Class frmKeywordExtraction
 		SyncLock Me
 			CloseButtons()
 
-			Dim dt1 As DateTime = DateTime.Now
+			Try
+				Dim dt1 As DateTime = DateTime.Now
 
-			StatusLabel.Text = "Keyword extraction process is ongoing: 0%"
+				StatusLabel.Text = "Keyword extraction process is ongoing: 0%"
 
-			ResultListView.Items.Clear()
+				ResultListView.Items.Clear()
 
-			MyData.WordsFre = MyFun.StatisticsWords(MyData.TheDoc)
+				MyData.WordsFre = MyFun.StatisticsWords(MyData.TheDoc)
 
-			For i As Integer = 0 To MyData.WordsFre.Length - 1
-				MyData.WordsFre(i).EntropyDifference_Normal()
-				progressBar1.Value = i * 100 \ MyData.WordsFre.Length
-				StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBar1.Value & "%"
-			Next
+				For i As Integer = 0 To MyData.WordsFre.Length - 1
+					MyData.WordsFre(i).EntropyDifference_Normal()
+					progressBar1.Value = i * 100 \ MyData.WordsFre.Length
+					StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBar1.Value & "%"
+				Next
 
-			MyFun.QuickSort(MyData.WordsFre, 0, MyData.WordsFre.Length - 1)
+				MyFun.QuickSort(MyData.WordsFre, 0, MyData.WordsFre.Length - 1)
 
-			Dim WordsNum As Integer = 0
-			For i As Integer = 0 To MyData.WordsFre.Length - 1
-				If MyData.WordsFre(i).ED > 0 Then
-					WordsNum += 1
-				Else
-					Exit For
-				End If
-			Next
-			Dim lvi As ListViewItem() = New ListViewItem(WordsNum - 1) {}
-			For i As Integer = 0 To WordsNum - 1
-				lvi(i) = New ListViewItem()
-				lvi(i).SubItems(0).Text = (i + 1).ToString()
-				lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
+				Dim WordsNum As Integer = 0
+				For i As Integer = 0 To MyData.WordsFre.Length - 1
+					If MyData.WordsFre(i).ED > 0 Then
+						WordsNum += 1
+					Else
+						Exit For
+					End If
+				Next
+				Dim lvi As ListViewItem() = New ListViewItem(WordsNum - 1) {}
+				For i As Integer = 0 To WordsNum - 1
+					lvi(i) = New ListViewItem()
+					lvi(i).SubItems(0).Text = (i + 1).ToString()
+					lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
 
-				If Me.zrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
-					MyData.WordsFre(i).IsInModel = True
-					Dim loFont = New Font("Arial", 10, FontStyle.Bold)
-					lvi(i).SubItems(1).Font = loFont
-					lvi(i).ForeColor = Color.RoyalBlue
-					'lvi(i).BackColor = Color.Beige
-				End If
-				lvi(i).SubItems.Add(MyData.WordsFre(i).ED.ToString())
-				lvi(i).SubItems.Add(MyData.WordsFre(i).Frequency.ToString())
-			Next
-			ResultListView.Items.AddRange(lvi)
+					If Me.zrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+						MyData.WordsFre(i).IsInModel = True
+						Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+						lvi(i).SubItems(1).Font = loFont
+						lvi(i).ForeColor = Color.RoyalBlue
+						'lvi(i).BackColor = Color.Beige
+					End If
+					lvi(i).SubItems.Add(MyData.WordsFre(i).ED.ToString())
+					lvi(i).SubItems.Add(MyData.WordsFre(i).Frequency.ToString())
+				Next
+				ResultListView.Items.AddRange(lvi)
 
-			Dim dt2 As DateTime = DateTime.Now
-			SaveButton.Enabled = True
-			progressBar1.Value = 100
+				Dim dt2 As DateTime = DateTime.Now
+				SaveButton.Enabled = True
+				progressBar1.Value = 100
 
-			StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
+				StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
 
-			OpenButton()
+				OpenButton()
+
+			Catch ex As Exception
+				OpenButton()
+			End Try
+
 		End SyncLock
 	End Sub
 

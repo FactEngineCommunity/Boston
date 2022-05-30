@@ -104,7 +104,7 @@ Namespace Richmond
 
                         If Not My.Settings.SilentPreConfiguration Then
 
-                            lsMessage = "Cannot find the ORM Stuio database at the default/configured location:"
+                            lsMessage = "Cannot find the Boston database at the default/configured location:"
                             lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
                             lsMessage.AppendDoubleLineBreak("If this is a new installation of Boston, Boston will try and locate the database at:")
                             lsMessage.AppendDoubleLineBreak(lsLocalDatabaseLocation)

@@ -454,7 +454,7 @@ Namespace PGS
                                     Call Me.FBMModelElement.SetReferenceMode(Trim(Me._ReferenceMode))
                                 End With
                             Else
-                                Dim lsMessage = "It makes no sense to have a Primary Reference Schema for a Model Element that is is absorbed into a supertype."
+                                Dim lsMessage = "It makes no sense to have a Primary Reference Scheme for a Model Element that is is absorbed into a supertype."
                                 lsMessage &= vbCrLf & vbCrLf & "Reverting Reference Model for this Entity Type to ' '."
                                 Me.ReferenceMode = " "
                                 MsgBox(lsMessage)

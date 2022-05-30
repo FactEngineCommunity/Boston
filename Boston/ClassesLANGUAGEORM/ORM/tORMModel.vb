@@ -376,6 +376,10 @@ Namespace FBM
         <XmlIgnore()>
         Public Port As String 'E.g. As needed by TypeDB for a Session/Connection. See also the physical model.
 
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public IsClipboardModel As Boolean = False
+
         Public ReadOnly Property RequiresConnectionString As Boolean
             Get
                 Select Case Me.TargetDatabaseType
@@ -432,10 +436,19 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="aiLanguageId"></param>
+        ''' <param name="as_model_name"></param>
+        ''' <param name="as_ModelId"></param>
+        ''' <param name="arNamespace"></param>
+        ''' <param name="abIsClipboardModel">True if the Model is just for using in the clipboard. No RDS Processing. E.g. RDS.AddTable.</param>
         Sub New(ByVal aiLanguageId As pcenumLanguage,
                 ByVal as_model_name As String,
                 ByVal as_ModelId As String,
-                Optional ByVal arNamespace As ClientServer.Namespace = Nothing)
+                Optional ByVal arNamespace As ClientServer.Namespace = Nothing,
+                Optional ByVal abIsClipboardModel As Boolean = False)
 
             MyBase.New()
 
@@ -445,6 +458,8 @@ Namespace FBM
             If arNamespace IsNot Nothing Then
                 Me.Namespace = arNamespace
             End If
+
+            Me.IsClipboardModel = abIsClipboardModel
 
         End Sub
 
@@ -467,7 +482,12 @@ Namespace FBM
         ''' <param name="aiLanguageId"></param>
         ''' <param name="as_ORMModel_name"></param>
         ''' <remarks></remarks>
-        Sub New(ByVal aiEnterprise_id As String, ByVal aiSubject_area_id As String, ByVal aiProject_id As String, ByVal aiModelId As String, ByVal aiLanguageId As pcenumLanguage, Optional ByVal as_ORMModel_name As String = Nothing)
+        Sub New(ByVal aiEnterprise_id As String,
+                ByVal aiSubject_area_id As String,
+                ByVal aiProject_id As String,
+                ByVal aiModelId As String,
+                ByVal aiLanguageId As pcenumLanguage,
+                Optional ByVal as_ORMModel_name As String = Nothing)
 
             If IsNothing(aiModelId) Then
                 Me.ModelId = System.Guid.NewGuid.ToString
@@ -565,7 +585,8 @@ Namespace FBM
                                  Optional ByVal abMakeModelDirty As Boolean = False,
                                  Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                  Optional arConceptInstance As FBM.ConceptInstance = Nothing,
-                                 Optional abMakeDictionaryEntryDirty As Boolean = False)
+                                 Optional abMakeDictionaryEntryDirty As Boolean = False,
+                                 Optional ByVal abIgnoreRDSProcessing As Boolean = False)
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
 
@@ -616,16 +637,18 @@ Namespace FBM
 
                 '======================================================================================
                 'RDS
-                If Not arEntityType.IsMDAModelElement And Not arEntityType.IsObjectifyingEntityType Then
+                If Not arEntityType.IsMDAModelElement And Not arEntityType.IsObjectifyingEntityType And Not abIgnoreRDSProcessing Then
                     Dim lrTable As New RDS.Table(Me.RDS, arEntityType.Id, arEntityType)
-                    Call Me.RDS.addTable(lrTable)
+                    If Not Me.IsClipboardModel Then
+                        Call Me.RDS.addTable(lrTable)
+                    End If
                     '20220522-Was the below. Was not adding to CMML
                     'Me.RDS.Table.AddUnique(lrTable)
                 End If
 
-                ''=====================================================================================
-                ''Broadcast the addition to the DuplexServer
-                If My.Settings.UseClientServer _
+                    ''=====================================================================================
+                    ''Broadcast the addition to the DuplexServer
+                    If My.Settings.UseClientServer _
                     And My.Settings.InitialiseClient _
                     And abBroadcastInterfaceEvent Then
 
@@ -678,30 +701,46 @@ Namespace FBM
             Dim lrEntityType As FBM.EntityType
             Dim lrValueType As FBM.ValueType
 
-            For Each lrValueType In Me.ValueType
-                lrValueType.ModelError.Clear()
-            Next
+            Try
 
-            For Each lrEntityType In Me.EntityType
-                lrEntityType.ModelError.Clear()
-            Next
-
-            For Each lrFactType In Me.FactType
-                lrFactType.ModelError.Clear()
-                For Each lrFact In lrFactType.Fact
-                    lrFact.ModelError.Clear()
+                For Each lrValueType In Me.ValueType
+                    lrValueType.ModelError.Clear()
                 Next
-            Next
 
-            For Each lrRoleConstraint In Me.RoleConstraint
-                lrRoleConstraint.ModelError.Clear()
-                For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
-                    'lrRoleConstraintRole.ModelError.Clear()
+                For Each lrEntityType In Me.EntityType
+                    lrEntityType.ModelError.Clear()
                 Next
-            Next
 
-            Me.ModelError.Clear()
-            RaiseEvent ModelErrorsCleared()
+                For Each lrFactType In Me.FactType
+
+                    lrFactType.ModelError = New List(Of ModelError) 'For copying/pasting
+
+                    lrFactType.ModelError.Clear()
+                    For Each lrFact In lrFactType.Fact
+                        lrFact.ModelError.Clear()
+                    Next
+                Next
+
+                For Each lrRoleConstraint In Me.RoleConstraint
+                    lrRoleConstraint.ModelError = New List(Of ModelError) 'For copying/pasting
+                    lrRoleConstraint.ModelError.Clear()
+                    For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
+                        'lrRoleConstraintRole.ModelError.Clear()
+                    Next
+                Next
+
+                Me.ModelError.Clear()
+                RaiseEvent ModelErrorsCleared()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         Public Sub AddModelNote(ByRef arModelNote As FBM.ModelNote, Optional ByVal abMakeModelDirty As Boolean = False)

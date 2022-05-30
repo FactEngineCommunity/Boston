@@ -61,6 +61,70 @@ Namespace ERD
 
         Public PrimaryKey As New List(Of ERD.Attribute)
 
+        Private _ReferenceMode As String = ""
+
+
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
+         DescriptionAttribute("The 'Reference Mode' for the Entity Type"),
+         TypeConverter(GetType(tMyConverter))>
+        Public Shadows Property ReferenceMode() As String
+            Get
+                Dim TempString As String = ""
+                'Holds our selected option for return
+
+                Select Case Me.RDSTable.FBMModelElement.GetType
+                    Case Is = GetType(FBM.EntityType)
+
+                        Dim lrEntityType As FBM.EntityType = CType(Me.RDSTable.FBMModelElement, FBM.EntityType)
+
+                        If lrEntityType.ReferenceMode = Nothing Then
+                            'If an option has not already been selected
+                            If tGlobalForTypeConverter.OptionStringArray.GetUpperBound(0) > 0 Then
+                                'If there is more than 1 option
+                                'Sort them alphabetically
+                                Array.Sort(tGlobalForTypeConverter.OptionStringArray)
+                            End If
+                            TempString = tGlobalForTypeConverter.OptionStringArray(0)
+                            'Choose the first option (or the empty one)
+                        Else 'Otherwise, if the option is already selected
+                            'Choose the already selected value                    
+                            TempString = lrEntityType.ReferenceMode
+                        End If
+
+                        Return TempString
+
+                    Case Is = GetType(FBM.FactType)
+
+                        Dim lrFactType As FBM.FactType = CType(Me.RDSTable.FBMModelElement, FBM.FactType)
+                        If lrFactType.IsObjectified Then
+                            If lrFactType.ObjectifyingEntityType.ReferenceMode = Nothing Then
+                                'If an option has not already been selected
+                                If tGlobalForTypeConverter.OptionStringArray.GetUpperBound(0) > 0 Then
+                                    'If there is more than 1 option
+                                    'Sort them alphabetically
+                                    Array.Sort(tGlobalForTypeConverter.OptionStringArray)
+                                End If
+                                TempString = tGlobalForTypeConverter.OptionStringArray(0)
+                                'Choose the first option (or the empty one)
+                            Else 'Otherwise, if the option is already selected
+                                'Choose the already selected value                    
+                                TempString = lrFactType.ObjectifyingEntityType.ReferenceMode
+                            End If
+                        Else
+                            TempString = ""
+                        End If
+                        Return TempString
+                End Select
+
+                Return ""
+            End Get
+            Set(ByVal Value As String)
+                Me._ReferenceMode = Value
+            End Set
+        End Property
+
+
         Public Overrides ReadOnly Property isSubtype As Boolean
             Get
                 Return Me.RDSTable.isSubtype
@@ -322,6 +386,39 @@ Namespace ERD
                             '-----------------------------------------------------------------------------
                             'Me.FactData.Data = Me.Name
                             Call Me.RDSTable.FBMModelElement.setName(Me.Name)
+                        Case Is = "ReferenceMode"
+
+                            Select Case Me.RDSTable.FBMModelElement.GetType
+                                Case Is = GetType(FBM.EntityType)
+
+                                    Dim lrEntityType As FBM.EntityType = CType(Me.RDSTable.FBMModelElement, FBM.EntityType)
+                                    If lrEntityType.GetTopmostNonAbsorbedSupertype.Id = lrEntityType.Id Then
+                                        With New WaitCursor
+                                            Call lrEntityType.SetReferenceMode(Trim(Me._ReferenceMode))
+                                        End With
+                                    Else
+                                        Dim lsMessage = "It makes no sense to have a Primary Reference Scheme for a Model Element that is is absorbed into a supertype."
+                                        lsMessage &= vbCrLf & vbCrLf & "Reverting Reference Model for this Entity Type to ' '."
+                                        Me.ReferenceMode = " "
+                                        MsgBox(lsMessage)
+                                    End If
+                                Case Is = GetType(FBM.FactType)
+
+                                    Dim lrFactType As FBM.FactType = CType(Me.RDSTable.FBMModelElement, FBM.FactType)
+                                    If lrFactType.IsObjectified Then
+                                        Try
+                                            lrFactType.ObjectifyingEntityType.SetReferenceMode(Me._ReferenceMode)
+                                            '20220530-VM-Comment out for now.
+                                            'If Me._ReferenceMode = " " Then
+                                            '    Call Me.SetPropertyAttributes(Me, "DataType", False)
+                                            'End If
+                                        Catch ex As Exception
+                                            Throw New Exception("Error trying to set the Reference Mode for an Objectified Fact Type.")
+                                        End Try
+                                    Else
+                                        MsgBox("The Fact Type must be objectified to have a Reference Mode.")
+                                    End If
+                            End Select
                     End Select
                 End If
 

@@ -39,8 +39,19 @@ Namespace FBM
             End Set
         End Property
 
+
         <XmlIgnore()>
-        Public ReferenceMode As String = ""
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ReferenceMode As String = ""
+        <XmlIgnore()>
+        Public Shadows Property ReferenceMode As String
+            Get
+                Return Me._ReferenceMode
+            End Get
+            Set(value As String)
+                Me._ReferenceMode = value
+            End Set
+        End Property
 
         <XmlIgnore()>
         Public primitive_type_entity_id As Integer = 0
@@ -384,8 +395,8 @@ Namespace FBM
         End Function
 
         Public Overloads Overrides Function Clone(ByRef arModel As FBM.Model,
-                                        Optional ByVal abAddToModel As Boolean = False,
-                                        Optional ByVal abIsMDAModelElement As Boolean = False) As Object
+                                            Optional ByVal abAddToModel As Boolean = False,
+                                            Optional ByVal abIsMDAModelElement As Boolean = False) As Object
 
             Dim lrEntityType As New FBM.EntityType
             Dim lrParentEntityType As FBM.EntityType
@@ -1793,6 +1804,8 @@ Namespace FBM
             Try
                 Dim larRolesToReturn As New List(Of FBM.Role)
 
+
+
                 If Me.HasSimpleReferenceScheme Then
 
                     '20210824-VM-Needed when need to get the Active Role of a downstream EntityType with Simple Reference Scheme.
@@ -1801,6 +1814,23 @@ Namespace FBM
 
                 ElseIf Me.HasCompoundReferenceMode Then
 
+                    Try
+                        Dim lrTable As RDS.Table = Me.getCorrespondingRDSTable
+
+                        Dim larColumn = lrTable.getPrimaryKeyColumns
+
+                        Dim larRole = From Column In larColumn
+                                      Select Column.ActiveRole
+
+                        If larRole.Count > 0 Then
+                            Return larRole.ToList
+                        End If
+
+                    Catch ex As Exception
+                        GoTo FailsafeContinue
+                    End Try
+
+FailsafeContinue:
                     For Each lrRoleConstraintRole In Me.ReferenceModeRoleConstraint.RoleConstraintRole
 
                         If aarCoveredRoles.Contains(lrRoleConstraintRole.Role) Then
@@ -2547,13 +2577,13 @@ Namespace FBM
         ''' <param name="abSimpleAssignment">True if just setting the ReferenceMode without creating references or changing anything, else False</param>
         ''' <param name="asValueTypeName">Provided if the name for the ValueType is known and need not be generated.</param>
         ''' <remarks></remarks>
-        Public Sub SetReferenceMode(ByVal asReferenceMode As String,
-                                    Optional ByVal abSimpleAssignment As Boolean = False,
-                                    Optional ByVal asValueTypeName As String = Nothing,
-                                    Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                    Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
-                                    Optional ByVal abSuppressModelSave As Boolean = False,
-                                    Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False)
+        Public Overrides Sub SetReferenceMode(ByVal asReferenceMode As String,
+                                              Optional ByVal abSimpleAssignment As Boolean = False,
+                                              Optional ByVal asValueTypeName As String = Nothing,
+                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                              Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
+                                              Optional ByVal abSuppressModelSave As Boolean = False,
+                                              Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False)
 
             Try
                 If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then

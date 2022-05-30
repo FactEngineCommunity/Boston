@@ -286,11 +286,17 @@ Namespace ERD
                         lsPartOfPrimaryKey = ""
                     End If
                 Else
-                    If Me.Column.isPartOfPrimaryKey Then
-                        lsPartOfPrimaryKey = "#"
-                    Else
-                        lsPartOfPrimaryKey = ""
-                    End If
+                    lsPartOfPrimaryKey = ""
+                    Try
+                        Dim lrTable As RDS.Table = Me.Column.Role.FactType.getCorrespondingRDSTable(Nothing, True)
+
+                        If Me.Column.isPartOfPrimaryKey(lrTable Is Nothing) Then
+                            lsPartOfPrimaryKey = "#"
+                        End If
+                    Catch ex As Exception
+                        lsPartOfPrimaryKey = "[Error]"
+                    End Try
+
                 End If
 
                 If Me.Mandatory Then

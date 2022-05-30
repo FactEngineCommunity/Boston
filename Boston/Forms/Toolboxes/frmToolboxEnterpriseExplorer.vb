@@ -115,6 +115,7 @@ Public Class frmToolboxEnterpriseExplorer
             Call LoadEnterpriseTreeSearchItems()
 
             Call frmMain.ShowHideMenuOptions()
+            Call Me.ShowHideMenuItems()
 
             Me.TreeView.Nodes(0).Expand()
 
@@ -955,6 +956,24 @@ Public Class frmToolboxEnterpriseExplorer
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+    End Sub
+
+    Private Sub ShowHideMenuItems()
+
+        Try
+            If My.Settings.UseClientServer Then
+                Me.ToolStripMenuItemKeywordExtractionTool.Enabled = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
     End Sub
 
     Private Sub HideCircularProgressBar()
@@ -4722,7 +4741,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Private Sub KeywordExtractionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles KeywordExtractionToolStripMenuItem.Click
+    Private Sub KeywordExtractionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemKeywordExtractionTool.Click
 
         Dim lrModel As FBM.Model
 

@@ -75,6 +75,19 @@ Namespace FBM
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ReferenceMode As String = ""
+        <XmlIgnore()>
+        Public Shadows Property ReferenceMode As String
+            Get
+                Return Me._ReferenceMode
+            End Get
+            Set(value As String)
+                Me._ReferenceMode = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsLinkFactType As Boolean = False
         <XmlAttribute()>
         Public Overridable Property IsLinkFactType() As Boolean

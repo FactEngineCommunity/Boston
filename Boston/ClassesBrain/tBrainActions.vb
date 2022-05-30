@@ -824,7 +824,9 @@ EndProcessing:
                         Case Is = pcenumLanguage.PropertyGraphSchema
 
                             Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)
+                        Case Is = pcenumLanguage.EntityRelationshipDiagram
 
+                            Call Me.Page.LoadERDEntityFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50))
                     End Select
 
                     If Me.AutoLayoutOn Then

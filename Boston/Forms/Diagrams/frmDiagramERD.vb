@@ -1903,7 +1903,7 @@ SkipORMReadingEditor:
 
                                 Call Me.zrPage.DropEntityAtPoint(lrEntity, loPointF)
 
-                                Me.zrPage.ERDiagram.Entity.Add(lrEntity)
+                                Me.zrPage.ERDiagram.Entity.AddUnique(lrEntity)
                                 '=========================================================================================
                         End Select
                     End If
@@ -2103,6 +2103,10 @@ SkipORMReadingEditor:
                 '------------------------------------------------
                 'User Left-Clicked on the Canvas
                 '------------------------------------------------
+                Call prApplication.setWorkingPage(Me.zrPage)
+                If prApplication.ToolboxForms.FindAll(Function(x) x.Name = frmToolboxBrainBox.Name).Count > 0 Then
+                    prApplication.Brain.Page = Me.zrPage
+                End If
 
                 '---------------------------
                 'Clear the SelectedObjects
@@ -2427,7 +2431,8 @@ SkipORMReadingEditor:
 
         If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
             If Me.Diagram.Selection.Items.Count > 0 Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
@@ -3519,5 +3524,194 @@ SkipORMReadingEditor:
 
     End Sub
 
+    Private Sub ToolStripMenuItemIndexManager_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemIndexManager.Click
+
+        Try
+            Dim lrfrmCRUDIndexManager As New frmCRUDIndexManager
+
+            Dim lrTable As RDS.Table
+            Try
+                lrTable = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = Me.zrPage.SelectedObject(0).name)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+
+            lrfrmCRUDIndexManager.mrTable = lrTable
+            Call lrfrmCRUDIndexManager.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' Called when [Add Attribute] menu option selected on Node Type or Edge Type.
+    ''' </summary>
+    Private Sub AddPropertyToEntity()
+
+        Dim lsMessage As String
+        Try
+            Dim lrERDEntity As ERD.Entity
+            Dim lrRelation As ERD.Relation
+
+            Dim lrModelElement As FBM.ModelObject
+
+            Dim lfrmAddAttributeForm = New frmCRUDAddAttributeNew
+
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+
+            Select Case Me.zrPage.SelectedObject(0).GetType
+                Case Is = GetType(ERD.Entity)
+                    lrERDEntity = Me.zrPage.SelectedObject(0)
+                    lfrmAddAttributeForm.zrEntity = lrERDEntity
+                    lrModelElement = lrERDEntity.RDSTable.FBMModelElement
+                Case Is = GetType(ERD.Relation)
+                    lrRelation = Me.zrPage.SelectedObject(0)
+                    Dim lrRelationFactType As FBM.FactType = Nothing
+                    If lrRelation.RelationFactType.IsLinkFactType Then
+                        lrModelElement = lrRelation.RelationFactType.LinkFactTypeRole.FactType
+                    Else
+                        lrModelElement = lrRelation.RelationFactType
+                    End If
+                    lrRelationFactType = lrModelElement
+                    If Not lrRelationFactType.IsObjectified Then
+                        Call lrRelation.RelationFactType.Objectify()
+                    End If
+                    lfrmAddAttributeForm.zrEntity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRelationFactType.Id)
+
+                Case Else
+                    Exit Sub
+            End Select
+
+
+            Dim lrModel As FBM.Model = Me.zrPage.Model
+
+            lfrmAddAttributeForm.zrModel = lrModel
+            lfrmAddAttributeForm.zrModelObject = lrModelElement
+
+            Dim lsValueTypeName As String = lrModel.CreateUniqueValueTypeName("NewValueType", 0)
+            Dim lrValueType As FBM.ValueType = lrModel.CreateValueType(lsValueTypeName, True,,,, False)
+            lfrmAddAttributeForm.zrValueType = lrValueType
+
+            '----------------------------------------------------------------------------------------------------------------
+            'Establish a dummy FactType for the new Attribute.
+            '  NB If the User clicks [Cancel] then the FactType and ValueType must be removed from the Model.
+            '-------------------------------------------------------------------
+            Dim lrFactType As FBM.FactType = Nothing
+            If lrModelElement.ConceptType = pcenumConceptType.EntityType Then
+                Dim lrEntityType As FBM.EntityType = lrModelElement
+                lrFactType = lrEntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+
+            ElseIf lrModelElement.ConceptType = pcenumConceptType.FactType Then
+                Dim lrSelectedFactType As FBM.FactType = lrModelElement
+
+                If Not lrSelectedFactType.IsObjectified Then
+                    lrSelectedFactType.Objectify()
+                End If
+                lrFactType = lrSelectedFactType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+            Else
+                Throw New NotImplementedException("Not implemented.")
+            End If
+
+            lfrmAddAttributeForm.zrFactType = lrFactType
+
+            Dim lsUniqueAttributeName = lfrmAddAttributeForm.zrEntity.CreateUniqueAttributeName("NewAttribute", 0)
+
+            If lfrmAddAttributeForm.ShowDialog(lsUniqueAttributeName) = DialogResult.OK Then
+                With New WaitCursor
+
+                    Dim lrTempValueType As FBM.ValueType = Me.zrPage.Model.GetModelObjectByName(lfrmAddAttributeForm.zsValueTypeName, True)
+                    If lrTempValueType IsNot Nothing Then
+                        'Setting the Property/Attribute to an existing Value Type.
+                        Call lrFactType.RoleGroup(1).ReassignJoinedModelObject(lrTempValueType, True, Nothing, False)
+                        lrValueType.RemoveFromModel(True, False, True,, True, False)
+
+                        Dim lsSubMessage = ""
+                        If lrTempValueType.DataTypeLength <> lrValueType.DataTypeLength Then
+                            lsSubMessage = "Length"
+                        End If
+
+                        If lrTempValueType.DataTypePrecision <> lrValueType.DataTypePrecision Then
+                            If lsSubMessage <> "" Then lsSubMessage.AppendString(" and ")
+                            lsSubMessage.AppendString("Precision")
+                        End If
+
+                        If lsSubMessage <> "" Then
+                            lsMessage = "You are reusing the ORM level Value Type, " & lrValueType.Id & ", for this Property/Attribute."
+                            lsMessage.AppendDoubleLineBreak("Do you want to change it's " & lsSubMessage & " to the new value you have set?")
+                            Select Case MsgBox(lsMessage, MsgBoxStyle.YesNoCancel)
+                                Case Is = MsgBoxResult.Yes
+                                    lrTempValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+                                    lrTempValueType.SetDataTypeLength(lfrmAddAttributeForm.ziDataTypeLength, True)
+                                    lrTempValueType.SetDataTypePrecision(lfrmAddAttributeForm.ziDataTypePrecision, True)
+                                Case Is = MsgBoxResult.Cancel
+                                    Dim lfrmFlashCard As New frmFlashCard
+                                    lfrmFlashCard.ziIntervalMilliseconds = 1500
+                                    lfrmFlashCard.zsText = "Aborting addition of new Property."
+                                    lfrmFlashCard.Show(frmMain)
+
+                                    GoTo Aborted
+                            End Select
+                        End If
+
+                        lrValueType = lrTempValueType
+
+                    Else
+                        lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
+                        lrValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+                        lrValueType.SetDataTypeLength(lfrmAddAttributeForm.ziDataTypeLength, True)
+                        lrValueType.SetDataTypePrecision(lfrmAddAttributeForm.ziDataTypePrecision, True)
+                    End If
+
+                    lrFactType.RoleGroup(0).SetMandatory(lfrmAddAttributeForm.zbAttributeIsMandatory, True)
+                    Dim larRole As New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {"has", ""})
+                    lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                    Dim lsNewName As String = lrFactType.MakeNameFromFactTypeReadings()
+                    Call lrFactType.setName(lsNewName, True)
+
+                    Call Me.resetNodeAndLinkColors()
+                End With
+            Else
+Aborted:
+                Call lrFactType.RemoveFromModel(True, False)
+                Call lrValueType.RemoveFromModel(True, False)
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Private Sub resetNodeAndLinkColors()
+
+    End Sub
+
+    Private Sub ToolStripMenuItemAddAttribute_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAddAttribute.Click
+
+        Try
+            Call Me.AddPropertyToEntity()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 
 End Class

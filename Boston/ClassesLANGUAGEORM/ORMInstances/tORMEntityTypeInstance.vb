@@ -2977,6 +2977,13 @@ MoveOn:
                     'Is on the Page.
                     If Me.Shape IsNot Nothing Then
                         Me.Shape.Visible = False
+                        Try
+                            Me.EntityTypeNameShape.Visible = False
+                            Me.ReferenceModeShape.Visible = False
+                        Catch ex As Exception
+                            'At least try.
+                        End Try
+
                     End If
                 End If
 

@@ -379,9 +379,18 @@ Namespace RDS
 
         Public Sub setOriginMandatory(ByVal abOriginIsMandatory As Boolean)
 
-            Me.RelationOriginIsMandatory = abOriginIsMandatory
+            Try
+                Me.RelationOriginIsMandatory = abOriginIsMandatory
 
-            RaiseEvent OriginMandatoryChanged(abOriginIsMandatory)
+                RaiseEvent OriginMandatoryChanged(abOriginIsMandatory)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

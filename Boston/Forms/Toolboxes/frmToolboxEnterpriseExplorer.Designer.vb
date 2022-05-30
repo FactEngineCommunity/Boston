@@ -51,7 +51,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GenerateDocumentationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CodeGenerationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FactEngineToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.KeywordExtractionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemKeywordExtractionTool = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.AddPageToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPastePage = New System.Windows.Forms.ToolStripMenuItem()
@@ -301,7 +301,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.KeywordExtractionToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
         Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 424)
         '
@@ -340,12 +340,11 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.FactEngineToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.FactEngineToolStripMenuItem.Text = "&Fact Engine"
         '
-        'KeywordExtractionToolStripMenuItem
+        'ToolStripMenuItemKeywordExtractionTool
         '
-        Me.KeywordExtractionToolStripMenuItem.Enabled = False
-        Me.KeywordExtractionToolStripMenuItem.Name = "KeywordExtractionToolStripMenuItem"
-        Me.KeywordExtractionToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.KeywordExtractionToolStripMenuItem.Text = "&Keyword Extraction Tool"
+        Me.ToolStripMenuItemKeywordExtractionTool.Name = "ToolStripMenuItemKeywordExtractionTool"
+        Me.ToolStripMenuItemKeywordExtractionTool.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemKeywordExtractionTool.Text = "&Keyword Extraction Tool"
         '
         'ToolStripSeparator7
         '
@@ -424,6 +423,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.BusinessProcessModellingNotationToolStripMenuItem.Name = "BusinessProcessModellingNotationToolStripMenuItem"
         Me.BusinessProcessModellingNotationToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
         Me.BusinessProcessModellingNotationToolStripMenuItem.Text = "&Business Process Modelling Notation"
+        Me.BusinessProcessModellingNotationToolStripMenuItem.Visible = False
         '
         'AddBPMNPageToolStripMenuItem
         '
@@ -701,7 +701,7 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItemFixModelErrors As ToolStripMenuItem
     Friend WithEvents UnhideASelectedModelToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ImportormNORMAFileToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents KeywordExtractionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemKeywordExtractionTool As ToolStripMenuItem
     Friend WithEvents BusinessProcessModellingNotationToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddBPMNPageToolStripMenuItem As ToolStripMenuItem
 End Class

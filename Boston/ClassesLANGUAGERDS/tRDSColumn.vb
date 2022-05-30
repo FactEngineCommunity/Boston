@@ -638,7 +638,7 @@ Namespace RDS
         '''   such that the ERD.Attribute.PartOfPrimaryKey is not set to False.
         ''' </summary>
         ''' <returns></returns>
-        Public Function isPartOfPrimaryKey() As Boolean
+        Public Function isPartOfPrimaryKey(Optional ByVal abIgnoreGetRDSTableError As Boolean = False) As Boolean
 
             Dim lrTable As RDS.Table
 
@@ -654,7 +654,7 @@ Namespace RDS
                     ElseIf Me.Role.JoinedORMObject.Id = Me.Table.Name Then
                         lrTable = Me.Table
                     ElseIf Me.Role.FactType.Id = Me.Table.Name Then
-                        lrTable = Me.Role.FactType.getCorrespondingRDSTable
+                        lrTable = Me.Role.FactType.getCorrespondingRDSTable(Nothing, abIgnoreGetRDSTableError)
                     Else
                         'This is required because some Columns may be inherited by Not IsAbsorbed on corresponding ModelElement.
                         If Me.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
@@ -683,13 +683,13 @@ Namespace RDS
                     Try
                         Return Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
                     Catch ex2 As Exception
-                        Return Nothing
+                        Return False
                     End Try
                 End Try
                 '20200427-VM-was Me.Table.Index.Find(Function(x) x.IsPrimaryKey And (x.Column.Find(Function(y) y.Id = Me.Id) IsNot Nothing)) IsNot Nothing
 
             Catch ex As Exception
-                    Return False
+                Return False
             End Try
 
         End Function

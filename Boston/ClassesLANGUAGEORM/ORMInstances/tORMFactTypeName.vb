@@ -161,31 +161,31 @@ Namespace FBM
 
         End Sub
 
-        Public Sub Moved() Implements iPageObject.Moved
+        Public Overloads Sub Moved() Implements iPageObject.Moved
 
         End Sub
 
-        Public Sub NodeDeleting() Implements iPageObject.NodeDeleting
+        Public Overloads Sub NodeDeleting() Implements iPageObject.NodeDeleting
 
         End Sub
 
-        Public Sub NodeDeselected() Implements iPageObject.NodeDeselected
+        Public Overloads Sub NodeDeselected() Implements iPageObject.NodeDeselected
 
         End Sub
 
-        Public Sub NodeModified() Implements iPageObject.NodeModified
+        Public Overloads Sub NodeModified() Implements iPageObject.NodeModified
 
         End Sub
 
-        Public Sub NodeSelected() Implements iPageObject.NodeSelected
+        Public Overloads Sub NodeSelected() Implements iPageObject.NodeSelected
 
         End Sub
 
-        Public Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+        Public Overloads Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
 
         End Sub
 
-        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+        Public Overloads Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
 
         End Sub
 

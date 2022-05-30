@@ -51,6 +51,21 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ConceptType As pcenumConceptType
 
+        ''' <summary>
+        ''' Just used for EntityTypes and FactTypes.
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore()>
+        Public Property ReferenceMode As String
+            Get
+                Return ""
+            End Get
+            Set(value As String)
+                'Nothing to do here.
+            End Set
+        End Property
+
+
         <XmlAttribute()>
         Public Overridable Property ConceptType As pcenumConceptType
             Get
@@ -555,8 +570,8 @@ Namespace FBM
 
         End Function
 
-        Public Overridable Overloads Function Clone(ByRef arModel As FBM.Model, _
-                                                    Optional ByVal abAddToModel As Boolean = False, _
+        Public Overridable Overloads Function Clone(ByRef arModel As FBM.Model,
+                                                    Optional ByVal abAddToModel As Boolean = False,
                                                     Optional ByVal abIsMDAModelElement As Boolean = False) As Object
             Return New Object
 
@@ -1474,6 +1489,16 @@ Namespace FBM
                                             Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
             'See inherited Classes.
         End Function
+
+        Public Overridable Sub SetReferenceMode(ByVal asReferenceMode As String,
+                                                Optional ByVal abSimpleAssignment As Boolean = False,
+                                                Optional ByVal asValueTypeName As String = Nothing,
+                                                Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
+                                                Optional ByVal abSuppressModelSave As Boolean = False,
+                                                Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False)
+
+        End Sub
 
         Public Sub SetShortDescription(ByVal asShortDescription As String)
             Me.ShortDescription = asShortDescription

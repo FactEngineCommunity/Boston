@@ -313,7 +313,7 @@ Class MyFun
 		End Try
 	End Function
 
-	Public Shared Function RemoveStop(TheDoc As String) As String
+	Public Shared Function RemoveStop(TheDoc As String, ByRef aoProgressBar As ProgressBar) As String
 
 		Dim path_stops As String = My.Settings.KeywordExtractionStopListLocation
 		Dim encode As Encoding = Encoding.GetEncoding("GB2312")
@@ -325,7 +325,7 @@ Class MyFun
 		Dim WordNum As Integer = 0
 		Dim StopNum As Integer = 0
 
-		words = TheDoc.Split(" "C)
+		words = TheDoc.Split(" "c)
 
 		Try
 			stops = File.ReadAllLines(path_stops, encode)
@@ -352,7 +352,11 @@ Class MyFun
 				End If
 				isStop = False
 				WordNum += 1
+
+				aoProgressBar.Value = WordNum * 100 \ words.Length
 			Next
+
+			aoProgressBar.Value = 100
 
 			Return TheDoc_New
 		Catch ex As System.Exception
