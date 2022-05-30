@@ -2145,7 +2145,8 @@ FinishedProcessing:
         Public Function CreateEntityType(Optional ByVal asEntityTypeName As String = Nothing,
                                          Optional ByVal abAddToModel As Boolean = True,
                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                         Optional ByVal abCheckForErrors As Boolean = True) As FBM.EntityType
+                                         Optional ByVal abCheckForErrors As Boolean = True,
+                                         Optional ByVal abForceUseEntityTypeName As Boolean = False) As FBM.EntityType
 
             Dim lrEntityType As FBM.EntityType
 
@@ -2158,7 +2159,7 @@ FinishedProcessing:
                     lsNewUniqueName = "NewEntityType"
                 End If
 
-                If Me.ExistsModelElement(lsNewUniqueName) Then
+                If Me.ExistsModelElement(lsNewUniqueName) And Not abForceUseEntityTypeName Then
                     lsNewUniqueName = Me.CreateUniqueEntityTypeName(lsNewUniqueName, 0)
                 End If
 
@@ -3374,11 +3375,13 @@ FinishedProcessing:
                     Call TableModelDictionary.UpdateModelDictionaryEntry(lrDictionaryEntry)
                 Else
                     lrDictionaryEntry = Me.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                    If lrDictionaryEntry.Realisations.Count <= 1 Then
-                        Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
-                    Else
-                        Dim lrConcept As New FBM.Concept(arEntityType.Id)
-                        lrDictionaryEntry.Realisations.Remove(pcenumConceptType.EntityType)
+                    If lrDictionaryEntry IsNot Nothing Then
+                        If lrDictionaryEntry.Realisations.Count <= 1 Then
+                            Me.RemoveDictionaryEntry(lrDictionaryEntry, abDoDatabaseProcessing)
+                        Else
+                            Dim lrConcept As New FBM.Concept(arEntityType.Id)
+                            lrDictionaryEntry.Realisations.Remove(pcenumConceptType.EntityType)
+                        End If
                     End If
                 End If
 
@@ -3392,7 +3395,7 @@ FinishedProcessing:
                 '==========================================================================================================
                 'RDS
                 Dim lrEntityType As FBM.EntityType = arEntityType
-                Dim lrTable As RDS.Table = Me.RDS.Table.Find(Function(x) x.Name = lrEntityType.Name)
+                Dim lrTable As RDS.Table = Me.RDS.Table.Find(Function(x) x.FBMModelElement.Id = lrEntityType.Id)
 
                 If lrTable IsNot Nothing Then
                     Call Me.RDS.removeTable(lrTable)

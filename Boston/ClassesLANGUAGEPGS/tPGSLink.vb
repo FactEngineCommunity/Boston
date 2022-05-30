@@ -59,12 +59,10 @@ Namespace PGS
             Me.RDSRelation = arRelation.RDSRelation
 
             If IsSomething(aoOriginModelElement) Then
-                Me.OriginModelElement = New PGS.Node
                 Me.OriginModelElement = aoOriginModelElement
             End If
 
             If IsSomething(aoDestinationModelElement) Then
-                Me.DestinationModelElement = New PGS.Node
                 Me.DestinationModelElement = aoDestinationModelElement
             End If
 

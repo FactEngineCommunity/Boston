@@ -3189,6 +3189,12 @@ Public Class frmToolboxORMVerbalisation
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()
 
+        lrVerbaliser.VerbaliseQuantifier("ORM Level: ")
+        lrVerbaliser.VerbaliseModelObjectLight(arTable.FBMModelElement)
+        lrVerbaliser.VerbaliseQuantifier(" (" & arTable.FBMModelElement.ConceptType.ToString & ")")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
         lrVerbaliser.VerbaliseHeading("Constraints:")
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()

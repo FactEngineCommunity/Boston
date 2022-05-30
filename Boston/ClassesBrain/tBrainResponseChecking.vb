@@ -17,7 +17,8 @@ Partial Public Class tBrain
                 Case Is = 2 'pcenumExpectedResponseType.ATMOSTONEONEMANYTOMANY
 
                     Select Case LCase(Me.InputBuffer)
-                        Case Is = "at most one", "one", "many to many"
+                        Case Is = "at most one", "one"
+
                             '---------------------------------------------------------------
                             'Step out of the Brain and work on the WorkingModel/WorkingPage
                             '---------------------------------------------------------------
@@ -26,6 +27,17 @@ Partial Public Class tBrain
                                 Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
                             End If
                             Call Me.executeStatementAddInternalUniquenessConstraint(Me.CurrentQuestion, LCase(Me.InputBuffer))
+                            Me.CurrentQuestion.IsResolved = True
+                            Call Me.CurrentQuestionAnswered()
+                            Call Me.send_data("Okay")
+
+                        Case Is = "many to many"
+
+                            If Me.CurrentSentence IsNot Nothing Then
+                                Me.CurrentSentence.SentenceType.Add(pcenumSentenceType.Response)
+                                Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
+                            End If
+                            Call Me.executeMakeFactTypeManyToMany(Me.CurrentQuestion.ModelObject(0))
                             Me.CurrentQuestion.IsResolved = True
                             Call Me.CurrentQuestionAnswered()
                             Call Me.send_data("Okay")

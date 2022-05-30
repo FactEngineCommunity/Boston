@@ -789,6 +789,11 @@ Namespace PGS
                         If Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrTable.Name) Is Nothing Then
                             Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrTable, New PointF(10, 10))
                         End If
+                        If Me.Page IsNot Nothing Then
+                            If Me.Page.Form IsNot Nothing Then
+                                Call Me.Page.Form.resetNodeAndLinkColors
+                            End If
+                        End If
                     End If
                 End If
 

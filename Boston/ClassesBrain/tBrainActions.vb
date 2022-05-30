@@ -161,6 +161,22 @@ Partial Public Class tBrain
 
     End Sub
 
+    Public Sub executeMakeFactTypeManyToMany(ByRef arFactType As FBM.FactType)
+
+        Try
+
+            Call arFactType.MakeManyToManyRelationship()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
     Private Sub ProcessISACONCEPTStatement()
 
         Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME = ""
@@ -386,7 +402,7 @@ Partial Public Class tBrain
                 End If
             End If
 
-            If lrFactType.RoleGroup.Select(Function(x) x.IsMDAModelElement).Count > 0 Then
+            If lrFactType.RoleGroup.FindAll(Function(x) x.IsMDAModelElement).Count > 0 Then
                 lrFactType.IsMDAModelElement = True
             End If
 

@@ -347,6 +347,7 @@ Namespace FBM
         Public Event IsPreferredReferenceModeChanged(ByVal abNewIsPreferrdReferenceMode As Boolean)
         Public Event IsSubtypeRelationshipFactTypeChanged(ByVal abNewIsSubtypeRelationshipFactType As Boolean)
         Public Event LinkFactTypeRoleChanged(ByRef arRole As FBM.Role)
+        Public Event MadeManyToManyRelationship()
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         Public Event Objectified() 'When the FactType is changed to an ObjectifiedFactType
         Public Event ObjectifyingEntityTypeChanged(ByRef arNewObjectifyingEntityType As FBM.EntityType)
@@ -1316,6 +1317,37 @@ Namespace FBM
 
                     End If
                 Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub MakeManyToManyRelationship()
+
+            Try
+                For Each lrInternalUniquenessConstraint In Me.InternalUniquenessConstraint.ToArray
+                    Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
+                Next
+                Dim larRole As List(Of FBM.Role) = Me.RoleGroup.ToList
+                Call Me.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
+                Call Me.Objectify()
+                For Each lrRole In Me.RoleGroup
+
+                    Select Case lrRole.TypeOfJoin
+                        Case Is = pcenumRoleJoinType.ValueType
+                        Case Else
+                            Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(Me)
+                    End Select
+                Next
+
+                RaiseEvent MadeManyToManyRelationship()
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -3757,7 +3789,7 @@ Namespace FBM
 
             Try
                 If arObjectifyingEntityType Is Nothing Then
-                    Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Me.Id, False)
+                    Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Me.Id, False,,, True)
                     Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
                     Me.ObjectifyingEntityType.ObjectifiedFactType = Me
                     Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)

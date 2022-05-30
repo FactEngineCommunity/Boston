@@ -3781,9 +3781,11 @@ Public Class frmDiagramPGS
                 Exit Sub
             End Try
 
-
             lrfrmCRUDIndexManager.mrTable = lrTable
             Call lrfrmCRUDIndexManager.ShowDialog()
+
+            Call Me.zrPage.Model.checkIfCanCheckForErrors()
+            Call Me.resetNodeAndLinkColors()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -4012,9 +4014,10 @@ Aborted:
 
             With New WaitCursor
                 lrPGSRelation = Me.zrPage.SelectedObject(0)
-
                 Dim lrFactType As FBM.FactType = Nothing
                 Dim lbGoForward As Boolean = True
+
+#Region "Prechecks"
                 If lrPGSRelation.RelationFactType.IsLinkFactType Then
 
                     Try
@@ -4032,26 +4035,16 @@ Aborted:
 
                 'CodeSafe
                 If Not (lrFactType.IsManyTo1BinaryFactType Or lrFactType.Is1To1BinaryFactType) Then Exit Sub
+#End Region
 
 FinishedPretesting:
                 If lbGoForward Then
 
-                    For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint.ToArray
-                        Call lrInternalUniquenessConstraint.RemoveFromModel(True, False, True,, True)
-                    Next
-                    Dim larRole As List(Of FBM.Role) = lrFactType.RoleGroup.ToList
-                    Call lrFactType.CreateInternalUniquenessConstraint(larRole, True, True, True, False, Nothing)
-                    Call lrFactType.Objectify()
-                    For Each lrRole In lrFactType.RoleGroup
+                    Call lrFactType.MakeManyToManyRelationship
 
-                        Select Case lrRole.TypeOfJoin
-                            Case Is = pcenumRoleJoinType.ValueType
-                            Case Else
-                                Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(lrFactType)
-                        End Select
-                    Next
                 End If
 
+                Call Me.resetNodeAndLinkColors()
                 Call Me.resetNodeAndLinkColors()
 
             End With
