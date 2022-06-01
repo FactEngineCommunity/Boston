@@ -4752,6 +4752,13 @@ Public Class frmToolboxEnterpriseExplorer
             lrModel = New FBM.Model
             lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
+            'CodesSafe-Load the model
+            If Not lrModel.Loaded Then
+                With New WaitCursor
+                    Call lrModel.Load(False, False, Nothing, False)
+                End With
+            End If
+
             Call frmMain.LoadKeywordExtractionTool(lrModel)
 
         Catch ex As Exception

@@ -163,7 +163,13 @@ Namespace FBM
                 '----------------------------------------------
                 'CodeSafe
                 If Me.Page.Diagram Is Nothing Then Exit Sub
-                If Me.Link IsNot Nothing Then Exit Sub
+                If Me.Link IsNot Nothing Then
+                    If Me.Page.Diagram IsNot Nothing Then
+                        If Me.Page.Diagram.Links.Contains(Me.Link) Then
+                            Exit Sub
+                        End If
+                    End If
+                End If
 
                 '--------------------------------------------------------
                 'Create a Link for the SubType on the DiagramView object

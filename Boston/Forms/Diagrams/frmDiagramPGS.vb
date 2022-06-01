@@ -2535,6 +2535,17 @@ Public Class frmDiagramPGS
             'Next
 
             '===========================================
+#Region "Create DashPattern for Link Fact Types"
+            'Create the dash pattern
+            Dim loPen As New MindFusion.Drawing.Pen(Color.SkyBlue, 0.2)
+            ReDim loPen.DashPattern(3)
+            loPen.DashPattern(0) = 10
+            loPen.DashPattern(1) = 5
+            loPen.DashPattern(2) = 10
+            loPen.DashPattern(3) = 5
+#End Region
+
+
             For liInd = 1 To Diagram.Links.Count
 
                 lrLink = Diagram.Links(liInd - 1)
@@ -2543,6 +2554,32 @@ Public Class frmDiagramPGS
                 'lrLink.Text = ""            
                 lrLink.TextStyle = LinkTextStyle.Rotate
                 Dim lrPGSLink As PGS.Link = lrLink.Tag
+
+#Region "Experimental - Link Fact Types as dashed lines"
+
+                Dim lrFactType As FBM.FactType
+
+                If lrPGSLink.Relation.IsPGSRelationNode Or lrPGSLink.RDSRelation.ResponsibleFactType.isRDSTable Then
+
+                    If lrPGSLink.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        If lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                            If lrFactType.getCorrespondingRDSTable(Nothing, True).isPGSRelation Then
+                                'SimplePredicate                                
+                                lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
+                            Else
+                                lrPGSLink.Link.Pen = loPen
+                            End If
+                        Else
+                            lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
+                        End If
+                    Else
+                        lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
+                    End If
+                ElseIf lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                    lrPGSLink.Link.Pen = loPen
+                End If
+#End Region
 
                 If lrPGSLink IsNot Nothing Then
                     Call lrPGSLink.setPredicate()
