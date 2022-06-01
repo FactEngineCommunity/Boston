@@ -2209,6 +2209,25 @@
                         If lrReturnColumn.MODELELEMENTNAME IsNot Nothing Then
 
                             If lrReturnColumn.COLUMNNAMESTR Is Nothing Then
+
+                                'Check if use forgot to put TableName as in Cinema.CinemaName
+                                Try
+                                    Dim lrWhichSelectStatemet = arWhichSelectStatement
+                                    Dim larTryColumn = From Table In Me.Model.RDS.Table
+                                                       From Column In Table.Column
+                                                       Where Me.Nodes.Select(Function(x) x.Name).Contains(Table.Name)
+                                                       Where Column.Name = lrReturnColumn.MODELELEMENTNAME
+                                                       Select Column
+
+                                    If larTryColumn.Count = 1 Then
+                                        larColumn.Add(larTryColumn.First)
+                                        GoTo MoveForward
+                                    End If
+
+                                Catch ex As Exception
+
+                                End Try
+
                                 'Must be * (as in Lecturer.*)
                                 Try
                                     Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrReturnColumn.MODELELEMENTNAME)
@@ -2245,6 +2264,7 @@
 
                             Next
                         End If
+MoveForward:
                     Next
                 ElseIf abIsStraightDerivationClause Then
                     Dim lrProjectionColumn As RDS.Column = Nothing
@@ -2359,7 +2379,7 @@
                     Dim lrQueryEdge As FactEngine.QueryEdge
                     Dim lrRole As FBM.Role = Nothing
                     For Each lrQueryEdge In Me.getProjectQueryEdges()
-                        If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id Then
+                        If (lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Or lrQueryEdge.FBMFactType.Is1To1BinaryFactType) And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id Then
                             '20210724-VM-Was the below, which is wrong.
                             'If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
                             liRoleInd = 0 'TargetNode is for other side of ManyToOne BinaryFactType
@@ -2388,6 +2408,12 @@
                                 lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
                             End If
                         End If
+
+                        'CodeSafe
+                        If lrRole Is Nothing Then
+                            Throw New Exception("Could not find Role for Query Edge Fact Type: " & lrQueryEdge.FBMFactType.Id)
+                        End If
+
                         Select Case lrRole.JoinedORMObject.ConceptType 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                             Case Is = pcenumConceptType.ValueType
                                 Dim lrColumn As RDS.Column

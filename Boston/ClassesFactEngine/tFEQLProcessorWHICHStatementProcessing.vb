@@ -187,6 +187,11 @@
                     'AND THAT Lecturer works for THAT Faculty 
                     '------------------------------------------
 
+                    'CodeSafe
+                    If lrQueryGraph.QueryEdges.Count = 0 Then
+                        lrPreviousTargetNode = lrQueryGraph.HeadNode
+                    End If
+
                     Select Case Me.getWHICHClauseType(Me.WHICHCLAUSE, loWhichClause)
                         Case Is = FactEngine.pcenumWhichClauseType.None
                             Throw New Exception("Unknown WhichClauseType.")
@@ -353,7 +358,7 @@
                 Return lrQueryGraph
 
             Catch appex As ApplicationException
-                Throw appex
+                Throw New ApplicationException(appex.Message & vbCrLf & vbCrLf & appex.StackTrace)
             Catch ex As Exception
                 Throw New Exception(ex.Message)
             End Try

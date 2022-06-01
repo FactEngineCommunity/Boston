@@ -733,6 +733,12 @@ Public Class frmFactEngine
                             lrQueryEdge = lrRecordset.ApplicationException.Data.Item("QueryEdgeGetFBMFactTypeFail")
 
                             Dim larModelObject As New List(Of FBM.ModelObject)
+
+                            If lrQueryEdge.BaseNode Is Nothing Or lrQueryEdge.TargetNode Is Nothing Then
+                                Me.LabelError.Text.AppendDoubleLineBreak(lrRecordset.ApplicationException.StackTrace)
+                                Exit Sub
+                            End If
+
                             larModelObject.Add(lrQueryEdge.BaseNode.FBMModelObject)
                             larModelObject.Add(lrQueryEdge.TargetNode.FBMModelObject)
 
