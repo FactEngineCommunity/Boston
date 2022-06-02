@@ -960,6 +960,10 @@ Public Class frmToolboxModelDictionary
 
             End Select
 
+            If My.Settings.SuperuserMode Then
+                Me.ToolStripMenuItemMakeMDAModelElement.Visible = True
+            End If
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1341,6 +1345,37 @@ Public Class frmToolboxModelDictionary
 
         Catch ex As Exception
             Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemMakeMDAModelElement_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemMakeMDAModelElement.Click
+
+        Dim lsMessage As String
+        Dim lrModelObject As FBM.ModelObject
+
+        Try
+            lsMessage = "Are you sure that you want to convert this model element to a MDA Model Element?"
+            lsMessage.AppendDoubleLineBreak("This action should only be done by FactEngine staff.")
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.DefaultButton3) = MsgBoxResult.Yes Then
+                Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                    Case Is = GetType(RDS.Table)
+                        MsgBox("Sorry, this action only applicable to Object-Role Modelling model elements.")
+                        Exit Sub
+                    Case Else
+                        lrModelObject = Me.TreeView1.SelectedNode.Tag
+
+                        Call lrModelObject.SetIsMDAModelElement
+                End Select
+            End If
+
+        Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

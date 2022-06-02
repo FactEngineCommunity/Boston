@@ -245,6 +245,21 @@ Namespace FBM
 
         Public Overloads Sub NodeSelected() Implements iPageObject.NodeSelected
 
+            Try
+                Me.RoleInstance.Shape.Brush =
+                                  New MindFusion.Drawing.SolidBrush(Color.FromArgb(
+                                  [Enum].Parse(GetType(pcenumColourWheel), [Enum].GetName(GetType(pcenumColourWheel), pcenumColourWheel.LightPurple))
+                                  ))
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         Public Overloads Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour

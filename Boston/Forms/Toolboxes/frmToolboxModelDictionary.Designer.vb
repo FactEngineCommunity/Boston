@@ -26,6 +26,8 @@ Partial Class frmToolboxModelDictionary
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxModelDictionary))
         Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptViewAs = New System.Windows.Forms.Label()
+        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.CheckBoxShowModelDictionary = New System.Windows.Forms.CheckBox()
         Me.CheckBoxShowCoreModelElements = New System.Windows.Forms.CheckBox()
@@ -40,13 +42,12 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemMakeNewPageForThisModelElement = New System.Windows.Forms.ToolStripMenuItem()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemMakeMDAModelElement = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelPromptRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
-        Me.LabelPromptViewAs = New System.Windows.Forms.Label()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -73,6 +74,25 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.TabIndex = 0
         Me.GroupBox_Main.TabStop = False
         Me.GroupBox_Main.Text = "Model Dictionary:"
+        '
+        'LabelPromptViewAs
+        '
+        Me.LabelPromptViewAs.AutoSize = True
+        Me.LabelPromptViewAs.Location = New System.Drawing.Point(17, 52)
+        Me.LabelPromptViewAs.Name = "LabelPromptViewAs"
+        Me.LabelPromptViewAs.Size = New System.Drawing.Size(47, 13)
+        Me.LabelPromptViewAs.TabIndex = 8
+        Me.LabelPromptViewAs.Text = "View as:"
+        '
+        'ComboBox1
+        '
+        Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBox1.FormattingEnabled = True
+        Me.ComboBox1.Items.AddRange(New Object() {"Object-Role Model - Model Elements", "Entity-Relation - Entities", "Property Graph - Node Types"})
+        Me.ComboBox1.Location = New System.Drawing.Point(70, 49)
+        Me.ComboBox1.Name = "ComboBox1"
+        Me.ComboBox1.Size = New System.Drawing.Size(269, 21)
+        Me.ComboBox1.TabIndex = 7
         '
         'ButtonRefresh
         '
@@ -168,9 +188,9 @@ Partial Class frmToolboxModelDictionary
         '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 136)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 158)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -211,6 +231,13 @@ Partial Class frmToolboxModelDictionary
         Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(280, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
+        'ToolStripMenuItemMakeMDAModelElement
+        '
+        Me.ToolStripMenuItemMakeMDAModelElement.Name = "ToolStripMenuItemMakeMDAModelElement"
+        Me.ToolStripMenuItemMakeMDAModelElement.Size = New System.Drawing.Size(280, 22)
+        Me.ToolStripMenuItemMakeMDAModelElement.Text = "Make &MDA Model Element"
+        Me.ToolStripMenuItemMakeMDAModelElement.Visible = False
+        '
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelPromptRealisationsCount, Me.ToolStripStatusLabelRealisationsCount, Me.ToolStripStatusLabelPromptModelElementTypeCount, Me.ToolStripStatusLabelModelElementTypeCount})
@@ -243,25 +270,6 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Name = "ToolStripStatusLabelModelElementTypeCount"
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
-        '
-        'ComboBox1
-        '
-        Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Items.AddRange(New Object() {"Object-Role Model - Model Elements", "Entity-Relation - Entities", "Property Graph - Node Types"})
-        Me.ComboBox1.Location = New System.Drawing.Point(70, 49)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(269, 21)
-        Me.ComboBox1.TabIndex = 7
-        '
-        'LabelPromptViewAs
-        '
-        Me.LabelPromptViewAs.AutoSize = True
-        Me.LabelPromptViewAs.Location = New System.Drawing.Point(17, 52)
-        Me.LabelPromptViewAs.Name = "LabelPromptViewAs"
-        Me.LabelPromptViewAs.Size = New System.Drawing.Size(47, 13)
-        Me.LabelPromptViewAs.TabIndex = 8
-        Me.LabelPromptViewAs.Text = "View as:"
         '
         'frmToolboxModelDictionary
         '
@@ -305,4 +313,5 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents ViewInGlossaryToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LabelPromptViewAs As Label
     Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents ToolStripMenuItemMakeMDAModelElement As ToolStripMenuItem
 End Class

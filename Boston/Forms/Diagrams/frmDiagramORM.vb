@@ -4782,7 +4782,9 @@ Public Class frmDiagramORM
                             lrRoleInstance.FactType.Shape.Selected = True
                             lrRoleInstance.Shape.Selected = True
                         End If
-
+                    Case Is = pcenumConceptType.RoleName
+                        Dim lrRoleNameInstance As FBM.RoleName = CType(e.Node.Tag, FBM.RoleName)
+                        Call lrRoleNameInstance.NodeSelected()
                     Case Is = pcenumConceptType.FactTypeName
                         'N/A
                     Case Is = pcenumConceptType.FactTypeReading

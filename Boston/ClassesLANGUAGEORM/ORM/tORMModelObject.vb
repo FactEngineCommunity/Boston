@@ -1435,6 +1435,23 @@ Namespace FBM
 
         End Sub
 
+        Public Sub SetIsMDAModelElement()
+
+            Try
+                Me.IsMDAModelElement = True
+                Call Me.makeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub SetLongDescription(ByVal asLongDescription As String)
 
             Me.LongDescription = asLongDescription
