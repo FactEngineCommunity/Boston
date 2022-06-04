@@ -4379,7 +4379,9 @@ Public Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_ORMModel.ImageScalingSize = New Drawing.Size(16, 16)
 
         If prApplication.User IsNot Nothing Then 'Is nothing if not using Client/Server.
-            If prApplication.User.IsSuperuser Or prApplication.User.Function.Contains(pcenumFunction.FullPermission) Then
+            If prApplication.User.IsSuperuser Or
+               prApplication.User.Function.Contains(pcenumFunction.FullPermission) Or
+               prApplication.User.Role.FindAll(Function(x) x.Name = "Superuser").Count > 0 Then
                 Me.ToolStripMenuItemModelConfiguration.Enabled = True
             Else
                 Me.ToolStripMenuItemModelConfiguration.Enabled = False

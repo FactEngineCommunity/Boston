@@ -224,7 +224,16 @@ Namespace FBM
 
         <NonSerialized(),
         XmlIgnore()>
-        Public RoleInstance As New List(Of FBM.RoleInstance)
+        Public _RoleInstance As New List(Of FBM.RoleInstance)
+        Public Property RoleInstance As List(Of FBM.RoleInstance)
+            Get
+                Return Me._RoleInstance
+            End Get
+            Set(value As List(Of FBM.RoleInstance))
+                Me._RoleInstance = value
+            End Set
+        End Property
+
         Public RoleConstraintInstance As New List(Of FBM.RoleConstraintInstance)
         <NonSerialized()>
         Public FactInstance As New List(Of FBM.FactInstance)

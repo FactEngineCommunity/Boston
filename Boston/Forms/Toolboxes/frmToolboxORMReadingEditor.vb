@@ -14,7 +14,6 @@ Public Class frmToolboxORMReadingEditor
     Private zrHashList As New Hashtable
     Private zrTermList As New List(Of String) 'List of ORMObjectTypes within the FactType for which the reading is being created.
 
-
     Private FTRScanner As FTR.Scanner
     Private FTRProcessor As New FTR.Processor 'Used for parsing FTR texts as input by the user. 
     Private FTRParser As New FTR.Parser(New FTR.Scanner)
@@ -208,6 +207,8 @@ Public Class frmToolboxORMReadingEditor
         End Try
 
     End Sub
+
+
 
     Private Sub frm_orm_reading_editor_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 

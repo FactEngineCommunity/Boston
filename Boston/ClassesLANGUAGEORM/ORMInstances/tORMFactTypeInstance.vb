@@ -849,6 +849,11 @@ Namespace FBM
             Dim lrRoleInstance As FBM.RoleInstance
 
             Try
+                'CodeSafe
+                If Me.Page.PageId = "ClipboardPage" Then
+                    Exit Sub
+                End If
+
                 For Each lrRoleInstance In Me.RoleGroup.ToArray
                     Call lrRoleInstance.RemoveFromPage()
                 Next

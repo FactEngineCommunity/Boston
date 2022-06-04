@@ -885,6 +885,7 @@ Public Class frmDiagramORM
 
             'ModelObjects first.
             If Not (TypeOf (lrDroppedObject) Is MindFusion.Diagramming.Shape) Then
+#Region "Model Objects. I.e. Not shapes"
                 '---------------------------------------------------------------------
                 'DraggedObject is a ModelObject (from the ModelDictionary form etc),
                 ' rather than a Shape Object dragged from the Toolbox.
@@ -1145,6 +1146,7 @@ Public Class frmDiagramORM
                 End Select
 
                 Me.zrPage.DiagramView.Focus()
+#End Region
             End If
 
             If (GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
@@ -1162,7 +1164,7 @@ Public Class frmDiagramORM
             lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
             If lrDraggedNode.Index >= 0 Then
                 If (lrDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount) Then
-
+#Region "Shapes from the Toolbox"
                     If IsNothing(Diagram.GetNodeAt(loPt)) Then
                         liDropTarget = pcenumShapeDropTarget.Canvas
                     Else
@@ -1225,6 +1227,13 @@ Public Class frmDiagramORM
                             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
                             loDropPtF = New Point(loPt.X - 15, loPt.Y - 5)
                             lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, loDropPtF)
+
+                            'ReferenceMode
+                            If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+                                Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
+                                Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                            End If
+
                             Me.zrPage.Save()
 
                             '======================================================================
@@ -1378,10 +1387,9 @@ Public Class frmDiagramORM
                             Call Me.DropModelNoteAtPoint(lrModelNote, loPt)
                             Me.zrPage.Save()
                     End Select
+#End Region
                 End If
             End If
-        Else
-
         End If
 
         Me.zrPage.DiagramView.Focus()
@@ -9885,21 +9893,37 @@ SkipRemovalFromModel:
 
         Dim lrFactTypeInstance As FBM.FactTypeInstance
 
-        ToolStripMenuItemFactTypeReadings.Checked = Not ToolStripMenuItemFactTypeReadings.Checked
+        Try
 
-        If ToolStripMenuItemFactTypeReadings.Checked Then
-            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) And Not lrFactTypeInstance.isPreferredReferenceMode Then
-                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
-                End If
-            Next
-        Else
-            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
-                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
-                End If
-            Next
-        End If
+            ToolStripMenuItemFactTypeReadings.Checked = Not ToolStripMenuItemFactTypeReadings.Checked
+
+            If ToolStripMenuItemFactTypeReadings.Checked Then
+                For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) And Not lrFactTypeInstance.isPreferredReferenceMode Then
+                            lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
+                        End If
+                    End If
+                Next
+            Else
+                For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                            lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
+                        End If
+                    End If
+                Next
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
     End Sub
 
     Private Sub ToolStripMenuItemFactTypeNames_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemFactTypeNames.Click
@@ -10939,25 +10963,38 @@ SkipRemovalFromModel:
         Dim lrRoleInstance As FBM.RoleInstance
         Dim lrFactTypeInstance As FBM.FactTypeInstance
 
-        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-            For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                If IsSomething(lrRoleInstance.RoleName.Shape) Then
-                    lrRoleInstance.RoleName.Shape.Visible = False
-                End If
+        Try
 
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    lrFactTypeInstance.FactTypeReadingShape.shape.Visible = False
-                End If
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+                    If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                        lrRoleInstance.RoleName.Shape.Visible = False
+                    End If
 
-                If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) Then
-                    lrFactTypeInstance.FactTypeNameShape.Visible = False
-                End If
+                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
+                            lrFactTypeInstance.FactTypeReadingShape.shape.Visible = False
+                        End If
+                    End If
+
+                    If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) Then
+                        lrFactTypeInstance.FactTypeNameShape.Visible = False
+                    End If
+                Next
             Next
-        Next
 
-        ToolStripMenuItemRoleNames.Checked = False
-        ToolStripMenuItemFactTypeReadings.Checked = False
-        ToolStripMenuItemFactTypeNames.Checked = False
+            ToolStripMenuItemRoleNames.Checked = False
+            ToolStripMenuItemFactTypeReadings.Checked = False
+            ToolStripMenuItemFactTypeNames.Checked = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

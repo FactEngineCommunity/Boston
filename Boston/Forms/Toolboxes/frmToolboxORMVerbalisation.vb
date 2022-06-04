@@ -2781,7 +2781,7 @@ Public Class frmToolboxORMVerbalisation
                         If arFactType.IsManyToOneByRoleOrder(lrFactTypeReading.RoleList) Then
                             lrVerbaliser.VerbaliseIndent()
                             lrVerbaliser.VerbaliseQuantifier("Each ")
-                            lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(0).JoinedORMObject)
+                            lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.RoleList(0).JoinedORMObject)
                             lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
                             If arFactType.RoleGroup(0).Mandatory Then
                                 lrVerbaliser.VerbaliseQuantifier(" one ")
@@ -2790,17 +2790,17 @@ Public Class frmToolboxORMVerbalisation
                             End If
 
                             lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
-                            lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(1).JoinedORMObject)
+                            lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.RoleList(1).JoinedORMObject)
 
                             lrVerbaliser.HTW.WriteBreak()
                             lrVerbaliser.VerbaliseIndent()
 
                             lrVerbaliser.VerbaliseQuantifier("It is possible that more than one ")
-                            lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(0).JoinedORMObject)
+                            lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.RoleList(0).JoinedORMObject)
                             lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
                             lrVerbaliser.VerbaliseQuantifier(" the same ")
                             lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
-                            lrVerbaliser.VerbaliseModelObject(arFactType.RoleGroup(1).JoinedORMObject)
+                            lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.RoleList(1).JoinedORMObject)
                             lrVerbaliser.HTW.WriteBreak()
                         End If
                         lrVerbaliser.HTW.WriteBreak()
