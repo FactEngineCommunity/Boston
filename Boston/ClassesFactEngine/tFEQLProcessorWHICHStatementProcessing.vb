@@ -19,9 +19,12 @@
                 If Me.DatabaseManager.Connection Is Nothing Then
                     Call Me.Model.connectToDatabase()
                 End If
+
                 Select Case Me.Model.TargetDatabaseType
                     Case Is = pcenumDatabaseType.TypeDB
                         lsSQLQuery = lrQueryGraph.generateTypeQL(Me.WHICHSELECTStatement)
+                    Case Is = pcenumDatabaseType.Neo4j
+                        lsSQLQuery = lrQueryGraph.generateCypher(Me.WHICHSELECTStatement)
                     Case Else
                         lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
                 End Select

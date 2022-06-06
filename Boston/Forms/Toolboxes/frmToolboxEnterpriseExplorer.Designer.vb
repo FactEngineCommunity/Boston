@@ -217,6 +217,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(11, "PostgeSQL.png")
         Me.ImageList.Images.SetKeyName(12, "Snowflake16x16.png")
         Me.ImageList.Images.SetKeyName(13, "TypeDB16x16.png")
+        Me.ImageList.Images.SetKeyName(14, "Neo4j16x16.png")
         '
         'CircularProgressBar
         '
@@ -303,7 +304,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 424)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 402)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -429,7 +430,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.AddBPMNPageToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.BPMNAdd16x16
         Me.AddBPMNPageToolStripMenuItem.Name = "AddBPMNPageToolStripMenuItem"
-        Me.AddBPMNPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.AddBPMNPageToolStripMenuItem.Size = New System.Drawing.Size(162, 22)
         Me.AddBPMNPageToolStripMenuItem.Text = "&Add BPMN Page"
         '
         'ToolStripSeparator1

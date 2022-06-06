@@ -260,6 +260,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.TypeDB
                     loNode.ImageIndex = 13
                     loNode.SelectedImageIndex = 13
+                Case Is = pcenumDatabaseType.Neo4j
+                    loNode.ImageIndex = 14
+                    loNode.SelectedImageIndex = 14
             End Select
         End If
 
