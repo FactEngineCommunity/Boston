@@ -64,6 +64,8 @@ Namespace FactEngine
                         Me.Connection = New FactEngine.TypeDB.TypeDBConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                     Case Is = pcenumDatabaseType.ODBC
                         Me.Connection = New FactEngine.ODBCConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
+                    Case Is = pcenumDatabaseType.Neo4j
+                        Me.Connection = New FactEngine.Neo4jConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                 End Select
 
                 Me.FBMModel.DatabaseConnection = Me.Connection

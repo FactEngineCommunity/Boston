@@ -91,6 +91,7 @@ Public Module publicConstants
         Snowflake = 108
         TypeDB = 109
         NORMA = 110
+        Neo4j = 111
     End Enum
 
     Public Enum pcenumDebugMode

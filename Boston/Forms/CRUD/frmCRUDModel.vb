@@ -264,6 +264,27 @@ Public Class frmCRUDModel
                             Me.LabelOpenSuccessfull.Text = "Success"
                         End If
 
+                    Case Is = pcenumDatabaseType.Neo4j
+                        Dim lsReturnMessage As String = Nothing
+
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        Try
+                            Dim lrConnection = New FactEngine.Neo4jConnection(Me.zrModel,
+                                                                          Trim(Me.TextBoxDatabaseConnectionString.Text),
+                                                                          0,
+                                                                          False)
+                            Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                            Me.LabelOpenSuccessfull.Text = "Success"
+                            Return True
+
+                        Catch ex As Exception
+                            GoTo ConnectionFailed
+                        End Try
+ConnectionFailed:
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
+                        Me.LabelOpenSuccessfull.Text = "Fail"
+
                     Case Is = pcenumDatabaseType.MSJet
 
                         Dim ldbConnection As New ADODB.Connection
