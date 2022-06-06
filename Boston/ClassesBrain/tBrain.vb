@@ -441,9 +441,22 @@ Public Class tBrain
                     Me.OutputChannel.Controls.Add(Button3) ' get it inside the rich text box
                     Button3.Location = New Point(Button2.Left + Button2.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
 
+                    Dim Button4 = New Button ' Create new instance
+                    Button4.Size = New System.Drawing.Size(125, 27) ' give the button a size
+                    Button4.Text = "Abort" ' set the button text
+                    Button4.UseVisualStyleBackColor = True ' make it look windows like
+                    Button4.Cursor = Cursors.Hand
+                    Button4.Tag = "Abort"
+
+                    AddHandler Button4.Click, AddressOf Me.ResponseButton_Click
+
+                    Me.OutputChannel.Controls.Add(Button4) ' get it inside the rich text box
+                    Button4.Location = New Point(Button3.Left + Button3.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
+
                     Me.ResponseButtons.Add(Button1)
                     Me.ResponseButtons.Add(Button2)
                     Me.ResponseButtons.Add(Button3)
+                    Me.ResponseButtons.Add(Button4)
 
                     Dim lrRichTextBox As RichTextBox = Me.OutputChannel
                     lrRichTextBox.AutoScrollOffset = New Point(Button1.Left, Button1.Top + Button1.Height)

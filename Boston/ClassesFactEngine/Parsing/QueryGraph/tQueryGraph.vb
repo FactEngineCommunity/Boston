@@ -134,15 +134,60 @@
 
                 larFromEdges.RemoveAll(Function(x) larSubQueryEdges.Contains(x))
 
+                'Derived Fact Type Parameters
+                'The QueryEdge.FBMFactType is derived, the Column for the QueryNode IsDerivationParameter
+                Dim larFromNodes = Me.Nodes.FindAll(Function(x) x.FBMModelObject.ConceptType <> pcenumConceptType.ValueType)
+
+                'Circular/Recursive QueryEdges/TargetNodes are treated differently. See Recursive region below.
+                Dim larNode As List(Of QueryNode) = (From Node In larFromNodes
+                                                     Where Node.QueryEdge IsNot Nothing
+                                                     Where Node.QueryEdge.IsRecursive
+                                                     Where (Node.QueryEdge.IsCircular Or
+                                                            Node.RDSTable.isCircularToTable(Node.QueryEdge.BaseNode.RDSTable))).ToList
+                larFromNodes.RemoveAll(Function(x) larNode.Contains(x))
+
+
+                Dim larDerivationNodes = (From Node In larFromNodes
+                                          Where Node.QueryEdge IsNot Nothing
+                                          Where Node.QueryEdge.FBMFactType IsNot Nothing
+                                          Where Node.QueryEdge.FBMFactType.IsDerived
+                                          Select Node).ToList
+
+                Dim larRemovedDerivationNode As New List(Of FactEngine.QueryNode)
+                For Each lrDerivationNode In larDerivationNodes
+                    'Get the Derivation Column
+                    Dim lrDerivationTable As RDS.Table = lrDerivationNode.QueryEdge.FBMFactType.getCorrespondingRDSTable
+                    Dim larDerivationColumn = From Column In lrDerivationTable.Column
+                                              Where Column.Role.JoinedORMObject.Id = lrDerivationNode.Name
+                                              Select Column
+
+                    If larDerivationColumn.Count > 0 Then
+                        If larDerivationColumn.First.IsDerivationParameter Then
+                            larFromNodes.Remove(lrDerivationNode)
+                            larRemovedDerivationNode.Add(lrDerivationNode)
+                        End If
+                    End If
+                Next
+
                 liInd = 0
                 For Each lrQueryEdge In larFromEdges.FindAll(Function(x) Not (x.FBMFactType.IsDerived Or x.FBMFactType.IsUnaryFactType))
 
                     'BaseNode
-                    lsCypherQuery &= "(" & LCase(lrQueryEdge.BaseNode.Name) & ":" & lrQueryEdge.BaseNode.Name & ")"
+                    Dim lrPreviousQueryEdge As FactEngine.QueryEdge = lrQueryEdge.GetPreviousQueryEdge
+
+                    If lrPreviousQueryEdge Is Nothing Then
+                        lsCypherQuery &= "(" & LCase(lrQueryEdge.BaseNode.Name) & lrQueryEdge.BaseNode.Alias & ":" & lrQueryEdge.BaseNode.Name & ")"
+                    Else
+                        If lrPreviousQueryEdge.TargetNode.Name = lrQueryEdge.BaseNode.Name And lrPreviousQueryEdge.Alias = lrQueryEdge.Alias Then
+                            'Add Nothing
+                        Else
+                            lsCypherQuery &= "(" & LCase(lrQueryEdge.BaseNode.Name) & lrQueryEdge.BaseNode.Alias & ":" & lrQueryEdge.BaseNode.Name & ")"
+                        End If
+                    End If
                     'Predicate/Edge
-                    lsCypherQuery &= "-[" & lrQueryEdge.FBMFactType.DBName & "]-"
+                    lsCypherQuery &= "-[" & LCase(lrQueryEdge.FBMFactType.DBName) & lrQueryEdge.Alias & ":" & lrQueryEdge.FBMFactType.DBName & "]-"
                     'TargetNode
-                    lsCypherQuery &= "(" & LCase(lrQueryEdge.TargetNode.Name) & ":" & lrQueryEdge.TargetNode.Name & ")"
+                    lsCypherQuery &= "(" & LCase(lrQueryEdge.TargetNode.Name) & lrQueryEdge.TargetNode.Alias & ":" & lrQueryEdge.TargetNode.Name & ")"
 
                 Next
 
@@ -322,17 +367,19 @@
 
 #End Region
 
-
-#Region "WHERE Clauses"
-                GoTo ReturnClause
                 'WHERE
+                larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
+                                         Where QueryEdge.TargetNode IsNot Nothing
+                                         Select QueryEdge
+
                 'WhereEdges are Where joins, rather than ConditionalQueryEdges which test for values by identifiers.
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
-                x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
-                x.IsRDSTable Or x.IsDerived)
-
-                'Remove Link Fact Types
-                larWhereEdges.RemoveAll(Function(x) x.FBMFactType.IsLinkFactType)
+                                                                                       x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
+                                                                                       x.IsRDSTable Or x.IsDerived)
+                'And
+                'Not (x.IsPartialFactTypeMatch And
+                'x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
+                ')
 
                 'Add special DerivedFactType WhereEdges
                 Dim larSpecialDerivedQueryEdges = From QueryEdge In Me.QueryEdges
@@ -342,208 +389,92 @@
 
                 larWhereEdges.AddRange(larSpecialDerivedQueryEdges.ToList)
 
-                '20210926-VM-This might be better served by removing QueryEdges that have already been processed.
-                larWhereEdges.RemoveAll(Function(x) x.BaseNode.FBMModelObject.isUnaryFactType)
-
-#Region "WHERE Joins"
-                liInd = 1
-                Dim lbHasWhereClause As Boolean = False
-
-                For Each lrQueryEdge In larWhereEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
-
-                    Dim lrOriginTable As RDS.Table
-
-                    If lrQueryEdge.IsPartialFactTypeMatch Then 'And lrQueryEdge.TargetNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
-#Region "Partial FactType match"
-                        '==================================================================================================
-                        'Taken care of in From section (above). 20210909.
-                        'Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
-
-                        ''Dim lrOtherRole As FBM.Role = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMPredicatePart.Role.Id)
-                        'lsCypherQuery &= "("
-                        'liInd = 0
-                        'For Each lrColumn In lrNaryTable.getPrimaryKeyColumns
-                        '    If liInd > 0 Then lsCypherQuery.AppendString(",")
-                        '    lsCypherQuery &= lrColumn.Role.Name & ": $" & lrColumn.Name
-                        '    liInd += 1
-                        'Next
-                        'lsCypherQuery.AppendString(") isa " & lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName & ";" & vbCrLf)
-
-#End Region
-                    ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
-                        'E.g. Of the type "Person 1 Is Not Person 2" or "Person 1 Is Person 2"
-#Region "AndThatIdentityComparitor. 'E.g. Of the type 'Person 1 Is Not Person 2' or 'Person 1 Is Person 2'"
-                        lsCypherQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
-                        If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
-                            lsCypherQuery &= " = "
-                        Else
-                            lsCypherQuery &= " != "
-                        End If
-                        lsCypherQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "")
-                        lsCypherQuery &= ";" & vbCrLf
-#End Region
-                    ElseIf lrQueryEdge.IsDerived Then
-
-                        '==================================================================================================
-                        'Taken care of in From section (above). 20210909.
-
-                        'lrOriginTable = lrQueryEdge.FBMFactType.getCorrespondingRDSTable(Nothing, True)
-
-                        'If lrOriginTable Is Nothing Then
-                        '    lrOriginTable = New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType)
-                        'End If
-                        'liInd = 0
-                        'For Each lrRole In lrQueryEdge.FBMFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.GetType <> GetType(FBM.ValueType))
-                        '    Dim lrDestinationTable As RDS.Table = lrRole.JoinedORMObject.getCorrespondingRDSTable
-
-                        '    Dim liInd2 As Integer = 0
-                        '    For Each lrColumn In lrDestinationTable.getPrimaryKeyColumns
-                        '        Dim lrOriginColumn As RDS.Column = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                        '        If lrOriginColumn Is Nothing Then
-                        '            lsCypherQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
-                        '        Else
-                        '            lsCypherQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.Name & " = "
-                        '        End If
-                        '        lsCypherQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
-                        '        liInd2 += 1
-                        '    Next
-                        '    liInd += 1
-                        'Next
-
-                    ElseIf (lrQueryEdge.FBMFactType.isRDSTable And lrQueryEdge.FBMFactType.Arity = 2) Then
-
-                        'RDSTable
-#Region "PGSNodeTable/RDSTable"
-                        Dim lrOtherRole As FBM.Role = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMPredicatePart.Role.Id)
-                        lsCypherQuery &= "(" & lrQueryEdge.FBMPredicatePart.Role.Name & ": $" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & ","
-                        Select Case lrQueryEdge.TargetNode.FBMModelObject.GetType
-                            Case Is = GetType(FBM.ValueType)
-                                lsCypherQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.FBMFactType.DBName & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName
-                            Case Else
-                                lsCypherQuery &= lrOtherRole.Name & ": $" & lrQueryEdge.TargetNode.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DBName
-                        End Select
-
-                        '----------------------------------------------------
-                        'Return Columns
-                        Dim larReturnColumn = From Column In Me.ProjectionColumn
-                                              Where Column.Table.Name = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Name
-                                              Where Column.TemporaryAlias = lrQueryEdge.Alias
-                                              Where Not Column.isPartOfPrimaryKey
-                                              Select Column
-
-                        For Each lrReturnColumn In larReturnColumn
-                            lsCypherQuery &= ", has " & lrReturnColumn.Name & " $" & lrReturnColumn.Table.DBVariableName & lrReturnColumn.TemporaryAlias & lrReturnColumn.Name
-                        Next
-
-                        lsCypherQuery &= ";" & vbCrLf
-
-#End Region
-                    ElseIf lrQueryEdge.FBMFactType.DerivationType = pcenumFEQLDerivationType.Count Then
-#Region "DerivationType = COUNT"
-                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
-                        lrBaseNode = lrQueryEdge.BaseNode
-                        lrTargetNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge)
-
-                        lsCypherQuery &= lrBaseNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name & " = " & lrTargetNode.RDSTable.DatabaseName & "." & lrBaseNode.RDSTable.getPrimaryKeyColumns.First.Name
-#End Region
-                    Else
-#Region "Other/Else"
-                        Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
-                        If lrQueryEdge.IsReciprocal Then
-                            lrBaseNode = lrQueryEdge.TargetNode
-                            lrTargetNode = lrQueryEdge.BaseNode
-                        ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
-                            lrBaseNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge, False)
-                            lrTargetNode = lrQueryEdge.TargetNode
-                        Else
-                            lrBaseNode = lrQueryEdge.BaseNode
-                            lrTargetNode = lrQueryEdge.TargetNode
-                        End If
-
-                        lrOriginTable = lrBaseNode.RDSTable
-                        Dim larModelObject = New List(Of FBM.ModelObject)
-                        larModelObject.Add(lrBaseNode.FBMModelObject)
-                        larModelObject.Add(lrTargetNode.FBMModelObject)
-                        Dim lrRelation = lrOriginTable.getRelationByFBMModelObjects(larModelObject, lrQueryEdge.FBMFactType, lrQueryEdge)
-
-                        Dim liInd2 = 1
-                        If lrRelation.OriginTable Is lrOriginTable Then
-                            Dim larOriginColumn As New List(Of RDS.Column)
-                            Dim larTargetColumn As New List(Of RDS.Column)
-                            'was  larTargetColumn = lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns ' FBMModelObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-
-                            For Each lrColumn In lrRelation.OriginColumns
-                                larOriginColumn.Add(lrColumn.Clone(Nothing, Nothing))
-                            Next
-
-                            For Each lrColumn In lrRelation.DestinationColumns
-                                larTargetColumn.Add(lrColumn.Clone(Nothing, Nothing))
-                            Next
-
-                            lsCypherQuery &= "($" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrBaseNode.Alias, "") & ","
-                            lsCypherQuery &= "$" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrTargetNode.Alias, "") & ") isa " & lrQueryEdge.FBMFactType.DatabaseName & ";" & vbCrLf
-
-                        Else
-                            Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-
-                            lsCypherQuery &= "($" & lrQueryEdge.TargetNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & ","
-                            lsCypherQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & ") " & " isa " & lrQueryEdge.FBMFactType.Id
-
-
-                        End If
-#End Region
-                    End If
-
-                    'CodeSafe Remove wayward ANDs           
-                    If Not lsCypherQuery.EndsWith(vbCrLf) Then lsCypherQuery &= vbCrLf
-
-                    liInd += 1
-                    lbHasWhereClause = True
+                'Remove DerivationParameter Nodes
+                For Each lrDerivationParameterNode In larRemovedDerivationNode
+                    larWhereEdges.Remove(lrDerivationParameterNode.QueryEdge)
                 Next
 
-#End Region
+                larConditionalQueryEdges = New List(Of FactEngine.QueryEdge)
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
+                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                '20210826-VM-Removed
+                'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+
+                'BooleanPredicate edges. E.g. Protein is enzyme
+                larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing And Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+
+                'ShortestPath conditionals are excluded.
+                '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
+                '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
+                If Not abIsStraightDerivationClause Then
+                    larConditionalQueryEdges.RemoveAll(Function(x) x.FBMFactType.IsDerived)
+                End If
+
+                'Recursive NodePropertyIdentification conditionals are excluded.
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+
+                larWhereEdges.RemoveAll(Function(x) (Not x.IsRDSTable And x.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType)) And (x.IdentifierList.Count = 0) And (x.TargetNode.IdentifierList.Count = 0))
+
+                If larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
+                    If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                        lsCypherQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
+                    End If
+                    Return lsCypherQuery
+                End If
+
+                lsCypherQuery &= vbCrLf & "WHERE "
+
+#Region "WhereClauses"
+                liInd = 1
+                Dim lbAddedAND = False
+                Dim lbIntialWhere = Nothing
+                Dim lbHasWhereClause As Boolean = False
 
 #Region "WhereConditionals"
-                Dim lbFirstQueryEdgeIsRecursive As Boolean = False
-                If Me.QueryEdges.Count > 0 Then
-                    If Me.QueryEdges(0).IsRecursive Then lbFirstQueryEdgeIsRecursive = True
-                End If
-                If Me.HeadNode.HasIdentifier And Not lbFirstQueryEdgeIsRecursive Then
+                If Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive Then
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
-                        lsCypherQuery &= "$" & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "';" & vbCrLf
+                        lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then
+                            lsCypherQuery &= "AND "
+                        End If
                         liInd += 1
                     Next
+                    lbIntialWhere = "AND "
                 End If
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Dim lrFactType As FBM.FactType = Nothing
-                            Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
-                                Case GetType(FBM.FactType)
-                                    If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.WithClause Then
-                                        lrFactType = lrQueryEdge.FBMFactType
-                                    Else
-                                        lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
-                                    End If
-
-                                Case GetType(FBM.EntityType)
-                                    lrFactType = lrQueryEdge.FBMFactType
-                                Case GetType(FBM.ValueType)
-                                    If lrQueryEdge.IsPartialFactTypeMatch Then
-                                        lrFactType = lrQueryEdge.FBMFactType
-                                    Else
-                                        Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
-                                    End If
-                            End Select
-
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
 
                             If lrQueryEdge.FBMPredicatePart IsNot Nothing Then
                                 lrPredicatePart = lrQueryEdge.FBMPredicatePart
+                                lrFactType = lrQueryEdge.FBMFactType
                             Else
+
+                                Select Case lrQueryEdge.BaseNode.FBMModelObject.GetType
+                                    Case GetType(FBM.FactType)
+                                        If lrQueryEdge.WhichClauseType = pcenumWhichClauseType.WithClause Then
+                                            lrFactType = lrQueryEdge.FBMFactType
+                                        Else
+                                            lrFactType = CType(lrQueryEdge.BaseNode.FBMModelObject, FBM.FactType)
+                                        End If
+
+                                    Case GetType(FBM.EntityType)
+                                        lrFactType = lrQueryEdge.FBMFactType
+                                    Case GetType(FBM.ValueType)
+                                        If lrQueryEdge.IsPartialFactTypeMatch Then
+                                            lrFactType = lrQueryEdge.FBMFactType
+                                        Else
+                                            Throw New NotImplementedException("Unknown Conditional type in query. Contact support.")
+                                        End If
+                                End Select
+
 
                                 Dim larPredicatePart As List(Of FBM.PredicatePart)
                                 If lrQueryEdge.Predicate = "" Then
@@ -616,7 +547,6 @@
                                 Else
                                     lrResponsibleRole = lrPredicatePart.Role
                                 End If
-
                             End If
 
                             Dim lrTable As RDS.Table
@@ -628,13 +558,13 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsCypherQuery &= "$" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & lrColumn.Name
+                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
                                         lsCypherQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
-                                lsCypherQuery &= Me.Model.DatabaseConnection.ComparitorOperator(lrQueryEdge.TargetNode.Comparitor)
+                                lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
@@ -645,7 +575,7 @@
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
+                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
 
                             Else
@@ -653,16 +583,17 @@
 
                                 Dim lrColumn = (From Column In lrTable.Column
                                                 Where Column.Role Is lrResponsibleRole
+                                                Where Column.ActiveRole IsNot Nothing
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsCypherQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DBVariableName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & lrColumn.Name
+                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
                                         lsCypherQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
-                                lsCypherQuery &= Me.Model.DatabaseConnection.ComparitorOperator(lrQueryEdge.TargetNode.Comparitor)
+                                lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
@@ -673,16 +604,18 @@
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
+                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
 
                             End If
+
+                            lbIntialWhere = "AND "
                         Case Else
 
                             Select Case lrQueryEdge.WhichClauseType
                                 Case Is = pcenumWhichClauseType.BooleanPredicate
 
-                                    lsCypherQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & "."
+                                    lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & "."
 
                                     Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
@@ -697,7 +630,8 @@
 
                                         If lrQueryEdge.FBMFactType.IsDerived Then
 
-                                            lsCypherQuery &= lrQueryEdge.FBMFactType.Id &
+                                            lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") &
+                                              lrQueryEdge.FBMFactType.Id &
                                               Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
                                               "." &
                                               CType(lrQueryEdge.TargetNode.PreboundText & lrQueryEdge.TargetNode.Name, String).Replace("-", "")
@@ -711,17 +645,17 @@
                                             'Math function
                                             Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                             Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
-                                            lsCypherQuery &= "$" & lrTargetColumn.Table.DBVariableName & lrTargetColumn.Name & lrTargetColumn.TemporaryAlias
-
-                                            'lrTargetTable.DatabaseName &
-                                            '  Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
-                                            '  "." &
-                                            '  lrTargetColumn.Name
+                                            lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") &
+                                              lrTargetTable.DatabaseName &
+                                              Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
+                                              "." &
+                                              lrTargetColumn.Name
 
                                             lsCypherQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & ";" & vbCrLf
+                                            lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
 
                                         End If
+                                        lbIntialWhere = "AND "
                                     Else
                                         Dim lrTargetTable As RDS.Table = Nothing
                                         Dim lsAlias As String = ""
@@ -734,7 +668,7 @@
                                             If lrQueryEdge.FBMFactType.IsLinkFactType Then
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole)
                                                 '20210820-VM-Added below. Was not hear for some reason.
-                                                lsCypherQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
@@ -745,7 +679,7 @@
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                                lsCypherQuery &= "$" & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & lrColumn.Name
+                                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDate,
                                                               pcenumORMDataType.TemporalDateAndTime
@@ -758,7 +692,7 @@
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
                                                         lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
+                                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             End If
 
@@ -773,26 +707,26 @@
 
                                             Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
 
-                                            If larIndexColumns.Count = 0 Then
-                                                larIndexColumns = lrTargetTable.getPrimaryKeyColumns
-                                            End If
-
                                             liInd = 0
                                             For Each lsIdentifier In lrQueryEdge.IdentifierList
-                                                lsCypherQuery &= "$" & lrTargetTable.DBVariableName & lsAlias & " has " & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "';" & vbCrLf
+                                                If liInd > 0 Then
+                                                    lsCypherQuery &= "AND "
+                                                    lbIntialWhere = ""
+                                                End If
+                                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
                                                 liInd += 1
                                             Next
                                         End If
 
+                                        lbIntialWhere = "AND "
                                     End If
                             End Select
                     End Select
                     lbHasWhereClause = True
                 Next
 #End Region
-
-
 #End Region
+
 
 #Region "Subqueries"
                 '=====================================================================================

@@ -17,6 +17,14 @@ Partial Public Class tBrain
                 Case Is = 2 'pcenumExpectedResponseType.ATMOSTONEONEMANYTOMANY
 
                     Select Case LCase(Me.InputBuffer)
+                        Case Is = "abort"
+                            If Me.CurrentSentence IsNot Nothing Then
+                                Me.CurrentSentence.SentenceType.Add(pcenumSentenceType.Response)
+                                Me.CurrentSentence.SentenceType.Remove(pcenumSentenceType.Unknown)
+                            End If
+                            Call Me.AbortCurrentPlan()
+                            Call Me.CurrentQuestionAnswered()
+                            Call Me.send_data("Okay")
                         Case Is = "at most one", "one"
 
                             '---------------------------------------------------------------
