@@ -54,7 +54,6 @@ Namespace RDS
                 Else
 
                     Return Me.FBMModelElement.DatabaseName.Replace(" ", "")
-
                 End If
             End Get
         End Property
