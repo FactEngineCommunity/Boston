@@ -799,7 +799,24 @@ ReturnClause:
                     End If
 
                     liInd = 1
-                    For Each lrProjectColumn In Me.ProjectionColumn.FindAll(Function(x) x IsNot Nothing)
+
+                    Dim larProjectColumn = (From Column In Me.ProjectionColumn
+                                            Where Column IsNot Nothing).GroupBy(Function(d) New With {Key d.Table.Name, Key d.TemporaryAlias, Key .ColumnName = d.Name}).Select(Function(d) d.FirstOrDefault()).ToList()
+                    'Group New With {.TableName = Column.Table.Name,
+                    '                 .TableDatabaseName = Column.Table.DatabaseName,
+                    '                 .TableDBVariableName = Column.Table.DBVariableName,
+                    '                 .ColumnName = Column.Name,
+                    '                 .ColumnTemporaryAlias = Column.TemporaryAlias,
+                    '                 .ColumnAsName = Column.AsName,
+                    '                 .ColumnRoleFactTypeIsDerived = Column.Role.FactType.IsDerived,
+                    '                 .ColumnRoleJoinedORMObjectGetType = Column.Role.JoinedORMObject.GetType,
+                    '                 .ColumnRoleFactTypeDBVariableName = Column.Role.FactType.DBVariableName} By newGroup Into Group
+                    'Select newGroup
+                    ' ).Distinct.ToList
+
+                    Me.ProjectionColumn = larProjectColumn
+
+                    For Each lrProjectColumn In larProjectColumn
 
                         If lrProjectColumn.Role.FactType.IsDerived Then
                             If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
@@ -815,7 +832,7 @@ ReturnClause:
                                 lsSelectClause &= " AS " & lrProjectColumn.AsName
                             End If
                         End If
-                        If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
+                        If liInd < larProjectColumn.Count Then lsSelectClause &= ","
                         liInd += 1
                     Next
 

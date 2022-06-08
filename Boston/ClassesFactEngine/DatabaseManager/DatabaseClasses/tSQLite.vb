@@ -81,11 +81,11 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arIndex.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arIndex.Table.Name & "_temp RENAME TO [" & arIndex.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arIndex.Table.Name & "_temp] RENAME TO [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -196,11 +196,11 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arColumn.Table.Name & "_temp RENAME TO [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.Name & "_temp] RENAME TO [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -251,11 +251,11 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arColumn.Table.Name & "_temp RENAME TO [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.Name & "_temp] RENAME TO [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -446,11 +446,11 @@ Namespace FactEngine
                 Next
                 'Primary Key
                 If arTable.getPrimaryKeyColumns.Count > 0 Then
-                    lsSQLCommand &= ", CONSTRAINT " & arTable.Name & "_PK PRIMARY KEY ("
+                    lsSQLCommand &= ", CONSTRAINT [" & arTable.Name.RemoveWhitespace & "_PK] PRIMARY KEY ("
                     liInd = 0
                     For Each lrColumn In arTable.getPrimaryKeyColumns
                         If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrColumn.Name
+                        lsSQLCommand &= "[" & lrColumn.Name & "]"
                         liInd += 1
                     Next
                     lsSQLCommand &= ")" & vbCrLf
@@ -463,7 +463,7 @@ Namespace FactEngine
                         Dim liInd2 = 0
                         For Each lrColumn In lrIndex.Column
                             If liInd2 > 0 Then lsSQLCommand &= ","
-                            lsSQLCommand &= lrColumn.Name
+                            lsSQLCommand &= "[" & lrColumn.Name & "]"
                             liInd2 += 1
                         Next
                         lsSQLCommand &= ")" & vbCrLf
@@ -475,14 +475,14 @@ Namespace FactEngine
                     liInd = 0
                     For Each lrColumn In lrRelation.OriginColumns
                         If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrColumn.Name
+                        lsSQLCommand &= "[" & lrColumn.Name & "]"
                         liInd += 1
                     Next
                     lsSQLCommand &= ") REFERENCES [" & lrRelation.DestinationTable.Name & "] ("
                     liInd = 0
                     For Each lrColumn In lrRelation.OriginColumns
                         If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrColumn.getReferencedColumn.Name
+                        lsSQLCommand &= "[" & lrColumn.getReferencedColumn.Name & "]"
                         liInd += 1
                     Next
                     lsSQLCommand &= ")"
@@ -1174,11 +1174,11 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arIndex.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arIndex.Table.Name & "_temp RENAME TO [" & arIndex.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arIndex.Table.Name & "_temp] RENAME TO [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -1273,11 +1273,11 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arColumn.Table.Name & "_temp RENAME TO [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.Name & "_temp] RENAME TO [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -1333,7 +1333,7 @@ Namespace FactEngine
 
             Try
                 Dim lsSQLCommmand = "ALTER TABLE [" & arColumn.Table.Name & "]"
-                lsSQLCommmand &= " RENAME COLUMN " & arColumn.Name & " TO " & asNewColumnName
+                lsSQLCommmand &= " RENAME COLUMN [" & arColumn.Name & "] TO " & "[" & asNewColumnName & "]"
 
                 Me.GONonQuery(lsSQLCommmand)
 

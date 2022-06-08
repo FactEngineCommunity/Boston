@@ -30,6 +30,7 @@ Partial Class frmToolboxTableData
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonCommit = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButtonUndo = New System.Windows.Forms.ToolStripButton()
+        Me.ButtonAddRow = New System.Windows.Forms.ToolStripButton()
         Me.GroupBox1.SuspendLayout()
         CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
@@ -86,7 +87,7 @@ Partial Class frmToolboxTableData
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonCommit, Me.ToolStripButtonUndo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonCommit, Me.ToolStripButtonUndo, Me.ButtonAddRow})
         Me.ToolStrip1.Location = New System.Drawing.Point(2, 15)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(815, 25)
@@ -112,6 +113,16 @@ Partial Class frmToolboxTableData
         Me.ToolStripButtonUndo.Name = "ToolStripButtonUndo"
         Me.ToolStripButtonUndo.Size = New System.Drawing.Size(23, 22)
         Me.ToolStripButtonUndo.Text = "ToolStripButton1"
+        '
+        'ButtonAddRow
+        '
+        Me.ButtonAddRow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ButtonAddRow.Enabled = False
+        Me.ButtonAddRow.Image = Global.Boston.My.Resources.Resources.AddAttribute16x16
+        Me.ButtonAddRow.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ButtonAddRow.Name = "ButtonAddRow"
+        Me.ButtonAddRow.Size = New System.Drawing.Size(23, 22)
+        Me.ButtonAddRow.Text = "ToolStripButton1"
         '
         'frmToolboxTableData
         '
@@ -140,4 +151,5 @@ Partial Class frmToolboxTableData
     Friend WithEvents ToolStripStatusLabel As ToolStripStatusLabel
     Friend WithEvents ToolStripButtonUndo As ToolStripButton
     Friend WithEvents AdvancedDataGridView As ADGV.AdvancedDataGridView
+    Friend WithEvents ButtonAddRow As ToolStripButton
 End Class

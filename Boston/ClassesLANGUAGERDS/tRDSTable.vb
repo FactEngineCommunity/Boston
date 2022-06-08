@@ -225,7 +225,7 @@ Namespace RDS
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
         Public Event IsPGSRelationChanged(ByVal abNewValue As Boolean)
         Public Event JoinedFactTypeObjectified(ByRef arFactType As FBM.FactType) 'Only called when/if the underlying FactType is objectified...if Table is for FactType.
-        Public Event NameChanged(ByVal asNewName As String)
+        Public Event NameChanged(ByVal asOldName As String, ByVal asNewName As String)
         Public Event SubtypeRelationshipAdded()
         Public Event SubtypeRelationshipRemoved()
 
@@ -402,6 +402,12 @@ Namespace RDS
                 'CodeSafe: Don't add the Column if it already exists.
                 If Me.Column.Contains(arColumn) Then
                     Return False
+                End If
+
+                'CodeSafe
+                Dim lsColumnName = arColumn.Name
+                If Me.Column.Find(Function(x) x.Name = lsColumnName) IsNot Nothing Then
+                    arColumn.Name = Me.createUniqueColumnName(lsColumnName)
                 End If
 
                 Me.Column.AddUnique(arColumn)
@@ -1197,14 +1203,15 @@ Namespace RDS
 
         End Function
 
-        Private Sub FBMModelElement_NameChanged(ByVal asNewName As String) Handles _FBMModelElement.NameChanged
+        Private Sub FBMModelElement_NameChanged(ByVal asOldName As String, ByVal asNewName As String) Handles _FBMModelElement.NameChanged
 
             'For database synchronisation
             Dim lrTempTable = Me.Clone
+            lrTempTable.Name = asOldName
 
             Me.Name = asNewName
 
-            RaiseEvent NameChanged(asNewName)
+            RaiseEvent NameChanged(asOldName, asNewName)
 
             'Database synchronisation
             If Me.Model.Model.IsDatabaseSynchronised Then
@@ -1533,6 +1540,14 @@ Namespace RDS
                 If abRemoveFromDatabase Then
                     If Me.Model.Model.IsDatabaseSynchronised Then
                         Call Me.Model.Model.connectToDatabase()
+
+                        For Each lrIndex In arColumn.Index.ToArray
+                            Call lrIndex.removeColumn(arColumn)
+                            If lrIndex.Column.Count = 0 Then
+                                Call Me.removeIndex(lrIndex)
+                            End If
+                        Next
+
                         Call Me.Model.Model.DatabaseConnection.removeColumn(arColumn)
                     End If
                 End If

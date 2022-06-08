@@ -1178,6 +1178,8 @@ Namespace FBM
             '  The Id of the ValueType is modified later in this Set.
             '-----------------------------------------------------------
             Try
+                Dim lsOldName = Me.Id
+
                 _Name = asNewName
                 Me.Symbol = asNewName
 
@@ -1221,7 +1223,7 @@ Namespace FBM
 
                     Me.Model.MakeDirty()
 
-                    Call Me.RaiseEventNameChanged(asNewName) 'Needs to be before Updated so that the ConceptInstance in the database is modified/updated.
+                    Call Me.RaiseEventNameChanged(lsOldName, asNewName) 'Needs to be before Updated so that the ConceptInstance in the database is modified/updated.
                     RaiseEvent updated()
 
                     '------------------------------------------------------------------------------------

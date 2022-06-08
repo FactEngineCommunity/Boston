@@ -726,7 +726,7 @@ Namespace PGS
             'Call Me.Page.AddAttributeToEntity(arColumn)
         End Sub
 
-        Private Sub RDSTable_NameChanged(asNewName As String) Handles RDSTable.NameChanged
+        Private Sub RDSTable_NameChanged(ByVal asOldName As String, ByVal asNewName As String) Handles RDSTable.NameChanged
 
             Me.Id = asNewName
             Me.Name = asNewName

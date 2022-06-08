@@ -1105,6 +1105,11 @@ Namespace FBM
 
                         Dim lrColumn = larColumn.First
                         lrColumn.setRole(lrRole)
+
+                        If lrRole.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                            lrColumn.setActiveRole(lrRole)
+                        End If
+
                         lrColumn.FactType = lrFactType
                         '20220523-vm-was but wrong.
                         'lrColumn.setActiveRole(lrRole)
@@ -2917,6 +2922,8 @@ FailsafeContinue:
             '  The Id of the EntityType is modified later in this method.
             '-----------------------------------------------------------------
             Try
+                Dim lsOldName As String = Me.Id
+
                 _Name = asNewName
                 Me.Symbol = asNewName
 
@@ -2982,7 +2989,7 @@ FailsafeContinue:
                 End If
 
                 RaiseEvent updated(Me.ConceptType)
-                Call Me.RaiseEventNameChanged(asNewName)
+                Call Me.RaiseEventNameChanged(lsOldName, asNewName)
 
                 '------------------------------------------------------------------------------------
                 'Must save the Model because Roles that reference the EntityType must be saved.

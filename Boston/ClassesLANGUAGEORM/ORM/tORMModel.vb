@@ -1169,6 +1169,7 @@ Namespace FBM
                                                                       lrRoleConstraintRole,
                                                                       lrActiveRole,
                                                                       lrRoleConstraintRole.Mandatory)
+                                    lrNewColumn.Name = lrTable.createUniqueColumnName(lrNewColumn.Name)
                                     lrTable.addColumn(lrNewColumn, Me.IsDatabaseSynchronised)
                                     larAddedColumns.Add(lrNewColumn)
                                 Next

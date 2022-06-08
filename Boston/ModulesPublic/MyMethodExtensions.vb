@@ -2,6 +2,7 @@
 Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic
 Imports System.ComponentModel
+Imports System.Text.RegularExpressions
 
 Module MyMethodExtensions
 
@@ -182,6 +183,13 @@ Module MyMethodExtensions
 
         asString = asString & asStringExtension
         Return asString
+
+    End Function
+
+    <Extension()>
+    Public Function RemoveWhitespace(ByRef asString As String) As String
+
+        Return Regex.Replace(asString, "\s+", "")
 
     End Function
 

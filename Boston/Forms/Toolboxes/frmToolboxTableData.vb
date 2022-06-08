@@ -26,44 +26,58 @@ Public Class frmToolboxTableData
 
         Dim lsSQLQuery As String
 
-        Call Me.mrModel.connectToDatabase(True)
+        Try
+            Call Me.mrModel.connectToDatabase(True)
 
-        If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
-        Else
-            If Me.mrTable Is Nothing Then
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
             Else
-                Select Case Me.mrModel.TargetDatabaseType
-                    Case Is = pcenumDatabaseType.TypeDB
-                        lsSQLQuery = "match $table isa " & mrTable.DatabaseName
-                        For Each lrColumn In Me.mrTable.Column
-                            lsSQLQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Name
-                        Next
-                        lsSQLQuery &= ";" & vbCrLf
-                        Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.Select(Function(x) "$" & x.Name))
+                If Me.mrTable Is Nothing Then
+                Else
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.TypeDB
+                            lsSQLQuery = "match $table isa " & mrTable.DatabaseName
+                            For Each lrColumn In Me.mrTable.Column
+                                lsSQLQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Name
+                            Next
+                            lsSQLQuery &= ";" & vbCrLf
+                            Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.Select(Function(x) "$" & x.Name))
 
-                        lsSQLQuery &= "get " & lsColumnList & ";"
-                    Case Else
-                        lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
-                        lsSQLQuery &= " LIMIT 100"
-                End Select
+                            lsSQLQuery &= "get " & lsColumnList & ";"
+                        Case Else
+                            lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+                            lsSQLQuery &= " LIMIT 100"
+                    End Select
 
-                Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
+                    Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
-                Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
-                'Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
-                Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+                    Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                    'Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+                    Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+
+                    If Me.mrRecordset.Facts.Count = 0 Then
+                        Me.ButtonAddRow.Enabled = True
+                    End If
+                End If
             End If
-        End If
 
-        Me.ToolStripStatusLabel.Text = ""
+            Me.ToolStripStatusLabel.Text = ""
 
-        Me.AdvancedDataGridView.RowTemplate.Height = Me.AdvancedDataGridView.Font.Height + 8
+            Me.AdvancedDataGridView.RowTemplate.Height = Me.AdvancedDataGridView.Font.Height + 8
 
-        If Me.mrTable IsNot Nothing Then
-            Me.GroupBox1.Text = "Table Name: " & Me.mrTable.Name
-        End If
+            If Me.mrTable IsNot Nothing Then
+                Me.GroupBox1.Text = "Table Name: " & Me.mrTable.Name
+            End If
 
-        'AddHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
+            'AddHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -76,6 +90,13 @@ Public Class frmToolboxTableData
     Private Sub ToolStripButtonCommit_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCommit.Click
 
         Try
+            'Finalise Editing
+            If Me.AdvancedDataGridView.IsCurrentCellInEditMode Then
+                Call Me.AdvancedDataGridView.EndEdit()
+            End If
+            'Me.mrRecordset.Facts(liRowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data = Me.NewValue
+
+
             Dim larNewModifiedFacts = From Fact In Me.mrRecordset.Facts
                                       Where Fact.IsNewFact
                                       Select Fact
@@ -169,19 +190,34 @@ Public Class frmToolboxTableData
 
         Me.ToolStripStatusLabel.Text = ""
 
-        If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
-            Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
-        Else
-            Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
-            lrNewFact.Id = System.Guid.NewGuid.ToString
-            For Each lrFactData In lrNewFact.Data
-                lrFactData.setData("", pcenumConceptType.Value, False)
-            Next
-            lrNewFact.IsNewFact = True
-            Me.mrRecordset.Facts.Add(lrNewFact)
-            Me.ToolStripButtonCommit.Enabled = True
-            Me.ToolStripButtonUndo.Enabled = True
-        End If
+        Try
+
+            If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
+                Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+            Else
+                Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
+                lrNewFact.Id = System.Guid.NewGuid.ToString
+                For Each lrFactData In lrNewFact.Data
+                    lrFactData.setData("", pcenumConceptType.Value, False)
+                Next
+                lrNewFact.IsNewFact = True
+                Me.mrRecordset.Facts.Add(lrNewFact)
+                Me.ToolStripButtonCommit.Enabled = True
+                Me.ToolStripButtonUndo.Enabled = True
+            End If
+
+            If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then
+                Me.ToolStripButtonCommit.Enabled = True
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -284,6 +320,46 @@ Public Class frmToolboxTableData
 
     End Sub
 
+    Private Sub ButtonAddRow_Click(sender As Object, e As EventArgs) Handles ButtonAddRow.Click
+
+        Try
+            Dim lrDummyFactType As New FBM.FactType(Me.mrModel, "DummyFactType", True)
+            Dim lrFact = New FBM.Fact(lrDummyFactType, False)
+            lrFact.Id = System.Guid.NewGuid.ToString
+            lrFact.IsNewFact = True
+
+            For liInd = 0 To Me.mrTable.Column.Count - 1
+
+                Dim lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(liInd))
+
+                If lrColumn IsNot Nothing Then
+                    Dim lrRole = New FBM.Role(lrDummyFactType, lrColumn.Name, True, Nothing)
+                    lrDummyFactType.RoleGroup.AddUnique(lrRole)
+                    Dim lrFactData = New FBM.FactData(lrRole, New FBM.Concept(""), lrFact)
+                    lrFactData.setData("", pcenumConceptType.Value, False)
+                    lrFact.Data.Add(lrFactData)
+                End If
+            Next
+
+            Me.mrRecordset.Facts.Add(lrFact)
+
+            Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+
+            Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+
+            Me.ButtonAddRow.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Sub AdvancedDataGridView_FilterStringChanged(sender As Object, e As EventArgs) Handles AdvancedDataGridView.FilterStringChanged
 
         Dim lsSQLQuery As String
@@ -315,9 +391,9 @@ Public Class frmToolboxTableData
 
                     Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
 
-                        Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
-                    End If
+                    Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
                 End If
+            End If
 
 
 

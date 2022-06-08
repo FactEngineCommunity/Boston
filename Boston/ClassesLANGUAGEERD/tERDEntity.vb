@@ -837,7 +837,7 @@ Namespace ERD
 
         End Sub
 
-        Private Sub RDSTable_NameChanged(asNewName As String) Handles RDSTable.NameChanged
+        Private Sub RDSTable_NameChanged(asOldName As String, asNewName As String) Handles RDSTable.NameChanged
 
             Try
                 Me.TableShape.Caption = asNewName

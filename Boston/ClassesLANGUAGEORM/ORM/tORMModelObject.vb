@@ -483,7 +483,7 @@ Namespace FBM
         <NonSerialized()>
         Public Event LongDescriptionChanged(ByVal asLongDescription As String)
         <NonSerialized()>
-        Public Event NameChanged(ByVal asNewName As String)
+        Public Event NameChanged(ByVal asOldName As String, ByVal asNewName As String)
         <NonSerialized()>
         Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
         <NonSerialized()>
@@ -1624,9 +1624,9 @@ Namespace FBM
 
         End Sub
 
-        Public Sub RaiseEventNameChanged(ByVal asNewName As String)
+        Public Sub RaiseEventNameChanged(ByVal asOldName As String, ByVal asNewName As String)
 
-            RaiseEvent NameChanged(asNewName)
+            RaiseEvent NameChanged(asOldName, asNewName)
 
         End Sub
 

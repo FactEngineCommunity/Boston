@@ -3903,7 +3903,7 @@ Public Class frmDiagramPGS
                     End If
                     lrRelationFactType = lrModelElement
                     If Not lrRelationFactType.IsObjectified Then
-                        Call lrRelation.RelationFactType.Objectify()
+                        Call lrRelation.RelationFactType.Objectify(,,, True)
                     End If
                     lfrmAddAttributeForm.zrEntity = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRelationFactType.Id)
 

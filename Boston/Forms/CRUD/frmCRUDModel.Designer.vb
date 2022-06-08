@@ -52,6 +52,7 @@ Partial Class frmCRUDModel
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
+        Me.LabelModelId = New System.Windows.Forms.Label()
         Me.ButtonReplaceDatabaseModel = New System.Windows.Forms.Button()
         Me.CheckBoxSaveToXML = New System.Windows.Forms.CheckBox()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
@@ -72,11 +73,10 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
-        Me.LabelModelId = New System.Windows.Forms.Label()
+        Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.ButtonFileSelect = New System.Windows.Forms.Button()
         Me.ButtonCreateDatabase = New System.Windows.Forms.Button()
         Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
-        Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -385,6 +385,15 @@ Partial Class frmCRUDModel
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
         '
+        'LabelModelId
+        '
+        Me.LabelModelId.AutoSize = True
+        Me.LabelModelId.Location = New System.Drawing.Point(39, 130)
+        Me.LabelModelId.Name = "LabelModelId"
+        Me.LabelModelId.Size = New System.Drawing.Size(71, 13)
+        Me.LabelModelId.TabIndex = 11
+        Me.LabelModelId.Text = "LabelModelId"
+        '
         'ButtonReplaceDatabaseModel
         '
         Me.ButtonReplaceDatabaseModel.Location = New System.Drawing.Point(179, 87)
@@ -576,15 +585,6 @@ Partial Class frmCRUDModel
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
-        '
-        'LabelModelId
-        '
-        Me.LabelModelId.AutoSize = True
-        Me.LabelModelId.Location = New System.Drawing.Point(39, 130)
-        Me.LabelModelId.Name = "LabelModelId"
-        Me.LabelModelId.Size = New System.Drawing.Size(71, 13)
-        Me.LabelModelId.TabIndex = 11
-        Me.LabelModelId.Text = "LabelModelId"
         '
         'ButtonFileSelect
         '

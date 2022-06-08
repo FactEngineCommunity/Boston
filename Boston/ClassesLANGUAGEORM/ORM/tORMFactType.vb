@@ -3785,7 +3785,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub Objectify(Optional ByVal abSuppressSave As Boolean = False,
                              Optional ByVal abCreateLinkFactTypes As Boolean = True,
-                             Optional ByVal arObjectifyingEntityType As FBM.EntityType = Nothing)
+                             Optional ByVal arObjectifyingEntityType As FBM.EntityType = Nothing,
+                             Optional ByVal abAddToConnectedDatabase As Boolean = False)
 
             Try
                 If arObjectifyingEntityType Is Nothing Then
@@ -3836,7 +3837,7 @@ Namespace FBM
                     Dim lrColumn As RDS.Column
                     For Each lrColumn In larColumn
                         lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, Nothing, 0)
-                        Call lrTable.addColumn(lrColumn)
+                        Call lrTable.addColumn(lrColumn, abAddToConnectedDatabase)
                     Next
 
                     For Each lrRole In Me.RoleGroup
@@ -3855,7 +3856,7 @@ Namespace FBM
                     Dim lrResponsibleRole As FBM.Role = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
                     Dim lrOriginalTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrResponsibleRole.JoinedORMObject.Id)
                     lrColumn = lrOriginalTable.Column.Find(Function(x) x.Role Is lrResponsibleRole)
-                    Call lrOriginalTable.removeColumn(lrColumn)
+                    Call lrOriginalTable.removeColumn(lrColumn, abAddToConnectedDatabase)
 
                     For Each lrRole In Me.RoleGroup
                         Select Case lrRole.TypeOfJoin
@@ -4483,7 +4484,6 @@ Namespace FBM
             '  The Id of the FactType is modified later in this Set.
             '-----------------------------------------------------------
             Try
-
                 '--------------------------------------------------------------------------------------------------------
                 'CodeSafe: Abort if an attempt is made to set the Name/Id/Symbol of the ModelObject to "" (EmptyString)
                 '--------------------------------------------------------------------------------------------------------
@@ -4534,7 +4534,7 @@ Namespace FBM
 
 
                     Me.Model.MakeDirty()
-                    Call Me.RaiseEventNameChanged(asNewName)
+                    Call Me.RaiseEventNameChanged(lsOldName, asNewName)
                     RaiseEvent Updated()
 
                     If Not Me.Model.StoreAsXML Then

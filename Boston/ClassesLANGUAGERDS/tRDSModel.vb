@@ -11,7 +11,6 @@ Namespace RDS
         <NonSerialized()> _
         Public Model As FBM.Model
 
-
         <XmlElement()> _
         Public Table As New List(Of RDS.Table)
 

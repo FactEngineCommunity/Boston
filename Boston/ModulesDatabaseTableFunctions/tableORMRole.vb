@@ -209,11 +209,11 @@ ContinueThoughFaulty:
 
                         If (lrRole.JoinedORMObject Is Nothing) And Not (lrRole.TypeOfJoin = pcenumRoleJoinType.FactType) Then
                             Dim lsMissingId As String = ""
-                            lsMessage = "No ModelObject (" & lrRole.TypeOfJoin.ToString & ") with Id: '"
                             lsMissingId = Trim(Viev.NullVal(lREcordset("JoinsModelelementId").Value, ""))
+                            lsMessage = "No ModelObject (" & lrRole.TypeOfJoin.ToString & ") with Id: '"
                             lsMessage &= lsMissingId
                             lsMessage &= "', exists in the Model"
-                            lsMessage &= vbCrLf & "Model.Id: " & arFactType.Model.ModelId
+                            lsMessage.AppendDoubleLineBreak("Model.Id: " & arFactType.Model.ModelId)
                             lsMessage &= vbCrLf & "FactType.Id: " & arFactType.Id
                             lsMessage &= vbCrLf & "Role.Id: " & lrRole.Id & vbCrLf
 
@@ -241,6 +241,9 @@ ContinueThoughFaulty:
                                     lsMessage &= "To keep the show on the road, a Entity Type with Id: " & lsMissingId & " will be created in the model."
                                     Dim lrEntityType As New FBM.EntityType(arFactType.Model, pcenumLanguage.ORMModel, lsMissingId, lsMissingId, Nothing)
                                     arFactType.Model.AddEntityType(lrEntityType, True, True, Nothing, True)
+                                    Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model, lsMissingId, pcenumConceptType.EntityType,,, True, True,)
+                                    lrModelDictionaryEntry.isDirty = True
+                                    Call lrModelDictionaryEntry.Save()
                                     Call lrEntityType.Save()
                                     lrRole.JoinedORMObject = lrEntityType
                                     MsgBox(lsMessage)

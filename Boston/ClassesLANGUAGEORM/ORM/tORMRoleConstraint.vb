@@ -2400,6 +2400,8 @@ RemoveAnyway:
                 'Set the name and Symbol of the RoleConstraint to the new asNewName.
                 '  The Id of the RoleConstraint is modified later in this Set.
                 '-----------------------------------------------------------
+                Dim lsOldName = Me.Id
+
                 _Name = asNewName
                 Me.Symbol = asNewName
 
@@ -2428,7 +2430,7 @@ RemoveAnyway:
                     Me.Id = asNewName
                     Call TableRoleConstraint.UpdateRoleConstraint(Me) 'Sets the new Name
 
-                    Call Me.RaiseEventNameChanged(asNewName)
+                    Call Me.RaiseEventNameChanged(lsOldName, asNewName)
 
                     Me.Model.MakeDirty()
                 End If

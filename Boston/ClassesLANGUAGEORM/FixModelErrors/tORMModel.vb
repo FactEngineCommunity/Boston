@@ -622,13 +622,18 @@ SkipColumn2:
 
                     For Each lrDestinationColumn In lrRDSRelation.DestinationColumns
                         If lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) Is Nothing Then
-                            Dim lrActualColumn = (From Column In lrRDSRelation.OriginTable.Column
-                                                  Where Not lrRDSRelation.OriginColumns.Contains(Column)
-                                                  Select Column).First
-                            'lrRDSRelation.OriginTable.Column.Find(Function(x) x.Name = lrDestinationColumn.Name)
-                            If lrActualColumn IsNot Nothing Then
-                                Call lrRDSRelation.AddOriginColumn(lrActualColumn)
-                            End If
+                            Try
+                                Dim lrActualColumn = (From Column In lrRDSRelation.OriginTable.Column
+                                                      Where Not lrRDSRelation.OriginColumns.Contains(Column)
+                                                      Where lrRDSRelation.DestinationColumns.Select(Function(x) x.ActiveRole.Id).Contains(Column.ActiveRole.Id)
+                                                      Select Column).First
+                                'lrRDSRelation.OriginTable.Column.Find(Function(x) x.Name = lrDestinationColumn.Name)
+                                If lrActualColumn IsNot Nothing Then
+                                    Call lrRDSRelation.AddOriginColumn(lrActualColumn)
+                                End If
+                            Catch ex As Exception
+                                'Couldn't fix it.
+                            End Try
                         End If
                     Next
 

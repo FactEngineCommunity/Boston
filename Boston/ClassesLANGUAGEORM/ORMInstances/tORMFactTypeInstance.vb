@@ -2811,7 +2811,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub _FactType_NameChanged(ByVal asNewName As String) Handles _FactType.NameChanged
+        Private Sub _FactType_NameChanged(ByVal asOldName As String, ByVal asNewName As String) Handles _FactType.NameChanged
 
             Dim lrConceptInstance As FBM.ConceptInstance
 
