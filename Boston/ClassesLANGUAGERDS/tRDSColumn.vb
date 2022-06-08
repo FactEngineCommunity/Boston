@@ -173,6 +173,23 @@ Namespace RDS
             End Get
         End Property
 
+        Public ReadOnly Property DataTypeIsTextOrDate As Boolean
+            Get
+                Select Case Me.getMetamodelDataType
+                    Case Is = pcenumORMDataType.TextFixedLength,
+                              pcenumORMDataType.TextLargeLength,
+                              pcenumORMDataType.TextVariableLength,
+                              pcenumORMDataType.TemporalDate,
+                              pcenumORMDataType.TemporalDateAndTime,
+                              pcenumORMDataType.TemporalTime
+
+                        Return True
+                    Case Else
+                        Return False
+                End Select
+            End Get
+        End Property
+
         ''' <summary>
         ''' Not currently used. Designed to return the string to create the Column in the database.
         ''' </summary>

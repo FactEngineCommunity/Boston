@@ -234,7 +234,8 @@ Public Class frmToolboxTableData
                     'Nothing to do.
             End Select
 
-            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
+            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
 
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
@@ -244,7 +245,12 @@ Public Class frmToolboxTableData
             Dim lsValue As String
             For Each lrPKColumn In larPKColumn
                 liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
-                lsValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data
+                If lrPKColumn.Name = Me.mrRecordset.Columns(e.ColumnIndex) Then
+                    lsValue = lsOldValue
+                Else
+                    lsValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data
+                End If
+
                 lrPKColumn.TemporaryData = lsValue
             Next
 

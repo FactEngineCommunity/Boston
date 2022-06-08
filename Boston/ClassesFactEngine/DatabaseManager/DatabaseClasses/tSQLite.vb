@@ -1419,15 +1419,18 @@ Namespace FactEngine
 
             lsSQLQuery = "UPDATE " & asTableName & vbCrLf
             lsSQLQuery &= " SET " & arColumn.Name & " = " & vbCrLf
-            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsText, "'", "")
+            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "")
             lsSQLQuery &= asNewValue
-            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsText, "'", "") & vbCrLf
+            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf
             lsSQLQuery &= " WHERE "
+            Dim liInd = 0
             For Each lrColumn In aarPKColumn
+                lsSQLQuery &= Richmond.returnIfTrue(liInd > 0, " AND ", "")
                 lsSQLQuery &= lrColumn.Name & " = "
-                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsTextOrDate, "'", "")
                 lsSQLQuery &= lrColumn.TemporaryData
-                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
+                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf
+                liInd += 1
             Next
 
             Dim lrRecordset = Me.GO(lsSQLQuery)
