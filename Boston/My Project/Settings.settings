@@ -219,7 +219,7 @@
       <Value Profile="(Default)">.\shapelibrary\bpmn-core.shl</Value>
     </Setting>
     <Setting Name="ShowStackTraceFactEngineQuery" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

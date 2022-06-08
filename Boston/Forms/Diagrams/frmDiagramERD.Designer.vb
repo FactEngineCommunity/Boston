@@ -37,7 +37,9 @@ Partial Class frmDiagramERD
         Me.ToolStripMenuItemEntityIndexEditor = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemEntityModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemAddAttribute = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemIndexManager = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
         Me.RemoveFromPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.ViewTableDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -80,15 +82,9 @@ Partial Class frmDiagramERD
         Me.ContextMenuStripTab = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CloseAllButThisPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram4 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripMenuItemAddAttribute = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -183,12 +179,23 @@ Partial Class frmDiagramERD
         Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
         Me.ToolStripSeparator8.Size = New System.Drawing.Size(311, 6)
         '
+        'ToolStripMenuItemAddAttribute
+        '
+        Me.ToolStripMenuItemAddAttribute.Name = "ToolStripMenuItemAddAttribute"
+        Me.ToolStripMenuItemAddAttribute.Size = New System.Drawing.Size(314, 22)
+        Me.ToolStripMenuItemAddAttribute.Text = "Add &Attribute"
+        '
         'ToolStripMenuItemIndexManager
         '
         Me.ToolStripMenuItemIndexManager.Image = Global.Boston.My.Resources.Resources.Index
         Me.ToolStripMenuItemIndexManager.Name = "ToolStripMenuItemIndexManager"
         Me.ToolStripMenuItemIndexManager.Size = New System.Drawing.Size(314, 22)
         Me.ToolStripMenuItemIndexManager.Text = "&Index Manager"
+        '
+        'ToolStripSeparator9
+        '
+        Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
+        Me.ToolStripSeparator9.Size = New System.Drawing.Size(311, 6)
         '
         'RemoveFromPageToolStripMenuItem
         '
@@ -501,17 +508,6 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'ToolStripSeparator9
-        '
-        Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-        Me.ToolStripSeparator9.Size = New System.Drawing.Size(311, 6)
-        '
-        'ToolStripMenuItemAddAttribute
-        '
-        Me.ToolStripMenuItemAddAttribute.Name = "ToolStripMenuItemAddAttribute"
-        Me.ToolStripMenuItemAddAttribute.Size = New System.Drawing.Size(314, 22)
-        Me.ToolStripMenuItemAddAttribute.Text = "Add &Attribute"
-        '
         'frmDiagramERD
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -583,15 +579,11 @@ Partial Class frmDiagramERD
     Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator4 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemAttributeModelErrors As ToolStripMenuItem
-    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents ViewTableDataToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddRelatedEntitiesToThisPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
     Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
     Friend WithEvents ShowInDiagramSpyToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram4 As MindFusion.Diagramming.Diagram
     Friend WithEvents ToolStripMenuItemEntityIndexEditor As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemIndexManager As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAddAttribute As ToolStripMenuItem

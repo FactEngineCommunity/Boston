@@ -3304,6 +3304,7 @@ Public Class frmDiagramPGS
 
             Me.ToolStripSeparator8.Visible = My.Settings.SuperuserMode
             Me.ToolStripMenuItemRelationRemoveFromPage.Visible = lrRelation.IsPGSRelationNode
+            Me.ToolStripMenuItemViewEdgeTableData.Enabled = lrRelation.IsPGSRelationNode
 
             '=============================================================================================
             'Morphing
@@ -4944,6 +4945,80 @@ EndProcessing:
 
         Catch ex As Exception
             Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemViewNodeTableData_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemViewNodeTableData.Click
+
+        Dim lrPGSNode As New PGS.Node
+
+        Try
+            '-------------------------
+            'Get the selected PGS Node            
+            lrPGSNode = Me.Diagram.Selection.Items(0).Tag
+
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
+
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Call prApplication.WorkingModel.connectToDatabase()
+            End If
+
+            Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+            lfrmToolboxTableData.mrTable = lrPGSNode.RDSTable
+            lfrmToolboxTableData.mrModel = prApplication.WorkingModel
+            Call lfrmToolboxTableData.SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemViewEdgeTableData_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemViewEdgeTableData.Click
+
+        Dim lrPGSNode As New PGS.Node
+        Dim lrPGSRelation As ERD.Relation = Nothing
+        Dim lsMessage As String = ""
+        Try
+            Try
+                lrPGSRelation = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                lsMessage = "Oops. Something went wrong. Click on the canvas then the Edge Type again."
+                MsgBox(lsMessage)
+                Exit Sub
+            End Try
+
+            '-------------------------
+            'Get the selected PGS Node            
+            lrPGSNode = lrPGSRelation.ActualPGSNode
+
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
+
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Call prApplication.WorkingModel.connectToDatabase()
+            End If
+
+            Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+            lfrmToolboxTableData.mrTable = lrPGSNode.RDSTable
+            lfrmToolboxTableData.mrModel = prApplication.WorkingModel
+            Call lfrmToolboxTableData.SetupForm()
+
+        Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
