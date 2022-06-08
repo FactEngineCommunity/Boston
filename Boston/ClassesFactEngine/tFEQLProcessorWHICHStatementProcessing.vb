@@ -361,7 +361,13 @@
                 Return lrQueryGraph
 
             Catch appex As ApplicationException
-                Throw New ApplicationException(appex.Message & vbCrLf & vbCrLf & appex.StackTrace)
+                Dim lsMessage As String = appex.Message
+                If My.Settings.ShowStackTraceFactEngineQuery Then lsMessage.AppendDoubleLineBreak(appex.StackTrace)
+                Dim lrApplicationException As New ApplicationException(lsMessage)
+                If appex.Data.Contains("QueryEdgeGetFBMFactTypeFail") Then
+                    lrApplicationException.Data.Add("QueryEdgeGetFBMFactTypeFail", appex.Data.Item("QueryEdgeGetFBMFactTypeFail"))
+                End If
+                Throw lrApplicationException
             Catch ex As Exception
                 Throw New Exception(ex.Message)
             End Try

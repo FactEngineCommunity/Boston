@@ -917,6 +917,18 @@ Namespace My
                 Me("BPMNShapeLibraryCore") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ShowStackTraceFactEngineQuery() As Boolean
+            Get
+                Return CType(Me("ShowStackTraceFactEngineQuery"),Boolean)
+            End Get
+            Set
+                Me("ShowStackTraceFactEngineQuery") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -218,5 +218,8 @@
     <Setting Name="BPMNShapeLibraryCore" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\shapelibrary\bpmn-core.shl</Value>
     </Setting>
+    <Setting Name="ShowStackTraceFactEngineQuery" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

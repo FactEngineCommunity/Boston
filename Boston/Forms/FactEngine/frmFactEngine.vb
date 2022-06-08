@@ -750,7 +750,7 @@ Public Class frmFactEngine
                                 lrSentence.addResolvedNounsByFBMModelObjectList(larModelObject)
                                 Call Me.loadVirtualAnalyst()
                                 'Call prApplication.Brain.processFactTypeReadingStatement
-
+                                Call prApplication.Brain.send_data("There is only one Fact Type between model elements, " & larModelObject(0).Id & " and " & larModelObject(1).Id & ".")
                                 Call prApplication.Brain.AskQuestionCreateFactTypeReading(lrSentence)
                                 Call prApplication.Brain.invokeTimeoutStart()
                             End If
