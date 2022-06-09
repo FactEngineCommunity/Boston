@@ -560,8 +560,9 @@ EndProcessing:
             '===========================
             'RoleConstraint
             larRole = New List(Of FBM.Role)
+            Dim lrRoleConstraint As FBM.RoleConstraint
+
             If arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.ManyToOne) Then
-                Dim lrRoleConstraint As FBM.RoleConstraint
 
                 Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
 
@@ -578,9 +579,23 @@ EndProcessing:
                 lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
 
                 Me.Model.AddRoleConstraint(lrRoleConstraint, True, abBroadcastInterfaceEvent)
-            End If
-            '===========================
 
+            ElseIf arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.ManyToMany) Then
+
+                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                                                                     lrFactType.RoleGroup,
+                                                                     "InternalUniquenessConstraint",
+                                                                     1,
+                                                                     False,
+                                                                     False)
+
+                lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+
+                Me.Model.AddRoleConstraint(lrRoleConstraint, True, abBroadcastInterfaceEvent)
+            End If
+
+            '===========================
+#Region "Page Drawing - Model Elements"
             If Me.Page IsNot Nothing Then
                 Select Case Me.Page.Language
                     Case Is = pcenumLanguage.ORMModel
@@ -613,6 +628,7 @@ EndProcessing:
                     Me.Page.Form.AutoLayout()
                 End If
             End If
+#End Region
 
         Catch ex As Exception
             Dim lsMessage As String

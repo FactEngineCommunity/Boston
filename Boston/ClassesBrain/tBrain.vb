@@ -2560,6 +2560,12 @@ SkipOutputChannel:
                 Case Is = Boston.VAQL.TokenType.FACTTYPECLAUSE
                     Call Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
+                Case Is = Boston.VAQL.TokenType.KEYWDANYNUMBEROF
+                    Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
+                    Return True
+                Case Is = Boston.VAQL.TokenType.KEYWDATLEASTONE
+                    Call Me.FormulateQuestionsATLEASTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
+                    Return True
                 Case Is = Boston.VAQL.TokenType.KEYWDATMOSTONE
                     Call Me.FormulateQuestionsATMOSTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True

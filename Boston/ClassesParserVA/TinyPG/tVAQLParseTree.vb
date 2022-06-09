@@ -217,6 +217,12 @@ Namespace VAQL
                 Case TokenType.NATURALLANGUAGEPROMPT
                     Value = EvalNATURALLANGUAGEPROMPT(tree, paramlist)
                     Exit Select
+                Case TokenType.BINARYFACTTYPEANYNUMBEROFCLAUSE
+                    Value = EvalBINARYFACTTYPEANYNUMBEROFCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.BINARYFACTTYPEATLEASTONECLAUSE
+                    Value = EvalBINARYFACTTYPEATLEASTONECLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.BINARYFACTTYPEATMOSTONECLAUSE
                     Value = EvalBINARYFACTTYPEATMOSTONECLAUSE(tree, paramlist)
                     Exit Select
@@ -301,6 +307,14 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalNATURALLANGUAGEPROMPT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalBINARYFACTTYPEANYNUMBEROFCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalBINARYFACTTYPEATLEASTONECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

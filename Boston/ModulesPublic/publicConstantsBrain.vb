@@ -114,6 +114,7 @@
     Public Enum pcenumStepFactTypeAttributes
         None
         BinaryFactType
+        ManyToMany
         ManyToOne
         MandatoryFirstRole
     End Enum

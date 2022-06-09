@@ -58,6 +58,86 @@ Namespace VAQL
             End If
         End Sub ' NonTerminalSymbol: NATURALLANGUAGEPROMPT
 
+        Private Sub ParseBINARYFACTTYPEANYNUMBEROFCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: BINARYFACTTYPEANYNUMBEROFCLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.BINARYFACTTYPEANYNUMBEROFCLAUSE), "BINARYFACTTYPEANYNUMBEROFCLAUSE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.KEYWDANYNUMBEROF) ' Terminal Rule: KEYWDANYNUMBEROF
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDANYNUMBEROF Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDANYNUMBEROF"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: BINARYFACTTYPEANYNUMBEROFCLAUSE
+
+        Private Sub ParseBINARYFACTTYPEATLEASTONECLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: BINARYFACTTYPEATLEASTONECLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.BINARYFACTTYPEATLEASTONECLAUSE), "BINARYFACTTYPEATLEASTONECLAUSE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.KEYWDATLEASTONE) ' Terminal Rule: KEYWDATLEASTONE
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDATLEASTONE Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDATLEASTONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATLEASTONE"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            ParseMODELELEMENT(node) ' NonTerminal Rule: MODELELEMENT
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: BINARYFACTTYPEATLEASTONECLAUSE
+
         Private Sub ParseBINARYFACTTYPEATMOSTONECLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: BINARYFACTTYPEATMOSTONECLAUSE
             Dim tok As Token
             Dim n As ParseNode
@@ -959,9 +1039,21 @@ Namespace VAQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDATMOSTONE, TokenType.KEYWDONE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDANYNUMBEROF, TokenType.KEYWDATLEASTONE, TokenType.KEYWDATMOSTONE, TokenType.KEYWDONE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
+                Case TokenType.KEYWDANYNUMBEROF
+                    ParseBINARYFACTTYPEANYNUMBEROFCLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPEANYNUMBEROFCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDATLEASTONE
+                    ParseBINARYFACTTYPEATLEASTONECLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPEATLEASTONECLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
                 Case TokenType.KEYWDATMOSTONE
                     ParseBINARYFACTTYPEATMOSTONECLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPEATMOSTONECLAUSE
             If m_tree.Errors.Count > 0 Then
@@ -1057,10 +1149,12 @@ Namespace VAQL
                 Case Else
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDATMOSTONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATMOSTONE"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDATMOSTONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDONE"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDATMOSTONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDATMOSTONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDANYNUMBEROF"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATLEASTONE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATMOSTONE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDONE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
                 End If
                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                     Exit Select
@@ -1340,9 +1434,21 @@ Namespace VAQL
 
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDONE, TokenType.KEYWDATMOSTONE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDANYNUMBEROF, TokenType.KEYWDATLEASTONE, TokenType.KEYWDONE, TokenType.KEYWDATMOSTONE, TokenType.PREBOUNDREADINGTEXT, TokenType.MODELELEMENTNAME) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
+                Case TokenType.KEYWDANYNUMBEROF
+                    ParseBINARYFACTTYPEANYNUMBEROFCLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPEANYNUMBEROFCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.KEYWDATLEASTONE
+                    ParseBINARYFACTTYPEATLEASTONECLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPEATLEASTONECLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
                 Case TokenType.KEYWDONE
                     ParseBINARYFACTTYPEMANYTOONEDEFINITIONCLAUSE(node) ' NonTerminal Rule: BINARYFACTTYPEMANYTOONEDEFINITIONCLAUSE
             If m_tree.Errors.Count > 0 Then
@@ -1370,10 +1476,12 @@ Namespace VAQL
                 Case Else
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDONE"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATMOSTONE"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
-                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDONE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDANYNUMBEROF"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATLEASTONE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDONE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDATMOSTONE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREBOUNDREADINGTEXT"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDANYNUMBEROF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "MODELELEMENTNAME"))
                 End If
                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                     Exit Select

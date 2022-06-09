@@ -1045,6 +1045,16 @@ Namespace VAQL
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
+                           Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDANYNUMBEROF) Then
+                        aoTokenType = TokenType.KEYWDANYNUMBEROF
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
+                           Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDATLEASTONE) Then
+                        aoTokenType = TokenType.KEYWDATLEASTONE
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
                            Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDATMOSTONE) Then
                         aoTokenType = TokenType.KEYWDATMOSTONE
                         aoParseTree = Me.Parsetree
