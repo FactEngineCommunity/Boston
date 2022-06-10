@@ -2549,6 +2549,10 @@ SkipOutputChannel:
                     'Is StraightToAction
                     Call Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent)
                     Return True
+                Case Is = Boston.VAQL.TokenType.VALUECONSTRAINTCLAUSE
+                    'Is StraightToAction
+                    Call Me.ProcessVALUECONSTRAINTCLAUSE(abBroadcastInterfaceEvent)
+                    Return True
                 Case Is = Boston.VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                     'Is StraightToAction
                     Call Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent)

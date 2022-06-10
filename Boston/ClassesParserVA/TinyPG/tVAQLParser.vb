@@ -58,6 +58,55 @@ Namespace VAQL
             End If
         End Sub ' NonTerminalSymbol: NATURALLANGUAGEPROMPT
 
+        Private Sub ParseADDITIONALVALUECONSTRAINTVALUE(ByVal parent As ParseNode) ' NonTerminalSymbol: ADDITIONALVALUECONSTRAINTVALUE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.ADDITIONALVALUECONSTRAINTVALUE), "ADDITIONALVALUECONSTRAINTVALUE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.COMMA) ' Terminal Rule: COMMA
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.COMMA Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.COMMA.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COMMA"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.VALUECONSTRAINTVALUE) ' Terminal Rule: VALUECONSTRAINTVALUE
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.VALUECONSTRAINTVALUE Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.VALUECONSTRAINTVALUE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "VALUECONSTRAINTVALUE"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: ADDITIONALVALUECONSTRAINTVALUE
+
         Private Sub ParseBINARYFACTTYPEANYNUMBEROFCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: BINARYFACTTYPEANYNUMBEROFCLAUSE
             Dim tok As Token
             Dim n As ParseNode
@@ -1608,6 +1657,164 @@ Namespace VAQL
             End If
         End Sub ' NonTerminalSymbol: UNARYPREDICATECLAUSE
 
+        Private Sub ParseVALUECONSTRAINTCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: VALUECONSTRAINTCLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.VALUECONSTRAINTCLAUSE), "VALUECONSTRAINTCLAUSE")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.KEYWDINCLUDES) ' Terminal Rule: KEYWDINCLUDES
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.KEYWDINCLUDES Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDINCLUDES.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDINCLUDES"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.VALUECONSTRAINTVALUE, TokenType.CURLYBRACKETOPEN) ' Choice Rule
+            Select Case tok.Type
+             ' Choice Rule
+                Case TokenType.VALUECONSTRAINTVALUE
+                    tok = m_scanner.Scan(TokenType.VALUECONSTRAINTVALUE) ' Terminal Rule: VALUECONSTRAINTVALUE
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.VALUECONSTRAINTVALUE Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.VALUECONSTRAINTVALUE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "VALUECONSTRAINTVALUE"))
+                        Return
+
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case TokenType.CURLYBRACKETOPEN
+
+                     ' Concat Rule
+                    tok = m_scanner.Scan(TokenType.CURLYBRACKETOPEN) ' Terminal Rule: CURLYBRACKETOPEN
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.CURLYBRACKETOPEN Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.CURLYBRACKETOPEN.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CURLYBRACKETOPEN"))
+                        Return
+
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+
+                     ' Concat Rule
+                    ParseVALUECONSTRAINTVALUELIST(node) ' NonTerminal Rule: VALUECONSTRAINTVALUELIST
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+
+                     ' Concat Rule
+                    tok = m_scanner.Scan(TokenType.CURLYBRACKETCLOSE) ' Terminal Rule: CURLYBRACKETCLOSE
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If tok.Type <> TokenType.CURLYBRACKETCLOSE Then
+                        m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.CURLYBRACKETCLOSE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CURLYBRACKETCLOSE"))
+                        Return
+
+                    End If
+
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
+                Case Else
+                If m_tree.Errors.Count = 0 Then
+                m_tree.Optionals.Clear
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.VALUECONSTRAINTVALUE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "VALUECONSTRAINTVALUE"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.VALUECONSTRAINTVALUE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "CURLYBRACKETOPEN"))
+                End If
+                    m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                    Exit Select
+            End Select ' Choice Rule
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: VALUECONSTRAINTCLAUSE
+
+        Private Sub ParseVALUECONSTRAINTVALUELIST(ByVal parent As ParseNode) ' NonTerminalSymbol: VALUECONSTRAINTVALUELIST
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.VALUECONSTRAINTVALUELIST), "VALUECONSTRAINTVALUELIST")
+            parent.Nodes.Add(node)
+
+
+             ' Concat Rule
+            tok = m_scanner.Scan(TokenType.VALUECONSTRAINTVALUE) ' Terminal Rule: VALUECONSTRAINTVALUE
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If tok.Type <> TokenType.VALUECONSTRAINTVALUE Then
+                m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.VALUECONSTRAINTVALUE.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "VALUECONSTRAINTVALUE"))
+                Return
+
+            End If
+
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+             ' Concat Rule
+            tok = m_scanner.LookAhead(TokenType.COMMA) ' ZeroOrMore Rule
+            While tok.Type = TokenType.COMMA
+                ParseADDITIONALVALUECONSTRAINTVALUE(node) ' NonTerminal Rule: ADDITIONALVALUECONSTRAINTVALUE
+            If m_tree.Errors.Count > 0 Then
+                            parent.Token.UpdateRange(node.Token)
+                            Exit Sub
+            End If
+            tok = m_scanner.LookAhead(TokenType.COMMA) ' ZeroOrMore Rule
+            End While
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+            If m_tree.Errors.Count > 0 Then
+                        parent.Token.UpdateRange(node.Token)
+                        Exit Sub
+            End If
+
+            parent.Token.UpdateRange(node.Token)
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            m_tree.Optionals.Clear()
+            End If
+        End Sub ' NonTerminalSymbol: VALUECONSTRAINTVALUELIST
+
         Private Sub ParseVALUETYPEISWRITTENASCLAUSE(ByVal parent As ParseNode) ' NonTerminalSymbol: VALUETYPEISWRITTENASCLAUSE
             Dim tok As Token
             Dim n As ParseNode
@@ -2392,7 +2599,7 @@ Namespace VAQL
             End If
 
              ' Concat Rule
-            tok = m_scanner.LookAhead(TokenType.KEYWDISAKINDOF, TokenType.KEYWDISACONCEPT, TokenType.KEYWDISANENTITYTYPE, TokenType.KEYWDISAVALUETYPE, TokenType.KEYWDISWHERE, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISWRITTENAS, TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART) ' Choice Rule
+            tok = m_scanner.LookAhead(TokenType.KEYWDISAKINDOF, TokenType.KEYWDISACONCEPT, TokenType.KEYWDISANENTITYTYPE, TokenType.KEYWDISAVALUETYPE, TokenType.KEYWDISWHERE, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISWRITTENAS, TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART, TokenType.KEYWDINCLUDES) ' Choice Rule
             Select Case tok.Type
              ' Choice Rule
                 Case TokenType.KEYWDISAKINDOF
@@ -2539,6 +2746,12 @@ Namespace VAQL
                                 parent.Token.UpdateRange(node.Token)
                                 Exit Sub
             End If
+                Case TokenType.KEYWDINCLUDES
+                    ParseVALUECONSTRAINTCLAUSE(node) ' NonTerminal Rule: VALUECONSTRAINTCLAUSE
+            If m_tree.Errors.Count > 0 Then
+                                parent.Token.UpdateRange(node.Token)
+                                Exit Sub
+            End If
                 Case Else
                 If m_tree.Errors.Count = 0 Then
                 m_tree.Optionals.Clear
@@ -2551,6 +2764,7 @@ Namespace VAQL
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWRITTENAS"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATEPART"))
                 m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "UNARYPREDICATEPART"))
+                m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDINCLUDES"))
                 End If
                     m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                     Exit Select

@@ -878,6 +878,64 @@ EndProcessing:
 
     End Sub
 
+    Private Sub ProcessVALUECONSTRAINTCLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQL.VALUECONSTRAINTClause.MODELELEMENTNAME = ""
+                Me.VAQL.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE = New List(Of String)
+
+                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.VALUECONSTRAINTClause, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.VALUECONSTRAINTClause.MODELELEMENTNAME))
+
+                If Not Me.Model.ExistsModelElement(lsValueTypeName) Then
+                    Me.send_data("There is no Model Element with the name, '" & lsValueTypeName & "'. Try another name")
+                    Exit Sub
+                End If
+
+                Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lsValueTypeName, True)
+
+                If Not lrModelElement.GetType = GetType(FBM.ValueType) Then
+                    Me.send_data("There is no Value Type called, '" & lsValueTypeName & "'.")
+                    Exit Sub
+                End If
+
+                Dim lrValueType = CType(lrModelElement, FBM.ValueType)
+
+
+                For Each lsValueConstraintValue In Me.VAQL.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE
+
+                    If lrValueType.ValueConstraint.Contains(lsValueConstraintValue) Then
+                        Me.send_data("The value, " & lsValueConstraintValue & ", already exists in the Value Constraint for Value Type, " & lsValueTypeName)
+                    Else
+                        Call lrValueType.AddValueConstraint(lsValueConstraintValue)
+                    End If
+
+                Next
+
+                Me.send_data("Ok")
+
+                Me.Timeout.Start()
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
     Private Sub ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
         Dim lsMessage As String
@@ -958,14 +1016,20 @@ EndProcessing:
                 '=================================================================================================================
 
                 If Me.Page IsNot Nothing Then
-                    Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+                    Select Case Me.Page.Language
+                        Case Is = pcenumLanguage.ORMModel
 
-                    Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                    Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, abBroadcastInterfaceEvent)
+                            Dim lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+                            Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, abBroadcastInterfaceEvent)
+
+                    End Select
 
                     If Me.AutoLayoutOn Then
                         Me.Page.Form.AutoLayout()
                     End If
+
                 End If
 
                 Me.send_data("Ok")

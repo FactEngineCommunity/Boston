@@ -416,6 +416,31 @@ Namespace VAQL
 
     End Class
 
+    Public Class ValueConstraintClause
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _VALUECONSTRAINTVALUE As New List(Of String)
+        Public Property VALUECONSTRAINTVALUE As List(Of String)
+            Get
+                Return Me._VALUECONSTRAINTVALUE
+            End Get
+            Set(value As List(Of String))
+                Me._VALUECONSTRAINTVALUE = value
+            End Set
+        End Property
+
+    End Class
+
+
     Public Class ValueTypeWrittenAsClause
 
         Private _DATATYPE As Object
@@ -620,6 +645,7 @@ Namespace VAQL
         Public MODELELEMENTTYPEClause As New VAQL.ModelElementTypeClause
         Public VALUETYPEISWRITTENASStatement As New VAQL.ValueTypeIsWrittenAsStatement
         Public VALUETYPEWRITTENASClause As New VAQL.ValueTypeWrittenAsClause
+        Public VALUECONSTRAINTClause As New VAQL.ValueConstraintClause
 
 
         Public Sub New()
@@ -1029,6 +1055,11 @@ Namespace VAQL
                     If Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then
                         aoTokenType = TokenType.VALUETYPEISWRITTENASCLAUSE
                         aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUECONSTRAINTCLAUSE) Then
+                        aoTokenType = TokenType.VALUECONSTRAINTCLAUSE
+                        aoParseTree = Me.Parsetree
+
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISAKINDOF) Then
                         aoTokenType = TokenType.KEYWDISAKINDOF
                         aoParseTree = Me.Parsetree

@@ -217,6 +217,9 @@ Namespace VAQL
                 Case TokenType.NATURALLANGUAGEPROMPT
                     Value = EvalNATURALLANGUAGEPROMPT(tree, paramlist)
                     Exit Select
+                Case TokenType.ADDITIONALVALUECONSTRAINTVALUE
+                    Value = EvalADDITIONALVALUECONSTRAINTVALUE(tree, paramlist)
+                    Exit Select
                 Case TokenType.BINARYFACTTYPEANYNUMBEROFCLAUSE
                     Value = EvalBINARYFACTTYPEANYNUMBEROFCLAUSE(tree, paramlist)
                     Exit Select
@@ -274,6 +277,12 @@ Namespace VAQL
                 Case TokenType.UNARYPREDICATECLAUSE
                     Value = EvalUNARYPREDICATECLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.VALUECONSTRAINTCLAUSE
+                    Value = EvalVALUECONSTRAINTCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.VALUECONSTRAINTVALUELIST
+                    Value = EvalVALUECONSTRAINTVALUELIST(tree, paramlist)
+                    Exit Select
                 Case TokenType.VALUETYPEISWRITTENASCLAUSE
                     Value = EvalVALUETYPEISWRITTENASCLAUSE(tree, paramlist)
                     Exit Select
@@ -307,6 +316,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalNATURALLANGUAGEPROMPT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalADDITIONALVALUECONSTRAINTVALUE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -383,6 +396,14 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalUNARYPREDICATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalVALUECONSTRAINTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalVALUECONSTRAINTVALUELIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
