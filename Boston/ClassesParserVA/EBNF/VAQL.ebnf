@@ -2,7 +2,7 @@ BROpen = "(".
 BRClose = ")".
 CapitalLetter = ( "'A'" | "'B'" | "'C'" | "'D'" | "'E'" | "'F'" | "'G'" | "'H'" | "'I'" | "'J'" | "'K'" | "'L'" | "'M'" | "'N'" |
                   "'O'" | "'P'" | "'Q'" | "'R'" | "'S'" | "'T'" | "'U'" | "'V'" | "'W'" | "'X'" | "'Y'" | "'Z'").
-BinaryFactTypeProduction = ModelElementName PredicatePart ['ONE' | 'AT MOST ONE'] ModelElementName.
+BinaryFactTypeProduction = ModelElementName PredicatePart ['ONE' | 'AT MOST ONE' | 'AT LEAST ONE' | 'ANY ONE OF' ] ModelElementName.
 DataType = ("'LogicalTrueFalse'" | "'LogicalYesNo'" | "'AutoCounter'" | "'FloatDoublePrecision'" | "'FloatSinglePrecision'" |
                           "'SignedBigInteger'" | "'SignedInteger'" | "'SignedSmallInteger'" | "'UnsignedBigInteger'" | "'UnsignedInteger'" |
                           "'UnsignedSmallInteger'" | "'UnsignedTinyInteger'" | "'ObjectId'" | "'RowId'" | "'RawDataOLEObject'" |
@@ -27,4 +27,7 @@ ModelElementName = CapitalLetter {LowerORUppercaseLetter}.
 PredicatePart = PredicatePartWord {Space PredicatePartWord}.
 PredicatePartWord = LowercaseLetter {LowercaseLetter}.
 ValueTypeIsWrittenAsProduction = begin ModelElementName "'IS WRITTEN AS'" (DataType | DataTypeWithLength | DataTypeWithPrecision) end.
-VAQLStatement = [FactTypeProduction | MandatoryManyToOneProduction | OptionalManyToOneProduction | ValueTypeIsWrittenAsProduction].
+ValueConstraintValue = String.
+ValueConstraintValueList = "'{'" ValueConstraintValue {"','" ValueConstraintValue} "'}'".
+ValueTypeValueConstraintProduction = begin ModelElementName "'INCLUDES'" (ValueConstraintValue | ValueConstraintValueList) end.
+VAQLStatement = [FactTypeProduction | MandatoryManyToOneProduction | OptionalManyToOneProduction | ValueTypeIsWrittenAsProduction | ValueTypeValueConstraintStatement].
