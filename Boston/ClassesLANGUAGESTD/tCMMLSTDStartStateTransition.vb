@@ -95,6 +95,8 @@ Namespace STD
                 Dim loNode1 As MindFusion.Diagramming.ShapeNode = Me.StartStateIndicator.Shape
                 Dim loNode2 As MindFusion.Diagramming.ShapeNode = Me.FromState.Shape
 
+                loNode1.HandlesStyle = HandlesStyle.Invisible
+
                 Dim loLink As New DiagramLink(Me.Page.Diagram, loNode1, loNode2)
                 loLink.Locked = False
                 loLink.Tag = Me

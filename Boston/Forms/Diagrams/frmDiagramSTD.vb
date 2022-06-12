@@ -914,9 +914,9 @@ Public Class frmStateTransitionDiagram
 
                     Me.Diagram.Links.Remove(Me.zrPage.STDiagram.StartIndicator.Link)
 
-                    Dim lrFact As FBM.Fact = lrSTDState.setStartState(True)
-
                 End If
+
+                Dim lrFact As FBM.Fact = lrSTDState.setStartState(True)
             End If
 
         ElseIf (loFirstEntity.ConceptType = pcenumConceptType.State) And (loSecondEntity.ConceptType = pcenumConceptType.EndStateIndicator) Then
@@ -1089,6 +1089,7 @@ Public Class frmStateTransitionDiagram
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
 
         Me.DiagramView.Behavior = Behavior.DrawLinks
+        e.Node.AllowOutgoingLinks = True
         Me.Diagram.Invalidate()
         Me.Diagram.Selection.Clear()
         Me.Cursor = Cursors.Hand
@@ -1244,6 +1245,10 @@ Public Class frmStateTransitionDiagram
             lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
             Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
+
+            '-------------------------------------------------------
+            'Shift Key Draw Links
+
 
             '--------------------------------------------------
             'Just to be sure...set the Richmond.WorkingProject

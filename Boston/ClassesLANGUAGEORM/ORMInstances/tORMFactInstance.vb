@@ -259,7 +259,7 @@ Namespace FBM
         Public Function CloneConceptInstance() As FBM.ConceptInstance
 
             Try
-                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType, Me.X, Me.Y)
 
                 Return lrConceptInstance
             Catch ex As Exception
@@ -469,6 +469,8 @@ Namespace FBM
 
         Public Overrides Sub makeDirty()
             Me.FactType.isDirty = True
+            Me.Model.IsDirty = True
+            Me.Page.IsDirty = True
             Me.isDirty = True
         End Sub
 

@@ -44,6 +44,8 @@ Namespace STD
                 Me.FactInstance.Y = aiNewY
             End If
 
+            Me.FactInstance.makeDirty()
+
         End Sub
 
         ''' <summary>
@@ -108,7 +110,7 @@ Namespace STD
             Dim loDroppedNode As ShapeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 10, 10, Shapes.Ellipse)
 
             loDroppedNode.Resize(10, 10)
-            loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
+            loDroppedNode.HandlesStyle = HandlesStyle.Invisible
             loDroppedNode.Pen.Width = 0.5
             loDroppedNode.Pen.Color = Color.Black
 

@@ -1217,11 +1217,14 @@ SkipValueTypeInstance:
                     Dim lrFactDataInstance As FBM.FactDataInstance
                     For Each lrFact In lrFactType.Fact
 
-                        If IsSomething(arXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)) Then
+                        Dim lrFactConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)
+                        If lrFactConceptInstance IsNot Nothing Then
                             '----------------------------------
                             'The Fact is included on the Page
                             '----------------------------------
                             lrFactInstance = lrFact.CloneInstance(lrPage)
+                            lrFactInstance.X = lrFactConceptInstance.X
+                            lrFactInstance.Y = lrFactConceptInstance.Y
                             lrFactInstance.isDirty = True
                             For Each lrFactDataInstance In lrFactInstance.Data
                                 lrFactDataInstance.isDirty = True

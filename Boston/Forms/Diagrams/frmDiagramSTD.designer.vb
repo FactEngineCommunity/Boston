@@ -44,6 +44,7 @@ Partial Class frmStateTransitionDiagram
         Me.RemoveFromPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_StateTransition = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.EditEventTextToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveFromPageAndModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerLinkSwitch = New System.Windows.Forms.Timer(Me.components)
         Me.HiddenDiagram = New MindFusion.Diagramming.Diagram()
@@ -53,10 +54,9 @@ Partial Class frmStateTransitionDiagram
         Me.ToolStripLabel_ValueType = New System.Windows.Forms.ToolStripLabel()
         Me.ComboBox_ValueType = New System.Windows.Forms.ToolStripComboBox()
         Me.ContextMenuStrip_StartStateTransition = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelHelp = New System.Windows.Forms.Label()
-        Me.EditEventTextToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
@@ -219,6 +219,13 @@ Partial Class frmStateTransitionDiagram
         Me.ContextMenuStrip_StateTransition.Name = "ContextMenuStrip_Process"
         Me.ContextMenuStrip_StateTransition.Size = New System.Drawing.Size(236, 48)
         '
+        'EditEventTextToolStripMenuItem
+        '
+        Me.EditEventTextToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.EditEventTextToolStripMenuItem.Name = "EditEventTextToolStripMenuItem"
+        Me.EditEventTextToolStripMenuItem.Size = New System.Drawing.Size(235, 22)
+        Me.EditEventTextToolStripMenuItem.Text = "Edit Event Text"
+        '
         'RemoveFromPageAndModelToolStripMenuItem
         '
         Me.RemoveFromPageAndModelToolStripMenuItem.Name = "RemoveFromPageAndModelToolStripMenuItem"
@@ -275,6 +282,13 @@ Partial Class frmStateTransitionDiagram
         Me.ContextMenuStrip_StartStateTransition.Name = "ContextMenuStrip_Process"
         Me.ContextMenuStrip_StartStateTransition.Size = New System.Drawing.Size(236, 48)
         '
+        'ToolStripMenuItem2
+        '
+        Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(235, 22)
+        Me.ToolStripMenuItem2.Text = "Edit Event Text"
+        '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
@@ -290,26 +304,12 @@ Partial Class frmStateTransitionDiagram
         Me.LabelHelp.Size = New System.Drawing.Size(891, 83)
         Me.LabelHelp.TabIndex = 12
         '
-        'EditEventTextToolStripMenuItem
-        '
-        Me.EditEventTextToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.edit16x16
-        Me.EditEventTextToolStripMenuItem.Name = "EditEventTextToolStripMenuItem"
-        Me.EditEventTextToolStripMenuItem.Size = New System.Drawing.Size(235, 22)
-        Me.EditEventTextToolStripMenuItem.Text = "Edit Event Text"
-        '
-        'ToolStripMenuItem2
-        '
-        Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.edit16x16
-        Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        Me.ToolStripMenuItem2.Size = New System.Drawing.Size(235, 22)
-        Me.ToolStripMenuItem2.Text = "Edit Event Text"
-        '
         'DiagramView
         '
         Me.DiagramView.AllowDrop = True
         Me.DiagramView.AllowInplaceEdit = True
         Me.DiagramView.BackColor = System.Drawing.Color.White
-        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
         Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
         Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
         Me.DiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.IgnoreControl
@@ -347,7 +347,7 @@ Partial Class frmStateTransitionDiagram
         '
         Me.ContextMenuStrip_EndStateTransition.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem3, Me.ToolStripMenuItem4})
         Me.ContextMenuStrip_EndStateTransition.Name = "ContextMenuStrip_Process"
-        Me.ContextMenuStrip_EndStateTransition.Size = New System.Drawing.Size(236, 70)
+        Me.ContextMenuStrip_EndStateTransition.Size = New System.Drawing.Size(236, 48)
         '
         'ToolStripMenuItem3
         '

@@ -95,15 +95,15 @@ Namespace STD
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub Moved() Implements iPageObject.Moved
+        Public Overloads Sub Moved() Implements iPageObject.Moved
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
+        Public Overloads Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
+        Public Overloads Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
             Throw New NotImplementedException()
         End Sub
 
@@ -115,7 +115,7 @@ Namespace STD
             Dim loDroppedNode As ShapeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 10, 10, Shapes.Ellipse)
 
             loDroppedNode.Resize(10, 10)
-            loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
+            loDroppedNode.HandlesStyle = HandlesStyle.Invisible
             loDroppedNode.Pen.Width = 0.5
             loDroppedNode.Pen.Color = Color.Black
 
