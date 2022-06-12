@@ -399,6 +399,12 @@ Namespace FBM
         <NonSerialized()>
         Public Event MadeDirty(ByVal abGlobalBroadcast As Boolean)
         <NonSerialized()>
+        Public Event ModelElementAdded(ByRef arModelElement As FBM.ModelObject)
+        <NonSerialized()>
+        Public Event ModelElementModified(ByRef arModelElement As FBM.ModelObject)
+        <NonSerialized()>
+        Public Event ModelElementRemoved(ByRef arModelElement As FBM.ModelObject)
+        <NonSerialized()>
         Public Event ModelErrorAdded()
         <NonSerialized()>
         Public Event ModelErrorRemoved(ByVal arModelError As FBM.ModelError)
@@ -412,6 +418,10 @@ Namespace FBM
         Public Event ModelErrorsUpdated()
         <NonSerialized()>
         Public Event RDSColumnAdded(ByRef arColumn As RDS.Column)
+        <NonSerialized()>
+        Public Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        <NonSerialized()>
+        Public Event SubtypeRelationshipRemoved(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
         <NonSerialized()>
         Public Event Saved()
 
@@ -620,6 +630,8 @@ Namespace FBM
                     Me.MakeDirty(False, True)
                 End If
 
+                RaiseEvent ModelElementAdded(arEntityType)
+
                 ''=====================================================================================
                 ''Add the EntityType to the SharedModel
                 Dim lrInterfaceEntityType As New Viev.FBM.Interface.EntityType
@@ -685,7 +697,7 @@ Namespace FBM
         Public Sub AddModelError(ByRef arModelError As FBM.ModelError)
 
             If Not Me.ModelError.Exists(AddressOf arModelError.Equals) Then
-                Me.ModelError.Add(arModelError)
+                Me.ModelError.AddUnique(arModelError)
             End If
 
             RaiseEvent ModelErrorAdded()
@@ -3385,6 +3397,8 @@ FinishedProcessing:
                         End If
                     End If
                 End If
+
+                RaiseEvent ModelElementRemoved(arEntityType)
 
                 '==========================================================================================================
                 'Client/Server
@@ -6339,6 +6353,51 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
         Protected Overrides Sub Finalize()
             MyBase.Finalize()
+        End Sub
+
+        Public Sub TriggerSubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+
+            Try
+                RaiseEvent SubtypeRelationshipAdded(arSubtypeRelationship)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub TriggerSubtypeRelationshipRemoved(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+
+            Try
+                RaiseEvent SubtypeRelationshipRemoved(arSubtypeRelationship)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub TriggerEventModelElementModified(ByRef arModelElement As FBM.ModelObject)
+
+            Try
+                RaiseEvent ModelElementModified(arModelElement)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
     End Class

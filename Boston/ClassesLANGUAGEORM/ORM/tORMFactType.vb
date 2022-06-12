@@ -4549,6 +4549,8 @@ Namespace FBM
                         Next
                     End If
 
+                    Call Me.Model.TriggerEventModelElementModified(Me)
+
                     Me.Model.Save()
 
                     Return True

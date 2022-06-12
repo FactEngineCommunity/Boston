@@ -1069,9 +1069,9 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Function HasSimpleReferenceScheme() As Boolean
+        Public Overrides Function HasSimpleReferenceScheme(Optional ByVal abIngoreRemoveReferenceModeErrors As Boolean = False) As Boolean
 
-            Return Me.EntityType.HasSimpleReferenceScheme
+            Return Me.EntityType.HasSimpleReferenceScheme(abIngoreRemoveReferenceModeErrors)
 
         End Function
 
@@ -1781,6 +1781,7 @@ MoveOn:
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
                             End Select
                             If Me.EntityType.HasSimpleReferenceScheme Then
+                                Me.EntityType.ModelError.RemoveAll(Function(x) x.ErrorId = 127)
                                 Me.EntityType.ReferenceModeValueType.SetDataType(Me._DataType)
                             End If
                         Case Is = "DataTypeLength"

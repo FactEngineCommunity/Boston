@@ -1109,7 +1109,20 @@ Namespace FBM
                 Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateValueType, Me, Nothing)
             End If
 
-            Me.ModelError.RemoveAll(Function(x) x.ErrorId = 127)
+            Select Case aiNewDataType
+                Case Is = pcenumORMDataType.DataTypeNotSet
+                    Dim lsErrorMessage = "Data Type Not Specified Error -Value Type: '" & Me.Name & "'."
+                    Dim lrModelError = New FBM.ModelError(pcenumModelErrors.DataTypeNotSpecifiedError,
+                                                          lsErrorMessage,
+                                                          Nothing,
+                                                          Me)
+
+                    Me.ModelError.AddUnique(lrModelError)
+                    Me.Model.AddModelError(lrModelError)
+                Case Else
+                    Me.ModelError.RemoveAll(Function(x) x.ErrorId = 127)
+            End Select
+
 
             Me.isDirty = True
             Me.Model.Save()

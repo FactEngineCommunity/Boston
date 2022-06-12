@@ -3,7 +3,7 @@
 
     Friend _MyTreeNodeCollection As cTreeNodeCollection
 
-    Public Shadows Nodes As New cTreeNodeCollection(MyBase.Nodes)
+    Public Shadows Nodes As New cTreeNodeCollection(MyBase.Nodes, Nothing)
 
     Public Sub New()
         MyBase.New()

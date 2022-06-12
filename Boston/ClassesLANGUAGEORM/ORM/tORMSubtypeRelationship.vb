@@ -168,6 +168,8 @@ Namespace FBM
                 'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.
                 If Me.Model.StoreAsXML Then Me.Model.Save()
 
+                Call Me.Model.TriggerSubtypeRelationshipRemoved(Me)
+
                 'RDS
                 Dim lrTable = CType(Me.ModelElement, FBM.EntityType).getCorrespondingRDSTable
 

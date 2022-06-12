@@ -4834,4 +4834,35 @@ Public Class frmToolboxEnterpriseExplorer
 
 
     End Sub
+
+    Private Sub ToolStripMenuItemTaxonomyTree_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemTaxonomyTree.Click
+
+        Dim lrModel As FBM.Model
+
+        Try
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = New FBM.Model
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            'CodesSafe-Load the model
+            If Not lrModel.Loaded Then
+                With New WaitCursor
+                    Call lrModel.Load(False, False, Nothing, False)
+                End With
+            End If
+
+            Call frmMain.LoadToolboxTaxonomyTree(lrModel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

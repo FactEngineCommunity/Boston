@@ -74,7 +74,7 @@ Public Class BostonTreeView
 #End Region
 
     'Redefining native Node collection
-    Public Shadows _Nodes As New cTreeNodeCollection(MyBase.Nodes)
+    Public Shadows _Nodes As New cTreeNodeCollection(MyBase.Nodes, Me.ImageList)
 
     Public Shadows Property Nodes As cTreeNodeCollection
         Get

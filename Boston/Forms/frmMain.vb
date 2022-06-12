@@ -1559,6 +1559,28 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadToolboxTaxonomyTree(ByRef arModel As FBM.Model)
+
+        Try
+            Dim child As New frmToolboxTaxonomyTree
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Public Sub LoadCRUDModel(ByRef arModel As FBM.Model)
 
         Dim child As New frmCRUDModel

@@ -240,7 +240,13 @@ Namespace FBM
 
         Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
-                Return Me._ModelError
+                Dim larModelError As New List(Of FBM.ModelError)
+
+                larModelError = Me._ModelError.ToList
+                If Me.ReferenceModeValueType IsNot Nothing Then
+                    larModelError.AddRange(Me.ReferenceModeValueType.ModelError)
+                End If
+                Return larModelError
             End Get
             Set(ByVal value As System.Collections.Generic.List(Of ModelError))
                 Me._ModelError = value
@@ -1607,6 +1613,7 @@ Namespace FBM
                 End If
 
                 RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
+                Call Me.Model.TriggerSubtypeRelationshipAdded(lrSubtypeRelationship)
 
                 '=========================================================================
                 'RDS
@@ -2080,7 +2087,7 @@ FailsafeContinue:
 
         End Function
 
-        Public Overridable Function HasSimpleReferenceScheme() As Boolean
+        Public Overridable Function HasSimpleReferenceScheme(Optional ByVal abIgnoreThrowingRemoveReferenceModeError As Boolean = False) As Boolean
 
             Try
 
@@ -2118,19 +2125,21 @@ FailsafeContinue:
                                 Me.Save()
                             End If
 
-                            Dim lsMessage As String = ""
-                            lsMessage = "Entity Type, '" & Me.Id & "', had a Reference Mode but no associated Value Type or Fact Type."
-                            lsMessage &= vbCrLf & "As a precaution, the ReferenceMode has been removed and the Model saved."
-                            lsMessage.AppendDoubleLineBreak("Reference Mode was: " & lsOldReferenceMode)
-                            Try
-                                If Me.IsObjectifyingEntityType Then
-                                    lsMessage.AppendLine("Objectifying Entity Type for Fact Type: " & Me.ObjectifiedFactType.Id)
-                                End If
-                            Catch ex As Exception
-                                'Not a biggie, but want the message returned no matter what.
-                            End Try
+                            If Not abIgnoreThrowingRemoveReferenceModeError Then
+                                Dim lsMessage As String = ""
+                                lsMessage = "Entity Type, '" & Me.Id & "', had a Reference Mode but no associated Value Type or Fact Type."
+                                lsMessage &= vbCrLf & "As a precaution, the ReferenceMode has been removed and the Model saved."
+                                lsMessage.AppendDoubleLineBreak("Reference Mode was: " & lsOldReferenceMode)
+                                Try
+                                    If Me.IsObjectifyingEntityType Then
+                                        lsMessage.AppendLine("Objectifying Entity Type for Fact Type: " & Me.ObjectifiedFactType.Id)
+                                    End If
+                                Catch ex As Exception
+                                    'Not a biggie, but want the message returned no matter what.
+                                End Try
 
-                            Throw New Exception(lsMessage)
+                                Throw New Exception(lsMessage)
+                            End If
                         ElseIf Me.ReferenceModeRoleConstraint IsNot Nothing Then
                             Return True
                         Else
@@ -2385,7 +2394,7 @@ FailsafeContinue:
                     Me.ReferenceModeValueType = Nothing
                     Me.ReferenceModeRoleConstraint.SetIsPreferredIdentifier(False)
                     Me.ReferenceModeRoleConstraint = Nothing
-                    'NB Me.PreferredIdentifierRCId set in the Property.Set method of ReferenceModeRoleConstraint (set to "")
+                    'NB Me.PreferredIdentifierRCId set in the Property.Set method of ,ReferenceModeRoleConstraint (set to "")
                     Me.ReferenceMode = ""
 
                     Me.isDirty = True
@@ -2447,6 +2456,8 @@ FailsafeContinue:
                 'No point in the ModelObject being Absorbed.
                 Me.IsAbsorbed = False
             End If
+
+            Call Me.Model.TriggerSubtypeRelationshipRemoved(arSubtypeRelationship)
 
             RaiseEvent SubtypeConstraintRemoved(arSubtypeRelationship)
 
@@ -2990,6 +3001,7 @@ FailsafeContinue:
 
                 RaiseEvent updated(Me.ConceptType)
                 Call Me.RaiseEventNameChanged(lsOldName, asNewName)
+                Call Me.Model.TriggerEventModelElementModified(Me)
 
                 '------------------------------------------------------------------------------------
                 'Must save the Model because Roles that reference the EntityType must be saved.

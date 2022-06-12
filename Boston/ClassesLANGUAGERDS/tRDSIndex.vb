@@ -259,7 +259,7 @@ Namespace RDS
                         Dim lrEntityType = CType(lrModelObject, FBM.EntityType)
                         lrReferenceModeRoleConstraint = CType(lrEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeRoleConstraint
 
-                        If lrEntityType.IsSubtype And lrEntityType.HasSimpleReferenceScheme Then
+                        If lrEntityType.IsSubtype And lrEntityType.HasSimpleReferenceScheme(True) Then
                             Dim lrTopmostSupertype = CType(lrEntityType.GetTopmostSupertype, FBM.EntityType)
                             lrReferenceModeRoleConstraint = lrTopmostSupertype.ReferenceModeRoleConstraint
                         End If

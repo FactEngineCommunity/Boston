@@ -4,8 +4,9 @@
 
     Friend _VisibleNodes As TreeNodeCollection
     Friend _ActualNodes As New List(Of cTreeNode)
+    Friend _ImageList As ImageList = Nothing
 
-    Friend Sub New(TreeNodeCollection As TreeNodeCollection)
+    Friend Sub New(TreeNodeCollection As TreeNodeCollection, ByRef arImageList As ImageList)
         _VisibleNodes = TreeNodeCollection
     End Sub
 
@@ -43,6 +44,11 @@
         lrNode._MyTreeNodeCollection = Me
 
         _ActualNodes.Add(lrNode)
+
+        If Me._ImageList IsNot Nothing Then
+            lrNode.ImageIndex = aiInt1
+            lrNode.SelectedImageIndex = aiInt2
+        End If
 
         'if the node is Hidden, there is no need to add it to TreeNodeCollection
         If lrNode.Hidden = False Then _VisibleNodes.Add(lrNode)
