@@ -1,0 +1,3 @@
+﻿see tActor.vb in ClassesLANGUAGECMML.
+
+CMML.Actor is common to Use Case Diagrams, DFDs, FlowCharts etc, so is excluded from this language set of Classes.

@@ -803,6 +803,8 @@
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker100PopulationUniquenessError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tModelValidator.vb" />
+    <Compile Include="ClassesLANGUAGEUMLUCD\tUseCaseModel.vb" />
+    <Compile Include="ClassesLANGUAGEUMLUCD\tUseCaseSystemBoundary.vb" />
     <Compile Include="ClassesODBCDatabaseReverseEngineer\tODBCDatabaseReverseEngineer.vb" />
     <Compile Include="ClassesOntology\tOntologyItem.vb" />
     <Compile Include="ClassesOntology\tUnifiedOntologyModel.vb" />
@@ -1334,6 +1336,12 @@
       <DependentUpon>frmDiagramSTD.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramSTD.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramUMLUseCase.designer.vb">
+      <DependentUpon>frmDiagramUMLUseCase.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramUMLUseCase.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\DialogBoxes\frmTextboxFind.Designer.vb">
@@ -2163,6 +2171,9 @@
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramSTD.resx">
       <DependentUpon>frmDiagramSTD.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramUMLUseCase.resx">
+      <DependentUpon>frmDiagramUMLUseCase.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmTextboxFind.resx">
       <DependentUpon>frmTextboxFind.vb</DependentUpon>
     </EmbeddedResource>
@@ -2686,6 +2697,8 @@
     <Content Include="ClassesFBMInterfaceHost\ReadMe.txt" />
     <Content Include="ClassesLANGUAGESTM\ReadMe.txt" />
     <Content Include="ClassesLANGUAGESTD\ReadMe.txt" />
+    <Content Include="ClassesLANGUAGEUMLUCD\tUseCaseActor.txt" />
+    <Content Include="ClassesLANGUAGEUMLUCD\tUseCaseProcess.txt" />
     <Content Include="ClassesParserVA\VAQLProcessorReflection\ReadMe.txt" />
     <None Include="Images\Icons\SubtypeConnectorSmallCursor.ico" />
     <Content Include="CodeGeneration\bin\Release\FirebirdSql.Data.FirebirdClient.dll" />
@@ -3050,6 +3063,7 @@
     <None Include="Images\MenuImages\CQL16x16.png" />
     <None Include="Images\MenuImages\CopyToClipboard16x16.png" />
     <None Include="Images\MenuImages\Convert16x16.jpg" />
+    <None Include="Images\MenuImages\DataFlowDiagram16x16.png" />
     <Content Include="Images\MenuImages\dictionary16x16.png" />
     <None Include="Images\MenuImages\edit16x16.jpg" />
     <None Include="Images\MenuImages\empty16x16.jpg" />

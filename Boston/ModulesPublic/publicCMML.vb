@@ -42,6 +42,7 @@ Public Enum pcenumCMMLRelations
         'UML Use Case Diagrams
         '------------------------------------------
         CoreActorToProcessParticipationRelation  ' 200(ActorSymbol,ProcessSymbol)
+        CoreProcessToProcessParticipationRelation
         CoreProcessToProcessRelation
 
         '-----------------------------------------------------
@@ -125,6 +126,7 @@ Public Enum pcenumCMMLRelations
         Concept 'State/Value (e.g. 'Value' of ValueType). Concept is used ubiquetously though, because every ObjectType and Fact in Richmond is a Concept
         DataStore 'Used in DataFlowDiagrams
         Entity 'Used in ER Diagrams
+        [Event] 'Used in State Transition Diagrams
         ERDEntity 'ERDEntity
         ERDAttributeRole1 'ERDAttribute
         ERDAttributeRole2 'ERDAttribute

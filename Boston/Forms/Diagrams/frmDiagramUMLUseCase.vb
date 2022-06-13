@@ -44,8 +44,8 @@ Public Class frm_UseCaseModel
         '----------------------------------------------        
         Me.zrPage.FormLoaded = False
 
-        prRichmondApplication.workingmodel = Nothing
-        prRichmondApplication.workingpage = Nothing
+        prApplication.WorkingModel = Nothing
+        prApplication.WorkingPage = Nothing
 
         '------------------------------------------------
         'If the 'Properties' window is open, reset the
@@ -100,12 +100,12 @@ Public Class frm_UseCaseModel
     Private Sub frm_UseCaseModel_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
         If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
-                frmMain.zfrm_enterprise_tree_viewer.TreeView.SelectedNode = Me.zoTreeNode
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
             End If
 
-            If IsSomething(frmMain.zfrm_model_dictionary) Then
-                Call frmMain.zfrm_model_dictionary.LoadToolboxModelDictionary(Me.zrPage.Language)
+            If prApplication.GetToolboxForm(frmToolboxModelDictionary.Name) Is Nothing Then
+                Call frmMain.LoadToolboxModelDictionary(Me.zrPage.Language)
             End If
         End If
 
@@ -133,15 +133,15 @@ Public Class frm_UseCaseModel
         Dim lo_shape As Shape
         Dim child As New frmToolbox
 
-        If prRichmondApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+        If prApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
 
-            child = prRichmondApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
+            child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
             child.ShapeListBox.Shapes = lsl_shape_library.Shapes
 
             For Each lo_shape In child.ShapeListBox.Shapes
                 Select Case lo_shape.DisplayName
                     Case Is = "Actor"
-                        lo_shape.Image = My.Resources.actor
+                        lo_shape.Image = My.Resources.CMML.actor
                 End Select
             Next
         End If
@@ -154,7 +154,7 @@ Public Class frm_UseCaseModel
         'Only allow 'InPlaceEdit' on Processes
         '---------------------------------------
         If Me.Diagram.Selection.Items.Count = 1 Then
-            If Me.Diagram.Selection.Items(0).Tag.ConceptType = pcenumConceptType.process Then
+            If Me.Diagram.Selection.Items(0).Tag.ConceptType = pcenumConceptType.Process Then
                 Me.DiagramView.AllowInplaceEdit = True
             Else
                 Me.DiagramView.AllowInplaceEdit = False
@@ -199,7 +199,8 @@ Public Class frm_UseCaseModel
                             Dim lrParentEntityType As FBM.EntityType = New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel, "Actor", "Actor")
                             lrParentEntityType = Me.zrPage.Model.EntityType.Find(AddressOf lrParentEntityType.Equals)
 
-                            lrEntityType.parentEntityType.Add(lrParentEntityType)
+                            '20220613-VM-Removed. Now using CoreElementHasElementType at the CMML level.
+                            'lrEntityType.parentEntityType.Add(lrParentEntityType)
 
                             '---------------------------------------------------
                             'Find the Core Page that lists Actor (EntityTypes)
@@ -242,7 +243,7 @@ Public Class frm_UseCaseModel
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prRichmondApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -274,8 +275,8 @@ Public Class frm_UseCaseModel
 
     '    loDroppedNode.Text = ar_process_instance.name
 
-    '    lr_process_instance.Model = prRichmondApplication.workingmodel
-    '    lr_process_instance.PageId = prRichmondApplication.workingpage.PageId
+    '    lr_process_instance.Model = prApplication.workingmodel
+    '    lr_process_instance.PageId = prApplication.workingpage.PageId
     '    lr_process_instance.process.LongDescription = ar_process_instance.LongDescription
     '    lr_process_instance.process.ShortDescription = ar_process_instance.ShortDescription
     '    lr_process_instance.shape = loDroppedNode
@@ -332,7 +333,7 @@ Public Class frm_UseCaseModel
         '   with the corresponding 'object' within the ORMModelPage object
         '------------------------------------------------------------------------
         Dim lrFactTypeInstance As New FBM.FactTypeInstance
-        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString)
+        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
         If IsSomething(lrFactTypeInstance) Then
             '------------------------------------------------------------------
             'At least one Actor/Process relation has already been established
@@ -341,7 +342,7 @@ Public Class frm_UseCaseModel
         Else
         End If
 
-        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.ProcessToProcessRelation.ToString)
+        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessRelation.ToString)
         Me.UseCaseModel.PocessToProcessRelation = lrFactTypeInstance
 
 
@@ -392,12 +393,12 @@ Public Class frm_UseCaseModel
                             loDroppedNode.Resize(20, 15)
                             loDroppedNode.AllowIncomingLinks = True
                             loDroppedNode.AllowOutgoingLinks = True
-                            loDroppedNode.Image = My.Resources.actor
+                            loDroppedNode.Image = My.Resources.CMML.actor
                             loDroppedNode.Transparent = True
 
                             loDroppedNode.Tag = New ERD.Entity
                             loDroppedNode.Tag = lr_actor
-                            lr_actor.shape = loDroppedNode
+                            lr_actor.Shape = loDroppedNode
 
                             lr_actor_shape = loDroppedNode 'lr_actor_shape is used below to draw the link
 
@@ -445,7 +446,7 @@ Public Class frm_UseCaseModel
 
                         loDroppedNode.Tag = New ERD.Entity
                         loDroppedNode.Tag = lr_process
-                        lr_process.shape = loDroppedNode
+                        lr_process.Shape = loDroppedNode
 
                         lr_process_shape = loDroppedNode
                     End If
@@ -500,7 +501,7 @@ Public Class frm_UseCaseModel
                     Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraintType
                         Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                             Diagram.Nodes(liInd - 1).Pen.Color = Color.Maroon
-                        Case Is = pcenumRoleConstraintType.ExclusionConstraint, _
+                        Case Is = pcenumRoleConstraintType.ExclusionConstraint,
                                   pcenumRoleConstraintType.ExternalUniquenessConstraint
                             Diagram.Nodes(liInd - 1).Pen.Color = Color.White
                         Case Else
@@ -606,12 +607,12 @@ Public Class frm_UseCaseModel
         Dim lrTypeOfRelation As pcenumCMMLRelations
 
         If (lo_first_entity.ConceptType = pcenumConceptType.Actor) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
-            lrTypeOfRelation = pcenumCMMLRelations.ActorToProcessParticipationRelation
+            lrTypeOfRelation = pcenumCMMLRelations.CoreActorToProcessParticipationRelation
             '----------------------------------
             'Create the Fact within the Model
             '----------------------------------
             Dim lsSQLString As String = ""
-            lsSQLString = "INSERT INTO " & pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString
+            lsSQLString = "INSERT INTO " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
             lsSQLString &= " (Actor, Process)"
             lsSQLString &= " VALUES ("
             lsSQLString &= "'" & lo_first_entity.Name & "'"
@@ -621,7 +622,7 @@ Public Class frm_UseCaseModel
             '----------------------------------
             'Create the Fact within the Model
             '----------------------------------
-            lrFact = Me.zrPage.Model.processORMQLStatement(lsSQLString)
+            lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
 
             '----------------------------------
             'Clone an instance of the Fact
@@ -638,16 +639,16 @@ Public Class frm_UseCaseModel
             Dim lr_process As New CMML.Process
 
             lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
-            lr_process.shape = New ShapeNode
-            lr_process.shape = Me.Diagram.FindNode(lo_second_entity)
-            lr_process.shape.Tag = lr_process
+            lr_process.Shape = New ShapeNode
+            lr_process.Shape = Me.Diagram.FindNode(lo_second_entity)
+            lr_process.Shape.Tag = lr_process
         ElseIf (lo_first_entity.ConceptType = pcenumConceptType.Process) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
 
             '----------------------------------
             'Create the Fact within the Model
             '----------------------------------
             Dim lsSQLString As String = ""
-            lsSQLString = "INSERT INTO " & pcenumCMMLRelations.ProcessToProcessRelation.ToString
+            lsSQLString = "INSERT INTO " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
             lsSQLString &= " (Process1, Process2)"
             lsSQLString &= " VALUES ("
             lsSQLString &= "'" & lo_first_entity.Name & "'"
@@ -657,7 +658,7 @@ Public Class frm_UseCaseModel
             '----------------------------------
             'Create the Fact within the Model
             '----------------------------------
-            lrFact = Me.zrPage.Model.processORMQLStatement(lsSQLString)
+            lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
 
             '----------------------------------
             'Clone and instance of the Fact
@@ -674,9 +675,9 @@ Public Class frm_UseCaseModel
             Dim lr_process As New CMML.Process
 
             lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
-            lr_process.shape = New ShapeNode
-            lr_process.shape = Me.Diagram.FindNode(lo_second_entity)
-            lr_process.shape.Tag = lr_process
+            lr_process.Shape = New ShapeNode
+            lr_process.Shape = Me.Diagram.FindNode(lo_second_entity)
+            lr_process.Shape.Tag = lr_process
 
         End If
 
@@ -709,18 +710,18 @@ Public Class frm_UseCaseModel
 
         If (lo_first_entity.ConceptType = pcenumConceptType.Actor) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
             Dim lsSQLString As String = ""
-            lsSQLString = "DELETE FROM " & pcenumCMMLRelations.ActorToProcessParticipationRelation.ToString
+            lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
             lsSQLString &= " WHERE Actor = '" & lo_first_entity.Name & "'"
             lsSQLString &= "   AND Process = '" & lo_second_entity.Name & "'"
 
-            Me.zrPage.Model.processORMQLStatement(lsSQLString)
+            Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
         ElseIf (lo_first_entity.ConceptType = pcenumConceptType.Process) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
             Dim lsSQLString As String = ""
-            lsSQLString = "DELETE FROM " & pcenumCMMLRelations.ProcessToProcessRelation.ToString
+            lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
             lsSQLString &= " WHERE Process1 = '" & lo_first_entity.Name & "'"
             lsSQLString &= "   AND Process2 = '" & lo_second_entity.Name & "'"
 
-            Me.zrPage.Model.processORMQLStatement(lsSQLString)
+            Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
         End If
 
         Me.Cursor = Cursors.Default
@@ -733,7 +734,7 @@ Public Class frm_UseCaseModel
         'ORM Verbalisation
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
-        lrToolboxForm = prRichmondApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
         If IsSomething(lrToolboxForm) Then
             lrToolboxForm.zrModel = Me.zrPage.Model
             Select Case e.Link.Tag.ConceptType
@@ -798,7 +799,7 @@ Public Class frm_UseCaseModel
         If IsSomething(e.Node.Tag) Then
 
             Select Case e.Node.Tag.ConceptType
-                Case Is = pcenumConceptType.Class, _
+                Case Is = pcenumConceptType.Class,
                           pcenumConceptType.Process
                     lrShapeNode = e.Node
                     Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
@@ -1043,7 +1044,7 @@ Public Class frm_UseCaseModel
 
     Private Sub ModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
 
-        Call frmMain.LoadToolboxModelDictionary(Me.zrPage.Model)
+        Call frmMain.LoadToolboxModelDictionary(True)
 
     End Sub
 
@@ -1099,8 +1100,7 @@ Public Class frm_UseCaseModel
         '--------------------------------------------------------------------------------------------------------
         'The EntityType represents an Actor. i.e. Has a ParentEntityType of 'Actor' within the Core meta-schema
         '--------------------------------------------------------------------------------------------------------
-        larPage_list = prRichmondApplication.CMML.get_use_case_diagram_pages_for_actor(lr_actor)
-
+        larPage_list = prApplication.CMML.getUseCaseDiagramPagesForActor(lr_actor)
 
         For Each lr_page In larPage_list
             Dim lo_menu_option As ToolStripItem
@@ -1109,15 +1109,12 @@ Public Class frm_UseCaseModel
             '---------------------------------------------------
             lo_menu_option = Me.MenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram, _
-                                                       lr_page, _
-                                                       lr_page.Model.EnterpriseId, _
-                                                       lr_page.Model.SubjectAreaId, _
-                                                       lr_page.Model.ProjectId, _
-                                                       lr_page.Model.SolutionId, _
-                                                       lr_page.Model.ModelId, _
-                                                       pcenumLanguage.UseCaseDiagram, _
-                                                       Nothing, lr_page.PageId)
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.UMLUseCaseDiagram,
+                                                               Nothing,
+                                                               lr_page.PageId)
             lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler lo_menu_option.Click, AddressOf Me.morph_to_UseCase_diagram
         Next
@@ -1131,7 +1128,7 @@ Public Class frm_UseCaseModel
         'Load the ORMDiagrams that relate to the Actor
         '  as selectable menuOptions
         '--------------------------------------------------------                        
-        larPage_list = prRichmondApplication.CMML.get_orm_diagram_pages_for_actor(lr_actor)
+        larPage_list = prApplication.CMML.getORMDiagramPagesForActor(lr_actor)
 
         For Each lr_page In larPage_list
             Dim lo_menu_option As ToolStripItem
@@ -1143,16 +1140,12 @@ Public Class frm_UseCaseModel
             '  is now added for those hidden Pages.
             '----------------------------------------------------------
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                       lr_page, _
-                                                       lr_model.EnterpriseId, _
-                                                       lr_model.SubjectAreaId, _
-                                                       lr_model.ProjectId, _
-                                                       lr_model.SolutionId, _
-                                                       lr_model.ModelId, _
-                                                       pcenumLanguage.ORMModel, _
-                                                       Nothing, _
-                                                       lr_page.PageId)
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
+                                                               Nothing,
+                                                               lr_page.PageId)
 
             lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             If IsSomething(lr_enterprise_view) Then
@@ -1174,7 +1167,7 @@ Public Class frm_UseCaseModel
         'Load the DataFlowDiagrams that relate to the EntityType
         '  as selectable menuOptions
         '--------------------------------------------------------
-        larPage_list = prRichmondApplication.CMML.get_DataFlowDiagram_pages_for_actor(lr_actor)
+        larPage_list = prApplication.CMML.getDataFlowDiagramPagesForActor(lr_actor)
 
         For Each lr_page In larPage_list
             Dim lo_menu_option As ToolStripItem
@@ -1184,15 +1177,12 @@ Public Class frm_UseCaseModel
             lo_menu_option = Me.MenuOptionDataFlowDiagramActor.DropDownItems.Add(lr_page.Name)
 
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram, _
-                                                       lr_page, _
-                                                       lr_page.Model.EnterpriseId, _
-                                                       lr_page.Model.SubjectAreaId, _
-                                                       lr_page.Model.ProjectId, _
-                                                       lr_page.Model.SolutionId, _
-                                                       lr_page.Model.ModelId, _
-                                                       pcenumLanguage.DataFlowDiagram, _
-                                                       Nothing, lr_page.PageId)
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.DataFlowDiagram,
+                                                               Nothing,
+                                                               lr_page.PageId)
 
             lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
@@ -1242,11 +1232,11 @@ Public Class frm_UseCaseModel
         End Select
 
 
-        If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
+        If IsSomething(frmMain.zfrmModelExplorer) Then
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = item.Tag
-            frmMain.zfrm_enterprise_tree_viewer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-            prRichmondApplication.WorkingPage = lr_enterprise_view.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+            prApplication.WorkingPage = lr_enterprise_view.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Process/Entity being morphed
@@ -1258,22 +1248,22 @@ Public Class frm_UseCaseModel
 
             Select Case liConceptType
                 Case Is = pcenumConceptType.Actor
-                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance _
-                                  From Fact In FactType.Fact _
-                                  From RoleData In Fact.Data _
-                                  Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString _
-                                  And RoleData.Data = lrEntity.Name _
-                                  Select New FBM.FactDataInstance(Me.zrPage, Fact, RoleData.Role, RoleData.Concept, RoleData.X, RoleData.Y)
+                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance
+                                       From Fact In FactType.Fact
+                                       From RoleData In Fact.Data
+                                       Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString _
+                                  And RoleData.Data = lrEntity.Name
+                                       Select New FBM.FactDataInstance(Me.zrPage, Fact, RoleData.Role, RoleData.Concept, RoleData.X, RoleData.Y)
 
                     For Each lrFactDataInstance In lrEntityList
                         Exit For
                     Next
                 Case Is = pcenumConceptType.Process
-                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance _
-                                       From Fact In FactType.Fact _
-                                       From RoleData In Fact.Data _
+                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance
+                                       From Fact In FactType.Fact
+                                       From RoleData In Fact.Data
                                        Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Process.ToString _
-                                       And RoleData.Data = lrEntity.Name _
+                                       And RoleData.Data = lrEntity.Name
                                        Select New FBM.FactDataInstance(Me.zrPage, Fact, RoleData.Role, RoleData.Concept, RoleData.X, RoleData.Y)
                     For Each lrFactDataInstance In lrEntityList
                         Exit For
@@ -1312,24 +1302,24 @@ Public Class frm_UseCaseModel
         Dim lr_shape_node As ShapeNode
 
 
-        If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
+        If IsSomething(frmMain.zfrmModelExplorer) Then
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = item.Tag
-            prRichmondApplication.WorkingPage = lr_enterprise_view.Tag
+            prApplication.WorkingPage = lr_enterprise_view.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
             Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
             lr_page = lr_enterprise_view.Tag
-            Dim lrEntityTypeInstanceList = From EntityTypeInstance In lr_page.EntityTypeInstance _
-                                           Where EntityTypeInstance.Id = lr_actor.Data _
-                                           Select New FBM.EntityTypeInstance(lr_page.Model, _
-                                                                    pcenumLanguage.ORMModel, _
-                                                                    EntityTypeInstance.Name, _
-                                                                    True, _
-                                                                    EntityTypeInstance.x, _
-                                                                    EntityTypeInstance.y)
+            Dim lrEntityTypeInstanceList = From EntityTypeInstance In lr_page.EntityTypeInstance
+                                           Where EntityTypeInstance.Id = lr_actor.Data
+                                           Select New FBM.EntityTypeInstance(lr_page.Model,
+                                                                    pcenumLanguage.ORMModel,
+                                                                    EntityTypeInstance.Name,
+                                                                    True,
+                                                                    EntityTypeInstance.X,
+                                                                    EntityTypeInstance.Y)
 
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
             For Each lrEntityTypeInstance In lrEntityTypeInstanceList
@@ -1342,10 +1332,10 @@ Public Class frm_UseCaseModel
             lrEntityTypeInstance = lr_page.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
 
             If lr_page.FormLoaded Then
-                lr_shape_node = lrEntityTypeInstance.shape.Clone(True)
+                lr_shape_node = lrEntityTypeInstance.Shape.Clone(True)
                 Me.morph_shape = lr_shape_node
             Else
-                Me.morph_shape = lr_actor.shape.Clone(True)
+                Me.morph_shape = lr_actor.Shape.Clone(True)
                 Me.morph_shape.Shape = Shapes.RoundRect
                 Me.morph_shape.HandlesStyle = HandlesStyle.InvisibleMove
                 Me.morph_shape.Text = lr_actor.Data
@@ -1357,7 +1347,7 @@ Public Class frm_UseCaseModel
 
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
-            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrEntityTypeInstance.x, lrEntityTypeInstance.y, 40)
+            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrEntityTypeInstance.X, lrEntityTypeInstance.Y, 40)
             Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
             Me.MorphStepTimer.Start()
             Me.MorphTimer.Start()
@@ -1396,11 +1386,11 @@ Public Class frm_UseCaseModel
         Me.DiagramHidden.Invalidate()
 
 
-        If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
+        If IsSomething(frmMain.zfrmModelExplorer) Then
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = item.Tag
 
-            prRichmondApplication.WorkingPage = lr_enterprise_view.Tag
+            prApplication.WorkingPage = lr_enterprise_view.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the ValueType being morphed
@@ -1443,28 +1433,28 @@ Public Class frm_UseCaseModel
         lr_shape_node.Text = ""
         lr_shape_node.Pen.Color = Color.White
         lr_shape_node.Transparent = True
-        lr_shape_node.Image = My.Resources.resource_file.actor
+        lr_shape_node.Image = My.Resources.CMML.actor
         lr_shape_node.Visible = True
 
         Me.morph_shape = lr_shape_node
 
         Me.DiagramHidden.Invalidate()
 
-        If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
+        If IsSomething(frmMain.zfrmModelExplorer) Then
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = item.Tag
-            frmMain.zfrm_enterprise_tree_viewer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-            prRichmondApplication.WorkingPage = lr_enterprise_view.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+            prApplication.WorkingPage = lr_enterprise_view.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
             Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
             lr_page = lr_enterprise_view.Tag
-            Dim lrActor = From FactType In lr_page.FactTypeInstance _
-                          From Fact In FactType.Fact _
-                          From RoleData In Fact.Data _
-                          Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString _
+            Dim lrActor = From FactType In lr_page.FactTypeInstance
+                          From Fact In FactType.Fact
+                          From RoleData In Fact.Data
+                          Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString
                           Select New FBM.FactDataInstance(Me.zrPage, Fact, RoleData.Role, RoleData.Concept, RoleData.X, RoleData.Y)
 
             Dim lrFactDataInstance As New Object
@@ -1493,7 +1483,7 @@ Public Class frm_UseCaseModel
         Dim lr_point As New Point
         Dim lr_rect As New Rectangle
 
-        lr_point = Me.morph_vector.get_nextmorphvector_step_point
+        lr_point = Me.morph_vector.getNextMorphVectorStepPoint
 
         Me.morph_shape.Move(lr_point.X, lr_point.Y)
         Me.DiagramHidden.Invalidate()
@@ -1501,8 +1491,8 @@ Public Class frm_UseCaseModel
         If Me.morph_vector.VectorStep > Me.morph_vector.VectorSteps Then
             Me.MorphStepTimer.Stop()
             Me.MorphStepTimer.Enabled = False
-            frmMain.zfrm_enterprise_tree_viewer.TreeView.SelectedNode = Me.MorphStepTimer.Tag
-            Call frmMain.zfrm_enterprise_tree_viewer.EditPageToolStripMenuItem_Click(sender, e)
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphStepTimer.Tag
+            Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
             Me.DiagramView.BringToFront()
             Me.Diagram.Invalidate()
             Me.MorphTimer.Enabled = False
@@ -1513,8 +1503,8 @@ Public Class frm_UseCaseModel
     Private Sub frm_UseCaseModel_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
 
         If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
-                frmMain.zfrm_enterprise_tree_viewer.TreeView.SelectedNode = Me.zoTreeNode
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
             End If
         End If
 
@@ -1582,7 +1572,7 @@ Public Class frm_UseCaseModel
         'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
-        Me.morph_vector = New tmorphvector(lr_process.X, lr_process.Y, 0, 0, 40)
+        Me.morph_vector = New tMorphVector(lr_process.X, lr_process.Y, 0, 0, 40)
 
         '---------------------------------------------------------------------
         'Clear the list of DFDDiagrams that may relate to the EntityType
@@ -1602,7 +1592,7 @@ Public Class frm_UseCaseModel
         '--------------------------------------
         'The EntityType represents a Process.
         '--------------------------------------
-        larPage_list = prRichmondApplication.CMML.get_DataFlowDiagram_pages_for_process(lr_process)
+        larPage_list = prApplication.CMML.getDataFlowDiagramPagesForProcess(lr_process)
 
         For Each lr_page In larPage_list
             Dim lo_menu_option As ToolStripItem
@@ -1611,15 +1601,12 @@ Public Class frm_UseCaseModel
             '----------------------------------------------------
             lo_menu_option = Me.DFDToolStripMenuItem.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram, _
-                                                       lr_page, _
-                                                       lr_page.Model.EnterpriseId, _
-                                                       lr_page.Model.SubjectAreaId, _
-                                                       lr_page.Model.ProjectId, _
-                                                       lr_page.Model.SolutionId, _
-                                                       lr_page.Model.ModelId, _
-                                                       pcenumLanguage.DataFlowDiagram, _
-                                                       Nothing, lr_page.PageId)
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.DataFlowDiagram,
+                                                               Nothing,
+                                                               lr_page.PageId)
             lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
         Next
@@ -1632,7 +1619,7 @@ Public Class frm_UseCaseModel
         '--------------------------------------
         'The Entity represents a Process.
         '--------------------------------------
-        larPage_list = prRichmondApplication.CMML.get_StateTransitionDiagram_pages_for_process(lr_process)
+        larPage_list = prApplication.CMML.getStateTransitionDiagramPagesForProcess(lr_process)
 
         For Each lr_page In larPage_list
             Dim lo_menu_option As ToolStripItem
@@ -1641,15 +1628,13 @@ Public Class frm_UseCaseModel
             '----------------------------------------------------
             lo_menu_option = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageStateTransitionDiagram, _
-                                                       lr_page, _
-                                                       lr_page.Model.EnterpriseId, _
-                                                       lr_page.Model.SubjectAreaId, _
-                                                       lr_page.Model.ProjectId, _
-                                                       lr_page.Model.SolutionId, _
-                                                       lr_page.Model.ModelId, _
-                                                       pcenumLanguage.StateTransitionDiagram, _
-                                                       Nothing, lr_page.PageId)
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageSTD,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.StateTransitionDiagram,
+                                                               Nothing,
+                                                               lr_page.PageId)
+
             lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler lo_menu_option.Click, AddressOf Me.morph_to_StateTransitionDiagram
         Next
@@ -1660,7 +1645,7 @@ Public Class frm_UseCaseModel
 
         Dim lo_point As System.Drawing.PointF
 
-        prRichmondApplication.WorkingPage = Me.zrPage
+        prApplication.WorkingPage = Me.zrPage
 
         lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
@@ -1673,7 +1658,7 @@ Public Class frm_UseCaseModel
             '---------------------------------------------------
             Dim lrPropertyGridForm As frmToolboxProperties
 
-            lrPropertyGridForm = prRichmondApplication.GetToolboxForm(frmToolboxProperties.Name)
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             If IsSomething(lrPropertyGridForm) Then
 
                 Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
@@ -1698,7 +1683,7 @@ Public Class frm_UseCaseModel
         ''--------------------------------------------------
         ''Just to be sure...set the Richmond.WorkingProject
         ''--------------------------------------------------
-        'prRichmondApplication.WorkingPage = Me.zrPage
+        'prApplication.WorkingPage = Me.zrPage
 
         'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
         '    '----------------------------
@@ -1747,19 +1732,19 @@ Public Class frm_UseCaseModel
         '    '        '------------------------------------                
         '    '        loNode.Selected = True
         '    '        loNode.Pen.Color = Color.Blue
-        '    '        prRichmondApplication.workingpage.MultiSelectionPerformed = True
+        '    '        prApplication.workingpage.MultiSelectionPerformed = True
 
         '    '        Select Case loNode.Tag.ConceptType
         '    '            Case Is = pcenumConceptType.role
         '    '                '----------------------------------------------------------------------
         '    '                'This stops a Role AND its FactType being selected at the same time
         '    '                '----------------------------------------------------------------------
-        '    '                prRichmondApplication.workingpage.SelectedObject.Remove(loNode.Tag.FactType)
+        '    '                prApplication.workingpage.SelectedObject.Remove(loNode.Tag.FactType)
         '    '        End Select
 
         '    '        Exit Sub
         '    '    Else
-        '    '        If prRichmondApplication.workingpage.MultiSelectionPerformed Then
+        '    '        If prApplication.workingpage.MultiSelectionPerformed Then
         '    '            If Diagram.Selection.Nodes.Contains(loNode) Then
         '    '                '--------------------------------------------------------------------
         '    '                'Don't clear the SelectedObjects if the ShapeNode selected/clicked on 
@@ -1863,7 +1848,7 @@ Public Class frm_UseCaseModel
         Me.zrPage.Language = pcenumLanguage.ORMModel
         Me.zrPage.FormLoaded = False
 
-        Call frmMain.zfrm_enterprise_tree_viewer.EditPageToolStripMenuItem_Click(sender, e)
+        Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
 
     End Sub
 End Class

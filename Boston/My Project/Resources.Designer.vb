@@ -243,6 +243,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property DataFlowDiagram16x16() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("DataFlowDiagram16x16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property deleteround16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("deleteround16x16", resourceCulture)

@@ -122,21 +122,21 @@ Partial Class frm_UseCaseModel
         '
         'ToolboxToolStripMenuItem
         '
-        Me.ToolboxToolStripMenuItem.Image = Global.Richmond.My.Resources.Resources.Toolbox16x16BW
+        Me.ToolboxToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.Toolbox16x16B_W
         Me.ToolboxToolStripMenuItem.Name = "ToolboxToolStripMenuItem"
         Me.ToolboxToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
         Me.ToolboxToolStripMenuItem.Text = "&Toolbox"
         '
         'ModelDictionaryToolStripMenuItem
         '
-        Me.ModelDictionaryToolStripMenuItem.Image = Global.Richmond.My.Resources.Resources.dictionary16x161
+        Me.ModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.dictionary16x16
         Me.ModelDictionaryToolStripMenuItem.Name = "ModelDictionaryToolStripMenuItem"
         Me.ModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
         Me.ModelDictionaryToolStripMenuItem.Text = "Model &Dictionary"
         '
         'PropertiesToolStripMenuItem
         '
-        Me.PropertiesToolStripMenuItem.Image = Global.Richmond.My.Resources.Resources.Properties216x16
+        Me.PropertiesToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.PropertiesToolStripMenuItem.Name = "PropertiesToolStripMenuItem"
         Me.PropertiesToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
         Me.PropertiesToolStripMenuItem.Text = "&Properties"
@@ -156,14 +156,14 @@ Partial Class frm_UseCaseModel
         '
         'mnuOption_ViewGrid
         '
-        Me.mnuOption_ViewGrid.Image = Global.Richmond.My.Resources.Resources.Grid
+        Me.mnuOption_ViewGrid.Image = Global.Boston.My.Resources.MenuImages.Grid
         Me.mnuOption_ViewGrid.Name = "mnuOption_ViewGrid"
         Me.mnuOption_ViewGrid.Size = New System.Drawing.Size(96, 22)
         Me.mnuOption_ViewGrid.Text = "&Grid"
         '
         'CopyToolStripMenuItem
         '
-        Me.CopyToolStripMenuItem.Image = Global.Richmond.My.Resources.Resources.Camera16x16
+        Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Camera16x16
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
         Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy Image to Clipboard"
@@ -188,21 +188,21 @@ Partial Class frm_UseCaseModel
         '
         'MenuItemUseCaseDiagramActor
         '
-        Me.MenuItemUseCaseDiagramActor.Image = Global.Richmond.My.Resources.Resources.usecase_16_16
+        Me.MenuItemUseCaseDiagramActor.Image = Global.Boston.My.Resources.Resources.UML_UseCase16x16
         Me.MenuItemUseCaseDiagramActor.Name = "MenuItemUseCaseDiagramActor"
         Me.MenuItemUseCaseDiagramActor.Size = New System.Drawing.Size(174, 22)
         Me.MenuItemUseCaseDiagramActor.Text = "&Use Case Diagram"
         '
         'ORMDiagramToolStripMenuItem
         '
-        Me.ORMDiagramToolStripMenuItem.Image = Global.Richmond.My.Resources.Resources.ORM_16x16
+        Me.ORMDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
         Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(174, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'MenuOptionDataFlowDiagramActor
         '
-        Me.MenuOptionDataFlowDiagramActor.Image = Global.Richmond.My.Resources.Resources.DataFlowDiagram16x16
+        Me.MenuOptionDataFlowDiagramActor.Image = Global.Boston.My.Resources.Resources.DataFlowDiagram16x16
         Me.MenuOptionDataFlowDiagramActor.Name = "MenuOptionDataFlowDiagramActor"
         Me.MenuOptionDataFlowDiagramActor.Size = New System.Drawing.Size(174, 22)
         Me.MenuOptionDataFlowDiagramActor.Text = "&Data Flow Diagram"
@@ -214,7 +214,7 @@ Partial Class frm_UseCaseModel
         '
         'PropertiesToolStripMenuItem1
         '
-        Me.PropertiesToolStripMenuItem1.Image = Global.Richmond.My.Resources.Resources.Properties216x16
+        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
         Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(127, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
@@ -234,21 +234,21 @@ Partial Class frm_UseCaseModel
         '
         'ToolStripMenuItemUseCaseDiagram
         '
-        Me.ToolStripMenuItemUseCaseDiagram.Image = Global.Richmond.My.Resources.Resources.usecase_16_16
+        Me.ToolStripMenuItemUseCaseDiagram.Image = Global.Boston.My.Resources.Resources.UML_UseCase16x16
         Me.ToolStripMenuItemUseCaseDiagram.Name = "ToolStripMenuItemUseCaseDiagram"
         Me.ToolStripMenuItemUseCaseDiagram.Size = New System.Drawing.Size(204, 22)
         Me.ToolStripMenuItemUseCaseDiagram.Text = "&Use Case Diagram"
         '
         'DFDToolStripMenuItem
         '
-        Me.DFDToolStripMenuItem.Image = Global.Richmond.My.Resources.Resources.DataFlowDiagram16x16
+        Me.DFDToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.DataFlowDiagram16x16
         Me.DFDToolStripMenuItem.Name = "DFDToolStripMenuItem"
         Me.DFDToolStripMenuItem.Size = New System.Drawing.Size(204, 22)
         Me.DFDToolStripMenuItem.Text = "&Data Flow Diagram"
         '
         'ToolStripMenuItemStateTransitionDiagram
         '
-        Me.ToolStripMenuItemStateTransitionDiagram.Image = Global.Richmond.My.Resources.Resources.StateTransitionDiagram_16x16
+        Me.ToolStripMenuItemStateTransitionDiagram.Image = Global.Boston.My.Resources.Resources.StateTransitionDiagram_16x16
         Me.ToolStripMenuItemStateTransitionDiagram.Name = "ToolStripMenuItemStateTransitionDiagram"
         Me.ToolStripMenuItemStateTransitionDiagram.Size = New System.Drawing.Size(204, 22)
         Me.ToolStripMenuItemStateTransitionDiagram.Text = "&State Transition Diagram"
@@ -260,7 +260,7 @@ Partial Class frm_UseCaseModel
         '
         'PropertiesToolStripMenuItem2
         '
-        Me.PropertiesToolStripMenuItem2.Image = Global.Richmond.My.Resources.Resources.Properties216x16
+        Me.PropertiesToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.PropertiesToolStripMenuItem2.Name = "PropertiesToolStripMenuItem2"
         Me.PropertiesToolStripMenuItem2.Size = New System.Drawing.Size(133, 22)
         Me.PropertiesToolStripMenuItem2.Text = "&Properties"
@@ -290,7 +290,7 @@ Partial Class frm_UseCaseModel
         '
         'PropertiesToolStripMenuItem3
         '
-        Me.PropertiesToolStripMenuItem3.Image = Global.Richmond.My.Resources.Resources.Properties216x16
+        Me.PropertiesToolStripMenuItem3.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.PropertiesToolStripMenuItem3.Name = "PropertiesToolStripMenuItem3"
         Me.PropertiesToolStripMenuItem3.Size = New System.Drawing.Size(127, 22)
         Me.PropertiesToolStripMenuItem3.Text = "&Properties"

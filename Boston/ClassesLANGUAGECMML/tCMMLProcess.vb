@@ -145,7 +145,7 @@ Namespace CMML
                     loDroppedNode.Shape = Shapes.Ellipse                    
                     loDroppedNode.Resize(20, 15)
                     loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
-                Case Is = pcenumLanguage.UseCaseDiagram
+                Case Is = pcenumLanguage.UMLUseCaseDiagram
                     loDroppedNode.Shape = Shapes.Ellipse
                     loDroppedNode.Resize(40, 12)
                 Case Is = pcenumLanguage.FlowChart

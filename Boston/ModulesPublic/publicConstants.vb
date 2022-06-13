@@ -364,10 +364,12 @@ Public Module publicConstants
     Public Enum pcenumMenuType
         menuBoston
         modelORMModel
+        pageDataFlowDiagram
         pageORMModel
         pagePGSDiagram
         pageERD
         pageSTD
+        pageUMLUseCaseDiagram
     End Enum
 
     <Serializable()> _

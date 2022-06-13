@@ -4,6 +4,30 @@ Public Class tCMML
 
     Public Core As FBM.Model
 
+    Public Function getORMDiagramPagesForActor(ByVal arActor As CMML.tActor) As List(Of FBM.Page)
+
+        getORMDiagramPagesForActor = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model
+
+        lrModel = arActor.Model
+
+        '---------------------------------------------------------------
+        'Pages where Actor is on the Page as an EntityType or FactType
+        '-------------------------------------
+        Dim larPage = From Page In lrModel.Page
+                      From ModelElement In Page.GetAllPageObjects
+                      Where Page.Language = pcenumLanguage.ORMModel _
+                      And ModelElement.Id = arActor.Data 'Could be either EntityType or FactType
+                      Select Page Distinct
+                      Order By Page.Name
+
+
+        getORMDiagramPagesForActor = larPage.ToList
+
+    End Function
+
+
     Public Function getORMDiagramPagesForEntityType(ByVal arEntityType As FBM.EntityType) As List(Of FBM.Page)
 
         Try
@@ -33,6 +57,8 @@ Public Class tCMML
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True,, True)
+
+            Return New List(Of FBM.Page)
         End Try
 
     End Function
@@ -41,22 +67,22 @@ Public Class tCMML
 
         getORMDiagramPagesForModelElementName = New List(Of FBM.Page)
 
-        Dim larPage = From Page In arModel.Page _
-                     From EntityTypeInstance In Page.EntityTypeInstance _
-                     Where Page.Language = pcenumLanguage.ORMModel _
-                     And EntityTypeInstance.EntityType.Id = asModelElementName _
-                     Select Page Distinct _
-                     Order By Page.Name
+        Dim larPage = From Page In arModel.Page
+                      From EntityTypeInstance In Page.EntityTypeInstance
+                      Where Page.Language = pcenumLanguage.ORMModel _
+                     And EntityTypeInstance.EntityType.Id = asModelElementName
+                      Select Page Distinct
+                      Order By Page.Name
 
         For Each lrPage In larPage
             getORMDiagramPagesForModelElementName.Add(lrPage)
         Next
 
-        larPage = From Page In arModel.Page _
-                  From FactTypeInstance In Page.FactTypeInstance _
+        larPage = From Page In arModel.Page
+                  From FactTypeInstance In Page.FactTypeInstance
                   Where Page.Language = pcenumLanguage.ORMModel _
-                  And FactTypeInstance.FactType.Id = asModelElementName _
-                  Select Page Distinct _
+                  And FactTypeInstance.FactType.Id = asModelElementName
+                  Select Page Distinct
                   Order By Page.Name
 
         For Each lrPage In larPage
@@ -64,6 +90,55 @@ Public Class tCMML
         Next
 
     End Function
+
+    Public Function getDataFlowDiagramPagesForActor(ByVal arActor As CMML.tActor) As List(Of FBM.Page)
+
+        getDataFlowDiagramPagesForActor = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model
+
+        lrModel = arActor.Model
+
+        Dim larPage = From Page In lrModel.Page
+                      From FactTypeInstance In Page.FactTypeInstance
+                      From Fact In FactTypeInstance.FactType.Fact
+                      From FactData In Fact.Data
+                      Where Page.Language = pcenumLanguage.DataFlowDiagram _
+                      And FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                      And FactData.Role.Name = "Element" _
+                      And FactData.Concept.Symbol = arActor.Name
+                      Select Page Distinct
+                      Order By Page.Name
+
+        getDataFlowDiagramPagesForActor = larPage.tolist
+
+    End Function
+
+    Public Function getDataFlowDiagramPagesForProcess(ByVal arProcess As CMML.Process) As List(Of FBM.Page)
+
+        '================================================
+        getDataFlowDiagramPagesForProcess = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model
+
+        lrModel = arProcess.Model
+
+        Dim larPage = From Page In lrModel.Page
+                      From FactTypeInstance In Page.FactTypeInstance
+                      From Fact In FactTypeInstance.FactType.Fact
+                      From FactData In Fact.Data
+                      Where Page.Language = pcenumLanguage.DataFlowDiagram _
+                      And FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                      And FactData.Role.Name = "Element" _
+                      And FactData.Concept.Symbol = arProcess.Name
+                      Select Page Distinct
+                      Order By Page.Name
+
+        getDataFlowDiagramPagesForProcess = larPage.tolist
+
+
+    End Function
+
 
     Public Function GetERDiagramPagesForEntity(ByVal arEntity As ERD.Entity) As List(Of FBM.Page)
 
@@ -162,6 +237,29 @@ Public Class tCMML
         For Each lrPage In larPage
             getPGSDiagramPagesForModelElementName.Add(lrPage)
         Next
+
+    End Function
+
+    Public Function getStateTransitionDiagramPagesForProcess(ByVal arProcess As CMML.Process) As List(Of FBM.Page)
+
+        getStateTransitionDiagramPagesForProcess = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model
+
+        lrModel = arProcess.Model
+
+        Dim larPage = From Page In lrModel.Page
+                      From FactType In Page.FactTypeInstance
+                      From Fact In FactType.FactType.Fact
+                      From RoleData In Fact.Data
+                      Where Page.Language = pcenumLanguage.StateTransitionDiagram _
+                      And FactType.Name = pcenumCMMLRelations.CoreStateTransition.ToString _
+                      And RoleData.Role.Name = pcenumCMML.Event.ToString _
+                      And RoleData.Concept.Symbol = arProcess.Name
+                      Select Page Distinct
+                      Order By Page.Name
+
+        getStateTransitionDiagramPagesForProcess = larPage.tolist
 
     End Function
 
@@ -406,5 +504,30 @@ Public Class tCMML
         End Try
 
     End Function
+
+    Public Function getUseCaseDiagramPagesForActor(ByVal arActor As CMML.tActor) As List(Of FBM.Page)
+
+        getUseCaseDiagramPagesForActor = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model
+
+        lrModel = arActor.Model
+
+        Dim larPage = From Page In lrModel.Page
+                      From FactType In Page.FactTypeInstance
+                      From Fact In FactType.FactType.Fact
+                      From RoleData In Fact.Data
+                      Where Page.Language = pcenumLanguage.UMLUseCaseDiagram _
+                     And FactType.Name = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString _
+                     And RoleData.Role.Name = pcenumCMML.Actor.ToString _
+                     And RoleData.Concept.Symbol = arActor.Name
+                      Select Page Distinct
+                      Order By Page.Name
+
+        getUseCaseDiagramPagesForActor = larPage.tolist
+
+
+    End Function
+
 
 End Class

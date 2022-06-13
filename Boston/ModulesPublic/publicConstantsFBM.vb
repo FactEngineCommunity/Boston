@@ -3,7 +3,7 @@
     <Serializable()> _
     Public Enum pcenumLanguage
         ORMModel = 1
-        UseCaseDiagram = 2
+        UMLUseCaseDiagram = 2
         BusinessRulesNaturalLanguage = 3 'English (see Italian below...may need to change this. We ClassBrain for more information about natural language processing).
         ZNotation = 4
         FlowChart = 6
@@ -12,7 +12,6 @@
         PropertyGraphSchema = 22
         StateTransitionDiagram = 10
         BPMN = 11
-        UMLUseCaseDiagram = 12
     End Enum
 
     <Serializable()>
