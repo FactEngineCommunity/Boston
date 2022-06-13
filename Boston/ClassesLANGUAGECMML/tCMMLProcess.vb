@@ -32,7 +32,7 @@ Namespace CMML
         ''' The Actor responsible for the process, as in (say) an EventTraceDiagram
         ''' </summary>
         ''' <remarks></remarks>
-        Public ResponsibleActor As CMML.tActor
+        Public ResponsibleActor As CMML.Actor
 
         <CategoryAttribute("Process"), _
              DefaultValueAttribute(GetType(String), ""), _

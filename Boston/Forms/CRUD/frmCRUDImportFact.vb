@@ -53,6 +53,8 @@ Public Class frmCRUDImportFact
 
         Call Me.zrFactTypeInstance.FactTable.ResortFactTable()
 
+        Me.zrFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
+
         Call Me.zrFactTypeInstance.Page.MakeDirty() 'Leave this as last call, because triggers events
 
         Me.DialogResult = Windows.Forms.DialogResult.OK

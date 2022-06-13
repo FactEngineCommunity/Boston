@@ -1285,7 +1285,7 @@ Namespace FactEngine
         Public Overrides Sub removeColumn(ByRef arColumn As RDS.Column)
 
             Try
-                Dim lsSQL As String
+                'Dim lsSQL As String
 
                 'lsSQL = "PRAGMA foreign_keys=OFF"
                 'Me.GONonQuery(lsSQL)

@@ -3376,6 +3376,8 @@ Public Class frmToolboxEnterpriseExplorer
                         Call frmMain.loadPGSDiagramView(lrPage, Me.TreeView.SelectedNode, asSelectModelElementId)
                     Case Is = pcenumLanguage.StateTransitionDiagram
                         Call frmMain.load_StateTransitionDiagram_view(lrPage, Me.TreeView.SelectedNode, True)
+                    Case Is = pcenumLanguage.UMLUseCaseDiagram
+                        Call frmMain.loadUMLUseCaseDiagramView(lrPage, Me.TreeView.SelectedNode, True)
                 End Select
 
                 'Select Case Me.TreeView.SelectedNode.Tag.MenuType
@@ -4865,4 +4867,61 @@ Public Class frmToolboxEnterpriseExplorer
         End Try
 
     End Sub
+
+    Private Sub AddUseCaseDiagramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddUseCaseDiagramToolStripMenuItem.Click
+
+        Try
+            '========================================================================================            
+            Dim lrModel As FBM.Model
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
+            '==============================================================
+            'Get the Core Metamodel.Page for an UseCaseDiagram
+            '==============================================================
+            Dim lrPage As FBM.Page
+
+            Using lrWaitCursor As New WaitCursor
+                Richmond.WriteToStatusBar("Loading the MetaModel for Use Case Diagrams")
+
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString,
+                                               pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString,
+                                               pcenumLanguage.ORMModel)
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
+                End If
+
+                '----------------------------------------------------
+                'Create the Page for the StateTransitionDiagram.
+                '----------------------------------------------------
+                Richmond.WriteToStatusBar("Creating the Page.")
+                lrPage = lrCorePage.Clone(prApplication.WorkingModel, True, True, , True) 'Assigns new PageId
+                lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("UML-UCD-NewDiagram", 0)
+                lrPage.Language = pcenumLanguage.UMLUseCaseDiagram
+
+                Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage, False)
+
+                Call lrPage.Save()
+
+            End Using 'WaitCursor
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

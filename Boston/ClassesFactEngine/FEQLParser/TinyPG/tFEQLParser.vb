@@ -36,42 +36,40 @@ Namespace FEQL
         End Function
 
         Private Function ParseFOLLOWINGREADINGTEXT(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: FOLLOWINGREADINGTEXT
-            Dim tok As Token
-            Dim n As ParseNode
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.FOLLOWINGREADINGTEXT), "FOLLOWINGREADINGTEXT")
             Dim lbProblemSolved As Boolean = True
 
-            Dim liOriginalRange as Integer = m_scanner.StartPos
+            Dim liOriginalRange As Integer = m_scanner.StartPos
             parent.Nodes.Add(node)
 
             Try
-            ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
-            If m_tree.Errors.Count > 0 Then
-              If m_scanner.EndPos > Me.MaxDistance Then
-                Me.MaxDistance = m_scanner.StartPos
-                max_tree = m_tree.clone
-              End If
-              If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
-              lbProblemSolved = False
-            End If
-
-            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
-              m_tree.Optionals.Clear()
-            End If
-            Finally
-            If lbProblemSolved Then
-              parent.Token.UpdateRange(node.Token)
-              Me.MaxDistance = node.Token.EndPos
-              If m_scanner.EndPos >= Me.MaxDistance Then
-                If m_tree.MaxDistance > max_tree.MaxDistance Then
-                Me.MaxDistance = m_scanner.StartPos
-                max_tree = m_tree.clone
+                ParsePREDICATECLAUSE(node) ' NonTerminal Rule: PREDICATECLAUSE
+                If m_tree.Errors.Count > 0 Then
+                    If m_scanner.EndPos > Me.MaxDistance Then
+                        Me.MaxDistance = m_scanner.StartPos
+                        max_tree = m_tree.Clone
+                    End If
+                    If node.Nodes.Count > 0 Then node.Nodes.RemoveAt(node.Nodes.Count - 1)
+                    lbProblemSolved = False
                 End If
-              End If
-            Else
-              m_scanner.StartPos = liOriginalRange
-              parent.Nodes.Remove(node)
-            End If
+
+                If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+                    m_tree.Optionals.Clear()
+                End If
+            Finally
+                If lbProblemSolved Then
+                    parent.Token.UpdateRange(node.Token)
+                    Me.MaxDistance = node.Token.EndPos
+                    If m_scanner.EndPos >= Me.MaxDistance Then
+                        If m_tree.MaxDistance > max_tree.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.Clone
+                        End If
+                    End If
+                Else
+                    m_scanner.StartPos = liOriginalRange
+                    parent.Nodes.Remove(node)
+                End If
             End Try
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: FOLLOWINGREADINGTEXT
@@ -1322,8 +1320,7 @@ Namespace FEQL
         End Function ' NonTerminalSymbol: Atom
 
         Private Function ParseFORMULA(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: FORMULA
-            Dim tok As Token
-            Dim n As ParseNode
+
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.FORMULA), "FORMULA")
             Dim lbProblemSolved As Boolean = True
 
@@ -2252,7 +2249,6 @@ Namespace FEQL
 
         Private Function ParseCOLUMNLIST(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: COLUMNLIST
             Dim tok As Token
-            Dim n As ParseNode
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.COLUMNLIST), "COLUMNLIST")
             Dim lbProblemSolved As Boolean = True
 
@@ -2647,8 +2643,7 @@ Namespace FEQL
         End Function ' NonTerminalSymbol: COMPARISON
 
         Private Function ParseCOMPARISONLIST(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: COMPARISONLIST
-            Dim tok As Token
-            Dim n As ParseNode
+
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.COMPARISONLIST), "COMPARISONLIST")
             Dim lbProblemSolved As Boolean = True
 
@@ -4384,8 +4379,7 @@ Namespace FEQL
         End Function ' NonTerminalSymbol: DATATYPEPRECISION
 
         Private Function ParseFACTPREDICATE(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: FACTPREDICATE
-            Dim tok As Token
-            Dim n As ParseNode
+
             Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.FACTPREDICATE), "FACTPREDICATE")
             Dim lbProblemSolved As Boolean = True
 

@@ -377,9 +377,9 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneActor(ByRef arPage As FBM.Page) As CMML.tActor
+        Public Function CloneActor(ByRef arPage As FBM.Page) As CMML.Actor
 
-            Dim lr_actor As New CMML.tActor
+            Dim lr_actor As New CMML.Actor
 
             With Me
                 lr_actor.Model = .Model

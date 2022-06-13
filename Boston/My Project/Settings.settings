@@ -45,7 +45,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="UsecaseShapeLibrary" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">.\shapelibrary\usecase.shl</Value>
     </Setting>
     <Setting Name="ORMShapeLibrary" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\shapelibrary\orm.shl</Value>

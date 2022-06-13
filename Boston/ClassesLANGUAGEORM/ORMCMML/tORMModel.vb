@@ -827,6 +827,25 @@ Namespace FBM
 
         End Sub
 
+        Public Sub createCMMLActor(ByRef arActor As CMML.Actor)
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " (Element, ElementType)"
+            lsSQLQuery &= " VALUES ('" & arActor.Name & "', 'Actor')"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+
+            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementName.ToString
+            lsSQLQuery &= " (Element, ElementName)"
+            lsSQLQuery &= " VALUES ('" & arActor.Name & "')"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
 
         Public Sub createCMMLTable(ByRef arTable As RDS.Table)
 

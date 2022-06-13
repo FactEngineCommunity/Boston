@@ -4,19 +4,19 @@ Imports System.Xml.Serialization
 Imports System.Reflection
 
 Namespace CMML
-    <Serializable()> _
-    Public Class tActor
+    <Serializable()>
+    Public Class Actor
         Inherits FBM.FactDataInstance
-        Implements IEquatable(Of CMML.tActor)
+        Implements IEquatable(Of CMML.Actor)
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Actor
 
-        <CategoryAttribute("Actor"), _
-             DefaultValueAttribute(GetType(String), ""), _
-             DescriptionAttribute("Name of the Actor.")> _
+        <CategoryAttribute("Actor"),
+             DefaultValueAttribute(GetType(String), ""),
+             DescriptionAttribute("Name of the Actor.")>
         Public Shadows _name As String = ""
-        Public Property EntityTypeName() As String
+        Public Overrides Property Name() As String
             Get
                 Return Me._name
             End Get
@@ -33,8 +33,8 @@ Namespace CMML
 
         Public process As List(Of CMML.Process)
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public NameShape As ShapeNode
 
         Public Sub New()
@@ -56,7 +56,7 @@ Namespace CMML
 
         End Sub
 
-        Public Shadows Function Equals(ByVal other As CMML.tActor) As Boolean Implements System.IEquatable(Of CMML.tActor).Equals
+        Public Shadows Function Equals(ByVal other As CMML.Actor) As Boolean Implements System.IEquatable(Of CMML.Actor).Equals
 
             If (Me.Role.Id = other.Role.Id) And (Me.Concept.Symbol = other.Concept.Symbol) Then
                 Return True
@@ -66,7 +66,7 @@ Namespace CMML
 
         End Function
 
-        Public Shadows Function EqualsByName(ByVal other As CMML.tActor) As Boolean
+        Public Shadows Function EqualsByName(ByVal other As CMML.Actor) As Boolean
 
             If other.Name Like (Me.Name) Then
                 Return True
@@ -86,7 +86,7 @@ Namespace CMML
 
         End Function
 
-        Public Shared Function CompareSequenceNrs(ByVal aoA As CMML.tActor, ByVal aoB As CMML.tActor) As Integer
+        Public Shared Function CompareSequenceNrs(ByVal aoA As CMML.Actor, ByVal aoB As CMML.Actor) As Integer
 
             '------------------------------------------------------
             'Used as a delegate within 'SortRoleGroup'
@@ -116,12 +116,12 @@ Namespace CMML
             loDroppedNode.Pen.Color = Color.White
             loDroppedNode.ShadowColor = Color.White
 
-            loDroppedNode.Tag = New CMML.tActor
+            loDroppedNode.Tag = New CMML.Actor
             loDroppedNode.Resize(10, 15)
 
             loDroppedNode.Tag = Me
 
-            Me.shape = loDroppedNode
+            Me.Shape = loDroppedNode
 
             '-----------------------------------------
             'Establish the Name caption for the Actor

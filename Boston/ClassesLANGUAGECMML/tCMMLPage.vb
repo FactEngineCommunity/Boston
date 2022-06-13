@@ -5,7 +5,7 @@ Namespace CMML
     Public Class Page
         Inherits FBM.Page
 
-        Sub DropActorAtPoint(ByRef arActor As CMML.tActor, ByVal aoPointF As PointF)
+        Sub DropActorAtPoint(ByRef arActor As CMML.Actor, ByVal aoPointF As PointF)
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance

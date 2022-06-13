@@ -93,6 +93,7 @@ Public Enum pcenumCMMLRelations
         CoreIndexIsForEntity
         CoreElementHasComment
         CoreElementHasElementType '{Element, ElementType}        
+        CoreElementHasElementName '{Element, ElementType}        
         CoreEnumerationHasEnumerationName
         CoreEnumerationHasEnumerationLiteral
         CoreEnumerationLiteralHasEnumerationLiteralName

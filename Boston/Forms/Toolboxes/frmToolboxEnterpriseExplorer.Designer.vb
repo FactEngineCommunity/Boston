@@ -427,7 +427,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'BusinessProcessModellingNotationToolStripMenuItem

@@ -36,19 +36,19 @@ Namespace FBM
 
         End Sub
 
-        Public Sub MouseDown() Implements iPageObject.MouseDown
+        Public Overloads Sub MouseDown() Implements iPageObject.MouseDown
 
         End Sub
 
-        Public Sub MouseMove() Implements iPageObject.MouseMove
+        Public Overloads Sub MouseMove() Implements iPageObject.MouseMove
 
         End Sub
 
-        Public Sub MouseUp() Implements iPageObject.MouseUp
+        Public Overloads Sub MouseUp() Implements iPageObject.MouseUp
 
         End Sub
 
-        Public Sub Moved() Implements iPageObject.Moved
+        Public Overloads Sub Moved() Implements iPageObject.Moved
 
         End Sub
 

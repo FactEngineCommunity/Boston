@@ -6,15 +6,14 @@ Imports MindFusion.Diagramming.WinForms
 Imports MindFusion.Drawing
 Imports MindFusion.Diagramming.Layout
 
-Public Class frm_UseCaseModel
+Public Class frmDiagrmUMLUseCase
 
     Public zrPage As FBM.Page = Nothing
     Public zoTreeNode As TreeNode = Nothing
-    Public UseCaseModel As New tUseCaseModel
 
     Private zo_containernode As ContainerNode
 
-    Private morph_vector As tmorphvector
+    Private morph_vector As tMorphVector
     Private morph_shape As New ShapeNode
 
 
@@ -27,13 +26,13 @@ Public Class frm_UseCaseModel
             If Me.zrPage.IsDirty Then
                 Select Case MsgBox("Changes have been made to the Page. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
                     Case Is = MsgBoxResult.Yes
-                        Me.zrPage.save()
+                        Me.zrPage.Save()
                     Case Is = MsgBoxResult.Cancel
                         e.Cancel = True
                         Exit Sub
                 End Select
             End If
-            Me.zrPage.form = Nothing
+            Me.zrPage.Form = Nothing
             Me.zrPage.ReferencedForm = Nothing
         End If
 
@@ -71,7 +70,7 @@ Public Class frm_UseCaseModel
 
     Sub SetupForm()
 
-        zo_containernode = Diagram.Factory.CreateContainerNode(10, 10, 100, 100, False)
+        zo_containernode = Diagram.Factory.CreateContainerNode(10, 100, 100, 100, False)
 
         zo_containernode.Tag = New tUseCaseSystemBoundary(pcenumConceptType.SystemBoundary)
         'lo_containernode.AllowIncomingLinks = False
@@ -211,7 +210,7 @@ Public Class frm_UseCaseModel
 
                             Call lrPage.ClearAndRefresh()
 
-                            Dim lrActor As New CMML.tActor(Me.zrPage)
+                            Dim lrActor As New CMML.Actor(Me.zrPage)
 
                             liCount = Me.zrPage.Model.EntityType.FindAll(AddressOf lrActor.EqualsByNameLike).Count
                             lrActor.Name &= " " & (CStr(liCount) + 1)
@@ -307,7 +306,7 @@ Public Class frm_UseCaseModel
         '
         'PARAMETERS
         '  arPage:  The Page of the ORM (meta-) Model within which the Use Case Diagram is injected.
-        '            The Richmond data model is an ORM meta-model. Use Case Diagrams are stored as 
+        '            The Boston data model is an ORM meta-model. Use Case Diagrams are stored as 
         '            propositional functions within the ORM meta-model.
         '
         'PSEUDOCODE
@@ -325,146 +324,106 @@ Public Class frm_UseCaseModel
 
         Me.zoTreeNode = aoTreeNode
 
-        Dim lr_actor_shape, lr_process_shape As New ShapeNode
+        Dim lrActorShape, lrProcessShape As New ShapeNode
 
+        '--------------------
+        'Load the Entities.
+        '--------------------
+        Dim lsSQLQuery As String = ""
+        Dim lrRecordset As ORMQL.Recordset
+
+        Dim lrActor As CMML.Actor = Nothing
+        Dim lrFactTypeInstance As New FBM.FactTypeInstance
+        Dim lrFactInstance As FBM.FactInstance
+        Dim lrFactDataInstance As FBM.FactDataInstance
+
+        lsSQLQuery = "SELECT *"
+        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+        lsSQLQuery &= " WHERE ElementType = 'Actor'"
+
+        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        While Not lrRecordset.EOF
+
+            lrFactDataInstance = lrRecordset("Element")
+            lrActor = lrFactDataInstance.CloneActor(arPage)
+            lrActor.X = lrFactDataInstance.X
+            lrActor.Y = lrFactDataInstance.Y
+
+            Call lrActor.DisplayAndAssociate()
+
+            Me.zrPage.UseCaseDiagram.Actor.Add(lrActor)
+
+            lrRecordset.MoveNext()
+        End While
+
+        'Set the location of the System Boundary
+        If Me.zrPage.UseCaseDiagram.Actor.Count > 0 Then
+            Dim larMinActorX = (From Actor In Me.zrPage.UseCaseDiagram.Actor
+                                Select Actor.X).Min
+            Me.zo_containernode.Move(larMinActorX + 30, zo_containernode.Bounds.Y)
+        End If
 
         '------------------------------------------------------------------------
         'Display the UseCaseDiagram by logically associating Shape objects
         '   with the corresponding 'object' within the ORMModelPage object
         '------------------------------------------------------------------------
-        Dim lrFactTypeInstance As New FBM.FactTypeInstance
-        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
-        If IsSomething(lrFactTypeInstance) Then
-            '------------------------------------------------------------------
-            'At least one Actor/Process relation has already been established
-            '------------------------------------------------------------------
-            Me.UseCaseModel.ActorToProcessParticipationRelation = lrFactTypeInstance
-        Else
-        End If
-
-        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessRelation.ToString)
-        Me.UseCaseModel.PocessToProcessRelation = lrFactTypeInstance
+        Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
+        Me.zrPage.UseCaseDiagram.PocessToProcessRelation = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessRelation.ToString)
 
 
-        Dim lrFactInstance As New FBM.FactInstance
-        Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
+        lsSQLQuery = "SELECT *"
+        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
 
-        If IsSomething(Me.UseCaseModel.ActorToProcessParticipationRelation) Then
-            For Each lrFactInstance In Me.UseCaseModel.ActorToProcessParticipationRelation.Fact
-                For Each lrFactDataInstance In lrFactInstance.Data
+        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If lrFactDataInstance.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString Then
-                        '------------
-                        'Is Actor
-                        '------------
-                        Dim lr_actor As New CMML.tActor
-                        lr_actor = lrFactDataInstance.CloneActor(arPage)
+        While Not lrRecordset.EOF
 
-                        '-------------------------------------------------------------------------------
-                        'Check to see if the Shape for the Actor has already been loaded onto the Page
-                        '-------------------------------------------------------------------------------
-                        Dim lr_node As MindFusion.Diagramming.DiagramNode
-                        Dim lbActorAlreadyLoaded As Boolean = False
-                        For Each lr_node In Diagram.Nodes
-                            Select Case lr_node.GetType.ToString
-                                Case Is = GetType(MindFusion.Diagramming.ShapeNode).ToString
-                                    If lr_node.Tag.ConceptType = pcenumConceptType.Actor Then
-                                        If lr_node.Tag.Name = lr_actor.Name Then
-                                            lbActorAlreadyLoaded = True
-                                            loDroppedNode = lr_node
-                                            lr_actor_shape = loDroppedNode
-                                        End If
-                                    End If
-                            End Select
-                        Next
+#Region "Actor"
+            Dim lbActorAlreadyLoaded As Boolean = False
 
-                        If lbActorAlreadyLoaded Then
-                            '----------------------------------------------------------------
-                            'Nothing further to do, because the Actor ShapeNode has already
-                            '  been loaded onto the Page.
-                            '----------------------------------------------------------------
-                        Else
-                            '----------------------------------------------
-                            'Create a ShapeNode on the Page for the Actor
-                            '----------------------------------------------
-                            loDroppedNode = Diagram.Factory.CreateShapeNode(lr_actor.X, lr_actor.Y, 2, 2)
-                            loDroppedNode.Shape = Shapes.Ellipse
-                            loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
-                            loDroppedNode.Resize(20, 15)
-                            loDroppedNode.AllowIncomingLinks = True
-                            loDroppedNode.AllowOutgoingLinks = True
-                            loDroppedNode.Image = My.Resources.CMML.actor
-                            loDroppedNode.Transparent = True
+            lrFactDataInstance = lrRecordset("Actor")
+            lrActor = lrFactDataInstance.CloneActor(arPage)
 
-                            loDroppedNode.Tag = New ERD.Entity
-                            loDroppedNode.Tag = lr_actor
-                            lr_actor.Shape = loDroppedNode
+            '-------------------------------------------------------------------------------
+            'Check to see if the Shape for the Actor has already been loaded onto the Page
+            '-------------------------------------------------------------------------------
+            Dim lrExistingActor = Me.zrPage.UseCaseDiagram.Actor.Find(Function(x) x.Name = lrActor.Name)
+            If lrExistingActor IsNot Nothing Then
+                lbActorAlreadyLoaded = True
+                loDroppedNode = lrActor.Shape
+                lrActorShape = loDroppedNode
+                lrActor = lrExistingActor
+            Else
+                lrActor.DisplayAndAssociate()
+            End If
+#End Region
 
-                            lr_actor_shape = loDroppedNode 'lr_actor_shape is used below to draw the link
+#Region "Process"
 
-                            '-----------------------------------------
-                            'Establish the Name caption for the Actor
-                            '-----------------------------------------
-                            Dim StringSize As New SizeF
-                            Dim lo_actor_name As New ShapeNode
+            Dim lrProcess As CMML.Process
+            lrFactDataInstance = lrRecordset("Process")
+            lrProcess = lrFactDataInstance.CloneProcess(arPage)
 
-                            StringSize = Me.Diagram.MeasureString("[" & Trim(lr_actor.Name) & "]", Me.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                            Dim lr_rectanglef As New RectangleF(loDroppedNode.Bounds.X, loDroppedNode.Bounds.Bottom, StringSize.Width, StringSize.Height)
-                            lo_actor_name = Me.Diagram.Factory.CreateShapeNode(lr_rectanglef, MindFusion.Diagramming.Shapes.Rectangle)
-                            lo_actor_name.HandlesStyle = HandlesStyle.InvisibleMove
-                            lo_actor_name.TextColor = Color.Black
-                            lo_actor_name.Transparent = True
-                            lo_actor_name.Visible = True
-                            lo_actor_name.Text = lr_actor.Name
-                            lo_actor_name.ZTop()
-                            Dim lrActorName As New CMML.ActorName
-                            lo_actor_name.Tag = lrActorName
-                            lrActorName.Shape = lo_actor_name
+            Call lrProcess.DisplayAndAssociate()
+#End Region
 
-                            lr_actor.NameShape = lo_actor_name
+            '------------------------------------------
+            'Link the Actor to the associated Process
+            '------------------------------------------
+            Dim lo_link As DiagramLink
+            lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
+            lo_link.Tag = New FBM.ModelObject
 
-                            '-----------------------------------------------------------
-                            'Attach the Actor.Name ShapeNode to the Actor Shape
-                            '-----------------------------------------------------------
-                            lo_actor_name.AttachTo(loDroppedNode, AttachToNode.BottomCenter)
-                        End If
-                    Else
-                        '------------
-                        'Is Process
-                        '------------
-                        Dim lr_process As New CMML.Process
-                        lr_process = lrFactDataInstance.CloneProcess(arPage)
+            lo_link.Tag = lrRecordset.CurrentFact
 
-                        loDroppedNode = Diagram.Factory.CreateShapeNode(lr_process.X, lr_process.Y, 2, 2)
-                        loDroppedNode.Shape = Shapes.Ellipse
-                        loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
-                        loDroppedNode.Resize(20, 15)
-                        loDroppedNode.AllowIncomingLinks = True
-                        loDroppedNode.AllowOutgoingLinks = True
-                        loDroppedNode.Text = lr_process.Name
-                        Me.zo_containernode.Add(loDroppedNode)
+            lrRecordset.MoveNext()
+        End While
 
-                        loDroppedNode.Tag = New ERD.Entity
-                        loDroppedNode.Tag = lr_process
-                        lr_process.Shape = loDroppedNode
-
-                        lr_process_shape = loDroppedNode
-                    End If
-
-                Next 'For Each lrFactDataInstance In lrFactInstance.data
-
-                '------------------------------------------
-                'Link the Actor to the associated Process
-                '------------------------------------------
-                Dim lo_link As DiagramLink
-                lo_link = Me.Diagram.Factory.CreateDiagramLink(lr_actor_shape, lr_process_shape)
-                lo_link.Tag = New FBM.ModelObject
-                lo_link.Tag = lrFactInstance
-            Next
-        End If
-
-        If IsSomething(Me.UseCaseModel.PocessToProcessRelation) Then
-            For Each lrFactInstance In Me.UseCaseModel.ActorToProcessParticipationRelation.Fact
+        If IsSomething(Me.zrPage.UseCaseDiagram.PocessToProcessRelation) Then
+            For Each lrFactInstance In Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation.Fact
                 For Each lrFactDataInstance In lrFactInstance.Data
 
                 Next
@@ -564,17 +523,17 @@ Public Class frm_UseCaseModel
 
     End Sub
 
-    Sub DropActorAtPoint(ByRef arActor As CMML.tActor, ByVal aoPointF As PointF)
+    Sub DropActorAtPoint(ByRef arActor As CMML.Actor, ByVal aoPointF As PointF)
 
         arActor.X = aoPointF.X
         arActor.Y = aoPointF.Y
 
-        If Not Me.UseCaseModel.Actor.Exists(AddressOf arActor.Equals) Then
+        If Not Me.zrPage.UseCaseDiagram.Actor.Exists(AddressOf arActor.Equals) Then
             '--------------------------------------------------
             'The EntityType is not already within the ORMModel
             '  so add it.
             '--------------------------------------------------
-            Me.UseCaseModel.Actor.Add(arActor)
+            Me.zrPage.UseCaseDiagram.Actor.Add(arActor)
         End If
 
         Call arActor.DisplayAndAssociate()
@@ -628,7 +587,7 @@ Public Class frm_UseCaseModel
             'Clone an instance of the Fact
             '----------------------------------
             lrFactInstance = lrFact.CloneInstance(Me.zrPage)
-            Me.UseCaseModel.ActorToProcessParticipationRelation.AddFact(lrFactInstance)
+            Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation.AddFact(lrFactInstance)
 
             Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
             Dim lrRole As New FBM.Role
@@ -664,7 +623,7 @@ Public Class frm_UseCaseModel
             'Clone and instance of the Fact
             '----------------------------------
             lrFactInstance = lrFact.CloneInstance(Me.zrPage)
-            Me.UseCaseModel.PocessToProcessRelation.AddFact(lrFactInstance)
+            Me.zrPage.UseCaseDiagram.PocessToProcessRelation.AddFact(lrFactInstance)
 
             Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
             Dim lrRole As New FBM.Role
@@ -1018,7 +977,7 @@ Public Class frm_UseCaseModel
             If Me.Diagram.Selection.Items.Count > 0 Then
                 frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.UseCaseModel
+                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.zrPage.UseCaseDiagram
             End If
         End If
 
@@ -1054,7 +1013,7 @@ Public Class frm_UseCaseModel
         Dim lr_page As FBM.Page
         Dim larPage_list As New List(Of FBM.Page)
         Dim lr_model As FBM.Model
-        Dim lr_actor As New CMML.tActor
+        Dim lr_actor As New CMML.Actor
 
 
         If Me.zrPage.SelectedObject.Count = 0 Then
@@ -1296,7 +1255,7 @@ Public Class frm_UseCaseModel
         Call Me.DiagramView.SendToBack()
         Call Me.HiddenDiagramView.BringToFront()
 
-        Dim lr_actor As New CMML.tActor
+        Dim lr_actor As New CMML.Actor
         lr_actor = Me.zrPage.SelectedObject(0)
 
         Dim lr_shape_node As ShapeNode
@@ -1656,6 +1615,8 @@ Public Class frm_UseCaseModel
             'If any objects are already highlighted as blue, 
             '  then change the outline to black/originalcolour
             '---------------------------------------------------
+            Me.zrPage.SelectedObject.Clear()
+
             Dim lrPropertyGridForm As frmToolboxProperties
 
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
@@ -1831,7 +1792,7 @@ Public Class frm_UseCaseModel
             If Me.Diagram.Selection.Items.Count > 0 Then
                 frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.UseCaseModel
+                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.zrPage.UseCaseDiagram
             End If
         End If
     End Sub
@@ -1851,4 +1812,5 @@ Public Class frm_UseCaseModel
         Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
 
     End Sub
+
 End Class

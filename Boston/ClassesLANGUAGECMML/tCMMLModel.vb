@@ -3,7 +3,7 @@
     Public Class Model
         Inherits FBM.Model
 
-        Public Actor As New List(Of CMML.tActor)
+        Public Actor As New List(Of CMML.Actor)
         Public Process As New List(Of CMML.Process)
 
         Public Sub AddActor()

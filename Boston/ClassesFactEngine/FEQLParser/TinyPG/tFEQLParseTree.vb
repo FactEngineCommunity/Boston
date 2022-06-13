@@ -780,7 +780,7 @@ Namespace FEQL
             Return Value
         End Function
 
-        Public Function Equals(other As ParseNode) As Boolean Implements IEquatable(Of ParseNode).Equals
+        Public Shadows Function Equals(other As ParseNode) As Boolean Implements IEquatable(Of ParseNode).Equals
             Return Me.GUID = other.GUID
         End Function
 

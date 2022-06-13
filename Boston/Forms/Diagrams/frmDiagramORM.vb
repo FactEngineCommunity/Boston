@@ -7429,6 +7429,7 @@ Public Class frmDiagramORM
                         'Add the new FactInstance to the FactTypeInstance
                         '--------------------------------------------------
                         lrFactTypeInstance.Fact.Add(lrFactInstance)
+                        Me.zrPage.FactInstance.Add(lrFactInstance)
 
                         lrFactTypeInstance.FactTable.ResortFactTable()
 
