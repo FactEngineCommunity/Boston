@@ -65,11 +65,11 @@ Namespace STD
 
         End Sub
 
-        Public Sub MouseDown() Implements iPageObject.MouseDown
+        Public Overloads Sub MouseDown() Implements iPageObject.MouseDown
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub MouseMove() Implements iPageObject.MouseMove
+        Public Overloads Sub MouseMove() Implements iPageObject.MouseMove
             Throw New NotImplementedException()
         End Sub
 

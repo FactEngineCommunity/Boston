@@ -798,6 +798,36 @@ Namespace FBM
 
         End Sub
 
+        Public Sub setCoreElementIsActor(ByRef arModelElement As FBM.ModelObject, ByVal abIsActor As Boolean)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                If abIsActor Then
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " (Element, ElementType)"
+                    lsSQLQuery &= " VALUES ('" & arModelElement.Id & "', 'Actor')"
+                Else
+                    lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " WHERE Element = '" & arModelElement.Id & "'"
+                    lsSQLQuery &= " AND ElementType = 'Actor'"
+                End If
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub createCMMLTable(ByRef arTable As RDS.Table)
 
             Dim lsSQLQuery As String

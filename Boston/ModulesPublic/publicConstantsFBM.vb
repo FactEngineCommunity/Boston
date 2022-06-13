@@ -12,6 +12,7 @@
         PropertyGraphSchema = 22
         StateTransitionDiagram = 10
         BPMN = 11
+        UMLUseCaseDiagram = 12
     End Enum
 
     <Serializable()>

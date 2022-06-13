@@ -3035,6 +3035,9 @@
     <None Include="Images\MenuImages\AddAttribute16x16.png" />
     <None Include="Images\MenuImages\BPMN16x16.png" />
     <None Include="Images\MenuImages\BPMNAdd16x16.png" />
+    <None Include="Images\MenuImages\BPMN-CollaborationDiagram-16x16.png" />
+    <None Include="Images\MenuImages\BPMN-ConversationDiagram-16x16.png" />
+    <None Include="Images\MenuImages\BPMN-ChoreiographyDiagram-16x16.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />
@@ -3120,6 +3123,8 @@
     <None Include="Images\ORMShapes\symmetric_transitive.png" />
     <None Include="Images\ORMShapes\acyclic_strongly_intransitive.png" />
     <None Include="Images\MenuImages\Verbalisation16x16.png" />
+    <None Include="Images\MenuImages\UML-UseCase16x16.png" />
+    <None Include="Images\MenuImages\UML16x16.png" />
     <Content Include="Images\Splash\Splash.png" />
     <Content Include="Images\Splash\Splash.png" />
     <None Include="Images\Viev\VievLogoMedium.jpg" />
