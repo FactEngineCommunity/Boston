@@ -480,7 +480,11 @@ Namespace XMLModel
                     'Establish the set of FactInstances that are on the Page
                     '  as ConceptInstances.
                     '--------------------------------------------------------------
-                    For Each lrFactInstance In lrPage.FactInstance
+                    Dim larFactInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          Select FactInstance
+
+                    For Each lrFactInstance In larFactInstance
                         lrConceptInstance = lrFactInstance.CloneConceptInstance
                         '-------------------------------------
                         'Add the ConceptInstance to the Page
@@ -492,7 +496,11 @@ Namespace XMLModel
                     'Establish the set of ValueInstances that are on the Page
                     '  as ConceptInstances.
                     '--------------------------------------------------------------
-                    For Each lrFactDataInstance In lrPage.ValueInstance
+                    Dim larFactData = From FactInstance In larFactInstance
+                                      From FactData In FactInstance.Data
+                                      Select FactData
+
+                    For Each lrFactDataInstance In larFactData
                         lrConceptInstance = lrFactDataInstance.CloneConceptInstance
                         '-------------------------------------
                         'Add the ConceptInstance to the Page

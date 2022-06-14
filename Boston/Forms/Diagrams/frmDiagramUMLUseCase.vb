@@ -286,12 +286,15 @@ Public Class frmDiagrmUMLUseCase
                             Call Me.DropActorAtPoint(lrActor, loPointF)
 
                         Case Is = "Process"
-                            'Use Case Model Level
-                            Dim lsUniqueProcessText = Me.zrPage.UMLDiagram.CreateUniqueProcessText("New Process", 0)
-                            Dim lrProcess As UML.Process = Me.zrPage.Model.createCMMLProcess(lsUniqueProcessText)
+
+                            'CMML Model level
+                            Dim lsUniqueProcessText = Me.zrPage.Model.UML.CreateUniqueProcessText("New ProcessTest", 0)
+                            Dim lrCMMLProcess As New CMML.Process(Me.zrPage.Model.UML, System.Guid.NewGuid.ToString, lsUniqueProcessText)
+                            Call Me.zrPage.Model.UML.addProcess(lrCMMLProcess)
 
                             'Page Level
-                            lrProcess = Me.zrPage.DropProcessAtPoint(lrProcess, loPointF, Me.zo_containernode)
+                            Call Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
+                            Debugger.Break()
                     End Select
                 End If
             End If
@@ -892,39 +895,51 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub Diagram_LinkSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkSelected
 
-        '-------------------------------------------------------
-        'ORM Verbalisation
-        '-------------------------------------------------------
-        Dim lrToolboxForm As frmToolboxORMVerbalisation
-        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
-            lrToolboxForm.zrModel = Me.zrPage.Model
-            Select Case e.Link.Tag.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    Call lrToolboxForm.VerbaliseEntityType(e.Link.Tag.EntityType)
-                Case Is = pcenumConceptType.ValueType
-                    Call lrToolboxForm.VerbaliseValueType(e.Link.Tag.ValueType)
-                Case Is = pcenumConceptType.FactType
-                    Call lrToolboxForm.VerbaliseFactType(e.Link.Tag.FactType)
-                Case Is = pcenumConceptType.Fact
-                    Dim lrFact As New FBM.Fact
-                    lrFact = e.Link.Tag.Fact
-                    Call lrToolboxForm.VerbaliseFact(lrFact)
-                Case Is = pcenumConceptType.RoleConstraint
-                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                    lrRoleConstraintInstance = e.Link.Tag
-                    Select Case lrRoleConstraintInstance.RoleConstraintType
-                        Case Is = pcenumRoleConstraintType.SubsetConstraint
-                            Call lrToolboxForm.VerbaliseRoleConstraintSubset(lrRoleConstraintInstance.RoleConstraint)
-                    End Select
-            End Select
-        End If
+        Try
+            '-------------------------------------------------------
+            'ORM Verbalisation
+            '-------------------------------------------------------
+            Dim lrToolboxForm As frmToolboxORMVerbalisation
+            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+            If IsSomething(lrToolboxForm) Then
+                lrToolboxForm.zrModel = Me.zrPage.Model
+                Select Case e.Link.Tag.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        Call lrToolboxForm.VerbaliseEntityType(e.Link.Tag.EntityType)
+                    Case Is = pcenumConceptType.ValueType
+                        Call lrToolboxForm.VerbaliseValueType(e.Link.Tag.ValueType)
+                    Case Is = pcenumConceptType.FactType
+                        Call lrToolboxForm.VerbaliseFactType(e.Link.Tag.FactType)
+                    Case Is = pcenumConceptType.Fact
+                        Dim lrFact As New FBM.Fact
+                        lrFact = e.Link.Tag.Fact
+                        Call lrToolboxForm.VerbaliseFact(lrFact)
+                    Case Is = pcenumConceptType.RoleConstraint
+                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                        lrRoleConstraintInstance = e.Link.Tag
+                        Select Case lrRoleConstraintInstance.RoleConstraintType
+                            Case Is = pcenumRoleConstraintType.SubsetConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintSubset(lrRoleConstraintInstance.RoleConstraint)
+                        End Select
+                End Select
+            End If
 
-        Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
-            Case Is = pcenumConceptType.ProcessProcessLink
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
-        End Select
+            Try
+                Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+                    Case Is = pcenumConceptType.ProcessProcessLink
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
+                End Select
+            Catch ex As Exception
+            End Try
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
@@ -2200,4 +2215,62 @@ Public Class frmDiagrmUMLUseCase
         End Try
 
     End Sub
+
+    Private Sub RemoveFromPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveFromPageToolStripMenuItem.Click
+
+        Dim lsSQLQuery As String = ""
+
+        Try
+            With New WaitCursor
+
+                ''---------------------------------------------------------
+                ''Get the Process represented by the (selected) Process
+                ''---------------------------------------------------------
+                Dim lrProcess As UML.Process = Me.Diagram.Selection.Items(0).Tag
+
+                '-------------------------------------------------------------------------
+                'Remove the Process from the Page
+                '---------------------------------
+                lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & lrProcess.Name & "'"
+
+                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim larLinkToRemove As New List(Of DiagramLink)
+
+                For Each lrLink In lrProcess.Shape.IncomingLinks
+                    larLinkToRemove.Add(lrLink)
+                Next
+
+                For Each lrLink In lrProcess.Shape.OutgoingLinks
+                    larLinkToRemove.Add(lrLink)
+                Next
+
+                For Each lrLink In larLinkToRemove
+                    Me.Diagram.Links.Remove(lrLink)
+                Next
+
+                '----------------------------------------------------------------------------------------------------------
+                'Remove the Process that represents the Process from the Diagram on the Page.
+                '-------------------------------------------------------------------------------
+                Me.Diagram.Nodes.Remove(lrProcess.Shape)
+                Me.zrPage.UMLDiagram.Process.Remove(lrProcess)
+
+            End With
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            Me.Cursor = Cursors.Default
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

@@ -235,14 +235,24 @@ Namespace FBM
         End Property
 
         Public RoleConstraintInstance As New List(Of FBM.RoleConstraintInstance)
-        <NonSerialized()>
-        Public FactInstance As New List(Of FBM.FactInstance)
-        <NonSerialized()>
-        Public ValueInstance As New List(Of FBM.FactDataInstance)
+
         <XmlIgnore()>
         Public ModelNoteInstance As New List(Of FBM.ModelNoteInstance)
 
         Public SubtypeRelationship As New List(Of FBM.SubtypeRelationshipInstance)
+
+        ''' <summary>
+        ''' 20220615-VM-Could be redundant. Now using LINQ in .fbm XMl file generation.
+        ''' </summary>
+        <NonSerialized()>
+        Public FactInstance As New List(Of FBM.FactInstance)
+
+        ''' <summary>
+        ''' 20220615-VM-Could be redundant. Now using LINQ in .fbm XMl file generation.
+        ''' </summary>
+        <NonSerialized()>
+        Public ValueInstance As New List(Of FBM.FactDataInstance)
+
 
         <JsonIgnore()>
         <NonSerialized()>

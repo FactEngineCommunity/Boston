@@ -841,7 +841,7 @@ Namespace FBM
 
             lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementName.ToString
             lsSQLQuery &= " (Element, ElementName)"
-            lsSQLQuery &= " VALUES ('" & arActor.Name & "')"
+            lsSQLQuery &= " VALUES ('" & arActor.Name & "','" & arActor.Name & "')"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -1659,6 +1659,66 @@ Namespace FBM
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
         End Sub
+
+        Public Sub PopulateCMMLStructureFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+
+            Try
+                Me.RDSLoading = True
+                Dim lsMessage As String
+
+                Dim lsSQLQuery As String = ""
+                Dim lrActor As CMML.Actor
+
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE ElementType = 'Actor'"
+
+                Dim lrORMRecordset
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lrModelElement As FBM.ModelObject
+                Dim lsColumnName As String = ""
+                Dim liInd As Integer = 0 'For reporting progress on Actors loaded.
+
+                While Not lrORMRecordset.EOF
+#Region "Actors"
+                    '-----------------------------------------------------
+                    'Get the underlying ModelElement
+                    lrModelElement = Me.GetModelObjectByName(lrORMRecordset("Element").Data)
+
+                    If lrModelElement Is Nothing Then
+                        'This is dire. Create a dummy FBMEntityType for the Actor, and add the EntityType to the Model. 
+                        '  The user can then elect to delete the EntityType/Actor if it shouldn't be in the model
+                        Dim lrEntityType = Me.CreateEntityType(lrORMRecordset("Element").Data, True)
+                        lrModelElement = lrEntityType
+
+                        'Let the user know what happened.
+                        lsMessage = "The Actor, '" & lrModelElement.Name & "', within the relational model had no corresponding Object-Role Model model element."
+                        lsMessage &= vbCrLf & vbCrLf & "An Entity Type has been created in the model to cater for this. If you no longer need this model element remove it from the model."
+                        Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
+                    End If
+
+                    lrActor = New CMML.Actor(Me.UML, lrORMRecordset("Element").Data, lrModelElement)
+                    Me.UML.Actor.Add(lrActor)
+
+                    lrORMRecordset.MoveNext()
+#End Region
+                End While 'Stepping through Actors
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Me.RDSLoading = False
+            End Try
+
+        End Sub
+
 
     End Class
 

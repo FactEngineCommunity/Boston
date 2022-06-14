@@ -4,13 +4,19 @@ Namespace FBM
 
     Partial Public Class Model
 
-        Public Function createCMMLProcess(ByVal asProcessText As String) As UML.Process
+        ''' <summary>
+        ''' Creates a Process within the CMML layer of the 4-Layer Architecture. Also creates a UML.Process
+        ''' </summary>
+        ''' <param name="arCMMLProcess"></param>
+        ''' <returns></returns>
+        Public Function createCMMLProcess(ByRef arCMMLProcess As CMML.Process) As UML.Process
 
             Dim lrProcess = New UML.Process
-            lrProcess.Text = asProcessText
-            lrProcess.Model = Me
 
-            'Me.CMML.Process.AddUnique(lrProcess)
+            lrProcess.Id = arCMMLProcess.Id 'Ids are used for Processes
+            lrProcess.CMMLProcess = arCMMLProcess
+            lrProcess.Text = arCMMLProcess.Text
+            lrProcess.Model = Me
 
             Dim lsSQLQuery As String
 

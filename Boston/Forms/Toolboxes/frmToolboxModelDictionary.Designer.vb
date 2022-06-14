@@ -88,7 +88,7 @@ Partial Class frmToolboxModelDictionary
         '
         Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Items.AddRange(New Object() {"Object-Role Model - Model Elements", "Entity-Relation - Entities", "Property Graph - Node Types"})
+        Me.ComboBox1.Items.AddRange(New Object() {"Object-Role Model - Model Elements", "Entity-Relation - Entities", "Property Graph - Node Types", "CMML - Common MetaModel Language"})
         Me.ComboBox1.Location = New System.Drawing.Point(70, 49)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(269, 21)

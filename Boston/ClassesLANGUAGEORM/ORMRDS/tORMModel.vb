@@ -2065,7 +2065,6 @@ Namespace FBM
 
                 '==========================================================================================================
                 'Relations                
-
                 Call Me.populateRDSRelationsFromCoreMDAElements()
 
                 '==========================================================
@@ -2075,10 +2074,13 @@ Namespace FBM
                     Call Me.PopulateSTMStructureFromCoreMDAElements()
                 End If
 
+                If CDbl(Viev.NullVal(Me.CoreVersionNumber, 0)) >= 2.2 Then
+                    Call Me.PopulateCMMLStructureFromCoreMDAElements()
+                End If
+
                 SyncLock Me
                     Me.RDSLoading = False
                 End SyncLock
-
 
             Catch ex As Exception
                 Dim lsMessage1 As String

@@ -1,4 +1,6 @@
-﻿Namespace CMML
+﻿Imports System.Reflection
+
+Namespace CMML
 
     Public Class Model
         '20220614-Was. Not sure why it was a subtype of FBM.Model
@@ -12,19 +14,96 @@
         Public ActorProcessRelation = New List(Of CMML.ActorProcessRelation)
         Public ProcessProcessRelation = New List(Of CMML.ProcessProcessRelation)
 
+        Public Event ActorAdded(ByRef arActor As CMML.Actor)
+        Public Event ActorRemoved(ByRef arTable As CMML.Actor)
+        Public Event ActorProcessRelationAdded(ByRef arActorProcessRelation As CMML.ActorProcessRelation)
+        Public Event ActorProcessRelationRemoved(ByRef arActorProcessRelation As CMML.ActorProcessRelation)
+        Public Event ProcessProcessRelationAdded(ByRef arProcesProcessRelation As CMML.ProcessProcessRelation)
+        Public Event ProcessProcessRelationRemoved(ByRef arProcesProcessRelation As CMML.ProcessProcessRelation)
+        Public Event ProcessAdded(ByRef arProcess As CMML.Process)
+        Public Event ProcessRemoved(ByVal arProcess As CMML.Process)
+
         Public Sub New(ByRef arModel As FBM.Model)
 
             Me.Model = arModel
 
         End Sub
 
-        Public Sub AddActor()
+        Public Sub addActor(ByRef arActor As CMML.Actor)
+
+            Try
+                Dim lrActor As CMML.Actor = arActor
+
+                'CodeSafe - Check that the Actor doesn't already exist
+                If Me.Actor.Find(Function(x) x.Name = lrActor.Name) IsNot Nothing Then
+                    'CodeSafe: Set arActor to the existing Actor.
+                    '20200725-VM-This might not be the right strategy. Need to revisit. Why is a Actor being created that already exists.
+                    'See FBM.FactType.Objectify for ManyToOne FactType.
+                    arActor = Me.Actor.Find(Function(x) x.Name = lrActor.Name)
+                    Exit Sub
+                    'Throw New Exception("Actor with name, " & arActor.Name & ", already exists in the Relational Data Structure.")
+                End If
+
+                Me.Actor.AddUnique(arActor)
+
+                Call Me.Model.createCMMLActor(arActor)
+
+                RaiseEvent ActorAdded(arActor)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
-        Public Sub AddProcess()
+
+        Public Sub addProcess(ByRef arProcess As CMML.Process)
+
+            Try
+                Me.Process.Add(arProcess)
+
+                Call Me.Model.createCMMLProcess(arProcess)
+
+                RaiseEvent ProcessAdded(arProcess)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
+
+        Public Function CreateUniqueProcessText(ByVal asRootProcessText As String, Optional aiCounter As Integer = 0) As String
+
+            Dim lsTrialProcessText As String
+
+            If aiCounter = 0 Then
+                lsTrialProcessText = asRootProcessText
+            Else
+                lsTrialProcessText = asRootProcessText & CStr(aiCounter)
+            End If
+
+            CreateUniqueProcessText = lsTrialProcessText
+
+            If Me.Process.Find(Function(x) x.Text = lsTrialProcessText) IsNot Nothing Then
+                CreateUniqueProcessText = Me.CreateUniqueProcessText(asRootProcessText, aiCounter + 1)
+            Else
+                Return lsTrialProcessText
+            End If
+
+        End Function
+
+
+
 
 
         ''' <summary>

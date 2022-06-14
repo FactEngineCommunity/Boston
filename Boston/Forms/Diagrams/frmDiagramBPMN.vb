@@ -180,7 +180,7 @@ Public Class frmDiagramBPMN
         lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
         While Not lrRecordset.EOF
 
-            lrProcess = New UML.Process(Me.zrPage, System.Guid.NewGuid.ToString, "DummyProcessId", "DummyProcessName")
+            lrProcess = New UML.Process(Me.zrPage, "DummyProcessId", "DummyProcessName")
 
             Dim lrFactDataInstance As FBM.FactDataInstance
 
@@ -203,7 +203,7 @@ Public Class frmDiagramBPMN
         lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
         While Not lrRecordset.EOF
 
-            lrProcess = New UML.Process(Me.zrPage, lrRecordset("Process").Data, "DummyProcessId", "DummyProcessName")
+            lrProcess = New UML.Process(Me.zrPage, lrRecordset("Process").Data, "DummyProcessName")
             lrProcess = Me.zrPage.UMLDiagram.Process.Find(AddressOf lrProcess.EqualsByName)
 
             Dim lrRecordsetSequenceNr As New ORMQL.Recordset
@@ -320,9 +320,9 @@ Public Class frmDiagramBPMN
 
         While Not lrRecordset.EOF
 
-            Dim lrProcess1 As New UML.Process(Me.zrPage, lrRecordset("Process1").Data, "DummyProcessId", "DummyProcessName")
+            Dim lrProcess1 As New UML.Process(Me.zrPage, lrRecordset("Process1").Data, "DummyProcessName")
             lrProcess1.FactData.Model = Me.zrPage.Model
-            Dim lrProcess2 As New UML.Process(Me.zrPage, lrRecordset("Process2").Data, "DummyProcessId", "DummyProcessName")
+            Dim lrProcess2 As New UML.Process(Me.zrPage, lrRecordset("Process2").Data, "DummyProcessName")
             lrProcess2.FactData.Model = Me.zrPage.Model
 
             lrProcess1 = Me.zrPage.UMLDiagram.Process.Find(AddressOf lrProcess1.EqualsByName)

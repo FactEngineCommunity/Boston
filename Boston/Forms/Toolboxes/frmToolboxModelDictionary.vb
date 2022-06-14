@@ -106,6 +106,9 @@ Public Class frmToolboxModelDictionary
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
                     Me.ComboBox1.SelectedIndex = 2
+                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                    Call Me.LoadCMMLModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 3
             End Select
             AddHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
 
@@ -330,6 +333,43 @@ Public Class frmToolboxModelDictionary
         End Try
 
     End Sub
+
+    Private Sub LoadCMMLModelDictionary()
+
+        Try
+            Dim loNode As New TreeNode
+
+            loNode = Me.TreeView1.Nodes.Add("Node", "Node", 0, 0)
+            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram, Nothing)
+
+            If prApplication.WorkingModel Is Nothing Then
+                Exit Sub
+            End If
+
+            Dim lrActor As CMML.Actor
+
+            prApplication.WorkingModel.UML.Actor.Sort(AddressOf CMML.Actor.CompareName)
+
+            For Each lrActor In prApplication.WorkingModel.UML.Actor
+                'loNode = New TreeNode
+                loNode = Me.TreeView1.Nodes("Node").Nodes.Add("Node" & lrActor.Name, lrActor.Name, 22, 22)
+                loNode.Tag = lrActor
+
+            Next
+
+            Me.TreeView1.Nodes(0).Expand()
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 
     Private Sub LoadPGSModelDictionary()
 
@@ -1284,6 +1324,9 @@ Public Class frmToolboxModelDictionary
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
                     Me.ComboBox1.SelectedIndex = 2
+                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                    Call Me.LoadCMMLModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 3
             End Select
             AddHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
 
@@ -1341,6 +1384,9 @@ Public Class frmToolboxModelDictionary
                     Call Me.LoadERDModelDictionary()
                 Case Is = 2
                     Call Me.LoadPGSModelDictionary()
+                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                    Call Me.LoadCMMLModelDictionary()
+                    Me.ComboBox1.SelectedIndex = 3
             End Select
 
         Catch ex As Exception

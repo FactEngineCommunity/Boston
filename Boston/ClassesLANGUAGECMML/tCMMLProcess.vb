@@ -61,6 +61,7 @@ Namespace CMML
         End Sub
 
         Public Sub New(ByRef arModel As CMML.Model, ByVal asProcessId As String, ByVal asProcessText As String)
+
             Call MyBase.New
 
             Me.Id = asProcessId

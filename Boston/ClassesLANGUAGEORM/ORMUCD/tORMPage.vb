@@ -9,6 +9,66 @@ Namespace FBM
         <NonSerialized>
         Public WithEvents CMMLModel As CMML.Model
 
+        Public Function DropCMMLProcessAtPoint(ByRef arCMMLProcess As CMML.Process,
+                                               ByVal aoPointF As PointF,
+                                               ByRef aoContainerNode As MindFusion.Diagramming.ContainerNode,
+                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As UML.Process
+
+            Dim lsSQLQuery As String = ""
+            Dim lrFactInstance As FBM.FactInstance
+            Dim lrRecordset As ORMQL.Recordset
+            Dim lsMessage As String = ""
+
+            Try
+                'Set the Process' Page to Me                
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE Element = '" & arCMMLProcess.Id & "'"
+
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If lrRecordset.EOF Then
+                    lsMessage = "The Process, '" & arCMMLProcess.Text & "', does not seem to exist at the Model level."
+
+                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Return Nothing
+                Else
+
+                    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                    lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lrUMLProcess As UML.Process = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneProcess(Me)
+                    lrUMLProcess.Id = arCMMLProcess.Id
+                    lrUMLProcess.Text = arCMMLProcess.Text
+
+                    Me.UMLDiagram.Process.AddUnique(lrUMLProcess)
+                    '===================================================================================================================
+
+                    Call lrUMLProcess.Move(aoPointF.X, aoPointF.Y, abBroadcastInterfaceEvent)
+
+                    Call Me.Save(False, False)
+
+                    Call lrUMLProcess.DisplayAndAssociate(aoContainerNode)
+
+                    Return lrUMLProcess
+                End If
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -27,6 +87,9 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
+                'Set the Process' Page to Me
+                arProcess.Page = Me
+
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                 lsSQLQuery &= " WHERE Element = '" & arProcess.Id & "'"

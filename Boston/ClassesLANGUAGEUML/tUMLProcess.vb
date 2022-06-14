@@ -17,6 +17,8 @@ Namespace UML
         ''' </summary>
         Public Text As String
 
+        Public CMMLProcess As CMML.Process
+
         Public Shadows Page As FBM.Page
 
         Public include_process As List(Of CMML.Process)
@@ -58,9 +60,10 @@ Namespace UML
             Me.Id = System.Guid.NewGuid.ToString
         End Sub
 
-        Public Sub New(ByRef arPage As FBM.Page, ByVal asGUID As String, ByVal asProcessId As String, ByVal asProcessText As String)
+        Public Sub New(ByRef arPage As FBM.Page, ByVal asProcessId As String, ByVal asProcessText As String)
             Call MyBase.New
 
+            Me.Id = asProcessId
             Me.Page = arPage
             Me.Model = arPage.Model
             Me.FactData.Model = arPage.Model
@@ -178,17 +181,29 @@ Namespace UML
             Me.X = aiNewX
             Me.Y = aiNewY
 
-            Me.FactDataInstance.X = aiNewX
-            Me.FactDataInstance.Y = aiNewY
+            Try
 
-            Me.FactDataInstance.Fact.FactType.isDirty = True
-            Me.FactDataInstance.Fact.isDirty = True
-            Me.FactDataInstance.isDirty = True
+                Me.FactDataInstance.X = aiNewX
+                Me.FactDataInstance.Y = aiNewY
+
+                Me.FactDataInstance.Fact.FactType.isDirty = True
+                Me.FactDataInstance.Fact.isDirty = True
+                Me.FactDataInstance.isDirty = True
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
             Try
                 Me.FactDataInstance.Page.MakeDirty()
             Catch ex As Exception
-
             End Try
 
         End Sub

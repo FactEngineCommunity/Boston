@@ -26,6 +26,8 @@ Namespace CMML
             End Set
         End Property
 
+        Public FBMModelElement As FBM.ModelObject
+
         ''' <summary>
         ''' The SequenceNr assigned to the Actor in (say) an EventTraceDiagram.
         ''' </summary>
@@ -44,10 +46,11 @@ Namespace CMML
             '-----------------------------------
         End Sub
 
-        Public Sub New(ByRef arModel As CMML.Model, ByVal asActorName As String)
+        Public Sub New(ByRef arModel As CMML.Model, ByVal asActorName As String, Optional ByRef arModelElement As FBM.ModelObject = Nothing)
 
             Me.Model = arModel
             Me.Name = asActorName
+            Me.FBMModelElement = arModelElement
 
         End Sub
 
@@ -74,6 +77,12 @@ Namespace CMML
             Else
                 Return False
             End If
+
+        End Function
+
+        Public Shared Function CompareName(x As CMML.Actor, y As CMML.Actor) As Integer
+
+            Return String.Compare(x.Name, y.Name)
 
         End Function
 
