@@ -20,66 +20,96 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub frm_UseCaseModel_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
-        '-------------------------------------------
-        'Process the page associated with the form.
-        '-------------------------------------------
-        If IsSomething(Me.zrPage) Then
-            If Me.zrPage.IsDirty Then
-                Select Case MsgBox("Changes have been made to the Page. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
-                    Case Is = MsgBoxResult.Yes
-                        Me.zrPage.Save()
-                    Case Is = MsgBoxResult.Cancel
-                        e.Cancel = True
-                        Exit Sub
-                End Select
+        Try
+            '-------------------------------------------
+            'Process the page associated with the form.
+            '-------------------------------------------
+            If IsSomething(Me.zrPage) Then
+                If Me.zrPage.IsDirty Then
+                    Select Case MsgBox("Changes have been made to the Page. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
+                        Case Is = MsgBoxResult.Yes
+                            Me.zrPage.Save()
+                        Case Is = MsgBoxResult.Cancel
+                            e.Cancel = True
+                            Exit Sub
+                    End Select
+                End If
+                Me.zrPage.Form = Nothing
+                Me.zrPage.ReferencedForm = Nothing
             End If
-            Me.zrPage.Form = Nothing
-            Me.zrPage.ReferencedForm = Nothing
-        End If
 
-        '----------------------------------------------
-        'Reset the PageLoaded flag on the Page so
-        '  that the User can open the Page again
-        '  if they want.
-        '----------------------------------------------        
-        Me.zrPage.FormLoaded = False
+            '----------------------------------------------
+            'Reset the PageLoaded flag on the Page so
+            '  that the User can open the Page again
+            '  if they want.
+            '----------------------------------------------        
+            Me.zrPage.FormLoaded = False
 
-        prApplication.WorkingModel = Nothing
-        prApplication.WorkingPage = Nothing
+            prApplication.WorkingModel = Nothing
+            prApplication.WorkingPage = Nothing
 
-        '------------------------------------------------
-        'If the 'Properties' window is open, reset the
-        '  SelectedObject
-        '------------------------------------------------
-        If Not IsNothing(frmMain.zfrm_properties) Then
-            frmMain.zfrm_properties.PropertyGrid.SelectedObject = Nothing
-        End If
+            '------------------------------------------------
+            'If the 'Properties' window is open, reset the
+            '  SelectedObject
+            '------------------------------------------------
+            If Not IsNothing(frmMain.zfrm_properties) Then
+                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Nothing
+            End If
 
-        Me.Hide()
+            Me.Hide()
 
-        frmMain.ToolStripButton_Save.Enabled = False
+            frmMain.ToolStripButton_Save.Enabled = False
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
 
     Private Sub frm_UseCaseModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
-        Call Me.SetupForm()
+        Try
+            Call Me.SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
 
     End Sub
 
     Sub SetupForm()
 
-        zo_containernode = Diagram.Factory.CreateContainerNode(10, 100, 100, 100, False)
+        Try
+            zo_containernode = Diagram.Factory.CreateContainerNode(10, 100, 100, 100, False)
 
-        zo_containernode.Tag = New UCD.UseCaseSystemBoundary(pcenumConceptType.SystemBoundary)
-        'lo_containernode.AllowIncomingLinks = False
-        zo_containernode.AllowOutgoingLinks = False
-        zo_containernode.Caption = "System Boundary"
-        zo_containernode.ToolTip = "System Boundary"
-        zo_containernode.Foldable = True
-        zo_containernode.AutoShrink = True
+            zo_containernode.Tag = New UCD.UseCaseSystemBoundary(pcenumConceptType.SystemBoundary)
+            'lo_containernode.AllowIncomingLinks = False
+            zo_containernode.AllowOutgoingLinks = False
+            zo_containernode.Caption = "System Boundary"
+            zo_containernode.ToolTip = "System Boundary"
+            zo_containernode.Foldable = True
+            zo_containernode.AutoShrink = True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -92,28 +122,47 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub frm_UseCaseModel_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
 
-        Call SetToolbox()
+        Try
+            Call SetToolbox()
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
     Private Sub frm_UseCaseModel_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
-        If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
+        Try
+            If IsSomething(Me.zoTreeNode) Then
+                If IsSomething(frmMain.zfrmModelExplorer) Then
+                    frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
+                End If
+
+                If prApplication.GetToolboxForm(frmToolboxModelDictionary.Name) Is Nothing Then
+                    Call frmMain.LoadToolboxModelDictionary(Me.zrPage.Language)
+                End If
             End If
 
-            If prApplication.GetToolboxForm(frmToolboxModelDictionary.Name) Is Nothing Then
-                Call frmMain.LoadToolboxModelDictionary(Me.zrPage.Language)
+            If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+                frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
             End If
-        End If
 
-        If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
-            frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
-        End If
+            Call SetToolbox()
 
-        Call SetToolbox()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -129,22 +178,36 @@ Public Class frmDiagrmUMLUseCase
 
     Sub SetToolbox()
 
-        Dim lsl_shape_library As ShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.UsecaseShapeLibrary)
-        Dim lo_shape As Shape
-        Dim child As New frmToolbox
+        Try
 
-        If prApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+            Dim lsl_shape_library As ShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.UsecaseShapeLibrary)
+            Dim lo_shape As Shape
+            Dim child As New frmToolbox
 
-            child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
-            child.ShapeListBox.Shapes = lsl_shape_library.Shapes
+            If prApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
 
-            For Each lo_shape In child.ShapeListBox.Shapes
-                Select Case lo_shape.DisplayName
-                    Case Is = "Actor"
-                        lo_shape.Image = My.Resources.CMML.actor
-                End Select
-            Next
-        End If
+                child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
+                child.ShapeListBox.Shapes = lsl_shape_library.Shapes
+
+                For Each lo_shape In child.ShapeListBox.Shapes
+                    Select Case lo_shape.DisplayName
+                        Case Is = "Actor"
+                            lo_shape.Image = My.Resources.CMML.actor
+                    End Select
+                Next
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+
+            lsMessage.AppendDoubleLineBreak(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
+            lsMessage.AppendDoubleLineBreak(Richmond.GetConfigFileLocation)
+
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -306,15 +369,14 @@ Public Class frmDiagrmUMLUseCase
         Dim loDroppedNode As ShapeNode = Nothing
         Dim lrFactTypeInstance_pt As PointF = Nothing
 
-        '-------------------------------------------------------
-        'Set the Caption/Title of the Page to the PageName
-        '-------------------------------------------------------
-        Me.zrPage = arPage
-        Me.TabText = arPage.Name
-
-        Me.zoTreeNode = aoTreeNode
-
         Try
+            '-------------------------------------------------------
+            'Set the Caption/Title of the Page to the PageName
+            '-------------------------------------------------------
+            Me.zrPage = arPage
+            Me.TabText = arPage.Name
+
+            Me.zoTreeNode = aoTreeNode
 
             Dim lrActorShape, lrProcessShape As New ShapeNode
 
@@ -476,7 +538,6 @@ Public Class frmDiagrmUMLUseCase
             End While
 #End Region
 
-
 #Region "Process to Process Participation Relations"
             lsSQLQuery = "SELECT *"
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
@@ -552,7 +613,6 @@ Public Class frmDiagrmUMLUseCase
                 lrRecordset.MoveNext()
             End While
 #End Region
-
 
             'System Boundary - Wrap around Processes
 #Region "System Boundary - Wrap around Processes"
@@ -1747,21 +1807,31 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub frm_UseCaseModel_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
 
-        If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
+        Try
+            If IsSomething(Me.zoTreeNode) Then
+                If IsSomething(frmMain.zfrmModelExplorer) Then
+                    frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
+                End If
             End If
-        End If
 
-        If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
-            frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
-        End If
+            If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+                frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
+            End If
 
-        If IsSomething(Me.zrPage) Then
-            Me.zrPage.SelectedObject.Clear()
-        End If
+            If IsSomething(Me.zrPage) Then
+                Me.zrPage.SelectedObject.Clear()
+            End If
 
-        Call Me.SetToolbox()
+            Call Me.SetToolbox()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

@@ -32,46 +32,55 @@ Namespace UCD
 
             Dim loDroppedNode As ShapeNode
 
-            loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
-            loDroppedNode.Shape = Shapes.RoundRect
-            loDroppedNode.HandlesStyle = HandlesStyle.Invisible
-            loDroppedNode.ToolTip = "Actor"
-            loDroppedNode.Visible = True
-            loDroppedNode.Image = My.Resources.CMML.actor
-            loDroppedNode.Pen.Color = Color.White
-            loDroppedNode.ShadowColor = Color.White
+            Try
+                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
+                loDroppedNode.Shape = Shapes.RoundRect
+                loDroppedNode.HandlesStyle = HandlesStyle.Invisible
+                loDroppedNode.ToolTip = "Actor"
+                loDroppedNode.Visible = True
+                loDroppedNode.Image = My.Resources.CMML.actor
+                loDroppedNode.Pen.Color = Color.White
+                loDroppedNode.ShadowColor = Color.White
 
-            loDroppedNode.Tag = New CMML.Actor
-            loDroppedNode.Resize(10, 15)
+                loDroppedNode.Tag = New CMML.Actor
+                loDroppedNode.Resize(10, 15)
 
-            loDroppedNode.Tag = Me
+                loDroppedNode.Tag = Me
 
-            Me.Shape = loDroppedNode
+                Me.Shape = loDroppedNode
 
-            '-----------------------------------------
-            'Establish the Name caption for the Actor
-            '-----------------------------------------
-            Dim StringSize As New SizeF
-            Dim loActorNameShape As New ShapeNode
+                '-----------------------------------------
+                'Establish the Name caption for the Actor
+                '-----------------------------------------
+                Dim StringSize As New SizeF
+                Dim loActorNameShape As New ShapeNode
 
-            StringSize = Me.Page.Diagram.MeasureString("[" & Trim(Me.Name) & "]", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-            Dim lr_rectanglef As New RectangleF(loDroppedNode.Bounds.X, loDroppedNode.Bounds.Bottom, StringSize.Width, StringSize.Height)
-            loActorNameShape = Me.Page.Diagram.Factory.CreateShapeNode(lr_rectanglef, MindFusion.Diagramming.Shapes.Rectangle)
-            loActorNameShape.HandlesStyle = HandlesStyle.Invisible
-            loActorNameShape.TextColor = Color.Black
-            loActorNameShape.Transparent = True
-            loActorNameShape.Visible = True
-            loActorNameShape.Text = Me.Name
-            loActorNameShape.ZTop()
-            Dim lrActorName As New UCD.ActorName
-            loActorNameShape.Tag = lrActorName
-            lrActorName.Shape = loActorNameShape
+                StringSize = Me.Page.Diagram.MeasureString("[" & Trim(Me.Name) & "]", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                Dim lr_rectanglef As New RectangleF(loDroppedNode.Bounds.X, loDroppedNode.Bounds.Bottom, StringSize.Width, StringSize.Height)
+                loActorNameShape = Me.Page.Diagram.Factory.CreateShapeNode(lr_rectanglef, MindFusion.Diagramming.Shapes.Rectangle)
+                loActorNameShape.HandlesStyle = HandlesStyle.Invisible
+                loActorNameShape.TextColor = Color.Black
+                loActorNameShape.Transparent = True
+                loActorNameShape.Visible = True
+                loActorNameShape.Text = Me.Name
+                loActorNameShape.ZTop()
+                Dim lrActorName As New UCD.ActorName
+                loActorNameShape.Tag = lrActorName
+                lrActorName.Shape = loActorNameShape
 
-            '-----------------------------------------------------------
-            'Attach the Actor.Name ShapeNode to the Actor Shape
-            '-----------------------------------------------------------
-            loActorNameShape.AttachTo(loDroppedNode, AttachToNode.BottomCenter)
+                '-----------------------------------------------------------
+                'Attach the Actor.Name ShapeNode to the Actor Shape
+                '-----------------------------------------------------------
+                loActorNameShape.AttachTo(loDroppedNode, AttachToNode.BottomCenter)
 
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -405,21 +405,31 @@ Namespace FBM
 
             Dim lr_actor As New UCD.Actor
 
-            With Me
-                lr_actor.Model = .Model
-                lr_actor.Page = arPage
-                lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
-                lr_actor.FactData = .FactData
-                lr_actor.Name = .Concept.Symbol
-                lr_actor.FactDataInstance = Me
-                lr_actor.JoinedObjectType = .Role.JoinedORMObject
-                lr_actor.Concept = .Concept
-                lr_actor.Role = .Role
-                lr_actor.X = .X
-                lr_actor.Y = .Y
-                lr_actor.Shape = .Shape
-                lr_actor.TableShape = .TableShape
-            End With
+            Try
+                With Me
+                    lr_actor.Model = .Model
+                    lr_actor.Page = arPage
+                    lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lr_actor.FactData = .FactData
+                    lr_actor.Name = .Concept.Symbol
+                    lr_actor.FactDataInstance = Me
+                    lr_actor.JoinedObjectType = .Role.JoinedORMObject
+                    lr_actor.Concept = .Concept
+                    lr_actor.Role = .Role
+                    lr_actor.X = .X
+                    lr_actor.Y = .Y
+                    lr_actor.Shape = .Shape
+                    lr_actor.TableShape = .TableShape
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
             Return lr_actor
 
@@ -628,22 +638,32 @@ Namespace FBM
 
             Dim lrProcess As New UCD.Process
 
-            With Me
-                lrProcess.Model = .Model
-                lrProcess.Page = arPage
-                lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
-                lrProcess.FactData = Me.FactData
-                lrProcess.Id = .Concept.Symbol
-                lrProcess.Name = .Concept.Symbol
-                lrProcess.Symbol = .Data
-                lrProcess.FactDataInstance = New FBM.FactDataInstance
-                lrProcess.FactDataInstance = Me
-                lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
-                lrProcess.Concept = .Concept
-                lrProcess.Role = .Role
-                lrProcess.X = .X
-                lrProcess.Y = .Y
-            End With
+            Try
+                With Me
+                    lrProcess.Model = .Model
+                    lrProcess.Page = arPage
+                    lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lrProcess.FactData = Me.FactData
+                    lrProcess.Id = .Concept.Symbol
+                    lrProcess.Name = .Concept.Symbol
+                    lrProcess.Symbol = .Data
+                    lrProcess.FactDataInstance = New FBM.FactDataInstance
+                    lrProcess.FactDataInstance = Me
+                    lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
+                    lrProcess.Concept = .Concept
+                    lrProcess.Role = .Role
+                    lrProcess.X = .X
+                    lrProcess.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
             Return lrProcess
 

@@ -128,48 +128,59 @@ Namespace UCD
         Public Sub DisplayAndAssociate(Optional ByRef aoContainerNode As ContainerNode = Nothing)
 
             Dim loDroppedNode As New ShapeNode
-            '--------------------------------------------------------------------
-            'Create a Shape for the EntityTypeInstance on the DiagramView object
-            '--------------------------------------------------------------------            
-            loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
-            loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove ''HatchHandles3 is a very professional look, or SquareHandles2
-            loDroppedNode.ToolTip = "process"
-            loDroppedNode.AllowOutgoingLinks = True
-            loDroppedNode.AllowIncomingLinks = True
-            loDroppedNode.Text = Me.Text 'arProcessInstance.Name            
-            loDroppedNode.Tag = New FBM.EntityTypeInstance 'loDroppedNode.Tag = New Object
-            loDroppedNode.Tag = Me
-            loDroppedNode.Obstacle = True
-            Me.Shape = loDroppedNode
 
-            Select Case Me.Page.Language
-                Case Is = pcenumLanguage.ORMModel
-                    'Can delete this later. At present, if the MetaModel is shown as an ORM diagram, the Page.Language changes to ORMModel
-                    ' then if you drop a Process on the Page, the Process has no default shape
-                    loDroppedNode.Shape = Shapes.Ellipse
-                    loDroppedNode.Resize(20, 15)
-                    loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
-                Case Is = pcenumLanguage.DataFlowDiagram
-                    loDroppedNode.Shape = Shapes.Ellipse
-                    loDroppedNode.Resize(20, 15)
-                    loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
-                Case Is = pcenumLanguage.UMLUseCaseDiagram
-                    loDroppedNode.Shape = Shapes.Ellipse
-                    loDroppedNode.Resize(40, 12)
-                Case Is = pcenumLanguage.FlowChart
-                    If Me.IsDecision Then
-                        loDroppedNode.Shape = Shapes.Decision
-                    ElseIf Me.IsStart Then
-                        loDroppedNode.Shape = Shapes.Ellipse
-                    ElseIf Me.IsStop Then
-                        loDroppedNode.Shape = Shapes.Ellipse
-                    End If
-                    loDroppedNode.Resize(20, 15)
-            End Select
+            Try
+                '--------------------------------------------------------------------
+                'Create a Shape for the EntityTypeInstance on the DiagramView object
+                '--------------------------------------------------------------------            
+                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
+                loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove ''HatchHandles3 is a very professional look, or SquareHandles2
+                loDroppedNode.ToolTip = "process"
+                loDroppedNode.AllowOutgoingLinks = True
+                loDroppedNode.AllowIncomingLinks = True
+                loDroppedNode.Text = Me.Text 'arProcessInstance.Name            
+                loDroppedNode.Tag = New FBM.EntityTypeInstance 'loDroppedNode.Tag = New Object
+                loDroppedNode.Tag = Me
+                loDroppedNode.Obstacle = True
+                Me.Shape = loDroppedNode
 
-            If IsSomething(aoContainerNode) Then
-                aoContainerNode.Add(loDroppedNode)
-            End If
+                Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        'Can delete this later. At present, if the MetaModel is shown as an ORM diagram, the Page.Language changes to ORMModel
+                        ' then if you drop a Process on the Page, the Process has no default shape
+                        loDroppedNode.Shape = Shapes.Ellipse
+                        loDroppedNode.Resize(20, 15)
+                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
+                    Case Is = pcenumLanguage.DataFlowDiagram
+                        loDroppedNode.Shape = Shapes.Ellipse
+                        loDroppedNode.Resize(20, 15)
+                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
+                    Case Is = pcenumLanguage.UMLUseCaseDiagram
+                        loDroppedNode.Shape = Shapes.Ellipse
+                        loDroppedNode.Resize(40, 12)
+                    Case Is = pcenumLanguage.FlowChart
+                        If Me.IsDecision Then
+                            loDroppedNode.Shape = Shapes.Decision
+                        ElseIf Me.IsStart Then
+                            loDroppedNode.Shape = Shapes.Ellipse
+                        ElseIf Me.IsStop Then
+                            loDroppedNode.Shape = Shapes.Ellipse
+                        End If
+                        loDroppedNode.Resize(20, 15)
+                End Select
+
+                If IsSomething(aoContainerNode) Then
+                    aoContainerNode.Add(loDroppedNode)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
