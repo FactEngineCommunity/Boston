@@ -377,9 +377,9 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneActor(ByRef arPage As FBM.Page) As CMML.Actor
+        Public Function CloneActor(ByRef arPage As FBM.Page) As UML.Actor
 
-            Dim lr_actor As New CMML.Actor
+            Dim lr_actor As New UML.Actor
 
             With Me
                 lr_actor.Model = .Model
@@ -400,6 +400,31 @@ Namespace FBM
             Return lr_actor
 
         End Function
+
+        Public Function CloneUCDActor(ByRef arPage As FBM.Page) As UCD.Actor
+
+            Dim lr_actor As New UCD.Actor
+
+            With Me
+                lr_actor.Model = .Model
+                lr_actor.Page = arPage
+                lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                lr_actor.FactData = .FactData
+                lr_actor.Name = .Concept.Symbol
+                lr_actor.FactDataInstance = Me
+                lr_actor.JoinedObjectType = .Role.JoinedORMObject
+                lr_actor.Concept = .Concept
+                lr_actor.Role = .Role
+                lr_actor.X = .X
+                lr_actor.Y = .Y
+                lr_actor.Shape = .Shape
+                lr_actor.TableShape = .TableShape
+            End With
+
+            Return lr_actor
+
+        End Function
+
 
         Public Function CloneAttribute(ByRef arPage As FBM.Page) As ERD.Attribute
 
@@ -574,9 +599,9 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneProcess(ByRef arPage As FBM.Page) As CMML.Process
+        Public Function CloneProcess(ByRef arPage As FBM.Page) As UML.Process
 
-            Dim lrProcess As New CMML.Process
+            Dim lrProcess As New UML.Process
 
             With Me
                 lrProcess.Model = .Model
@@ -598,6 +623,32 @@ Namespace FBM
             Return lrProcess
 
         End Function
+
+        Public Function CloneUCDProcess(ByRef arPage As FBM.Page) As UCD.Process
+
+            Dim lrProcess As New UCD.Process
+
+            With Me
+                lrProcess.Model = .Model
+                lrProcess.Page = arPage
+                lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                lrProcess.FactData = Me.FactData
+                lrProcess.Id = .Concept.Symbol
+                lrProcess.Name = .Concept.Symbol
+                lrProcess.Symbol = .Data
+                lrProcess.FactDataInstance = New FBM.FactDataInstance
+                lrProcess.FactDataInstance = Me
+                lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
+                lrProcess.Concept = .Concept
+                lrProcess.Role = .Role
+                lrProcess.X = .X
+                lrProcess.Y = .Y
+            End With
+
+            Return lrProcess
+
+        End Function
+
 
 
         Public Sub ChangeData(ByVal asNewSymbol As String)

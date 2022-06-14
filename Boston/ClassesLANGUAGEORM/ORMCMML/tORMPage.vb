@@ -285,6 +285,7 @@ Namespace FBM
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                 lsSQLQuery &= " WHERE Element = '" & arTable.Name & "'"
+                lsSQLQuery &= " AND ElementType = 'Entity'"
 
                 lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -2040,6 +2041,7 @@ SkipAdding:
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                 lsSQLQuery &= " WHERE Element = '" & arTable.Name & "'"
+                lsSQLQuery &= " AND ElementType = 'Entity'"
 
                 lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 

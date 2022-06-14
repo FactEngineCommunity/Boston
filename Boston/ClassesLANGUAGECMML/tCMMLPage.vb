@@ -5,7 +5,7 @@ Namespace CMML
     Public Class Page
         Inherits FBM.Page
 
-        Sub DropActorAtPoint(ByRef arActor As CMML.Actor, ByVal aoPointF As PointF)
+        Sub DropActorAtPoint(ByRef arActor As UML.Actor, ByVal aoPointF As PointF)
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance
@@ -312,7 +312,7 @@ Namespace CMML
 
         End Sub
 
-        Sub DropProcessAtPoint(ByRef arProcessInstance As CMML.Process, ByVal aoPointF As PointF, Optional ByRef aoContainerNode As ContainerNode = Nothing)
+        Sub DropProcessAtPoint(ByRef arProcessInstance As UML.Process, ByVal aoPointF As PointF, Optional ByRef aoContainerNode As ContainerNode = Nothing)
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance

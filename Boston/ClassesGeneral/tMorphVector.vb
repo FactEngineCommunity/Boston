@@ -26,6 +26,7 @@ Public Class tMorphVector
     Public TargetZoomFactor As Integer = 100
 
     Public TargetShape As pcenumTargetMorphShape = pcenumTargetMorphShape.RoundRectangle
+    Public TargetText As String = ""
 
     Public ModelElementId As String = ""
 
@@ -59,7 +60,9 @@ Public Class tMorphVector
             Dim li_vector_x As Integer = Abs(Me.EndPoint.X - Me.StartPoint.X)
             Dim li_vector_y As Integer = Abs(Me.EndPoint.Y - Me.StartPoint.Y)
 
-            Me.VectorStep += 1
+            Dim liHypotenuse = Math.Sqrt(li_vector_x ^ 2 + li_vector_y ^ 2)
+
+            Me.VectorStep += liHypotenuse / Me.VectorSteps
 
             li_vector_x = Int((li_vector_x / Me.VectorSteps) * Me.VectorStep)
             li_vector_y = Int((li_vector_y / Me.VectorSteps) * Me.VectorStep)

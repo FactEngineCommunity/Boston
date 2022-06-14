@@ -16,10 +16,10 @@ Namespace FBM
         ''' <param name="aoPointF"></param>
         ''' <param name="aoContainerNode"></param>
         ''' <returns></returns>
-        Public Function DropProcessAtPoint(ByRef arProcess As CMML.Process,
+        Public Function DropProcessAtPoint(ByRef arProcess As UML.Process,
                                            ByVal aoPointF As PointF,
                                            ByRef aoContainerNode As MindFusion.Diagramming.ContainerNode,
-                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As CMML.Process
+                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As UML.Process
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance
@@ -46,9 +46,9 @@ Namespace FBM
 
                     lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrProcess As CMML.Process = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneProcess(Me)
+                    Dim lrProcess As UML.Process = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneProcess(Me)
                     lrProcess.Text = arProcess.Text
-                    Me.UseCaseDiagram.Process.AddUnique(lrProcess)
+                    Me.UMLDiagram.Process.AddUnique(lrProcess)
                     '===================================================================================================================
 
                     Call lrProcess.Move(aoPointF.X, aoPointF.Y, abBroadcastInterfaceEvent)

@@ -1,0 +1,3 @@
+﻿see tActor.vb in ClassesLANGUAGECMML.
+
+The template for UCD.Actor is common to Use Case Diagrams, DFDs, FlowCharts, BPMN etc, but each has their own implementation.

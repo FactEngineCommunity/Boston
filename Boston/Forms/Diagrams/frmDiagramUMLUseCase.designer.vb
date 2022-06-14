@@ -353,7 +353,7 @@ Partial Class frmDiagrmUMLUseCase
         '
         'MorphTimer
         '
-        Me.MorphTimer.Interval = 1500
+        Me.MorphTimer.Interval = 2500
         '
         'MorphStepTimer
         '

@@ -1109,7 +1109,7 @@ Public Class frmToolboxEnterpriseExplorer
                     '-----------------------------------------------
                     Select Case loObject.MenuType
                         Case Is = pcenumMenuType.modelORMModel
-
+#Region "Model"
                             Dim lrModel As FBM.Model
 
                             frmMain.ToolStripButtonNew.Enabled = True
@@ -1151,6 +1151,7 @@ Public Class frmToolboxEnterpriseExplorer
                             End If
 
                             frmMain.ToolStripButton_Save.Enabled = lrModel.IsDirty
+#End Region
 
                         Case Is = pcenumMenuType.pageORMModel,
                                   pcenumMenuType.pageERD,
@@ -1158,7 +1159,7 @@ Public Class frmToolboxEnterpriseExplorer
                                   pcenumMenuType.pageSTD
 
                             Dim lrPage As FBM.Page
-
+#Region "Page"
                             frmMain.ToolStripButtonNew.Enabled = False
 
                             lrPage = loObject.tag
@@ -1197,6 +1198,7 @@ Public Class frmToolboxEnterpriseExplorer
                             lsMessage &= vbCrLf & "- Click on the Page to change its name."
 
                             Me.LabelHelpTips.Text = lsMessage
+#End Region
                     End Select
 
                     Call Me.SetWorkingEnvironmentForObject(loObject)
@@ -1257,7 +1259,8 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumMenuType.pageORMModel,
                           pcenumMenuType.pageERD,
                           pcenumMenuType.pagePGSDiagram,
-                          pcenumMenuType.pageSTD
+                          pcenumMenuType.pageSTD,
+                          pcenumMenuType.pageUMLUseCaseDiagram
 
                     Dim lr_page As FBM.Page = ao_object.Tag
 

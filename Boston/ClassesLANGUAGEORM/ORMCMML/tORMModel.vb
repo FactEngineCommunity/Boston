@@ -548,6 +548,7 @@ Namespace FBM
 
             lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " WHERE Element = '" & arTable.Name & "'"
+            lsSQLQuery &= " AND ElementType = 'Entity'"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 

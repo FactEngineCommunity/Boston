@@ -1,3 +1,0 @@
-﻿see tProcess.vb in ClassesLANGUAGECMML.
-
-CMML.Process is common to Use Case Diagrams, DFDs, FlowCharts etc, so is excluded from this language set of Classes.

@@ -4,7 +4,7 @@ Public Class tCMML
 
     Public Core As FBM.Model
 
-    Public Function getORMDiagramPagesForActor(ByVal arActor As CMML.Actor) As List(Of FBM.Page)
+    Public Function getORMDiagramPagesForActor(ByVal arActor As UML.Actor) As List(Of FBM.Page)
 
         getORMDiagramPagesForActor = New List(Of FBM.Page)
 
@@ -91,7 +91,7 @@ Public Class tCMML
 
     End Function
 
-    Public Function getDataFlowDiagramPagesForActor(ByVal arActor As CMML.Actor) As List(Of FBM.Page)
+    Public Function getDataFlowDiagramPagesForActor(ByVal arActor As UML.Actor) As List(Of FBM.Page)
 
         getDataFlowDiagramPagesForActor = New List(Of FBM.Page)
 
@@ -114,7 +114,7 @@ Public Class tCMML
 
     End Function
 
-    Public Function getDataFlowDiagramPagesForProcess(ByVal arProcess As CMML.Process) As List(Of FBM.Page)
+    Public Function getDataFlowDiagramPagesForProcess(ByVal arProcess As UML.Process) As List(Of FBM.Page)
 
         '================================================
         getDataFlowDiagramPagesForProcess = New List(Of FBM.Page)
@@ -134,7 +134,7 @@ Public Class tCMML
                       Select Page Distinct
                       Order By Page.Name
 
-        getDataFlowDiagramPagesForProcess = larPage.tolist
+        getDataFlowDiagramPagesForProcess = larPage.ToList
 
 
     End Function
@@ -240,7 +240,7 @@ Public Class tCMML
 
     End Function
 
-    Public Function getStateTransitionDiagramPagesForProcess(ByVal arProcess As CMML.Process) As List(Of FBM.Page)
+    Public Function getStateTransitionDiagramPagesForProcess(ByVal arProcess As UML.Process) As List(Of FBM.Page)
 
         getStateTransitionDiagramPagesForProcess = New List(Of FBM.Page)
 
@@ -259,7 +259,7 @@ Public Class tCMML
                       Select Page Distinct
                       Order By Page.Name
 
-        getStateTransitionDiagramPagesForProcess = larPage.tolist
+        getStateTransitionDiagramPagesForProcess = larPage.ToList
 
     End Function
 
@@ -505,7 +505,7 @@ Public Class tCMML
 
     End Function
 
-    Public Function getUseCaseDiagramPagesForActor(ByVal arActor As CMML.Actor) As List(Of FBM.Page)
+    Public Function getUseCaseDiagramPagesForActor(ByVal arActor As UML.Actor) As List(Of FBM.Page)
 
         getUseCaseDiagramPagesForActor = New List(Of FBM.Page)
 

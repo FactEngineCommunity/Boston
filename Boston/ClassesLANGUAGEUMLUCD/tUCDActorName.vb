@@ -1,5 +1,5 @@
-Namespace CMML
-    <Serializable()> _
+Namespace UCD
+    <Serializable()>
     Public Class ActorName
         Inherits FBM.PageObject
 

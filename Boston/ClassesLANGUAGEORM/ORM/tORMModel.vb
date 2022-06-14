@@ -284,6 +284,14 @@ Namespace FBM
         Public RDS As New RDS.Model(Me)
 
         ''' <summary>
+        ''' The UML Model that also incorporates BPMN. E.g. For UseCaseDiagrams, DataFlowDiagrams, EventTraceDiagrams etc.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <NonSerialized()>
+        <XmlIgnore()>
+        Public UML As New CMML.Model(Me)
+
+        ''' <summary>
         ''' The State Transition Model for Value Type / Value Type Constraints for the Model.
         ''' </summary>
         <NonSerialized()>

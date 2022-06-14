@@ -188,6 +188,7 @@ Public Module publicConstants
         PGSNode
         Procedure
         Process
+        ProcessProcessLink
         Relation
         Role
         'RingConstraint

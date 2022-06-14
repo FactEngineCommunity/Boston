@@ -9,6 +9,9 @@
         Public Actor As New List(Of CMML.Actor)
         Public Process As New List(Of CMML.Process)
 
+        Public ActorProcessRelation = New List(Of CMML.ActorProcessRelation)
+        Public ProcessProcessRelation = New List(Of CMML.ProcessProcessRelation)
+
         Public Sub New(ByRef arModel As FBM.Model)
 
             Me.Model = arModel
