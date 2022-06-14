@@ -583,6 +583,7 @@ Namespace FBM
                 lrProcess.Page = arPage
                 lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
                 lrProcess.FactData = Me.FactData
+                lrProcess.Id = .Concept.Symbol
                 lrProcess.Name = .Concept.Symbol
                 lrProcess.Symbol = .Data
                 lrProcess.FactDataInstance = New FBM.FactDataInstance

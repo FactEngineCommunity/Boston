@@ -585,6 +585,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumLanguage.StateTransitionDiagram
                     liPageMenuType = pcenumMenuType.pageSTD
                     liImageIndex = 5
+                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                    liPageMenuType = pcenumMenuType.pageUMLUseCaseDiagram
+                    liImageIndex = 15
             End Select
             loNode = arTreeNode.Nodes.Add(Trim(arPage.PageId), Trim(arPage.Name), liImageIndex, liImageIndex)
             loNode.Tag = New tEnterpriseEnterpriseView(liPageMenuType,

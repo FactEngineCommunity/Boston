@@ -1,10 +1,19 @@
 ﻿Namespace CMML
 
     Public Class Model
-        Inherits FBM.Model
+        '20220614-Was. Not sure why it was a subtype of FBM.Model
+        'Inherits FBM.Model
+
+        Public WithEvents Model As FBM.Model
 
         Public Actor As New List(Of CMML.Actor)
         Public Process As New List(Of CMML.Process)
+
+        Public Sub New(ByRef arModel As FBM.Model)
+
+            Me.Model = arModel
+
+        End Sub
 
         Public Sub AddActor()
 
@@ -25,26 +34,26 @@
             '  i.e. Establish the EntityType within the Model as well
             '  as creating a new object for the Actor.
             '----------------------------------------------------------
-            Dim lrEntityType As FBM.EntityType = Me.CreateEntityType
+            Dim lrEntityType As FBM.EntityType = Me.Model.CreateEntityType
 
             lrEntityType.SetName("New Actor")
             Dim liCount As Integer
-            liCount = Me.EntityType.FindAll(AddressOf lrEntityType.EqualsByNameLike).Count
+            liCount = Me.Model.EntityType.FindAll(AddressOf lrEntityType.EqualsByNameLike).Count
             lrEntityType.Name &= " " & (CStr(liCount) + 1)
 
             '--------------------------------------------
             'Set the ParentEntityType for the new Actor
             '--------------------------------------------
-            Dim lrParentEntityType As FBM.EntityType = New FBM.EntityType(Me, pcenumLanguage.ORMModel, "Actor", "Actor")
-            lrParentEntityType = Me.EntityType.Find(AddressOf lrParentEntityType.Equals)
+            Dim lrParentEntityType As FBM.EntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, "Actor", "Actor")
+            lrParentEntityType = Me.Model.EntityType.Find(AddressOf lrParentEntityType.Equals)
 
             lrEntityType.parentModelObjectList.Add(lrParentEntityType)
 
             '---------------------------------------------------
             'Find the Core Page that lists Actor (EntityTypes)
             '---------------------------------------------------
-            Dim lrPage As New FBM.Page(Me, "CoreActorEntityTypes", "CoreActorEntityTypes", pcenumLanguage.ORMModel)
-            lrPage = Me.Page.Find(AddressOf lrPage.EqualsByName)
+            Dim lrPage As New FBM.Page(Me.Model, "CoreActorEntityTypes", "CoreActorEntityTypes", pcenumLanguage.ORMModel)
+            lrPage = Me.Model.Page.Find(AddressOf lrPage.EqualsByName)
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage)
             lrEntityTypeInstance.X = 10
@@ -73,7 +82,7 @@
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " WHERE " & pcenumCMML.Element.ToString & " = '" & lsUniqueDataStoreName & "'"
 
-            lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             If CInt(lrRecordset("Count").Data) > 0 Then
 
@@ -102,7 +111,7 @@
             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
             lsSQLQuery &= " WHERE " & pcenumCMML.Element.ToString & " = '" & lsUniqueProcessName & "'"
 
-            lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             If CInt(lrRecordset("Count").Data) > 0 Then
 

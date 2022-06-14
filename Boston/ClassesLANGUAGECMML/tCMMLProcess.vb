@@ -7,9 +7,15 @@ Namespace CMML
     <Serializable()> _
     Public Class Process
         Inherits FBM.FactDataInstance
+        Implements FBM.iPageObject
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
+
+        ''' <summary>
+        ''' The text of the Process
+        ''' </summary>
+        Public Text As String
 
         Public Shadows Page As FBM.Page
 
@@ -34,9 +40,9 @@ Namespace CMML
         ''' <remarks></remarks>
         Public ResponsibleActor As CMML.Actor
 
-        <CategoryAttribute("Process"), _
-             DefaultValueAttribute(GetType(String), ""), _
-             DescriptionAttribute("Name of the Process.")> _
+        <CategoryAttribute("Process"),
+             DefaultValueAttribute(GetType(String), ""),
+             DescriptionAttribute("Name of the Process.")>
         Public Property ProcessName() As String
             Get
                 Return Me.Name
@@ -46,17 +52,19 @@ Namespace CMML
             End Set
         End Property
 
-        Public Sub New()
+        Public Event FactChanged(ByRef arFact As FBM.Fact)
 
+        Public Sub New()
+            Me.Id = System.Guid.NewGuid.ToString
         End Sub
 
-        Public Sub New(ByRef arPage As FBM.Page, ByVal asProcessName As String)
+        Public Sub New(ByRef arPage As FBM.Page, ByVal asGUID As String, ByVal asProcessId As String, ByVal asProcessText As String)
+            Call MyBase.New
 
             Me.Page = arPage
             Me.Model = arPage.Model
             Me.FactData.Model = arPage.Model
-            Me.SetName(asProcessName)
-
+            Me.Text = asProcessText
 
         End Sub
 
@@ -123,12 +131,12 @@ Namespace CMML
             '--------------------------------------------------------------------
             'Create a Shape for the EntityTypeInstance on the DiagramView object
             '--------------------------------------------------------------------            
-            loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)            
+            loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
             loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove ''HatchHandles3 is a very professional look, or SquareHandles2
-            loDroppedNode.ToolTip = "process"            
+            loDroppedNode.ToolTip = "process"
             loDroppedNode.AllowOutgoingLinks = True
             loDroppedNode.AllowIncomingLinks = True
-            loDroppedNode.Text = Me.Symbol 'arProcessInstance.Name            
+            loDroppedNode.Text = Me.Text 'arProcessInstance.Name            
             loDroppedNode.Tag = New FBM.EntityTypeInstance 'loDroppedNode.Tag = New Object
             loDroppedNode.Tag = Me
             loDroppedNode.Obstacle = True
@@ -142,7 +150,7 @@ Namespace CMML
                     loDroppedNode.Resize(20, 15)
                     loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
                 Case Is = pcenumLanguage.DataFlowDiagram
-                    loDroppedNode.Shape = Shapes.Ellipse                    
+                    loDroppedNode.Shape = Shapes.Ellipse
                     loDroppedNode.Resize(20, 15)
                     loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
                 Case Is = pcenumLanguage.UMLUseCaseDiagram
@@ -162,6 +170,26 @@ Namespace CMML
             If IsSomething(aoContainerNode) Then
                 aoContainerNode.Add(loDroppedNode)
             End If
+
+        End Sub
+
+        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+
+            Me.X = aiNewX
+            Me.Y = aiNewY
+
+            Me.FactDataInstance.X = aiNewX
+            Me.FactDataInstance.Y = aiNewY
+
+            Me.FactDataInstance.Fact.FactType.isDirty = True
+            Me.FactDataInstance.Fact.isDirty = True
+            Me.FactDataInstance.isDirty = True
+
+            Try
+                Me.FactDataInstance.Page.MakeDirty()
+            Catch ex As Exception
+
+            End Try
 
         End Sub
 
@@ -190,6 +218,25 @@ Namespace CMML
                 End If
 
             Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetProcessText(ByVal asNewProcessText As String)
+
+            Try
+                Me.Text = asNewProcessText
+
+                'CMML
+                Call Me.Model.updateCMMLProcessText(Me)
+
+            Catch ex As Exception
+                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -273,6 +320,53 @@ Namespace CMML
             End Try
 
         End Sub
+
+        Public Sub setFact(ByRef arFact As FBM.Fact)
+
+            Try
+
+                Me.Fact = arFact
+
+                RaiseEvent FactChanged(arFact)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Overloads Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
+
+            Call Me.SetAppropriateColour()
+        End Sub
+
+        Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
+
+            Try
+                If IsSomething(Me.Shape) Then
+                    If Me.Shape.Selected Then
+                        Me.Shape.Pen.Color = Color.Blue
+                    Else
+                        Me.Shape.Pen.Color = Color.Black
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
 
     End Class

@@ -2145,7 +2145,7 @@ Public Class frmDiagramPGS
                     Select Case lrToolboxForm.ShapeListBox.Shapes(loDraggedNode.Index).Id
                         Case Is = "Node Type"
                             '---------------------------------------------------------------
-                            'Establish a new EntityType and Entity for the dropped object.
+                            'Establish a new NodeType for the dropped object.
                             '---------------------------------------------------------------    
 
                             With New WaitCursor

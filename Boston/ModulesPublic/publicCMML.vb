@@ -44,6 +44,7 @@ Public Enum pcenumCMMLRelations
         CoreActorToProcessParticipationRelation  ' 200(ActorSymbol,ProcessSymbol)
         CoreProcessToProcessParticipationRelation
         CoreProcessToProcessRelation
+        CoreProcessHasProcessText
 
         '-----------------------------------------------------
         'ERDs (EntityRelationshipDiagrams)

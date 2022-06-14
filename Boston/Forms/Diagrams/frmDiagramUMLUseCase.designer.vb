@@ -22,46 +22,46 @@ Partial Class frmDiagrmUMLUseCase
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
-        Me.Diagram = New MindFusion.Diagramming.Diagram
-        Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView
+        Me.components = New System.ComponentModel.Container()
+        Me.Diagram = New MindFusion.Diagramming.Diagram()
+        Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStrip_Diagram = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolboxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.PropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.PageAsORMMetaModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.mnuOption_ViewGrid = New System.Windows.Forms.ToolStripMenuItem
-        Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator
+        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolboxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertiesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PageAsORMMetaModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuOption_ViewGrid = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Actor = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.MorphToToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuItemUseCaseDiagramActor = New System.Windows.Forms.ToolStripMenuItem
-        Me.ORMDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.MenuOptionDataFlowDiagramActor = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator
-        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
+        Me.MorphToToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuItemUseCaseDiagramActor = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ORMDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuOptionDataFlowDiagramActor = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Process = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItemUseCaseDiagram = New System.Windows.Forms.ToolStripMenuItem
-        Me.DFDToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripMenuItemStateTransitionDiagram = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator
-        Me.PropertiesToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemUseCaseDiagram = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DFDToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemStateTransitionDiagram = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
+        Me.PropertiesToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_ProcessLink = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.IncludesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ExtendsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator
-        Me.PropertiesToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem
+        Me.IncludesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ExtendsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.PropertiesToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerLinkSwitch = New System.Windows.Forms.Timer(Me.components)
         Me.ContextMenuStrip_EntityType = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.mnuOption_EntityTypeMorphTo = New System.Windows.Forms.ToolStripMenuItem
-        Me.UseCToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator
-        Me.mnuOption_EntityTypeProperties = New System.Windows.Forms.ToolStripMenuItem
-        Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView
-        Me.DiagramHidden = New MindFusion.Diagramming.Diagram
+        Me.mnuOption_EntityTypeMorphTo = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UseCToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
+        Me.mnuOption_EntityTypeProperties = New System.Windows.Forms.ToolStripMenuItem()
+        Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.DiagramHidden = New MindFusion.Diagramming.Diagram()
         Me.MorphTimer = New System.Windows.Forms.Timer(Me.components)
         Me.MorphStepTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ContextMenuStrip_Diagram.SuspendLayout()
@@ -90,6 +90,7 @@ Partial Class frmDiagrmUMLUseCase
         'DiagramView
         '
         Me.DiagramView.AllowDrop = True
+        Me.DiagramView.AllowInplaceEdit = True
         Me.DiagramView.BackColor = System.Drawing.Color.White
         Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
         Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
@@ -236,21 +237,21 @@ Partial Class frmDiagrmUMLUseCase
         '
         Me.ToolStripMenuItemUseCaseDiagram.Image = Global.Boston.My.Resources.Resources.UML_UseCase16x16
         Me.ToolStripMenuItemUseCaseDiagram.Name = "ToolStripMenuItemUseCaseDiagram"
-        Me.ToolStripMenuItemUseCaseDiagram.Size = New System.Drawing.Size(204, 22)
+        Me.ToolStripMenuItemUseCaseDiagram.Size = New System.Drawing.Size(202, 22)
         Me.ToolStripMenuItemUseCaseDiagram.Text = "&Use Case Diagram"
         '
         'DFDToolStripMenuItem
         '
         Me.DFDToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.DataFlowDiagram16x16
         Me.DFDToolStripMenuItem.Name = "DFDToolStripMenuItem"
-        Me.DFDToolStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.DFDToolStripMenuItem.Size = New System.Drawing.Size(202, 22)
         Me.DFDToolStripMenuItem.Text = "&Data Flow Diagram"
         '
         'ToolStripMenuItemStateTransitionDiagram
         '
         Me.ToolStripMenuItemStateTransitionDiagram.Image = Global.Boston.My.Resources.Resources.StateTransitionDiagram_16x16
         Me.ToolStripMenuItemStateTransitionDiagram.Name = "ToolStripMenuItemStateTransitionDiagram"
-        Me.ToolStripMenuItemStateTransitionDiagram.Size = New System.Drawing.Size(204, 22)
+        Me.ToolStripMenuItemStateTransitionDiagram.Size = New System.Drawing.Size(202, 22)
         Me.ToolStripMenuItemStateTransitionDiagram.Text = "&State Transition Diagram"
         '
         'ToolStripSeparator3
@@ -315,7 +316,7 @@ Partial Class frmDiagrmUMLUseCase
         'UseCToolStripMenuItem
         '
         Me.UseCToolStripMenuItem.Name = "UseCToolStripMenuItem"
-        Me.UseCToolStripMenuItem.Size = New System.Drawing.Size(302, 22)
+        Me.UseCToolStripMenuItem.Size = New System.Drawing.Size(300, 22)
         Me.UseCToolStripMenuItem.Text = "&Use Case Diagram for this EntityType/Actor"
         '
         'ToolStripSeparator5
@@ -358,14 +359,14 @@ Partial Class frmDiagrmUMLUseCase
         '
         Me.MorphStepTimer.Interval = 45
         '
-        'frm_UseCaseModel
+        'frmDiagrmUMLUseCase
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(891, 530)
         Me.Controls.Add(Me.DiagramView)
         Me.Controls.Add(Me.HiddenDiagramView)
-        Me.Name = "frm_UseCaseModel"
+        Me.Name = "frmDiagrmUMLUseCase"
         Me.TabText = "Use Case Diagram"
         Me.Text = "Use Case Constructs"
         Me.WindowState = System.Windows.Forms.FormWindowState.Maximized

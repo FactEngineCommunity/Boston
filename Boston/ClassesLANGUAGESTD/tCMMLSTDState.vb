@@ -253,7 +253,7 @@ Namespace STD
             Call Me.SetAppropriateColour()
         End Sub
 
-        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Overloads Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY

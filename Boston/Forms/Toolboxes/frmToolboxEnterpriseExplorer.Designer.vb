@@ -223,6 +223,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(12, "Snowflake16x16.png")
         Me.ImageList.Images.SetKeyName(13, "TypeDB16x16.png")
         Me.ImageList.Images.SetKeyName(14, "Neo4j16x16.png")
+        Me.ImageList.Images.SetKeyName(15, "UML-UseCase16x16.png")
         '
         'CircularProgressBar
         '
@@ -309,7 +310,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 446)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 424)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -427,7 +428,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'AddSTDPageToolStripMenuItem
         '
         Me.AddSTDPageToolStripMenuItem.Name = "AddSTDPageToolStripMenuItem"
-        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.AddSTDPageToolStripMenuItem.Size = New System.Drawing.Size(148, 22)
         Me.AddSTDPageToolStripMenuItem.Text = "&Add STD Page"
         '
         'BusinessProcessModellingNotationToolStripMenuItem

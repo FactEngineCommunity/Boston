@@ -5,6 +5,7 @@ Imports MindFusion.Diagramming
 Imports MindFusion.Diagramming.WinForms
 Imports MindFusion.Drawing
 Imports MindFusion.Diagramming.Layout
+Imports System.Threading
 
 Public Class frmDiagrmUMLUseCase
 
@@ -13,7 +14,7 @@ Public Class frmDiagrmUMLUseCase
 
     Private zo_containernode As ContainerNode
 
-    Private morph_vector As tMorphVector
+    Private MorphVector As New List(Of tMorphVector)
     Private morph_shape As New ShapeNode
 
 
@@ -156,10 +157,10 @@ Public Class frmDiagrmUMLUseCase
             If Me.Diagram.Selection.Items(0).Tag.ConceptType = pcenumConceptType.Process Then
                 Me.DiagramView.AllowInplaceEdit = True
             Else
-                Me.DiagramView.AllowInplaceEdit = False
+                'Me.DiagramView.AllowInplaceEdit = False
             End If
         Else
-            Me.DiagramView.AllowInplaceEdit = False
+            'Me.DiagramView.AllowInplaceEdit = False
         End If
 
     End Sub
@@ -174,11 +175,15 @@ Public Class frmDiagrmUMLUseCase
             Dim loDraggedNode As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
 
             If loDraggedNode.Index >= 0 Then
-                If loDraggedNode.Index < frmMain.zfrm_toolbox.ShapeListBox.ShapeCount Then
+
+                Dim lrToolboxForm As frmToolbox
+                lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+
+                If loDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
                     Dim loPoint As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
                     Dim loPointF As PointF = Me.DiagramView.ClientToDoc(New Point(loPoint.X, loPoint.Y))
 
-                    Select Case frmMain.zfrm_toolbox.ShapeListBox.Shapes(loDraggedNode.Index).Id
+                    Select Case lrToolboxForm.ShapeListBox.Shapes(loDraggedNode.Index).Id
                         Case Is = "Actor"
                             '----------------------------------------------------------
                             'Establish a new Actor(EntityType) for the dropped object.
@@ -216,34 +221,19 @@ Public Class frmDiagrmUMLUseCase
                             lrActor.Name &= " " & (CStr(liCount) + 1)
 
                             Call Me.DropActorAtPoint(lrActor, loPointF)
+
                         Case Is = "Process"
-                            Dim lrProcess As New CMML.Process(Me.zrPage, System.Guid.NewGuid.ToString)
-                            Call Me.DropProcessAtPoint(lrProcess, loPointF)
+                            'Use Case Model Level
+                            Dim lsUniqueProcessText = Me.zrPage.UseCaseDiagram.CreateUniqueProcessText("New Process", 0)
+                            Dim lrProcess As CMML.Process = Me.zrPage.Model.createCMMLProcess(lsUniqueProcessText)
+
+                            'Page Level
+                            lrProcess = Me.zrPage.DropProcessAtPoint(lrProcess, loPointF, Me.zo_containernode)
                     End Select
                 End If
             End If
         End If
 
-
-    End Sub
-
-    Sub DropProcessAtPoint(ByRef arProcessInstance As CMML.Process, ByVal aoPointF As PointF)
-
-        Try
-
-            arProcessInstance.X = aoPointF.X
-            arProcessInstance.Y = aoPointF.Y
-
-            Call arProcessInstance.DisplayAndAssociate(Me.zo_containernode)
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
 
     End Sub
 
@@ -324,114 +314,208 @@ Public Class frmDiagrmUMLUseCase
 
         Me.zoTreeNode = aoTreeNode
 
-        Dim lrActorShape, lrProcessShape As New ShapeNode
+        Try
 
-        '--------------------
-        'Load the Entities.
-        '--------------------
-        Dim lsSQLQuery As String = ""
-        Dim lrRecordset As ORMQL.Recordset
+            Dim lrActorShape, lrProcessShape As New ShapeNode
 
-        Dim lrActor As CMML.Actor = Nothing
-        Dim lrFactTypeInstance As New FBM.FactTypeInstance
-        Dim lrFactInstance As FBM.FactInstance
-        Dim lrFactDataInstance As FBM.FactDataInstance
+            '--------------------
+            'Load the Entities.
+            '--------------------
+            Dim lsSQLQuery As String = ""
+            Dim lrRecordset As ORMQL.Recordset
 
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " WHERE ElementType = 'Actor'"
+            Dim lrActor As CMML.Actor = Nothing
+            Dim lrProcess As CMML.Process
+            Dim lrFactTypeInstance As New FBM.FactTypeInstance
+            Dim lrFactInstance As FBM.FactInstance
+            Dim lrFactDataInstance As FBM.FactDataInstance
 
-        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+#Region "Actors - Load"
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            lsSQLQuery &= " WHERE ElementType = 'Actor'"
 
-        While Not lrRecordset.EOF
+            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            lrFactDataInstance = lrRecordset("Element")
-            lrActor = lrFactDataInstance.CloneActor(arPage)
-            lrActor.X = lrFactDataInstance.X
-            lrActor.Y = lrFactDataInstance.Y
+            While Not lrRecordset.EOF
 
-            Call lrActor.DisplayAndAssociate()
+                lrFactDataInstance = lrRecordset("Element")
+                lrActor = lrFactDataInstance.CloneActor(arPage)
+                lrActor.X = lrFactDataInstance.X
+                lrActor.Y = lrFactDataInstance.Y
 
-            Me.zrPage.UseCaseDiagram.Actor.Add(lrActor)
+                Call lrActor.DisplayAndAssociate()
 
-            lrRecordset.MoveNext()
-        End While
+                Me.zrPage.UseCaseDiagram.Actor.Add(lrActor)
 
-        'Set the location of the System Boundary
-        If Me.zrPage.UseCaseDiagram.Actor.Count > 0 Then
-            Dim larMinActorX = (From Actor In Me.zrPage.UseCaseDiagram.Actor
-                                Select Actor.X).Min
-            Me.zo_containernode.Move(larMinActorX + 30, zo_containernode.Bounds.Y)
-        End If
+                lrRecordset.MoveNext()
+            End While
+#End Region
 
-        '------------------------------------------------------------------------
-        'Display the UseCaseDiagram by logically associating Shape objects
-        '   with the corresponding 'object' within the ORMModelPage object
-        '------------------------------------------------------------------------
-        Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
-        Me.zrPage.UseCaseDiagram.PocessToProcessRelation = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessRelation.ToString)
+#Region "Processes - Load"
 
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            lsSQLQuery &= " WHERE ElementType = 'Process'"
 
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            While Not lrRecordset.EOF
 
-        While Not lrRecordset.EOF
+                lrFactDataInstance = lrRecordset("Element")
+                lrProcess = lrFactDataInstance.CloneProcess(arPage)
+                lrProcess.X = lrFactDataInstance.X
+                lrProcess.Y = lrFactDataInstance.Y
+
+#Region "Process Text - Get from CMML"
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
+                lsSQLQuery &= " WHERE Process = '" & lrProcess.Id & "'"
+
+                Dim lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If Not lrRecordset2.EOF Then
+                    lrProcess.Text = lrRecordset2("ProcessText").Data
+                End If
+#End Region
+
+                Call lrProcess.DisplayAndAssociate()
+
+                Me.zrPage.UseCaseDiagram.Process.Add(lrProcess)
+
+                lrRecordset.MoveNext()
+            End While
+#End Region
+
+            'Set the location of the System Boundary
+            If Me.zrPage.UseCaseDiagram.Actor.Count > 0 Then
+                Dim larMinActorX = (From Actor In Me.zrPage.UseCaseDiagram.Actor
+                                    Select Actor.X).Min
+                Me.zo_containernode.Move(larMinActorX + 30, zo_containernode.Bounds.Y)
+            End If
+
+            '------------------------------------------------------------------------
+            'Display the UseCaseDiagram by logically associating Shape objects
+            '   with the corresponding 'object' within the ORMModelPage object
+            '------------------------------------------------------------------------
+            Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
+            Me.zrPage.UseCaseDiagram.PocessToProcessRelation = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessRelation.ToString)
+
+#Region "Actor-2-Process Participation Relations"
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+
+            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            While Not lrRecordset.EOF
 
 #Region "Actor"
-            Dim lbActorAlreadyLoaded As Boolean = False
+                Dim lbActorAlreadyLoaded As Boolean = False
 
-            lrFactDataInstance = lrRecordset("Actor")
-            lrActor = lrFactDataInstance.CloneActor(arPage)
+                lrFactDataInstance = lrRecordset("Actor")
+                lrActor = lrFactDataInstance.CloneActor(arPage)
 
-            '-------------------------------------------------------------------------------
-            'Check to see if the Shape for the Actor has already been loaded onto the Page
-            '-------------------------------------------------------------------------------
-            Dim lrExistingActor = Me.zrPage.UseCaseDiagram.Actor.Find(Function(x) x.Name = lrActor.Name)
-            If lrExistingActor IsNot Nothing Then
-                lbActorAlreadyLoaded = True
-                loDroppedNode = lrActor.Shape
-                lrActorShape = loDroppedNode
-                lrActor = lrExistingActor
-            Else
-                lrActor.DisplayAndAssociate()
-            End If
+                '-------------------------------------------------------------------------------
+                'Check to see if the Shape for the Actor has already been loaded onto the Page
+                '-------------------------------------------------------------------------------
+                Dim lrExistingActor = Me.zrPage.UseCaseDiagram.Actor.Find(Function(x) x.Name = lrActor.Name)
+                If lrExistingActor IsNot Nothing Then
+                    lbActorAlreadyLoaded = True
+                    loDroppedNode = lrActor.Shape
+                    lrActorShape = loDroppedNode
+                    lrActor = lrExistingActor
+                Else
+                    lrActor.DisplayAndAssociate()
+                    Me.zrPage.UseCaseDiagram.Actor.Add(lrActor)
+                End If
 #End Region
 
 #Region "Process"
+                lrFactDataInstance = lrRecordset("Process")
+                lrProcess = lrFactDataInstance.CloneProcess(arPage)
 
-            Dim lrProcess As CMML.Process
-            lrFactDataInstance = lrRecordset("Process")
-            lrProcess = lrFactDataInstance.CloneProcess(arPage)
+                Dim lrActualProcess As CMML.Process = Me.zrPage.UseCaseDiagram.Process.Find(Function(x) x.Id = lrProcess.Id)
 
-            Call lrProcess.DisplayAndAssociate()
+                If lrActualProcess Is Nothing Then
+
+#Region "Process Text - Get from CMML"
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrProcess.Id & "'"
+
+                    Dim lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrRecordset2.EOF Then
+                        lrProcess.Text = lrRecordset2("ProcessText").Data
+                    End If
 #End Region
 
-            '------------------------------------------
-            'Link the Actor to the associated Process
-            '------------------------------------------
-            Dim lo_link As DiagramLink
-            lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
-            lo_link.Tag = New FBM.ModelObject
+                    Call lrProcess.DisplayAndAssociate()
+                    Me.zrPage.UseCaseDiagram.Process.Add(lrProcess)
+                Else
+                    lrProcess = lrActualProcess
+                End If
+#End Region
 
-            lo_link.Tag = lrRecordset.CurrentFact
+                '------------------------------------------
+                'Link the Actor to the associated Process
+                '------------------------------------------
+                Dim lo_link As DiagramLink
+                lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
+                lo_link.Tag = New FBM.ModelObject
 
-            lrRecordset.MoveNext()
-        End While
+                lo_link.Tag = lrRecordset.CurrentFact
 
-        If IsSomething(Me.zrPage.UseCaseDiagram.PocessToProcessRelation) Then
-            For Each lrFactInstance In Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation.Fact
-                For Each lrFactDataInstance In lrFactInstance.Data
+                lrRecordset.MoveNext()
+            End While
+#End Region
 
-                Next
+            'System Boundary - Wrap around Processes
+#Region "System Boundary - Wrap around Processes"
+            If Me.zrPage.UseCaseDiagram.Process.Count > 0 Then
+                Dim larMinProcessX = (From Process In Me.zrPage.UseCaseDiagram.Process
+                                      Select Process.X).Min
+                Dim larMinProcessY = (From Process In Me.zrPage.UseCaseDiagram.Process
+                                      Select Process.Y).Min
+                Dim larMaxProcessX = (From Process In Me.zrPage.UseCaseDiagram.Process
+                                      Select Process.X).Max
+                Dim larMaxProcessY = (From Process In Me.zrPage.UseCaseDiagram.Process
+                                      Select Process.Y).Max
+                Me.zo_containernode.Move(larMinProcessX - 10, larMinProcessY)
+                Me.zo_containernode.Resize(larMaxProcessX - larMinProcessX, larMaxProcessY - larMinProcessY)
+            End If
+
+            For Each lrProcess In Me.zrPage.UseCaseDiagram.Process
+                Me.zo_containernode.Add(lrProcess.Shape)
             Next
-        End If
+#End Region
 
-        Me.Diagram.Invalidate()
-        Me.zrPage.FormLoaded = True
+            If IsSomething(Me.zrPage.UseCaseDiagram.PocessToProcessRelation) Then
+                For Each lrFactInstance In Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation.Fact
+                    For Each lrFactDataInstance In lrFactInstance.Data
+
+                    Next
+                Next
+            End If
+
+            Me.Diagram.Invalidate()
+            Me.zrPage.FormLoaded = True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Me.zrPage.FormLoaded = False
+        End Try
 
     End Sub
 
@@ -444,8 +528,13 @@ Public Class frmDiagrmUMLUseCase
         '------------------------------------------------------------------------------------
         For liInd = 1 To Diagram.Nodes.Count
             Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    Diagram.Nodes(liInd - 1).Pen.Color = Color.Black
+                Case Is = pcenumConceptType.Actor
+                    If Diagram.Nodes(liInd - 1).Selected Then
+                        Diagram.Nodes(liInd - 1).Pen.Color = Color.Blue
+                    Else
+                        Diagram.Nodes(liInd - 1).Pen.Color = Color.White
+                    End If
+
                 Case Is = pcenumConceptType.FactType
                     If Diagram.Nodes(liInd - 1).Tag.IsObjectified Then
                         Diagram.Nodes(liInd - 1).Visible = True
@@ -572,10 +661,11 @@ Public Class frmDiagrmUMLUseCase
             '----------------------------------
             Dim lsSQLString As String = ""
             lsSQLString = "INSERT INTO " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
-            lsSQLString &= " (Actor, Process)"
+            lsSQLString &= " (Actor, Process, Data)"
             lsSQLString &= " VALUES ("
             lsSQLString &= "'" & lo_first_entity.Name & "'"
             lsSQLString &= ",'" & lo_second_entity.Name & "'"
+            lsSQLString &= ",''"
             lsSQLString &= ")"
 
             '----------------------------------
@@ -586,21 +676,8 @@ Public Class frmDiagrmUMLUseCase
             '----------------------------------
             'Clone an instance of the Fact
             '----------------------------------
-            lrFactInstance = lrFact.CloneInstance(Me.zrPage)
-            Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation.AddFact(lrFactInstance)
+            Me.zrPage.UseCaseDiagram.ActorToProcessParticipationRelation.AddFact(lrFact)
 
-            Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
-            Dim lrRole As New FBM.Role
-            lrRole.Id = pcenumCMML.Process.ToString
-            lrRole.Name = lrRole.Id
-            lrFactDataInstance.Role = lrRole.CloneInstance(Me.zrPage)
-            lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
-            Dim lr_process As New CMML.Process
-
-            lr_process = lrFactDataInstance.CloneProcess(Me.zrPage)
-            lr_process.Shape = New ShapeNode
-            lr_process.Shape = Me.Diagram.FindNode(lo_second_entity)
-            lr_process.Shape.Tag = lr_process
         ElseIf (lo_first_entity.ConceptType = pcenumConceptType.Process) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
 
             '----------------------------------
@@ -740,64 +817,82 @@ Public Class frmDiagrmUMLUseCase
         Me.zrPage.MakeDirty()
         frmMain.ToolStripButton_Save.Enabled = True
 
+        Try
 
-        If TypeOf (e.Node) Is MindFusion.Diagramming.ContainerNode Then
-            Exit Sub
-        End If
+            If TypeOf (e.Node) Is MindFusion.Diagramming.ContainerNode Then
 
-        '-------------------------------------------------------------------------------------------
-        'The user has clicked/moved a ShapeNode, so update the X and Y coordinates of the ShapeNode
-        '-------------------------------------------------------------------------------------------            
-        'Dim lrLink As DiagramLink
-        Dim lrORMObject As New Object
-        Dim lrShapeNode As New ShapeNode
-        Dim lrFactInstance As New FBM.FactInstance
+                Dim lrSystemBoundary = e.Node
 
-        lrShape = e.Node
+                For Each lrProcessShape In lrSystemBoundary.SubordinateGroup.AttachedNodes
+                    Dim lrProcess As CMML.Process = lrProcessShape.Tag
+                    Call lrProcess.Move(lrProcessShape.Bounds.X, lrProcessShape.Bounds.Y, True)
+                Next
 
-        If IsSomething(e.Node.Tag) Then
+                Exit Sub
+            End If
 
-            Select Case e.Node.Tag.ConceptType
-                Case Is = pcenumConceptType.Class,
-                          pcenumConceptType.Process
-                    lrShapeNode = e.Node
-                    Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
+            '-------------------------------------------------------------------------------------------
+            'The user has clicked/moved a ShapeNode, so update the X and Y coordinates of the ShapeNode
+            '-------------------------------------------------------------------------------------------            
+            'Dim lrLink As DiagramLink
+            Dim lrORMObject As New Object
+            Dim lrShapeNode As New ShapeNode
+            Dim lrFactInstance As New FBM.FactInstance
 
-                    lrFactDataInstance = lrShapeNode.Tag.FactDataInstance
-                    lrFactDataInstance.X = e.Node.Bounds.X
-                    lrFactDataInstance.Y = e.Node.Bounds.Y
-            End Select
+            lrShape = e.Node
+
+            If IsSomething(e.Node.Tag) Then
+
+                Select Case e.Node.Tag.ConceptType
+                    Case Is = pcenumConceptType.Class,
+                              pcenumConceptType.Process
+                        lrShapeNode = e.Node
+                        Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
+
+                        lrFactDataInstance = lrShapeNode.Tag.FactDataInstance
+                        lrFactDataInstance.X = e.Node.Bounds.X
+                        lrFactDataInstance.Y = e.Node.Bounds.Y
+                End Select
 
 
-            'For Each lrLink In lrShape.GetAllLinks
-            '    If lrLink.Origin Is lrShape Then
-            '        lrORMObject = lrLink.Origin.Tag
-            '    End If
-            '    If lrLink.Destination Is lrShape Then
-            '        lrORMObject = lrLink.Destination.Tag
-            '    End If
-            '    lrORMObject.X = e.Node.Bounds.X
-            '    lrORMObject.Y = e.Node.Bounds.Y
-            '    '---------------------------------------
-            '    'Get the Fact associated with the Link
-            '    '---------------------------------------
-            '    lrFactInstance = lrLink.Tag
-            '    Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
-            '    Dim lrRole As New FBM.Role
-            '    Select Case lrORMObject.ConceptType
-            '        Case Is = pcenumConceptType.Actor
-            '            lrRole.Id = pcenumCMML.Actor.ToString
-            '        Case Is = pcenumConceptType.Process
-            '            lrRole.Id = pcenumCMML.Process.ToString
-            '    End Select
-            '    lrRole.Name = lrRole.Id
-            '    lrFactDataInstance.Role = lrRole.CloneInstance(Me.zrPage)
-            '    lrFactDataInstance.Data = lrORMObject.Data
-            '    lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.Equals)
-            '    lrFactDataInstance.X = e.Node.Bounds.X
-            '    lrFactDataInstance.Y = e.Node.Bounds.Y
-            'Next
-        End If
+                'For Each lrLink In lrShape.GetAllLinks
+                '    If lrLink.Origin Is lrShape Then
+                '        lrORMObject = lrLink.Origin.Tag
+                '    End If
+                '    If lrLink.Destination Is lrShape Then
+                '        lrORMObject = lrLink.Destination.Tag
+                '    End If
+                '    lrORMObject.X = e.Node.Bounds.X
+                '    lrORMObject.Y = e.Node.Bounds.Y
+                '    '---------------------------------------
+                '    'Get the Fact associated with the Link
+                '    '---------------------------------------
+                '    lrFactInstance = lrLink.Tag
+                '    Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
+                '    Dim lrRole As New FBM.Role
+                '    Select Case lrORMObject.ConceptType
+                '        Case Is = pcenumConceptType.Actor
+                '            lrRole.Id = pcenumCMML.Actor.ToString
+                '        Case Is = pcenumConceptType.Process
+                '            lrRole.Id = pcenumCMML.Process.ToString
+                '    End Select
+                '    lrRole.Name = lrRole.Id
+                '    lrFactDataInstance.Role = lrRole.CloneInstance(Me.zrPage)
+                '    lrFactDataInstance.Data = lrORMObject.Data
+                '    lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.Equals)
+                '    lrFactDataInstance.X = e.Node.Bounds.X
+                '    lrFactDataInstance.Y = e.Node.Bounds.Y
+                'Next
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -844,9 +939,39 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub Diagram_NodeTextEdited(ByVal sender As Object, ByVal e As MindFusion.Diagramming.EditNodeTextEventArgs) Handles Diagram.NodeTextEdited
 
-        If e.Node.Tag.ConceptType = pcenumConceptType.Process Then
-            e.Node.Tag.name = e.NewText
-        End If
+        Try
+            Dim lrActor As CMML.Actor
+            Dim lrProcess As CMML.Process
+
+            Select Case e.Node.Tag.GetType
+                Case Is = GetType(CMML.Actor)
+
+                Case Is = GetType(CMML.Process)
+
+                    lrProcess = e.Node.Tag
+
+                    'Check Processes for duplicate Process Text.
+                    If Me.zrPage.UseCaseDiagram.Process.Find(Function(x) x.Id <> lrProcess.Id And x.Text = lrProcess.Text) IsNot Nothing Then
+                        If e.NewText = e.OldText Then Exit Sub
+                        MsgBox("A Process with the text, '" & e.NewText & "', already exists on the Page.", MsgBoxStyle.Exclamation, "Process Text Conflict")
+                        lrProcess.Shape.Text = e.OldText
+                        Exit Sub
+                    End If
+
+                    Call lrProcess.SetProcessText(e.NewText)
+
+            End Select
+
+            Me.Diagram.Invalidate()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -887,6 +1012,8 @@ Public Class frmDiagrmUMLUseCase
         If Control.ModifierKeys And Keys.Control Then
             Exit Sub
         End If
+
+        Call Me.reset_node_and_link_colors()
 
         '-------------------------------------------------------
         'Check to see if the user was clicking over a ShapeNode
@@ -1044,7 +1171,9 @@ Public Class frmDiagrmUMLUseCase
         'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
-        Me.morph_vector = New tMorphVector(lr_actor.X, lr_actor.Y, 0, 0, 40)
+        Me.MorphVector.Clear()
+        Dim lrMorphVector As New tMorphVector(lr_actor.X, lr_actor.Y, 0, 0, 40)
+        Me.MorphVector.Add(lrMorphVector)
 
         '---------------------------------------------------------------------
         'Clear the list of UseCaseDiagrams that may relate to the EntityType
@@ -1229,7 +1358,8 @@ Public Class frmDiagrmUMLUseCase
                     Next
             End Select
 
-            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
+            Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.bounds.X, Me.zrPage.SelectedObject(0).Shape.bounds.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
+            Me.MorphVector.Add(lrMorphVector)
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
 
@@ -1247,71 +1377,95 @@ Public Class frmDiagrmUMLUseCase
         If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
         If Me.zrPage.SelectedObject.Count > 1 Then Exit Sub
 
-        '----------------------------------------------------------
-        'Diagram1 is on the HiddenDiagramView
-        '  Is a MindFusion Diagram on which the morphing is done.
-        '----------------------------------------------------------
-        Me.DiagramHidden.Nodes.Clear()
-        Call Me.DiagramView.SendToBack()
-        Call Me.HiddenDiagramView.BringToFront()
+        Try
+            '----------------------------------------------------------
+            'Diagram1 is on the HiddenDiagramView
+            '  Is a MindFusion Diagram on which the morphing is done.
+            '----------------------------------------------------------
+            Me.DiagramHidden.Nodes.Clear()
+            Call Me.DiagramView.SendToBack()
+            Call Me.HiddenDiagramView.BringToFront()
 
-        Dim lr_actor As New CMML.Actor
-        lr_actor = Me.zrPage.SelectedObject(0)
+            Dim lr_actor As New CMML.Actor
+            lr_actor = Me.zrPage.SelectedObject(0)
 
-        Dim lr_shape_node As ShapeNode
+            Dim lrShapeNode As ShapeNode
+
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = item.Tag
+                prApplication.WorkingPage = lr_enterprise_view.Tag
+
+                '------------------------------------------------------------------
+                'Get the X,Y co-ordinates of the Actor/EntityType being morphed
+                '------------------------------------------------------------------
+                Dim lrPage As New FBM.Page(lr_enterprise_view.Tag.Model)
+                lrPage = lr_enterprise_view.Tag
+                Dim lrEntityTypeInstanceList = From EntityTypeInstance In lrPage.EntityTypeInstance
+                                               Where EntityTypeInstance.Id = lr_actor.Data
+                                               Select New FBM.EntityTypeInstance(lrPage.Model,
+                                                                        pcenumLanguage.ORMModel,
+                                                                        EntityTypeInstance.Name,
+                                                                        True,
+                                                                        EntityTypeInstance.X,
+                                                                        EntityTypeInstance.Y)
+
+                Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+                For Each lrEntityTypeInstance In lrEntityTypeInstanceList
+                    Exit For
+                Next
+
+                '----------------------------------------------------------------
+                'Retreive the actual EntityTypeInstance on the destination page
+                '----------------------------------------------------------------
+                lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
+
+                lrShapeNode = New ShapeNode(lrEntityTypeInstance.Shape)
 
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+                If lrPage.FormLoaded Then
+                    lrShapeNode = New ShapeNode(lrEntityTypeInstance.Shape)
+                    lrShapeNode.Text = lrEntityTypeInstance.Id
+                    lrShapeNode.Font = New System.Drawing.Font("Arial", 10)
+                    Me.morph_shape = lrShapeNode
+                Else
+                    lrShapeNode = lr_actor.Shape.Clone(True)
+                    lrShapeNode.Shape = Shapes.RoundRect
+                    lrShapeNode.HandlesStyle = HandlesStyle.InvisibleMove
+                    lrShapeNode.Text = lr_actor.Data
+                    lrShapeNode.Resize(20, 15)
+                End If
 
-            '------------------------------------------------------------------
-            'Get the X,Y co-ordinates of the Actor/EntityType being morphed
-            '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-            lr_page = lr_enterprise_view.Tag
-            Dim lrEntityTypeInstanceList = From EntityTypeInstance In lr_page.EntityTypeInstance
-                                           Where EntityTypeInstance.Id = lr_actor.Data
-                                           Select New FBM.EntityTypeInstance(lr_page.Model,
-                                                                    pcenumLanguage.ORMModel,
-                                                                    EntityTypeInstance.Name,
-                                                                    True,
-                                                                    EntityTypeInstance.X,
-                                                                    EntityTypeInstance.Y)
+                If lrPage.DiagramView IsNot Nothing Then
+                    Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
+                Else
+                    Me.MorphVector(0).TargetZoomFactor = My.Settings.DefaultPageZoomFactor
+                End If
 
-            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
-            For Each lrEntityTypeInstance In lrEntityTypeInstanceList
-                Exit For
-            Next
+                Me.MorphVector(0).Shape = lrShapeNode
+                Me.DiagramHidden.Nodes.Add(Me.MorphVector(0).Shape)
+                Me.DiagramHidden.Invalidate()
 
-            '----------------------------------------------------------------
-            'Retreive the actual EntityTypeInstance on the destination page
-            '----------------------------------------------------------------
-            lrEntityTypeInstance = lr_page.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
+                Me.MorphTimer.Enabled = True
+                Me.MorphStepTimer.Enabled = True
 
-            If lr_page.FormLoaded Then
-                lr_shape_node = lrEntityTypeInstance.Shape.Clone(True)
-                Me.morph_shape = lr_shape_node
-            Else
-                Me.morph_shape = lr_actor.Shape.Clone(True)
-                Me.morph_shape.Shape = Shapes.RoundRect
-                Me.morph_shape.HandlesStyle = HandlesStyle.InvisibleMove
-                Me.morph_shape.Text = lr_actor.Data
-                Me.morph_shape.Resize(20, 15)
+                Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+                Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
+                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+
+                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+
             End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Me.DiagramHidden.Nodes.Add(Me.morph_shape)
-            Me.DiagramHidden.Invalidate()
-
-            Me.MorphTimer.Enabled = True
-            Me.MorphStepTimer.Enabled = True
-            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrEntityTypeInstance.X, lrEntityTypeInstance.Y, 40)
-            Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
-            Me.MorphStepTimer.Start()
-            Me.MorphTimer.Start()
-
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1359,7 +1513,8 @@ Public Class frmDiagrmUMLUseCase
 
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
-            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, 5, 5, 40)
+            Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.Bounds.X, Me.zrPage.SelectedObject(0).Shape.Bounds.Y, 5, 5, 40)
+            Me.MorphVector.Add(lrMorphVector)
             Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
             Me.MorphStepTimer.Start()
             Me.MorphTimer.Start()
@@ -1421,7 +1576,8 @@ Public Class frmDiagrmUMLUseCase
                 Exit For
             Next
 
-            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
+            Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.Bounds.X, Me.zrPage.SelectedObject(0).Shape.Bounds.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
+            Me.MorphVector.Add(lrMorphVector)
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
 
@@ -1431,31 +1587,66 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub MorphTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MorphTimer.Tick
 
-        Call Me.HiddenDiagramView.SendToBack()
-
+        Me.DiagramHidden.Nodes.Clear()
         Me.MorphTimer.Stop()
 
     End Sub
 
     Private Sub MorphStepTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MorphStepTimer.Tick
 
-        Dim lr_point As New Point
-        Dim lr_rect As New Rectangle
+        Dim lrPoint As New Point
+        Dim lrRectangle As New Rectangle
+        Dim lrMorphVector As tMorphVector
 
-        lr_point = Me.morph_vector.getNextMorphVectorStepPoint
+        Try
+            For Each lrMorphVector In Me.MorphVector
+                lrPoint = lrMorphVector.getNextMorphVectorStepPoint
 
-        Me.morph_shape.Move(lr_point.X, lr_point.Y)
-        Me.DiagramHidden.Invalidate()
+                Me.HiddenDiagramView.ZoomFactor = Me.MorphVector(0).InitialZoomFactor + ((Me.MorphVector(0).VectorStep / Me.MorphVector(0).VectorSteps) * (Me.MorphVector(0).TargetZoomFactor - Me.MorphVector(0).InitialZoomFactor))
 
-        If Me.morph_vector.VectorStep > Me.morph_vector.VectorSteps Then
+                lrMorphVector.Shape.Move(lrPoint.X, lrPoint.Y)
+
+                lrRectangle = lrMorphVector.getNextMorphVectorRectangle
+                lrMorphVector.Shape.Resize(lrRectangle.Width, lrRectangle.Height)
+
+                If lrMorphVector.VectorStep > lrMorphVector.VectorSteps / 2 Then
+                    Select Case lrMorphVector.TargetShape
+                        Case Is = pcenumTargetMorphShape.Circle
+                            lrMorphVector.Shape.Shape = Shapes.Ellipse
+                            lrMorphVector.Shape.Image = My.Resources.ORMShapes.Blank
+                        Case Else
+                            lrMorphVector.Shape.Shape = Shapes.RoundRect
+                    End Select
+                End If
+            Next
+
+            Me.DiagramHidden.Invalidate()
+
+            If Me.MorphVector(0).VectorStep > Me.MorphVector(0).VectorSteps Then
+                Me.MorphStepTimer.Stop()
+                Me.MorphStepTimer.Enabled = False
+                Call Me.HiddenDiagramView.SendToBack()
+                'Me.DiagramView.BringToFront()
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphStepTimer.Tag 'Me.MorphVector(0).EnterpriseTreeView.TreeNode
+                Call frmMain.zfrmModelExplorer.LoadSelectedPage(Me.MorphVector(0).ModelElementId)
+                Me.MorphTimer.Enabled = False
+            End If
+
+        Catch ex As Exception
+
             Me.MorphStepTimer.Stop()
-            Me.MorphStepTimer.Enabled = False
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphStepTimer.Tag
-            Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
             Me.DiagramView.BringToFront()
             Me.Diagram.Invalidate()
-            Me.MorphTimer.Enabled = False
-        End If
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+        End Try
+
 
     End Sub
 
@@ -1531,7 +1722,8 @@ Public Class frmDiagrmUMLUseCase
         'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
-        Me.morph_vector = New tMorphVector(lr_process.X, lr_process.Y, 0, 0, 40)
+        Dim lrMorphVector = New tMorphVector(lr_process.Shape.Bounds.X, lr_process.Shape.Bounds.Y, 0, 0, 40)
+        Me.MorphVector.Add(lrMorphVector)
 
         '---------------------------------------------------------------------
         'Clear the list of DFDDiagrams that may relate to the EntityType
@@ -1630,6 +1822,9 @@ Public Class frmDiagrmUMLUseCase
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
 
             End If
+
+            Call Me.reset_node_and_link_colors()
+
         End If
 
         '===============================================================================
@@ -1813,4 +2008,26 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
+    Private Sub Diagram_NodeDeselected(sender As Object, e As NodeEventArgs) Handles Diagram.NodeDeselected
+
+        Try
+
+            If IsSomething(e.Node) Then
+                Select Case e.Node.Tag.ConceptType
+                    Case Is = pcenumConceptType.Actor
+                        Dim lrActor As CMML.Actor = e.Node.Tag
+                        Call lrActor.NodeDeselected()
+                End Select
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

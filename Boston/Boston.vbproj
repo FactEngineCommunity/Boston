@@ -576,6 +576,8 @@
     <Compile Include="ClassesLANGUAGEORM\ORMPGS\tORMPage.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMSTM\tORMPage.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMUCD\tORMModel.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMUCD\tORMPage.vb" />
     <Compile Include="ClassesLANGUAGERDS\TypeDBSpecific\tRDSPlays.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDStartStateTransition.vb" />
     <Compile Include="ClassesLANGUAGESTD\tCMMLSTDEndStateTransition.vb" />
