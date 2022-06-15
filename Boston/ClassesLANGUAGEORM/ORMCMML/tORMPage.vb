@@ -2194,6 +2194,71 @@ SkipAdding:
             End Try
         End Function
 
+        Public Sub loadProcessProcessRelationsForCMMLProcess(ByRef arCMMLProcess As CMML.Process)
+
+            Try
+                '====================================================
+                'Map the Relations from the Model level
+                '====================================================
+                Dim lsSQLQuery As String = ""
+                Dim lrRecordset As ORMQL.Recordset
+
+                Dim lrOriginUMLProcess As UML.Process
+                Dim lrDestinationUMLProcess As UML.Process
+
+                Dim lsOriginCMMLProcessId = arCMMLProcess.Id
+
+                lrOriginUMLProcess = Me.UMLDiagram.Process.Find(Function(x) x.Id = lsOriginCMMLProcessId)
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+                lsSQLQuery &= " WHERE Process1 = '" & lsOriginCMMLProcessId & "'"
+
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lrFactInstance As FBM.FactInstance
+                While Not lrRecordset.EOF
+
+                    lrDestinationUMLProcess = Me.UMLDiagram.Process.Find(Function(x) x.Id = lrRecordset("Process2").Data)
+
+
+                    If lrOriginUMLProcess IsNot Nothing And lrDestinationUMLProcess IsNot Nothing Then
+                        '----------------------------------
+                        'Add the Fact to the FactTypeInstance
+                        '----------------------------------
+                        lrFactInstance = Me.UMLDiagram.PocessToProcessRelationFTI.AddFact(lrRecordset.CurrentFact)
+
+                        Dim lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me, lrOriginUMLProcess, lrDestinationUMLProcess)
+                        lrUMLProcessProcessRelation.Fact = lrRecordset.CurrentFact
+                        lrUMLProcessProcessRelation.CMMLProcessProcessRelation = Me.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrOriginUMLProcess.Id And x.Process2.Id = lrDestinationUMLProcess.Id)
+
+                        Me.UMLDiagram.ProcessProcessRelation.AddUnique(lrUMLProcessProcessRelation)
+
+                        '------------------------------------------
+                        'Link the Actor to the associated Process
+                        '------------------------------------------
+                        Dim lo_link As MindFusion.Diagramming.DiagramLink
+                        lo_link = Me.Diagram.Factory.CreateDiagramLink(lrOriginUMLProcess.Shape, lrDestinationUMLProcess.Shape)
+                        lrUMLProcessProcessRelation.Link = lo_link
+                        lo_link.Tag = lrUMLProcessProcessRelation
+                    End If
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Call Me.MakeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         ''' <summary>
         ''' PRECONDITION: Relations are already created in the RDS Model of the FBM.Model. i.e. Is not used to create relationships, but load them onto a Page.
         ''' </summary>

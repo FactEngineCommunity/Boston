@@ -12,6 +12,8 @@ Namespace UML
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
 
+        Public UMLModel As UML.Model
+
         ''' <summary>
         ''' The text of the Process
         ''' </summary>

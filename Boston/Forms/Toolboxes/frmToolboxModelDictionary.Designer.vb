@@ -185,6 +185,8 @@ Partial Class frmToolboxModelDictionary
         Me.ImageList.Images.SetKeyName(21, "PGSNode.png")
         Me.ImageList.Images.SetKeyName(22, "PGSRelation.png")
         Me.ImageList.Images.SetKeyName(23, "value_comparison.png")
+        Me.ImageList.Images.SetKeyName(24, "Actor16x16.png")
+        Me.ImageList.Images.SetKeyName(25, "Process16x16.png")
         '
         'ContextMenuStrip1
         '

@@ -1251,6 +1251,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub removeCMMLProcessProcessRelation(ByRef arCMMLProcesProcessRelation As CMML.ProcessProcessRelation)
+
+            Try
+                Dim lsSQLString As String = ""
+
+                lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+                lsSQLString &= " WHERE Process1 = '" & arCMMLProcesProcessRelation.Process1.Id & "'"
+                lsSQLString &= "   AND Process2 = '" & arCMMLProcesProcessRelation.Process2.Id & "'"
+
+                Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub removeCMMLRelation(ByRef arRelation As RDS.Relation)
 
             Dim lsSQLQuery As String
@@ -1668,12 +1690,16 @@ Namespace FBM
 
                 Dim lsSQLQuery As String = ""
                 Dim lrActor As CMML.Actor
+                Dim lrProcess, lrProcess1, lrProcess2 As CMML.Process
+                Dim lrActorProcessRelation As CMML.ActorProcessRelation
+                Dim lrProcessProcessRelation As CMML.ProcessProcessRelation
 
+#Region "Actors"
                 lsSQLQuery = " SELECT *"
                 lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                 lsSQLQuery &= " WHERE ElementType = 'Actor'"
 
-                Dim lrORMRecordset
+                Dim lrORMRecordset, lrORMRecordset2 As ORMQL.Recordset
 
                 lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -1682,7 +1708,6 @@ Namespace FBM
                 Dim liInd As Integer = 0 'For reporting progress on Actors loaded.
 
                 While Not lrORMRecordset.EOF
-#Region "Actors"
                     '-----------------------------------------------------
                     'Get the underlying ModelElement
                     lrModelElement = Me.GetModelObjectByName(lrORMRecordset("Element").Data)
@@ -1703,8 +1728,85 @@ Namespace FBM
                     Me.UML.Actor.Add(lrActor)
 
                     lrORMRecordset.MoveNext()
-#End Region
+
                 End While 'Stepping through Actors
+#End Region
+
+#Region "Processes"
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE ElementType = 'Process'"
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lsProcessText As String = ""
+
+                While Not lrORMRecordset.EOF
+
+#Region "Process Text"
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lsProcessText = "Error-No Process Text"
+                    If Not lrORMRecordset2.EOF Then
+                        lsProcessText = lrORMRecordset2("ProcessText").Data
+                    End If
+#End Region
+
+                    lrProcess = New CMML.Process(Me.UML, lrORMRecordset("Element").Data, lsProcessText)
+                    Me.UML.Process.Add(lrProcess)
+
+                    lrORMRecordset.MoveNext()
+
+                End While 'Stepping through Actors
+#End Region
+
+#Region "Actor to Process Relations"
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrORMRecordset.EOF
+
+                    lrActor = Me.UML.Actor.Find(Function(x) x.Name = lrORMRecordset("Actor").Data)
+                    lrProcess = Me.UML.Process.Find(Function(x) x.Id = lrORMRecordset("Process").Data)
+
+                    lrActorProcessRelation = New CMML.ActorProcessRelation(lrActor, lrProcess)
+
+                    Me.UML.ActorProcessRelation.Add(lrActorProcessRelation)
+
+                    lrActor.Process.Add(lrProcess)
+
+                    lrORMRecordset.MoveNext()
+
+                End While 'Stepping through Actors
+#End Region
+
+#Region "Process to Process Relations"
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                While Not lrORMRecordset.EOF
+
+                    lrProcess1 = Me.UML.Process.Find(Function(x) x.Id = lrORMRecordset("Process1").Data)
+                    lrProcess2 = Me.UML.Process.Find(Function(x) x.Id = lrORMRecordset("Process2").Data)
+
+                    lrProcessProcessRelation = New CMML.ProcessProcessRelation(Me.UML, lrProcess1, lrProcess2)
+
+                    Me.UML.ProcessProcessRelation.Add(lrProcessProcessRelation)
+
+                    lrProcess1.Process.Add(lrProcess2)
+
+                    lrORMRecordset.MoveNext()
+
+                End While 'Stepping through Actors
+#End Region
 
             Catch ex As Exception
                 Dim lsMessage1 As String

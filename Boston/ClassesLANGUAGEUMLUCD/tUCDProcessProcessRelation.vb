@@ -9,7 +9,7 @@
         Public Sub New()
         End Sub
 
-        Public Sub New(ByVal arProcess1 As CMML.Process, ByVal arProcess2 As CMML.Process)
+        Public Sub New(ByVal arProcess1 As UML.Process, ByVal arProcess2 As UML.Process)
 
             Me.Process1 = arProcess1
             Me.Process2 = Process2

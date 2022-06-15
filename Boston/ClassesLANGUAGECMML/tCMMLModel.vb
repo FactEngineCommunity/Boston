@@ -11,8 +11,9 @@ Namespace CMML
         Public Actor As New List(Of CMML.Actor)
         Public Process As New List(Of CMML.Process)
 
-        Public ActorProcessRelation = New List(Of CMML.ActorProcessRelation)
-        Public ProcessProcessRelation = New List(Of CMML.ProcessProcessRelation)
+        Public ActorProcessRelation As New List(Of CMML.ActorProcessRelation)
+
+        Public ProcessProcessRelation As New List(Of CMML.ProcessProcessRelation)
 
         Public Event ActorAdded(ByRef arActor As CMML.Actor)
         Public Event ActorRemoved(ByRef arTable As CMML.Actor)
@@ -205,7 +206,24 @@ Namespace CMML
 
         End Function
 
-        Public Sub CreateProcess()
+        Public Sub RemoveProcessProcessRelation(ByRef arProcessProcessRelation As CMML.ProcessProcessRelation)
+
+            Try
+                Me.ProcessProcessRelation.Remove(arProcessProcessRelation)
+
+                'CMML
+                Call Me.Model.removeCMMLProcessProcessRelation(arProcessProcessRelation)
+
+                RaiseEvent ProcessProcessRelationRemoved(arProcessProcessRelation)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

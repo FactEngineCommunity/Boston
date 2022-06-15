@@ -21,10 +21,18 @@ Namespace CMML
 
         Public Name As String
 
-        Public include_process As List(Of CMML.Process)
-        Public included_by_process As List(Of CMML.Process)
-        Public extend_to_process As List(Of CMML.Process)
-        Public extended_by_process As List(Of CMML.Process)
+        ''' <summary>
+        ''' Processes participated with by the Process
+        ''' </summary>
+        Public Process As New List(Of CMML.Process)
+
+        ''' <summary>
+        ''' 20220615-VM-Can probably make these derived Propeties.
+        ''' </summary>
+        Public Include_process As List(Of CMML.Process)
+        Public Included_by_process As List(Of CMML.Process)
+        Public Extend_to_process As List(Of CMML.Process)
+        Public Extended_by_process As List(Of CMML.Process)
 
         ''' <summary>
         ''' The SequenceNr assigned to the Process in a sequence of Processes in (say) a FlowChart or EventTraceDiagram
@@ -94,6 +102,12 @@ Namespace CMML
             Catch ex As Exception
                 prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Function
+
+        Public Shared Function CompareText(x As CMML.Process, y As CMML.Process) As Integer
+
+            Return String.Compare(x.Text, y.Text)
 
         End Function
 

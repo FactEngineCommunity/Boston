@@ -233,21 +233,59 @@ Public Class frmDiagrmUMLUseCase
         Dim liInd As Integer = 0
         Dim loNode As New ShapeNode
 
+        Dim loPoint As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
+        Dim loPointF As PointF = Me.DiagramView.ClientToDoc(New Point(loPoint.X, loPoint.Y))
+
         If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
 
             Dim loDraggedNode As tShapeNodeDragItem = e.Data.GetData(tShapeNodeDragItem.DraggedItemObjectType)
 
-            If loDraggedNode.Index >= 0 Then
+            Dim lrDroppedObject As Object
+            Dim lrCMMLModelElement As Object
+            lrDroppedObject = loDraggedNode.Tag
 
-                Dim lrToolboxForm As frmToolbox
+
+            Dim lrToolboxForm As frmToolbox
                 lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
+                'ModelObjects first.
+                If Not (TypeOf (lrDroppedObject) Is MindFusion.Diagramming.Shape) Then
+#Region "Model Objects. I.e. Not shapes"
+                '---------------------------------------------------------------------
+                'DraggedObject is a ModelObject (from the ModelDictionary form etc),
+                ' rather than a Shape Object dragged from the Toolbox.
+                '---------------------------------------------------------------------
+                lrCMMLModelElement = loDraggedNode.Tag
+
+                Select Case lrCMMLModelElement.ConceptType
+
+                    Case Is = pcenumConceptType.Process 'Process
+
+                        Dim lrCMMLProcess As CMML.Process = lrCMMLModelElement
+
+
+                        'Page Level
+                        Call Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
+                        Call Me.zrPage.loadProcessProcessRelationsForCMMLProcess(lrCMMLProcess)
+
+                        '======================================================================
+                        'Save the Page
+                        Me.zrPage.Save()
+
+                        Exit Sub
+                End Select
+
+                Me.zrPage.DiagramView.Focus()
+#End Region
+                End If
+
+            If loDraggedNode.Index >= 0 Then
+#Region "Shape Toolbox"
                 If loDraggedNode.Index < lrToolboxForm.ShapeListBox.ShapeCount Then
-                    Dim loPoint As Point = Me.DiagramView.PointToClient(New Point(e.X, e.Y))
-                    Dim loPointF As PointF = Me.DiagramView.ClientToDoc(New Point(loPoint.X, loPoint.Y))
 
                     Select Case lrToolboxForm.ShapeListBox.Shapes(loDraggedNode.Index).Id
                         Case Is = "Actor"
+#Region "Actor - Shape Toolbox"
                             '----------------------------------------------------------
                             'Establish a new Actor(EntityType) for the dropped object.
                             '  i.e. Establish the EntityType within the Model as well
@@ -284,7 +322,7 @@ Public Class frmDiagrmUMLUseCase
                             lrActor.Name &= " " & (CStr(liCount) + 1)
 
                             Call Me.DropActorAtPoint(lrActor, loPointF)
-
+#End Region
                         Case Is = "Process"
 
                             'CMML Model level
@@ -294,9 +332,11 @@ Public Class frmDiagrmUMLUseCase
 
                             'Page Level
                             Call Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
-                            Debugger.Break()
+
                     End Select
                 End If
+#End Region
+
             End If
         End If
 
@@ -609,9 +649,19 @@ Public Class frmDiagrmUMLUseCase
                 '------------------------------------------
                 'Link the Actor to the associated Process
                 '------------------------------------------
+                Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation
+
+                lrFactInstance = lrRecordset.CurrentFact
+                lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
+                lrUMLProcessProcessRelation.Fact = lrRecordset.CurrentFact
+                lrUMLProcessProcessRelation.CMMLProcessProcessRelation = Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+
+                Me.zrPage.UMLDiagram.ProcessProcessRelation.Add(lrUMLProcessProcessRelation)
+
                 Dim lo_link As DiagramLink
                 lo_link = Me.Diagram.Factory.CreateDiagramLink(lrProcess1.Shape, lrProcess2.Shape)
-                lo_link.Tag = lrRecordset.CurrentFact
+                lrUMLProcessProcessRelation.Link = lo_link
+                lo_link.Tag = lrUMLProcessProcessRelation
 
                 lrRecordset.MoveNext()
             End While
@@ -869,25 +919,26 @@ Public Class frmDiagrmUMLUseCase
         Me.Cursor = Cursors.WaitCursor
 
 
-        lo_first_entity = e.Link.Origin.Tag
-        lo_second_entity = e.Link.Destination.Tag
+        '20220615-Now handled by RemoveFromPage
+        'lo_first_entity = e.Link.Origin.Tag
+        'lo_second_entity = e.Link.Destination.Tag
 
 
-        If (lo_first_entity.ConceptType = pcenumConceptType.Actor) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
-            Dim lsSQLString As String = ""
-            lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
-            lsSQLString &= " WHERE Actor = '" & lo_first_entity.Name & "'"
-            lsSQLString &= "   AND Process = '" & lo_second_entity.Name & "'"
+        'If (lo_first_entity.ConceptType = pcenumConceptType.Actor) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
+        '    Dim lsSQLString As String = ""
+        '    lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+        '    lsSQLString &= " WHERE Actor = '" & lo_first_entity.Name & "'"
+        '    lsSQLString &= "   AND Process = '" & lo_second_entity.Name & "'"
 
-            Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
-        ElseIf (lo_first_entity.ConceptType = pcenumConceptType.Process) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
-            Dim lsSQLString As String = ""
-            lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
-            lsSQLString &= " WHERE Process1 = '" & lo_first_entity.Name & "'"
-            lsSQLString &= "   AND Process2 = '" & lo_second_entity.Name & "'"
+        '    Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
+        'ElseIf (lo_first_entity.ConceptType = pcenumConceptType.Process) And (lo_second_entity.ConceptType = pcenumConceptType.Process) Then
+        '    Dim lsSQLString As String = ""
+        '    lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+        '    lsSQLString &= " WHERE Process1 = '" & lo_first_entity.Name & "'"
+        '    lsSQLString &= "   AND Process2 = '" & lo_second_entity.Name & "'"
 
-            Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
-        End If
+        '    Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
+        'End If
 
         Me.Cursor = Cursors.Default
 
@@ -1980,10 +2031,18 @@ Public Class frmDiagrmUMLUseCase
 
         lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
-        Dim loNode = Diagram.GetNodeAt(lo_point)
+        Dim loNode = Diagram.GetNodeAt(lo_point, 2)
+        Dim loLink = Diagram.GetLinkAt(lo_point, 5)
 
-        If IsSomething(loNode) Then
-            Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
+        If loLink IsNot Nothing Then
+            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
+
+            Me.zrPage.SelectedObject.Clear()
+            Me.zrPage.SelectedObject.Add(loLink.Tag)
+
+        ElseIf IsSomething(loNode) Then
+        Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
+
         Else
             '---------------------------------------------------
             'MouseDown is on canvas (not on object).
@@ -2270,6 +2329,57 @@ Public Class frmDiagrmUMLUseCase
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+
+    End Sub
+
+    Private Sub RemoveFromPageToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles RemoveFromPageToolStripMenuItem1.Click
+
+        Try
+            Dim loProcessRelation = Me.zrPage.SelectedObject(0)
+
+            Select Case loProcessRelation.GetType
+                Case Is = GetType(UML.ProcessProcessRelation)
+                    Dim lrProcessProcessRelation As UML.ProcessProcessRelation = loProcessRelation
+
+                    Call lrProcessProcessRelation.RemoveFromPage
+            End Select
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RemoveFromPageAndModelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveFromPageAndModelToolStripMenuItem.Click
+
+        Try
+            Dim loProcessRelation = Me.zrPage.SelectedObject(0)
+
+            If MsgBox("Are you sure you want to remove the Relation from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Select Case loProcessRelation.GetType
+                    Case Is = GetType(UML.ProcessProcessRelation)
+                        Dim lrProcessProcessRelation As UML.ProcessProcessRelation = loProcessRelation
+
+                        Call lrProcessProcessRelation.CMMLProcessProcessRelation.RemoveFromModel()
+                End Select
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
 
     End Sub
 

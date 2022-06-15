@@ -33,7 +33,6 @@ Namespace FBM
                     Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
                     Return Nothing
                 Else
-
                     lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
                     lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                     lsSQLQuery &= " ON PAGE '" & Me.Name & "'"

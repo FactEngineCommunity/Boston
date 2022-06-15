@@ -295,6 +295,34 @@ Namespace FBM
 
         End Function
 
+        Public Function CloneProcessProcessRelation(ByRef arPage As FBM.Page, Optional ByRef arProcess1 As UML.Process = Nothing, Optional ByRef arProcess2 As UML.Process = Nothing)
+
+            Dim lrUMLProcessProcessRelation As New UML.ProcessProcessRelation(arPage.UMLDiagram, arProcess1, arProcess2)
+            Try
+                With Me
+                    lrUMLProcessProcessRelation.Model = .Model
+                    lrUMLProcessProcessRelation.UMLModel = arPage.UMLDiagram
+                    lrUMLProcessProcessRelation.Page = arPage
+                    lrUMLProcessProcessRelation.Fact = Me.Fact
+                    lrUMLProcessProcessRelation.FactInstance = Me
+                    lrUMLProcessProcessRelation.Concept = .Concept
+                    lrUMLProcessProcessRelation.X = .X
+                    lrUMLProcessProcessRelation.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrUMLProcessProcessRelation
+
+        End Function
+
 
         ''' <summary>
         ''' Start State Indicator is a circle linking to the first State in a State Transition Diagram.

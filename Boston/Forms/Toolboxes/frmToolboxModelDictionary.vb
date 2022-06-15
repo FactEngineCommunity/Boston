@@ -338,24 +338,50 @@ Public Class frmToolboxModelDictionary
 
         Try
             Dim loNode As New TreeNode
-
-            loNode = Me.TreeView1.Nodes.Add("Node", "Node", 0, 0)
-            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram, Nothing)
+            Dim lrActor As CMML.Actor
+            Dim lrProcess, lrProcess1 As CMML.Process
 
             If prApplication.WorkingModel Is Nothing Then
                 Exit Sub
             End If
 
-            Dim lrActor As CMML.Actor
+#Region "Actors"
+            loNode = Me.TreeView1.Nodes.Add("Actor", "Actor", 24, 24)
+            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram, Nothing)
 
             prApplication.WorkingModel.UML.Actor.Sort(AddressOf CMML.Actor.CompareName)
 
             For Each lrActor In prApplication.WorkingModel.UML.Actor
-                'loNode = New TreeNode
-                loNode = Me.TreeView1.Nodes("Node").Nodes.Add("Node" & lrActor.Name, lrActor.Name, 22, 22)
+
+                loNode = Me.TreeView1.Nodes("Actor").Nodes.Add("Actor" & lrActor.Name, lrActor.Name, 24, 24)
                 loNode.Tag = lrActor
 
+                For Each lrProcess In lrActor.Process
+                    Dim loProcessNode = loNode.Nodes.Add("Process", lrProcess.Text, 25, 25)
+                    loProcessNode.Tag = lrProcess
+                Next
+
             Next
+#End Region
+
+#Region "Processes"
+            loNode = Me.TreeView1.Nodes.Add("Process", "Process", 25, 25)
+            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram, Nothing)
+
+            prApplication.WorkingModel.UML.Process.Sort(AddressOf CMML.Process.CompareText)
+
+            For Each lrProcess In prApplication.WorkingModel.UML.Process
+
+                loNode = Me.TreeView1.Nodes("Process").Nodes.Add("Pocess" & lrProcess.Text, lrProcess.Text, 25, 25)
+                loNode.Tag = lrProcess
+
+                For Each lrProcess1 In lrProcess.Process
+                    Dim loSubProcessNode = loNode.Nodes.Add("Process", lrProcess1.Text, 22, 22)
+                    loSubProcessNode.Tag = lrProcess1
+                Next
+
+            Next
+#End Region
 
             Me.TreeView1.Nodes(0).Expand()
 

@@ -34,7 +34,10 @@ Namespace CMML
         ''' <remarks></remarks>
         Public SequenceNr As Single = 1
 
-        Public process As List(Of CMML.Process)
+        ''' <summary>
+        ''' Processes participated with by the Actor
+        ''' </summary>
+        Public Process As New List(Of CMML.Process)
 
         <NonSerialized(),
         XmlIgnore()>

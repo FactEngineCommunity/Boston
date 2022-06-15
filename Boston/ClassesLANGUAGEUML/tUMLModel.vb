@@ -12,6 +12,9 @@
         Public Actor As New List(Of UML.Actor)
         Public Process As New List(Of UML.Process)
 
+        Public ActorProcessRelation As New List(Of UML.ActorProcessRelation)
+        Public ProcessProcessRelation As New List(Of UML.ProcessProcessRelation)
+
         Public ActorToProcessParticipationRelationFTI As FBM.FactTypeInstance
         Public PocessToProcessRelationFTI As FBM.FactTypeInstance
 
