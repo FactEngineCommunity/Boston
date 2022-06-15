@@ -8,6 +8,11 @@ Namespace CMML
         Public Process1 As CMML.Process
         Public Process2 As CMML.Process
 
+        ''' <summary>
+        ''' The Fact that stores this ProcessProcessRelation at the Model/CMML level (I.e. Not the Page level, the Model level)
+        ''' </summary>
+        Public Fact As FBM.Fact
+
         Public Event RemovedFromModel()
 
         ''' <summary>

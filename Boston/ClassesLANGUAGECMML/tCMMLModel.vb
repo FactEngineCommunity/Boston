@@ -19,7 +19,7 @@ Namespace CMML
         Public Event ActorRemoved(ByRef arTable As CMML.Actor)
         Public Event ActorProcessRelationAdded(ByRef arActorProcessRelation As CMML.ActorProcessRelation)
         Public Event ActorProcessRelationRemoved(ByRef arActorProcessRelation As CMML.ActorProcessRelation)
-        Public Event ProcessProcessRelationAdded(ByRef arProcesProcessRelation As CMML.ProcessProcessRelation)
+        Public Event ProcessProcessRelationAdded(ByRef arProcessProcessRelation As CMML.ProcessProcessRelation)
         Public Event ProcessProcessRelationRemoved(ByRef arProcesProcessRelation As CMML.ProcessProcessRelation)
         Public Event ProcessAdded(ByRef arProcess As CMML.Process)
         Public Event ProcessRemoved(ByVal arProcess As CMML.Process)
@@ -82,6 +82,27 @@ Namespace CMML
             End Try
 
         End Sub
+
+        Public Sub addProcessProcessRelation(ByRef arCMMLProcessProcessRelation As CMML.ProcessProcessRelation)
+
+            Try
+                Me.ProcessProcessRelation.AddUnique(arCMMLProcessProcessRelation)
+
+                arCMMLProcessProcessRelation.Fact = Me.Model.createCMMLProcessProcessRelation(arCMMLProcessProcessRelation)
+
+                RaiseEvent ProcessProcessRelationAdded(arCMMLProcessProcessRelation)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
         Public Function CreateUniqueProcessText(ByVal asRootProcessText As String, Optional aiCounter As Integer = 0) As String
 

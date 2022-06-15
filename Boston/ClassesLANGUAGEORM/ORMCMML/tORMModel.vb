@@ -847,6 +847,39 @@ Namespace FBM
 
         End Sub
 
+        Public Function createCMMLProcessProcessRelation(ByRef arCMMLProcessProcessRelation As CMML.ProcessProcessRelation) As FBM.Fact
+
+            Try
+                '----------------------------------
+                'Create the Fact within the Model
+                '----------------------------------
+                Dim lsSQLString As String = ""
+                lsSQLString = "INSERT INTO " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+                lsSQLString &= " (Process1, Process2, Data)"
+                lsSQLString &= " VALUES ("
+                lsSQLString &= "'" & arCMMLProcessProcessRelation.Process1.Id & "'"
+                lsSQLString &= ",'" & arCMMLProcessProcessRelation.Process2.Id & "'"
+                lsSQLString &= ",''"
+                lsSQLString &= ")"
+
+                '----------------------------------
+                'Create the Fact within the Model
+                '----------------------------------
+                Return Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
 
         Public Sub createCMMLTable(ByRef arTable As RDS.Table)
 
@@ -1798,6 +1831,7 @@ Namespace FBM
                     lrProcess2 = Me.UML.Process.Find(Function(x) x.Id = lrORMRecordset("Process2").Data)
 
                     lrProcessProcessRelation = New CMML.ProcessProcessRelation(Me.UML, lrProcess1, lrProcess2)
+                    lrProcessProcessRelation.Fact = lrORMRecordset.CurrentFact
 
                     Me.UML.ProcessProcessRelation.Add(lrProcessProcessRelation)
 

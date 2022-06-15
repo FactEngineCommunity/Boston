@@ -4,9 +4,10 @@ Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports System.Reflection
 Imports Newtonsoft.Json
+Imports Boston.CMML
 
 Namespace FBM
-    <Serializable()> _
+    <Serializable()>
     Public Class Page
         Implements IEquatable(Of FBM.Page)
         Implements IDisposable
@@ -313,6 +314,11 @@ Namespace FBM
             Me.Model = arModel
             Me.RDSModel = arModel.RDS
             Me.STModel = arModel.STM
+
+            Select Case aiLanguageId
+                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                    Me.CMMLModel = arModel.UML
+            End Select
 
             If IsSomething(as_PageId) Then
                 Me.PageId = as_PageId
@@ -3191,6 +3197,87 @@ NextY:
 
         Public Sub triggerPageDeleted()
             RaiseEvent PageDeleted()
+        End Sub
+
+        Private Sub CMMLModel_ProcessProcessRelationAdded(ByRef arProcessProcessRelation As ProcessProcessRelation) Handles CMMLModel.ProcessProcessRelationAdded
+
+            Try
+                'CodeSafe
+                If Not Me.Model.Page.Contains(Me) Then
+                    Me.Dispose()
+                    Exit Sub
+                End If
+
+                'CodeSafe 
+                If Me.IsCoreModelPage Then Exit Sub
+                If Me.FactTypeInstance.Find(Function(x) x.Id = pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString) Is Nothing Then
+                    Exit Sub
+                End If
+
+                Dim laiLanguage() = {pcenumLanguage.UMLUseCaseDiagram}
+
+                If Not laiLanguage.Contains(Me.Language) Then Exit Sub
+
+                'Check to see that both the processes are on the Page.
+                Dim lsProcess1Id = arProcessProcessRelation.Process1.Id
+                Dim lsProcess2Id = arProcessProcessRelation.Process2.Id
+
+                Dim lrProcess1 = Me.UMLDiagram.Process.Find(Function(x) x.Id = lsProcess1Id)
+                Dim lrProcess2 = Me.UMLDiagram.Process.Find(Function(x) x.Id = lsProcess2Id)
+
+                Dim lrFactInstance As FBM.FactInstance
+
+                If lrProcess1 IsNot Nothing And lrProcess2 IsNot Nothing Then
+
+#Region "Load the link"
+                    Dim lsSQLQuery As String
+                    Dim lrRecordset As ORMQL.Recordset
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    lsSQLQuery &= " WHERE Process1 = '" & lrProcess1.Id & "'"
+                    lsSQLQuery &= " AND Process2 = '" & lrProcess2.Id & "'"
+
+                    lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation
+                    If lrRecordset.EOF Then
+                        lrFactInstance = Me.UMLDiagram.PocessToProcessRelationFTI.AddFact(arProcessProcessRelation.Fact)
+                    Else
+                        lrFactInstance = lrRecordset.CurrentFact
+                        lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me, lrProcess1, lrProcess2)
+                    End If
+
+                    '------------------------------------------
+                    'Link the Actor to the associated Process
+                    '------------------------------------------
+                    lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me, lrProcess1, lrProcess2)
+                    lrUMLProcessProcessRelation.Fact = lrFactInstance
+                    lrUMLProcessProcessRelation.CMMLProcessProcessRelation = arProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+
+                    Me.UMLDiagram.ProcessProcessRelation.Add(lrUMLProcessProcessRelation)
+
+                    Dim lo_link As DiagramLink
+                    lo_link = Me.Diagram.Factory.CreateDiagramLink(lrProcess1.Shape, lrProcess2.Shape)
+                    lrUMLProcessProcessRelation.Link = lo_link
+                    lo_link.Tag = lrUMLProcessProcessRelation
+
+#End Region
+
+                End If
+
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
     End Class
