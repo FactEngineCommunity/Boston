@@ -27,6 +27,11 @@ Namespace UML
         End Property
 
         ''' <summary>
+        ''' The Actor at the CMML level of the Model. I.e. As in FBM.Model.UML; not the Page level, but the Model level.
+        ''' </summary>
+        Public WithEvents CMMLActor As CMML.Actor
+
+        ''' <summary>
         ''' The SequenceNr assigned to the Actor in (say) an EventTraceDiagram.
         ''' </summary>
         ''' <remarks></remarks>
@@ -36,7 +41,7 @@ Namespace UML
 
         <NonSerialized(),
         XmlIgnore()>
-        Public NameShape As ShapeNode
+        Public NameShape As New UML.ActorName(Me)
 
         Public Sub New()
             '-----------------------------------
@@ -139,7 +144,7 @@ Namespace UML
             loActorNameShape.Visible = True
             loActorNameShape.Text = Me.Name
             loActorNameShape.ZTop()
-            Dim lrActorName As New UCD.ActorName
+            Dim lrActorName As New UML.ActorName
             loActorNameShape.Tag = lrActorName
             lrActorName.Shape = loActorNameShape
 
@@ -194,8 +199,8 @@ Namespace UML
                     'Diagram is set.
                     '------------------
                     If IsSomething(Me.NameShape) Then
-                        If Me.NameShape.Text <> "" Then
-                            Me.NameShape.Text = Trim(Me.FactData.Data)
+                        If Me.NameShape.Shape.Text <> "" Then
+                            Me.NameShape.Shape.Text = Trim(Me.FactData.Data)
 
                             '----------------------------------------
                             'Setup the ActorName shape size
@@ -207,7 +212,7 @@ Namespace UML
                             StringSize = Me.Page.Diagram.MeasureString(Trim(Me.FactData.Data), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                             StringSize.Height += 2
 
-                            Me.NameShape.SetRect(New RectangleF(Me.NameShape.Bounds.X, Me.NameShape.Bounds.Y, StringSize.Width, StringSize.Height), True)
+                            Me.NameShape.Shape.SetRect(New RectangleF(Me.NameShape.Shape.Bounds.X, Me.NameShape.Shape.Bounds.Y, StringSize.Width, StringSize.Height), True)
 
                             Me.Page.Diagram.Invalidate()
 
@@ -247,6 +252,54 @@ Namespace UML
             End Try
 
         End Sub
+
+        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+
+            Me.X = aiNewX
+            Me.Y = aiNewY
+
+            Try
+
+                Me.FactDataInstance.X = aiNewX
+                Me.FactDataInstance.Y = aiNewY
+
+                Me.FactDataInstance.Fact.FactType.isDirty = True
+                Me.FactDataInstance.Fact.isDirty = True
+                Me.FactDataInstance.isDirty = True
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Try
+                Me.FactDataInstance.Page.MakeDirty()
+            Catch ex As Exception
+            End Try
+
+        End Sub
+
+        Public Overrides Function setName(asNewName As String, Optional abBroadcastInterfaceEvent As Boolean = True, Optional abSuppressModelSave As Boolean = False) As Boolean
+
+            Try
+                Call Me.CMMLActor.FBMModelElement.setName(asNewName, abBroadcastInterfaceEvent, abSuppressModelSave)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
 
     End Class
 

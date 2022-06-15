@@ -9,7 +9,7 @@
         Public Sub New()
         End Sub
 
-        Public Sub New(ByVal arActor As CMML.Actor, ByVal arProcess As CMML.Process)
+        Public Sub New(ByVal arActor As UCD.Actor, ByVal arProcess As UCD.Process)
 
             Me.Actor = arActor
             Me.Process = arProcess

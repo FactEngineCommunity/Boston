@@ -258,6 +258,19 @@ Public Class frmDiagrmUMLUseCase
                 lrCMMLModelElement = loDraggedNode.Tag
 
                 Select Case lrCMMLModelElement.ConceptType
+                    Case Is = pcenumConceptType.Actor 'Actor
+
+                        Dim lrCMMLActor As CMML.Actor = lrCMMLModelElement
+
+                        'Page Level
+                        Call Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF)
+                        Call Me.zrPage.loadActorProcessRelationsForCMMLActor(lrCMMLActor)
+
+                        '======================================================================
+                        'Save the Page
+                        Me.zrPage.Save()
+
+                        Exit Sub
 
                     Case Is = pcenumConceptType.Process 'Process
 
@@ -288,40 +301,16 @@ Public Class frmDiagrmUMLUseCase
 #Region "Actor - Shape Toolbox"
                             '----------------------------------------------------------
                             'Establish a new Actor(EntityType) for the dropped object.
-                            '  i.e. Establish the EntityType within the Model as well
-                            '  as creating a new object for the Actor.
+                            '  i.e. Establish the EntityType within the Model as well as creating a new object for the Actor.
                             '----------------------------------------------------------
-                            Dim lrEntityType As FBM.EntityType = Me.zrPage.Model.CreateEntityType
+                            Dim lrEntityType As FBM.EntityType = Me.zrPage.Model.CreateEntityType("New Actor", True, True, False, False)
 
-                            lrEntityType.SetName("New Actor")
-                            Dim liCount As Integer
-                            liCount = Me.zrPage.Model.EntityType.FindAll(AddressOf lrEntityType.EqualsByNameLike).Count
-                            lrEntityType.Name &= " " & (CStr(liCount) + 1)
+                            Dim lrCMMLActor As New CMML.Actor(Me.zrPage.Model.UML, lrEntityType.Id, lrEntityType)
+                            Me.zrPage.Model.UML.addActor(lrCMMLActor)
 
-                            '--------------------------------------------
-                            'Set the ParentEntityType for the new Actor
-                            '--------------------------------------------
-                            Dim lrParentEntityType As FBM.EntityType = New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel, "Actor", "Actor")
-                            lrParentEntityType = Me.zrPage.Model.EntityType.Find(AddressOf lrParentEntityType.Equals)
+                            Dim lrUCDActor As New UCD.Actor(Me.zrPage, lrCMMLActor)
 
-                            '20220613-VM-Removed. Now using CoreElementHasElementType at the CMML level.
-                            'lrEntityType.parentEntityType.Add(lrParentEntityType)
-
-                            '---------------------------------------------------
-                            'Find the Core Page that lists Actor (EntityTypes)
-                            '---------------------------------------------------
-                            Dim lrPage As New FBM.Page(Me.zrPage.Model, "Core-ActorEntityTypes", "Core-ActorEntityTypes", pcenumLanguage.ORMModel)
-                            lrPage = Me.zrPage.Model.Page.Find(AddressOf lrPage.Equals)
-                            lrPage.EntityTypeInstance.Add(lrEntityType.CloneInstance(lrPage))
-
-                            Call lrPage.ClearAndRefresh()
-
-                            Dim lrActor As New UCD.Actor(Me.zrPage)
-
-                            liCount = Me.zrPage.Model.EntityType.FindAll(AddressOf lrActor.EqualsByNameLike).Count
-                            lrActor.Name &= " " & (CStr(liCount) + 1)
-
-                            Call Me.DropActorAtPoint(lrActor, loPointF)
+                            Call Me.zrPage.DropUMLActorAtPoint(lrUCDActor, loPointF)
 #End Region
                         Case Is = "Process"
 
@@ -455,6 +444,10 @@ Public Class frmDiagrmUMLUseCase
 
                 Call lrActor.DisplayAndAssociate()
 
+                '----------------------------------------------
+                'CMML
+                lrActor.CMMLActor = Me.zrPage.Model.UML.Actor.Find(Function(x) x.Name = lrActor.Name)
+
                 Me.zrPage.UMLDiagram.Actor.Add(lrActor)
 
                 lrRecordset.MoveNext()
@@ -514,72 +507,53 @@ Public Class frmDiagrmUMLUseCase
             Me.zrPage.UMLDiagram.PocessToProcessRelationFTI = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString)
 
 #Region "Actor to Process Participation Relations"
-            lsSQLQuery = "SELECT *"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            Dim larActorName = (From Actor In Me.zrPage.UMLDiagram.Actor
+                                Select Actor.Name).ToList
 
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            Dim larCMMLActorProcessRelation = From ActorProcessRelation In Me.zrPage.Model.UML.ActorProcessRelation
+                                              Where larActorName.Contains(ActorProcessRelation.Actor.Name)
+                                              Select ActorProcessRelation
 
-            While Not lrRecordset.EOF
 
-#Region "Actor"
-                Dim lbActorAlreadyLoaded As Boolean = False
+            For Each lrCMMLActorProcessRelation In larCMMLActorProcessRelation
 
-                lrFactDataInstance = lrRecordset("Actor")
-                lrActor = lrFactDataInstance.CloneUCDActor(arPage)
+                lrActor = Me.zrPage.UMLDiagram.Actor.Find(Function(x) x.Name = lrCMMLActorProcessRelation.Actor.Name)
+                lrProcess = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLActorProcessRelation.Process.Id)
 
-                '-------------------------------------------------------------------------------
-                'Check to see if the Shape for the Actor has already been loaded onto the Page
-                '-------------------------------------------------------------------------------
-                Dim lrExistingActor = Me.zrPage.UMLDiagram.Actor.Find(Function(x) x.Name = lrActor.Name)
-                If lrExistingActor IsNot Nothing Then
-                    lbActorAlreadyLoaded = True
-                    loDroppedNode = lrActor.Shape
-                    lrActorShape = loDroppedNode
-                    lrActor = lrExistingActor
-                Else
-                    lrActor.DisplayAndAssociate()
-                    Me.zrPage.UMLDiagram.Actor.Add(lrActor)
-                End If
-#End Region
-
-#Region "Process"
-                lrFactDataInstance = lrRecordset("Process")
-                lrProcess = lrFactDataInstance.CloneUCDProcess(arPage)
-
-                Dim lrActualProcess As UCD.Process = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrProcess.Id)
-
-                If lrActualProcess Is Nothing Then
-
-#Region "Process Text - Get from CMML"
+                If lrActor IsNot Nothing And lrProcess IsNot Nothing Then
 
                     lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
-                    lsSQLQuery &= " WHERE Process = '" & lrProcess.Id & "'"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    lsSQLQuery &= " WHERE Actor = '" & lrActor.Name & "'"
+                    lsSQLQuery &= " AND Process = '" & lrProcess.Id & "'"
 
-                    Dim lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If Not lrRecordset2.EOF Then
-                        lrProcess.Text = lrRecordset2("ProcessText").Data
+                    Dim lrUMLActorProcessRelation As UML.ActorProcessRelation
+                    If lrRecordset.EOF Then
+                        lrFactInstance = Me.zrPage.UMLDiagram.ActorToProcessParticipationRelationFTI.AddFact(lrCMMLActorProcessRelation.Fact)
+                    Else
+                        lrFactInstance = lrRecordset.CurrentFact
+                        lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me.zrPage, lrActor, lrProcess)
                     End If
-#End Region
 
-                    Call lrProcess.DisplayAndAssociate()
-                    Me.zrPage.UMLDiagram.Process.Add(lrProcess)
-                Else
-                    lrProcess = lrActualProcess
+                    '------------------------------------------
+                    'Link the Processes
+                    '------------------------------------------
+                    lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me.zrPage, lrActor, lrProcess)
+                    lrUMLActorProcessRelation.Fact = lrFactInstance
+                    lrUMLActorProcessRelation.CMMLActorProcessRelation = lrCMMLActorProcessRelation 'Me.zrPage.Model.UML.ActorProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+
+                    Me.zrPage.UMLDiagram.ActorProcessRelation.Add(lrUMLActorProcessRelation)
+
+                    Dim lo_link As DiagramLink
+                    lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
+                    lrUMLActorProcessRelation.Link = lo_link
+                    lo_link.Tag = lrUMLActorProcessRelation
+
                 End If
-#End Region
-
-                '------------------------------------------
-                'Link the Actor to the associated Process
-                '------------------------------------------
-                Dim lo_link As DiagramLink
-                lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
-                lo_link.Tag = lrRecordset.CurrentFact
-
-                lrRecordset.MoveNext()
-            End While
+            Next
 #End Region
 
 #Region "Process to Process Participation Relations"
@@ -591,74 +565,12 @@ Public Class frmDiagrmUMLUseCase
                                                 Where larProcessId.Contains(ProcessProcessRelation.Process1.Id)
                                                 Select ProcessProcessRelation
 
-            'lsSQLQuery = "SELECT *"
-            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
-            'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-            'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
             Dim lrProcess1, lrProcess2 As UCD.Process
 
-            'While Not lrRecordset.EOF
             For Each lrCMMLProcessProcessRelation In larCMMLProcessProcessRelation
 
-#Region "Process 1"
                 lrProcess1 = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcessProcessRelation.Process1.Id)
-
-                'lrFactDataInstance = lrRecordset("Process1")
-                'lrProcess1 = lrFactDataInstance.CloneUCDProcess(arPage)
-
-                '-------------------------------------------------------------------------------
-                'Check to see if the Shape for the Actor has already been loaded onto the Page
-                '-------------------------------------------------------------------------------
-                'Dim lrExistingProcess = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrProcess1.Id)
-                'If lrExistingProcess IsNot Nothing Then
-                '    lrProcess1 = lrExistingProcess
-                'Else
-                '    lsSQLQuery = "SELECT *"
-                '    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
-                '    lsSQLQuery &= " WHERE Process = '" & lrProcess1.Id & "'"
-
-                '    Dim lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                '    If Not lrRecordset.EOF Then
-                '        lrProcess1.Text = lrRecordset2("ProcessText").data
-                '    End If
-
-                '    lrProcess1.DisplayAndAssociate()
-                '    Me.zrPage.UMLDiagram.Process.AddUnique(lrProcess1)
-
-                'End If
-#End Region
-
-#Region "Process 2"
                 lrProcess2 = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcessProcessRelation.Process2.Id)
-
-                '                lrFactDataInstance = lrRecordset("Process2")
-                '                lrProcess2 = lrFactDataInstance.CloneUCDProcess(arPage)
-
-                '                lrExistingProcess = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrProcess2.Id)
-
-                '                If lrExistingProcess IsNot Nothing Then
-                '                    lrProcess2 = lrExistingProcess
-                '                Else
-
-                '#Region "Process Text - Get from CMML"
-
-                '                    lsSQLQuery = "SELECT *"
-                '                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
-                '                    lsSQLQuery &= " WHERE Process = '" & lrProcess2.Id & "'"
-
-                '                    Dim lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                '                    If Not lrRecordset2.EOF Then
-                '                        lrProcess2.Text = lrRecordset2("ProcessText").Data
-                '                    End If
-                '#End Region
-
-                '                    Call lrProcess2.DisplayAndAssociate()
-                '                    Me.zrPage.UMLDiagram.Process.AddUnique(lrProcess2)
-                '                End If
-#End Region
 
                 If lrProcess1 IsNot Nothing And lrProcess2 IsNot Nothing Then
 
@@ -679,7 +591,7 @@ Public Class frmDiagrmUMLUseCase
                     End If
 
                     '------------------------------------------
-                    'Link the Actor to the associated Process
+                    'Link the Processes
                     '------------------------------------------
                     lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
                     lrUMLProcessProcessRelation.Fact = lrFactInstance
@@ -693,8 +605,6 @@ Public Class frmDiagrmUMLUseCase
                     lo_link.Tag = lrUMLProcessProcessRelation
 
                 End If
-                'lrRecordset.MoveNext()
-                'End While
             Next
 #End Region
 
@@ -835,23 +745,6 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
-    Sub DropActorAtPoint(ByRef arActor As UCD.Actor, ByVal aoPointF As PointF)
-
-        arActor.X = aoPointF.X
-        arActor.Y = aoPointF.Y
-
-        If Not Me.zrPage.UMLDiagram.Actor.Exists(AddressOf arActor.Equals) Then
-            '--------------------------------------------------
-            'The EntityType is not already within the ORMModel
-            '  so add it.
-            '--------------------------------------------------
-            Me.zrPage.UMLDiagram.Actor.Add(arActor)
-        End If
-
-        Call arActor.DisplayAndAssociate()
-
-    End Sub
-
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
 
         Dim loObject As Object = e.Link.Destination
@@ -875,33 +768,16 @@ Public Class frmDiagrmUMLUseCase
         loFirstModelElement = e.Link.Origin.Tag
         loSecondModelElement = e.Link.Destination.Tag
 
-        Dim lrTypeOfRelation As pcenumCMMLRelations
-
         If (loFirstModelElement.ConceptType = pcenumConceptType.Actor) And (loSecondModelElement.ConceptType = pcenumConceptType.Process) Then
 
-            lrTypeOfRelation = pcenumCMMLRelations.CoreActorToProcessParticipationRelation
+            Dim lrCMMLActor As CMML.Actor = loFirstModelElement.CMMLActor
+            Dim lrCMMLProcess As CMML.Process = loSecondModelElement.CMMLProcess
 
-            '----------------------------------
-            'Create the Fact within the Model
-            '----------------------------------
-            Dim lsSQLString As String = ""
-            lsSQLString = "INSERT INTO " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
-            lsSQLString &= " (Actor, Process, Data)"
-            lsSQLString &= " VALUES ("
-            lsSQLString &= "'" & loFirstModelElement.Name & "'"
-            lsSQLString &= ",'" & loSecondModelElement.Name & "'"
-            lsSQLString &= ",''"
-            lsSQLString &= ")"
+            Dim lrCMMLActorProcessRelation = New CMML.ActorProcessRelation(Me.zrPage.Model.UML, lrCMMLActor, lrCMMLProcess)
 
-            '----------------------------------
-            'Create the Fact within the Model
-            '----------------------------------
-            lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLString)
+            Me.zrPage.Model.UML.addActorProcessRelation(lrCMMLActorProcessRelation)
 
-            '----------------------------------
-            'Clone an instance of the Fact
-            '----------------------------------
-            Me.zrPage.UMLDiagram.ActorToProcessParticipationRelationFTI.AddFact(lrFact)
+            Me.Diagram.Links.Remove(e.Link)
 
         ElseIf (loFirstModelElement.ConceptType = pcenumConceptType.Process) And (loSecondModelElement.ConceptType = pcenumConceptType.Process) Then
 
@@ -915,19 +791,6 @@ Public Class frmDiagrmUMLUseCase
 
 
             Me.Diagram.Links.Remove(e.Link)
-
-            ''----------------------------------
-            ''Add the Fact to the FactTypeInstance
-            ''----------------------------------
-            'lrFactInstance = Me.zrPage.UMLDiagram.PocessToProcessRelationFTI.AddFact(lrCMMLProcessProcessRelation.Fact)
-            'Dim lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me.zrPage, loFirstModelElement, loSecondModelElement)
-            'lrUMLProcessProcessRelation.Fact = lrFactInstance
-            'lrUMLProcessProcessRelation.CMMLProcessProcessRelation = lrCMMLProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
-
-            'Me.zrPage.UMLDiagram.ProcessProcessRelation.Add(lrUMLProcessProcessRelation)
-
-            'lrUMLProcessProcessRelation.Link = e.Link
-            'e.Link.Tag = lrUMLProcessProcessRelation
 
         End If
 
@@ -1029,6 +892,16 @@ Public Class frmDiagrmUMLUseCase
     End Sub
 
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
+
+        Select Case e.Node.Tag.GetType
+            Case Is = GetType(UCD.Actor)
+
+                Dim lrActor As UML.Actor = e.Node.Tag
+
+                Call Me.DiagramView.BeginEdit(lrActor.NameShape.Shape)
+
+        End Select
+
 
         Me.DiagramView.Behavior = Behavior.DrawLinks
         Me.Diagram.Invalidate()
@@ -1167,11 +1040,17 @@ Public Class frmDiagrmUMLUseCase
     Private Sub Diagram_NodeTextEdited(ByVal sender As Object, ByVal e As MindFusion.Diagramming.EditNodeTextEventArgs) Handles Diagram.NodeTextEdited
 
         Try
-            Dim lrActor As UCD.Actor
             Dim lrProcess As UCD.Process
 
+            'CodeSafe
+            If Trim(e.NewText) = "" Then Exit Sub
+
             Select Case e.Node.Tag.GetType
-                Case Is = GetType(UCD.Actor)
+                Case Is = GetType(UML.ActorName)
+
+                    Dim lrActorName As UML.ActorName = e.Node.Tag
+
+                    Call lrActorName.Actor.setName(e.NewText)
 
                 Case Is = GetType(UCD.Process)
 
@@ -2374,9 +2253,14 @@ Public Class frmDiagrmUMLUseCase
 
             Select Case loProcessRelation.GetType
                 Case Is = GetType(UML.ProcessProcessRelation)
+                    Dim lrActorProcessRelation As UML.ActorProcessRelation = loProcessRelation
+
+                    Call lrActorProcessRelation.RemoveFromPage()
+
+                Case Is = GetType(UML.ProcessProcessRelation)
                     Dim lrProcessProcessRelation As UML.ProcessProcessRelation = loProcessRelation
 
-                    Call lrProcessProcessRelation.RemoveFromPage
+                    Call lrProcessProcessRelation.RemoveFromPage()
             End Select
 
 
@@ -2400,6 +2284,11 @@ Public Class frmDiagrmUMLUseCase
 
             If MsgBox("Are you sure you want to remove the Relation from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
                 Select Case loProcessRelation.GetType
+                    Case Is = GetType(UML.ActorProcessRelation)
+                        Dim lrActorProcessRelation As UML.ActorProcessRelation = loProcessRelation
+
+                        Call lrActorProcessRelation.CMMLActorProcessRelation.RemoveFromModel()
+
                     Case Is = GetType(UML.ProcessProcessRelation)
                         Dim lrProcessProcessRelation As UML.ProcessProcessRelation = loProcessRelation
 

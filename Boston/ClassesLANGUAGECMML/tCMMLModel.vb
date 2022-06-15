@@ -83,6 +83,27 @@ Namespace CMML
 
         End Sub
 
+        Public Sub addActorProcessRelation(ByRef arCMMLActorProcessRelation As CMML.ActorProcessRelation)
+
+            Try
+                Me.ActorProcessRelation.AddUnique(arCMMLActorProcessRelation)
+
+                arCMMLActorProcessRelation.Fact = Me.Model.createCMMLActorProcessRelation(arCMMLActorProcessRelation)
+
+                RaiseEvent ActorProcessRelationAdded(arCMMLActorProcessRelation)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub addProcessProcessRelation(ByRef arCMMLProcessProcessRelation As CMML.ProcessProcessRelation)
 
             Try
@@ -226,6 +247,27 @@ Namespace CMML
             Return lsUniqueProcessName
 
         End Function
+
+        Public Sub RemoveActorProcessRelation(ByRef arActorProcessRelation As CMML.ActorProcessRelation)
+
+            Try
+                Me.ActorProcessRelation.Remove(arActorProcessRelation)
+
+                'CMML
+                Call Me.Model.removeCMMLActorProcessRelation(arActorProcessRelation)
+
+                RaiseEvent ActorProcessRelationRemoved(arActorProcessRelation)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Sub RemoveProcessProcessRelation(ByRef arProcessProcessRelation As CMML.ProcessProcessRelation)
 

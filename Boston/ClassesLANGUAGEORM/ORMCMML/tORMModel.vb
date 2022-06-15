@@ -847,6 +847,40 @@ Namespace FBM
 
         End Sub
 
+        Public Function createCMMLActorProcessRelation(ByRef arCMMLActorProcessRelation As CMML.ActorProcessRelation) As FBM.Fact
+
+            Try
+                '----------------------------------
+                'Create the Fact within the Model
+                '----------------------------------
+                Dim lsSQLString As String = ""
+                lsSQLString = "INSERT INTO " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                lsSQLString &= " (Actor, Process, Data)"
+                lsSQLString &= " VALUES ("
+                lsSQLString &= "'" & arCMMLActorProcessRelation.Actor.Name & "'"
+                lsSQLString &= ",'" & arCMMLActorProcessRelation.Process.Id & "'"
+                lsSQLString &= ",''"
+                lsSQLString &= ")"
+
+                '----------------------------------
+                'Create the Fact within the Model
+                '----------------------------------
+                Return Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+
         Public Function createCMMLProcessProcessRelation(ByRef arCMMLProcessProcessRelation As CMML.ProcessProcessRelation) As FBM.Fact
 
             Try
@@ -1284,6 +1318,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub removeCMMLActorProcessRelation(ByRef arCMMLActorProcessRelation As CMML.ActorProcessRelation)
+
+            Try
+                Dim lsSQLString As String = ""
+
+                lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                lsSQLString &= " WHERE Actor = '" & arCMMLActorProcessRelation.Actor.Name & "'"
+                lsSQLString &= "   AND Process = '" & arCMMLActorProcessRelation.Process.Id & "'"
+
+                Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub removeCMMLProcessProcessRelation(ByRef arCMMLProcesProcessRelation As CMML.ProcessProcessRelation)
 
             Try
@@ -1581,6 +1637,27 @@ Namespace FBM
 
         End Sub
 
+        Public Sub updateCMMLActorName(ByVal asOldName As String, ByVal asNewName As String)
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " SET Element = '" & asNewName & "'"
+                lsSQLQuery &= " WHERE Element '" & asOldName & "'"
+                lsSQLQuery &= " AND ElementType = 'Actor'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Sub updateCMMLTableName(ByVal asOldName As String, ByVal asNewName As String)
             Try
                 Dim lsSQLQuery As String = ""
@@ -1808,7 +1885,8 @@ Namespace FBM
                     lrActor = Me.UML.Actor.Find(Function(x) x.Name = lrORMRecordset("Actor").Data)
                     lrProcess = Me.UML.Process.Find(Function(x) x.Id = lrORMRecordset("Process").Data)
 
-                    lrActorProcessRelation = New CMML.ActorProcessRelation(lrActor, lrProcess)
+                    lrActorProcessRelation = New CMML.ActorProcessRelation(Me.UML, lrActor, lrProcess)
+                    lrActorProcessRelation.Fact = lrORMRecordset.CurrentFact
 
                     Me.UML.ActorProcessRelation.Add(lrActorProcessRelation)
 

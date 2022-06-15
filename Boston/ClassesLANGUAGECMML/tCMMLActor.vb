@@ -26,7 +26,7 @@ Namespace CMML
             End Set
         End Property
 
-        Public FBMModelElement As FBM.ModelObject
+        Public WithEvents FBMModelElement As FBM.ModelObject
 
         ''' <summary>
         ''' The SequenceNr assigned to the Actor in (say) an EventTraceDiagram.
@@ -42,6 +42,8 @@ Namespace CMML
         <NonSerialized(),
         XmlIgnore()>
         Public NameShape As ShapeNode
+
+        Public Event NameChanged(ByVal asNewName As String)
 
         Public Sub New()
             '-----------------------------------
@@ -105,6 +107,50 @@ Namespace CMML
             End Try
 
         End Function
+
+        Public Sub setName(ByVal asNewName As String)
+
+            Try
+                Dim lsOldName As String = Me.Name
+
+                Me.Name = asNewName
+
+                Me.FBMModelElement.setName(asNewName)
+
+                'CMML
+                Me.Model.Model.updateCMMLActorName(lsOldName, asNewName)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub FBMModelElement_NameChanged(asOldName As String, asNewName As String) Handles FBMModelElement.NameChanged
+
+            Try
+                Dim lsOldName = Me.Name
+
+                Me.Name = asNewName
+
+                'CMML
+                Me.Model.Model.updateCMMLActorName(lsOldName, asNewName)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
     End Class
 

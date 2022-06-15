@@ -3280,5 +3280,86 @@ NextY:
 
         End Sub
 
+        Private Sub CMMLModel_ActorProcessRelationAdded(ByRef arActorProcessRelation As ActorProcessRelation) Handles CMMLModel.ActorProcessRelationAdded
+
+            Try
+                'CodeSafe
+                If Not Me.Model.Page.Contains(Me) Then
+                    Me.Dispose()
+                    Exit Sub
+                End If
+
+                'CodeSafe 
+                If Me.IsCoreModelPage Then Exit Sub
+                If Me.FactTypeInstance.Find(Function(x) x.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString) Is Nothing Then
+                    Exit Sub
+                End If
+
+                Dim laiLanguage() = {pcenumLanguage.UMLUseCaseDiagram}
+
+                If Not laiLanguage.Contains(Me.Language) Then Exit Sub
+
+                'Check to see that both the processes are on the Page.
+                Dim lsActorName = arActorProcessRelation.Actor.Name
+                Dim lsProcessId = arActorProcessRelation.Process.Id
+
+                Dim lrActor = Me.UMLDiagram.Actor.Find(Function(x) x.Name = lsActorName)
+                Dim lrProcess = Me.UMLDiagram.Process.Find(Function(x) x.Id = lsProcessId)
+
+                Dim lrFactInstance As FBM.FactInstance
+
+                If lrActor IsNot Nothing And lrProcess IsNot Nothing Then
+
+#Region "Load the link"
+                    Dim lsSQLQuery As String
+                    Dim lrRecordset As ORMQL.Recordset
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    lsSQLQuery &= " WHERE Actor = '" & lrActor.Name & "'"
+                    lsSQLQuery &= " AND Process = '" & lrProcess.Id & "'"
+
+                    lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    Dim lrUMLActorProcessRelation As UML.ActorProcessRelation
+
+                    If lrRecordset.EOF Then
+                        lrFactInstance = Me.UMLDiagram.ActorToProcessParticipationRelationFTI.AddFact(arActorProcessRelation.Fact)
+                    Else
+                        lrFactInstance = lrRecordset.CurrentFact
+                        lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me, lrActor, lrProcess)
+                    End If
+
+                    '------------------------------------------
+                    'Link the Actor to the associated Process
+                    '------------------------------------------
+                    lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me, lrActor, lrProcess)
+                    lrUMLActorProcessRelation.Fact = lrFactInstance
+                    lrUMLActorProcessRelation.CMMLActorProcessRelation = arActorProcessRelation 'Me.zrPage.Model.UML.ActorProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+
+                    Me.UMLDiagram.ActorProcessRelation.Add(lrUMLActorProcessRelation)
+
+                    Dim lo_link As DiagramLink
+                    lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
+                    lrUMLActorProcessRelation.Link = lo_link
+                    lo_link.Tag = lrUMLActorProcessRelation
+
+#End Region
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+
+        End Sub
+
     End Class
 End Namespace

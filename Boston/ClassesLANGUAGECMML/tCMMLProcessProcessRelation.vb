@@ -3,7 +3,7 @@
 Namespace CMML
     Public Class ProcessProcessRelation
 
-        Public CMMLModel As CMML.Model
+        Public WithEvents CMMLModel As CMML.Model
 
         Public Process1 As CMML.Process
         Public Process2 As CMML.Process

@@ -142,7 +142,9 @@ Public Class frmDiagramBPMN
 
         While Not lrRecordset.EOF
 
-            Dim lrActor As New UCD.Actor(Me.zrPage)
+            Dim lrCMMLActor = Me.zrPage.Model.UML.Actor.Find(Function(x) x.Name = lrRecordset("Element").Data)
+
+            Dim lrActor As New UCD.Actor(Me.zrPage, lrCMMLActor)
             Dim lrFactDataInstance As FBM.FactDataInstance
             lrFactDataInstance = lrRecordset("Element")
             lrActor = lrFactDataInstance.CloneActor(Me.zrPage)

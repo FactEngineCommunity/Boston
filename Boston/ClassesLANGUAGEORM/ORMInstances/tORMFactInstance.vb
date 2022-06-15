@@ -295,7 +295,36 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneProcessProcessRelation(ByRef arPage As FBM.Page, Optional ByRef arProcess1 As UML.Process = Nothing, Optional ByRef arProcess2 As UML.Process = Nothing)
+        Public Function CloneActorProcessRelation(ByRef arPage As FBM.Page, Optional ByRef arActor As UML.Actor = Nothing, Optional ByRef arProcess As UML.Process = Nothing) As UML.ActorProcessRelation
+
+            Dim lrUMLActorProcessRelation As New UML.ActorProcessRelation(arPage.UMLDiagram, arActor, arProcess)
+            Try
+                With Me
+                    lrUMLActorProcessRelation.Model = .Model
+                    lrUMLActorProcessRelation.UMLModel = arPage.UMLDiagram
+                    lrUMLActorProcessRelation.Page = arPage
+                    lrUMLActorProcessRelation.Fact = Me.Fact
+                    lrUMLActorProcessRelation.FactInstance = Me
+                    lrUMLActorProcessRelation.Concept = .Concept
+                    lrUMLActorProcessRelation.X = .X
+                    lrUMLActorProcessRelation.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrUMLActorProcessRelation
+
+        End Function
+
+
+        Public Function CloneProcessProcessRelation(ByRef arPage As FBM.Page, Optional ByRef arProcess1 As UML.Process = Nothing, Optional ByRef arProcess2 As UML.Process = Nothing) As UML.ProcessProcessRelation
 
             Dim lrUMLProcessProcessRelation As New UML.ProcessProcessRelation(arPage.UMLDiagram, arProcess1, arProcess2)
             Try

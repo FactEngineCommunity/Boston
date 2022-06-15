@@ -2194,6 +2194,71 @@ SkipAdding:
             End Try
         End Function
 
+        Public Sub loadActorProcessRelationsForCMMLActor(ByRef arCMMLActor As CMML.Actor)
+
+            Try
+                '====================================================
+                'Map the Relations from the Model level
+                '====================================================
+                Dim lsSQLQuery As String = ""
+                Dim lrRecordset As ORMQL.Recordset
+
+                Dim lrOriginUMLActor As UML.Actor
+                Dim lrDestinationUMLProcess As UML.Process
+
+                Dim lsOriginCMMLActorName = arCMMLActor.Name
+
+                lrOriginUMLActor = Me.UMLDiagram.Actor.Find(Function(x) x.Name = lsOriginCMMLActorName)
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                lsSQLQuery &= " WHERE Actor = '" & lsOriginCMMLActorName & "'"
+
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lrFactInstance As FBM.FactInstance
+                While Not lrRecordset.EOF
+
+                    lrDestinationUMLProcess = Me.UMLDiagram.Process.Find(Function(x) x.Id = lrRecordset("Process").Data)
+
+                    If lrOriginUMLActor IsNot Nothing And lrDestinationUMLProcess IsNot Nothing Then
+                        '----------------------------------
+                        'Add the Fact to the FactTypeInstance
+                        '----------------------------------
+                        lrFactInstance = Me.UMLDiagram.ActorToProcessParticipationRelationFTI.AddFact(lrRecordset.CurrentFact)
+
+                        Dim lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me, lrOriginUMLActor, lrDestinationUMLProcess)
+                        lrUMLActorProcessRelation.Fact = lrRecordset.CurrentFact
+                        lrUMLActorProcessRelation.CMMLActorProcessRelation = Me.Model.UML.ActorProcessRelation.Find(Function(x) x.Actor.Name = lrOriginUMLActor.Name And x.Process.Id = lrDestinationUMLProcess.Id)
+
+                        Me.UMLDiagram.ActorProcessRelation.AddUnique(lrUMLActorProcessRelation)
+
+                        '------------------------------------------
+                        'Link the Actor to the associated Process
+                        '------------------------------------------
+                        Dim lo_link As MindFusion.Diagramming.DiagramLink
+                        lo_link = Me.Diagram.Factory.CreateDiagramLink(lrOriginUMLActor.Shape, lrDestinationUMLProcess.Shape)
+                        lrUMLActorProcessRelation.Link = lo_link
+                        lo_link.Tag = lrUMLActorProcessRelation
+                    End If
+
+                    lrRecordset.MoveNext()
+                End While
+
+                Call Me.MakeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub loadProcessProcessRelationsForCMMLProcess(ByRef arCMMLProcess As CMML.Process)
 
             Try

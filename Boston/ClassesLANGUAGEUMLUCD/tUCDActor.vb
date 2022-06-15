@@ -15,10 +15,11 @@ Namespace UCD
             '-----------------------------------
         End Sub
 
-        Public Sub New(ByRef arPage As FBM.Page)
+        Public Sub New(ByRef arPage As FBM.Page, ByRef arCMMLActor As CMML.Actor)
 
             Me.Model = arPage.Model
             Me.Page = arPage
+            Me.CMMLActor = arCMMLActor
             Me.FactData.Model = arPage.Model
             Me.Data = "New Actor"
             Me.Id = Me.Data
@@ -56,7 +57,9 @@ Namespace UCD
                 Dim loActorNameShape As New ShapeNode
 
                 StringSize = Me.Page.Diagram.MeasureString("[" & Trim(Me.Name) & "]", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                Dim lr_rectanglef As New RectangleF(loDroppedNode.Bounds.X, loDroppedNode.Bounds.Bottom, StringSize.Width, StringSize.Height)
+                Dim liNameX = loDroppedNode.Bounds.X - (((StringSize.Width + 5) - loDroppedNode.Bounds.Width) / 2)
+
+                Dim lr_rectanglef As New RectangleF(liNameX, loDroppedNode.Bounds.Bottom, StringSize.Width + 5, StringSize.Height + 3)
                 loActorNameShape = Me.Page.Diagram.Factory.CreateShapeNode(lr_rectanglef, MindFusion.Diagramming.Shapes.Rectangle)
                 loActorNameShape.HandlesStyle = HandlesStyle.Invisible
                 loActorNameShape.TextColor = Color.Black
@@ -64,9 +67,8 @@ Namespace UCD
                 loActorNameShape.Visible = True
                 loActorNameShape.Text = Me.Name
                 loActorNameShape.ZTop()
-                Dim lrActorName As New UCD.ActorName
-                loActorNameShape.Tag = lrActorName
-                lrActorName.Shape = loActorNameShape
+                loActorNameShape.Tag = Me.NameShape
+                Me.NameShape.Shape = loActorNameShape
 
                 '-----------------------------------------------------------
                 'Attach the Actor.Name ShapeNode to the Actor Shape
@@ -127,8 +129,8 @@ Namespace UCD
                     'Diagram is set.
                     '------------------
                     If IsSomething(Me.NameShape) Then
-                        If Me.NameShape.Text <> "" Then
-                            Me.NameShape.Text = Trim(Me.FactData.Data)
+                        If Me.NameShape.Shape.Text <> "" Then
+                            Me.NameShape.Shape.Text = Trim(Me.FactData.Data)
 
                             '----------------------------------------
                             'Setup the ActorName shape size
@@ -140,7 +142,7 @@ Namespace UCD
                             StringSize = Me.Page.Diagram.MeasureString(Trim(Me.FactData.Data), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                             StringSize.Height += 2
 
-                            Me.NameShape.SetRect(New RectangleF(Me.NameShape.Bounds.X, Me.NameShape.Bounds.Y, StringSize.Width, StringSize.Height), True)
+                            Me.NameShape.Shape.SetRect(New RectangleF(Me.NameShape.Shape.Bounds.X, Me.NameShape.Shape.Bounds.Y, StringSize.Width, StringSize.Height), True)
 
                             Me.Page.Diagram.Invalidate()
 
@@ -177,6 +179,26 @@ Namespace UCD
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub CMMLActor_NameChanged(asNewName As String) Handles CMMLActor.NameChanged
+
+            Try
+                Me.Name = asNewName
+
+                If Me.NameShape.Shape IsNot Nothing Then
+                    Me.NameShape.Shape.Text = asNewName
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
