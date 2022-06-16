@@ -123,6 +123,8 @@ Partial Class frmMain
         Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TestNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DoNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemSuperuser = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ThrowTestErrorMessageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip_main = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton_Save = New System.Windows.Forms.ToolStripButton()
@@ -159,7 +161,7 @@ Partial Class frmMain
         '
         'MenuStrip_main
         '
-        Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem})
+        Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem, Me.ToolStripMenuItemSuperuser})
         Me.MenuStrip_main.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip_main.Name = "MenuStrip_main"
         Me.MenuStrip_main.Padding = New System.Windows.Forms.Padding(4, 1, 0, 1)
@@ -706,6 +708,20 @@ Partial Class frmMain
         Me.DoNotificationToolStripMenuItem.Size = New System.Drawing.Size(155, 22)
         Me.DoNotificationToolStripMenuItem.Text = "Do Notification"
         '
+        'ToolStripMenuItemSuperuser
+        '
+        Me.ToolStripMenuItemSuperuser.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ThrowTestErrorMessageToolStripMenuItem})
+        Me.ToolStripMenuItemSuperuser.Name = "ToolStripMenuItemSuperuser"
+        Me.ToolStripMenuItemSuperuser.Size = New System.Drawing.Size(71, 22)
+        Me.ToolStripMenuItemSuperuser.Text = "Superuse&r"
+        Me.ToolStripMenuItemSuperuser.Visible = False
+        '
+        'ThrowTestErrorMessageToolStripMenuItem
+        '
+        Me.ThrowTestErrorMessageToolStripMenuItem.Name = "ThrowTestErrorMessageToolStripMenuItem"
+        Me.ThrowTestErrorMessageToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
+        Me.ThrowTestErrorMessageToolStripMenuItem.Text = "Throw test &Error Message"
+        '
         'ToolStrip_main
         '
         Me.ToolStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton_Save, Me.ToolStripSeparator4, Me.ToolStripButtonNewModel, Me.ToolStripButtonNew, Me.ToolStripButtonPrint, Me.ToolStripButtonCopy, Me.ToolStripButtonPaste, Me.toolStripSeparator12, Me.ToolStripLabelPrompt_zoom, Me.ToolStripComboBox_zoom, Me.toolStripSeparator, Me.ToolStripButtonHelp, Me.ToolStripSeparator3, Me.ToolStripButtonProfile, Me.ToolStripButtonNotifications})
@@ -1056,4 +1072,6 @@ Partial Class frmMain
     Friend WithEvents ToolStripMenuItemUnifiedOntologyBrowser As ToolStripMenuItem
     Friend WithEvents RegistrationToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ShowClientServerBroadcastTesterToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemSuperuser As ToolStripMenuItem
+    Friend WithEvents ThrowTestErrorMessageToolStripMenuItem As ToolStripMenuItem
 End Class

@@ -41,17 +41,16 @@ Partial Class frmCustomMessageBox
         Me.TableLayoutPanel.RowCount = 2
         Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 68.76562!))
         Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 31.23438!))
-        Me.TableLayoutPanel.Size = New System.Drawing.Size(495, 164)
+        Me.TableLayoutPanel.Size = New System.Drawing.Size(495, 165)
         Me.TableLayoutPanel.TabIndex = 0
         '
         'LabelMessage
         '
-        Me.LabelMessage.AutoSize = True
         Me.LabelMessage.BackColor = System.Drawing.Color.White
         Me.LabelMessage.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LabelMessage.Location = New System.Drawing.Point(3, 0)
         Me.LabelMessage.Name = "LabelMessage"
-        Me.LabelMessage.Size = New System.Drawing.Size(489, 112)
+        Me.LabelMessage.Size = New System.Drawing.Size(489, 113)
         Me.LabelMessage.TabIndex = 0
         Me.LabelMessage.Text = "LabelMessage"
         Me.LabelMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -59,7 +58,7 @@ Partial Class frmCustomMessageBox
         'FlowLayoutPanel
         '
         Me.FlowLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel.Location = New System.Drawing.Point(3, 115)
+        Me.FlowLayoutPanel.Location = New System.Drawing.Point(3, 116)
         Me.FlowLayoutPanel.Name = "FlowLayoutPanel"
         Me.FlowLayoutPanel.Size = New System.Drawing.Size(489, 46)
         Me.FlowLayoutPanel.TabIndex = 1
@@ -68,14 +67,13 @@ Partial Class frmCustomMessageBox
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(495, 164)
+        Me.ClientSize = New System.Drawing.Size(495, 165)
         Me.ControlBox = False
         Me.Controls.Add(Me.TableLayoutPanel)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.Name = "frmCustomMessageBox"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.TableLayoutPanel.ResumeLayout(False)
-        Me.TableLayoutPanel.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub

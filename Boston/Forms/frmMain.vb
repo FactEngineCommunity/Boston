@@ -458,8 +458,14 @@ ConfigurationOK:
                     If publicRegistration.CheckRegistration(lsApplicationKey, lsRegistrationKey, lrRegistrationResult, lsDefaultRegistrationKey) Then
                         If lrRegistrationResult.SubscriptionType = "Subscription" Then lbCanCheckForUpdates = True
                     Else
-                        'The Trial must be up.
-                        MsgBox("Your trial of Boston has expired or your registration key is invalid. Please contact FactEngine to obtain a registration key for Boston.")
+                        'The Trial must be up, or new install of Boston.
+                        lsMessage = "Please contact FactEngine to obtain a registration key for Boston."
+                        lsMessage.AppendDoubleLineBreak("Either:")
+                        lsMessage.AppendLine("1. You have installed a new copy of Boston Professional;")
+                        lsMessage.AppendLine("2. Your trial of Boston has expired; or")
+                        lsMessage.AppendLine("3. Your registration key is invalid.")
+                        MsgBox(lsMessage)
+
                         Dim lrRegistrationForm As New frmRegistration
                         If Not lrRegistrationForm.ShowDialog() Then
                             Call Me.Close()
@@ -482,7 +488,7 @@ SkipRegistrationChecking:
                 '-------------------------
                 If My.Settings.UseAutoUpdateChecker And lbCanCheckForUpdates Then
                     AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
-                    AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+                    AutoUpdater.Start("https: //www.factengine.ai/products/Boston/update-info.xml")
                 End If
 
             Else
@@ -765,6 +771,10 @@ SkipRegistrationChecking:
             If prApplication.User IsNot Nothing Then
                 Me.RegistrationToolStripMenuItem.Visible = My.Settings.UseClientServer And prApplication.User.IsSuperuser
             End If
+            If My.Settings.SuperuserMode Then
+                Me.ToolStripMenuItemSuperuser.Visible = True
+            End If
+
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -5236,6 +5246,26 @@ SkipRegistrationChecking:
         Try
             Dim lfrmToolboxClientServerBroadcastTester As New frmToolboxClientServerBroadcastTester
             lfrmToolboxClientServerBroadcastTester.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ThrowTestErrorMessageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ThrowTestErrorMessageToolStripMenuItem.Click
+
+        Try
+            Dim lrModel As New FBM.Model
+            lrModel.EntityType = Nothing
+            lrModel.EntityType(0).Model = lrModel
+
+            Throw New Exception("Test Error Message thrown by user in Superuser mode.")
 
         Catch ex As Exception
             Dim lsMessage As String

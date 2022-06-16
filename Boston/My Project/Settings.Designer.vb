@@ -929,6 +929,18 @@ Namespace My
                 Me("ShowStackTraceFactEngineQuery") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property BostonErrorMessagesShowStackTrace() As Boolean
+            Get
+                Return CType(Me("BostonErrorMessagesShowStackTrace"),Boolean)
+            End Get
+            Set
+                Me("BostonErrorMessagesShowStackTrace") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -44,8 +44,11 @@ Public Class frmCRUDBostonConfiguration
 
         Call Me.LoadDebugModes()
 
+        'Error Management
         Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked = My.Settings.ThrowInformationDebugMessagesToScreen
         Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked = My.Settings.ThrowCriticalDebugMessagesToScreen
+        Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
+        Me.CheckBoxShowStackTrace.Checked = My.Settings.BostonErrorMessagesShowStackTrace
 
         '---------------------------------------------------------
         'Virtual Analyst
@@ -74,13 +77,12 @@ Public Class frmCRUDBostonConfiguration
             Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
         End If
 
-        Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
-
         'FactEngine
         Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
         Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked = My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
         Me.ComboBoxFactEngineUserDateFormat.Text = My.Settings.FactEngineUserDateFormat
         Me.ComboBoxFactEngineUserDateTimeFormat.Text = My.Settings.FactEngineUserDateTimeFormat
+        Me.CheckBoxFactEngineShowStackTrace.Checked = My.Settings.ShowStackTraceFactEngineQuery
 
         'ER Diagrams
         Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
@@ -141,15 +143,23 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.DatabaseConnectionString = Me.TextBoxDatabaseConnectionString.Text
                 My.Settings.DisplayBrianaVirtualAnalyst = Me.CheckBoxVirtualAnalystDisplayBriana.Checked
                 My.Settings.StartVirtualAnalystInQuietMode = Me.CheckBoxStartVirtualAnalystInQuietMode.Checked
+
+                'Error messages
                 My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked
                 My.Settings.ThrowInformationDebugMessagesToScreen = Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked
+                My.Settings.BostonErrorMessagesShowStackTrace = Me.CheckBoxShowStackTrace.Checked
                 My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
                 My.Settings.RequireLoginAtStartup = Me.CheckBoxEnableClientServer.Checked
                 My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
                 My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
+
+                'FactEngine
                 My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
-                My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
                 My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
+                My.Settings.ShowStackTraceFactEngineQuery = Me.CheckBoxFactEngineShowStackTrace.Checked
+
+                My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
+
                 My.Settings.AutoCompleteSingleClickSelects = Me.CheckBoxAutoCompleteSingleClickSelects.Checked
                 My.Settings.ReverseEngineeringKeepDatabaseColumnNames = Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked
                 My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
@@ -431,6 +441,8 @@ Public Class frmCRUDBostonConfiguration
             Dim lsMessage = "Use Superuser Mode with caution. Superuser Mode allows you to modify a model in such a way that it may become unusable."
             lsMessage &= vbCrLf & vbCrLf & "Please contact support if you have any questions."
             MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+
+            Call frmMain.ShowHideMenuOptions()
         End If
 
     End Sub

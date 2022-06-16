@@ -434,8 +434,17 @@ Public Class tApplication
         Dim lsStackTrace As String = ""
 
         Try
-            If IsSomething(asStackTrace) And abShowStackTrace Then
+            asErrorMessage.AppendLine("")
+
+            If My.Settings.UseAutomatedErrorReporting Then
+                asErrorMessage.AppendDoubleLineBreak("Boston will send this error to FactEngine to be fixed. Automatic error reporting is turned on.")
+            End If
+
+            If (IsSomething(asStackTrace) And abShowStackTrace) And My.Settings.BostonErrorMessagesShowStackTrace Then
                 asErrorMessage &= vbCrLf & vbCrLf & "Stack Trace: " & asStackTrace
+            ElseIf IsSomething(asStackTrace) And abShowStackTrace And Not My.Settings.BostonErrorMessagesShowStackTrace Then
+                lsStackTrace = ""
+                'Add nothing
             ElseIf IsSomething(asStackTrace) Then
                 lsStackTrace = asStackTrace
             Else
@@ -446,6 +455,7 @@ Public Class tApplication
             ' = new System.Diagnostics.StackTrace().GetFrame(0).GetMethod().Name;
 
             If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+#Region "Debug"
                 '-----------------------
                 'Write to the ErrorLog
                 '-----------------------
@@ -464,12 +474,14 @@ Public Class tApplication
                     Case Is = pcenumErrorType.Warning
                         Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
                 End Select
+#End Region
             ElseIf My.Settings.DebugMode = pcenumDebugMode.DebugCriticalErrorsOnly.ToString Then
 
                 Dim aiMessageResponse As MsgBoxResult
 
                 Select Case aiMessageType
                     Case Is = pcenumErrorType.Information
+#Region "Information"
                         If pbLogStartup Then
                             '-----------------------
                             'Write to the ErrorLog
@@ -485,7 +497,9 @@ Public Class tApplication
                             End If
 
                         End If
+#End Region
                     Case Is = pcenumErrorType.Critical
+#Region "Critical"
                         '-----------------------
                         'Write to the ErrorLog
                         '-----------------------
@@ -507,14 +521,76 @@ Public Class tApplication
 
                             If abAbortApplication Then asErrorMessage &= vbCrLf & vbCrLf & "This is a critical error. Boston will now close."
 
-                            aiMessageResponse = MsgBox(asErrorMessage, MsgBoxStyle.Critical + aiMessageBoxButtons)
+                            '============================================================================================
+                            Dim lrCustomMessageBox As New frmCustomMessageBox
+
+                            lrCustomMessageBox.LeftJustify = True
+                            lrCustomMessageBox.Message = asErrorMessage
+
+                            Select Case aiMessageBoxButtons
+                                Case Is = MessageBoxButtons.OK
+                                    lrCustomMessageBox.ButtonText.Add("OK")
+                                    If Not My.Settings.UseAutomatedErrorReporting Then
+                                        lrCustomMessageBox.ButtonText.Add("OK. And Turn on Automatic Error Reporting.")
+                                    End If
+                                Case Is = MessageBoxButtons.OKCancel
+                                    lrCustomMessageBox.ButtonText.Add("OK")
+                                    lrCustomMessageBox.ButtonText.Add("Cancel")
+                                Case Is = MessageBoxButtons.YesNo
+                                    lrCustomMessageBox.ButtonText.Add("Yes")
+                                    lrCustomMessageBox.ButtonText.Add("No")
+                                Case Is = MessageBoxButtons.YesNoCancel
+                                    lrCustomMessageBox.ButtonText.Add("Yes")
+                                    lrCustomMessageBox.ButtonText.Add("No")
+                                    lrCustomMessageBox.ButtonText.Add("Cancel")
+                                Case Is = MessageBoxButtons.RetryCancel
+                                    lrCustomMessageBox.ButtonText.Add("Retry")
+                                    lrCustomMessageBox.ButtonText.Add("Cancel")
+                                Case Is = MessageBoxButtons.AbortRetryIgnore
+                                    lrCustomMessageBox.ButtonText.Add("Abort")
+                                    lrCustomMessageBox.ButtonText.Add("Retry")
+                                    lrCustomMessageBox.ButtonText.Add("Ignore")
+                            End Select
+
+                            Select Case lrCustomMessageBox.ShowDialog
+                                Case Is = "OK"
+                                    aiMessageResponse = MsgBoxResult.Ok
+                                Case Is = "OK. And Turn on Automatic Error Reporting."
+                                    My.Settings.UseAutomatedErrorReporting = True
+                                    aiMessageResponse = MsgBoxResult.Ok
+#Region "Send the message to FactEngine"
+                                    Try
+                                        Throw New Exception(asErrorMessage)
+                                    Catch ex As Exception
+                                        Try
+                                            prRaygunClient.Send(ex)
+                                        Catch ex1 As Exception
+                                            'Should not get here, but have insurance.
+                                        End Try
+                                    End Try
+#End Region
+                                Case Is = "No"
+                                    aiMessageResponse = MsgBoxResult.No
+                                Case Is = "Yes"
+                                    aiMessageResponse = MsgBoxResult.Yes
+                                Case Is = "Cancel"
+                                    aiMessageResponse = MsgBoxResult.Cancel
+                                Case Is = "Abort"
+                                    aiMessageResponse = MsgBoxResult.Abort
+                                Case Is = "Retry"
+                                    aiMessageResponse = MsgBoxResult.Retry
+                            End Select
+                            '============================================================================================
+
+                            'aiMessageResponse = MsgBox(asErrorMessage, MsgBoxStyle.Critical + aiMessageBoxButtons)
 
                             If abAbortApplication Then Call Application.Exit()
 
                             Return aiMessageResponse
                         End If
+#End Region
                     Case Is = pcenumErrorType.Warning
-
+#Region "Warning"
                         Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
 
                         If abThrowtoMSGBox Then
@@ -522,6 +598,7 @@ Public Class tApplication
 
                             Return aiMessageResponse
                         End If
+#End Region
                 End Select
 
             Else

@@ -1774,6 +1774,18 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
 
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+
                 'Set the CoreModel VersionNr of the Model.
                 lrModel.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
 
@@ -3885,7 +3897,6 @@ Public Class frmToolboxEnterpriseExplorer
                 Dim lrProject As ClientServer.Project = Me.ComboBoxProject.SelectedItem.Tag
                 Call Me.loadNamespacesForProject(lrProject)
                 Me.zrProject = lrProject
-
 
                 '----------------------------------------------------------------------------
                 'Set the WorkingProject of the Application.

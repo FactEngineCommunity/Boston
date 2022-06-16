@@ -102,22 +102,14 @@ Namespace Richmond
                         '-----------------------------------
                         lsLocalDatabaseLocation = Richmond.MyPath & "\database\boston.vdb"
 
-                        If Not My.Settings.SilentPreConfiguration Then
-
-                            lsMessage = "Cannot find the Boston database at the default/configured location:"
-                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
-                            lsMessage.AppendDoubleLineBreak("If this is a new installation of Boston, Boston will try and locate the database at:")
-                            lsMessage.AppendDoubleLineBreak(lsLocalDatabaseLocation)
-                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
-
-                            MsgBox(lsMessage)
-                        End If
-
                         Try
                             lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
                             If lsDatabaseLocation IsNot Nothing Then
                                 If System.IO.File.Exists(lsDatabaseLocation) Then
                                     lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+                                    If Not File.Exists(lsDatabaseLocation) Then GoTo StillCannotFindTheDatabase
+
                                     My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
                                     lsConnectionString = My.Settings.DatabaseConnectionString
                                     GoTo OpenConnection
@@ -126,6 +118,18 @@ Namespace Richmond
                         Catch ex As Exception
                             'Not a biggie.
                         End Try
+
+StillCannotFindTheDatabase:
+                        If Not My.Settings.SilentPreConfiguration Then
+
+                            lsMessage = "Cannot find the Boston database at the default/configured location:"
+                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
+                            lsMessage.AppendDoubleLineBreak("If this is an upgrade or new installation of Boston, Boston will try and locate the database.")
+                            lsMessage.AppendDoubleLineBreak("Click [OK] to continue")
+                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
+
+                            MsgBox(lsMessage)
+                        End If
 
                         If System.IO.File.Exists(lsLocalDatabaseLocation) Then
                             lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation

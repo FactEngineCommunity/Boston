@@ -43,6 +43,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelDatabaseType = New System.Windows.Forms.Label()
         Me.ComboBoxDatabaseType = New System.Windows.Forms.ComboBox()
         Me.GroupBoxDebugging = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxShowStackTrace = New System.Windows.Forms.CheckBox()
         Me.CheckBoxThrowCriticalDebugMessagesToScreen = New System.Windows.Forms.CheckBox()
         Me.CheckBoxThrowInformationDebugMessagesToScreen = New System.Windows.Forms.CheckBox()
         Me.ComboBoxDebugMode = New System.Windows.Forms.ComboBox()
@@ -81,12 +82,13 @@ Partial Class frmCRUDBostonConfiguration
         Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
         Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
-        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.GroupBoxModelling = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxUseDefaultReferenceMode = New System.Windows.Forms.CheckBox()
-        Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
+        Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
+        Me.CheckBoxUseDefaultReferenceMode = New System.Windows.Forms.CheckBox()
+        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxFactEngineShowStackTrace = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -106,9 +108,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox5.SuspendLayout()
         Me.TabPage5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
-        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage7.SuspendLayout()
         Me.GroupBoxModelling.SuspendLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -138,14 +140,14 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDebugging)
         Me.GroupBox_main.Location = New System.Drawing.Point(6, 6)
         Me.GroupBox_main.Name = "GroupBox_main"
-        Me.GroupBox_main.Size = New System.Drawing.Size(595, 571)
+        Me.GroupBox_main.Size = New System.Drawing.Size(595, 592)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
         'GroupBoxAutoComplete
         '
         Me.GroupBoxAutoComplete.Controls.Add(Me.CheckBoxAutoCompleteSingleClickSelects)
-        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 484)
+        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 517)
         Me.GroupBoxAutoComplete.Name = "GroupBoxAutoComplete"
         Me.GroupBoxAutoComplete.Size = New System.Drawing.Size(556, 69)
         Me.GroupBoxAutoComplete.TabIndex = 15
@@ -166,7 +168,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.GroupBox2.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Location = New System.Drawing.Point(17, 350)
+        Me.GroupBox2.Location = New System.Drawing.Point(17, 383)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(556, 128)
         Me.GroupBox2.TabIndex = 14
@@ -221,7 +223,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox1.Controls.Add(Me.CheckBoxStartVirtualAnalystInQuietMode)
         Me.GroupBox1.Controls.Add(Me.CheckBoxVirtualAnalystDisplayBriana)
         Me.GroupBox1.Controls.Add(Me.ButtonImportLanguageRules)
-        Me.GroupBox1.Location = New System.Drawing.Point(17, 230)
+        Me.GroupBox1.Location = New System.Drawing.Point(17, 263)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(443, 114)
         Me.GroupBox1.TabIndex = 13
@@ -306,16 +308,27 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxDebugging
         '
+        Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxShowStackTrace)
         Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxThrowCriticalDebugMessagesToScreen)
         Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxThrowInformationDebugMessagesToScreen)
         Me.GroupBoxDebugging.Controls.Add(Me.ComboBoxDebugMode)
         Me.GroupBoxDebugging.Controls.Add(Me.LabelPrompt_StrategyTerm)
         Me.GroupBoxDebugging.Location = New System.Drawing.Point(17, 112)
         Me.GroupBoxDebugging.Name = "GroupBoxDebugging"
-        Me.GroupBoxDebugging.Size = New System.Drawing.Size(443, 112)
+        Me.GroupBoxDebugging.Size = New System.Drawing.Size(443, 128)
         Me.GroupBoxDebugging.TabIndex = 11
         Me.GroupBoxDebugging.TabStop = False
         Me.GroupBoxDebugging.Text = "Error Management:"
+        '
+        'CheckBoxShowStackTrace
+        '
+        Me.CheckBoxShowStackTrace.AutoSize = True
+        Me.CheckBoxShowStackTrace.Location = New System.Drawing.Point(25, 101)
+        Me.CheckBoxShowStackTrace.Name = "CheckBoxShowStackTrace"
+        Me.CheckBoxShowStackTrace.Size = New System.Drawing.Size(115, 17)
+        Me.CheckBoxShowStackTrace.TabIndex = 15
+        Me.CheckBoxShowStackTrace.Text = "Show &Stack Trace"
+        Me.CheckBoxShowStackTrace.UseVisualStyleBackColor = True
         '
         'CheckBoxThrowCriticalDebugMessagesToScreen
         '
@@ -371,7 +384,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(614, 609)
+        Me.TabControl1.Size = New System.Drawing.Size(614, 630)
         Me.TabControl1.TabIndex = 9
         '
         'TabPage1
@@ -380,7 +393,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage1.Size = New System.Drawing.Size(606, 604)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -391,7 +404,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage2.Size = New System.Drawing.Size(606, 604)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Client/Server"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -445,7 +458,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage3.Controls.Add(Me.GroupBoxFactEngine)
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage3.Size = New System.Drawing.Size(606, 604)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "FactEngine"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -455,6 +468,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineShowStackTrace)
         Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineUserDateTimeFormat)
         Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineUserDateFormat)
         Me.GroupBoxFactEngine.Controls.Add(Me.LabelPromptFactEngineUserDateTimeFormat)
@@ -552,7 +566,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage4.Controls.Add(Me.GroupBoxERDiagrams)
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage4.Size = New System.Drawing.Size(606, 604)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "ER Diagrams"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -584,7 +598,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage6.Controls.Add(Me.GroupBox5)
         Me.TabPage6.Location = New System.Drawing.Point(4, 22)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage6.Size = New System.Drawing.Size(606, 604)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Reverse Engineering"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -636,7 +650,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage5.Size = New System.Drawing.Size(606, 604)
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "Boston"
         Me.TabPage5.UseVisualStyleBackColor = True
@@ -663,7 +677,7 @@ Partial Class frmCRUDBostonConfiguration
         'CheckBoxAutomaticallyReportErrorEvents
         '
         Me.CheckBoxAutomaticallyReportErrorEvents.AutoSize = True
-        Me.CheckBoxAutomaticallyReportErrorEvents.Location = New System.Drawing.Point(12, 101)
+        Me.CheckBoxAutomaticallyReportErrorEvents.Location = New System.Drawing.Point(12, 41)
         Me.CheckBoxAutomaticallyReportErrorEvents.Name = "CheckBoxAutomaticallyReportErrorEvents"
         Me.CheckBoxAutomaticallyReportErrorEvents.Size = New System.Drawing.Size(246, 17)
         Me.CheckBoxAutomaticallyReportErrorEvents.TabIndex = 4
@@ -673,7 +687,7 @@ Partial Class frmCRUDBostonConfiguration
         'CheckBoxAutomaticallyCheckForUpdates
         '
         Me.CheckBoxAutomaticallyCheckForUpdates.AutoSize = True
-        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 78)
+        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 18)
         Me.CheckBoxAutomaticallyCheckForUpdates.Name = "CheckBoxAutomaticallyCheckForUpdates"
         Me.CheckBoxAutomaticallyCheckForUpdates.Size = New System.Drawing.Size(177, 17)
         Me.CheckBoxAutomaticallyCheckForUpdates.TabIndex = 3
@@ -682,7 +696,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'ButtonReplaceCoreMetamodel
         '
-        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(256, 12)
+        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(377, 12)
         Me.ButtonReplaceCoreMetamodel.Name = "ButtonReplaceCoreMetamodel"
         Me.ButtonReplaceCoreMetamodel.Size = New System.Drawing.Size(149, 23)
         Me.ButtonReplaceCoreMetamodel.TabIndex = 2
@@ -693,7 +707,7 @@ Partial Class frmCRUDBostonConfiguration
         'CheckBoxDiagramSpyShowLinkFactTypes
         '
         Me.CheckBoxDiagramSpyShowLinkFactTypes.AutoSize = True
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 55)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 80)
         Me.CheckBoxDiagramSpyShowLinkFactTypes.Name = "CheckBoxDiagramSpyShowLinkFactTypes"
         Me.CheckBoxDiagramSpyShowLinkFactTypes.Size = New System.Drawing.Size(201, 17)
         Me.CheckBoxDiagramSpyShowLinkFactTypes.TabIndex = 1
@@ -704,24 +718,20 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.CheckBoxSuperuserMode.AutoSize = True
         Me.CheckBoxSuperuserMode.Enabled = False
-        Me.CheckBoxSuperuserMode.Location = New System.Drawing.Point(12, 16)
+        Me.CheckBoxSuperuserMode.Location = New System.Drawing.Point(12, 123)
         Me.CheckBoxSuperuserMode.Margin = New System.Windows.Forms.Padding(2)
         Me.CheckBoxSuperuserMode.Name = "CheckBoxSuperuserMode"
-        Me.CheckBoxSuperuserMode.Size = New System.Drawing.Size(104, 17)
+        Me.CheckBoxSuperuserMode.Size = New System.Drawing.Size(304, 17)
         Me.CheckBoxSuperuserMode.TabIndex = 0
-        Me.CheckBoxSuperuserMode.Text = "Superuser Mode"
+        Me.CheckBoxSuperuserMode.Text = "Superuser Mode (used rarely and on advice of FactEngine)"
         Me.CheckBoxSuperuserMode.UseVisualStyleBackColor = True
-        '
-        'ErrorProvider
-        '
-        Me.ErrorProvider.ContainerControl = Me
         '
         'TabPage7
         '
         Me.TabPage7.Controls.Add(Me.GroupBoxModelling)
         Me.TabPage7.Location = New System.Drawing.Point(4, 22)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(606, 583)
+        Me.TabPage7.Size = New System.Drawing.Size(606, 604)
         Me.TabPage7.TabIndex = 6
         Me.TabPage7.Text = "Modelling"
         Me.TabPage7.UseVisualStyleBackColor = True
@@ -734,9 +744,25 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxModelling.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBoxModelling.Location = New System.Drawing.Point(0, 0)
         Me.GroupBoxModelling.Name = "GroupBoxModelling"
-        Me.GroupBoxModelling.Size = New System.Drawing.Size(606, 583)
+        Me.GroupBoxModelling.Size = New System.Drawing.Size(606, 604)
         Me.GroupBoxModelling.TabIndex = 0
         Me.GroupBoxModelling.TabStop = False
+        '
+        'TextBoxDefaultReferenceMode
+        '
+        Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(247, 62)
+        Me.TextBoxDefaultReferenceMode.Name = "TextBoxDefaultReferenceMode"
+        Me.TextBoxDefaultReferenceMode.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultReferenceMode.TabIndex = 2
+        '
+        'LabelPromptDefaultReferenceMode
+        '
+        Me.LabelPromptDefaultReferenceMode.AutoSize = True
+        Me.LabelPromptDefaultReferenceMode.Location = New System.Drawing.Point(15, 65)
+        Me.LabelPromptDefaultReferenceMode.Name = "LabelPromptDefaultReferenceMode"
+        Me.LabelPromptDefaultReferenceMode.Size = New System.Drawing.Size(226, 13)
+        Me.LabelPromptDefaultReferenceMode.TabIndex = 1
+        Me.LabelPromptDefaultReferenceMode.Text = "Default Reference Mode for new Entity Types:"
         '
         'CheckBoxUseDefaultReferenceMode
         '
@@ -748,27 +774,25 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxUseDefaultReferenceMode.Text = "Use default &Reference Mode for new Entity Types"
         Me.CheckBoxUseDefaultReferenceMode.UseVisualStyleBackColor = True
         '
-        'LabelPromptDefaultReferenceMode
+        'ErrorProvider
         '
-        Me.LabelPromptDefaultReferenceMode.AutoSize = True
-        Me.LabelPromptDefaultReferenceMode.Location = New System.Drawing.Point(15, 65)
-        Me.LabelPromptDefaultReferenceMode.Name = "LabelPromptDefaultReferenceMode"
-        Me.LabelPromptDefaultReferenceMode.Size = New System.Drawing.Size(226, 13)
-        Me.LabelPromptDefaultReferenceMode.TabIndex = 1
-        Me.LabelPromptDefaultReferenceMode.Text = "Default Reference Mode for new Entity Types:"
+        Me.ErrorProvider.ContainerControl = Me
         '
-        'TextBoxDefaultReferenceMode
+        'CheckBoxFactEngineShowStackTrace
         '
-        Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(247, 62)
-        Me.TextBoxDefaultReferenceMode.Name = "TextBoxDefaultReferenceMode"
-        Me.TextBoxDefaultReferenceMode.Size = New System.Drawing.Size(100, 20)
-        Me.TextBoxDefaultReferenceMode.TabIndex = 2
+        Me.CheckBoxFactEngineShowStackTrace.AutoSize = True
+        Me.CheckBoxFactEngineShowStackTrace.Location = New System.Drawing.Point(19, 181)
+        Me.CheckBoxFactEngineShowStackTrace.Name = "CheckBoxFactEngineShowStackTrace"
+        Me.CheckBoxFactEngineShowStackTrace.Size = New System.Drawing.Size(160, 17)
+        Me.CheckBoxFactEngineShowStackTrace.TabIndex = 8
+        Me.CheckBoxFactEngineShowStackTrace.Text = "Show Stack Trace on Errors"
+        Me.CheckBoxFactEngineShowStackTrace.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(762, 632)
+        Me.ClientSize = New System.Drawing.Size(762, 647)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.button_okay)
@@ -807,10 +831,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
-        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage7.ResumeLayout(False)
         Me.GroupBoxModelling.ResumeLayout(False)
         Me.GroupBoxModelling.PerformLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -878,4 +902,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents TextBoxDefaultReferenceMode As TextBox
     Friend WithEvents LabelPromptDefaultReferenceMode As Label
     Friend WithEvents CheckBoxUseDefaultReferenceMode As CheckBox
+    Friend WithEvents CheckBoxShowStackTrace As CheckBox
+    Friend WithEvents CheckBoxFactEngineShowStackTrace As CheckBox
 End Class
