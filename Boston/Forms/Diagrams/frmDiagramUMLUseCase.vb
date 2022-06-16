@@ -15,8 +15,21 @@ Public Class frmDiagrmUMLUseCase
     Private zo_containernode As ContainerNode
 
     Private MorphVector As New List(Of tMorphVector)
-    Private morph_shape As New ShapeNode
 
+    Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
+
+        Call MyBase.BringToFront()
+
+        'If asSelectModelElementId IsNot Nothing Then
+        '    Me.Diagram.Selection.Items.Clear()
+
+        '    Dim lrModelElement As Object = Me.zrPage.GetAllPageObjects.Find(Function(x) x.Id = asSelectModelElementId)
+        '    If lrModelElement IsNot Nothing Then
+        '        lrModelElement.Shape.Selected = True
+        '    End If
+        'End If
+
+    End Sub
 
     Private Sub frm_UseCaseModel_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
@@ -1083,13 +1096,24 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub IncludesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles IncludesToolStripMenuItem.Click
 
-        Me.IncludesToolStripMenuItem.Checked = Not Me.IncludesToolStripMenuItem.Checked
-        Me.ExtendsToolStripMenuItem.Checked = Not Me.IncludesToolStripMenuItem.Checked
+        Try
+            'CodeSafe 
+            If Me.Diagram.Selection.Items(0).GetType <> GetType(DiagramLink) Then Exit Sub
 
-        Dim lo_link As DiagramLink = Me.Diagram.Selection.Items(0)
-        lo_link.Text = "<Includes>"
+            Me.IncludesToolStripMenuItem.Checked = Not Me.IncludesToolStripMenuItem.Checked
+            Me.ExtendsToolStripMenuItem.Checked = Not Me.IncludesToolStripMenuItem.Checked
 
+            Dim lo_link As DiagramLink = Me.Diagram.Selection.Items(0)
+            lo_link.Text = "<Includes>"
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1410,16 +1434,14 @@ Public Class frmDiagrmUMLUseCase
         'Paste the selected Actor/EntityType to the HiddenDiagramView
         '  (for animated morphing)
         '--------------------------------------------------------------
-        Dim lr_shape_node As ShapeNode
-        lr_shape_node = Me.zrPage.SelectedObject(0).Shape
-        lr_shape_node = Me.DiagramHidden.Factory.CreateShapeNode(lr_shape_node.Bounds.X, lr_shape_node.Bounds.Y, lr_shape_node.Bounds.Width, lr_shape_node.Bounds.Height)
-        lr_shape_node.Shape = Shapes.Ellipse
-        lr_shape_node.Text = Me.zrPage.SelectedObject(0).Name
-        lr_shape_node.Transparent = True
+        Dim lrShapeNode As ShapeNode
+        lrShapeNode = Me.zrPage.SelectedObject(0).Shape
+        lrShapeNode = Me.DiagramHidden.Factory.CreateShapeNode(lrShapeNode.Bounds.X, lrShapeNode.Bounds.Y, lrShapeNode.Bounds.Width, lrShapeNode.Bounds.Height)
+        lrShapeNode.Shape = Shapes.Ellipse
+        lrShapeNode.Text = Me.zrPage.SelectedObject(0).Name
+        lrShapeNode.Transparent = True
 
-        lr_shape_node.Visible = True
-
-        Me.morph_shape = lr_shape_node
+        lrShapeNode.Visible = True
 
         Me.DiagramHidden.Invalidate()
 
@@ -1473,6 +1495,7 @@ Public Class frmDiagrmUMLUseCase
             End Select
 
             Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.bounds.X, Me.zrPage.SelectedObject(0).Shape.bounds.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
+            lrMorphVector.Shape = lrShapeNode
             Me.MorphVector.Add(lrMorphVector)
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
@@ -1606,20 +1629,18 @@ Public Class frmDiagrmUMLUseCase
         'Paste the selected Actor/EntityType to the HiddenDiagramView
         '  (for animated morphing)
         '--------------------------------------------------------------
-        Dim lr_shape_node As ShapeNode
-        lr_shape_node = Me.zrPage.SelectedObject(0).Shape
+        Dim lrShapeNode As ShapeNode
+        lrShapeNode = Me.zrPage.SelectedObject(0).Shape
 
         Dim lrProcess As New UCD.Process
         lrProcess = Me.zrPage.SelectedObject(0)
 
-        lr_shape_node = Me.DiagramHidden.Factory.CreateShapeNode(lr_shape_node.Bounds.X, lr_shape_node.Bounds.Y, 70, 5) ' lr_shape_node.Shape = Shapes.RoundRect
-        lr_shape_node.Shape = Shapes.Rectangle
-        lr_shape_node.Text = lrProcess.Name
-        lr_shape_node.Pen.Color = Color.Black
-        lr_shape_node.Visible = True
-        lr_shape_node.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
-
-        Me.morph_shape = lr_shape_node
+        lrShapeNode = Me.DiagramHidden.Factory.CreateShapeNode(lrShapeNode.Bounds.X, lrShapeNode.Bounds.Y, 70, 5) ' lrShapeNode.Shape = Shapes.RoundRect
+        lrShapeNode.Shape = Shapes.Rectangle
+        lrShapeNode.Text = lrProcess.Name
+        lrShapeNode.Pen.Color = Color.Black
+        lrShapeNode.Visible = True
+        lrShapeNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
 
         Me.DiagramHidden.Invalidate()
 
@@ -1639,6 +1660,7 @@ Public Class frmDiagrmUMLUseCase
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
             Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.Bounds.X, Me.zrPage.SelectedObject(0).Shape.Bounds.Y, 5, 5, 40)
+            lrMorphVector.Shape = lrShapeNode
             Me.MorphVector.Add(lrMorphVector)
             Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
             Me.MorphStepTimer.Start()
@@ -1662,17 +1684,15 @@ Public Class frmDiagrmUMLUseCase
             'Paste the selected Actor/EntityType to the HiddenDiagramView
             '  (for animated morphing)
             '--------------------------------------------------------------
-            Dim lr_shape_node As ShapeNode
-            lr_shape_node = Me.zrPage.SelectedObject(0).Shape
-            lr_shape_node = Me.DiagramHidden.Factory.CreateShapeNode(lr_shape_node.Bounds.X, lr_shape_node.Bounds.Y, lr_shape_node.Bounds.Width, lr_shape_node.Bounds.Height)
-            lr_shape_node.Shape = Shapes.Rectangle
-            lr_shape_node.Text = ""
-            lr_shape_node.Pen.Color = Color.White
-            lr_shape_node.Transparent = True
-            lr_shape_node.Image = My.Resources.CMML.actor
-            lr_shape_node.Visible = True
-
-            Me.morph_shape = lr_shape_node
+            Dim lrShapeNode As ShapeNode
+            lrShapeNode = Me.zrPage.SelectedObject(0).Shape
+            lrShapeNode = Me.DiagramHidden.Factory.CreateShapeNode(lrShapeNode.Bounds.X, lrShapeNode.Bounds.Y, lrShapeNode.Bounds.Width, lrShapeNode.Bounds.Height)
+            lrShapeNode.Shape = Shapes.Rectangle
+            lrShapeNode.Text = ""
+            lrShapeNode.Pen.Color = Color.White
+            lrShapeNode.Transparent = True
+            lrShapeNode.Image = My.Resources.CMML.actor
+            lrShapeNode.Visible = True
 
             Me.DiagramHidden.Invalidate()
 
@@ -1685,23 +1705,24 @@ Public Class frmDiagrmUMLUseCase
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the Actor/EntityType being morphed
                 '------------------------------------------------------------------
-                Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-                lr_page = lr_enterprise_view.Tag
-                Dim lrActor = From FactType In lr_page.FactTypeInstance
-                              From Fact In FactType.Fact
-                              From RoleData In Fact.Data
-                              Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString
-                              Select New FBM.FactDataInstance(Me.zrPage, Fact, RoleData.Role, RoleData.Concept, RoleData.X, RoleData.Y)
+                Dim lr_page As FBM.Page = lr_enterprise_view.Tag
 
-                Dim lrFactDataInstance As New Object
-                For Each lrFactDataInstance In lrActor
-                    Exit For
-                Next
+                Dim lrActor = (From Actor In lr_page.UMLDiagram.Actor
+                               Where Actor.Name = Me.zrPage.SelectedObject(0).Name
+                               Select Actor).First
 
-                Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.Bounds.X, Me.zrPage.SelectedObject(0).Shape.Bounds.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
-                Me.MorphVector.Add(lrMorphVector)
+                Me.MorphVector(0).Shape = lrShapeNode
+                Me.MorphVector(0).EndPoint = New Point(lrActor.X, lrActor.Y)
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
+                Me.MorphVector(0).EndSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
+                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).TargetImage = Me.zrPage.SelectedObject(0).Shape.Image
                 Me.MorphTimer.Enabled = True
                 Me.MorphStepTimer.Enabled = True
+
+                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
 
             End If
 
@@ -1713,6 +1734,8 @@ Public Class frmDiagrmUMLUseCase
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
+            Call Me.HiddenDiagramView.SendToBack()
+
         End Try
 
     End Sub
@@ -1722,6 +1745,11 @@ Public Class frmDiagrmUMLUseCase
         Me.MorphTimer.Enabled = False
         Me.MorphTimer.Stop()
         Me.DiagramHidden.Nodes.Clear()
+
+        'CodeSafe
+        Me.MorphStepTimer.Stop()
+        Me.MorphStepTimer.Enabled = False
+        Call Me.HiddenDiagramView.SendToBack()
 
     End Sub
 
@@ -1750,9 +1778,15 @@ Public Class frmDiagrmUMLUseCase
                             lrMorphVector.Shape.Text = lrMorphVector.TargetText
                         Case Else
                             lrMorphVector.Shape.Shape = Shapes.RoundRect
-                            lrMorphVector.Shape.Image = Nothing
+
+                            If lrMorphVector.TargetImage IsNot Nothing Then
+                                lrMorphVector.Shape.Image = lrMorphVector.TargetImage
+                            Else
+                                lrMorphVector.Shape.Image = Nothing
+                            End If
+
                             lrMorphVector.Shape.Text = lrMorphVector.TargetText
-                    End Select
+                            End Select
                 End If
             Next
 

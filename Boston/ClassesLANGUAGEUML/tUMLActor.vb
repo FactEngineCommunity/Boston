@@ -216,7 +216,6 @@ Namespace UML
 
                             Me.Page.Diagram.Invalidate()
 
-                            Call Me.EnableSaveButton()
                         End If
                     End If
                 End If

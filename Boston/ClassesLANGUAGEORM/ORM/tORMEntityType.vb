@@ -2700,60 +2700,73 @@ FailsafeContinue:
 
             Dim lsReferenceModeName As String = ""
 
-            Select Case Me.ReferenceMode
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotHash)
-                    lsReferenceModeName = Me.Name & "_#"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseCode)
-                    lsReferenceModeName = Me.Name & "_code"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotUppercaseCode)
-                    lsReferenceModeName = Me.Name & "_Code"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotCamelcaseId)
-                    lsReferenceModeName = Me.Name & "_Id"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseId)
-                    lsReferenceModeName = Me.Name & "_id"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotALLCAPSID)
-                    lsReferenceModeName = Me.Name & "_ID"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseName)
-                    lsReferenceModeName = Me.Name & "_name"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotUppercaseName)
-                    lsReferenceModeName = Me.Name & "_Name"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotUppwercaseNr)
-                    lsReferenceModeName = Me.Name & "_Nr"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseNr)
-                    lsReferenceModeName = Me.Name & "_nr"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotUppercaseTitle)
-                    lsReferenceModeName = Me.Name & "_Title"
-                Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseTitle)
-                    lsReferenceModeName = Me.Name & "_title"
-                Case Is = GetEnumDescription(pcenumReferenceMode.AUD)
-                    lsReferenceModeName = "AUD"
-                Case Is = GetEnumDescription(pcenumReferenceMode.CE)
-                    lsReferenceModeName = "CE"
-                Case Is = GetEnumDescription(pcenumReferenceMode.Celsius)
-                    lsReferenceModeName = "Celcius"
-                Case Is = GetEnumDescription(pcenumReferenceMode.cm)
-                    lsReferenceModeName = "cm"
-                Case Is = GetEnumDescription(pcenumReferenceMode.EUR)
-                    lsReferenceModeName = "EUR"
-                Case Is = GetEnumDescription(pcenumReferenceMode.Fahrenheit)
-                    lsReferenceModeName = "Fahrenheit"
-                Case Is = GetEnumDescription(pcenumReferenceMode.kg)
-                    lsReferenceModeName = "kg"
-                Case Is = GetEnumDescription(pcenumReferenceMode.km)
-                    lsReferenceModeName = "km"
-                Case Is = GetEnumDescription(pcenumReferenceMode.mile)
-                    lsReferenceModeName = "mile"
-                Case Is = GetEnumDescription(pcenumReferenceMode.mm)
-                    lsReferenceModeName = "mm"
-                Case Is = GetEnumDescription(pcenumReferenceMode.USD)
-                    lsReferenceModeName = "USD"
-                Case Else
-                    If Me.ReferenceMode.Substring(0, 1) = "." Then
-                        lsReferenceModeName = Me.Id & "_" & Me.ReferenceMode.Substring(1, Me.ReferenceMode.Length - 1)
-                    Else
-                        lsReferenceModeName = Me.ReferenceMode
-                    End If
-            End Select
+            Try
+                'CodeSafe 
+                If Me.ReferenceMode = "" Then Return ""
+
+                Select Case Me.ReferenceMode
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotHash)
+                        lsReferenceModeName = Me.Name & "_#"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseCode)
+                        lsReferenceModeName = Me.Name & "_code"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotUppercaseCode)
+                        lsReferenceModeName = Me.Name & "_Code"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotCamelcaseId)
+                        lsReferenceModeName = Me.Name & "_Id"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseId)
+                        lsReferenceModeName = Me.Name & "_id"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotALLCAPSID)
+                        lsReferenceModeName = Me.Name & "_ID"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseName)
+                        lsReferenceModeName = Me.Name & "_name"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotUppercaseName)
+                        lsReferenceModeName = Me.Name & "_Name"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotUppwercaseNr)
+                        lsReferenceModeName = Me.Name & "_Nr"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseNr)
+                        lsReferenceModeName = Me.Name & "_nr"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotUppercaseTitle)
+                        lsReferenceModeName = Me.Name & "_Title"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.DotLowercaseTitle)
+                        lsReferenceModeName = Me.Name & "_title"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.AUD)
+                        lsReferenceModeName = "AUD"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.CE)
+                        lsReferenceModeName = "CE"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.Celsius)
+                        lsReferenceModeName = "Celcius"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.cm)
+                        lsReferenceModeName = "cm"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.EUR)
+                        lsReferenceModeName = "EUR"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.Fahrenheit)
+                        lsReferenceModeName = "Fahrenheit"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.kg)
+                        lsReferenceModeName = "kg"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.km)
+                        lsReferenceModeName = "km"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.mile)
+                        lsReferenceModeName = "mile"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.mm)
+                        lsReferenceModeName = "mm"
+                    Case Is = GetEnumDescription(pcenumReferenceMode.USD)
+                        lsReferenceModeName = "USD"
+                    Case Else
+                        If Me.ReferenceMode.Substring(0, 1) = "." Then
+                            lsReferenceModeName = Me.Id & "_" & Me.ReferenceMode.Substring(1, Me.ReferenceMode.Length - 1)
+                        Else
+                            lsReferenceModeName = Me.ReferenceMode
+                        End If
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
             Return lsReferenceModeName
 
@@ -3022,7 +3035,7 @@ FailsafeContinue:
 
                 '==============================================================================================
                 'ReferenceModeFactTypeName if one exists
-                If Me.HasSimpleReferenceScheme Then
+                If Me.HasSimpleReferenceScheme And Me.ReferenceModeValueType IsNot Nothing Then
                     Dim lsValueTypeName = Me.MakeReferenceModeName
                     Call Me.ReferenceModeValueType.SetName(lsValueTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
                     Dim lsFactTypeName As String = Me.Id & "Has" & Me.ReferenceModeValueType.Id
