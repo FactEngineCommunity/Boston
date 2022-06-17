@@ -13,6 +13,11 @@ Namespace CMML
         ''' </summary>
         Public Fact As FBM.Fact
 
+        Public IsIncludes As Boolean = False
+        Public IsExtends As Boolean = False
+
+        Public Event IsExtendsChanged(ByVal abIsExtends As Boolean)
+        Public Event IsIncludesChanged(ByVal abIsExtends As Boolean)
         Public Event RemovedFromModel()
 
         ''' <summary>
@@ -46,6 +51,50 @@ Namespace CMML
             End Try
 
         End Sub
+
+        Public Sub setIsExtends(ByVal abIsExtends As Boolean)
+
+            Try
+                Me.IsExtends = abIsExtends
+
+                'CMML
+                Me.CMMLModel.Model.setCMMLProcessToProcessRelationIsExtends(Me, abIsExtends)
+
+                RaiseEvent IsExtendsChanged(abIsExtends)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub setIsIncludes(ByVal abIsIncludes As Boolean)
+
+            Try
+                Me.IsIncludes = abIsIncludes
+
+                'CMML
+                Me.CMMLModel.Model.setCMMLProcessToProcessRelationIsIncludes(Me, abIsIncludes)
+
+                RaiseEvent IsIncludesChanged(abIsIncludes)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
 
     End Class
 

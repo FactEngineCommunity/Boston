@@ -33,9 +33,9 @@ Public Class frmDiagramORM
     Public _row As Integer = -1
     Public _col As Integer = -1
     Public _table As TableNode = Nothing
-    Public _ComboBoxFactInstance As New ComboBox
-    Public _ComboBoxEntityTypeInstance As New ComboBox
-    Public _ComboBoxValueTypeInstance As New ComboBox
+    Public _ComboBoxFactInstance As New ComboBox 'NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
+    Public _ComboBoxEntityTypeInstance As New ComboBox 'NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
+    Public _ComboBoxValueTypeInstance As New ComboBox 'NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
 
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
 
@@ -278,6 +278,9 @@ Public Class frmDiagramORM
 
             Dim lsDebugMessage As String = ""
 
+            'CodeSafe
+            If lrFactDataInstance.Role.Role.JoinedORMObject.GetType <> GetType(FBM.ValueType) Then Exit Sub
+
             lrFactDataInstance = _table(_col, _row).Tag
 
             '-------------------------------------------------------------------------------
@@ -332,58 +335,75 @@ Public Class frmDiagramORM
         Me.DiagramView.Behavior = Behavior.DrawLinks
     End Sub
 
+
+    ''' <summary>
+    ''' NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub ComboBoxFact_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ComboBoxFact.SelectedIndexChanged
         '-----------------------
         'Used for ComboboxFact
         '-----------------------
 
+        Dim loFact = Me.ComboBoxFact.SelectedItem
+
+        'NB _col and _row likely set outside of frmDiagramORM. See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
         If _col <> -1 And _row <> -1 And (Not _table Is Nothing) Then
 
-            Dim lrFactDataInstance As New FBM.FactDataInstance
+            Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactDataInstance As FBM.FactDataInstance
             Dim lsDebugMessage As String = ""
 
+            lrFactInstance = Me.ComboBoxFact.SelectedItem.Tag
             lrFactDataInstance = _table(_col, _row).Tag
 
+#Region "Debugging"
             lsDebugMessage = "Changing FactDataInstance at Row:" & _row & ", Col:" & _col & " in FactTable"
-            If IsSomething(lrFactDataInstance.FactType) Then
-                lsDebugMessage &= vbCrLf & "FactType.Id: " & lrFactDataInstance.FactType.Id
+            If IsSomething(lrFactInstance.FactType) Then
+                lsDebugMessage &= vbCrLf & "FactType.Id: " & lrFactInstance.FactType.Id
             Else
                 lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
             End If
-            If IsSomething(lrFactDataInstance.Fact) Then
-                lsDebugMessage &= vbCrLf & "Fact.Symbol: " & lrFactDataInstance.Fact.Symbol
-                lsDebugMessage &= vbCrLf & lrFactDataInstance.Fact.EnumerateAsBracketedFact
+            If IsSomething(lrFactInstance.Fact) Then
+                lsDebugMessage &= vbCrLf & "Fact.Symbol: " & lrFactInstance.Id
+                lsDebugMessage &= vbCrLf & lrFactInstance.Fact.EnumerateAsBracketedFact
             Else
                 lsDebugMessage &= vbCrLf & "Fact.Symbol: Nothing"
             End If
-            lsDebugMessage &= vbCrLf & "Role.Id :" & lrFactDataInstance.Role.Id
-            lsDebugMessage &= vbCrLf & vbCrLf
-            If IsSomething(lrFactDataInstance.FactData.FactType) Then
-                lsDebugMessage &= vbCrLf & "FactData.FactType.Id: " & lrFactDataInstance.FactData.FactType.Id
-            Else
-                lsDebugMessage &= vbCrLf & "FactData.FactType.Id: Nothing"
-            End If
-            If IsSomething(lrFactDataInstance.FactData.Fact) Then
-                lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: " & lrFactDataInstance.FactData.Fact.Symbol
-                lsDebugMessage &= vbCrLf & lrFactDataInstance.FactData.Fact.EnumerateAsBracketedFact
-            Else
-                lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: Nothing"
-            End If
-            lsDebugMessage &= vbCrLf & "FactData.Role.Id :" & lrFactDataInstance.FactData.Role.Id
-            Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+            '20220617-VM-Not use for FactDataInstances...but for FactInstances (as above)
+            'lsDebugMessage &= vbCrLf & "Role.Id :" & lrFactDataInstance.Role.Id
+            'lsDebugMessage &= vbCrLf & vbCrLf
+            'If IsSomething(lrFactDataInstance.FactData.FactType) Then
+            '    lsDebugMessage &= vbCrLf & "FactData.FactType.Id: " & lrFactDataInstance.FactData.FactType.Id
+            'Else
+            '    lsDebugMessage &= vbCrLf & "FactData.FactType.Id: Nothing"
+            'End If
+            'If IsSomething(lrFactDataInstance.FactData.Fact) Then
+            '    lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: " & lrFactDataInstance.FactData.Fact.Symbol
+            '    lsDebugMessage &= vbCrLf & lrFactDataInstance.FactData.Fact.EnumerateAsBracketedFact
+            'Else
+            '    lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: Nothing"
+            'End If
+            'lsDebugMessage &= vbCrLf & "FactData.Role.Id :" & lrFactDataInstance.FactData.Role.Id
 
-            Call prApplication.ThrowErrorMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
+            '20220617-VM-Removed, not really using.
+            'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+            'Call prApplication.ThrowErrorMessage("...." & lrFactInstance.Fact.Symbol, pcenumErrorType.Information)
+#End Region 'Debugging
 
             '---------------------------------------------
             'Update the FactData of the FactDataInstance
             '  and the Data of the FactDataInstance
             '---------------------------------------------
+
             lrFactDataInstance.FactData.Data = Me.ComboBoxFact.Items(Me.ComboBoxFact.SelectedIndex).ItemData
             lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
-
-            Call prApplication.ThrowErrorMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
+            '20220617-VM-Not really using.
+            'Call prApplication.ThrowErrorMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
 
             lrFactDataInstance.Cell.Text = Me.ComboBoxFact.SelectedItem.Tag.EnumerateAsBracketedFact()
+
         End If
 
         'Me.zrPage.MakeDirty()
@@ -1913,6 +1933,13 @@ Public Class frmDiagramORM
 
             lrFactDataInstance = e.Cell.Tag
 
+            'CodeSafe
+            If lrFactDataInstance Is Nothing Then
+                e.Cell.Text = "Error-No Fact Data"
+                Call lrFactTable.ResortFactTable(True)
+                Exit Sub
+            End If
+
             For Each lrFactDataInstance In lrFactDataInstance.Fact.Data
                 lrFactDataInstance.Cell.TextColor = Color.Blue
                 lrFactDataInstance.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
@@ -1936,6 +1963,7 @@ Public Class frmDiagramORM
             End If
 
             '==============================================================================================
+#Region "Model Errors - Showing in Menu"
             Dim lrModel As FBM.Model
             Dim lrFact As New FBM.Fact
             Dim lrFactInstance As New FBM.FactInstance
@@ -1959,6 +1987,7 @@ Public Class frmDiagramORM
                     lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
                 End If
             End If
+#End Region
             '==============================================================================================
 
             '----------------

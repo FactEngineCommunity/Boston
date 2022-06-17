@@ -95,8 +95,13 @@ Namespace UCD
                 '--------------------------------------------------------
                 'Me.FactData.Data = Me.Name
 
-            Catch lo_err As Exception
-                MsgBox("class_UML_actor.RefreshShape: " & lo_err.Message & ". Symbol: " & Me.Symbol & ", PageId:" & Me.Page.PageId)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

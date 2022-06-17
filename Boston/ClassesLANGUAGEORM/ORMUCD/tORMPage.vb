@@ -115,7 +115,8 @@ Namespace FBM
         Public Function DropCMMLProcessAtPoint(ByRef arCMMLProcess As CMML.Process,
                                                ByVal aoPointF As PointF,
                                                ByRef aoContainerNode As MindFusion.Diagramming.ContainerNode,
-                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As UML.Process
+                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                               Optional ByVal aiLanguage As pcenumLanguage = pcenumLanguage.CMML) As Object
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance
@@ -145,17 +146,24 @@ Namespace FBM
                     Dim lrUMLProcess As UML.Process = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneProcess(Me)
                     lrUMLProcess.Id = arCMMLProcess.Id
                     lrUMLProcess.Text = arCMMLProcess.Text
+                    lrUMLProcess.CMMLProcess = arCMMLProcess
 
-                    Me.UMLDiagram.Process.AddUnique(lrUMLProcess)
+                    Dim lrProcess As UML.Process = lrUMLProcess
+                    Select Case aiLanguage
+                        Case Is = pcenumLanguage.UMLUseCaseDiagram
+                            lrProcess = lrUMLProcess.CloneUCDProcess(Me)
+                    End Select
+
+                    Me.UMLDiagram.Process.AddUnique(lrProcess)
                     '===================================================================================================================
 
-                    Call lrUMLProcess.Move(aoPointF.X, aoPointF.Y, abBroadcastInterfaceEvent)
+                    Call lrProcess.Move(aoPointF.X, aoPointF.Y, abBroadcastInterfaceEvent)
 
                     Call Me.Save(False, False)
 
-                    Call lrUMLProcess.DisplayAndAssociate(aoContainerNode)
+                    Call lrProcess.DisplayAndAssociate(aoContainerNode)
 
-                    Return lrUMLProcess
+                    Return lrProcess
                 End If
 
             Catch ex As Exception

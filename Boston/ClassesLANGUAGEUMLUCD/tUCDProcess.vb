@@ -12,47 +12,62 @@ Namespace UCD
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
 
-        ''' <summary>
-        ''' The text of the Process
-        ''' </summary>
-        Public Text As String
+        Public Shadows WithEvents CMMLProcess As CMML.Process
 
-        Public Shadows Page As FBM.Page
-
-        Public include_process As List(Of CMML.Process)
-        Public included_by_process As List(Of CMML.Process)
-        Public extend_to_process As List(Of CMML.Process)
-        Public extended_by_process As List(Of CMML.Process)
-
-        ''' <summary>
-        ''' The SequenceNr assigned to the Process in a sequence of Processes in (say) a FlowChart or EventTraceDiagram
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public SequenceNr As Single = 1
-
-        Public Shadows IsDecision As Boolean = False
-        Public IsStart As Boolean = False
-        Public IsStop As Boolean = False
-
-        ''' <summary>
-        ''' The Actor responsible for the process, as in (say) an EventTraceDiagram
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public ResponsibleActor As CMML.Actor
-
+        <XmlIgnore()>
         <CategoryAttribute("Process"),
-             DefaultValueAttribute(GetType(String), ""),
-             DescriptionAttribute("Name of the Process.")>
-        Public Property ProcessName() As String
+        Browsable(True),
+        [ReadOnly](True),
+        DescriptionAttribute("The unique Process Id of the Process.")>
+        Public Overloads ReadOnly Property ProcessId As String
             Get
-                Return Me.Name
+                Return Me.Id
             End Get
-            Set(ByVal Value As String)
-                Me.Name = Value
-            End Set
         End Property
 
-        Public Event FactChanged(ByRef arFact As FBM.Fact)
+        '20220617-VM-Remove if not needed.
+        '''' <summary>
+        '''' The text of the Process
+        '''' </summary>
+        'Public Text As String
+
+        'Public Shadows Page As FBM.Page
+
+        'Public include_process As List(Of CMML.Process)
+        'Public included_by_process As List(Of CMML.Process)
+        'Public extend_to_process As List(Of CMML.Process)
+        'Public extended_by_process As List(Of CMML.Process)
+
+        '''' <summary>
+        '''' The SequenceNr assigned to the Process in a sequence of Processes in (say) a FlowChart or EventTraceDiagram
+        '''' </summary>
+        '''' <remarks></remarks>
+        'Public SequenceNr As Single = 1
+
+        'Public Shadows IsDecision As Boolean = False
+        'Public IsStart As Boolean = False
+        'Public IsStop As Boolean = False
+
+        '''' <summary>
+        '''' The Actor responsible for the process, as in (say) an EventTraceDiagram
+        '''' </summary>
+        '''' <remarks></remarks>
+        'Public ResponsibleActor As CMML.Actor
+
+        '20220617-VM-Not really used.
+        '<CategoryAttribute("Process"),
+        '     DefaultValueAttribute(GetType(String), ""),
+        '     DescriptionAttribute("Name of the Process.")>
+        'Public Property ProcessName() As String
+        '    Get
+        '        Return Me.Name
+        '    End Get
+        '    Set(ByVal Value As String)
+        '        Me.Name = Value
+        '    End Set
+        'End Property
+
+        Public Shadows Event FactChanged(ByRef arFact As FBM.Fact)
 
         Public Sub New()
             Me.Id = System.Guid.NewGuid.ToString
@@ -157,6 +172,7 @@ Namespace UCD
                         loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.Beige)
                     Case Is = pcenumLanguage.UMLUseCaseDiagram
                         loDroppedNode.Shape = Shapes.Ellipse
+                        loDroppedNode.HandlesStyle = HandlesStyle.Invisible
                         loDroppedNode.Resize(40, 12)
                     Case Is = pcenumLanguage.FlowChart
                         If Me.IsDecision Then
@@ -204,7 +220,61 @@ Namespace UCD
 
         End Sub
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Overrides Function RemoveFromPage() As Boolean
+
+            Try
+                Dim lsSQLQuery As String
+
+                '----------------------------------------------------------------------------------------------------------
+                'Remove the Process that represents the Process from the Diagram on the Page.
+                '-------------------------------------------------------------------------------
+                Me.Page.UMLDiagram.Process.Remove(Me)
+
+                Dim larLinkToRemove As New List(Of DiagramLink)
+
+                If Me.Page.Diagram IsNot Nothing Then
+
+                    Me.Page.Diagram.Nodes.Remove(Me.Shape)
+
+                    For Each lrLink In Me.Shape.IncomingLinks
+                        larLinkToRemove.Add(lrLink)
+                    Next
+
+                    For Each lrLink In Me.Shape.OutgoingLinks
+                        larLinkToRemove.Add(lrLink)
+                    Next
+
+                    For Each lrLink In larLinkToRemove
+                        Me.Page.Diagram.Links.Remove(lrLink)
+                    Next
+                End If
+
+                '-------------------------------------------------------------------------
+                'Remove the Process from the Page
+                '---------------------------------
+#Region "CMML"
+                'Likely already deleted when deleted at the Model level.
+                lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & Me.Id & "'"
+                lsSQLQuery &= "   AND ElementType = 'Process'"
+
+                Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+#End Region
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+
+        Public Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
 
             Dim lsMessage As String = ""
 
@@ -294,7 +364,7 @@ Namespace UCD
             End Try
         End Sub
 
-        Friend Sub UpdateGUIFromModel()
+        Friend Shadows Sub UpdateGUIFromModel()
 
             '---------------------------------------------------------------------
             'Linked by Delegate in New to the 'update' event of the ModelObject 
@@ -378,7 +448,21 @@ Namespace UCD
 
         End Sub
 
+        Private Sub CMMLProcess_RemovedFromModel() Handles CMMLProcess.RemovedFromModel
 
+            Try
+                Call Me.RemoveFromPage()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
     End Class
 

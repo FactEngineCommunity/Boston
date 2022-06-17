@@ -248,6 +248,27 @@ Namespace CMML
 
         End Function
 
+        Public Sub RemoveProcess(ByRef arProcess As CMML.Process)
+
+            Try
+                Me.Process.Remove(arProcess)
+
+                'CMML
+                Call Me.Model.removeCMMLProcess(arProcess)
+
+                RaiseEvent ProcessRemoved(arProcess)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub RemoveActorProcessRelation(ByRef arActorProcessRelation As CMML.ActorProcessRelation)
 
             Try

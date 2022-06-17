@@ -13,6 +13,8 @@ Public Enum pcenumCMMLRelations
         CoreIsActor
         CoreIsDecision
         CoreIsERTable
+        CoreP2PIsExtends
+        CoreP2PIsIncludes
 
         '---------------------------------------------
         'STDs (State Transition Diagrams)

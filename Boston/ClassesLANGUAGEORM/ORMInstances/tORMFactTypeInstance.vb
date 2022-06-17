@@ -3185,7 +3185,7 @@ Namespace FBM
                     '-----------------------
                     Me.Page.Form._comboBoxFactInstance.Items.clear()
                     For Each lrFactInstance In lrJoinedFactTypeInstance.Fact
-                        Dim lo_combobox_item As tComboboxItem = New tComboboxItem(lrFactInstance.Symbol, lrFactInstance.EnumerateAsBracketedFact, lrFactInstance)
+                        Dim lo_combobox_item As tComboboxItem = New tComboboxItem(lrFactInstance.Id, lrFactInstance.EnumerateAsBracketedFact, lrFactInstance)
                         If Not Me.Page.Form._comboBoxFactInstance.Items.Contains(lo_combobox_item) Then
                             Me.Page.Form._comboBoxFactInstance.Items.Add(lo_combobox_item)
                         End If

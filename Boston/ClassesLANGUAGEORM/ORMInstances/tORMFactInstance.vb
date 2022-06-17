@@ -158,6 +158,25 @@ Namespace FBM
 
         End Function
 
+        Public Shadows Function EqualsByDataMatch(ByVal other As FBM.FactInstance) As Boolean
+
+            Dim lr_data As FBM.FactDataInstance
+            Dim lbFound As Boolean = True
+
+            If Me.FactType.Id = other.FactType.Id Then
+                For Each lr_data In other.Data
+                    If Me.Data.Find(Function(x) (x.Role.Id = lr_data.Role.Id) And (x.Concept.Symbol = lr_data.Concept.Symbol)) Is Nothing Then 'AddressOf lr_data.Equals) Is Nothing Then
+                        lbFound = False
+                    End If
+                Next
+                Return lbFound
+            Else
+                Return False
+            End If
+
+        End Function
+
+
         Public Shadows Function EqualsByFirstDataMatch(ByVal other As FBM.FactInstance) As Boolean
 
             Dim lr_data As FBM.FactDataInstance
@@ -323,8 +342,39 @@ Namespace FBM
 
         End Function
 
+        Public Function CloneUCDActorProcessRelation(ByRef arPage As FBM.Page, Optional ByRef arActor As UML.Actor = Nothing, Optional ByRef arProcess As UML.Process = Nothing) As UCD.ActorProcessRelation
 
-        Public Function CloneProcessProcessRelation(ByRef arPage As FBM.Page, Optional ByRef arProcess1 As UML.Process = Nothing, Optional ByRef arProcess2 As UML.Process = Nothing) As UML.ProcessProcessRelation
+            Dim lrUCDActorProcessRelation As New UCD.ActorProcessRelation(arPage.UMLDiagram, arActor, arProcess)
+            Try
+                With Me
+                    lrUCDActorProcessRelation.Model = .Model
+                    lrUCDActorProcessRelation.UMLModel = arPage.UMLDiagram
+                    lrUCDActorProcessRelation.Page = arPage
+                    lrUCDActorProcessRelation.Fact = Me.Fact
+                    lrUCDActorProcessRelation.FactInstance = Me
+                    lrUCDActorProcessRelation.Concept = .Concept
+                    lrUCDActorProcessRelation.X = .X
+                    lrUCDActorProcessRelation.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrUCDActorProcessRelation
+
+        End Function
+
+
+
+        Public Function CloneProcessProcessRelation(ByRef arPage As FBM.Page,
+                                                    Optional ByRef arProcess1 As UML.Process = Nothing,
+                                                    Optional ByRef arProcess2 As UML.Process = Nothing) As UML.ProcessProcessRelation
 
             Dim lrUMLProcessProcessRelation As New UML.ProcessProcessRelation(arPage.UMLDiagram, arProcess1, arProcess2)
             Try
@@ -349,6 +399,36 @@ Namespace FBM
             End Try
 
             Return lrUMLProcessProcessRelation
+
+        End Function
+
+        Public Function CloneUCDProcessProcessRelation(ByRef arPage As FBM.Page,
+                                                       Optional ByRef arProcess1 As UML.Process = Nothing,
+                                                       Optional ByRef arProcess2 As UML.Process = Nothing) As UCD.ProcessProcessRelation
+
+            Dim lrUCDProcessProcessRelation As New UCD.ProcessProcessRelation(arPage.UMLDiagram, arProcess1, arProcess2)
+            Try
+                With Me
+                    lrUCDProcessProcessRelation.Model = .Model
+                    lrUCDProcessProcessRelation.UMLModel = arPage.UMLDiagram
+                    lrUCDProcessProcessRelation.Page = arPage
+                    lrUCDProcessProcessRelation.Fact = Me.Fact
+                    lrUCDProcessProcessRelation.FactInstance = Me
+                    lrUCDProcessProcessRelation.Concept = .Concept
+                    lrUCDProcessProcessRelation.X = .X
+                    lrUCDProcessProcessRelation.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrUCDProcessProcessRelation
 
         End Function
 

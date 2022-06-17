@@ -2021,7 +2021,7 @@ Namespace ORMQL
                         '    lrFactInstance = lrFactTypeInstance.Fact.Find(AddressOf lrFactInstance.EqualsByFirstDataMatch)
                         'Loop 'Remove all Facts on the Page that match the WHERE clause.
 
-                        Dim larFactInstance As List(Of FBM.FactInstance) = lrFactTypeInstance.Fact.FindAll(AddressOf lrFactInstance.EqualsByFirstDataMatch)
+                        Dim larFactInstance As List(Of FBM.FactInstance) = lrFactTypeInstance.Fact.FindAll(AddressOf lrFactInstance.EqualsByDataMatch)
 
                         For Each lrFactInstance In larFactInstance
                             lrFactTypeInstance.RemoveFact(lrFactInstance)

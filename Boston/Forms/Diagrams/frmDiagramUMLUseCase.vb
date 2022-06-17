@@ -333,7 +333,7 @@ Public Class frmDiagrmUMLUseCase
                             Call Me.zrPage.Model.UML.addProcess(lrCMMLProcess)
 
                             'Page Level
-                            Call Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
+                            Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode,, pcenumLanguage.UMLUseCaseDiagram)
 
                     End Select
                 End If
@@ -543,27 +543,28 @@ Public Class frmDiagrmUMLUseCase
 
                     lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrUMLActorProcessRelation As UML.ActorProcessRelation
+                    Dim lrUCDActorProcessRelation As UCD.ActorProcessRelation
                     If lrRecordset.EOF Then
                         lrFactInstance = Me.zrPage.UMLDiagram.ActorToProcessParticipationRelationFTI.AddFact(lrCMMLActorProcessRelation.Fact)
                     Else
                         lrFactInstance = lrRecordset.CurrentFact
-                        lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me.zrPage, lrActor, lrProcess)
                     End If
+
+                    lrUCDActorProcessRelation = lrFactInstance.CloneUCDActorProcessRelation(Me.zrPage, lrActor, lrProcess)
 
                     '------------------------------------------
                     'Link the Processes
                     '------------------------------------------
-                    lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me.zrPage, lrActor, lrProcess)
-                    lrUMLActorProcessRelation.Fact = lrFactInstance
-                    lrUMLActorProcessRelation.CMMLActorProcessRelation = lrCMMLActorProcessRelation 'Me.zrPage.Model.UML.ActorProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+                    lrUCDActorProcessRelation.Fact = lrFactInstance
+                    lrUCDActorProcessRelation.CMMLActorProcessRelation = lrCMMLActorProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+                    lrUCDActorProcessRelation.CMMLActorProcessRelation = lrCMMLActorProcessRelation 'Me.zrPage.Model.UML.ActorProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
 
-                    Me.zrPage.UMLDiagram.ActorProcessRelation.Add(lrUMLActorProcessRelation)
+                    Me.zrPage.UMLDiagram.ActorProcessRelation.Add(lrUCDActorProcessRelation)
 
                     Dim lo_link As DiagramLink
                     lo_link = Me.Diagram.Factory.CreateDiagramLink(lrActor.Shape, lrProcess.Shape)
-                    lrUMLActorProcessRelation.Link = lo_link
-                    lo_link.Tag = lrUMLActorProcessRelation
+                    lrUCDActorProcessRelation.Link = lo_link
+                    lo_link.Tag = lrUCDActorProcessRelation
 
                 End If
             Next
@@ -595,27 +596,36 @@ Public Class frmDiagrmUMLUseCase
 
                     lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation
+                    Dim lrUCDProcessProcessRelation As UCD.ProcessProcessRelation
                     If lrRecordset.EOF Then
                         lrFactInstance = Me.zrPage.UMLDiagram.PocessToProcessRelationFTI.AddFact(lrCMMLProcessProcessRelation.Fact)
                     Else
                         lrFactInstance = lrRecordset.CurrentFact
-                        lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
                     End If
+
+                    lrUCDProcessProcessRelation = lrFactInstance.CloneUCDProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
 
                     '------------------------------------------
                     'Link the Processes
-                    '------------------------------------------
-                    lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
-                    lrUMLProcessProcessRelation.Fact = lrFactInstance
-                    lrUMLProcessProcessRelation.CMMLProcessProcessRelation = lrCMMLProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+                    '------------------------------------------                    
+                    lrUCDProcessProcessRelation.Fact = lrFactInstance
+                    lrUCDProcessProcessRelation.IsExtends = lrCMMLProcessProcessRelation.IsExtends
+                    lrUCDProcessProcessRelation.IsIncludes = lrCMMLProcessProcessRelation.IsIncludes
+                    lrUCDProcessProcessRelation.CMMLProcessProcessRelation = lrCMMLProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+                    lrUCDProcessProcessRelation.IsExtends = lrCMMLProcessProcessRelation.IsExtends
 
-                    Me.zrPage.UMLDiagram.ProcessProcessRelation.Add(lrUMLProcessProcessRelation)
+                    Me.zrPage.UMLDiagram.ProcessProcessRelation.Add(lrUCDProcessProcessRelation)
 
                     Dim lo_link As DiagramLink
                     lo_link = Me.Diagram.Factory.CreateDiagramLink(lrProcess1.Shape, lrProcess2.Shape)
-                    lrUMLProcessProcessRelation.Link = lo_link
-                    lo_link.Tag = lrUMLProcessProcessRelation
+                    lrUCDProcessProcessRelation.Link = lo_link
+                    lo_link.Tag = lrUCDProcessProcessRelation
+                    If lrUCDProcessProcessRelation.IsExtends Then
+                        lo_link.Text = "<<Extends>>"
+                    ElseIf lrUCDProcessProcessRelation.IsIncludes Then
+                        lo_link.Text = "<<Includes>>"
+
+                    End If
 
                 End If
             Next
@@ -910,9 +920,11 @@ Public Class frmDiagrmUMLUseCase
             Case Is = GetType(UCD.Actor)
 
                 Dim lrActor As UML.Actor = e.Node.Tag
-
                 Call Me.DiagramView.BeginEdit(lrActor.NameShape.Shape)
+            Case Is = GetType(UCD.Actor)
 
+                Dim lrProcess As UML.Process = e.Node.Tag
+                Call Me.DiagramView.BeginEdit(lrProcess.Shape)
         End Select
 
 
@@ -937,8 +949,13 @@ Public Class frmDiagrmUMLUseCase
                 Dim lrSystemBoundary = e.Node
 
                 For Each lrProcessShape In lrSystemBoundary.SubordinateGroup.AttachedNodes
-                    Dim lrProcess As UCD.Process = lrProcessShape.Tag
-                    Call lrProcess.Move(lrProcessShape.Bounds.X, lrProcessShape.Bounds.Y, True)
+                    Try
+                        Dim lrProcess As UCD.Process = lrProcessShape.Tag
+                        Call lrProcess.Move(lrProcessShape.Bounds.X, lrProcessShape.Bounds.Y, True)
+                    Catch ex As Exception
+                        'Unknown why it is throwing an error
+                    End Try
+
                 Next
 
                 Exit Sub
@@ -1236,15 +1253,28 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub mnuOption_ProcessProperties_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertiesToolStripMenuItem2.Click
 
-        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+        Try
 
-        If Not IsNothing(frmMain.zfrm_properties) Then
+            Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If lrPropertyGridForm Is Nothing Then Exit Sub
+
             If Me.Diagram.Selection.Items.Count > 0 Then
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
             Else
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.zrPage.UMLDiagram
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.UMLDiagram
             End If
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1975,201 +2005,99 @@ Public Class frmDiagrmUMLUseCase
 
         Dim lo_point As System.Drawing.PointF
 
-        prApplication.WorkingPage = Me.zrPage
+        Try
+            prApplication.WorkingPage = Me.zrPage
 
-        lo_point = Me.DiagramView.ClientToDoc(e.Location)
+            lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
-        Dim loNode = Diagram.GetNodeAt(lo_point, 2)
-        Dim loLink = Diagram.GetLinkAt(lo_point, 5)
-
-        If loLink IsNot Nothing Then
-            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
-
-            Me.zrPage.SelectedObject.Clear()
-            Me.zrPage.SelectedObject.Add(loLink.Tag)
-
-        ElseIf IsSomething(loNode) Then
-        Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
-
-        Else
-            '---------------------------------------------------
-            'MouseDown is on canvas (not on object).
-            'If any objects are already highlighted as blue, 
-            '  then change the outline to black/originalcolour
-            '---------------------------------------------------        
-            Me.zrPage.SelectedObject.Clear()
+            Dim loNode = Diagram.GetNodeAt(lo_point, 2)
+            Dim loLink = Diagram.GetLinkAt(lo_point, 1)
 
             Dim lrPropertyGridForm As frmToolboxProperties
 
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            If IsSomething(lrPropertyGridForm) Then
 
-                Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
-                ' And you pass it to the PropertyGrid,
-                ' via its BrowsableAttributes property :
-                lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+            If loLink IsNot Nothing Then
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
+
+                Me.zrPage.SelectedObject.Clear()
+                Me.zrPage.SelectedObject.Add(loLink.Tag)
+
+            ElseIf IsSomething(loNode) Then
+                Me.zrPage.SelectedObject.Clear()
+                Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
+                loNode.Selected = True
+            Else
+                '---------------------------------------------------
+                'MouseDown is on canvas (not on object).
+                'If any objects are already highlighted as blue, 
+                '  then change the outline to black/originalcolour
+                '---------------------------------------------------        
+                Me.zrPage.SelectedObject.Clear()
+
+                If IsSomething(lrPropertyGridForm) Then
+
+                    Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage
+
+                End If
+
+                Call Me.reset_node_and_link_colors()
+
+                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
 
             End If
 
-            Call Me.reset_node_and_link_colors()
+#Region "Propery Grid"
+            If IsSomething(lrPropertyGridForm) Then
+                If IsSomething(loLink) Then
+                    Select Case loLink.Tag.GetType
+                        Case Is = GetType(UCD.ProcessProcessRelation)
+                            Dim lrProcessProcessRelation As UCD.ProcessProcessRelation
+                            lrProcessProcessRelation = loLink.Tag
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute1 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrProcessProcessRelation
+                    End Select
 
-            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+                ElseIf IsSomething(loNode) Then
 
-        End If
+                    Dim lrModelObject As FBM.ModelObject
+                    lrModelObject = loNode.Tag
+                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                    Select Case loNode.Tag.GetType
+                        Case Is = GetType(UCD.Process)
+                            Dim lrProcess As UCD.Process
+                            lrProcess = loNode.Tag
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute1 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrProcess
+                    End Select
+                End If
+            End If
+#End Region
 
-        '===============================================================================
-        'From second method handling same event
-        'Dim lo_point As System.Drawing.PointF
-        'Dim loNode As DiagramNode
+        Catch ex As Exception
+            Dim lsMessage As String
+        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        'lo_point = Me.UseCaseDiagramView.ClientToDoc(e.Location)
-
-        'Me.UseCaseDiagramView.SmoothingMode = SmoothingMode.AntiAlias
-
-        ''--------------------------------------------------
-        ''Just to be sure...set the Richmond.WorkingProject
-        ''--------------------------------------------------
-        'prApplication.WorkingPage = Me.zrPage
-
-        'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
-        '    '----------------------------
-        '    'Mouse is over an ShapeNode
-        '    '----------------------------
-        '    Me.Diagram.AllowUnconnectedLinks = True
-
-        '    '--------------------------------------------
-        '    'Turn on the TimerLinkSwitch.
-        '    '  After the user has held down the mouse button for 1second over a object,
-        '    '  then link creation will be allowed
-        '    '--------------------------------------------
-        '    TimerLinkSwitch.Enabled = True
-
-        '    '----------------------------------------------------
-        '    'Get the Node/Shape under the mouse cursor.
-        '    '----------------------------------------------------
-        '    loNode = Diagram.GetNodeAt(lo_point)
-        '    Me.UseCaseDiagramView.DrawLinkCursor = Cursors.Hand
-        '    Cursor.Show()
-
-        '    '---------------------------------------------------------------------------------------------------------------------------
-        '    'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the UseCaseModel object selected
-        '    '---------------------------------------------------------------------------------------------------------------------------
-        '    If Not IsNothing(frmMain.zfrm_properties) Then
-        '        frmMain.zfrm_properties.PropertyGrid.SelectedObject = loNode.Tag
-        '    End If
-
-        '    'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
-        '    '    '----------------------------
-        '    '    'Mouse is over an ShapeNode
-        '    '    '----------------------------
-
-        '    '    '----------------------------------------------------
-        '    '    'Get the Node/Shape under the mouse cursor.
-        '    '    '----------------------------------------------------
-        '    '    If TypeOf Diagram.GetNodeAt(lo_point) Is MindFusion.Diagramming.TableNode Then
-        '    '        Exit Sub
-        '    '    End If
-        '    '    loNode = Diagram.GetNodeAt(lo_point)
-
-        '    '    If Control.ModifierKeys And Keys.Control Then
-        '    '        '------------------------------------
-        '    '        'Use is holding down the CtrlKey so
-        '    '        '  enforce the selection of the object
-        '    '        '------------------------------------                
-        '    '        loNode.Selected = True
-        '    '        loNode.Pen.Color = Color.Blue
-        '    '        prApplication.workingpage.MultiSelectionPerformed = True
-
-        '    '        Select Case loNode.Tag.ConceptType
-        '    '            Case Is = pcenumConceptType.role
-        '    '                '----------------------------------------------------------------------
-        '    '                'This stops a Role AND its FactType being selected at the same time
-        '    '                '----------------------------------------------------------------------
-        '    '                prApplication.workingpage.SelectedObject.Remove(loNode.Tag.FactType)
-        '    '        End Select
-
-        '    '        Exit Sub
-        '    '    Else
-        '    '        If prApplication.workingpage.MultiSelectionPerformed Then
-        '    '            If Diagram.Selection.Nodes.Contains(loNode) Then
-        '    '                '--------------------------------------------------------------------
-        '    '                'Don't clear the SelectedObjects if the ShapeNode selected/clicked on 
-        '    '                '  is within the Diagram.Selection because the user has just performed
-        '    '                '  a MultiSelection, ostensibly (one would assume) to then 'move'
-        '    '                '  or 'delete' the selection of objects.
-        '    '                '--------------------------------------------------------------------                    
-        '    '                '------------------------------------------------------------------------------
-        '    '                'Unless the Shape.Tag is a FactType, then just select it
-        '    '                '  The reason for this, is because of MindFusion.Groups.
-        '    '                '  When a User selects a Role...the whole RoleGroup (all Roles in the FactType)
-        '    '                '  are selected, so it is a MultiSelection by default.
-        '    '                '------------------------------------------------------------------------------
-        '    '                Select Case loNode.Tag.ConceptType
-        '    '                    Case Is = pcenumConceptType.FactType
-        '    '                        me.zrPage.SelectedObject.Clear()
-        '    '                        Diagram.Selection.Clear()
-        '    '                        '-----------------------------------------------
-        '    '                        'Select the ShapeNode/ORMObject just clicked on
-        '    '                        '-----------------------------------------------                    
-        '    '                        loNode.Selected = True
-        '    '                        loNode.Pen.Color = Color.Blue
-
-        '    '                        '-------------------------------------------------------------------
-        '    '                        'Reset the MultiSelectionPerformed flag on the ORMModel
-        '    '                        '-------------------------------------------------------------------
-        '    '                        me.zrPage.MultiSelectionPerformed = False
-        '    '                End Select
-        '    '            Else
-        '    '                '---------------------------------------------------------------------------
-        '    '                'Clear the SelectedObjects because the user neither did a MultiSelection
-        '    '                '  nor held down the [Ctrl] key before clicking on the ShapeNode.
-        '    '                '  Clearing the SelectedObject groups, allows for new objects to be selected
-        '    '                '  starting with the ShapeNode/ORMObject just clicked on.
-        '    '                '---------------------------------------------------------------------------
-        '    '                me.zrPage.SelectedObject.Clear()
-        '    '                Diagram.Selection.Clear()
-        'ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
-        '    '-------------------------
-        '    'User clicked on a link
-        '    '-------------------------
-        'Else
-        '    '------------------------------------------------
-        '    'Use clicked on the Canvas
-        '    '------------------------------------------------
-
-        '    '---------------------------
-        '    'Clear the SelectedObjects
-        '    '---------------------------
-        '    Me.zrPage.SelectedObject.Clear()
-        '    Me.Diagram.Selection.Clear()
-
-        '    Me.UseCaseDiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-
-        '    Me.Diagram.AllowUnconnectedLinks = False
-
-        '    '------------------------------------------------------------------------------
-        '    'Clear the 'InPlaceEdit' on principal.
-        '    '  i.e. Is only allowed for 'Processes' and the user clicked on the Canvas,
-        '    '  so disable the 'InPlaceEdit'.
-        '    '  NB See Diagram.DoubleClick where if a 'Process' is DoubleClicked on,
-        '    '  then 'InPlaceEdit' is temporarily allowed.
-        '    '------------------------------------------------------------------------------
-        '    Me.UseCaseDiagramView.AllowInplaceEdit = False
-
-        '    '-----------------------------------------------------------------------------------------------------------
-        '    'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the UseCaseModel
-        '    '-----------------------------------------------------------------------------------------------------------
-        '    If Not IsNothing(frmMain.zfrm_properties) Then
-        '        frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.UseCaseModel
-        '    End If
-
-        '    Call Me.reset_node_and_link_colors()
-        'End If
-
-
-
+        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
     Private Sub PropertiesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertiesToolStripMenuItem.Click
@@ -2318,13 +2246,13 @@ Public Class frmDiagrmUMLUseCase
 
             If MsgBox("Are you sure you want to remove the Relation from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
                 Select Case loProcessRelation.GetType
-                    Case Is = GetType(UML.ActorProcessRelation)
-                        Dim lrActorProcessRelation As UML.ActorProcessRelation = loProcessRelation
+                    Case Is = GetType(UCD.ActorProcessRelation)
+                        Dim lrActorProcessRelation As UCD.ActorProcessRelation = loProcessRelation
 
                         Call lrActorProcessRelation.CMMLActorProcessRelation.RemoveFromModel()
 
-                    Case Is = GetType(UML.ProcessProcessRelation)
-                        Dim lrProcessProcessRelation As UML.ProcessProcessRelation = loProcessRelation
+                    Case Is = GetType(UCD.ProcessProcessRelation)
+                        Dim lrProcessProcessRelation As UCD.ProcessProcessRelation = loProcessRelation
 
                         Call lrProcessProcessRelation.CMMLProcessProcessRelation.RemoveFromModel()
                 End Select
@@ -2340,6 +2268,77 @@ Public Class frmDiagrmUMLUseCase
         End Try
 
 
+
+    End Sub
+
+    Private Sub PropertiesToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem3.Click
+
+        Try
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+            Dim lrProcessProcessRelation As UCD.ProcessProcessRelation
+            lrProcessProcessRelation = Me.zrPage.SelectedObject(0)
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            Dim loMiscFilterAttribute1 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+            lrPropertyGridForm.PropertyGrid.SelectedObject = lrProcessProcessRelation
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Private Sub RemoveFromPageModelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveFromPageModelToolStripMenuItem.Click
+
+        Try
+
+            With New WaitCursor
+                '---------------------------------------------------------
+                'Get the Process represented by the (selected) Process
+                '---------------------------------------------------------
+                Dim lrProcess As UCD.Process = Me.zrPage.SelectedObject(0)
+
+#Region "Connected Relations - ActorProcess/ProcessProcess"
+                Dim larConnectedProcessesProcessRelation = From ProcessProcessRelation In lrProcess.CMMLProcess.CMMLModel.ProcessProcessRelation.ToList
+                                                           Where (ProcessProcessRelation.Process1.Id = lrProcess.Id) Or (ProcessProcessRelation.Process2.Id = lrProcess.Id)
+                                                           Select ProcessProcessRelation
+
+                For Each lrCMMLConnectedProcessProcessRelation In larConnectedProcessesProcessRelation
+                    Call lrCMMLConnectedProcessProcessRelation.RemoveFromModel()
+                Next
+
+                Dim larConnectedActorProcessRelation = From ActorProcessRelation In lrProcess.CMMLProcess.CMMLModel.ActorProcessRelation.ToList
+                                                       Where ActorProcessRelation.Process.Id = lrProcess.Id
+                                                       Select ActorProcessRelation
+
+                For Each lrCMMLConnectedActorProcessRelation In larConnectedActorProcessRelation
+                    Call lrCMMLConnectedActorProcessRelation.RemoveFromModel()
+                Next
+#End Region
+
+                Call lrProcess.CMMLProcess.RemoveFromModel()
+
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

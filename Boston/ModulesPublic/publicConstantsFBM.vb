@@ -12,6 +12,7 @@
         PropertyGraphSchema = 22
         StateTransitionDiagram = 10
         BPMN = 11
+        CMML = 12 'Used for cloning UML.Process objects to UCD.Process objects etc.
     End Enum
 
     <Serializable()>

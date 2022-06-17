@@ -3241,18 +3241,18 @@ NextY:
 
                     lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation
+                    Dim lrUMLProcessProcessRelation As UCD.ProcessProcessRelation
                     If lrRecordset.EOF Then
                         lrFactInstance = Me.UMLDiagram.PocessToProcessRelationFTI.AddFact(arProcessProcessRelation.Fact)
                     Else
                         lrFactInstance = lrRecordset.CurrentFact
-                        lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me, lrProcess1, lrProcess2)
                     End If
+
+                    lrUMLProcessProcessRelation = lrFactInstance.CloneUCDProcessProcessRelation(Me, lrProcess1, lrProcess2)
 
                     '------------------------------------------
                     'Link the Actor to the associated Process
                     '------------------------------------------
-                    lrUMLProcessProcessRelation = lrFactInstance.CloneProcessProcessRelation(Me, lrProcess1, lrProcess2)
                     lrUMLProcessProcessRelation.Fact = lrFactInstance
                     lrUMLProcessProcessRelation.CMMLProcessProcessRelation = arProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
 
@@ -3295,8 +3295,8 @@ NextY:
                     Exit Sub
                 End If
 
+                'CodeSafe
                 Dim laiLanguage() = {pcenumLanguage.UMLUseCaseDiagram}
-
                 If Not laiLanguage.Contains(Me.Language) Then Exit Sub
 
                 'Check to see that both the processes are on the Page.
@@ -3359,6 +3359,35 @@ NextY:
             End Try
 
 
+        End Sub
+
+        Private Sub CMMLModel_ProcessRemoved(arProcess As Process) Handles CMMLModel.ProcessRemoved
+
+            Try
+                'CodeSafe
+                If Not Me.Model.Page.Contains(Me) Then
+                    Me.Dispose()
+                    Exit Sub
+                End If
+
+                'CodeSafe 
+                If Me.IsCoreModelPage Then Exit Sub
+                If Me.FactTypeInstance.Find(Function(x) x.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString) Is Nothing Then
+                    Exit Sub
+                End If
+
+                'CodeSafe
+                Dim laiLanguage() = {pcenumLanguage.UMLUseCaseDiagram}
+                If Not laiLanguage.Contains(Me.Language) Then Exit Sub
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
     End Class

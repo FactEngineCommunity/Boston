@@ -7,7 +7,7 @@ Namespace CMML
     <Serializable()>
     Public Class Process
 
-        Public Model As CMML.Model
+        Public CMMLModel As CMML.Model
 
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
@@ -21,18 +21,12 @@ Namespace CMML
 
         Public Name As String
 
-        ''' <summary>
-        ''' Processes participated with by the Process
-        ''' </summary>
-        Public Process As New List(Of CMML.Process)
-
-        ''' <summary>
-        ''' 20220615-VM-Can probably make these derived Propeties.
-        ''' </summary>
-        Public Include_process As List(Of CMML.Process)
-        Public Included_by_process As List(Of CMML.Process)
-        Public Extend_to_process As List(Of CMML.Process)
-        Public Extended_by_process As List(Of CMML.Process)
+        '20220617-VM-Can probably make these redundant/derived.
+        '''' <summary>
+        '''' Processes participated with by the Process
+        '''' </summary>
+        'Public Process As New List(Of CMML.Process)
+        'Public Extended_by_process As List(Of CMML.Process)
 
         ''' <summary>
         ''' The SequenceNr assigned to the Process in a sequence of Processes in (say) a FlowChart or EventTraceDiagram
@@ -63,6 +57,7 @@ Namespace CMML
         End Property
 
         Public Event FactChanged(ByRef arFact As FBM.Fact)
+        Public Event RemovedFromModel()
 
         Public Sub New()
             Me.Id = System.Guid.NewGuid.ToString
@@ -73,7 +68,7 @@ Namespace CMML
             Call MyBase.New
 
             Me.Id = asProcessId
-            Me.Model = arModel
+            Me.CMMLModel = arModel
             Me.Text = asProcessText
 
         End Sub
@@ -111,13 +106,31 @@ Namespace CMML
 
         End Function
 
+        Public Sub RemoveFromModel()
+
+            Try
+                Call Me.CMMLModel.RemoveProcess(Me)
+
+                RaiseEvent RemovedFromModel()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub SetProcessText(ByVal asNewProcessText As String)
 
             Try
                 Me.Text = asNewProcessText
 
                 'CMML
-                Call Me.Model.Model.updateCMMLProcessText(Me)
+                Call Me.CMMLModel.Model.updateCMMLProcessText(Me)
 
             Catch ex As Exception
                 Dim lsMessage As String

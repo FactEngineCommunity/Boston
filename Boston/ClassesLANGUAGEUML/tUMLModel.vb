@@ -27,6 +27,7 @@
         Public Sub New(ByRef arFBMModel As FBM.Model)
 
             Me.Model = arFBMModel
+
         End Sub
 
         ''' <summary>

@@ -14,12 +14,23 @@ Namespace UML
 
         Public UMLModel As UML.Model
 
+        Public Shadows WithEvents CMMLProcess As CMML.Process
+
+        <XmlIgnore()>
+        <CategoryAttribute("Process"),
+        Browsable(True),
+        [ReadOnly](True),
+        DescriptionAttribute("The unique Process Id of the Process.")>
+        Public ReadOnly Property ProcessId As String
+            Get
+                Return Me.Id
+            End Get
+        End Property
+
         ''' <summary>
         ''' The text of the Process
         ''' </summary>
         Public Text As String
-
-        Public CMMLProcess As CMML.Process
 
         Public Shadows Page As FBM.Page
 
@@ -103,6 +114,45 @@ Namespace UML
 
         End Sub
 
+        Public Overloads Function CloneUCDProcess(ByRef arPage As FBM.Page) As UCD.Process
+
+            Dim lrProcess As New UCD.Process
+
+            Try
+                With Me
+                    lrProcess.Model = .Model
+                    lrProcess.UMLModel = .UMLModel
+                    lrProcess.Page = arPage
+                    lrProcess.Id = .Id
+                    lrProcess.Text = .Text
+                    lrProcess.CMMLProcess = .CMMLProcess
+                    lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lrProcess.FactData = Me.FactData
+                    lrProcess.Name = .Concept.Symbol
+                    lrProcess.Symbol = .Data
+                    lrProcess.FactDataInstance = Me.FactDataInstance
+                    lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
+                    lrProcess.Concept = .Concept
+                    lrProcess.Role = .Role
+                    lrProcess.X = .X
+                    lrProcess.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrProcess
+
+        End Function
+
+
+
         Public Shadows Function EqualsByName(ByVal other As UML.Process) As Boolean
 
             If other.Name Like (Me.Name) Then
@@ -137,7 +187,7 @@ Namespace UML
             'Create a Shape for the EntityTypeInstance on the DiagramView object
             '--------------------------------------------------------------------            
             loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
-            loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove ''HatchHandles3 is a very professional look, or SquareHandles2
+            loDroppedNode.HandlesStyle = HandlesStyle.Invisible ''HatchHandles3 is a very professional look, or SquareHandles2
             loDroppedNode.ToolTip = "process"
             loDroppedNode.AllowOutgoingLinks = True
             loDroppedNode.AllowIncomingLinks = True

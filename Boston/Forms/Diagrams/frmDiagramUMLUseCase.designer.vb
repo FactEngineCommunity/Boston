@@ -211,7 +211,7 @@ Partial Class frmDiagrmUMLUseCase
         '
         Me.ContextMenuStrip_Process.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1, Me.ToolStripSeparator3, Me.RemoveFromPageToolStripMenuItem, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator6, Me.PropertiesToolStripMenuItem2})
         Me.ContextMenuStrip_Process.Name = "ContextMenuStrip_Process"
-        Me.ContextMenuStrip_Process.Size = New System.Drawing.Size(236, 104)
+        Me.ContextMenuStrip_Process.Size = New System.Drawing.Size(236, 126)
         '
         'ToolStripMenuItem1
         '

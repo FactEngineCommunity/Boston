@@ -12,6 +12,9 @@ Namespace UML
 
         Public WithEvents CMMLProcessProcessRelation As CMML.ProcessProcessRelation
 
+        Public IsIncludes As Boolean = False
+        Public IsExtends As Boolean = False
+
         Public Link As MindFusion.Diagramming.DiagramLink
 
         Public Event RemovedFromModel()
@@ -40,6 +43,23 @@ Namespace UML
 
                 RaiseEvent RemovedFromModel()
 
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        Public Function CloneUCDProcessProcessRelation() As UCD.ProcessProcessRelation
+
+            Try
+                Dim loAutoMapperConfig As New AutoMapper.MapperConfiguration(Function(cfg) cfg.CreateMap(Of UML.ProcessProcessRelation, UCD.ProcessProcessRelation)())
+                Dim loMapper = loAutoMapperConfig.CreateMapper()
+                Return loMapper.Map(Of UCD.ProcessProcessRelation)(Me)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

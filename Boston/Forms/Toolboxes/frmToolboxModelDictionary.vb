@@ -375,10 +375,11 @@ Public Class frmToolboxModelDictionary
                 loNode = Me.TreeView1.Nodes("Process").Nodes.Add("Pocess" & lrProcess.Text, lrProcess.Text, 25, 25)
                 loNode.Tag = lrProcess
 
-                For Each lrProcess1 In lrProcess.Process
-                    Dim loSubProcessNode = loNode.Nodes.Add("Process", lrProcess1.Text, 22, 22)
-                    loSubProcessNode.Tag = lrProcess1
-                Next
+                'SubProcesses write LINQ
+                'For Each lrProcess1 In lrProcess.Process
+                '    Dim loSubProcessNode = loNode.Nodes.Add("Process", lrProcess1.Text, 22, 22)
+                '    loSubProcessNode.Tag = lrProcess1
+                'Next
 
             Next
 #End Region

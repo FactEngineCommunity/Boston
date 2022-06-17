@@ -270,6 +270,10 @@ Namespace FBM
 
                 For Each lrFactInstance In Me.FactTypeInstance.Fact
                     For Each lrFactDataInstance In lrFactInstance.Data
+
+                        'CodeSafe
+                        If lrFactDataInstance.Cell Is Nothing Then GoTo SkipThat
+
                         If lrFactDataInstance.FactData.HasModelError Then
                             lrFactDataInstance.Cell.TextColor = Color.Red
                         Else
@@ -277,6 +281,7 @@ Namespace FBM
                         End If
 
                         lrFactDataInstance.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+SkipThat:
                     Next
                 Next
 
@@ -299,7 +304,7 @@ Namespace FBM
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub ResortFactTable()
+        Public Sub ResortFactTable(Optional ByVal abCellReflectsError As Boolean = False)
 
             Dim liInd As Integer
             Dim liRowNr As Integer = 0
@@ -384,10 +389,14 @@ Namespace FBM
                                 If IsSomething(lrJoinedFact) Then
                                     lrFactDataInstance.Cell.Text = lrJoinedFact.EnumerateAsBracketedFact
                                 Else
-                                    lsMessage = "Error: Could not find Fact for Role/FactData referencing Facts in a Fact Type"
-                                    lsMessage &= vbCrLf & "Role.JoinsFactType.Id: " & lrFactDataInstance.Role.JoinedORMObject.Id
-                                    lsMessage &= vbCrLf & "Joined Fact.Id: " & lrFactDataInstance.Data
-                                    Throw New System.Exception(lsMessage)
+                                    If abCellReflectsError Then
+                                        lrFactDataInstance.Cell.Text = "Error: No matching Fact."
+                                    Else
+                                        lsMessage = "Error: Could not find Fact for Role/FactData referencing Facts in a Fact Type"
+                                        lsMessage &= vbCrLf & "Role.JoinsFactType.Id: " & lrFactDataInstance.Role.JoinedORMObject.Id
+                                        lsMessage &= vbCrLf & "Joined Fact.Id: " & lrFactDataInstance.Data
+                                        Throw New System.Exception(lsMessage)
+                                    End If
                                 End If
 
                         End Select
@@ -398,10 +407,12 @@ Namespace FBM
                         End If
                         lrFactDataInstance.Cell.Tag = lrFactDataInstance
                     Next liInd
-                    lsMessage = "ResortFactTable:"
-                    lsMessage &= vbCrLf & "FactDataInstance.Fact.Id:" & lrFactDataInstance.Fact.Id
-                    lsMessage &= vbCrLf & "FactDataInstance.FactData.FactId:" & lrFactDataInstance.FactData.Fact.Id
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+
+                    '20220617-VM-Removed. Not really using.
+                    'lsMessage = "ResortFactTable:"
+                    'lsMessage &= vbCrLf & "FactDataInstance.Fact.Id:" & lrFactDataInstance.Fact.Id
+                    'lsMessage &= vbCrLf & "FactDataInstance.FactData.FactId:" & lrFactDataInstance.FactData.Fact.Id
+                    'Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
 
                     liRowNr += 1
                 Next

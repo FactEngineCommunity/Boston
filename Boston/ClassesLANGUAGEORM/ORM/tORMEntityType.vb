@@ -2701,9 +2701,6 @@ FailsafeContinue:
             Dim lsReferenceModeName As String = ""
 
             Try
-                'CodeSafe 
-                If Me.ReferenceMode = "" Then Return ""
-
                 Select Case Me.ReferenceMode
                     Case Is = GetEnumDescription(pcenumReferenceMode.DotHash)
                         lsReferenceModeName = Me.Name & "_#"

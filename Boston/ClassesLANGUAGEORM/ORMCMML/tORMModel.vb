@@ -799,6 +799,63 @@ Namespace FBM
 
         End Sub
 
+        Public Sub setCMMLProcessToProcessRelationIsExtends(ByRef arProcessToProcessRelation As CMML.ProcessProcessRelation, ByVal abIsExtends As Boolean)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                If abIsExtends Then
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreP2PIsExtends.ToString
+                    lsSQLQuery &= " (CoreP2PIsExtends)"
+                    lsSQLQuery &= " VALUES ('" & arProcessToProcessRelation.Fact.Id & "')"
+                Else
+                    lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreP2PIsExtends.ToString
+                    lsSQLQuery &= " WHERE CoreP2PIsExtends = '" & arProcessToProcessRelation.Fact.Id & "'"
+                End If
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub setCMMLProcessToProcessRelationIsIncludes(ByRef arProcessToProcessRelation As CMML.ProcessProcessRelation, ByVal abIsIncludes As Boolean)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                If abIsIncludes Then
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreP2PIsIncludes.ToString
+                    lsSQLQuery &= " (CoreP2PIsIncludes)"
+                    lsSQLQuery &= " VALUES ('" & arProcessToProcessRelation.Fact.Id & "')"
+                Else
+                    lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreP2PIsIncludes.ToString
+                    lsSQLQuery &= " WHERE CoreP2PIsIncludes = '" & arProcessToProcessRelation.Fact.Id & "'"
+                End If
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub setCoreElementIsActor(ByRef arModelElement As FBM.ModelObject, ByVal abIsActor As Boolean)
 
             Dim lsSQLQuery As String
@@ -1315,6 +1372,28 @@ Namespace FBM
             lsSQLQuery &= " AND Property = '" & arColumn.Id & "'"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
+        Public Sub removeCMMLProcess(ByRef arCMMLProcess As CMML.Process)
+
+            Try
+                Dim lsSQLString As String = ""
+
+                lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLString &= " WHERE Element = '" & arCMMLProcess.Id & "'"
+                lsSQLString &= "   AND ElementType = 'Process'"
+
+                Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -1911,9 +1990,33 @@ Namespace FBM
                     lrProcessProcessRelation = New CMML.ProcessProcessRelation(Me.UML, lrProcess1, lrProcess2)
                     lrProcessProcessRelation.Fact = lrORMRecordset.CurrentFact
 
+#Region "Is Extends"
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM CoreP2PIsExtends"
+                    lsSQLQuery &= " WHERE CoreP2PIsExtends = '" & lrProcessProcessRelation.Fact.Id & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcessProcessRelation.IsExtends = True
+                    End If
+#End Region
+
+#Region "Is Includes"
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM CoreP2PIsIncludes"
+                    lsSQLQuery &= " WHERE CoreP2PIsIncludes = '" & lrProcessProcessRelation.Fact.Id & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcessProcessRelation.IsIncludes = True
+                    End If
+#End Region
+
                     Me.UML.ProcessProcessRelation.Add(lrProcessProcessRelation)
 
-                    lrProcess1.Process.Add(lrProcess2)
+                    'lrProcess1.Process.Add(lrProcess2)
 
                     lrORMRecordset.MoveNext()
 
