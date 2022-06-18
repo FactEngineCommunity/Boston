@@ -10,6 +10,10 @@ Public Class tMorphVector
     Public StartSize As Rectangle
     Public EndSize As Rectangle
 
+    Public TargetImage As Image = Nothing
+    Public TargetShape As pcenumTargetMorphShape = pcenumTargetMorphShape.RoundRectangle
+    Public TargetText As String = ""
+
     ''' <summary>
     ''' The count of steps to be taken along the vector
     ''' </summary>
@@ -24,10 +28,6 @@ Public Class tMorphVector
 
     Public InitialZoomFactor As Integer = 100
     Public TargetZoomFactor As Integer = 100
-
-    Public TargetImage As Image = Nothing
-    Public TargetShape As pcenumTargetMorphShape = pcenumTargetMorphShape.RoundRectangle
-    Public TargetText As String = ""
 
     Public ModelElementId As String = ""
 

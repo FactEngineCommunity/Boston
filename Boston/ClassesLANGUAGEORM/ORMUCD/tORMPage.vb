@@ -124,7 +124,7 @@ Namespace FBM
                                                ByVal aoPointF As PointF,
                                                ByRef aoContainerNode As MindFusion.Diagramming.ContainerNode,
                                                Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                               Optional ByVal aiLanguage As pcenumLanguage = pcenumLanguage.CMML) As Object
+                                               Optional ByVal aiLanguage As pcenumLanguage = pcenumLanguage.CMML) As UML.Process
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance

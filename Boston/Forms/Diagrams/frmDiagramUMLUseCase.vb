@@ -301,7 +301,7 @@ Public Class frmDiagrmUMLUseCase
                         End If
 
                         'Page Level
-                        Dim lrUCDProcess As UCD.Process = Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
+                        Dim lrUCDProcess As UCD.Process = Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode,, pcenumLanguage.UMLUseCaseDiagram)
                         lrUCDProcess.CMMLProcess = lrCMMLProcess
                         Call Me.zrPage.loadProcessProcessRelationsForCMMLProcess(lrCMMLProcess)
 
@@ -347,7 +347,9 @@ Public Class frmDiagrmUMLUseCase
                             Call Me.zrPage.Model.UML.addProcess(lrCMMLProcess)
 
                             'Page Level
-                            Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode,, pcenumLanguage.UMLUseCaseDiagram)
+                            Dim lrUCDProcess As UCD.Process
+                            lrUCDProcess = Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode,, pcenumLanguage.UMLUseCaseDiagram)
+                            lrUCDProcess.CMMLProcess = lrCMMLProcess
 
                     End Select
                 End If
@@ -934,11 +936,11 @@ Public Class frmDiagrmUMLUseCase
         Select Case e.Node.Tag.GetType
             Case Is = GetType(UCD.Actor)
 
-                Dim lrActor As UML.Actor = e.Node.Tag
+                Dim lrActor As UCD.Actor = e.Node.Tag
                 Call Me.DiagramView.BeginEdit(lrActor.NameShape.Shape)
-            Case Is = GetType(UCD.Actor)
+            Case Is = GetType(UCD.Process)
 
-                Dim lrProcess As UML.Process = e.Node.Tag
+                Dim lrProcess As UCD.Process = e.Node.Tag
                 Call Me.DiagramView.BeginEdit(lrProcess.Shape)
         End Select
 
@@ -1062,8 +1064,8 @@ Public Class frmDiagrmUMLUseCase
 
         '----------------------------------------------------
         'Set the ContextMenuStrip menu for the selected item
-        '----------------------------------------------------
-        Select Case Me.Diagram.Selection.Items(0).Tag.ConceptType
+        '----------------------------------------------------        
+        Select Case Me.zrPage.SelectedObject(0).ConceptType
             Case Is = pcenumConceptType.Actor
                 Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Actor
             Case Is = pcenumConceptType.Process
@@ -1071,8 +1073,6 @@ Public Class frmDiagrmUMLUseCase
             Case Else
                 Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
         End Select
-
-        Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
 
     End Sub
 
@@ -1099,12 +1099,15 @@ Public Class frmDiagrmUMLUseCase
 
                     Dim lrUCDActor As UCD.Actor = e.Node.Tag.Actor
 
-                    Dim lrModelElement = Me.zrPage.Model.GetModelObjectByName(Me.Name, True)
-                    Dim lbModelElementExists As Boolean = lrUCDActor.CMMLActor.FBMModelElement IsNot lrModelElement
+                    Dim lrModelElement = Me.zrPage.Model.GetModelObjectByName(e.NewText, True)
+                    Dim lbModelElementExists As Boolean = False
+                    If lrModelElement IsNot Nothing Then
+                        lbModelElementExists = lrUCDActor.CMMLActor.FBMModelElement IsNot lrModelElement
+                    End If
                     If lbModelElementExists Or (Me.zrPage.Model.UML.Actor.Find(Function(x) x IsNot lrUCDActor.CMMLActor And LCase(Trim(x.Name)) = LCase(Trim(e.NewText))) IsNot Nothing) Then
                         lsMessage = "You cannot set the name of a Actor as the same as the name of another Actor in the model."
                         lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "A Actor with the name, '" & Me.Name & "', already exists in the model."
+                        lsMessage &= "A Actor with the name, '" & e.NewText & "', already exists in the model."
 
                         lrUCDActor.NameShape.Shape.Text = e.OldText
                         MsgBox(lsMessage)
@@ -1673,6 +1676,14 @@ Public Class frmDiagrmUMLUseCase
                     Me.MorphVector(0).TargetZoomFactor = My.Settings.DefaultPageZoomFactor
                 End If
 
+                Dim liHypotenuse As Integer = 40
+                Try
+                    liHypotenuse = Math.Sqrt(Math.Abs(lrEntityTypeInstance.X - lrActor.Shape.Bounds.X) ^ 2 + Math.Abs(lrEntityTypeInstance.Y - lrActor.Shape.Bounds.Y) ^ 2)
+                Catch
+                End Try
+                Me.MorphVector(0).VectorSteps = Viev.Greater(Viev.Lesser(35, liHypotenuse), 1)
+
+
                 Me.MorphVector(0).StartPoint = New Point(lrActor.Shape.Bounds.X, lrActor.Shape.Bounds.Y)
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, lrActor.Shape.Bounds.Width, lrActor.Shape.Bounds.Height)
                 Me.MorphVector(0).Shape = lrShapeNode
@@ -1764,9 +1775,8 @@ Public Class frmDiagrmUMLUseCase
             Call Me.DiagramView.SendToBack()
             Call Me.HiddenDiagramView.BringToFront()
 
-            '--------------------------------------------------------------
-            'Paste the selected Actor/EntityType to the HiddenDiagramView
-            '  (for animated morphing)
+            '--------------------------------------------------------------------------------------
+            'Paste the selected Actor/EntityType to the HiddenDiagramView (for animated morphing)
             '--------------------------------------------------------------
             Dim lrShapeNode As ShapeNode
             lrShapeNode = Me.zrPage.SelectedObject(0).Shape
@@ -1801,6 +1811,95 @@ Public Class frmDiagrmUMLUseCase
                 Me.MorphVector(0).EndSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
                 Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
                 Me.MorphVector(0).TargetImage = Me.zrPage.SelectedObject(0).Shape.Image
+                Me.MorphTimer.Enabled = True
+                Me.MorphStepTimer.Enabled = True
+
+                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Call Me.HiddenDiagramView.SendToBack()
+
+        End Try
+
+    End Sub
+
+    Public Sub morphToUseCaseDiagram_Process(ByVal sender As Object, ByVal e As EventArgs)
+
+        Dim item As ToolStripItem = CType(sender, ToolStripItem)
+
+
+        Try
+            Me.DiagramHidden.Nodes.Clear()
+            Call Me.DiagramView.SendToBack()
+            Call Me.HiddenDiagramView.BringToFront()
+
+            Dim lrStartProcess As UML.Process = Me.zrPage.SelectedObject(0)
+
+            '--------------------------------------------------------------------------------------
+            'Paste the selected Actor/EntityType to the HiddenDiagramView (for animated morphing)
+            '--------------------------------------------------------------
+            Dim lrShapeNode As ShapeNode
+            lrShapeNode = Me.zrPage.SelectedObject(0).Shape
+            lrShapeNode = Me.DiagramHidden.Factory.CreateShapeNode(lrShapeNode.Bounds.X, lrShapeNode.Bounds.Y, lrShapeNode.Bounds.Width, lrShapeNode.Bounds.Height)
+            lrShapeNode.Shape = Shapes.Ellipse
+            lrShapeNode.Text = lrStartProcess.Text
+            lrShapeNode.Pen.Color = Color.Black
+            lrShapeNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+            lrShapeNode.Visible = True
+            Me.DiagramHidden.Nodes.Add(lrShapeNode)
+
+            Me.DiagramHidden.Invalidate()
+
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = item.Tag
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+                prApplication.WorkingPage = lr_enterprise_view.Tag
+
+                '------------------------------------------------------------------
+                'Get the X,Y co-ordinates of the Actor/EntityType being morphed
+                '------------------------------------------------------------------
+                Dim lr_page As FBM.Page = lr_enterprise_view.Tag
+
+                Dim lrFactDataInstance = From Page In Me.zrPage.Model.Page
+                                         From FactTypeInstance In Page.FactTypeInstance
+                                         From FactInstance In FactTypeInstance.Fact
+                                         From FactDataInstance In FactInstance.Data
+                                         Where Page.Name = lr_page.Name
+                                         Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
+                                         Where FactDataInstance.Role.Name = "Element"
+                                         Where FactDataInstance.Concept.Symbol = Me.zrPage.SelectedObject(0).Id
+                                         Select FactDataInstance
+
+                Dim lrProcess = lrFactDataInstance.First.CloneProcess(Me.zrPage)
+
+                Me.MorphVector(0).Shape = lrShapeNode
+                Me.MorphVector(0).StartPoint = New Point(lrStartProcess.Shape.Bounds.X, lrStartProcess.Shape.Bounds.Y)
+                Me.MorphVector(0).EndPoint = New Point(lrProcess.X, lrProcess.Y)
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
+                Me.MorphVector(0).EndSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
+                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).TargetShape = pcenumTargetMorphShape.Circle
+                Me.MorphVector(0).TargetText = lrStartProcess.Text
+
+                Dim liHypotenuse As Integer = 40
+                Try
+                    liHypotenuse = Math.Sqrt(Math.Abs(lrProcess.X - lrStartProcess.Shape.Bounds.X) ^ 2 + Math.Abs(lrProcess.Y - lrStartProcess.Shape.Bounds.Y) ^ 2)
+                Catch
+                End Try
+                Me.MorphVector(0).VectorSteps = Viev.Greater(Viev.Lesser(35, liHypotenuse), 1)
+
                 Me.MorphTimer.Enabled = True
                 Me.MorphStepTimer.Enabled = True
 
@@ -1986,26 +2085,45 @@ Public Class frmDiagrmUMLUseCase
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
         Dim lrMorphVector = New tMorphVector(lr_process.Shape.Bounds.X, lr_process.Shape.Bounds.Y, 0, 0, 40)
+        Me.MorphVector.Clear()
         Me.MorphVector.Add(lrMorphVector)
 
-        '---------------------------------------------------------------------
-        'Clear the list of DFDDiagrams that may relate to the EntityType
-        '---------------------------------------------------------------------
+        '----------------------------------------------------------------------------
+        'Clear the list of Diagram Type menu options that may relate to the Process
+        '--------------------------------------------------------------------------
         Me.DFDToolStripMenuItem.DropDownItems.Clear()
-
-        '---------------------------------------------------------------------
-        'Clear the list of STDDiagrams that may relate to the EntityType
-        '---------------------------------------------------------------------
         Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
+        Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Clear()
 
+        '------------------------------------------------------------------------------
+        'Load the Use Case Diagrams that relate to the EntityType as selectable menuOptions
         '--------------------------------------------------------
-        'Load the DFDDiagrams that relate to the EntityType
-        '  as selectable menuOptions
-        '--------------------------------------------------------
+#Region "UCDs"
+        larPage_list = prApplication.CMML.getUseCaseDiagramPagesForProcess(lr_process, Me.zrPage)
 
-        '--------------------------------------
-        'The EntityType represents a Process.
-        '--------------------------------------
+        For Each lr_page In larPage_list
+            Dim lo_menu_option As ToolStripItem
+            '----------------------------------------------------
+            'Add the Page(Name) to the MenuOption.DropDownItems
+            '----------------------------------------------------
+            lo_menu_option = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lr_page.Name)
+            Dim lr_enterprise_view As tEnterpriseEnterpriseView
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.UMLUseCaseDiagram,
+                                                               Nothing,
+                                                               lr_page.PageId)
+            lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            AddHandler lo_menu_option.Click, AddressOf Me.morphToUseCaseDiagram_Process
+        Next
+#End Region
+
+
+        '------------------------------------------------------------------------------
+        'Load the DFDDiagrams that relate to the EntityType as selectable menuOptions
+        '--------------------------------------------------------
+#Region "DFDs"
         larPage_list = prApplication.CMML.getDataFlowDiagramPagesForProcess(lr_process)
 
         For Each lr_page In larPage_list
@@ -2024,15 +2142,12 @@ Public Class frmDiagrmUMLUseCase
             lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
         Next
+#End Region
 
+        '------------------------------------------------------------------------------
+        'Load the STDDiagrams that relate to the EntityType as selectable menuOptions
         '--------------------------------------------------------
-        'Load the STDDiagrams that relate to the EntityType
-        '  as selectable menuOptions
-        '--------------------------------------------------------
-
-        '--------------------------------------
-        'The Entity represents a Process.
-        '--------------------------------------
+#Region "STDs"
         larPage_list = prApplication.CMML.getStateTransitionDiagramPagesForProcess(lr_process)
 
         For Each lr_page In larPage_list
@@ -2052,6 +2167,7 @@ Public Class frmDiagrmUMLUseCase
             lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler lo_menu_option.Click, AddressOf Me.morph_to_StateTransitionDiagram
         Next
+#End Region
 
     End Sub
 
@@ -2063,8 +2179,6 @@ Public Class frmDiagrmUMLUseCase
     ''' <param name="e"></param>
     Private Sub frm_UseCaseModel_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseDown
 
-
-
         Dim lo_point As System.Drawing.PointF
 
         Try
@@ -2072,32 +2186,29 @@ Public Class frmDiagrmUMLUseCase
 
             lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
-            Dim loNode = Diagram.GetNodeAt(lo_point, 2)
+            Dim loNode = Diagram.GetNodeAt(lo_point)
             Dim loLink = Diagram.GetLinkAt(lo_point, 1)
 
             Dim lrPropertyGridForm As frmToolboxProperties
 
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
+            Me.zrPage.SelectedObject.Clear()
+
             If loLink IsNot Nothing Then
+                Me.zrPage.SelectedObject.AddUnique(loLink.Tag)
                 Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
 
-                Me.zrPage.SelectedObject.Clear()
-                Me.zrPage.SelectedObject.Add(loLink.Tag)
 
             ElseIf IsSomething(loNode) Then
-
+                loNode = Diagram.GetNodeAt(lo_point)
+                Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                 Select Case loNode.GetType
                     Case Is = GetType(UCD.Actor)
                         Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Actor
                     Case Is = GetType(UCD.Process)
                         Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Process
                 End Select
-
-
-
-                Me.zrPage.SelectedObject.Clear()
-                Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                 loNode.Selected = True
             Else
                 '---------------------------------------------------

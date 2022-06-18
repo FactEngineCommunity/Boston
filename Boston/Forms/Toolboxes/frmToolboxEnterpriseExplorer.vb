@@ -746,7 +746,8 @@ Public Class frmToolboxEnterpriseExplorer
                         Case Is = pcenumMenuType.pageORMModel,
                                   pcenumMenuType.pageERD,
                                   pcenumMenuType.pagePGSDiagram,
-                                  pcenumMenuType.pageSTD
+                                  pcenumMenuType.pageSTD,
+                                  pcenumMenuType.pageUMLUseCaseDiagram
 
                             Dim lrModel As FBM.Model = loObject.Tag.Model
                             If lrModel.Page.Find(Function(x) x.Name = e.Label) IsNot Nothing Then
@@ -893,6 +894,8 @@ Public Class frmToolboxEnterpriseExplorer
                                 Case Is = pcenumMenuType.pagePGSDiagram
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Is = pcenumMenuType.pageSTD
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
+                                Case Is = pcenumMenuType.pageUMLUseCaseDiagram
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Else
                                     Me.TreeView.ContextMenuStrip = Nothing
@@ -1156,7 +1159,8 @@ Public Class frmToolboxEnterpriseExplorer
                         Case Is = pcenumMenuType.pageORMModel,
                                   pcenumMenuType.pageERD,
                                   pcenumMenuType.pagePGSDiagram,
-                                  pcenumMenuType.pageSTD
+                                  pcenumMenuType.pageSTD,
+                                  pcenumMenuType.pageUMLUseCaseDiagram
 
                             Dim lrPage As FBM.Page
 #Region "Page"
