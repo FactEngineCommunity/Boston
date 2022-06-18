@@ -1563,6 +1563,9 @@ Public Class frmToolboxEnterpriseExplorer
                     Case Is = pcenumLanguage.StateTransitionDiagram
                         liNavigationIcon = pcenumNavigationIcons.iconSTDPage
                         liMenuType = pcenumMenuType.pageSTD
+                    Case Is = pcenumLanguage.UMLUseCaseDiagram
+                        liNavigationIcon = pcenumNavigationIcons.iconUCDPage
+                        liMenuType = pcenumMenuType.pageUMLUseCaseDiagram
                 End Select
 
                 Dim lrModel As FBM.Model

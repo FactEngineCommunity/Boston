@@ -404,11 +404,14 @@ Namespace TableEntityType
 
         End Function
 
-        Public Sub ModifyKey(ByVal arEntityType As FBM.EntityType, ByVal asNewKey As String)
+        Public Sub ModifyKey(ByVal arEntityType As FBM.EntityType, ByVal asNewKey As String, ByRef arModelDictionaryEntry As FBM.DictionaryEntry)
 
             Dim lsSQLQuery As String
 
             Try
+                'CodeSafe
+                Call TableModelDictionary.AddModelDictionaryEntry(arModelDictionaryEntry, True)
+
                 lsSQLQuery = " UPDATE MetaModelEntityType"
                 lsSQLQuery &= "   SET EntityTypeId = '" & Replace(Trim(asNewKey), "'", "`") & "'"
                 lsSQLQuery &= " WHERE EntityTypeId = '" & arEntityType.Id & "'"

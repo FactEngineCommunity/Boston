@@ -1534,7 +1534,7 @@ Namespace FBM
             Me.Model.MakeDirty(False, False)
         End Sub
 
-        Public Sub SwitchConcept(ByVal arNewConcept As Concept, ByVal aiConceptType As pcenumConceptType)
+        Public Function SwitchConcept(ByVal arNewConcept As Concept, ByVal aiConceptType As pcenumConceptType) As FBM.DictionaryEntry
 
             Dim lsOriginalSymbol As String = ""
             Dim lrOriginalDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Concept.Symbol, pcenumConceptType.Value)
@@ -1550,6 +1550,7 @@ Namespace FBM
                     '--------------------
                     'Nothing to do here
                     '--------------------
+                    Return lrOriginalDictionaryEntry
                 Else
                     '--------------------------------------------------------
                     'See if the NewSymbol is already in the ModelDictionary
@@ -1583,6 +1584,8 @@ Namespace FBM
                         Me.Concept = lrNewDictionaryEntry.Concept
 
                         lrNewDictionaryEntry.AddConceptType(Me.ConceptType)
+
+                        Return lrNewDictionaryEntry
                     Else
                         '--------------------------------------------------------------------------------------------------
                         'The lrNewDictionaryEntry/arNewConcept does not exist in the ModelDictionary.
@@ -1600,10 +1603,13 @@ Namespace FBM
                         'Switch the Symbol of the Concept, which effectively changes the existing ModelDictionaryEntry
                         Me.Concept.Symbol = arNewConcept.Symbol
                         Try
+                            'I.e. the .Net Dictionary that accompanies the ModelDictionary
                             Me.Model.Dictionary.RenameKey(lrOriginalDictionaryEntry.Symbol, lrNewDictionaryEntry.Symbol)
                         Catch ex As Exception
                             Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
                         End Try
+
+                        Return lrNewDictionaryEntry
                     End If
 
                     If Me.Model.Loaded Then Call Me.makeDirty()
@@ -1622,7 +1628,7 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
-        End Sub
+        End Function
 
         Public Sub RaiseEventNameChanged(ByVal asOldName As String, ByVal asNewName As String)
 

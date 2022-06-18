@@ -275,8 +275,13 @@ Public Class frmDiagrmUMLUseCase
 
                         Dim lrCMMLActor As CMML.Actor = lrCMMLModelElement
 
+                        If Me.zrPage.UMLDiagram.Actor.Find(Function(x) x.Name = lrCMMLActor.Name) IsNot Nothing Then
+                            MsgBox("The page already contains the Actor: '" & lrCMMLActor.Name & "'")
+                            Exit Sub
+                        End If
+
                         'Page Level
-                        Call Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF)
+                        Call Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF, True, pcenumLanguage.UMLUseCaseDiagram)
                         Call Me.zrPage.loadActorProcessRelationsForCMMLActor(lrCMMLActor)
 
                         '======================================================================
@@ -289,6 +294,10 @@ Public Class frmDiagrmUMLUseCase
 
                         Dim lrCMMLProcess As CMML.Process = lrCMMLModelElement
 
+                        If Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcess.Id) IsNot Nothing Then
+                            MsgBox("The page already contains the Process: '" & lrCMMLProcess.Text & "'")
+                            Exit Sub
+                        End If
 
                         'Page Level
                         Call Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
@@ -321,9 +330,11 @@ Public Class frmDiagrmUMLUseCase
                             Dim lrCMMLActor As New CMML.Actor(Me.zrPage.Model.UML, lrEntityType.Id, lrEntityType)
                             Me.zrPage.Model.UML.addActor(lrCMMLActor)
 
-                            Dim lrUCDActor As New UCD.Actor(Me.zrPage, lrCMMLActor)
+                            Dim lrUCDActor As UCD.Actor
+                            lrUCDActor = Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF, True, pcenumLanguage.UMLUseCaseDiagram)
 
-                            Call Me.zrPage.DropUMLActorAtPoint(lrUCDActor, loPointF)
+                            '20220618-VM-Was. Replaced with the above.
+                            'Call Me.zrPage.DropUMLActorAtPoint(lrUCDActor, loPointF)
 #End Region
                         Case Is = "Process"
 
@@ -524,6 +535,7 @@ Public Class frmDiagrmUMLUseCase
                                 Select Actor.Name).ToList
 
             Dim larCMMLActorProcessRelation = From ActorProcessRelation In Me.zrPage.Model.UML.ActorProcessRelation
+                                              Where ActorProcessRelation.Actor IsNot Nothing
                                               Where larActorName.Contains(ActorProcessRelation.Actor.Name)
                                               Select ActorProcessRelation
 
@@ -948,18 +960,20 @@ Public Class frmDiagrmUMLUseCase
 
                 Dim lrSystemBoundary = e.Node
 
-                For Each lrProcessShape In lrSystemBoundary.SubordinateGroup.AttachedNodes
-                    Try
-                        Dim lrProcess As UCD.Process = lrProcessShape.Tag
-                        Call lrProcess.Move(lrProcessShape.Bounds.X, lrProcessShape.Bounds.Y, True)
-                    Catch ex As Exception
-                        'Unknown why it is throwing an error
-                    End Try
+                If lrSystemBoundary.SubordinateGroup IsNot Nothing Then
+                    For Each lrProcessShape In lrSystemBoundary.SubordinateGroup.AttachedNodes
+                        Try
+                            Dim lrProcess As UCD.Process = lrProcessShape.Tag
+                            Call lrProcess.Move(lrProcessShape.Bounds.X, lrProcessShape.Bounds.Y, True)
+                        Catch ex As Exception
+                            'Unknown why it is throwing an error
+                        End Try
 
-                Next
-
+                    Next
+                End If
                 Exit Sub
             End If
+
 
             '-------------------------------------------------------------------------------------------
             'The user has clicked/moved a ShapeNode, so update the X and Y coordinates of the ShapeNode
@@ -1111,17 +1125,20 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
-    Private Sub IncludesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles IncludesToolStripMenuItem.Click
+    Private Sub IncludesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemIncludes.Click
 
         Try
             'CodeSafe 
-            If Me.Diagram.Selection.Items(0).GetType <> GetType(DiagramLink) Then Exit Sub
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(UCD.ProcessProcessRelation) Then Exit Sub
 
-            Me.IncludesToolStripMenuItem.Checked = Not Me.IncludesToolStripMenuItem.Checked
-            Me.ExtendsToolStripMenuItem.Checked = Not Me.IncludesToolStripMenuItem.Checked
+            Dim lrProcessProcessRelation As UCD.ProcessProcessRelation = Me.zrPage.SelectedObject(0)
 
-            Dim lo_link As DiagramLink = Me.Diagram.Selection.Items(0)
-            lo_link.Text = "<Includes>"
+            Me.ToolStripMenuItemIncludes.Checked = Not Me.ToolStripMenuItemIncludes.Checked
+            Me.ToolStripMenuItemExtends.Checked = Not Me.ToolStripMenuItemIncludes.Checked
+
+            Call lrProcessProcessRelation.CMMLProcessProcessRelation.setIsExtends(Not Me.ToolStripMenuItemIncludes.Checked)
+            Call lrProcessProcessRelation.CMMLProcessProcessRelation.setIsIncludes(Me.ToolStripMenuItemIncludes.Checked)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1134,13 +1151,29 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
-    Private Sub ExtendsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExtendsToolStripMenuItem.Click
+    Private Sub ExtendsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemExtends.Click
 
-        Me.ExtendsToolStripMenuItem.Checked = Not Me.ExtendsToolStripMenuItem.Checked
-        Me.IncludesToolStripMenuItem.Checked = Not Me.ExtendsToolStripMenuItem.Checked
+        Try
+            'CodeSafe 
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(UCD.ProcessProcessRelation) Then Exit Sub
 
-        Dim lo_link As DiagramLink = Me.Diagram.Selection.Items(0)
-        lo_link.Text = "<Extends>"
+            Dim lrProcessProcessRelation As UCD.ProcessProcessRelation = Me.zrPage.SelectedObject(0)
+
+            Me.ToolStripMenuItemExtends.Checked = Not Me.ToolStripMenuItemExtends.Checked
+            Me.ToolStripMenuItemIncludes.Checked = Not Me.ToolStripMenuItemExtends.Checked
+
+            Call lrProcessProcessRelation.CMMLProcessProcessRelation.setIsIncludes(Not Me.ToolStripMenuItemExtends.Checked)
+            Call lrProcessProcessRelation.CMMLProcessProcessRelation.setIsExtends(Me.ToolStripMenuItemExtends.Checked)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1254,7 +1287,7 @@ Public Class frmDiagrmUMLUseCase
     Private Sub mnuOption_ProcessProperties_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertiesToolStripMenuItem2.Click
 
         Try
-
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
             Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
             'CodeSafe
@@ -2024,6 +2057,16 @@ Public Class frmDiagrmUMLUseCase
                 Me.zrPage.SelectedObject.Add(loLink.Tag)
 
             ElseIf IsSomething(loNode) Then
+
+                Select Case loNode.GetType
+                    Case Is = GetType(UCD.Actor)
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Actor
+                    Case Is = GetType(UCD.Process)
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Process
+                End Select
+
+
+
                 Me.zrPage.SelectedObject.Clear()
                 Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                 loNode.Selected = True
@@ -2161,7 +2204,7 @@ Public Class frmDiagrmUMLUseCase
                 ''---------------------------------------------------------
                 ''Get the Process represented by the (selected) Process
                 ''---------------------------------------------------------
-                Dim lrProcess As UML.Process = Me.Diagram.Selection.Items(0).Tag
+                Dim lrProcess As UCD.Process = Me.Diagram.Selection.Items(0).Tag
 
                 '-------------------------------------------------------------------------
                 'Remove the Process from the Page
@@ -2224,7 +2267,6 @@ Public Class frmDiagrmUMLUseCase
 
                     Call lrProcessProcessRelation.RemoveFromPage()
             End Select
-
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -2342,4 +2384,143 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
+    Private Sub ContextMenuStrip_ProcessLink_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_ProcessLink.Opening
+
+        Try
+            'CodeSafe 
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(UCD.ProcessProcessRelation) Then Exit Sub
+
+            Dim loUCDLink = Me.zrPage.SelectedObject(0)
+
+            Me.ToolStripMenuItemIncludes.Checked = False
+            Me.ToolStripMenuItemExtends.Checked = False
+
+            Select Case loUCDLink.GetType
+                Case Is = GetType(UCD.ProcessProcessRelation)
+                    Dim lrProcessProcessRelation As UCD.ProcessProcessRelation = loUCDLink
+
+                    If lrProcessProcessRelation.IsIncludes And lrProcessProcessRelation.IsExtends Then
+                        Me.ToolStripMenuItemIncludes.Checked = True
+                        Me.ToolStripMenuItemExtends.Checked = True
+                    ElseIf lrProcessProcessRelation.IsIncludes Then
+                        Me.ToolStripMenuItemIncludes.Checked = True
+                    ElseIf lrProcessProcessRelation.IsExtends Then
+                        Me.ToolStripMenuItemExtends.Checked = True
+                    End If
+                Case Else
+                    Me.ToolStripMenuItemIncludes.Enabled = False
+                    Me.ToolStripMenuItemExtends.Enabled = False
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RemoveFromPageToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles RemoveFromPageToolStripMenuItem2.Click
+
+        Dim lsSQLQuery As String = ""
+
+        Try
+            With New WaitCursor
+
+                ''---------------------------------------------------------
+                ''Get the Actor represented by the (selected) Actor
+                ''---------------------------------------------------------
+                Dim lrActor As UCD.Actor = Me.Diagram.Selection.Items(0).Tag
+
+                '-------------------------------------------------------------------------
+                'Remove the Actor from the Page
+                '---------------------------------
+                lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & lrActor.Name & "'"
+
+                Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim larLinkToRemove As New List(Of DiagramLink)
+                For Each lrLink In lrActor.Shape.OutgoingLinks
+                    larLinkToRemove.Add(lrLink)
+                Next
+                For Each lrLink In larLinkToRemove
+                    Me.Diagram.Links.Remove(lrLink)
+                Next
+
+                '----------------------------------------------------------------------------------------------------------
+                'Remove the Actor that represents the Actor from the Diagram on the Page.
+                '-------------------------------------------------------------------------------
+                Me.Diagram.Nodes.Remove(lrActor.NameShape.Shape)
+                Me.Diagram.Nodes.Remove(lrActor.Shape)
+                Me.zrPage.UMLDiagram.Actor.Remove(lrActor)
+
+            End With
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            Me.Cursor = Cursors.Default
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RemoveFromPageAndModelToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles RemoveFromPageAndModelToolStripMenuItem1.Click
+
+        Dim lsMessage As String
+
+        Try
+            Dim lrActor As UCD.Actor = Me.zrPage.SelectedObject(0)
+
+            'CodeSafe
+            If lrActor.CMMLActor.FBMModelElement.GetAdjoinedRoles(True).Count > 0 Then
+
+                lsMessage = "You cannot remove this actor from the model until its ORM level model element has no associated Fact Types."
+                lsMessage.AppendDoubleLineBreak("First go to an ORM view of the model and remove associated Fact Types.")
+                MsgBox(lsMessage)
+
+                Exit Sub
+            End If
+
+            With New WaitCursor
+                '---------------------------------------------------------
+                'Get the Actor represented by the (selected) Actor
+                '---------------------------------------------------------
+
+
+#Region "Connected Relations - ActorProcess"
+
+                Dim larConnectedActorProcessRelation = From ActorProcessRelation In lrActor.CMMLActor.Model.ActorProcessRelation.ToList
+                                                       Where ActorProcessRelation.Actor.Name = lrActor.Name
+                                                       Select ActorProcessRelation
+
+                For Each lrCMMLConnectedActorProcessRelation In larConnectedActorProcessRelation
+                    Call lrCMMLConnectedActorProcessRelation.RemoveFromModel()
+                Next
+#End Region
+
+                Call lrActor.CMMLActor.RemoveFromModel()
+
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

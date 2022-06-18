@@ -489,7 +489,9 @@ Public Class tApplication
                             Call prLogger.WriteToErrorLog(asErrorMessage, "", "Information")
                         Else
                             If abThrowtoMSGBox Then
+                                Dim aiDumy As Integer = 1
                                 Return MsgBox(asErrorMessage, aiMessageBoxButtons)
+
                             Else
                                 '-----------------------------
                                 'Do nothing

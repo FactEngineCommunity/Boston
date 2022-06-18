@@ -62,9 +62,43 @@ Namespace UML
 
         End Sub
 
+        Public Overrides Function CloneUCDActor(ByRef arPage As FBM.Page) As UCD.Actor
+
+            Dim lr_actor As New UCD.Actor
+
+            Try
+                With Me
+                    lr_actor.Model = .Model
+                    lr_actor.Page = arPage
+                    lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lr_actor.FactData = .FactData
+                    lr_actor.Name = .Concept.Symbol
+                    lr_actor.FactDataInstance = Me.FactDataInstance
+                    lr_actor.JoinedObjectType = .Role.JoinedORMObject
+                    lr_actor.Concept = .Concept
+                    lr_actor.Role = .Role
+                    lr_actor.X = .X
+                    lr_actor.Y = .Y
+                    lr_actor.Shape = .Shape
+                    lr_actor.TableShape = .TableShape
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lr_actor
+
+        End Function
+
         Public Shadows Function Equals(ByVal other As UML.Actor) As Boolean Implements System.IEquatable(Of UML.Actor).Equals
 
-            If (Me.Role.Id = other.Role.Id) And (Me.Concept.Symbol = other.Concept.Symbol) Then
+            If Me.Name = other.Name Then
                 Return True
             Else
                 Return False
@@ -122,7 +156,6 @@ Namespace UML
             loDroppedNode.Pen.Color = Color.White
             loDroppedNode.ShadowColor = Color.White
 
-            loDroppedNode.Tag = New CMML.Actor
             loDroppedNode.Resize(10, 15)
 
             loDroppedNode.Tag = Me
@@ -198,7 +231,7 @@ Namespace UML
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.NameShape) Then
+                    If IsSomething(Me.NameShape.Shape) Then
                         If Me.NameShape.Shape.Text <> "" Then
                             Me.NameShape.Shape.Text = Trim(Me.FactData.Data)
 
@@ -252,7 +285,7 @@ Namespace UML
 
         End Sub
 
-        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+        Public Overrides Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY

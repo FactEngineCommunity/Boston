@@ -44,6 +44,7 @@ Namespace CMML
         Public NameShape As ShapeNode
 
         Public Event NameChanged(ByVal asNewName As String)
+        Public Event RemovedFromModel()
 
         Public Sub New()
             '-----------------------------------
@@ -107,6 +108,24 @@ Namespace CMML
             End Try
 
         End Function
+
+        Public Sub RemoveFromModel()
+
+            Try
+                Call Me.Model.RemoveActor(Me)
+
+                RaiseEvent RemovedFromModel()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Sub setName(ByVal asNewName As String)
 

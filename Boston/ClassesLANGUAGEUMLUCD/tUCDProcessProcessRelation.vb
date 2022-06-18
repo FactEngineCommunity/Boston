@@ -63,6 +63,8 @@ Namespace UCD
         Private Sub CMMLProcessProcessRelation_IsIncludesChanged(abIsIncludes As Boolean) Handles _CMMLProcessProcessRelation.IsIncludesChanged
 
             Try
+                Me.IsIncludes = abIsIncludes
+
                 Call Me.RefreshShape()
 
             Catch ex As Exception
@@ -80,6 +82,8 @@ Namespace UCD
         Private Sub CMMLProcessProcessRelation_IsExtendsChanged(abIsExtends As Boolean) Handles _CMMLProcessProcessRelation.IsExtendsChanged
 
             Try
+                Me.IsExtends = abIsExtends
+
                 Call Me.RefreshShape()
 
             Catch ex As Exception

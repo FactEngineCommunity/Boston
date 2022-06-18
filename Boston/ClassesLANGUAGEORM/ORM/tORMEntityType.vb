@@ -2962,14 +2962,14 @@ FailsafeContinue:
                     '----------------------------------------------------------
                     'The new EntityType.Name does not match the EntityType.Id
                     '----------------------------------------------------------
-                    Call Me.SwitchConcept(New FBM.Concept(asNewName, True), pcenumConceptType.EntityType)
+                    Dim lrModelDictionaryEntry = Me.SwitchConcept(New FBM.Concept(asNewName, True), pcenumConceptType.EntityType)
 
                     '------------------------------------------------------------------------------------------
                     'Update the Model(database) immediately. There is no choice. The reason why
                     '  is because the (in-memory) key is changing, so the database must be updated to 
                     '  reflect the new key, otherwise it will not be possible to Update an existing EntityType.
                     '------------------------------------------------------------------------------------------
-                    Call TableEntityType.ModifyKey(Me, asNewName)
+                    Call TableEntityType.ModifyKey(Me, asNewName, lrModelDictionaryEntry)
                     Call TableConceptInstance.ModifyKey(Me, asNewName)
 
                     '-------------------------------------------------------

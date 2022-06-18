@@ -387,6 +387,7 @@ Namespace FBM
                 lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
                 lr_actor.FactData = .FactData
                 lr_actor.Name = .Concept.Symbol
+                lr_actor.FactDataInstance = New FBM.FactDataInstance
                 lr_actor.FactDataInstance = Me
                 lr_actor.JoinedObjectType = .Role.JoinedORMObject
                 lr_actor.Concept = .Concept
@@ -401,7 +402,7 @@ Namespace FBM
 
         End Function
 
-        Public Function CloneUCDActor(ByRef arPage As FBM.Page) As UCD.Actor
+        Public Overridable Function CloneUCDActor(ByRef arPage As FBM.Page) As UCD.Actor
 
             Dim lr_actor As New UCD.Actor
 
@@ -412,6 +413,7 @@ Namespace FBM
                     lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
                     lr_actor.FactData = .FactData
                     lr_actor.Name = .Concept.Symbol
+                    lr_actor.FactDataInstance = New FBM.FactDataInstance
                     lr_actor.FactDataInstance = Me
                     lr_actor.JoinedObjectType = .Role.JoinedORMObject
                     lr_actor.Concept = .Concept
@@ -1161,7 +1163,7 @@ Namespace FBM
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Overridable Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
             Throw New NotImplementedException()
         End Sub
 

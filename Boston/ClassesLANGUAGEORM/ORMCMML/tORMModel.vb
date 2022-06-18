@@ -1375,6 +1375,28 @@ Namespace FBM
 
         End Sub
 
+        Public Sub removeCMMLActor(ByRef arCMMLActor As CMML.Actor)
+
+            Try
+                Dim lsSQLString As String = ""
+
+                lsSQLString = "DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLString &= " WHERE Element = '" & arCMMLActor.Name & "'"
+                lsSQLString &= "   AND ElementType = 'Actor'"
+
+                Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub removeCMMLProcess(ByRef arCMMLProcess As CMML.Process)
 
             Try

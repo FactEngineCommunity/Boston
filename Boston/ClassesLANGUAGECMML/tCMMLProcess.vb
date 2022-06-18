@@ -58,6 +58,7 @@ Namespace CMML
 
         Public Event FactChanged(ByRef arFact As FBM.Fact)
         Public Event RemovedFromModel()
+        Public Event TextChanged(ByVal asNewText As String)
 
         Public Sub New()
             Me.Id = System.Guid.NewGuid.ToString
@@ -131,6 +132,8 @@ Namespace CMML
 
                 'CMML
                 Call Me.CMMLModel.Model.updateCMMLProcessText(Me)
+
+                RaiseEvent TextChanged(Me.Text)
 
             Catch ex As Exception
                 Dim lsMessage As String

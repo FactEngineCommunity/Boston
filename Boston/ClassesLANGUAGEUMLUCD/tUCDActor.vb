@@ -9,6 +9,8 @@ Namespace UCD
         Inherits UML.Actor 'NB UML.Actor is common to many languages, but methods, members can be overridden.
         Implements FBM.iPageObject
 
+        Public Shadows WithEvents CMMLActor As CMML.Actor
+
         Public Sub New()
             '-----------------------------------
             'Default Parameterless constructor
@@ -23,7 +25,7 @@ Namespace UCD
             Me.FactData.Model = arPage.Model
             Me.Data = "New Actor"
             Me.Id = Me.Data
-            Me.Name = Me.Data
+            Me.Name = arCMMLActor.Name
             Me.Symbol = Me.Data
             Me.Concept = New FBM.Concept(Me.Data)
 
@@ -160,6 +162,38 @@ Namespace UCD
 
         End Sub
 
+        Public Overrides Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+
+            Me.X = aiNewX
+            Me.Y = aiNewY
+
+            Try
+
+                Me.FactDataInstance.X = aiNewX
+                Me.FactDataInstance.Y = aiNewY
+
+                Me.FactDataInstance.Fact.FactType.isDirty = True
+                Me.FactDataInstance.Fact.isDirty = True
+                Me.FactDataInstance.isDirty = True
+
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Try
+                Me.FactDataInstance.Page.MakeDirty()
+            Catch ex As Exception
+            End Try
+
+        End Sub
         Public Overloads Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
 
             Call Me.SetAppropriateColour()
@@ -195,6 +229,73 @@ Namespace UCD
                 If Me.NameShape.Shape IsNot Nothing Then
                     Me.NameShape.Shape.Text = asNewName
                 End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Overrides Function RemoveFromPage() As Boolean
+
+            Try
+                Dim lsSQLQuery As String
+
+                '----------------------------------------------------------------------------------------------------------
+                'Remove the Actor that represents the Actor from the Diagram on the Page.
+                '-------------------------------------------------------------------------------
+                Me.Page.UMLDiagram.Actor.Remove(Me)
+
+                Dim larLinkToRemove As New List(Of DiagramLink)
+
+                If Me.Page.Diagram IsNot Nothing Then
+
+                    Me.Page.Diagram.Nodes.Remove(Me.Shape)
+                    Me.Page.Diagram.Nodes.Remove(Me.NameShape.Shape)
+
+                    For Each lrLink In Me.Shape.OutgoingLinks
+                        larLinkToRemove.Add(lrLink)
+                    Next
+                    For Each lrLink In larLinkToRemove
+                        Me.Page.Diagram.Links.Remove(lrLink)
+                    Next
+                End If
+
+                '-------------------------------------------------------------------------
+                'Remove the Actor from the Page
+                '---------------------------------
+#Region "CMML"
+                'Likely already deleted when deleted at the Model level.
+                lsSQLQuery = " DELETE FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                lsSQLQuery &= " WHERE Element = '" & Me.Name & "'"
+                lsSQLQuery &= "   AND ElementType = 'Actor'"
+
+                Call Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+#End Region
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+
+
+        Private Sub CMMLActor_RemovedFromModel() Handles CMMLActor.RemovedFromModel
+
+            Try
+                Call Me.RemoveFromPage()
 
             Catch ex As Exception
                 Dim lsMessage As String

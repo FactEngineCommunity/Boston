@@ -164,8 +164,8 @@ Namespace FBM
             Dim lbFound As Boolean = True
 
             If Me.FactType.Id = other.FactType.Id Then
-                For Each lr_data In other.Data
-                    If Me.Data.Find(Function(x) (x.Role.Id = lr_data.Role.Id) And (x.Concept.Symbol = lr_data.Concept.Symbol)) Is Nothing Then 'AddressOf lr_data.Equals) Is Nothing Then
+                For Each lr_data In Me.Data
+                    If other.Data.Find(Function(x) (x.Role.Id = lr_data.Role.Id) And (x.Concept.Symbol = lr_data.Concept.Symbol)) Is Nothing Then 'AddressOf lr_data.Equals) Is Nothing Then
                         lbFound = False
                     End If
                 Next

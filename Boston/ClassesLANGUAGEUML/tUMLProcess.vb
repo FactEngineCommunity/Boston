@@ -30,7 +30,18 @@ Namespace UML
         ''' <summary>
         ''' The text of the Process
         ''' </summary>
-        Public Text As String
+        Public _Text As String
+        <CategoryAttribute("Process"),
+         DefaultValueAttribute(GetType(String), ""),
+         DescriptionAttribute("Text of the Process.")>
+        Public Property Text() As String
+            Get
+                Return Me._Text
+            End Get
+            Set(ByVal Value As String)
+                Me._Text = Value
+            End Set
+        End Property
 
         Public Shadows Page As FBM.Page
 
@@ -54,18 +65,6 @@ Namespace UML
         ''' </summary>
         ''' <remarks></remarks>
         Public ResponsibleActor As UML.Actor
-
-        <CategoryAttribute("Process"),
-             DefaultValueAttribute(GetType(String), ""),
-             DescriptionAttribute("Name of the Process.")>
-        Public Property ProcessName() As String
-            Get
-                Return Me.Name
-            End Get
-            Set(ByVal Value As String)
-                Me.Name = Value
-            End Set
-        End Property
 
         Public Event FactChanged(ByRef arFact As FBM.Fact)
 
@@ -260,26 +259,26 @@ Namespace UML
 
         End Sub
 
-        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
 
             Dim lsMessage As String = ""
 
             Try
                 If IsSomething(aoChangedPropertyItem) Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
-                        Case Is = "Name"
+                        Case Is = "Text"
 
-                            If Me.Page.ExistsDataStore(Me.Name) Then
-                                lsMessage = "You cannot set the name of a Process as the same as the name of a DataStore in the Model."
+                            If Me.Model.UML.Process.Find(Function(x) x.Id <> Me.Id And Trim(x.Text) = Trim(Me.Text)) IsNot Nothing Then
+                                lsMessage = "You cannot set the name of a Process as the same as the name of another Process in the model."
                                 lsMessage &= vbCrLf & vbCrLf
-                                lsMessage &= "A DataStore with the name, '" & Me.Name & "', already exists in the Model"
+                                lsMessage &= "A Process with the tex, '" & Me.Text & "', already exists in the model."
 
-                                Me.Name = Me.Data
+                                Me.Text = Me.CMMLProcess.Text
 
                                 MsgBox(lsMessage, MsgBoxStyle.Exclamation)
                             Else
-                                Me.Shape.Text = Me.Name
-                                Call Me.setName(Me.Name)
+                                Call Me.CMMLProcess.SetProcessText(Me.Text)
                             End If
                     End Select
                 End If
@@ -434,8 +433,23 @@ Namespace UML
 
         End Sub
 
+        Private Sub CMMLProcess_TextChanged(asNewText As String) Handles CMMLProcess.TextChanged
 
+            Try
+                Me.Text = asNewText
 
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

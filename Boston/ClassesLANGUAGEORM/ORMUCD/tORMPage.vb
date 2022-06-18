@@ -42,6 +42,7 @@ Namespace FBM
                     Me.UMLDiagram.Actor.AddUnique(arActor)
 
                     Call arActor.DisplayAndAssociate()
+                    Call arActor.Move(arActor.X, arActor.Y, True)
                 End If
 
             Catch ex As Exception
@@ -56,7 +57,8 @@ Namespace FBM
 
         Public Function DropCMMLActorAtPoint(ByRef arCMMLActor As CMML.Actor,
                                                ByVal aoPointF As PointF,
-                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As UML.Actor
+                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                               Optional ByVal aiLanguage As pcenumLanguage = pcenumLanguage.CMML) As UML.Actor
 
             Dim lsSQLQuery As String = ""
             Dim lrFactInstance As FBM.FactInstance
@@ -85,7 +87,13 @@ Namespace FBM
                     lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                     Dim lrUMLActor As UML.Actor = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneActor(Me)
+                    Select Case aiLanguage
+                        Case Is = pcenumLanguage.UMLUseCaseDiagram
+                            lrUMLActor = lrUMLActor.CloneUCDActor(Me)
+                    End Select
+
                     lrUMLActor.Name = arCMMLActor.Name
+                    lrUMLActor.CMMLActor = arCMMLActor
 
                     Me.UMLDiagram.Actor.AddUnique(lrUMLActor)
                     '===================================================================================================================
