@@ -503,9 +503,18 @@ Namespace FBM
 
         End Function
 
-        Public Overloads Function Clone(ByRef arPage As FBM.Page, _
-                                        Optional ByVal abAddToPage As Boolean = False, _
-                                        Optional ByVal abIsMDAmodelElement As Boolean = False) As FBM.FactTypeInstance
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arPage"></param>
+        ''' <param name="abAddToPage"></param>
+        ''' <param name="abIsMDAmodelElement"></param>
+        ''' <param name="abAddToModel">Used when cloning Core Pages. May not be needed when Copying/Pasting.</param>
+        ''' <returns></returns>
+        Public Overloads Function Clone(ByRef arPage As FBM.Page,
+                                        Optional ByVal abAddToPage As Boolean = False,
+                                        Optional ByVal abIsMDAmodelElement As Boolean = False,
+                                        Optional ByVal abAddToModel As Boolean = False) As FBM.FactTypeInstance
 
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
             Dim lrRoleInstance As FBM.RoleInstance
@@ -570,6 +579,11 @@ Namespace FBM
                         lrFactTypeInstance.Y = .Y
 
                         For Each lrRoleInstance In .RoleGroup
+                            '20220618-VM-abAddToModel (below) used for Core Page cloning only at this stage.
+                            If abAddToModel Then
+                                arPage.Model.Role.AddUnique(lrRoleInstance.Role)
+                            End If
+
                             lrClonedRoleInstance = lrRoleInstance.Clone(arPage, abAddToPage)
                             lrClonedRoleInstance.FactType = lrFactTypeInstance
                             lrFactTypeInstance.RoleGroup.Add(lrClonedRoleInstance)

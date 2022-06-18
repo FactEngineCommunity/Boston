@@ -404,24 +404,25 @@ Namespace FBM
 
         Public Overridable Function CloneUCDActor(ByRef arPage As FBM.Page) As UCD.Actor
 
-            Dim lr_actor As New UCD.Actor
+            Dim lrUCDActor As New UCD.Actor
 
             Try
                 With Me
-                    lr_actor.Model = .Model
-                    lr_actor.Page = arPage
-                    lr_actor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
-                    lr_actor.FactData = .FactData
-                    lr_actor.Name = .Concept.Symbol
-                    lr_actor.FactDataInstance = New FBM.FactDataInstance
-                    lr_actor.FactDataInstance = Me
-                    lr_actor.JoinedObjectType = .Role.JoinedORMObject
-                    lr_actor.Concept = .Concept
-                    lr_actor.Role = .Role
-                    lr_actor.X = .X
-                    lr_actor.Y = .Y
-                    lr_actor.Shape = .Shape
-                    lr_actor.TableShape = .TableShape
+                    lrUCDActor.Model = .Model
+                    lrUCDActor.Page = arPage
+                    lrUCDActor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lrUCDActor.FactData = .FactData
+                    lrUCDActor.Name = .Concept.Symbol
+                    lrUCDActor.FactDataInstance = New FBM.FactDataInstance
+                    lrUCDActor.FactDataInstance = Me
+                    lrUCDActor.JoinedObjectType = .Role.JoinedORMObject
+                    lrUCDActor.Concept = .Concept
+                    lrUCDActor.Role = .Role
+                    lrUCDActor.X = .X
+                    lrUCDActor.Y = .Y
+                    lrUCDActor.Shape = .Shape
+                    lrUCDActor.TableShape = .TableShape
+                    lrUCDActor.NameShape.Actor = lrUCDActor
                 End With
 
             Catch ex As Exception
@@ -433,7 +434,7 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
-            Return lr_actor
+            Return lrUCDActor
 
         End Function
 

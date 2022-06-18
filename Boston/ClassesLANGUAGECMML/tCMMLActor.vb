@@ -139,6 +139,8 @@ Namespace CMML
                 'CMML
                 Me.Model.Model.updateCMMLActorName(lsOldName, asNewName)
 
+                RaiseEvent NameChanged(asNewName)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

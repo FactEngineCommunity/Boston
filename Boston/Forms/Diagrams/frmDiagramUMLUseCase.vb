@@ -281,7 +281,8 @@ Public Class frmDiagrmUMLUseCase
                         End If
 
                         'Page Level
-                        Call Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF, True, pcenumLanguage.UMLUseCaseDiagram)
+                        Dim lrUCDActor As UCD.Actor = Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF, True, pcenumLanguage.UMLUseCaseDiagram)
+                        lrUCDActor.CMMLActor = lrCMMLActor 'Leave here because it will not be set otherwise. The above does not set CMMLActor.
                         Call Me.zrPage.loadActorProcessRelationsForCMMLActor(lrCMMLActor)
 
                         '======================================================================
@@ -300,7 +301,8 @@ Public Class frmDiagrmUMLUseCase
                         End If
 
                         'Page Level
-                        Call Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
+                        Dim lrUCDProcess As UCD.Process = Me.zrPage.DropCMMLProcessAtPoint(lrCMMLProcess, loPointF, Me.zo_containernode)
+                        lrUCDProcess.CMMLProcess = lrCMMLProcess
                         Call Me.zrPage.loadProcessProcessRelationsForCMMLProcess(lrCMMLProcess)
 
                         '======================================================================
@@ -332,6 +334,7 @@ Public Class frmDiagrmUMLUseCase
 
                             Dim lrUCDActor As UCD.Actor
                             lrUCDActor = Me.zrPage.DropCMMLActorAtPoint(lrCMMLActor, loPointF, True, pcenumLanguage.UMLUseCaseDiagram)
+                            lrUCDActor.CMMLActor = lrCMMLActor 'CodeSafe
 
                             '20220618-VM-Was. Replaced with the above.
                             'Call Me.zrPage.DropUMLActorAtPoint(lrUCDActor, loPointF)
@@ -1083,6 +1086,8 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub Diagram_NodeTextEdited(ByVal sender As Object, ByVal e As MindFusion.Diagramming.EditNodeTextEventArgs) Handles Diagram.NodeTextEdited
 
+        Dim lsMessage As String
+
         Try
             Dim lrProcess As UCD.Process
 
@@ -1092,9 +1097,21 @@ Public Class frmDiagrmUMLUseCase
             Select Case e.Node.Tag.GetType
                 Case Is = GetType(UML.ActorName)
 
-                    Dim lrActorName As UML.ActorName = e.Node.Tag
+                    Dim lrUCDActor As UCD.Actor = e.Node.Tag.Actor
 
-                    Call lrActorName.Actor.setName(e.NewText)
+                    Dim lrModelElement = Me.zrPage.Model.GetModelObjectByName(Me.Name, True)
+                    Dim lbModelElementExists As Boolean = lrUCDActor.CMMLActor.FBMModelElement IsNot lrModelElement
+                    If lbModelElementExists Or (Me.zrPage.Model.UML.Actor.Find(Function(x) x IsNot lrUCDActor.CMMLActor And LCase(Trim(x.Name)) = LCase(Trim(e.NewText))) IsNot Nothing) Then
+                        lsMessage = "You cannot set the name of a Actor as the same as the name of another Actor in the model."
+                        lsMessage &= vbCrLf & vbCrLf
+                        lsMessage &= "A Actor with the name, '" & Me.Name & "', already exists in the model."
+
+                        lrUCDActor.NameShape.Shape.Text = e.OldText
+                        MsgBox(lsMessage)
+                        Exit Sub
+                    End If
+
+                    Call lrUCDActor.CMMLActor.setName(e.NewText)
 
                 Case Is = GetType(UCD.Process)
 
@@ -1115,7 +1132,6 @@ Public Class frmDiagrmUMLUseCase
             Me.Diagram.Invalidate()
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -1282,8 +1298,6 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
-
-
     Private Sub mnuOption_ProcessProperties_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertiesToolStripMenuItem2.Click
 
         Try
@@ -1295,6 +1309,13 @@ Public Class frmDiagrmUMLUseCase
             If lrPropertyGridForm Is Nothing Then Exit Sub
 
             If Me.Diagram.Selection.Items.Count > 0 Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                Dim loMiscFilterAttribute1 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+                lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
             Else
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.UMLDiagram
@@ -2034,7 +2055,15 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
+
+    ''' <summary>
+    ''' NB PropertiesGrid set here.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub frm_UseCaseModel_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseDown
+
+
 
         Dim lo_point As System.Drawing.PointF
 
@@ -2128,6 +2157,17 @@ Public Class frmDiagrmUMLUseCase
                             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
                             lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrProcess
+                        Case Is = GetType(UCD.Actor)
+                            Dim lrActor As UCD.Actor
+                            lrActor = loNode.Tag
+                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                            Dim loMiscFilterAttribute1 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrActor
                     End Select
                 End If
             End If
@@ -2523,4 +2563,39 @@ Public Class frmDiagrmUMLUseCase
         End Try
 
     End Sub
+
+    Private Sub PropertiesToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem1.Click
+
+        Try
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+            Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If lrPropertyGridForm Is Nothing Then Exit Sub
+
+            If Me.Diagram.Selection.Items.Count > 0 Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4})
+                lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
+            Else
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.UMLDiagram
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
 End Class

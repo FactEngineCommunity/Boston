@@ -39,6 +39,9 @@ Partial Class frmDiagrmUMLUseCase
         Me.ORMDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuOptionDataFlowDiagramActor = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+        Me.RemoveFromPageToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RemoveFromPageAndModelToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Process = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
@@ -71,9 +74,6 @@ Partial Class frmDiagrmUMLUseCase
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.RemoveFromPageToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.RemoveFromPageAndModelToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_Actor.SuspendLayout()
         Me.ContextMenuStrip_Process.SuspendLayout()
@@ -168,7 +168,7 @@ Partial Class frmDiagrmUMLUseCase
         '
         Me.MorphToToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItemUseCaseDiagramActor, Me.ORMDiagramToolStripMenuItem, Me.MenuOptionDataFlowDiagramActor})
         Me.MorphToToolStripMenuItem.Name = "MorphToToolStripMenuItem"
-        Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.MorphToToolStripMenuItem.Size = New System.Drawing.Size(235, 22)
         Me.MorphToToolStripMenuItem.Text = "&Morph To"
         '
         'MenuItemUseCaseDiagramActor
@@ -195,13 +195,30 @@ Partial Class frmDiagrmUMLUseCase
         'ToolStripSeparator4
         '
         Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-        Me.ToolStripSeparator4.Size = New System.Drawing.Size(177, 6)
+        Me.ToolStripSeparator4.Size = New System.Drawing.Size(232, 6)
+        '
+        'RemoveFromPageToolStripMenuItem2
+        '
+        Me.RemoveFromPageToolStripMenuItem2.Name = "RemoveFromPageToolStripMenuItem2"
+        Me.RemoveFromPageToolStripMenuItem2.Size = New System.Drawing.Size(235, 22)
+        Me.RemoveFromPageToolStripMenuItem2.Text = "Remove from &Page"
+        '
+        'RemoveFromPageAndModelToolStripMenuItem1
+        '
+        Me.RemoveFromPageAndModelToolStripMenuItem1.Name = "RemoveFromPageAndModelToolStripMenuItem1"
+        Me.RemoveFromPageAndModelToolStripMenuItem1.Size = New System.Drawing.Size(235, 22)
+        Me.RemoveFromPageAndModelToolStripMenuItem1.Text = "Remove from Page and &Model"
+        '
+        'ToolStripSeparator8
+        '
+        Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
+        Me.ToolStripSeparator8.Size = New System.Drawing.Size(232, 6)
         '
         'PropertiesToolStripMenuItem1
         '
         Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(235, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'ContextMenuStrip_Process
@@ -397,23 +414,6 @@ Partial Class frmDiagrmUMLUseCase
         Me.HiddenDiagramView.Size = New System.Drawing.Size(891, 530)
         Me.HiddenDiagramView.TabIndex = 10
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'RemoveFromPageToolStripMenuItem2
-        '
-        Me.RemoveFromPageToolStripMenuItem2.Name = "RemoveFromPageToolStripMenuItem2"
-        Me.RemoveFromPageToolStripMenuItem2.Size = New System.Drawing.Size(180, 22)
-        Me.RemoveFromPageToolStripMenuItem2.Text = "Remove from &Page"
-        '
-        'RemoveFromPageAndModelToolStripMenuItem1
-        '
-        Me.RemoveFromPageAndModelToolStripMenuItem1.Name = "RemoveFromPageAndModelToolStripMenuItem1"
-        Me.RemoveFromPageAndModelToolStripMenuItem1.Size = New System.Drawing.Size(235, 22)
-        Me.RemoveFromPageAndModelToolStripMenuItem1.Text = "Remove from Page and &Model"
-        '
-        'ToolStripSeparator8
-        '
-        Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-        Me.ToolStripSeparator8.Size = New System.Drawing.Size(232, 6)
         '
         'frmDiagrmUMLUseCase
         '

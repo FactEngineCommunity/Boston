@@ -88,17 +88,43 @@ Namespace UCD
 
         End Sub
 
-        Public Shadows Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)
+        Public Overloads Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                          Optional ByVal asSelectedGridItemLabel As String = "")
+
+            Dim lsMessage As String = ""
 
             Try
-                '--------------------------------------------------------
-                'Update the Model
-                '  NB GUI is updated via role_data.updated event below.
-                '--------------------------------------------------------
-                'Me.FactData.Data = Me.Name
+                If IsSomething(aoChangedPropertyItem) Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "Name"
+
+                            Dim lrModelElement = Me.Model.GetModelObjectByName(Me.Name, True)
+                            Dim lbModelElementExists As Boolean = Me.CMMLActor.FBMModelElement IsNot lrModelElement
+                            If lbModelElementExists Or (Me.Model.UML.Actor.Find(Function(x) x IsNot Me.CMMLActor And Trim(x.Name) = Trim(Me.Name)) IsNot Nothing) Then
+
+                                lsMessage = "You cannot set the name of a Actor as the same as the name of another Actor in the model."
+                                lsMessage &= vbCrLf & vbCrLf
+                                lsMessage &= "A Actor with the name, '" & Me.Name & "', already exists in the model."
+
+                                Me.Name = Me.CMMLActor.Name
+
+                                MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                                Exit Sub
+                            Else
+                                Call Me.CMMLActor.setName(Me.Name)
+                            End If
+                    End Select
+                End If
+
+                If Me.Shape IsNot Nothing Then
+                    Me.NameShape.Shape.Text = Me.Name
+                End If
+
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Invalidate()
+                End If
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -220,6 +246,22 @@ Namespace UCD
             End Try
 
         End Sub
+
+        Public Overrides Function setName(asNewName As String, Optional abBroadcastInterfaceEvent As Boolean = True, Optional abSuppressModelSave As Boolean = False) As Boolean
+
+            Try
+                Call Me.CMMLActor.FBMModelElement.setName(asNewName, abBroadcastInterfaceEvent, abSuppressModelSave)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
 
         Private Sub CMMLActor_NameChanged(asNewName As String) Handles CMMLActor.NameChanged
 

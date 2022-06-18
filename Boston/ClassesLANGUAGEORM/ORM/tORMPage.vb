@@ -404,6 +404,7 @@ Namespace FBM
                     lrPage.Model = arModel
                     If abSetRDSModel Then
                         lrPage.RDSModel = arModel.RDS
+                        lrPage.CMMLModel = arModel.UML
                     End If
                     lrPage.STModel = arModel.STM
                     lrPage.PageId = System.Guid.NewGuid.ToString
@@ -455,7 +456,7 @@ Namespace FBM
                             '  added to a Page, RoleInstance.Clone adds a clone of the referred FactTypeInstance to the Page.
                             '--------------------------------------------------------------------------------------------------
                         Else
-                            lrFactTypeInstance.Clone(lrPage, True, abMakeModelObjectsMDAModelElements)
+                            lrFactTypeInstance.Clone(lrPage, True, abMakeModelObjectsMDAModelElements, abAddToModel)
                         End If
                     Next
 
