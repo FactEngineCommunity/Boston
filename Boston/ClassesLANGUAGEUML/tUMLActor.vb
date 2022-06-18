@@ -49,7 +49,7 @@ Namespace UML
             '-----------------------------------
         End Sub
 
-        Public Sub New(ByRef arPage As FBM.Page)
+        Public Sub New(ByRef arPage As FBM.Page, Optional ByVal asName As String = Nothing)
 
             Me.Model = arPage.Model
             Me.Page = arPage
@@ -59,6 +59,10 @@ Namespace UML
             Me.Name = Me.Data
             Me.Symbol = Me.Data
             Me.Concept = New FBM.Concept(Me.Data)
+
+            If asName IsNot Nothing Then
+                Me.Name = asName
+            End If
 
         End Sub
 

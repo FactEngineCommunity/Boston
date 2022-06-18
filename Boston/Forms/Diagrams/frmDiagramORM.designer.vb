@@ -114,6 +114,7 @@ Partial Class frmDiagramORM
         Me.ORMDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ERDiagramToolStripMenu = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPropertyGraphSchema = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemUseCaseDiagramActor = New System.Windows.Forms.ToolStripMenuItem()
         Me.UseCToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuOptionDataFlowDiagramEntityType = New System.Windows.Forms.ToolStripMenuItem()
         Me.UMLClassDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -893,7 +894,7 @@ Partial Class frmDiagramORM
         '
         'mnuOption_EntityTypeMorphTo
         '
-        Me.mnuOption_EntityTypeMorphTo.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ORMDiagramToolStripMenuItem, Me.ERDiagramToolStripMenu, Me.ToolStripMenuItemPropertyGraphSchema, Me.UseCToolStripMenuItem, Me.MenuOptionDataFlowDiagramEntityType, Me.UMLClassDiagramToolStripMenuItem})
+        Me.mnuOption_EntityTypeMorphTo.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ORMDiagramToolStripMenuItem, Me.ERDiagramToolStripMenu, Me.ToolStripMenuItemPropertyGraphSchema, Me.ToolStripMenuItemUseCaseDiagramActor, Me.UseCToolStripMenuItem, Me.MenuOptionDataFlowDiagramEntityType, Me.UMLClassDiagramToolStripMenuItem})
         Me.mnuOption_EntityTypeMorphTo.Image = Global.Boston.My.Resources.Resources.Morphing16x16
         Me.mnuOption_EntityTypeMorphTo.Name = "mnuOption_EntityTypeMorphTo"
         Me.mnuOption_EntityTypeMorphTo.Size = New System.Drawing.Size(233, 22)
@@ -920,6 +921,13 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemPropertyGraphSchema.Name = "ToolStripMenuItemPropertyGraphSchema"
         Me.ToolStripMenuItemPropertyGraphSchema.Size = New System.Drawing.Size(199, 22)
         Me.ToolStripMenuItemPropertyGraphSchema.Text = "&Property Graph Schema"
+        '
+        'ToolStripMenuItemUseCaseDiagramActor
+        '
+        Me.ToolStripMenuItemUseCaseDiagramActor.Image = Global.Boston.My.Resources.Resources.UML_UseCase16x16
+        Me.ToolStripMenuItemUseCaseDiagramActor.Name = "ToolStripMenuItemUseCaseDiagramActor"
+        Me.ToolStripMenuItemUseCaseDiagramActor.Size = New System.Drawing.Size(199, 22)
+        Me.ToolStripMenuItemUseCaseDiagramActor.Text = "&Use Case Diagram"
         '
         'UseCToolStripMenuItem
         '
@@ -2524,4 +2532,5 @@ Partial Class frmDiagramORM
     Friend WithEvents ToolStripMenuItemConvertToFactType As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator45 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemShowFactTypesName As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemUseCaseDiagramActor As ToolStripMenuItem
 End Class

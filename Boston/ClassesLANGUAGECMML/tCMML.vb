@@ -532,25 +532,37 @@ Public Class tCMML
 
     Public Function getUseCaseDiagramPagesForActor(ByVal arActor As UML.Actor) As List(Of FBM.Page)
 
+
         getUseCaseDiagramPagesForActor = New List(Of FBM.Page)
 
-        Dim lrModel As FBM.Model
+        Try
 
-        lrModel = arActor.Model
+            Dim lrModel As FBM.Model
 
-        Dim larPage = From Page In lrModel.Page
-                      From FactType In Page.FactTypeInstance
-                      From Fact In FactType.FactType.Fact
-                      From RoleData In Fact.Data
-                      Where Page.Language = pcenumLanguage.UMLUseCaseDiagram _
-                     And FactType.Name = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString _
-                     And RoleData.Role.Name = pcenumCMML.Actor.ToString _
-                     And RoleData.Concept.Symbol = arActor.Name
-                      Select Page Distinct
-                      Order By Page.Name
+            lrModel = arActor.Model
 
-        getUseCaseDiagramPagesForActor = larPage.ToList
+            Dim larPage = From Page In lrModel.Page
+                          From FactTypeInstance In Page.FactTypeInstance
+                          From FactInstance In FactTypeInstance.Fact
+                          From FactDataInstance In FactInstance.Data
+                          Where Page.Language = pcenumLanguage.UMLUseCaseDiagram
+                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString
+                          Where FactDataInstance.Role IsNot Nothing
+                          Where FactDataInstance.Role.Name = pcenumCMML.Element.ToString
+                          Where FactDataInstance.Data = arActor.Name
+                          Select Page Distinct
+                          Order By Page.Name
 
+            getUseCaseDiagramPagesForActor = larPage.ToList
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Function
 

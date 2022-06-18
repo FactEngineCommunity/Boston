@@ -8472,6 +8472,87 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Public Sub morphToUseCaseDiagramActor(ByVal sender As Object, ByVal e As EventArgs)
+
+        Dim item As ToolStripItem = CType(sender, ToolStripItem)
+
+        Try
+            Me.HiddenDiagram.Nodes.Clear()
+            Call Me.DiagramView.SendToBack()
+            Call Me.HiddenDiagramView.BringToFront()
+
+            '--------------------------------------------------------------------------------------
+            'Paste the selected Actor/EntityType to the HiddenDiagramView (for animated morphing)
+            '--------------------------------------------------------------
+            Dim lrShapeNode As ShapeNode
+            lrShapeNode = Me.zrPage.SelectedObject(0).Shape
+            lrShapeNode = Me.HiddenDiagram.Factory.CreateShapeNode(lrShapeNode.Bounds.X, lrShapeNode.Bounds.Y, lrShapeNode.Bounds.Width, lrShapeNode.Bounds.Height)
+            lrShapeNode.Shape = Shapes.RoundRect
+            lrShapeNode.Text = Me.zrPage.SelectedObject(0).Id
+            lrShapeNode.Pen.Color = Color.Navy
+            lrShapeNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+            lrShapeNode.Image = Nothing
+            lrShapeNode.Visible = True
+
+
+            Me.HiddenDiagram.Invalidate()
+
+            If IsSomething(frmMain.zfrmModelExplorer) Then
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = item.Tag
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+                prApplication.WorkingPage = lr_enterprise_view.Tag
+
+                '------------------------------------------------------------------
+                'Get the X,Y co-ordinates of the Actor/EntityType being morphed
+                '------------------------------------------------------------------
+                Dim lrPage As FBM.Page = lr_enterprise_view.Tag
+
+                Dim lrFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                         From FactInstance In FactTypeInstance.Fact
+                                         From FactDataInstance In FactInstance.Data
+                                         Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
+                                         Where FactDataInstance.Role.Name = "Element"
+                                         Where FactDataInstance.Data = Me.zrPage.SelectedObject(0).Id
+                                         Select FactDataInstance
+
+                Dim lrActor = lrFactDataInstance.First.CloneActor(Me.zrPage)
+
+                Me.MorphVector(0).Shape = lrShapeNode
+                Me.MorphVector(0).EndPoint = New Point(lrActor.X, lrActor.Y)
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
+                Me.MorphVector(0).EndSize = New Rectangle(0, 0, 10, 15)
+                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).TargetImage = My.Resources.CMML.actor
+                Me.MorphTimer.Enabled = True
+
+                Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
+                If lrPage.DiagramView IsNot Nothing Then
+                    Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
+                Else
+                    Me.MorphVector(0).TargetZoomFactor = My.Settings.DefaultPageZoomFactor
+                End If
+
+                Me.MorphStepTimer.Enabled = True
+                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Call Me.HiddenDiagramView.SendToBack()
+
+        End Try
+
+    End Sub
 
     Private Sub MorphTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MorphTimer.Tick
 
@@ -8504,6 +8585,8 @@ Public Class frmDiagramORM
                             lrMorphVector.Shape.Image = My.Resources.ORMShapes.Blank
                         Case Else
                             lrMorphVector.Shape.Shape = Shapes.RoundRect
+                            lrMorphVector.Shape.Image = lrMorphVector.TargetImage
+                            lrMorphVector.Shape.Text = lrMorphVector.TargetText
                     End Select
                 End If
             Next
@@ -10659,6 +10742,7 @@ SkipRemovalFromModel:
             Me.ORMDiagramToolStripMenuItem.DropDownItems.Clear()
             Me.ERDiagramToolStripMenu.DropDownItems.Clear()
             Me.ToolStripMenuItemPropertyGraphSchema.DropDownItems.Clear()
+            Me.ToolStripMenuItemUseCaseDiagramActor.DropDownItems.Clear()
 
             '----------------------------------------------------------------
             'Clear the list of ORMDiagrams that may relate to the ValueType
@@ -10669,6 +10753,30 @@ SkipRemovalFromModel:
             'Clear the list of StateTransitionDiagrams that may relate to the ValueType
             '-----------------------------------------------------------------------------
             Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
+
+            '--------------------------------------------------------------------------------------------------------
+            'Load Use Case Diagram pages.
+            '--------------------------------------------------------------------------------------------------------
+#Region "UCDs"
+            Dim lrActor As New UML.Actor(Me.zrPage, lrEntityType.Id)
+            larPage_list = prApplication.CMML.getUseCaseDiagramPagesForActor(lrActor)
+
+            For Each lr_page In larPage_list
+                '---------------------------------------------------
+                'Add the Page(Name) to the MenuOption.DropDownItems
+                '---------------------------------------------------
+                lo_menu_option = Me.ToolStripMenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
+                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
+                                                               Nothing,
+                                                               lr_page.Model.ModelId,
+                                                               pcenumLanguage.UMLUseCaseDiagram,
+                                                               Nothing,
+                                                               lr_page.PageId)
+                lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                AddHandler lo_menu_option.Click, AddressOf Me.morphToUseCaseDiagramActor
+            Next
+#End Region
 
             '--------------------------------------------------------
             'Load the ORMDiagrams that relate to the EntityType
