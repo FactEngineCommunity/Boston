@@ -175,21 +175,21 @@ Partial Class frmDiagrmUMLUseCase
         '
         Me.MenuItemUseCaseDiagramActor.Image = Global.Boston.My.Resources.Resources.UML_UseCase16x16
         Me.MenuItemUseCaseDiagramActor.Name = "MenuItemUseCaseDiagramActor"
-        Me.MenuItemUseCaseDiagramActor.Size = New System.Drawing.Size(180, 22)
+        Me.MenuItemUseCaseDiagramActor.Size = New System.Drawing.Size(174, 22)
         Me.MenuItemUseCaseDiagramActor.Text = "&Use Case Diagram"
         '
         'ORMDiagramToolStripMenuItem
         '
         Me.ORMDiagramToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.ORM16x16
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
-        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(174, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'MenuOptionDataFlowDiagramActor
         '
         Me.MenuOptionDataFlowDiagramActor.Image = Global.Boston.My.Resources.Resources.DataFlowDiagram16x16
         Me.MenuOptionDataFlowDiagramActor.Name = "MenuOptionDataFlowDiagramActor"
-        Me.MenuOptionDataFlowDiagramActor.Size = New System.Drawing.Size(180, 22)
+        Me.MenuOptionDataFlowDiagramActor.Size = New System.Drawing.Size(174, 22)
         Me.MenuOptionDataFlowDiagramActor.Text = "&Data Flow Diagram"
         '
         'ToolStripSeparator4
@@ -225,7 +225,7 @@ Partial Class frmDiagrmUMLUseCase
         '
         Me.ContextMenuStrip_Process.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1, Me.ToolStripSeparator3, Me.RemoveFromPageToolStripMenuItem, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator6, Me.PropertiesToolStripMenuItem2})
         Me.ContextMenuStrip_Process.Name = "ContextMenuStrip_Process"
-        Me.ContextMenuStrip_Process.Size = New System.Drawing.Size(236, 126)
+        Me.ContextMenuStrip_Process.Size = New System.Drawing.Size(236, 104)
         '
         'ToolStripMenuItem1
         '

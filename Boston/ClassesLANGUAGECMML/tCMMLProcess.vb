@@ -107,6 +107,27 @@ Namespace CMML
 
         End Function
 
+        Public Function getParticipatingActors() As List(Of CMML.Actor)
+
+            Try
+                Dim larParticipatingActor = From ActorProcessRelation In Me.CMMLModel.ActorProcessRelation
+                                            Where ActorProcessRelation.Process.Id = Me.Id
+                                            Select ActorProcessRelation.Actor
+
+                Return larParticipatingActor.ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of CMML.Actor)
+            End Try
+        End Function
+
         Public Sub RemoveFromModel()
 
             Try

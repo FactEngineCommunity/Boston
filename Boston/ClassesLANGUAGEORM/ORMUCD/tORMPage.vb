@@ -102,10 +102,12 @@ Namespace FBM
 
                     Call Me.Save(False, False)
 
-                    Call lrUMLActor.DisplayAndAssociate()
+                    If Me.Diagram IsNot Nothing Then
+                        Call lrUMLActor.DisplayAndAssociate()
+                    End If
 
                     Return lrUMLActor
-                End If
+                    End If
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -169,10 +171,12 @@ Namespace FBM
 
                     Call Me.Save(False, False)
 
-                    Call lrProcess.DisplayAndAssociate(aoContainerNode)
+                    If Me.Diagram IsNot Nothing Then
+                        Call lrProcess.DisplayAndAssociate(aoContainerNode)
+                    End If
 
                     Return lrProcess
-                End If
+                    End If
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

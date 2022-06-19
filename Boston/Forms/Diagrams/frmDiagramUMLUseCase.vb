@@ -1418,11 +1418,11 @@ Public Class frmDiagrmUMLUseCase
         larPage_list = prApplication.CMML.getUseCaseDiagramPagesForActor(lr_actor)
 
         For Each lr_page In larPage_list
-            Dim lo_menu_option As ToolStripItem
+            Dim loMenuOption As ToolStripItem
             '---------------------------------------------------
             'Add the Page(Name) to the MenuOption.DropDownItems
             '---------------------------------------------------
-            lo_menu_option = Me.MenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
+            loMenuOption = Me.MenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
                                                                Nothing,
@@ -1430,8 +1430,8 @@ Public Class frmDiagrmUMLUseCase
                                                                pcenumLanguage.UMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-            lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler lo_menu_option.Click, AddressOf Me.morph_to_UseCase_diagram
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            AddHandler loMenuOption.Click, AddressOf Me.morph_to_UseCase_diagram
         Next
 
         '--------------------------------------------------------------
@@ -1446,7 +1446,7 @@ Public Class frmDiagrmUMLUseCase
         larPage_list = prApplication.CMML.getORMDiagramPagesForActor(lr_actor)
 
         For Each lr_page In larPage_list
-            Dim lo_menu_option As ToolStripItem
+            Dim loMenuOption As ToolStripItem
 
             '----------------------------------------------------------
             'Try and find the Page within the EnterpriseView.TreeView
@@ -1467,9 +1467,9 @@ Public Class frmDiagrmUMLUseCase
                 '---------------------------------------------------
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
-                lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
-                lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                AddHandler lo_menu_option.Click, AddressOf Me.morph_to_ORM_diagram
+                loMenuOption = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+                loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                AddHandler loMenuOption.Click, AddressOf Me.morph_to_ORM_diagram
             End If
         Next
 
@@ -1485,11 +1485,11 @@ Public Class frmDiagrmUMLUseCase
         larPage_list = prApplication.CMML.getDataFlowDiagramPagesForActor(lr_actor)
 
         For Each lr_page In larPage_list
-            Dim lo_menu_option As ToolStripItem
+            Dim loMenuOption As ToolStripItem
             '---------------------------------------------------
             'Add the Page(Name) to the MenuOption.DropDownItems
             '---------------------------------------------------
-            lo_menu_option = Me.MenuOptionDataFlowDiagramActor.DropDownItems.Add(lr_page.Name)
+            loMenuOption = Me.MenuOptionDataFlowDiagramActor.DropDownItems.Add(lr_page.Name)
 
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
@@ -1499,8 +1499,8 @@ Public Class frmDiagrmUMLUseCase
                                                                Nothing,
                                                                lr_page.PageId)
 
-            lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            AddHandler loMenuOption.Click, AddressOf Me.morph_to_DataFlowDiagram
         Next
 
 
@@ -1971,7 +1971,7 @@ Public Class frmDiagrmUMLUseCase
                             End If
 
                             lrMorphVector.Shape.Text = lrMorphVector.TargetText
-                            End Select
+                    End Select
                 End If
             Next
 
@@ -2034,6 +2034,81 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
+    Private Sub createUseCaseDiagramPageForProcess(ByVal sender As Object, ByVal e As EventArgs)
+
+        Dim lrPage As FBM.Page
+
+        With New WaitCursor
+
+            Try
+                Dim loToolStripItem As ToolStripItem = CType(sender, ToolStripItem)
+                Dim lsPageName As String = "UCD-New Use Case Diagram Page"
+                If loToolStripItem.Tag IsNot Nothing Then
+                    lsPageName = "UML-UCD-" & CType(loToolStripItem.Tag, UCD.Process).Text
+                    lsPageName = Viev.Strings.MakeCapCamelCase(lsPageName.Substring(0, lsPageName.Length))
+                End If
+                lsPageName = Me.zrPage.Model.CreateUniquePageName(lsPageName, 0)
+
+#Region "From Core"
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString,
+                                               pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString,
+                                               pcenumLanguage.ORMModel)
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
+                End If
+
+                '----------------------------------------------------
+                'Create the Page for the StateTransitionDiagram.
+                '----------------------------------------------------
+                Richmond.WriteToStatusBar("Creating the Page.")
+                lrPage = lrCorePage.Clone(prApplication.WorkingModel, True, True, , True) 'Assigns new PageId
+                lrPage.Name = lsPageName
+                lrPage.Language = pcenumLanguage.UMLUseCaseDiagram
+#End Region
+
+                lrPage.Loaded = True
+                Me.zrPage.Model.Page.Add(lrPage)
+                lrPage.Save(True, True)
+
+                Me.zrPage.Model.AllowCheckForErrors = True
+                frmMain.Cursor = Cursors.Default
+
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+
+                lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                MsgBox("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.")
+
+                If loToolStripItem.Tag IsNot Nothing Then
+                    Dim lrUCDProcess As UCD.Process = loToolStripItem.Tag
+                    Call lrPage.DropCMMLProcessAtPoint(lrUCDProcess.CMMLProcess, New PointF(80, 40), Nothing, True, pcenumLanguage.UMLUseCaseDiagram)
+
+                    Dim liInd = 20
+                    For Each lrCMMLActor In lrUCDProcess.CMMLProcess.getParticipatingActors()
+                        Call lrPage.DropCMMLActorAtPoint(lrCMMLActor, New PointF(20, liInd), True, pcenumLanguage.UMLUseCaseDiagram)
+                        liInd += 10
+                    Next
+                    Dim lrToolstripItem As New tDummyToolStripItem(lrEnterpriseView)
+                    Call Me.morphToUseCaseDiagram_Process(lrToolstripItem, lrEnterpriseView)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End With
+
+    End Sub
+
+
     Public Sub EnableSaveButton()
 
         '-------------------------------------
@@ -2054,17 +2129,18 @@ Public Class frmDiagrmUMLUseCase
         Dim lr_page As FBM.Page
         Dim larPage_list As New List(Of FBM.Page)
         Dim lr_model As FBM.Model
-        Dim lr_process As New UCD.Process
+        Dim lrUCDProcess As New UCD.Process
 
 
         If Me.zrPage.SelectedObject.Count = 0 Then
             Exit Sub
         End If
 
+        Call prApplication.setWorkingModel(Me.zrPage.Model)
         '-------------------------------------
         'Check that selected object is Actor
         '-------------------------------------
-        If lr_process.GetType Is Me.zrPage.SelectedObject(0).GetType Then
+        If lrUCDProcess.GetType Is Me.zrPage.SelectedObject(0).GetType Then
             '----------
             'All good
             '----------
@@ -2078,15 +2154,15 @@ Public Class frmDiagrmUMLUseCase
             Exit Sub
         End If
 
-        lr_process = Me.zrPage.SelectedObject(0)
+        lrUCDProcess = Me.zrPage.SelectedObject(0)
 
-        lr_model = lr_process.Model
+        lr_model = lrUCDProcess.Model
 
         '---------------------------------------------------------------------------------------------
-        'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
+        'Set the initial MorphVector for Morphing
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
-        Dim lrMorphVector = New tMorphVector(lr_process.Shape.Bounds.X, lr_process.Shape.Bounds.Y, 0, 0, 40)
+        Dim lrMorphVector = New tMorphVector(lrUCDProcess.Shape.Bounds.X, lrUCDProcess.Shape.Bounds.Y, 0, 0, 40)
         Me.MorphVector.Clear()
         Me.MorphVector.Add(lrMorphVector)
 
@@ -2097,18 +2173,27 @@ Public Class frmDiagrmUMLUseCase
         Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
         Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Clear()
 
+        Dim loMenuOption As ToolStripItem
+
+        '----------------------------------------------------------------------------------
+        'Provide and option for the User to create a UCD Page for the current Process.
+        Dim lsMessage As String = "Add an &Use Case Diagram for the selected Entity Type."
+        loMenuOption = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lsMessage, My.Resources.MenuImages.UML_UseCase16x16)
+        loMenuOption.Tag = lrUCDProcess
+        AddHandler loMenuOption.Click, AddressOf Me.createUseCaseDiagramPageForProcess
+
+
         '------------------------------------------------------------------------------
         'Load the Use Case Diagrams that relate to the EntityType as selectable menuOptions
         '--------------------------------------------------------
 #Region "UCDs"
-        larPage_list = prApplication.CMML.getUseCaseDiagramPagesForProcess(lr_process, Me.zrPage)
+        larPage_list = prApplication.CMML.getUseCaseDiagramPagesForProcess(lrUCDProcess, Me.zrPage)
 
         For Each lr_page In larPage_list
-            Dim lo_menu_option As ToolStripItem
             '----------------------------------------------------
             'Add the Page(Name) to the MenuOption.DropDownItems
             '----------------------------------------------------
-            lo_menu_option = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lr_page.Name)
+            loMenuOption = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
                                                                Nothing,
@@ -2116,8 +2201,8 @@ Public Class frmDiagrmUMLUseCase
                                                                pcenumLanguage.UMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-            lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler lo_menu_option.Click, AddressOf Me.morphToUseCaseDiagram_Process
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            AddHandler loMenuOption.Click, AddressOf Me.morphToUseCaseDiagram_Process
         Next
 #End Region
 
@@ -2126,14 +2211,13 @@ Public Class frmDiagrmUMLUseCase
         'Load the DFDDiagrams that relate to the EntityType as selectable menuOptions
         '--------------------------------------------------------
 #Region "DFDs"
-        larPage_list = prApplication.CMML.getDataFlowDiagramPagesForProcess(lr_process)
+        larPage_list = prApplication.CMML.getDataFlowDiagramPagesForProcess(lrUCDProcess)
 
         For Each lr_page In larPage_list
-            Dim lo_menu_option As ToolStripItem
             '----------------------------------------------------
             'Add the Page(Name) to the MenuOption.DropDownItems
             '----------------------------------------------------
-            lo_menu_option = Me.DFDToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+            loMenuOption = Me.DFDToolStripMenuItem.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
                                                                Nothing,
@@ -2141,8 +2225,8 @@ Public Class frmDiagrmUMLUseCase
                                                                pcenumLanguage.DataFlowDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-            lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            AddHandler loMenuOption.Click, AddressOf Me.morph_to_DataFlowDiagram
         Next
 #End Region
 
@@ -2150,14 +2234,13 @@ Public Class frmDiagrmUMLUseCase
         'Load the STDDiagrams that relate to the EntityType as selectable menuOptions
         '--------------------------------------------------------
 #Region "STDs"
-        larPage_list = prApplication.CMML.getStateTransitionDiagramPagesForProcess(lr_process)
+        larPage_list = prApplication.CMML.getStateTransitionDiagramPagesForProcess(lrUCDProcess)
 
         For Each lr_page In larPage_list
-            Dim lo_menu_option As ToolStripItem
             '----------------------------------------------------
             'Add the Page(Name) to the MenuOption.DropDownItems
             '----------------------------------------------------
-            lo_menu_option = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
+            loMenuOption = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageSTD,
                                                                Nothing,
@@ -2166,8 +2249,8 @@ Public Class frmDiagrmUMLUseCase
                                                                Nothing,
                                                                lr_page.PageId)
 
-            lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler lo_menu_option.Click, AddressOf Me.morph_to_StateTransitionDiagram
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            AddHandler loMenuOption.Click, AddressOf Me.morph_to_StateTransitionDiagram
         Next
 #End Region
 

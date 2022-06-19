@@ -173,7 +173,12 @@ Public Class frmGlossary
             'Declare that the EntityType(Name) is an EntityType
             '------------------------------------------------------
             lrVerbaliser.VerbaliseModelObject(arEntityType)
-            lrVerbaliser.VerbaliseQuantifier(" is an Entity Type.")
+            lrVerbaliser.VerbaliseQuantifier(" is an Entity Type")
+            If arEntityType.IsActor Then
+                lrVerbaliser.VerbaliseQuantifier(" and Actor.")
+            Else
+                lrVerbaliser.VerbaliseQuantifier(".")
+            End If
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
@@ -364,6 +369,23 @@ Public Class frmGlossary
                     lrVerbaliser.VerbaliseModelObject(lrModelObject)
                     lrVerbaliser.HTW.WriteBreak()
                 Next
+            End If
+
+            If arEntityType.IsActor Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseQuantifier("Associated Processes:")
+                lrVerbaliser.HTW.WriteBreak()
+
+                If arEntityType.getAssociatedCMMLProcesses.Count = 0 Then
+                    lrVerbaliser.VerbaliseQuantifierLight("There are no associated Processes for this Actor/Entity Type.")
+                    lrVerbaliser.HTW.WriteBreak()
+                Else
+                    lrVerbaliser.HTW.WriteBreak()
+                    For Each lrCMMLProcess In arEntityType.getAssociatedCMMLProcesses
+                        lrVerbaliser.VerbalisePredicateText("'" & lrCMMLProcess.Text & "'")
+                        lrVerbaliser.HTW.WriteBreak()
+                    Next
+                End If
             End If
 
         Catch ex As Exception

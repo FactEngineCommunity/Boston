@@ -759,6 +759,34 @@ Namespace FBM
 
         End Function
 
+        Public Function getAssociatedCMMLProcesses() As List(Of CMML.Process)
+
+            Try
+                Dim larCMMLProcess As New List(Of CMML.Process)
+
+                If Me.IsActor Then
+
+                    Dim larAssociatedProcess = From ActorProcessRelation In Me.Model.UML.ActorProcessRelation
+                                               Where ActorProcessRelation.Actor.Name = Me.Id
+                                               Select ActorProcessRelation.Process
+
+                    Return larAssociatedProcess.ToList
+
+                Else
+                    Return larCMMLProcess
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
         ''' </summary>
