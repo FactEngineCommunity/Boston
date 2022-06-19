@@ -112,6 +112,17 @@ Namespace CMML
         Public Sub RemoveFromModel()
 
             Try
+                Dim lrModelElement As FBM.ModelObject = Me.Model.Model.GetModelObjectByName(Me.Name)
+
+                If lrModelElement IsNot Nothing Then
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.EntityType)
+                            CType(lrModelElement, FBM.EntityType).setIsActor(False)
+                        Case Is = GetType(FBM.FactType)
+                            Throw New NotImplementedException("Not implemented for FactTypes that are Actors.")
+                    End Select
+                End If
+
                 Call Me.Model.RemoveActor(Me)
 
                 RaiseEvent RemovedFromModel()

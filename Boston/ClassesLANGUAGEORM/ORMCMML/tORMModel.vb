@@ -296,6 +296,30 @@ Namespace FBM
 
         End Sub
 
+        Public Function CMMLActorHasActorProcessParticipationRelations(ByRef arCMMLActor As CMML.Actor) As Boolean
+
+            Try
+                Dim lsSQLQuery As String
+                Dim lrRecordset As ORMQL.Recordset
+
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                lsSQLQuery &= " WHERE Actor = '" & arCMMLActor.Name & "'"
+
+                lrRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                Return Not lrRecordset.EOF
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Connects to the database if it is not already connected
         ''' </summary>
@@ -1936,6 +1960,15 @@ Namespace FBM
                     End If
 
                     lrActor = New CMML.Actor(Me.UML, lrORMRecordset("Element").Data, lrModelElement)
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.EntityType)
+                            Call CType(lrModelElement, FBM.EntityType).setIsActor(True, True)
+                        Case Is = GetType(FBM.FactType)
+                            '20220619-VM-Not implemented yet.
+                            'CType(lrModelElement, FBM.FactType).IsActor = True
+                    End Select
+
                     Me.UML.Actor.Add(lrActor)
 
                     lrORMRecordset.MoveNext()

@@ -205,7 +205,7 @@ Public Class frmDiagrmUMLUseCase
                 For Each lo_shape In child.ShapeListBox.Shapes
                     Select Case lo_shape.DisplayName
                         Case Is = "Actor"
-                            lo_shape.Image = My.Resources.CMML.actor
+                            lo_shape.Image = My.Resources.CMMLShapes.ActorShapeToolbox
                     End Select
                 Next
             End If
@@ -520,6 +520,8 @@ Public Class frmDiagrmUMLUseCase
                 lrRecordset.MoveNext()
             End While
 #End Region
+
+            Me.zo_containernode.Move(100, 20)
 
             'Set the location of the System Boundary
             If Me.zrPage.UMLDiagram.Actor.Count > 0 Then
@@ -2634,6 +2636,12 @@ Public Class frmDiagrmUMLUseCase
         Try
             Dim lrActor As UCD.Actor = Me.zrPage.SelectedObject(0)
 
+            lsMessage = "Are you sure that you want to remove this Actor from the Model?"
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then
+                Exit Sub
+            End If
+
             'CodeSafe
             If lrActor.CMMLActor.FBMModelElement.GetAdjoinedRoles(True).Count > 0 Then
 
@@ -2648,7 +2656,6 @@ Public Class frmDiagrmUMLUseCase
                 '---------------------------------------------------------
                 'Get the Actor represented by the (selected) Actor
                 '---------------------------------------------------------
-
 
 #Region "Connected Relations - ActorProcess"
 

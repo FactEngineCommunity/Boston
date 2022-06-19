@@ -253,6 +253,16 @@ Namespace CMML
             Try
                 Me.Actor.Remove(arActor)
 
+                'Remove all associated ActorProcessRelations
+                Dim lsActorName = arActor.Name
+                Dim larActorProcessRelation = From ActorProcessRelation In Me.ActorProcessRelation
+                                              Where ActorProcessRelation.Actor.Name = lsActorName
+                                              Select ActorProcessRelation
+
+                For Each lrActorProcessRelation In larActorProcessRelation.ToList
+                    Call lrActorProcessRelation.RemoveFromModel()
+                Next
+
                 'CMML
                 Call Me.Model.removeCMMLActor(arActor)
 

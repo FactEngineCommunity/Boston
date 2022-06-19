@@ -39,6 +39,15 @@ Namespace FBM
             End Set
         End Property
 
+        Private _IsActor As Boolean
+        Public Property IsActor As Boolean
+            Get
+                Return Me._IsActor
+            End Get
+            Set(value As Boolean)
+                Me._IsActor = value
+            End Set
+        End Property
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -265,6 +274,7 @@ Namespace FBM
         Public Event DataTypeLengthChanged(ByVal aiDataTypeLength As Integer)
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
         Public Event ExpandReferenceScheme()
+        Public Event IsActorChanged(ByVal abIsActor As Boolean)
         Public Event IsDatabaseReservedWordChanged(ByVal abIsDatabaseReservedWord As Boolean)
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
@@ -707,6 +717,48 @@ Namespace FBM
 
         End Sub
 
+        Public Overloads Function getCorrespondingCMMLActor(Optional ByVal abCreateActorIfNotExists As Boolean = False) As CMML.Actor
+
+            Try
+                Dim lsSQLQuery As String
+                lsSQLQuery = "SELECT *"
+                lsSQLQuery &= " FROM CoreElementHasElementType"
+                lsSQLQuery &= " WHERE Element = '" & Me.Id & "'"
+                lsSQLQuery &= " AND ElementType = 'Actor'"
+
+                Dim lrRecordset As ORMQL.Recordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If Not lrRecordset.EOF Then
+                    'CodeSafe: Search for the Actor rather than having a CMMLActor member in case not linked.
+                    '20220619-VM-May need to have CMMLActor member in the future.
+                    Dim lrCMMLActor As CMML.Actor = Me.Model.UML.Actor.Find(Function(x) x.Name = Me.Id)
+                    If lrCMMLActor IsNot Nothing Then
+                        Return lrCMMLActor
+                    Else
+                        If abCreateActorIfNotExists Then
+                            lrCMMLActor = New CMML.Actor(Me.Model.UML, Me.Id, Me)
+                            Me.Model.UML.addActor(lrCMMLActor)
+                            Return lrCMMLActor
+                        Else
+                            Return Nothing
+                        End If
+                    End If
+                Else
+                    Return Nothing
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return Nothing
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
         ''' </summary>
@@ -822,6 +874,9 @@ Namespace FBM
                     lrEntityTypeInstance.DerivationText = .DerivationText
                     lrEntityTypeInstance.DBName = .DBName
 
+                    'CMML
+                    lrEntityTypeInstance.IsActor = .IsActor
+
                     lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
 
                     If lrEntityTypeInstance.IsObjectifyingEntityType Then
@@ -908,6 +963,9 @@ Namespace FBM
                     lrEntityTypeInstance.IsAbsorbed = .IsAbsorbed
                     lrEntityTypeInstance.DerivationText = .DerivationText
                     lrEntityTypeInstance.DBName = .DBName
+
+                    'CMML
+                    lrEntityTypeInstance.IsActor = .IsActor
 
                     lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
 
@@ -2874,6 +2932,41 @@ FailsafeContinue:
 
             Catch ex As Exception
 
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="abIsActor"></param>
+        ''' <param name="abSimpleSet">True when loading the CMML (Model.UML) model. So that EntityTypeInstances are updated.</param>
+        Public Sub setIsActor(ByVal abIsActor As Boolean, Optional abSimpleSet As Boolean = False)
+
+            Try
+                Me._IsActor = abIsActor
+
+                'CMML Model
+                If Not abSimpleSet Then
+                    Dim lrCMMLActor = Me.getCorrespondingCMMLActor
+                    If Me._IsActor And lrCMMLActor Is Nothing Then
+                        lrCMMLActor = New CMML.Actor(Me.Model.UML, Me.Id, Me)
+                        Call Me.Model.UML.addActor(lrCMMLActor)
+                    ElseIf Me._IsActor And lrCMMLActor IsNot Nothing Then
+                        'Do nothing because something has gone wrong and this EntityType should have already been IsActor=True.
+                    ElseIf Not Me._IsActor Then
+                        Call Me.Model.UML.RemoveActor(lrCMMLActor)
+                    End If
+                End If
+                RaiseEvent IsActorChanged(abIsActor)
+
+            Catch ex As Exception
+                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

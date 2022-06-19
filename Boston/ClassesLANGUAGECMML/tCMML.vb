@@ -123,12 +123,12 @@ Public Class tCMML
 
         Dim larPage = From Page In lrModel.Page
                       From FactTypeInstance In Page.FactTypeInstance
-                      From Fact In FactTypeInstance.FactType.Fact
-                      From FactData In Fact.Data
+                      From FactInstance In FactTypeInstance.Fact
+                      From FactData In FactInstance.Data
                       Where Page.Language = pcenumLanguage.UMLUseCaseDiagram _
                       And FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                       And FactData.Role.Name = "Element" _
-                      And FactData.Concept.Symbol = arProcess.Id
+                      And FactData.Data = arProcess.Id
                       Where Page IsNot arExcludePage
                       Select Page Distinct
                       Order By Page.Name

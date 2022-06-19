@@ -1343,23 +1343,60 @@ Namespace FBM
             Return larFactType.ToList
 
         End Function
+
+        Public Overridable Function getCorrespondingCMMLActor() As CMML.Actor
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).getCorrespondingCMMLActor
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).IsObjectified Then
+                            Return CType(Me, FBM.FactType).getCorrespondingCMMLActor
+                        ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
+                            Return CType(Me, FBM.FactType).getCorrespondingCMMLActor
+                        Else
+                            Return Nothing
+                        End If
+                    Case Else
+                        Return Nothing
+                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Overridable Function getCorrespondingRDSTable() As RDS.Table
 
-            Select Case Me.GetType
-                Case Is = GetType(FBM.EntityType)
-                    Return CType(Me, FBM.EntityType).getCorrespondingRDSTable
-                Case Is = GetType(FBM.FactType)
-                    If CType(Me, FBM.FactType).IsObjectified Then
-                        Return CType(Me, FBM.FactType).getCorrespondingRDSTable
-                    ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
-                        Return CType(Me, FBM.FactType).getCorrespondingRDSTable
-                    Else
-                        Return Nothing
-                    End If
-                Case Else
-                    Return New RDS.Table
-            End Select
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).getCorrespondingRDSTable
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).IsObjectified Then
+                            Return CType(Me, FBM.FactType).getCorrespondingRDSTable
+                        ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
+                            Return CType(Me, FBM.FactType).getCorrespondingRDSTable
+                        Else
+                            Return Nothing
+                        End If
+                    Case Else
+                        Return New RDS.Table
+                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Function
 
         ''' <summary>

@@ -30,7 +30,6 @@ Namespace FBM
                 Me.Concept = value.Concept
             End Set
         End Property
-
         Public Overloads Property Instances As Viev.Strings.StringCollection
             Get
                 If Me.EntityType Is Nothing Then
@@ -74,6 +73,26 @@ Namespace FBM
         Private _IsDatabaseReservedWord As Boolean = False
 
         Private _IsObjectifyingEntityType As Boolean = False
+
+        ''' <summary>
+        ''' True if the EntityType is an Actor within the CMML.
+        ''' </summary>
+        Private Shadows _isActor As Boolean = False
+        <XmlElementAttribute()>
+        <CategoryAttribute("CMML"),
+        DisplayName("Is Actor"),
+        Browsable(True),
+        [ReadOnly](False),
+        DesignOnly(False),
+        DescriptionAttribute("True if the Entity Type is an Actor in the Commom Meta-Modelling Language.")>
+        Public Shadows Property IsActor As Boolean
+            Get
+                Return Me._isActor
+            End Get
+            Set(value As Boolean)
+                Me._isActor = value
+            End Set
+        End Property
 
         <XmlElementAttribute()>
         <CategoryAttribute("IsObjectifyingEntityType"),
@@ -1754,6 +1773,7 @@ MoveOn:
             Dim loEntityWidth As New SizeF
             Dim loEntityNameWidth As New SizeF
             Dim loReferenceModeWidth As New SizeF
+            Dim lsMessage As String
 
             Try
                 '------------------
@@ -1796,6 +1816,27 @@ MoveOn:
                             Call Me.EntityType.SetDBName(Me.DBName)
                         Case Is = "DerivationText"
                             Call Me.EntityType.SetDerivationText(Me.DerivationText, True)
+
+                        Case Is = "IsActor"
+                            If Me._isActor Then
+                                Call Me.EntityType.setIsActor(True)
+                            Else
+                                'Check to see if call remove the Actor
+                                Dim lrCMMLActor As CMML.Actor = Me.EntityType.getCorrespondingCMMLActor
+                                If lrCMMLActor IsNot Nothing Then
+                                    If Me.Model.CMMLActorHasActorProcessParticipationRelations(lrCMMLActor) Then
+
+                                        lsMessage = "The Actor, '" & Me.Id & "', has associated Processes. Are you sure you want to remove the Actor from the Model?"
+
+                                        If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                                            Call lrCMMLActor.RemoveFromModel()
+                                        End If
+                                    Else
+                                        Call lrCMMLActor.RemoveFromModel()
+                                    End If
+                                End If
+                            End If
+
                         Case Is = "IsDatabaseReservedWord"
                             Call Me.EntityType.setIsDatabaseReservedWord(Me.IsDatabaseReservedWord)
                         Case Is = "IsDerived"
@@ -1895,7 +1936,7 @@ MoveOn:
                                     Call Me.EntityType.SetReferenceMode(Trim(Me.ReferenceMode))
                                 End With
                             Else
-                                Dim lsMessage = "It makes no sense to have a Primary Reference Schema for a Model Element that is is absorbed into a supertype."
+                                lsMessage = "It makes no sense to have a Primary Reference Schema for a Model Element that is is absorbed into a supertype."
                                 lsMessage &= vbCrLf & vbCrLf & "Reverting Reference Model for this Entity Type to ' '."
                                 Me.ReferenceMode = " "
                                 MsgBox(lsMessage)
@@ -2039,7 +2080,6 @@ MoveOn:
                 End If
 
             Catch ex As Exception
-                Dim lsMessage As String
                 lsMessage = "Error: tEntityTypeInstance.RefreshShape:"
                 lsMessage &= vbCrLf & vbCrLf & "EntityTypeName: " & Me.Name
                 lsMessage &= vbCrLf & ", PageId:" & Me.Page.PageId
@@ -2998,6 +3038,23 @@ MoveOn:
             End Try
 
         End Sub
+
+        Private Sub _EntityType_IsActorChanged(abIsActor As Boolean) Handles _EntityType.IsActorChanged
+
+            Try
+                Me._isActor = abIsActor
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

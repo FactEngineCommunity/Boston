@@ -2621,6 +2621,10 @@ Namespace FBM
 
         End Function
 
+        Public Overrides Function getCorrespondingCMMLActor() As CMML.Actor
+            Throw New NotImplementedException("FBM.FactType does not have a getCorrespondingCMMLActor function yet.")
+        End Function
+
         ''' <summary>
         ''' PRECONDITION: FactType must have a corresponding RDS Table. Used to save typing.
         ''' </summary>

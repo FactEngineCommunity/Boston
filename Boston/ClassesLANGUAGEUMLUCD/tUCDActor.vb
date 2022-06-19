@@ -332,8 +332,6 @@ Namespace UCD
 
         End Function
 
-
-
         Private Sub CMMLActor_RemovedFromModel() Handles CMMLActor.RemovedFromModel
 
             Try
