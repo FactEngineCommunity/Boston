@@ -217,7 +217,7 @@ Public Class frmDiagrmUMLUseCase
             lsMessage &= vbCrLf & vbCrLf & ex.Message
 
             lsMessage.AppendDoubleLineBreak(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
-            lsMessage.AppendDoubleLineBreak(Richmond.GetConfigFileLocation)
+            lsMessage.AppendDoubleLineBreak(Boston.GetConfigFileLocation)
 
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
@@ -895,23 +895,6 @@ Public Class frmDiagrmUMLUseCase
             If IsSomething(lrToolboxForm) Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case e.Link.Tag.ConceptType
-                    Case Is = pcenumConceptType.EntityType
-                        Call lrToolboxForm.VerbaliseEntityType(e.Link.Tag.EntityType)
-                    Case Is = pcenumConceptType.ValueType
-                        Call lrToolboxForm.VerbaliseValueType(e.Link.Tag.ValueType)
-                    Case Is = pcenumConceptType.FactType
-                        Call lrToolboxForm.VerbaliseFactType(e.Link.Tag.FactType)
-                    Case Is = pcenumConceptType.Fact
-                        Dim lrFact As New FBM.Fact
-                        lrFact = e.Link.Tag.Fact
-                        Call lrToolboxForm.VerbaliseFact(lrFact)
-                    Case Is = pcenumConceptType.RoleConstraint
-                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                        lrRoleConstraintInstance = e.Link.Tag
-                        Select Case lrRoleConstraintInstance.RoleConstraintType
-                            Case Is = pcenumRoleConstraintType.SubsetConstraint
-                                Call lrToolboxForm.VerbaliseRoleConstraintSubset(lrRoleConstraintInstance.RoleConstraint)
-                        End Select
                 End Select
             End If
 
@@ -1200,10 +1183,46 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub CopyToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyToolStripMenuItem.Click
 
-        Dim image As Image = Diagram.CreateImage()
-        Windows.Forms.Clipboard.SetImage(image)
+        Call Me.CopyImageToClipboard()
 
     End Sub
+
+    Sub CopyImageToClipboard()
+
+        Try
+            Dim li_rectf As New RectangleF
+            li_rectf = Me.Diagram.GetContentBounds(False, True)
+
+            'Dim lo_image_processor As New t_image_processor(Diagram.CreateImage(li_rectf, 100))
+
+            Dim lr_image As Image = Diagram.CreateImage(li_rectf, 100)
+
+            lr_image = Boston.CropImage(lr_image, Color.White, 0)
+            lr_image = Boston.CreateFramedImage(lr_image, Color.White, 15)
+
+            Me.Diagram.ShowGrid = False
+
+            Me.Cursor = Cursors.WaitCursor
+
+            Windows.Forms.Clipboard.SetImage(lr_image)
+
+            '---------------------------------
+            'Set the grid back to what it was
+            '---------------------------------
+            Me.Diagram.ShowGrid = mnuOption_ViewGrid.Checked
+
+            Me.Cursor = Cursors.Default
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 
     Private Sub UseCaseDiagramView_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseUp
 
@@ -1777,6 +1796,9 @@ Public Class frmDiagrmUMLUseCase
             Call Me.DiagramView.SendToBack()
             Call Me.HiddenDiagramView.BringToFront()
 
+            'CodeSafe
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(UCD.Actor) Then Exit Sub
+
             '--------------------------------------------------------------------------------------
             'Paste the selected Actor/EntityType to the HiddenDiagramView (for animated morphing)
             '--------------------------------------------------------------
@@ -1803,9 +1825,17 @@ Public Class frmDiagrmUMLUseCase
                 '------------------------------------------------------------------
                 Dim lr_page As FBM.Page = lr_enterprise_view.Tag
 
-                Dim lrActor = (From Actor In lr_page.UMLDiagram.Actor
-                               Where Actor.Name = Me.zrPage.SelectedObject(0).Name
-                               Select Actor).First
+                Dim larFactDataInstance = From Page In Me.zrPage.Model.Page
+                                          From FactTypeInstance In Page.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where Page.Name = lr_page.Name
+                                          Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
+                                          Where FactDataInstance.Role.Name = "Element"
+                                          Where FactDataInstance.Concept.Symbol = Me.zrPage.SelectedObject(0).Name
+                                          Select FactDataInstance
+
+                Dim lrActor = larFactDataInstance.First.CloneActor(Me.zrPage)
 
                 Me.MorphVector(0).Shape = lrShapeNode
                 Me.MorphVector(0).EndPoint = New Point(lrActor.X, lrActor.Y)
@@ -2064,7 +2094,7 @@ Public Class frmDiagrmUMLUseCase
                 '----------------------------------------------------
                 'Create the Page for the StateTransitionDiagram.
                 '----------------------------------------------------
-                Richmond.WriteToStatusBar("Creating the Page.")
+                Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel, True, True, , True) 'Assigns new PageId
                 lrPage.Name = lsPageName
                 lrPage.Language = pcenumLanguage.UMLUseCaseDiagram
@@ -2130,7 +2160,6 @@ Public Class frmDiagrmUMLUseCase
         Dim larPage_list As New List(Of FBM.Page)
         Dim lr_model As FBM.Model
         Dim lrUCDProcess As New UCD.Process
-
 
         If Me.zrPage.SelectedObject.Count = 0 Then
             Exit Sub

@@ -36,7 +36,7 @@
             Me.lblDescription = New System.Windows.Forms.Label
             Me.lblTitle = New System.Windows.Forms.Label
             Me.pnlMain = New System.Windows.Forms.Panel
-            Me.SuperMain = New Boston.UI.ManageProjectSuperMain
+            Me.SuperMain = New UI.ManageProjectSuperMain
             Me.Panel1 = New System.Windows.Forms.Panel
             Me.tsMenu.SuspendLayout()
             Me.splitProps.Panel1.SuspendLayout()
@@ -227,7 +227,7 @@
         Friend WithEvents tsMenu As System.Windows.Forms.ToolStrip
         Friend WithEvents btnSupermain As System.Windows.Forms.ToolStripButton
         Friend WithEvents btnSettings As System.Windows.Forms.ToolStripButton
-        Friend WithEvents SuperMain As Boston.UI.ManageProjectSuperMain
+        Friend WithEvents SuperMain As UI.ManageProjectSuperMain
         Friend WithEvents pnlMain As System.Windows.Forms.Panel
         Friend WithEvents Panel1 As System.Windows.Forms.Panel
 

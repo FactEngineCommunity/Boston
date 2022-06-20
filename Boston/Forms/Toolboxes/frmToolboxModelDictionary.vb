@@ -595,7 +595,7 @@ Public Class frmToolboxModelDictionary
 
     Private Sub TreeView1_ItemDrag(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemDragEventArgs) Handles TreeView1.ItemDrag
 
-        'If Richmond.GetAsyncKeyState(Keys.ControlKey) Then
+        'If Boston.GetAsyncKeyState(Keys.ControlKey) Then
         '    DoDragDrop(e.Item, DragDropEffects.Move)
         'ElseIf e.Button = Windows.Forms.MouseButtons.Left Then        
         'End If

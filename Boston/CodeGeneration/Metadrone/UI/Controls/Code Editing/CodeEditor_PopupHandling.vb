@@ -18,14 +18,14 @@ Namespace UI
             Dim idx As Integer = Me.txtBox.SelectionStart + 1 - TAG_BEGIN.Length
             If idx < 0 Then idx = 0
             Dim str As String = Me.txtBox.Text.Substring(idx, TAG_BEGIN.Length - 1) & newChar
-            Return Boston.Parser.Syntax.Strings.StrEq(str, TAG_BEGIN)
+            Return Parser.Syntax.Strings.StrEq(str, TAG_BEGIN)
         End Function
 
         Private Function LeavingTag(ByVal newChar As String) As Boolean
             Dim idx As Integer = Me.txtBox.SelectionStart - TAG_END.Length
             If idx < 0 Then idx = 0
             Dim str As String = Me.txtBox.Text.Substring(idx + 1, TAG_END.Length - 1) & newChar
-            Return Boston.Parser.Syntax.Strings.StrEq(str, TAG_END)
+            Return Parser.Syntax.Strings.StrEq(str, TAG_END)
         End Function
 
         Private Function GetPopupContext(Optional ByVal defaultAs As SyntaxPopupList.Contexts = SyntaxPopupList.Contexts.DontShow) As SyntaxPopupList.Contexts

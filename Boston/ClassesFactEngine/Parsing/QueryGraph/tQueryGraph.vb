@@ -590,9 +590,9 @@ StartMatch:
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
 
                             Else
@@ -619,9 +619,9 @@ StartMatch:
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
 
                             End If
@@ -690,9 +690,9 @@ StartMatch:
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
-                                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
@@ -707,9 +707,9 @@ StartMatch:
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
-                                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsCypherQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             End If
 
@@ -1552,9 +1552,9 @@ ReturnClause:
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
+                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
                                 End Select
 
                             Else
@@ -1580,9 +1580,9 @@ ReturnClause:
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
+                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
                                 End Select
 
                             End If
@@ -1648,9 +1648,9 @@ ReturnClause:
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
-                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
@@ -1665,9 +1665,9 @@ ReturnClause:
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
-                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsTDBQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
+                                                        lsTDBQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & ";" & vbCrLf
                                                 End Select
                                             End If
 
@@ -2361,7 +2361,7 @@ ReturnClause:
                         If lrQueryEdge.BaseNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
                             For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                                 If Not lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).IsDerivationParameter Then
-                                    If liInd2 > 0 Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
+                                    If liInd2 > 0 Then lsSQLQuery &= Boston.returnIfTrue(lbAddedAND, "", " AND ")
                                     lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
                                     lsSQLQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
                                     liInd2 += 1
@@ -2370,7 +2370,7 @@ ReturnClause:
                             Next
                         End If
                         If lrQueryEdge.TargetNode.FBMModelObject.GetType <> GetType(FBM.ValueType) Then
-                            If Not lbAddedAND Then lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND, "", " AND ")
+                            If Not lbAddedAND Then lsSQLQuery &= Boston.returnIfTrue(lbAddedAND, "", " AND ")
                             liInd2 = 0
                             For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= " AND "
@@ -2728,9 +2728,9 @@ ReturnClause:
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
 
                             Else
@@ -2757,9 +2757,9 @@ ReturnClause:
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
-                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
 
                             End If
@@ -2828,9 +2828,9 @@ ReturnClause:
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0))
-                                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             Else
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
@@ -2845,9 +2845,9 @@ ReturnClause:
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
                                                         Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
-                                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
-                                                        lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             End If
 
@@ -2928,7 +2928,7 @@ ReturnClause:
                     'lrSubQueryGraph.Nodes.RemoveAll(Function(x) x.IsThatReferencedTargetNode)
 
                     If lbIntialWhere IsNot Nothing Then lbHasWhereClause = True
-                    lsSQLQuery &= Richmond.returnIfTrue(lbAddedAND Or Not lbHasWhereClause, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement,
+                    lsSQLQuery &= Boston.returnIfTrue(lbAddedAND Or Not lbHasWhereClause, "", " AND ") & lrSubQueryGraph.generateSQL(arWhichSelectStatement,
                                                                                                                                        True,,, True)
                     lsSQLQuery &= ")"
                 Next

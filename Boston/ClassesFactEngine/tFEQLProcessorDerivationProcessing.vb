@@ -163,10 +163,10 @@ Namespace FEQL
                             Select Case lrParameterNode.FBMModelObject.GetType
                                 Case Is = GetType(FBM.ValueType)
                                     Dim lrValueType As FBM.ValueType = lrParameterNode.FBMModelObject
-                                    lsIdentifierList &= Richmond.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'") & lsIdentifier & Richmond.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'")
+                                    lsIdentifierList &= Boston.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'") & lsIdentifier & Boston.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'")
                                 Case Else
                                     For Each lrColumn In lrParameterNode.RDSTable.getFirstUniquenessConstraintColumns
-                                        lsIdentifierList &= Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsIdentifier & Richmond.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'")
+                                        lsIdentifierList &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsIdentifier & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'")
                                     Next
                             End Select
                             liInd += 1

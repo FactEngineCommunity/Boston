@@ -26,7 +26,7 @@ Namespace UI
 
             ElseIf TypeOf TabPage.Controls(0) Is ManageProjectProperties Then
                 Dim props As ManageProjectProperties = CType(TabPage.Controls(0), ManageProjectProperties)
-                If TypeOf props.Tag Is Boston.Persistence.Properties Then Return CType(props.Tag, Boston.Persistence.Properties).GetDirty
+                If TypeOf props.Tag Is Persistence.Properties Then Return CType(props.Tag, Persistence.Properties).GetDirty
 
             ElseIf TypeOf TabPage.Controls(0) Is ManageSource Then
                 Dim man As ManageSource = CType(TabPage.Controls(0), ManageSource)
@@ -60,8 +60,8 @@ Namespace UI
 
             ElseIf TypeOf TabPage.Controls(0) Is ManageProjectProperties Then
                 Dim props As ManageProjectProperties = CType(TabPage.Controls(0), ManageProjectProperties)
-                If TypeOf props.Tag Is Boston.Persistence.Properties Then
-                    If CType(props.Tag, Boston.Persistence.Properties).GetDirty Then
+                If TypeOf props.Tag Is Persistence.Properties Then
+                    If CType(props.Tag, Persistence.Properties).GetDirty Then
                         Me.lstItems.Items.Add("Properties")
                     End If
                 End If
@@ -110,8 +110,8 @@ Namespace UI
 
                 ElseIf TypeOf tp.Controls(0) Is ManageProjectProperties Then
                     Dim props As ManageProjectProperties = CType(tp.Controls(0), ManageProjectProperties)
-                    If TypeOf props.Tag Is Boston.Persistence.Properties Then
-                        If CType(props.Tag, Boston.Persistence.Properties).GetDirty Then
+                    If TypeOf props.Tag Is Persistence.Properties Then
+                        If CType(props.Tag, Persistence.Properties).GetDirty Then
                             Me.lstItems.Items.Add("Properties")
                         End If
                     End If

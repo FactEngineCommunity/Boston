@@ -349,7 +349,7 @@ Namespace FBM
                 End If
 
                 If Me.IsDatabaseSynchronised And Me.RDS.DatabaseDataType.Count = 0 Then
-                    Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                    Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
                     Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
 
                     Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
@@ -395,7 +395,7 @@ Namespace FBM
                     '---------------------------------------------------------------
                     'The Entity does not exist in the ERD MetaModel, so create it.
                     '---------------------------------------------------------------
-                    Richmond.WriteToStatusBar("Creating Entity, '" & asEntityName & "'")
+                    Boston.WriteToStatusBar("Creating Entity, '" & asEntityName & "'")
 
                     lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                     lsSQLQuery &= " (Element, ElementType)"
@@ -520,7 +520,7 @@ Namespace FBM
                     '--------------------------------------------
                     If arColumn.Nullable = False Then
 
-                        Richmond.WriteToStatusBar("Creating MandatoryConstraint for Attribute, '" & asAttributeName & "', for Entity, '" & asEntityName & "'", True)
+                        Boston.WriteToStatusBar("Creating MandatoryConstraint for Attribute, '" & asAttributeName & "', for Entity, '" & asEntityName & "'", True)
 
                         lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
                         lsSQLQuery &= " VALUES ("

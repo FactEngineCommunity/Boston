@@ -1,4 +1,4 @@
-﻿Imports Boston.FBM.STM
+﻿Imports FBM.STM
 Imports System.Reflection
 Imports Newtonsoft.Json
 

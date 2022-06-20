@@ -45,7 +45,7 @@ Partial Class frmToolboxTaxonomyTree
         Me.ToolStripSeparator19 = New System.Windows.Forms.ToolStripSeparator()
         Me.ShowInModelDictionaryToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem10 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TreeView = New Boston.BostonTreeView()
+        Me.TreeView = New BostonTreeView()
         Me.GroupBox.SuspendLayout()
         Me.GroupBoxTaxonomy.SuspendLayout()
         Me.TabControl1.SuspendLayout()

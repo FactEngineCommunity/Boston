@@ -7,7 +7,7 @@ Public Class frmStartup
     Private Sub frmStartup_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Try
-            Dim lsApplicationPath As String = Richmond.MyPath
+            Dim lsApplicationPath As String = Boston.MyPath
 
             If My.Settings.UseClientServer Then
                 Me.WebBrowser.Navigate("file:\\" & lsApplicationPath & "\startup\indexClientServer.html")

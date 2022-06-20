@@ -4470,7 +4470,7 @@ Namespace FBM
 
             Dim lsMessage As String = ""
             '-----------------------------------------------------------------------------------------------------------
-            'The following explains the logic and philosophy of Richmond.
+            'The following explains the logic and philosophy of Boston.
             '  A FactType.Id/Name represents the same thing accross all Models in Richmond, otherwise the Richmond 
             '  user would have a different FactType.Id/Name for the differing Concepts (not excluding that in Richmond
             '  a FactType in one Model can have a wildly different RoleGroup (ModelObject associations) than the same

@@ -6,7 +6,7 @@
             Dim lrRecordset = New ORMQL.Recordset(FactEngine.pcenumFEQLStatementType.DESCRIBEStatement)
 
             Try
-                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
+                'Boston.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.DESCRIBEStatement = New FEQL.DESCRIBEStatement
 
                 Call Me.GetParseTreeTokensReflection(Me.DESCRIBEStatement, Me.Parsetree.Nodes(0))
@@ -37,7 +37,7 @@
             Dim lrRecordset = New ORMQL.Recordset(FactEngine.pcenumFEQLStatementType.SHOWStatement)
 
             Try
-                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
+                'Boston.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.SHOWStatement = New FEQL.SHOWStatement
 
                 Call Me.GetParseTreeTokensReflection(Me.SHOWStatement, Me.Parsetree.Nodes(0))

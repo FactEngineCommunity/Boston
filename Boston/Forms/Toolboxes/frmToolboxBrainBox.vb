@@ -83,16 +83,16 @@ Public Class frmToolboxBrainBox
 
     Private Sub frm_Brain_box_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         '----------------------------------------------------------------
-        'Rregister the Input and Output channels with the Richmond.Brain
+        'Rregister the Input and Output channels with the Boston.Brain
         '----------------------------------------------------------------
         Try
 
             prApplication.Brain = New tBrain
             prApplication.Brain.Page = prApplication.WorkingPage
             prApplication.Brain.Model = prApplication.WorkingModel
-            prApplication.Brain.VAQL = New VAQL.Processor(prApplication.WorkingModel)
+            prApplication.Brain.VAQLProcessor = New VAQL.Processor(prApplication.WorkingModel)
 
-            Dim thread As New Thread(AddressOf prApplication.Brain.VAQL.setDynamicObjects)
+            Dim thread As New Thread(AddressOf prApplication.Brain.VAQLProcessor.setDynamicObjects)
             thread.Start()
 
             prApplication.Brain.InputChannel = Me.TextBoxInput
@@ -423,7 +423,7 @@ Public Class frmToolboxBrainBox
                     End Select
 
                     '----------------------------------
-                    'Send data to the Richmond.Brain
+                    'Send data to the Boston.Brain
                     '----------------------------------
                     Me.inputbuffer.Add(Me.TextBoxInput.Text)
                     If Me.inputbuffer.Count >= 10 Then
@@ -670,7 +670,7 @@ Public Class frmToolboxBrainBox
 
                     If Me.zbSentence.POStaggingResolved Then
                         '----------------------------------
-                        'Send data to the Richmond.Brain
+                        'Send data to the Boston.Brain
                         '----------------------------------
                         Select Case lsText
                             Case Is = "yes", "no"

@@ -168,7 +168,7 @@ Namespace TableEntityType
             '  as the name of a dog; then the identity of the Napoleon that I picture (frame within a Model in my mind)
             '  is different from the identity of the Napoleon that you picture (frame within a Model in your mind).
             '  - In terms of Object Identity, Richmond only allows the allocation of a Concept to a Model 'once', 
-            '  so that Object Identity is preserved within any one Model under review within Richmond.
+            '  so that Object Identity is preserved within any one Model under review within Boston.
             '------------------------------------------------------------------------------------------------------------
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset

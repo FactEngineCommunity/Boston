@@ -40,7 +40,7 @@
         End Sub
 
         ''' <summary>
-        ''' Deletes any Concepts no longer required by any Model/Page within Richmond.
+        ''' Deletes any Concepts no longer required by any Model/Page within Boston.
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub DeleteUnneededConcepts()

@@ -25,7 +25,7 @@
             Try
                 'Use AvalonEdit. Scintilla is a pain to configure.
                 'Use ICSharpCode.TextEditor, AvalonEdit is not ready yet.
-                Me.txtBox = New txtBox(Boston.UI.txtBox.HighlightModes.MetadroneTemplate)
+                Me.txtBox = New txtBox(UI.txtBox.HighlightModes.MetadroneTemplate)
                 Me.txtBox.Dock = DockStyle.Fill
                 Me.txtBox.ShowLineNumbers = True
                 Me.pnlMain.Controls.Add(Me.txtBox)
@@ -36,7 +36,7 @@
             End Try
         End Sub
 
-        Public Sub New(ByVal HighlightMode As Boston.UI.txtBox.HighlightModes)
+        Public Sub New(ByVal HighlightMode As UI.txtBox.HighlightModes)
 
             ' This call is required by the Windows Form Designer.
             InitializeComponent()
@@ -192,7 +192,7 @@
             TagVal = TagVal.Trim
 
             'No begin tags to bother with just insert popup's tag value
-            If TagVal.IndexOf(Boston.Parser.Syntax.Constants.TAG_BEGIN) = -1 Then
+            If TagVal.IndexOf(Parser.Syntax.Constants.TAG_BEGIN) = -1 Then
                 Me.SelectedText = TagVal
                 Exit Sub
             End If
@@ -204,10 +204,10 @@
 
             'If a double up of begin tags happens
             'eg <<! <<!blah
-            idx = str.LastIndexOf(Boston.Parser.Syntax.Constants.TAG_BEGIN)
-            If idx > -1 And TagVal.IndexOf(Boston.Parser.Syntax.Constants.TAG_BEGIN) = 0 Then
+            idx = str.LastIndexOf(Parser.Syntax.Constants.TAG_BEGIN)
+            If idx > -1 And TagVal.IndexOf(Parser.Syntax.Constants.TAG_BEGIN) = 0 Then
                 'just remove that begin tag from tagval
-                TagVal = TagVal.Substring(Boston.Parser.Syntax.Constants.TAG_BEGIN.Length, TagVal.Length - Boston.Parser.Syntax.Constants.TAG_BEGIN.Length)
+                TagVal = TagVal.Substring(Parser.Syntax.Constants.TAG_BEGIN.Length, TagVal.Length - Parser.Syntax.Constants.TAG_BEGIN.Length)
             End If
             'Me.txtTemplate.SelectionStart = Me.txtTemplate.TextLength - idx
 

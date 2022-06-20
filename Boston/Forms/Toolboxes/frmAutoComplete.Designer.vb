@@ -24,7 +24,7 @@ Partial Class frmAutoComplete
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAutoComplete))
         Me.ListBox = New System.Windows.Forms.ListBox()
-        Me.DateTimePicker = New Boston.DateTimePicker()
+        Me.DateTimePicker = New DateTimePicker()
         Me.SuspendLayout()
         '
         'ListBox

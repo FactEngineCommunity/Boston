@@ -650,7 +650,7 @@ Namespace FactEngine
         Public Overrides Sub getDatabaseTypes()
 
             Try
-                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
                 Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
 
                 Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
@@ -957,7 +957,7 @@ Namespace FactEngine
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting to database.", True)
+                'Boston.WriteToStatusBar("Connecting to database.", True)
 
                 Dim adapter As OdbcDataAdapter = New OdbcDataAdapter(asQuery, Me.ODBCConnection)
                 Dim lrDataSet As New DataSet
@@ -1377,15 +1377,15 @@ Namespace FactEngine
 
             lsSQLQuery = "UPDATE " & asTableName & vbCrLf
             lsSQLQuery &= " SET " & arColumn.Name & " = " & vbCrLf
-            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsText, "'", "")
+            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "")
             lsSQLQuery &= asNewValue
-            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsText, "'", "") & vbCrLf
+            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "") & vbCrLf
             lsSQLQuery &= " WHERE "
             For Each lrColumn In aarPKColumn
                 lsSQLQuery &= lrColumn.Name & " = "
-                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                 lsSQLQuery &= lrColumn.TemporaryData
-                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
+                lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
             Next
 
             Dim lrRecordset = Me.GO(lsSQLQuery)

@@ -213,7 +213,7 @@ Namespace FBM
         <XmlIgnore()>
         Public KLLetter As String  'When doing proofs in ORM, is the letter within the formal theory of KL (Knowledge Language) assigned to this EntityType
         <XmlIgnore()>
-        Public date_created As Date 'The date that the EntityType was created within Richmond.
+        Public date_created As Date 'The date that the EntityType was created within Boston.
         <XmlIgnore()>
         Public last_modified As Date 'The date on which the EntityType was last modified.
         <XmlIgnore()>
@@ -2638,7 +2638,7 @@ FailsafeContinue:
                             If TableEntityType.ExistsEntityType(Me) Then
                                 '----------------------------------------------------------------
                                 'Entity Type already exists in Richmond DB, so no need to add.
-                                '  i.e. EntityType did not exist in Model, but did in Richmond.
+                                '  i.e. EntityType did not exist in Model, but did in Boston.
                                 '  EntityTypes in Richmond are model independant.
                                 '----------------------------------------------------------------
                             Else
@@ -3049,7 +3049,7 @@ FailsafeContinue:
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                           Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
             '-----------------------------------------------------------------------------------------------------------------
-            'The following explains the logic and philosophy of Richmond.
+            'The following explains the logic and philosophy of Boston.
             '  A EntityType.Id/Name represents the same thing accross all Models in Richmond, otherwise the Richmond 
             '  user would have a different EntityType.Id/Name for the differing Concepts (not excluding that in Richmond
             '  a FactType in one Model can have a wildly different RoleGroup (ModelObject associations) than the same

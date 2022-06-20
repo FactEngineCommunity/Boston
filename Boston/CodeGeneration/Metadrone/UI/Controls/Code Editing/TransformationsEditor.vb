@@ -19,7 +19,7 @@
 
             ' Add any initialization after the InitializeComponent() call.
             Try
-                Me.txtBox = New txtBox(Boston.UI.txtBox.HighlightModes.Transformations)
+                Me.txtBox = New txtBox(UI.txtBox.HighlightModes.Transformations)
                 Me.txtBox.Dock = DockStyle.Fill
                 Me.txtBox.ShowLineNumbers = True
                 Me.pnlMain.Controls.Add(Me.txtBox)

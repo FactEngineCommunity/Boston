@@ -2,7 +2,7 @@ Imports System.IO
 Imports System.Xml.Serialization
 Imports System.Xml.Linq
 Imports System.Text.RegularExpressions
-Imports Boston.Richmond.publicFunctions
+Imports Boston.publicFunctions
 Imports System.Reflection
 Imports System.Runtime
 Imports Gios.Word
@@ -164,7 +164,7 @@ Public Class frmToolboxEnterpriseExplorer
             larModel = TableModel.GetModels(asCreatedByUserId, asNamespaceId)
             prApplication.Models = larModel
 
-            Dim lasExcludedModelIds() As String = {}
+            Dim lasExcludedModelIds As New List(Of String)
 
             If Not My.Settings.DisplayLanguageModel Then
                 lasExcludedModelIds.Add("English")
@@ -835,7 +835,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             End If
 
-            If Richmond.GetAsyncKeyState(Keys.ControlKey) Then
+            If Boston.GetAsyncKeyState(Keys.ControlKey) Then
                 DoDragDrop(e.Item, DragDropEffects.Copy Or DragDropEffects.Move)
             Else
                 DoDragDrop(e.Item, DragDropEffects.Move Or DragDropEffects.Copy)
@@ -1039,17 +1039,17 @@ Public Class frmToolboxEnterpriseExplorer
                 Call TableModel.GetModelDetails(arModel)
 
                 Me.Cursor = Cursors.WaitCursor
-                Richmond.WriteToStatusBar("Loading Model")
+                Boston.WriteToStatusBar("Loading Model")
                 Call Me.ShowCircularProgressBar()
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
                     pdbConnection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                     pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
-                    Richmond.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
+                    Boston.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                 End If
                 Call arModel.Load(True, False, Me.BackgroundWorkerModelLoader)
                 Call Me.HideCircularProgressBar
                 Me.Cursor = Cursors.Default
-                Richmond.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
+                Boston.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
             End If
         Catch ex As Exception
             Dim lsMessage As String
@@ -1137,7 +1137,7 @@ Public Class frmToolboxEnterpriseExplorer
                                     Call TablePage.GetPagesByModel(lrModel, True)
                                 End If
                                 If lrModel.Loaded Then
-                                    Richmond.WriteToStatusBar("Model loaded")
+                                    Boston.WriteToStatusBar("Model loaded")
                                 End If
                             Else
                                 Call Me.DoModelLoading(lrModel)
@@ -1190,7 +1190,7 @@ Public Class frmToolboxEnterpriseExplorer
                                             Call Me.ShowCircularProgressBar()
                                             lrPage.Model.Load(True, False, Me.BackgroundWorkerModelLoader)
                                             Call Me.HideCircularProgressBar()
-                                            Richmond.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
+                                            Boston.WriteToStatusBar(lrPage.Model.Name & " - Model Loaded")
                                         End With
                                     End If
                                 End If
@@ -1579,9 +1579,9 @@ Public Class frmToolboxEnterpriseExplorer
                 prApplication.WorkingPage = lrPage
 
                 If Not abSuppressModelSave Then
-                    Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                    Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
                     lrModel.Save()
-                    Richmond.WriteToStatusBar("Model saved.")
+                    Boston.WriteToStatusBar("Model saved.")
                 End If
 
                 '------------------------------------
@@ -2366,7 +2366,7 @@ Public Class frmToolboxEnterpriseExplorer
         'Get the Pages
         '  Add the Page to the TreeView
         '-------------------------------
-        Richmond.WriteToStatusBar("Loading Pages")
+        Boston.WriteToStatusBar("Loading Pages")
         Dim loEnumElementQueryResult As IEnumerable(Of XElement)
         loEnumElementQueryResult = From ModelInformation In NORMAXMLDOC.Elements.<ormDiagram:ORMDiagram>
                                    Select ModelInformation
@@ -2401,13 +2401,13 @@ Public Class frmToolboxEnterpriseExplorer
         '-----------------------------------------
         'Get the ValueTypes from the nORMa model
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Value Types",, 10)
+        Boston.WriteToStatusBar("Loading Value Types",, 10)
         Call lrNORMAFileLoader.LoadValueTypes(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------
         'Get the EntityTypes from the nORMa model
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Entity Types",, 20)
+        Boston.WriteToStatusBar("Loading Entity Types",, 20)
         Call lrNORMAFileLoader.LoadEntityTypes(lrModel, NORMAXMLDOC)
 
         '-------------------------------------------------------
@@ -2418,25 +2418,25 @@ Public Class frmToolboxEnterpriseExplorer
         '----------------------------------------
         'Get the FactTypes from the nORMa model
         '----------------------------------------
-        Richmond.WriteToStatusBar("Loading Fact Types", True, 30)
+        Boston.WriteToStatusBar("Loading Fact Types", True, 30)
         Call lrNORMAFileLoader.LoadFactTypes(lrModel, NORMAXMLDOC)
 
         '----------------------------------------
         'Set Role.Ids for LinkFactTypes
         '----------------------------------------
-        Richmond.WriteToStatusBar("Loading Fact Types",, 35)
+        Boston.WriteToStatusBar("Loading Fact Types",, 35)
         Call lrNORMAFileLoader.SetRoleIdsForLinkFactTypes(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------
         'Get the Internal Uniqueness Constraints
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading Internal Uniqueness Constraints",, 40)
+        Boston.WriteToStatusBar("Loading Internal Uniqueness Constraints",, 40)
         Call lrNORMAFileLoader.LoadRoleConstraintInternalUniquenessConstraints(lrModel, NORMAXMLDOC, True)
 
         '-----------------------------------------
         'Get the External Uniqueness Constraints
         '-----------------------------------------
-        Richmond.WriteToStatusBar("Loading External Uniqueness Constraints",, 50)
+        Boston.WriteToStatusBar("Loading External Uniqueness Constraints",, 50)
         Call lrNORMAFileLoader.LoadRoleConstraintExternalUniquenessConstraints(lrModel, NORMAXMLDOC)
 
         '-------------------------------------------------------
@@ -2447,35 +2447,35 @@ Public Class frmToolboxEnterpriseExplorer
         '----------------------------
         'Get the Subset Constraints
         '----------------------------
-        Richmond.WriteToStatusBar("Loading Subset Constraints",, 60)
+        Boston.WriteToStatusBar("Loading Subset Constraints",, 60)
         Call lrNORMAFileLoader.LoadRoleConstraintSubsetConstraints(lrModel, NORMAXMLDOC)
 
         '--------------------------
         'Get the Ring Constraints
         '--------------------------
-        Richmond.WriteToStatusBar("Loading Ring Constraints",, 65)
+        Boston.WriteToStatusBar("Loading Ring Constraints",, 65)
         Call lrNORMAFileLoader.LoadRoleConstraintRingConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Exclusion Constraints",, 70)
+        Boston.WriteToStatusBar("Loading Exclusion Constraints",, 70)
         Call lrNORMAFileLoader.LoadRoleConstraintExclusionConstraints(lrModel, NORMAXMLDOC)
 
 
-        Richmond.WriteToStatusBar("Loading Inclusive Or Constraints",, 75)
+        Boston.WriteToStatusBar("Loading Inclusive Or Constraints",, 75)
         Call lrNORMAFileLoader.LoadRoleConstraintInclusiveOrConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Exclusive Or Constraints",, 80)
+        Boston.WriteToStatusBar("Loading Exclusive Or Constraints",, 80)
         Call lrNORMAFileLoader.LoadRoleConstraintExclusiveOrConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Equality Constraints",, 85)
+        Boston.WriteToStatusBar("Loading Equality Constraints",, 85)
         Call lrNORMAFileLoader.LoadRoleConstraintEqualityConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Loading Frequency Constraints",, 90)
+        Boston.WriteToStatusBar("Loading Frequency Constraints",, 90)
         Call lrNORMAFileLoader.LoadRoleConstraintFrequencyConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Value Comparison Constraints",, 95)
+        Boston.WriteToStatusBar("Value Comparison Constraints",, 95)
         Call lrNORMAFileLoader.LoadRoleConstraintValueComparisonConstraints(lrModel, NORMAXMLDOC)
 
-        Richmond.WriteToStatusBar("Model Notes",, 97)
+        Boston.WriteToStatusBar("Model Notes",, 97)
         Call lrNORMAFileLoader.LoadModelNotes(lrModel, NORMAXMLDOC)
 
         '----------------------------------------------------------------------------------------------------------
@@ -2484,56 +2484,56 @@ Public Class frmToolboxEnterpriseExplorer
         '  the FactType. In essense, NORMA has a Binary FactType refering to the Value Type and in Richmond
         '  only the Unary FactType (and singular Role) is required.
         '----------------------------------------------------------------------------------------------------------
-        Richmond.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes", True, 96)
+        Boston.WriteToStatusBar("Ridding of unnecessary Roles in FactTypes", True, 96)
         Call lrNORMAFileLoader.GetRidOfRolesInFactTypesThatReferToUnaryFactTypeValueTypes(arModel)
 
         '-------------------------------------------------------
         'Get ModelObjectInstances by Page from the nORMa model
         '-------------------------------------------------------
-        Richmond.WriteToStatusBar("Loading Page Model Object Instances", True, 97)
+        Boston.WriteToStatusBar("Loading Page Model Object Instances", True, 97)
         Call lrNORMAFileLoader.LoadPageModelInstances(lrModel, NORMAXMLDOC)
 
         '-----------------------------------------------------------------------------------------------------
         'Set the Ids of EntityTypes, ValueTypes, FactTypes, RoleConstraints to the same as the Name of
-        '  the ModelObject. That is the standard in Richmond. In NORMA, each Id is a GUID different from
+        '  the ModelObject. That is the standard in Boston. In NORMA, each Id is a GUID different from
         '  the name of the ModelObject.
         '-----------------------------------------------------------------------------------------------------
         frmMain.Cursor = Cursors.WaitCursor
 
         'For Each lrEntityType In lrModel.EntityType
-        '    Richmond.WriteToStatusBar("Updating Ids for EntityType: " & lrEntityType.Name)
+        '    Boston.WriteToStatusBar("Updating Ids for EntityType: " & lrEntityType.Name)
         '    lrEntityType.SetName(lrEntityType.Name)
         'Next
 
         'For Each lrValueType In lrModel.ValueType
-        '    Richmond.WriteToStatusBar("Updating Ids for ValueType: " & lrValueType.Name)
+        '    Boston.WriteToStatusBar("Updating Ids for ValueType: " & lrValueType.Name)
         '    lrValueType.SetName(lrValueType.Name)
         'Next
 
         'For Each lrFactType In lrModel.FactType
-        '    Richmond.WriteToStatusBar("Updating Ids for FactType: " & lrFactType.Name)
+        '    Boston.WriteToStatusBar("Updating Ids for FactType: " & lrFactType.Name)
         '    lrFactType.SetName(lrFactType.Name)
         'Next
 
         'For Each lrRoleConstraint In lrModel.RoleConstraint
-        '    Richmond.WriteToStatusBar("Updating Ids for RoleConstraint: " & lrFactType.Name)
+        '    Boston.WriteToStatusBar("Updating Ids for RoleConstraint: " & lrFactType.Name)
         '    lrRoleConstraint.SetName(lrRoleConstraint.Name)
         'Next
 
         'For Each lrPage In lrModel.Page
 
         '    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
-        '        Richmond.WriteToStatusBar("Updating Ids for EntityTypeInstances: " & lrEntityTypeInstance.Name)
+        '        Boston.WriteToStatusBar("Updating Ids for EntityTypeInstances: " & lrEntityTypeInstance.Name)
         '        lrEntityTypeInstance.SetName(lrEntityTypeInstance.Name)
         '    Next
 
         '    For Each lrValueTypeInstance In lrPage.ValueTypeInstance
-        '        Richmond.WriteToStatusBar("Updating Ids for ValueTypeInstances: " & lrValueTypeInstance.Name)
+        '        Boston.WriteToStatusBar("Updating Ids for ValueTypeInstances: " & lrValueTypeInstance.Name)
         '        lrValueTypeInstance.SetName(lrValueTypeInstance.Name)
         '    Next
 
         '    For Each lrFactTypeInstance In lrPage.FactTypeInstance
-        '        Richmond.WriteToStatusBar("Updating Ids for FactTypeInstances: " & lrFactTypeInstance.Name)
+        '        Boston.WriteToStatusBar("Updating Ids for FactTypeInstances: " & lrFactTypeInstance.Name)
         '        lrFactTypeInstance.SetName(lrFactTypeInstance.Name)
         '    Next
 
@@ -2546,7 +2546,7 @@ Public Class frmToolboxEnterpriseExplorer
         lrModel.Loaded = True
         frmMain.Cursor = Cursors.Default
 
-        Richmond.WriteToStatusBar("", True, 100)
+        Boston.WriteToStatusBar("", True, 100)
 
         frmMain.Cursor = Cursors.Default
         Me.Cursor = Cursors.Default
@@ -2615,7 +2615,7 @@ Public Class frmToolboxEnterpriseExplorer
             'Objects must be serialisable to use the Clipboard.
             '  Use the following to test if the Object is serialisable.
             '------------------------------------------------------------
-            Call Richmond.IsSerializable(prApplication.WorkingPage)
+            Call Boston.IsSerializable(prApplication.WorkingPage)
 
             '----------------------------
             ' Create a new data format.
@@ -2858,7 +2858,7 @@ Public Class frmToolboxEnterpriseExplorer
             Call lrExportModel.MapFromFBMModel(lrModel)
 
             Dim lsFileLocationName As String = ""
-            If Richmond.IsSerializable(lrExportModel) Then
+            If Boston.IsSerializable(lrExportModel) Then
 
                 If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
                     lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
@@ -2975,7 +2975,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             xml = XDocument.Load(asFileName)
 
-            Richmond.WriteToStatusBar("Loading model.", True)
+            Boston.WriteToStatusBar("Loading model.", True)
 
             lsXSDVersionNr = xml.<Model>.@XSDVersionNr
             '=====================================================================================================
@@ -3080,7 +3080,7 @@ Public Class frmToolboxEnterpriseExplorer
             lrNewTreeNode.Expand()
             Me.TreeView.Nodes(0).Nodes(Me.TreeView.Nodes(0).Nodes.Count - 1).EnsureVisible()
 
-            'Richmond.WriteToStatusBar("Saving model.", True)
+            'Boston.WriteToStatusBar("Saving model.", True)
             Dim lfrmFlashCard As New frmFlashCard
             '20220129-VM-Commented out.
             'lfrmFlashCard.ziIntervalMilliseconds = 1500
@@ -3138,7 +3138,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'lfrmFlashCard.ziIntervalMilliseconds = 3500
                 'lfrmFlashCard.zsText = "Saving model."
                 'lfrmFlashCard.Show(Me)
-                'Richmond.WriteToStatusBar("Saving model.", True)
+                'Boston.WriteToStatusBar("Saving model.", True)
                 'Call lrModel.Save()
             End If
 
@@ -3175,15 +3175,15 @@ Public Class frmToolboxEnterpriseExplorer
             Select Case lrCustomMessageBox.ShowDialog
                 Case Is = "Store as XML"
                     lrModel.StoreAsXML = True
-                    Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                    Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
                     Call lrModel.Save(True, False)
-                    Richmond.WriteToStatusBar("Model Saved")
+                    Boston.WriteToStatusBar("Model Saved")
                 Case Is = "Save to database"
                     With New WaitCursor
-                        Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                        Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
                         lfrmFlashCard.Show(Me)
                         Call lrModel.Save(True, True)
-                        Richmond.WriteToStatusBar("Model Saved")
+                        Boston.WriteToStatusBar("Model Saved")
                     End With
             End Select
 
@@ -3264,7 +3264,7 @@ Public Class frmToolboxEnterpriseExplorer
     '        '-----------------------------------------
     '        Call Me.AddModelToModelExplorer(lrModel, False)
 
-    '        Directory.SetCurrentDirectory(Richmond.MyPath)
+    '        Directory.SetCurrentDirectory(Boston.MyPath)
 
     '    Catch ex As Exception
     '        Dim lsMessage As String
@@ -3359,7 +3359,7 @@ Public Class frmToolboxEnterpriseExplorer
             End If
 
             If lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And (lrPage.Model.RDSLoading Or lrPage.Model.STMLoading)) Then
-                Richmond.WriteToStatusBar("Waiting for background loading of the Page", True)
+                Boston.WriteToStatusBar("Waiting for background loading of the Page", True)
                 frmMain.Cursor = Cursors.WaitCursor
                 frmMain.Refresh()
             End If
@@ -3489,7 +3489,7 @@ Public Class frmToolboxEnterpriseExplorer
                 lrEnterpriseView.FocusModelElement = Nothing
             End If
 
-            Richmond.WriteToStatusBar("Editing Page: '" & lrPage.Name & "'", True)
+            Boston.WriteToStatusBar("Editing Page: '" & lrPage.Name & "'", True)
 
             frmMain.ToolStripButtonPrint.Enabled = True
 
@@ -3644,7 +3644,7 @@ Public Class frmToolboxEnterpriseExplorer
             Using lrWaitCursor As New WaitCursor
                 Dim lrPage As FBM.Page
 
-                Richmond.WriteToStatusBar("Loading the MetaModel for Property Graph Schemas.")
+                Boston.WriteToStatusBar("Loading the MetaModel for Property Graph Schemas.")
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
                                                pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
@@ -3660,7 +3660,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '----------------------------------------------------
                 'Create the Page for the EntityRelationshipDiagram.
                 '----------------------------------------------------
-                Richmond.WriteToStatusBar("Creating the Page.")
+                Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel)
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("NewPropertyGraphSchema", 0)
                 lrPage.Language = pcenumLanguage.PropertyGraphSchema
@@ -3700,7 +3700,7 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lrPage As FBM.Page
 
             Using lrWaitCursor As New WaitCursor
-                Richmond.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
+                Boston.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
                                                pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
@@ -3716,7 +3716,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '----------------------------------------------------
                 'Create the Page for the EntityRelationshipDiagram.
                 '----------------------------------------------------
-                Richmond.WriteToStatusBar("Creating the Page.")
+                Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel)
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("NewEntityRelationshipDiagram", 0)
                 lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
@@ -3759,7 +3759,7 @@ Public Class frmToolboxEnterpriseExplorer
             End If
 
             While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
-                WriteToStatusBar("Still loading the Model's Pages")
+                Boston.WriteToStatusBar("Still loading the Model's Pages")
             End While
 
             Call frmMain.LoadGlossaryForm()
@@ -4211,7 +4211,7 @@ Public Class frmToolboxEnterpriseExplorer
             Call lrExportModel.MapFromFBMModel(lrModel)
 
             Dim lsFileLocationName As String = ""
-            If Richmond.IsSerializable(lrExportModel) Then
+            If Boston.IsSerializable(lrExportModel) Then
 
                 If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
                     lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
@@ -4378,7 +4378,7 @@ Public Class frmToolboxEnterpriseExplorer
                 End While
 
                 Dim rd As Gios.Word.WordDocument = New WordDocument(WordDocumentFormat.Letter_8_5x11)
-                Dim lrFBMWordVerbaliser As New Boston.FBM.ORMWordVerbailser(rd)
+                Dim lrFBMWordVerbaliser As New FBM.ORMWordVerbailser(rd)
 
                 Dim lrFrmGetDocumentGenerationSettings As New frmDocumentGeneratorSettings
                 lrFrmGetDocumentGenerationSettings.zrORMWordVerbaliser = lrFBMWordVerbaliser
@@ -4457,7 +4457,7 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lrPage As FBM.Page
 
             Using lrWaitCursor As New WaitCursor
-                Richmond.WriteToStatusBar("Loading the MetaModel for State Transition Diagrams")
+                Boston.WriteToStatusBar("Loading the MetaModel for State Transition Diagrams")
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
                                                pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString,
@@ -4473,7 +4473,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '----------------------------------------------------
                 'Create the Page for the StateTransitionDiagram.
                 '----------------------------------------------------
-                Richmond.WriteToStatusBar("Creating the Page.")
+                Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel, True, True, , True) 'Assigns new PageId
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("NewStateTransitionDiagram", 0)
                 lrPage.Language = pcenumLanguage.StateTransitionDiagram
@@ -4742,15 +4742,15 @@ Public Class frmToolboxEnterpriseExplorer
                     Select Case lrCustomMessageBox.ShowDialog
                         Case Is = "Store as XML"
                             lrModel.StoreAsXML = True
-                            Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
-                            Call lrModel.Save(True, False)
-                            Richmond.WriteToStatusBar("Model Saved")
-                        Case Is = "Save to database"
+                        Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                        Call lrModel.Save(True, False)
+                        Boston.WriteToStatusBar("Model Saved")
+                    Case Is = "Save to database"
                             With New WaitCursor
-                                Richmond.WriteToStatusBar("Saving Model: " & lrModel.Name)
-                                Call lrModel.Save(True, False)
-                                Richmond.WriteToStatusBar("Model Saved")
-                            End With
+                            Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
+                            Call lrModel.Save(True, False)
+                            Boston.WriteToStatusBar("Model Saved")
+                        End With
                     End Select
 
                     Call lrNewTreeNode.EnsureVisible()
@@ -4822,7 +4822,7 @@ Public Class frmToolboxEnterpriseExplorer
             Using lrWaitCursor As New WaitCursor
                 Dim lrPage As FBM.Page
 
-                Richmond.WriteToStatusBar("Loading the MetaModel for Property Graph Schemas.")
+                Boston.WriteToStatusBar("Loading the MetaModel for Property Graph Schemas.")
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
                                                pcenumCMMLCorePage.CoreBPMNDiagram.ToString,
@@ -4838,7 +4838,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '----------------------------------------------------
                 'Create the Page for the EntityRelationshipDiagram.
                 '----------------------------------------------------
-                Richmond.WriteToStatusBar("Creating the Page.")
+                Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel)
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("BPMN-NewPage", 0)
                 lrPage.Language = pcenumLanguage.BPMN
@@ -4910,7 +4910,7 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lrPage As FBM.Page
 
             Using lrWaitCursor As New WaitCursor
-                Richmond.WriteToStatusBar("Loading the MetaModel for Use Case Diagrams")
+                Boston.WriteToStatusBar("Loading the MetaModel for Use Case Diagrams")
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
                                                pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString,
@@ -4926,7 +4926,7 @@ Public Class frmToolboxEnterpriseExplorer
                 '----------------------------------------------------
                 'Create the Page for the StateTransitionDiagram.
                 '----------------------------------------------------
-                Richmond.WriteToStatusBar("Creating the Page.")
+                Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel, True, True, , True) 'Assigns new PageId
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("UML-UCD-NewDiagram", 0)
                 lrPage.Language = pcenumLanguage.UMLUseCaseDiagram

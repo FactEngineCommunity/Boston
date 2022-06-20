@@ -20,12 +20,12 @@ Namespace Database
                 lsCompactedDatabaseLocationName = New System.IO.FileInfo(lsDatabaseLocationName).DirectoryName & "\BostonCompacted.vdb"
 
                 Try
-                    Call Richmond.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
+                    Call Boston.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
                 Catch ex As Exception
                     prApplication.ThrowErrorMessage("Failed to compact the database. Check to see if any other application has the database open.", pcenumErrorType.Warning)
                 End Try
 
-                Call Richmond.OpenDatabase()
+                Call Boston.OpenDatabase()
 
             Catch ex As Exception
                 Dim lsMessage As String

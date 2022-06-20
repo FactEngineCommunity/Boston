@@ -42,7 +42,7 @@
             Me.lblConnectionString = New System.Windows.Forms.Label
             Me.tcMain = New System.Windows.Forms.TabControl
             Me.TabPage2 = New System.Windows.Forms.TabPage
-            Me.txtTransformations = New Boston.UI.TransformationsEditor
+            Me.txtTransformations = New UI.TransformationsEditor
             Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
             Me.TabPage1.SuspendLayout()
             CType(Me.picAccess2K, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -280,7 +280,7 @@
         Friend WithEvents tcMain As System.Windows.Forms.TabControl
         Friend WithEvents chkHdr As System.Windows.Forms.CheckBox
         Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
-        Friend WithEvents txtTransformations As Boston.UI.TransformationsEditor
+        Friend WithEvents txtTransformations As UI.TransformationsEditor
         Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
 
     End Class

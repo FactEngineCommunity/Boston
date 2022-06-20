@@ -36,16 +36,16 @@
             Me.TabPage2 = New System.Windows.Forms.TabPage
             Me.splitMain = New System.Windows.Forms.SplitContainer
             Me.splitQuery = New System.Windows.Forms.SplitContainer
-            Me.txtSchemaQuery = New Boston.UI.SQLEditor
+            Me.txtSchemaQuery = New UI.SQLEditor
             Me.Panel3 = New System.Windows.Forms.Panel
             Me.lblSchemaQuery = New System.Windows.Forms.Label
             Me.lnkPreviewSchema = New System.Windows.Forms.LinkLabel
             Me.splitTableColumn = New System.Windows.Forms.SplitContainer
-            Me.txtTableSchemaQuery = New Boston.UI.SQLEditor
+            Me.txtTableSchemaQuery = New UI.SQLEditor
             Me.lblTableSchemaQuery = New System.Windows.Forms.Label
-            Me.txtColumnSchemaQuery = New Boston.UI.SQLEditor
+            Me.txtColumnSchemaQuery = New UI.SQLEditor
             Me.lblColumnSchemaQuery = New System.Windows.Forms.Label
-            Me.QueryResults = New Boston.UI.QueryResults
+            Me.QueryResults = New UI.QueryResults
             Me.Panel1 = New System.Windows.Forms.Panel
             Me.grpApproach = New System.Windows.Forms.GroupBox
             Me.rbApproachSingle = New System.Windows.Forms.RadioButton
@@ -60,13 +60,13 @@
             Me.rbTableQuery = New System.Windows.Forms.RadioButton
             Me.TabPage3 = New System.Windows.Forms.TabPage
             Me.splitRoutine = New System.Windows.Forms.SplitContainer
-            Me.txtRoutineSchemaQuery = New Boston.UI.SQLEditor
+            Me.txtRoutineSchemaQuery = New UI.SQLEditor
             Me.Panel5 = New System.Windows.Forms.Panel
             Me.Label2 = New System.Windows.Forms.Label
             Me.lnkPreviewRoutineSchema = New System.Windows.Forms.LinkLabel
-            Me.RoutineQueryResults = New Boston.UI.QueryResults
+            Me.RoutineQueryResults = New UI.QueryResults
             Me.TabPage4 = New System.Windows.Forms.TabPage
-            Me.txtTransformations = New Boston.UI.TransformationsEditor
+            Me.txtTransformations = New UI.TransformationsEditor
             Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
             Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
             Me.TabPage1.SuspendLayout()
@@ -689,19 +689,19 @@
         Friend WithEvents splitTableColumn As System.Windows.Forms.SplitContainer
         Friend WithEvents lblTableSchemaQuery As System.Windows.Forms.Label
         Friend WithEvents lblColumnSchemaQuery As System.Windows.Forms.Label
-        Friend WithEvents QueryResults As Boston.UI.QueryResults
-        Friend WithEvents txtSchemaQuery As Boston.UI.SQLEditor
-        Friend WithEvents txtTableSchemaQuery As Boston.UI.SQLEditor
-        Friend WithEvents txtColumnSchemaQuery As Boston.UI.SQLEditor
+        Friend WithEvents QueryResults As UI.QueryResults
+        Friend WithEvents txtSchemaQuery As UI.SQLEditor
+        Friend WithEvents txtTableSchemaQuery As UI.SQLEditor
+        Friend WithEvents txtColumnSchemaQuery As UI.SQLEditor
         Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
         Friend WithEvents splitRoutine As System.Windows.Forms.SplitContainer
-        Friend WithEvents txtRoutineSchemaQuery As Boston.UI.SQLEditor
+        Friend WithEvents txtRoutineSchemaQuery As UI.SQLEditor
         Friend WithEvents Panel5 As System.Windows.Forms.Panel
         Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents lnkPreviewRoutineSchema As System.Windows.Forms.LinkLabel
-        Friend WithEvents RoutineQueryResults As Boston.UI.QueryResults
+        Friend WithEvents RoutineQueryResults As UI.QueryResults
         Friend WithEvents TabPage4 As System.Windows.Forms.TabPage
-        Friend WithEvents txtTransformations As Boston.UI.TransformationsEditor
+        Friend WithEvents txtTransformations As UI.TransformationsEditor
         Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
         Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
 

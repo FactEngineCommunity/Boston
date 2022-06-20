@@ -6,7 +6,7 @@
             Dim lrRecordset As New ORMQL.Recordset
 
             Try
-                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
+                'Boston.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.ENUMMERATEStatement = New FEQL.ENUMERATEStatement
 
                 Call Me.GetParseTreeTokensReflection(Me.ENUMMERATEStatement, Me.Parsetree.Nodes(0))
@@ -16,7 +16,7 @@
                 Dim lrFBMModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(Me.ENUMMERATEStatement.MODELELEMENTNAME)
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.ENUMMERATEStatement.MODELELEMENTNAME & "'.")
 
-                'Richmond.WriteToStatusBar("Generating SQL", True)
+                'Boston.WriteToStatusBar("Generating SQL", True)
 
                 '==========================================================================
                 'Get the records
@@ -34,14 +34,14 @@
 
                 ''==========================================================
                 ''Populate the lrRecordset with results from the database
-                ''Richmond.WriteToStatusBar("Connecting to database.", True)
+                ''Boston.WriteToStatusBar("Connecting to database.", True)
                 'Dim lrSQLiteConnection = Database.CreateConnection(Me.Model.TargetDatabaseConnectionString)
                 'Dim lrSQLiteDataReader = Database.getReaderForSQL(lrSQLiteConnection, lsSQLQuery)
 
                 'Dim larFact As New List(Of FBM.Fact)
                 'Dim lrFactType = New FBM.FactType(Me.Model, "DummyFactType", True)
                 'Dim lrFact As FBM.Fact
-                ''Richmond.WriteToStatusBar("Reading results.", True)
+                ''Boston.WriteToStatusBar("Reading results.", True)
 
                 ''=====================================================
                 ''Column Names        

@@ -56,13 +56,13 @@ Namespace Parser.CodeCompletion
                     For Each tmp In pkg.Templates
                         'Get template name and params
                         Dim t As New Template()
-                        If Boston.UI.MainForm IsNot Nothing Then
-                            Dim idx As Integer = Boston.UI.MainForm.TagFoundInTabPages(tmp)
+                        If UI.MainForm IsNot Nothing Then
+                            Dim idx As Integer = UI.MainForm.TagFoundInTabPages(tmp)
                             If idx > -1 Then
                                 'If in editor, use code there
-                                If TypeOf Boston.UI.MainForm.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
-                                    Dim editor As UI.CodeEditor = CType(Boston.UI.MainForm.tcMain.TabPages(idx).Controls(0), UI.CodeEditor)
-                                    Dim tag As Boston.Persistence.Template = CType(editor.Tag, Boston.Persistence.Template)
+                                If TypeOf UI.MainForm.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
+                                    Dim editor As UI.CodeEditor = CType(UI.MainForm.tcMain.TabPages(idx).Controls(0), UI.CodeEditor)
+                                    Dim tag As Persistence.Template = CType(editor.Tag, Persistence.Template)
                                     t = New Compilation("", tag.Text, False, True).GetTemplateParams()
                                 End If
                             Else
@@ -111,12 +111,12 @@ Namespace Parser.CodeCompletion
 
 
         Private Sub GetSource(ByVal src As Persistence.Source)
-            Dim idx As Integer = Boston.UI.MainForm.TagFoundInTabPages(src)
+            Dim idx As Integer = UI.MainForm.TagFoundInTabPages(src)
             If idx > -1 Then
                 'If in editor, use values there
-                If TypeOf Boston.UI.MainForm.tcMain.TabPages(idx).Controls(0) Is UI.ManageSource Then
-                    Dim tag As Object = CType(Boston.UI.MainForm.tcMain.TabPages(idx).Controls(0), UI.ManageSource).Tag
-                    Dim s As Parser.Source.Source = CType(tag, Boston.Persistence.Source).ToParserSource
+                If TypeOf UI.MainForm.tcMain.TabPages(idx).Controls(0) Is UI.ManageSource Then
+                    Dim tag As Object = CType(UI.MainForm.tcMain.TabPages(idx).Controls(0), UI.ManageSource).Tag
+                    Dim s As Parser.Source.Source = CType(tag, Persistence.Source).ToParserSource
                     Me.Sources.Add(New Source(s.Name, s.Provider, s.Transformations))
                 End If
             Else

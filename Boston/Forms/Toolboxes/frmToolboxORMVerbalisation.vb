@@ -2700,10 +2700,10 @@ Public Class frmToolboxORMVerbalisation
 
     Public Sub VerbaliseFact(ByVal arFact As FBM.Fact)
 
+        Dim lrVerbaliser As New FBM.ORMVerbailser
         Try
             Dim liInd As Integer = 0
 
-            Dim lrVerbaliser As New FBM.ORMVerbailser
             Call lrVerbaliser.Reset()
 
             lrVerbaliser.VerbaliseQuantifier("Fact with Fact.Id: '" & arFact.Id & "' is a Fact of FactType: '")
@@ -2725,7 +2725,9 @@ Public Class frmToolboxORMVerbalisation
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseError(lsMessage1)
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
         End Try
 
     End Sub

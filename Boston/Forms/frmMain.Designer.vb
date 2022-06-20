@@ -921,7 +921,7 @@ Partial Class frmMain
         '
         'HelpProvider
         '
-        Me.HelpProvider.HelpNamespace = ".\richmondhelp\Richmond.chm"
+        Me.HelpProvider.HelpNamespace = ".\richmondhelp\Boston.chm"
         '
         'NotifyIcon
         '

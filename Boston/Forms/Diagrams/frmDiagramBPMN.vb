@@ -1169,7 +1169,7 @@ Public Class frmDiagramBPMN
         Me.ETDDiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
         '--------------------------------------------------
-        'Just to be sure...set the Richmond.WorkingProject
+        'Just to be sure...set the Boston.WorkingProject
         '--------------------------------------------------
         prApplication.WorkingPage = Me.zrPage
 

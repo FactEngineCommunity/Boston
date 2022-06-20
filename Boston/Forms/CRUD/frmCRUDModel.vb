@@ -531,7 +531,7 @@ ConnectionFailed:
                 If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
                     If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
 
-                        Call System.IO.File.Copy(Richmond.MyPath & "\emptydatabases\emptymdbdatabase.mdb", lrSaveFileDialog.FileName)
+                        Call System.IO.File.Copy(Boston.MyPath & "\emptydatabases\emptymdbdatabase.mdb", lrSaveFileDialog.FileName)
 
                         Dim lsConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lrSaveFileDialog.FileName
 

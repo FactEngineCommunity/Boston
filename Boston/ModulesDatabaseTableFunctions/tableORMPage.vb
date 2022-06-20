@@ -166,14 +166,14 @@ Namespace TablePage
                         lrPage = New FBM.Page(ar_model, Trim(lREcordset("PageId").Value), Trim(lREcordset("PageName").Value), lREcordset("LanguageId").Value)
                         lrPage.IsDirty = False 'Because we haven't edited anything on the Page.
 
-                        Richmond.WriteToStatusBar("Loading Page: '" & lrPage.Name & "'")
+                        Boston.WriteToStatusBar("Loading Page: '" & lrPage.Name & "'")
                         lrPage.IsCoreModelPage = lREcordset("IsCoreModelPage").Value
                         lrPage.ShowFacts = lREcordset("ShowFacts").Value
 
                         liPageLoadedInd += 1
                         If aoBackgroundWorker IsNot Nothing Then
                             aoBackgroundWorker.ReportProgress(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
-                            Richmond.WriteToProgressBar(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
+                            Boston.WriteToProgressBar(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
                         End If
 
                         If ar_model.Page.Contains(lrPage) Then
@@ -202,7 +202,7 @@ Namespace TablePage
                                     lrPage.Load(True)
                                 End If
                             End If
-                            Richmond.WriteToStatusBar("Loaded Page: '" & lrPage.Name & "'")
+                            Boston.WriteToStatusBar("Loaded Page: '" & lrPage.Name & "'")
                         End If
 
                         lREcordset.MoveNext()

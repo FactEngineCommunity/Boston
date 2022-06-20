@@ -644,14 +644,14 @@ Public Class frmDiagramORM
     Private Sub frm_ORMModel_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
         Try
-            Call Directory.SetCurrentDirectory(Richmond.MyPath)
+            Call Directory.SetCurrentDirectory(Boston.MyPath)
 
 
             Dim lrPage As New FBM.Page
 
-            '20180620-Remove if all okay. Commented out because Richmond.PageDataExistsInClipboad caused some sort of unsolveable threading issue
+            '20180620-Remove if all okay. Commented out because Boston.PageDataExistsInClipboad caused some sort of unsolveable threading issue
             '  when the form is loading and when this form is the second/third/etc frmDiagramORM form loaded for a Model.
-            'If Richmond.PageDataExistsInClipboard(lrPage) Then
+            'If Boston.PageDataExistsInClipboard(lrPage) Then
             '    If IsSomething(Me.zrPage) Then
             '        If lrPage.CopiedPageId <> Me.zrPage.PageId Then
             '            prApplication.MainForm.PasteToolStripMenuItem.Enabled = True
@@ -1224,7 +1224,7 @@ Public Class frmDiagramORM
                             Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
 
                             If My.Settings.ToolboxDragOffersSelection Then
-                                If Richmond.DisplayGenericSelectForm(lrGenericSelection, "Entity Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsEntityType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
+                                If Boston.DisplayGenericSelectForm(lrGenericSelection, "Entity Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsEntityType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
                                     '----------------------------------------------------
                                     'Establish a new EntityType for the dropped object
                                     '----------------------------------------------------
@@ -1281,7 +1281,7 @@ Public Class frmDiagramORM
                             Dim lrGenericSelection As New tGenericSelection
 
                             If My.Settings.ToolboxDragOffersSelection Then
-                                If Richmond.DisplayGenericSelectForm(lrGenericSelection, "Value Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsValueType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
+                                If Boston.DisplayGenericSelectForm(lrGenericSelection, "Value Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsValueType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
                                     If lrGenericSelection.SelectIndex = "0" Then
                                         '--------------------------------------------
                                         'User has elected to create a new ValueType 
@@ -1640,7 +1640,7 @@ Public Class frmDiagramORM
                 lo_point = Me.DiagramView.ClientToDoc(loMouseLocation)
 
                 '--------------------------------------------------
-                'Just to be sure...set the Richmond.WorkingProject
+                'Just to be sure...set the Boston.WorkingProject
                 '--------------------------------------------------
                 prApplication.WorkingPage = Me.zrPage
 
@@ -3119,7 +3119,7 @@ Public Class frmDiagramORM
             'lo_point = Me.ORMDiagramView.ClientToDoc(loMouseLocation)
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
@@ -4697,7 +4697,7 @@ Public Class frmDiagramORM
         If IsSomething(e.Node.Tag) Then
 
             Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
 
             e.Node.Tag.x = e.Node.Bounds.X
             e.Node.Tag.y = e.Node.Bounds.Y
@@ -4726,7 +4726,7 @@ Public Class frmDiagramORM
             End If
             '==============================================================================
 
-            'lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
+            'lrUserAction.PostActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
             'prApplication.AddUndoAction(lrUserAction)
             'frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -6155,7 +6155,7 @@ Public Class frmDiagramORM
         For Each loORMObject In Me.zrPage.SelectedObject.ToArray
 
             Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
 
             '---------------------------------------------
             'Set the X,Y Co-Ordinates of the ORM Object
@@ -6211,7 +6211,7 @@ Public Class frmDiagramORM
                     End Try
             End Select
 
-            lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
+            lrUserAction.PostActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
             prApplication.AddUndoAction(lrUserAction)
             frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -7139,7 +7139,7 @@ Public Class frmDiagramORM
                                                 pcenumUserAction.MoveModelObject,
                                                 Me.zrPage,
                                                 lsTransactionId)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(lrPageObject.X, lrPageObject.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(lrPageObject.X, lrPageObject.Y)
             prApplication.AddUndoAction(lrUserAction)
         Next
 
@@ -7660,7 +7660,7 @@ Public Class frmDiagramORM
 
             If IsSomething(lrToolboxForm) Then
 
-                Call Directory.SetCurrentDirectory(Richmond.MyPath)
+                Call Directory.SetCurrentDirectory(Boston.MyPath)
                 loShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
 
                 lrToolboxForm.ShapeListBox.Shapes = loShapeLibrary.Shapes
@@ -7773,28 +7773,37 @@ Public Class frmDiagramORM
 
     Sub CopyImageToClipboard()
 
-        Dim li_rectf As New RectangleF
-        li_rectf = Me.Diagram.GetContentBounds(False, True)
+        Try
+            Dim li_rectf As New RectangleF
+            li_rectf = Me.Diagram.GetContentBounds(False, True)
 
-        'Dim lo_image_processor As New t_image_processor(Diagram.CreateImage(li_rectf, 100))
+            'Dim lo_image_processor As New t_image_processor(Diagram.CreateImage(li_rectf, 100))
 
-        Dim lr_image As Image = Diagram.CreateImage(li_rectf, 100)
+            Dim lr_image As Image = Diagram.CreateImage(li_rectf, 100)
 
-        lr_image = Me.CropImage(lr_image, Color.White, 0)
-        lr_image = Me.CreateFramedImage(lr_image, Color.White, 15)
+            lr_image = Me.CropImage(lr_image, Color.White, 0)
+            lr_image = Me.CreateFramedImage(lr_image, Color.White, 15)
 
-        Me.Diagram.ShowGrid = False
+            Me.Diagram.ShowGrid = False
 
-        Me.Cursor = Cursors.WaitCursor
+            Me.Cursor = Cursors.WaitCursor
 
-        Windows.Forms.Clipboard.SetImage(lr_image)
+            Windows.Forms.Clipboard.SetImage(lr_image)
 
-        '---------------------------------
-        'Set the grid back to what it was
-        '---------------------------------
-        Me.Diagram.ShowGrid = mnuOption_ViewGrid.Checked
+            '---------------------------------
+            'Set the grid back to what it was
+            '---------------------------------
+            Me.Diagram.ShowGrid = mnuOption_ViewGrid.Checked
 
-        Me.Cursor = Cursors.Default
+            Me.Cursor = Cursors.Default
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

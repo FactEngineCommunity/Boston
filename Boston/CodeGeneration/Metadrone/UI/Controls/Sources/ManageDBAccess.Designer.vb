@@ -42,17 +42,17 @@
             Me.TabPage2 = New System.Windows.Forms.TabPage
             Me.splitMain = New System.Windows.Forms.SplitContainer
             Me.pnlQuery = New System.Windows.Forms.Panel
-            Me.txtTableSchemaQuery = New Boston.UI.SQLEditor
+            Me.txtTableSchemaQuery = New UI.SQLEditor
             Me.Panel3 = New System.Windows.Forms.Panel
             Me.Label1 = New System.Windows.Forms.Label
             Me.lnkPreviewSchema = New System.Windows.Forms.LinkLabel
-            Me.QueryResults = New Boston.UI.QueryResults
+            Me.QueryResults = New UI.QueryResults
             Me.Panel1 = New System.Windows.Forms.Panel
             Me.rbQuery = New System.Windows.Forms.RadioButton
             Me.rbGeneric = New System.Windows.Forms.RadioButton
             Me.tcMain = New System.Windows.Forms.TabControl
             Me.TabPage3 = New System.Windows.Forms.TabPage
-            Me.txtTransformations = New Boston.UI.TransformationsEditor
+            Me.txtTransformations = New UI.TransformationsEditor
             Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
             Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
             Me.TabPage1.SuspendLayout()
@@ -444,10 +444,10 @@
         Friend WithEvents Panel3 As System.Windows.Forms.Panel
         Friend WithEvents lnkPreviewSchema As System.Windows.Forms.LinkLabel
         Friend WithEvents splitMain As System.Windows.Forms.SplitContainer
-        Friend WithEvents QueryResults As Boston.UI.QueryResults
-        Friend WithEvents txtTableSchemaQuery As Boston.UI.SQLEditor
+        Friend WithEvents QueryResults As UI.QueryResults
+        Friend WithEvents txtTableSchemaQuery As UI.SQLEditor
         Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
-        Friend WithEvents txtTransformations As Boston.UI.TransformationsEditor
+        Friend WithEvents txtTransformations As UI.TransformationsEditor
         Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
         Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
 

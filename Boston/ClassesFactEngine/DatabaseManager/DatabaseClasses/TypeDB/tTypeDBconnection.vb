@@ -302,7 +302,7 @@ Namespace FactEngine.TypeDB
         Public Overrides Sub getDatabaseTypes()
 
             Try
-                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
                 Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
 
                 Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)

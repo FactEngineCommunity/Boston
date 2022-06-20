@@ -106,13 +106,13 @@ Public Class frmMain
                         GoTo ConfigurationOK
                     End If
 
-                    Dim lsPath = Path.GetDirectoryName(Richmond.GetConfigFileLocation)
+                    Dim lsPath = Path.GetDirectoryName(Boston.GetConfigFileLocation)
                     Dim lasAssemblyFileNumber As New List(Of String) From {"6.1.1.0", "6.1.0.0", "6.0.1.0", "4.0.0.0"}
                     For Each lsAssemblyFileVersionNr In lasAssemblyFileNumber
                         lsPath = lsPath.Replace("FactEngine", "Viev_Pty_Ltd").Replace(psAssemblyFileVersionNumber, lsAssemblyFileVersionNr) & "\user.config"
                         If File.Exists(lsPath) Then
-                            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(Richmond.GetConfigFileLocation))
-                            File.Copy(lsPath, Richmond.GetConfigFileLocation)
+                            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(Boston.GetConfigFileLocation))
+                            File.Copy(lsPath, Boston.GetConfigFileLocation)
 
                             MsgBox("As part of this upgrade Boston needs to restart. Press [Ok] to close Boston and then restart Boston.")
                             Me.Close()
@@ -166,7 +166,7 @@ ConfigurationOK:
             'Get the Plugins for the Application.
             '  NB Plugins are not critical, so if the \plugins\ directory doesn't exist, then skip this step.
             Dim lsPluginDirectoryPath As String
-            lsPluginDirectoryPath = Richmond.MyPath & "\plugins\"
+            lsPluginDirectoryPath = Boston.MyPath & "\plugins\"
             If Directory.Exists(lsPluginDirectoryPath) Then
                 prApplication.Plugins = PluginServices.FindPlugins(lsPluginDirectoryPath, "IPlugin")
 
@@ -227,7 +227,7 @@ ConfigurationOK:
                     IO.Directory.CreateDirectory(lsCommonDatabaseFileLocation)
 
                     Dim lsFirstRunDatabaseLocation As String = ""
-                    lsFirstRunDatabaseLocation = Richmond.MyPath & "\database\" & lsDatabaseName
+                    lsFirstRunDatabaseLocation = Boston.MyPath & "\database\" & lsDatabaseName
                     Try
                         IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName, False)
                     Catch
@@ -253,7 +253,7 @@ ConfigurationOK:
 
             'DockPanel
             'Dim configFile As String = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.ExecutablePath), "DockPanel.config")            
-            Dim configFile As String = System.IO.Path.Combine(Richmond.MyPath, "DockPanel.config")
+            Dim configFile As String = System.IO.Path.Combine(Boston.MyPath, "DockPanel.config")
 
             Me.IsMdiContainer = True
 
@@ -264,7 +264,7 @@ ConfigurationOK:
 
 #Region "Open the database & Upgrade if necessary"
             Me.StatusLabelGeneralStatus.Text = "Opening Database"
-            If Richmond.OpenDatabase() Then
+            If Boston.OpenDatabase() Then
 
                 If pbLogStartup Then
                     prApplication.ThrowErrorMessage("Successfully opened the database", pcenumErrorType.Information)
@@ -518,7 +518,7 @@ SkipRegistrationChecking:
         Try
             prApplication.CMML.Core = New FBM.Model(pcenumLanguage.ORMModel, pcenumCMMLCoreModel.Core.ToString, True)
 
-            Richmond.WriteToStatusBar("Loading the Core MetaMetaModel")
+            Boston.WriteToStatusBar("Loading the Core MetaMetaModel")
             Call TableModel.GetModelDetails(prApplication.CMML.Core)
             prApplication.CMML.Core.Load(True, False)
 
@@ -2740,9 +2740,9 @@ SkipRegistrationChecking:
                         lrModel = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
                         If lrModel.IsDirty Or lrModel.hasADirtyPage Then
                             Me.Cursor = Cursors.WaitCursor
-                            Richmond.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
+                            Boston.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
                             Call lrModel.Save()
-                            Richmond.WriteToStatusBar("Saved Model: '" & lrModel.Name & "'")
+                            Boston.WriteToStatusBar("Saved Model: '" & lrModel.Name & "'")
                             Me.Cursor = Cursors.Default
 
                             If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
@@ -2759,9 +2759,9 @@ SkipRegistrationChecking:
                         lrPage = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
                         If lrPage.IsDirty Or lrPage.Model.IsDirty Then
                             Me.Cursor = Cursors.WaitCursor
-                            Richmond.WriteToStatusBar("Saving Model: '" & lrPage.Model.Name & "'", True)
+                            Boston.WriteToStatusBar("Saving Model: '" & lrPage.Model.Name & "'", True)
                             Call lrPage.Save()
-                            Richmond.WriteToStatusBar("Saved Model: '" & lrPage.Model.Name & "'", True)
+                            Boston.WriteToStatusBar("Saved Model: '" & lrPage.Model.Name & "'", True)
                             Me.Cursor = Cursors.Default
 
                             If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
@@ -2778,9 +2778,9 @@ SkipRegistrationChecking:
                         '-----------------------------------------------------
                         If IsSomething(prApplication.WorkingPage) Then
                             Me.Cursor = Cursors.WaitCursor
-                            Richmond.WriteToStatusBar("Saving Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
+                            Boston.WriteToStatusBar("Saving Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
                             Call prApplication.WorkingPage.Save()
-                            Richmond.WriteToStatusBar("Saved Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
+                            Boston.WriteToStatusBar("Saved Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
                             Me.Cursor = Cursors.Default
 
                             If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
@@ -3195,9 +3195,9 @@ SkipRegistrationChecking:
                             Case Is = pcenumConceptType.EntityType
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                 lrEntityTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-                                Richmond.IsSerializable(lrPage)
+                                Boston.IsSerializable(lrPage)
                                 lrEntityTypeInstance = lrEntityTypeInstance.Clone(lrPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement)
-                                Richmond.IsSerializable(lrPage)
+                                Boston.IsSerializable(lrPage)
                                 lrPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
                             Case Is = pcenumConceptType.FactType
                                 Dim lrFactTypeInstance As FBM.FactTypeInstance
@@ -3275,7 +3275,7 @@ SkipRegistrationChecking:
                     'Objects must be serialisable to use the Clipboard.
                     '  Use the following to test if the Object is serialisable.
                     '------------------------------------------------------------
-                    If Richmond.IsSerializable(lrPage) Then
+                    If Boston.IsSerializable(lrPage) Then
 
                         '----------------------------
                         ' Create a new data format.
@@ -3867,7 +3867,7 @@ SkipRegistrationChecking:
         s.Close()
         fs.Close()
 
-        Richmond.WriteToStatusBar("Successfully deleted the log file: " & lrErrorLogFilePath & "errlog.txt")
+        Boston.WriteToStatusBar("Successfully deleted the log file: " & lrErrorLogFilePath & "errlog.txt")
 
         Me.NotifyIcon.Icon = SystemIcons.Application
         Me.NotifyIcon.BalloonTipTitle = "Boston"
@@ -3990,7 +3990,7 @@ SkipRegistrationChecking:
             lsDatabaseFilePath = lrSQLConnectionStringBuilder("Data Source")
             '-----------------------------------------------------------------------
             'The Upgrade Database is readonly, so can be in the application file path.
-            lsUpgradeDatabaseFilePath = Path.GetDirectoryName(Richmond.MyPath & "\database\") & "\databaseupgrade\bostondatabaseupgrade.vdb"
+            lsUpgradeDatabaseFilePath = Path.GetDirectoryName(Boston.MyPath & "\database\") & "\databaseupgrade\bostondatabaseupgrade.vdb"
             If System.IO.File.Exists(lsUpgradeDatabaseFilePath) Then
                 '----------------------------------------------------------------------
                 'The rostersdatbaseupgrade.vdb file exists, so open the database
@@ -4024,7 +4024,7 @@ SkipRegistrationChecking:
                                 '------------------------------------------------
                                 'Update the Boston DatabaseVersionNr
                                 '------------------------------------------------
-                                Call Richmond.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
+                                Call Boston.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
                                 Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaseUpgrade.UpgradeId)
 
                                 'CodeSafe
@@ -4096,7 +4096,7 @@ SkipRegistrationChecking:
                 'There is no sense proceding with the upgrade because the rostersdatabaseupgrade.vdb file
                 '  does not exists. This file is required to perform the upgrade because it contains the
                 '  sequential set of sql statements required to perform the upgrade.
-                '  Inform the user that the file does not exist. Abort the upgrade, and close Richmond.
+                '  Inform the user that the file does not exist. Abort the upgrade, and close Boston.
                 '------------------------------------------------------------------------------------------
                 lsMessage = "The file required to upgrade the Boston database (bostondatabaseupgrade.vdb) is missing."
                 lsMessage &= vbCrLf & vbCrLf
@@ -4324,16 +4324,16 @@ SkipRegistrationChecking:
             lsWhereClause = " WHERE Id = '" & prApplication.User.Id & "'"
         End If
 
-        If Richmond.DisplayGenericSelectForm(lrGenericSelection, _
-                                               "User", _
-                                               "ClientServerUser", _
-                                               "FirstName & ' ' & LastName AS Name, Username", _
-                                               "Username", _
-                                               lsWhereClause, _
-                                               Nothing, _
-                                               pcenumComboBoxStyle.DropdownList, _
-                                               "1,2", _
-                                               2, _
+        If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "User",
+                                               "ClientServerUser",
+                                               "FirstName & ' ' & LastName AS Name, Username",
+                                               "Username",
+                                               lsWhereClause,
+                                               Nothing,
+                                               pcenumComboBoxStyle.DropdownList,
+                                               "1,2",
+                                               2,
                                                "120;120",
                                                "Name,Username") = Windows.Forms.DialogResult.OK Then
 
@@ -4397,10 +4397,10 @@ SkipRegistrationChecking:
             End If
         End If
 
-        If Richmond.DisplayGenericSelectForm(lrGenericSelection, _
-                                               "Projects", _
-                                               "ClientServerProject", _
-                                               "ProjectName", _
+        If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "Projects",
+                                               "ClientServerProject",
+                                               "ProjectName",
                                                "Id",
                                                lsWhereClause) = Windows.Forms.DialogResult.OK Then
 
@@ -4484,10 +4484,10 @@ SkipRegistrationChecking:
                     lsWhereClause = " WHERE Id IN (SELECT Id FROM ClientServerNamespace WHERE ProjectId IN (SELECT ProjectId FROM ClientServerProjectUser WHERE UserId = '" & prApplication.User.Id & "'))"
                 End If
 
-                If Richmond.DisplayGenericSelectForm(lrGenericSelection, _
-                                           "Namespaces", _
-                                           "ClientServerNamespace", _
-                                           "Namespace", _
+                If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                           "Namespaces",
+                                           "ClientServerNamespace",
+                                           "Namespace",
                                            "Id",
                                            lsWhereClause) = Windows.Forms.DialogResult.OK Then
 
@@ -4534,11 +4534,11 @@ SkipRegistrationChecking:
             lsWhereClause &= "            )"
         End If
 
-        If Richmond.DisplayGenericSelectForm(lrGenericSelection, _
-                                               "Groups", _
-                                               "ClientServerGroup", _
-                                               "GroupName", _
-                                               "Id", _
+        If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "Groups",
+                                               "ClientServerGroup",
+                                               "GroupName",
+                                               "Id",
                                                lsWhereClause) = Windows.Forms.DialogResult.OK Then
 
             lrGroup.Id = lrGenericSelection.SelectIndex
@@ -4573,10 +4573,10 @@ SkipRegistrationChecking:
             End If
 
 
-            If Richmond.DisplayGenericSelectForm(lrGenericSelection, _
-                                                   "Roles", _
-                                                   "ClientServerRole", _
-                                                   "RoleName", _
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                                   "Roles",
+                                                   "ClientServerRole",
+                                                   "RoleName",
                                                    "Id") = Windows.Forms.DialogResult.OK Then
 
                 lrRole.Id = lrGenericSelection.SelectIndex
@@ -5039,7 +5039,7 @@ SkipRegistrationChecking:
             Call Me.zfrmStartup.Show()
         End If
 
-        Dim lsApplicationPath As String = Richmond.MyPath
+        Dim lsApplicationPath As String = Boston.MyPath
         Me.zfrmStartup.WebBrowser.Navigate("file:\\" & lsApplicationPath & "\startup\index.html")
 
     End Sub
@@ -5136,9 +5136,9 @@ SkipRegistrationChecking:
 
                 lsCompactedDatabaseLocationName = New FileInfo(lsDatabaseLocationName).DirectoryName & "\BostonCompacted.vdb"
 
-                Call Richmond.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
+                Call Boston.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
 
-                Call Richmond.OpenDatabase()
+                Call Boston.OpenDatabase()
             End With
 
             MsgBox("The Boston database has successfully been compacted and repaired.")
@@ -5199,7 +5199,7 @@ SkipRegistrationChecking:
             Dim lrUnifiedOntology As New Ontology.UnifiedOntology
             Dim lsWhereClause As String = ""
 
-            If Richmond.DisplayGenericSelectForm(lrGenericSelection,
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
                                                "Unified Ontology",
                                                "UnifiedOntology",
                                                "UnifiedOntologyName",

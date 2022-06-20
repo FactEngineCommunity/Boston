@@ -1,6 +1,7 @@
 ﻿Imports Boston.Parser.Syntax.Constants
 Imports Boston.Persistence
 
+
 Namespace UI
 
     Partial Friend Class MainForm
@@ -41,8 +42,8 @@ Namespace UI
                     ElseIf TypeOf tab.Controls(0) Is ManageProjectProperties Then
                         Dim editor As ManageProjectProperties = CType(tab.Controls(0), ManageProjectProperties)
 
-                        If TypeOf editor.Tag Is Boston.Persistence.Properties Then
-                            If CType(editor.Tag, Boston.Persistence.Properties).GetDirty Then Return True
+                        If TypeOf editor.Tag Is Persistence.Properties Then
+                            If CType(editor.Tag, Persistence.Properties).GetDirty Then Return True
                         End If
 
                     ElseIf TypeOf tab.Controls(0) Is ManageSource Then
@@ -172,7 +173,7 @@ Namespace UI
         Private Sub tvwExplorer_NewPackageItem(ByVal name As String) Handles tvwExplorer.NewPackageItem
             'Add call statement to super main, open first
             For Each n As TreeNode In Me.tvwExplorer.tvwMain.Nodes(0).Nodes
-                If TypeOf n.Tag Is Boston.Persistence.Properties Then
+                If TypeOf n.Tag Is Persistence.Properties Then
                     Call Me.OpenNode(n)
                     Exit For
                 End If
@@ -182,7 +183,7 @@ Namespace UI
             For Each tp As TabPage In Me.tcMain.TabPages
                 If tp.Tag Is Nothing Then Continue For
                 If Not TypeOf tp.Tag Is TreeNode Then Continue For
-                If TypeOf CType(tp.Tag, TreeNode).Tag Is Boston.Persistence.Properties Then
+                If TypeOf CType(tp.Tag, TreeNode).Tag Is Persistence.Properties Then
                     Dim sb As New System.Text.StringBuilder(CType(tp.Controls(0), ManageProjectProperties).SuperMain.Text)
                     sb.AppendLine(System.Environment.NewLine & ACTION_CALL & " " & name)
                     CType(tp.Controls(0), ManageProjectProperties).SuperMain.Text = sb.ToString
@@ -412,9 +413,9 @@ Namespace UI
                 Me.tcMain.SelectedTab = tp
                 CType(Me.tcMain.SelectedTab.Controls(0), CodeEditor).FocusText()
 
-            ElseIf TypeOf Node.Tag Is Boston.Persistence.Properties Then
+            ElseIf TypeOf Node.Tag Is Persistence.Properties Then
                 'Make a copy of the node's tag
-                Dim Copy As Boston.Persistence.Properties = CType(CType(Node.Tag, Boston.Persistence.Properties).GetCopy(), Persistence.Properties)
+                Dim Copy As Persistence.Properties = CType(CType(Node.Tag, Persistence.Properties).GetCopy(), Persistence.Properties)
 
                 'Set up properties control
                 Dim man As New ManageProjectProperties()
@@ -515,8 +516,8 @@ Namespace UI
 
             Dim man As ManageProjectProperties = CType(Me.tcMain.SelectedTab.Controls(0), ManageProjectProperties)
             man.UpdateTag()
-            If Not CType(man.Tag, Boston.Persistence.Properties).GetDirty Then Me.tcMain.SelectedTab.Text &= "*"
-            CType(man.Tag, Boston.Persistence.Properties).SetDirty(True)
+            If Not CType(man.Tag, Persistence.Properties).GetDirty Then Me.tcMain.SelectedTab.Text &= "*"
+            CType(man.Tag, Persistence.Properties).SetDirty(True)
         End Sub
 
         Private Sub SourceValueChanged(ByVal value As Object)
@@ -582,9 +583,9 @@ Namespace UI
                 Dim man As ManageProjectProperties = CType(Tab.Controls(0), ManageProjectProperties)
                 Dim node As TreeNode = CType(Tab.Tag, TreeNode)
 
-                If TypeOf node.Tag Is Boston.Persistence.Properties Then
-                    node.Tag = CType(man.Tag, Boston.Persistence.Properties).GetCopy
-                    CType(man.Tag, Boston.Persistence.Properties).SetDirty(False)
+                If TypeOf node.Tag Is Persistence.Properties Then
+                    node.Tag = CType(man.Tag, Persistence.Properties).GetCopy
+                    CType(man.Tag, Persistence.Properties).SetDirty(False)
 
                     If Tab.Text.LastIndexOf("*").Equals(Tab.Text.Length - 1) Then
                         Tab.Text = Tab.Text.Substring(0, Tab.Text.Length - 1)

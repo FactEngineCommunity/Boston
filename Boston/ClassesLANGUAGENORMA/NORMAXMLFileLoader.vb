@@ -65,7 +65,7 @@ Namespace NORMA
         Public Sub getNORMADataTypes(ByRef arModel As FBM.Model)
 
             Try
-                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
                 Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
 
                 Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
@@ -669,7 +669,7 @@ SkippedSubtypeRelationship:
         ''' Loads a specific FactType from the NORMAXMLDOC
         ''' </summary>
         ''' <param name="arFactType">The FactType that is to be loaded. Must be prepopulated with the .Model and .Id of the FactType that is to be loaded.</param>
-        ''' <param name="arNORMAXMLDOC">The opened XDocument reference to the NORMA XML document that is being imported into Richmond.</param>
+        ''' <param name="arNORMAXMLDOC">The opened XDocument reference to the NORMA XML document that is being imported into Boston.</param>
         ''' <remarks></remarks>
         Public Function LoadFactType(ByRef arFactType As FBM.FactType, ByRef arNORMAXMLDOC As XDocument) As FBM.FactType
 
@@ -2770,7 +2770,7 @@ SkippedRole:
                             If lrPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
                                 lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Entity Type Instance")
+                                Boston.WriteToStatusBar("Loading Entity Type Instance")
                                 lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -2785,7 +2785,7 @@ SkippedRole:
                             If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
                                 lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Value Type Instance")
+                                Boston.WriteToStatusBar("Loading Value Type Instance")
                                 lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
                             End If
                             Dim lsBounds() As String
@@ -2798,7 +2798,7 @@ SkippedRole:
                             If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
                                 lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Fact Type Instance")
+                                Boston.WriteToStatusBar("Loading Fact Type Instance")
                                 lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
                             End If
                             Dim lsBounds() As String
@@ -2835,7 +2835,7 @@ SkippedRole:
 
                             lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel, lrFactType.Id, True) ' lrFactType.CloneInstance(lrPage, False)
                             lrFactTypeInstance.FactType = lrFactType
-                            Richmond.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
+                            Boston.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
@@ -3046,7 +3046,7 @@ SkippedRole:
                             'If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             '    lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             'Else
-                            '    Richmond.WriteToStatusBar("Loading Ring Constraint Instance")
+                            '    Boston.WriteToStatusBar("Loading Ring Constraint Instance")
                             '    lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             'End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3091,7 +3091,7 @@ SkippedRole:
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Ring Constraint Instance")
+                                Boston.WriteToStatusBar("Loading Ring Constraint Instance")
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3132,7 +3132,7 @@ SkippedRole:
                         If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                         Else
-                            Richmond.WriteToStatusBar("Loading Ring Constraint Instance")
+                            Boston.WriteToStatusBar("Loading Ring Constraint Instance")
                             lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                         End If
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3163,7 +3163,7 @@ SkippedRole:
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Role Value Constraint Instance")
+                                Boston.WriteToStatusBar("Loading Role Value Constraint Instance")
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3192,7 +3192,7 @@ SkippedRole:
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Role Value Constraint Instance")
+                                Boston.WriteToStatusBar("Loading Role Value Constraint Instance")
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3226,7 +3226,7 @@ SkippedRole:
                             'If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             '    lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             'Else
-                            '    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                            '    Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                             '    lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             'End If
                             'lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3271,7 +3271,7 @@ SkippedRole:
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
-                                    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                    Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                                     lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                                 End If
                                 lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3316,7 +3316,7 @@ SkippedRole:
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
-                                    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                    Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                                     lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                                 End If
                                 lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3373,7 +3373,7 @@ SkippedRole:
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
-                                    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                    Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                                     lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                                 End If
                                 lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3413,7 +3413,7 @@ SkippedRole:
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
-                                    Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                    Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                                     lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                                 End If
                                 lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3461,7 +3461,7 @@ SkippedRole:
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
-                                Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                                Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
@@ -3501,7 +3501,7 @@ SkippedRole:
                         If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                         Else
-                            Richmond.WriteToStatusBar("Loading Subset Constraint Instance")
+                            Boston.WriteToStatusBar("Loading Subset Constraint Instance")
                             lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                         End If
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")

@@ -1,4 +1,4 @@
-﻿Imports Boston.FBM.STM
+﻿Imports FBM.STM
 Imports System.Reflection
 Imports Newtonsoft.Json
 
@@ -113,7 +113,7 @@ Namespace FBM
         ''' Handles the event when a new EndStateTransition is added to the (ST) Model.
         ''' </summary>
         ''' <param name="arEndStateTransition"></param>
-        Private Sub STModel_EndStateTransitionAdded(ByRef arEndStateTransition As EndStateTransition) Handles STModel.EndStateTransitionAdded
+        Private Sub STModel_EndStateTransitionAdded(ByRef arEndStateTransition As STM.EndStateTransition) Handles STModel.EndStateTransitionAdded
 
             If Not Me.Language = pcenumLanguage.StateTransitionDiagram Then Exit Sub
             If Me.STDiagram.ValueType Is Nothing Then Exit Sub
@@ -143,7 +143,7 @@ Namespace FBM
 
         End Sub
 
-        Private Sub STModel_StateTransitionAdded(ByRef arStateTransition As StateTransition) Handles STModel.StateTransitionAdded
+        Private Sub STModel_StateTransitionAdded(ByRef arStateTransition As STM.StateTransition) Handles STModel.StateTransitionAdded
 
             If Not Me.Language = pcenumLanguage.StateTransitionDiagram Then Exit Sub
             If Me.STDiagram.ValueType Is Nothing Then Exit Sub

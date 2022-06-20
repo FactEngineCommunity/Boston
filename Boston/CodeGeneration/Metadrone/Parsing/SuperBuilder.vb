@@ -42,7 +42,7 @@ Namespace Parser
                     End If
 
                     'Keep adding node
-                    Dim node As New Boston.Parser.Syntax.SyntaxNode(line, False, lineNumber, False, Nothing)
+                    Dim node As New Parser.Syntax.SyntaxNode(line, False, lineNumber, False, Nothing)
                     If node.Action <> SyntaxNode.ExecActions.ACTION_CALL Then
                         Throw New Exception("Syntax error. Line: " & lineNumber.ToString)
                     End If

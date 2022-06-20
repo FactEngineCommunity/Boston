@@ -22,7 +22,7 @@ Partial Class frmNotifications
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.FlexibleListBox = New Boston.FlexibleListBox()
+        Me.FlexibleListBox = New FlexibleListBox()
         Me.SuspendLayout()
         '
         'FlexibleListBox
@@ -48,5 +48,5 @@ Partial Class frmNotifications
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents FlexibleListBox As Boston.FlexibleListBox
+    Friend WithEvents FlexibleListBox As FlexibleListBox
 End Class

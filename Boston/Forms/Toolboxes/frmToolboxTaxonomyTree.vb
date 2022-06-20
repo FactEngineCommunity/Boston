@@ -49,7 +49,7 @@ Public Class frmToolboxTaxonomyTree
 
                 If lrTable.getSupertypeTables.Count = 0 Then
 
-                    Dim lrTreeNode = New Boston.cTreeNode(lrTable.Name, lrTable.Name, 1, 1)
+                    Dim lrTreeNode = New cTreeNode(lrTable.Name, lrTable.Name, 1, 1)
                     lrTreeNode.Tag = lrTable.FBMModelElement
                     Me.TreeView.Nodes(0).Nodes.Add(lrTreeNode)
 

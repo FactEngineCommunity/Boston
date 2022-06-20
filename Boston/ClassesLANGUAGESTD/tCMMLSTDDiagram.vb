@@ -1,5 +1,5 @@
 ﻿
-Imports Boston.FBM.STM
+Imports FBM.STM
 
 Namespace STD
 

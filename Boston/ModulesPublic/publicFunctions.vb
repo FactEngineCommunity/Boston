@@ -11,7 +11,7 @@ Imports System.Configuration
 Imports System.Text
 Imports System.Xml.Serialization
 
-Namespace Richmond
+Namespace Boston
 
     Public Module publicFunctions
 
@@ -100,7 +100,7 @@ Namespace Richmond
                         '-----------------------------------
                         'Try and find the database locally
                         '-----------------------------------
-                        lsLocalDatabaseLocation = Richmond.MyPath & "\database\boston.vdb"
+                        lsLocalDatabaseLocation = Boston.MyPath & "\database\boston.vdb"
 
                         Try
                             lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
@@ -154,7 +154,7 @@ StillCannotFindTheDatabase:
                             lsMessage &= vbCrLf
                             lsMessage &= lsLocalDatabaseLocation
                             lsMessage &= vbCrLf & vbCrLf
-                            'lsMessage &= "Adjust the setting, 'database_connection_str', in the 'Richmond.exe.config' file and restart Richmond."
+                            'lsMessage &= "Adjust the setting, 'database_connection_str', in the 'Boston.exe.config' file and restart Boston."
                             lsMessage &= "Adjust the Database Connection String for your database and restart Boston."
                             MsgBox(lsMessage)
                             frmCRUDBostonConfiguration.ShowDialog()
@@ -491,7 +491,7 @@ OpenConnection:
 
         Private Sub ReadLicenceFile()
             ' load the license text file
-            Dim myFile As System.IO.StreamReader = New System.IO.StreamReader(Richmond.MyPath() & "\license.txt")
+            Dim myFile As System.IO.StreamReader = New System.IO.StreamReader(Boston.MyPath() & "\license.txt")
             Dim mystring As String = myFile.ReadToEnd()
 
             myFile.Close()
@@ -534,51 +534,52 @@ OpenConnection:
 
         End Sub
 
-        Public Function CropImage(ByVal img As Image, ByVal backgroundColor As Color, Optional ByVal margin As Integer = 0) As Image
+        '20220620-VM-REdundant in Namespace Boston
+        'Public Function CropImage(ByVal img As Image, ByVal backgroundColor As Color, Optional ByVal margin As Integer = 0) As Image
 
-            Dim minX As Integer = img.Width
-            Dim minY As Integer = img.Height
-            Dim maxX As Integer = 0
-            Dim maxY As Integer = 0
+        '    Dim minX As Integer = img.Width
+        '    Dim minY As Integer = img.Height
+        '    Dim maxX As Integer = 0
+        '    Dim maxY As Integer = 0
 
-            Using bmp As New Bitmap(img)
+        '    Using bmp As New Bitmap(img)
 
-                For y As Integer = 0 To bmp.Height - 1
-                    For x As Integer = 0 To bmp.Width - 1
-                        If bmp.GetPixel(x, y).ToArgb <> backgroundColor.ToArgb Then
-                            If x < minX Then
-                                minX = x
-                            ElseIf x > maxX Then
-                                maxX = x
-                            End If
-                            If y < minY Then
-                                minY = y
-                            ElseIf y > maxY Then
-                                maxY = y
-                            End If
-                        End If
-                    Next
-                Next
+        '        For y As Integer = 0 To bmp.Height - 1
+        '            For x As Integer = 0 To bmp.Width - 1
+        '                If bmp.GetPixel(x, y).ToArgb <> backgroundColor.ToArgb Then
+        '                    If x < minX Then
+        '                        minX = x
+        '                    ElseIf x > maxX Then
+        '                        maxX = x
+        '                    End If
+        '                    If y < minY Then
+        '                        minY = y
+        '                    ElseIf y > maxY Then
+        '                        maxY = y
+        '                    End If
+        '                End If
+        '            Next
+        '        Next
 
-                Dim rect As New Rectangle(minX - margin, minY - margin, maxX - minX + 2 * margin + 1, maxY - minY + 2 * margin + 1)
-                Dim cropped As Bitmap = bmp.Clone(rect, bmp.PixelFormat)
+        '        Dim rect As New Rectangle(minX - margin, minY - margin, maxX - minX + 2 * margin + 1, maxY - minY + 2 * margin + 1)
+        '        Dim cropped As Bitmap = bmp.Clone(rect, bmp.PixelFormat)
 
-                Return cropped
+        '        Return cropped
 
-            End Using
+        '    End Using
 
-        End Function
+        'End Function
 
-        Public Function CreateFramedImage(ByVal Source As Image, ByVal BorderColor As Color, ByVal BorderThickness As Integer) As Image
+        'Public Function CreateFramedImage(ByVal Source As Image, ByVal BorderColor As Color, ByVal BorderThickness As Integer) As Image
 
-            Dim b As New Bitmap(Source.Width + BorderThickness * 2, Source.Height + BorderThickness * 2)
-            Dim g As Graphics = Graphics.FromImage(b)
-            g.Clear(BorderColor)
-            g.DrawImage(Source, BorderThickness, BorderThickness)
-            g.Dispose()
-            Return b
+        '    Dim b As New Bitmap(Source.Width + BorderThickness * 2, Source.Height + BorderThickness * 2)
+        '    Dim g As Graphics = Graphics.FromImage(b)
+        '    g.Clear(BorderColor)
+        '    g.DrawImage(Source, BorderThickness, BorderThickness)
+        '    g.Dispose()
+        '    Return b
 
-        End Function
+        'End Function
 
         Public Sub CreateDirectoryIfItDoesntExist(ByVal asDirectoryPath As String)
 

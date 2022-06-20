@@ -35,15 +35,15 @@
             Me.btnCancel = New System.Windows.Forms.ToolStripButton()
             Me.splitMain = New System.Windows.Forms.SplitContainer()
             Me.splitWorkspace = New System.Windows.Forms.SplitContainer()
-            Me.tcExplore = New Boston.UI.CustTabControl()
+            Me.tcExplore = New UI.CustTabControl()
             Me.TabPage1 = New System.Windows.Forms.TabPage()
-            Me.tvwExplorer = New Boston.UI.Explorer()
+            Me.tvwExplorer = New UI.Explorer()
             Me.imlExploreTabPageImages = New System.Windows.Forms.ImageList(Me.components)
-            Me.tcMain = New Boston.UI.CustTabControl()
+            Me.tcMain = New UI.CustTabControl()
             Me.tpStart = New System.Windows.Forms.TabPage()
-            Me.StartPage1 = New Boston.UI.StartPage()
+            Me.StartPage1 = New UI.StartPage()
             Me.imlTabPageImages = New System.Windows.Forms.ImageList(Me.components)
-            Me.tcResults = New Boston.UI.CustTabControl()
+            Me.tcResults = New UI.CustTabControl()
             Me.tpResult = New System.Windows.Forms.TabPage()
             Me.txtResult = New System.Windows.Forms.TextBox()
             Me.tpOutput = New System.Windows.Forms.TabPage()
@@ -58,7 +58,7 @@
             Me.lblStatus = New System.Windows.Forms.ToolStripStatusLabel()
             Me.spliSearchContainer = New System.Windows.Forms.SplitContainer()
             Me.lblSearchMessage = New System.Windows.Forms.Label()
-            Me.SearchBox = New Boston.UI.SearchBox()
+            Me.SearchBox = New UI.SearchBox()
             Me.mnuTabControl = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.mniCloseTab = New System.Windows.Forms.ToolStripMenuItem()
             Me.mniCloseOtherTabs = New System.Windows.Forms.ToolStripMenuItem()
@@ -467,7 +467,7 @@
             Me.SearchBox.Dock = System.Windows.Forms.DockStyle.Fill
             Me.SearchBox.Location = New System.Drawing.Point(0, 0)
             Me.SearchBox.Name = "SearchBox"
-            Me.SearchBox.SearchScope = Boston.UI.SearchBox.SearchScopes.Project
+            Me.SearchBox.SearchScope = UI.SearchBox.SearchScopes.Project
             Me.SearchBox.Size = New System.Drawing.Size(201, 24)
             Me.SearchBox.TabIndex = 4
             '
@@ -564,13 +564,13 @@
         Friend WithEvents splitMain As System.Windows.Forms.SplitContainer
         Friend WithEvents splitWorkspace As System.Windows.Forms.SplitContainer
         Friend WithEvents imlTabPageImages As System.Windows.Forms.ImageList
-        Friend WithEvents tvwExplorer As Boston.UI.Explorer
-        Friend WithEvents tcMain As Boston.UI.CustTabControl
+        Friend WithEvents tvwExplorer As UI.Explorer
+        Friend WithEvents tcMain As UI.CustTabControl
         Friend WithEvents tpStart As System.Windows.Forms.TabPage
-        Friend WithEvents StartPage1 As Boston.UI.StartPage
+        Friend WithEvents StartPage1 As UI.StartPage
         Friend WithEvents StatusStrip As System.Windows.Forms.StatusStrip
         Friend WithEvents lblStatus As System.Windows.Forms.ToolStripStatusLabel
-        Friend WithEvents SearchBox As Boston.UI.SearchBox
+        Friend WithEvents SearchBox As UI.SearchBox
         Friend WithEvents spliSearchContainer As System.Windows.Forms.SplitContainer
         Friend WithEvents lblSearchMessage As System.Windows.Forms.Label
         Friend WithEvents mnuTabControl As System.Windows.Forms.ContextMenuStrip
@@ -579,12 +579,12 @@
         Friend WithEvents mniSep1 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents mniCloseAllTabs As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents txtResult As System.Windows.Forms.TextBox
-        Friend WithEvents tcResults As Boston.UI.CustTabControl
+        Friend WithEvents tcResults As UI.CustTabControl
         Friend WithEvents tpResult As System.Windows.Forms.TabPage
         Friend WithEvents imlOutputTabPageImages As System.Windows.Forms.ImageList
         Friend WithEvents tpConsole As System.Windows.Forms.TabPage
         Friend WithEvents txtConsole As System.Windows.Forms.TextBox
-        Friend WithEvents tcExplore As Boston.UI.CustTabControl
+        Friend WithEvents tcExplore As UI.CustTabControl
         Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
         Friend WithEvents imlExploreTabPageImages As System.Windows.Forms.ImageList
         Friend WithEvents tpOutput As System.Windows.Forms.TabPage

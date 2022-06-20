@@ -273,7 +273,7 @@ Namespace Parser
                             'If in editor, use values there
                             If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.ManageSource Then
                                 Dim tag As Object = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.ManageSource).Tag
-                                Dim s As Parser.Source.Source = CType(tag, Boston.Persistence.Source).ToParserSource
+                                Dim s As Parser.Source.Source = CType(tag, Persistence.Source).ToParserSource
                                 Me.sourceParser.AddSource(s.Name, s.Provider, New Syntax.SourceTransforms(s.Name, s.Transformations))
                             End If
                         Else
@@ -326,8 +326,8 @@ Namespace Parser
         End Sub
 
 
-        Friend Sub BuildPackage(ByVal ProjProperties As Boston.Persistence.Properties,
-                                ByVal Package As Boston.Persistence.MDPackage,
+        Friend Sub BuildPackage(ByVal ProjProperties As Persistence.Properties,
+                                ByVal Package As Persistence.MDPackage,
                                 ByVal PreCompiledPackage As Bin.CompiledPackage)
             'Get base output path
             Dim BasePath As String = ""
@@ -348,7 +348,7 @@ Namespace Parser
                         'If in editor, use values there
                         If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.ManageSource Then
                             Dim tag As Object = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.ManageSource).Tag
-                            Dim s As Parser.Source.Source = CType(tag, Boston.Persistence.Source).ToParserSource
+                            Dim s As Parser.Source.Source = CType(tag, Persistence.Source).ToParserSource
                             s.Transforms = Me.sourceParser.GetCompiledSource(s.Name).Transforms 'Pass on compiled transforms
                             PackageBuilder.AddSource(s)
                         End If
@@ -376,7 +376,7 @@ Namespace Parser
                     'If in editor, use code there
                     If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
                         Dim tag As Object = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.CodeEditor).Tag
-                        Me.packageParser.SetMain(CType(tag, Boston.Persistence.Main).Text)
+                        Me.packageParser.SetMain(CType(tag, Persistence.Main).Text)
                     End If
                 Else
                     'Just add from loaded
@@ -396,9 +396,9 @@ Namespace Parser
                     If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.ManageProjectProperties Then
                         Dim tag As Object = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.ManageProjectProperties).Tag
                         Dim props As New Parser.PackageBuilder.Properties()
-                        props.BeginTag = CType(tag, Boston.Persistence.Properties).BeginTag
-                        props.EndTag = CType(tag, Boston.Persistence.Properties).EndTag
-                        props.SuperMain = CType(tag, Boston.Persistence.Properties).SuperMain
+                        props.BeginTag = CType(tag, Persistence.Properties).BeginTag
+                        props.EndTag = CType(tag, Persistence.Properties).EndTag
+                        props.SuperMain = CType(tag, Persistence.Properties).SuperMain
                         Me.packageParser.SetProperties(props)
                     End If
                 Else
@@ -420,19 +420,19 @@ Namespace Parser
             End If
 
             'Templates in folders
-            For Each f As Boston.Persistence.Folder In Package.Folders
+            For Each f As Persistence.Folder In Package.Folders
                 Me.AddFolder(f)
             Next
 
             'Templates
             If Me.frmMain IsNot Nothing Then
-                For Each t As Boston.Persistence.Template In Package.Templates
+                For Each t As Persistence.Template In Package.Templates
                     Dim idx As Integer = Me.frmMain.TagFoundInTabPages(t)
                     If idx > -1 Then
                         'If in editor, use code there
                         If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
                             Dim editor As UI.CodeEditor = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.CodeEditor)
-                            Dim tag As Boston.Persistence.Template = CType(editor.Tag, Boston.Persistence.Template)
+                            Dim tag As Persistence.Template = CType(editor.Tag, Persistence.Template)
                             Me.packageParser.AddTemplate(tag.Name, tag.Text)
 
                             'If user has modified we therefore need to re-compile, not updating that compilation in the saved object data
@@ -448,7 +448,7 @@ Namespace Parser
                 Next
 
             Else
-                For Each t As Boston.Persistence.Template In Package.Templates
+                For Each t As Persistence.Template In Package.Templates
                     Me.packageParser.AddTemplate(t.Name, t.Text)
                 Next
 
@@ -464,7 +464,7 @@ Namespace Parser
                         'If in editor, use code there
                         If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
                             Dim editor As UI.CodeEditor = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.CodeEditor)
-                            Dim tag As Boston.Persistence.CodeDOM_VB = CType(editor.Tag, Boston.Persistence.CodeDOM_VB)
+                            Dim tag As Persistence.CodeDOM_VB = CType(editor.Tag, Persistence.CodeDOM_VB)
                             Me.packageParser.VBSource.AppendLine(tag.Text)
 
                             'If user has modified we therefore need to re-compile, not updating that compilation in the saved object data
@@ -485,7 +485,7 @@ Namespace Parser
                         'If in editor, use code there
                         If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
                             Dim editor As UI.CodeEditor = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.CodeEditor)
-                            Dim tag As Boston.Persistence.CodeDOM_CS = CType(editor.Tag, Boston.Persistence.CodeDOM_CS)
+                            Dim tag As Persistence.CodeDOM_CS = CType(editor.Tag, Persistence.CodeDOM_CS)
                             Me.packageParser.CSSource.AppendLine(tag.Text)
 
                             'If user has modified we therefore need to re-compile, not updating that compilation in the saved object data
@@ -520,7 +520,7 @@ Namespace Parser
                 Me.packageParser.Status.SetParseState(PackageBuilder.ParserStatus.ProcessState.Running)
                 Dim thrd As New Threading.Thread(AddressOf Me.packageParser.Start)
                 thrd.Start()
-                While Me.packageParser.Status.ParseState = Boston.Parser.PackageBuilder.ParserStatus.ProcessState.Running
+                While Me.packageParser.Status.ParseState = Parser.PackageBuilder.ParserStatus.ProcessState.Running
                     If Me.StopBuildRequest Then Me.packageParser.Stop()
                     Application.DoEvents() 'This somehow gives breathing room and improves speed in release mode. weird.
                 End While
@@ -539,21 +539,21 @@ Namespace Parser
             RaiseEvent Notify(OutputSummary(StartTime))
         End Sub
 
-        Private Sub AddFolder(ByVal f As Boston.Persistence.Folder)
+        Private Sub AddFolder(ByVal f As Persistence.Folder)
             'Add any sub folders
-            For Each folder As Boston.Persistence.Folder In f.Folders
+            For Each folder As Persistence.Folder In f.Folders
                 Me.AddFolder(folder)
             Next
 
             'Add templates in this folder
-            For Each t As Boston.Persistence.Template In f.Templates
+            For Each t As Persistence.Template In f.Templates
                 If Me.frmMain IsNot Nothing Then
                     Dim idx As Integer = Me.frmMain.TagFoundInTabPages(t)
                     If idx > -1 Then
                         'If in editor, use code there
                         If TypeOf Me.frmMain.tcMain.TabPages(idx).Controls(0) Is UI.CodeEditor Then
                             Dim tag As Object = CType(Me.frmMain.tcMain.TabPages(idx).Controls(0), UI.CodeEditor).Tag
-                            Me.packageParser.AddTemplate(CType(tag, Boston.Persistence.Template).Name, CType(tag, Boston.Persistence.Template).Text)
+                            Me.packageParser.AddTemplate(CType(tag, Persistence.Template).Name, CType(tag, Persistence.Template).Text)
                         End If
                     Else
                         'Just add from loaded

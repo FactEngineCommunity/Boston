@@ -624,14 +624,14 @@ Public Class frmDiagramORMForOntologyBrowser
     Private Sub frm_ORMModel_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
         Try
-            Call Directory.SetCurrentDirectory(Richmond.MyPath)
+            Call Directory.SetCurrentDirectory(Boston.MyPath)
 
 
             Dim lrPage As New FBM.Page
 
-            '20180620-Remove if all okay. Commented out because Richmond.PageDataExistsInClipboad caused some sort of unsolveable threading issue
+            '20180620-Remove if all okay. Commented out because Boston.PageDataExistsInClipboad caused some sort of unsolveable threading issue
             '  when the form is loading and when this form is the second/third/etc frmDiagramORM form loaded for a Model.
-            'If Richmond.PageDataExistsInClipboard(lrPage) Then
+            'If Boston.PageDataExistsInClipboard(lrPage) Then
             '    If IsSomething(Me.zrPage) Then
             '        If lrPage.CopiedPageId <> Me.zrPage.PageId Then
             '            prApplication.MainForm.PasteToolStripMenuItem.Enabled = True
@@ -1202,7 +1202,7 @@ Public Class frmDiagramORMForOntologyBrowser
                             Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
 
                             If My.Settings.ToolboxDragOffersSelection Then
-                                If Richmond.DisplayGenericSelectForm(lrGenericSelection, "Entity Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsEntityType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
+                                If Boston.DisplayGenericSelectForm(lrGenericSelection, "Entity Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsEntityType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
                                     '----------------------------------------------------
                                     'Establish a new EntityType for the dropped object
                                     '----------------------------------------------------
@@ -1252,7 +1252,7 @@ Public Class frmDiagramORMForOntologyBrowser
                             Dim lrGenericSelection As New tGenericSelection
 
                             If My.Settings.ToolboxDragOffersSelection Then
-                                If Richmond.DisplayGenericSelectForm(lrGenericSelection, "Value Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsValueType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
+                                If Boston.DisplayGenericSelectForm(lrGenericSelection, "Value Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsValueType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
                                     If lrGenericSelection.SelectIndex = "0" Then
                                         '--------------------------------------------
                                         'User has elected to create a new ValueType 
@@ -1612,7 +1612,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 lo_point = Me.DiagramView.ClientToDoc(loMouseLocation)
 
                 '--------------------------------------------------
-                'Just to be sure...set the Richmond.WorkingProject
+                'Just to be sure...set the Boston.WorkingProject
                 '--------------------------------------------------
                 prApplication.WorkingPage = Me.zrPage
 
@@ -3063,7 +3063,7 @@ Public Class frmDiagramORMForOntologyBrowser
             'lo_point = Me.ORMDiagramView.ClientToDoc(loMouseLocation)
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
@@ -4601,7 +4601,7 @@ Public Class frmDiagramORMForOntologyBrowser
         If IsSomething(e.Node.Tag) Then
 
             Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
 
             e.Node.Tag.x = e.Node.Bounds.X
             e.Node.Tag.y = e.Node.Bounds.Y
@@ -4631,7 +4631,7 @@ Public Class frmDiagramORMForOntologyBrowser
             End If
             '==============================================================================
 
-            'lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
+            'lrUserAction.PostActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
             'prApplication.AddUndoAction(lrUserAction)
             'frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -5184,7 +5184,7 @@ Public Class frmDiagramORMForOntologyBrowser
             'Display the RoleConstraints
             '-----------------------------
             'CodeSafe
-            Call Me.zrPage.removeRoleConstraintInstancesNoLongerInModel
+            Call Me.zrPage.RemoveRoleConstraintInstancesNoLongerInModel()
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
@@ -5231,7 +5231,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '-------------------------------------------------------------------
             'Load any State Transitions that relate to EntityTypes on the Page
             '-------------------------------------------------------------------
-            Call Me.loadStateTransitions
+            Call Me.loadStateTransitions()
 
             '------------------------------------------------------------------
             'Set the PropertiesGrid.SeletedObject to the ORMModel.Page itself
@@ -5629,7 +5629,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lrRoleConstraint As FBM.RoleConstraint
             lrRoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.FrequencyConstraint, larRoleConstraintRole, , , , False)
             lrRoleConstraint.Cardinality = 2
-            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
+            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
 
             Call Me.zrPage.DropFrequencyConstraintAtPoint(lrRoleConstraint, ao_pointf)
 
@@ -6010,7 +6010,7 @@ Public Class frmDiagramORMForOntologyBrowser
         For Each loORMObject In Me.zrPage.SelectedObject.ToArray
 
             Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
 
             '---------------------------------------------
             'Set the X,Y Co-Ordinates of the ORM Object
@@ -6053,7 +6053,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     End Try
             End Select
 
-            lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y)
+            lrUserAction.PostActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
             prApplication.AddUndoAction(lrUserAction)
             frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -6675,7 +6675,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 'Moved as a SubType
                 '--------------------
             Else
-                lrCentralEntityTypeInstance.shape.Move(liX, liY)
+                lrCentralEntityTypeInstance.Shape.Move(liX, liY)
                 lrCentralEntityTypeInstance.HasBeenMoved = True
             End If
 
@@ -6878,7 +6878,7 @@ Public Class frmDiagramORMForOntologyBrowser
                                                 pcenumUserAction.MoveModelObject,
                                                 Me.zrPage,
                                                 lsTransactionId)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(lrPageObject.X, lrPageObject.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(lrPageObject.X, lrPageObject.Y)
             prApplication.AddUndoAction(lrUserAction)
         Next
 
@@ -7190,7 +7190,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             If IsSomething(lrToolboxForm) Then
 
-                Call Directory.SetCurrentDirectory(Richmond.MyPath)
+                Call Directory.SetCurrentDirectory(Boston.MyPath)
                 loShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
 
                 lrToolboxForm.ShapeListBox.Shapes = loShapeLibrary.Shapes

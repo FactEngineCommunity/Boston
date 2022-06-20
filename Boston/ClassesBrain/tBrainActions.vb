@@ -15,14 +15,14 @@ Partial Public Class tBrain
             Dim lrEntityType As FBM.EntityType
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Nothing
 
-            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
-            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
-            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.KEYWDWRITTENAS = Nothing
-            Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.VALUETYPEWRITTENASCLAUSE = Nothing
+            Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME = ""
+            Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE = ""
+            Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.KEYWDWRITTENAS = Nothing
+            Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.VALUETYPEWRITTENASCLAUSE = Nothing
 
-            Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
+            Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
 
-            Dim lsEntityTypeName As String = Trim(Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
+            Dim lsEntityTypeName As String = Trim(Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
             Dim lsActualModelElementName As String = ""
 
             If Me.Model.GetConceptTypeByNameFuzzy(lsEntityTypeName, lsActualModelElementName) = pcenumConceptType.EntityType Then
@@ -59,7 +59,7 @@ Partial Public Class tBrain
                 'Call lrEntityTypeInstance.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y, True)
             End If
 
-            lsReferenceMode = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
+            lsReferenceMode = Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.REFERENCEMODE
             lsUnabatedReferenceMode = lsReferenceMode
 
             Dim items As Array
@@ -85,18 +85,18 @@ Partial Public Class tBrain
 
             If lrEntityType.ReferenceModeValueType IsNot Nothing And lrEntityType.ReferenceModeFactType IsNot Nothing Then
 
-                If Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.KEYWDWRITTENAS IsNot Nothing Then
+                If Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.KEYWDWRITTENAS IsNot Nothing Then
 
-                    Me.VAQL.VALUETYPEWRITTENASClause = Me.VAQL.ENTITYTYPEISIDENTIFIEDBYITSStatement.VALUETYPEWRITTENASCLAUSE
+                    Me.VAQLProcessor.VALUETYPEWRITTENASClause = Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.VALUETYPEWRITTENASCLAUSE
 
-                    If Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
-                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
-                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
-                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
-                        liDataTypeLength = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
-                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
-                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
-                        liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    If Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                    ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                        liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                        liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
                     End If
 
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -179,10 +179,10 @@ Partial Public Class tBrain
 
     Private Sub ProcessISACONCEPTStatement()
 
-        Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME = ""
-        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISACONCEPTStatement, Me.VAQLParsetree.Nodes(0))
+        Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME = ""
+        Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ISACONCEPTStatement, Me.VAQLParsetree.Nodes(0))
 
-        Dim lsConceptName As String = Me.VAQL.ISACONCEPTStatement.MODELELEMENTNAME
+        Dim lsConceptName As String = Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME
         Dim lrConcept As New FBM.Concept(lsConceptName)
         Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.GeneralConcept)
 
@@ -801,14 +801,14 @@ EndProcessing:
             With New WaitCursor
                 Me.Model = prApplication.WorkingModel
 
-                Me.VAQL.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
-                Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
+                Me.VAQLProcessor.ISANENTITYTYPEStatement.KEYWDISANENTITYTYPE = ""
+                Me.VAQLProcessor.ISANENTITYTYPEStatement.MODELELEMENTNAME = ""
 
-                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISANENTITYTYPEStatement, Me.VAQLParsetree.Nodes(0))
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ISANENTITYTYPEStatement, Me.VAQLParsetree.Nodes(0))
 
                 Me.Timeout.Stop()
 
-                Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISANENTITYTYPEStatement.MODELELEMENTNAME))
+                Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
                 If Me.Model.ExistsModelElement(lsEntityTypeName) Then
                     Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
@@ -886,14 +886,14 @@ EndProcessing:
             With New WaitCursor
                 Me.Model = prApplication.WorkingModel
 
-                Me.VAQL.VALUECONSTRAINTClause.MODELELEMENTNAME = ""
-                Me.VAQL.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE = New List(Of String)
+                Me.VAQLProcessor.VALUECONSTRAINTClause.MODELELEMENTNAME = ""
+                Me.VAQLProcessor.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE = New List(Of String)
 
-                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.VALUECONSTRAINTClause, Me.VAQLParsetree.Nodes(0))
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.VALUECONSTRAINTClause, Me.VAQLParsetree.Nodes(0))
 
                 Me.Timeout.Stop()
 
-                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.VALUECONSTRAINTClause.MODELELEMENTNAME))
+                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUECONSTRAINTClause.MODELELEMENTNAME))
 
                 If Not Me.Model.ExistsModelElement(lsValueTypeName) Then
                     Me.send_data("There is no Model Element with the name, '" & lsValueTypeName & "'. Try another name")
@@ -910,7 +910,7 @@ EndProcessing:
                 Dim lrValueType = CType(lrModelElement, FBM.ValueType)
 
 
-                For Each lsValueConstraintValue In Me.VAQL.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE
+                For Each lsValueConstraintValue In Me.VAQLProcessor.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE
 
                     If lrValueType.ValueConstraint.Contains(lsValueConstraintValue) Then
                         Me.send_data("The value, " & lsValueConstraintValue & ", already exists in the Value Constraint for Value Type, " & lsValueTypeName)
@@ -944,16 +944,16 @@ EndProcessing:
             With New WaitCursor
                 Me.Model = prApplication.WorkingModel
 
-                Me.VAQL.ISAVALUETYPEStatement.KEYWDISAVALUETYPE = ""
-                Me.VAQL.ISAVALUETYPEStatement.MODELELEMENTNAME = ""
-                Me.VAQL.ISAVALUETYPEStatement.KEYWDWRITTENAS = Nothing
-                Me.VAQL.ISAVALUETYPEStatement.VALUETYPEWRITTENASCLAUSE = Nothing
+                Me.VAQLProcessor.ISAVALUETYPEStatement.KEYWDISAVALUETYPE = ""
+                Me.VAQLProcessor.ISAVALUETYPEStatement.MODELELEMENTNAME = ""
+                Me.VAQLProcessor.ISAVALUETYPEStatement.KEYWDWRITTENAS = Nothing
+                Me.VAQLProcessor.ISAVALUETYPEStatement.VALUETYPEWRITTENASCLAUSE = Nothing
 
-                Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.ISAVALUETYPEStatement, Me.VAQLParsetree.Nodes(0))
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ISAVALUETYPEStatement, Me.VAQLParsetree.Nodes(0))
 
                 Me.Timeout.Stop()
 
-                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.ISAVALUETYPEStatement.MODELELEMENTNAME))
+                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISAVALUETYPEStatement.MODELELEMENTNAME))
 
                 If Me.Model.ExistsModelElement(lsValueTypeName) Then
                     Me.send_data("There is already a Model Element with the name, '" & lsValueTypeName & "'. Try another name")
@@ -975,18 +975,18 @@ EndProcessing:
                 Dim liDataTypePrecision As Integer = 0
                 Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
 
-                If Me.VAQL.ISAVALUETYPEStatement.KEYWDWRITTENAS IsNot Nothing Then
+                If Me.VAQLProcessor.ISAVALUETYPEStatement.KEYWDWRITTENAS IsNot Nothing Then
 
-                    Me.VAQL.VALUETYPEWRITTENASClause = Me.VAQL.ISAVALUETYPEStatement.VALUETYPEWRITTENASCLAUSE
+                    Me.VAQLProcessor.VALUETYPEWRITTENASClause = Me.VAQLProcessor.ISAVALUETYPEStatement.VALUETYPEWRITTENASCLAUSE
 
-                    If Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
-                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
-                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
-                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
-                        liDataTypeLength = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
-                    ElseIf Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
-                        lsDataTypeName = Me.VAQL.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
-                        liDataTypePrecision = CInt(Me.VAQL.VALUETYPEWRITTENASClause.NUMBER)
+                    If Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                    ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                        liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                        liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
                     End If
 
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -1202,32 +1202,32 @@ EndProcessing:
 
         Me.Model = prApplication.WorkingModel
 
-        Me.VAQL.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
-        Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE = New Object
-        Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPELENGTH = New Object
-        Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
-        Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER = ""
+        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
+        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE = New Object
+        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH = New Object
+        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
+        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER = ""
 
-        Call Me.VAQL.GetParseTreeTokensReflection(Me.VAQL.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree.Nodes(0))
+        Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree.Nodes(0))
 
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
         Dim lsValueTypeName As String = ""
         Dim lsDataTypeName As String = ""
         Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
 
-        lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQL.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
+        lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
 
         Dim liDataTypeLength As Integer = 0
         Dim liDataTypePrecision As Integer = 0
 
-        If Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE.GetType Is GetType(VAQL.ParseNode) Then
-            lsDataTypeName = Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPE.Nodes(0).Token.Text
-        ElseIf Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.GetType Is GetType(VAQL.ParseNode) Then
-            lsDataTypeName = Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.Nodes(0).Token.Text
-            liDataTypeLength = CInt(Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER)
-        ElseIf Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
-            lsDataTypeName = Me.VAQL.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
-            liDataTypePrecision = CInt(Me.VAQL.VALUETYPEISWRITTENASStatement.NUMBER)
+        If Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.GetType Is GetType(VAQL.ParseNode) Then
+            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.Nodes(0).Token.Text
+        ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.GetType Is GetType(VAQL.ParseNode) Then
+            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.Nodes(0).Token.Text
+            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
+        ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
+            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
+            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
         End If
 
         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)

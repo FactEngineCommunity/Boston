@@ -176,7 +176,7 @@ Public Class frmUnifiedOntologyBrowser
                                          From DictionaryEntry In Model.ModelDictionary
                                          Where (DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
                                                Or Fastenshtein.Levenshtein.Distance(DictionaryEntry.Symbol, TextBox1.Text) < 4 _
-                                               Or Richmond.Soundex(DictionaryEntry.Symbol, 4) = Richmond.Soundex(TextBox1.Text, 4))
+                                               Or Boston.Soundex(DictionaryEntry.Symbol, 4) = Boston.Soundex(TextBox1.Text, 4))
                                          Where DictionaryEntry.isEntityType Or DictionaryEntry.isValueType
                                          Select DictionaryEntry
 
@@ -469,14 +469,14 @@ Public Class frmUnifiedOntologyBrowser
                                                                   lrModelDictionaryEntry.Symbol,
                                                                   Nothing,
                                                                   True)
-                                Richmond.WriteToStatusBar("Getting Entity Type details.", True)
+                                Boston.WriteToStatusBar("Getting Entity Type details.", True)
                                 lrEntityType = TableEntityType.GetEntityTypeDetails(lrEntityType)
                                 lrEntityType.Model.EntityType.AddUnique(lrEntityType)
 
-                                Richmond.WriteToStatusBar("Loading Entity Type Reference Scheme Model Elements.", True)
+                                Boston.WriteToStatusBar("Loading Entity Type Reference Scheme Model Elements.", True)
                                 Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
                                 Call lrEntityType.SetReferenceModeObjects()
-                                Richmond.WriteToStatusBar("Getting Subtype Relationships for Model Element.", True)
+                                Boston.WriteToStatusBar("Getting Subtype Relationships for Model Element.", True)
                                 Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrEntityType, True)
                             End If
 

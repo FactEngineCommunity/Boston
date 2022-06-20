@@ -14,7 +14,7 @@ Namespace Parser.Syntax
         Private args As New List(Of Object)
         Private _templateCalled As String = ""
 
-        Private WithEvents Exec As Boston.Parser.Syntax.Exec_Template = Nothing
+        Private WithEvents Exec As Parser.Syntax.Exec_Template = Nothing
 
         Public OutputList As OutputCollection = Nothing
 
@@ -103,7 +103,7 @@ Namespace Parser.Syntax
             If Me.PreviewMode Then Exit Sub
 
             'Execute template
-            Me.Exec = New Boston.Parser.Syntax.Exec_Template(n, Me.BasePath, Me.PreviewMode, Me.TemplateCalled, Me.ScopeDepth + 1)
+            Me.Exec = New Parser.Syntax.Exec_Template(n, Me.BasePath, Me.PreviewMode, Me.TemplateCalled, Me.ScopeDepth + 1)
             Me.Exec.Process()
 			
 	        'Pass on output

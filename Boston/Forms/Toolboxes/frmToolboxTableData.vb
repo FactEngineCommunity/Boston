@@ -300,9 +300,9 @@ Public Class frmToolboxTableData
                             If liInd > 0 Then lsSQLQuery &= " AND "
                             lsSQLQuery.AppendString(lrColumn.Name & " = ")
                             Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
-                            lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                            lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                             lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
-                            lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                            lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                             liInd += 1
                         Next
                         Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsSQLQuery)

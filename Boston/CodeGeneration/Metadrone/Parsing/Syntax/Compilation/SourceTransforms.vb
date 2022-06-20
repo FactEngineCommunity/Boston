@@ -81,7 +81,7 @@ Namespace Parser.Syntax
                     Else
                         'Keep adding node
                         Try
-                            Dim node As New Boston.Parser.Syntax.SyntaxNode(line, False, lineNumber, False, Nothing)
+                            Dim node As New Parser.Syntax.SyntaxNode(line, False, lineNumber, False, Nothing)
                             For i As Integer = 1 To node.Tokens.Count - 1
                                 node.Tokens(i).SetTransformTarget()
                             Next
@@ -111,7 +111,7 @@ Namespace Parser.Syntax
         End Sub
 
         Private Function GetBlock(ByVal currentLine As String, ByRef LineNumber As Integer, ByRef sr As System.IO.StringReader) As Parser.Syntax.SyntaxNode
-            Dim topNode As New Boston.Parser.Syntax.SyntaxNode(currentLine, False, LineNumber, False, Nothing)
+            Dim topNode As New Parser.Syntax.SyntaxNode(currentLine, False, LineNumber, False, Nothing)
 
             currentLine = sr.ReadLine
             LineNumber += 1
@@ -156,7 +156,7 @@ Namespace Parser.Syntax
                 Else
                     'Keep adding node
                     Try
-                        Dim node As New Boston.Parser.Syntax.SyntaxNode(currentLine, False, LineNumber, False, Nothing)
+                        Dim node As New Parser.Syntax.SyntaxNode(currentLine, False, LineNumber, False, Nothing)
                         For i As Integer = 0 To node.Tokens.Count - 1
                             node.Tokens(i).SetTransformTarget()
                         Next
@@ -426,7 +426,7 @@ Namespace Parser.Syntax
 
 
 
-        Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Table, ByVal AttribName As String) As Object
+        Public Function GetAttributeValue(ByVal source As Parser.Meta.Database.Table, ByVal AttribName As String) As Object
             Call Me.Process(source, source)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Table, AttribName)
             If attrib Is Nothing Then
@@ -435,7 +435,7 @@ Namespace Parser.Syntax
             Return attrib.AttribVal
         End Function
 
-        Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Routine, ByVal AttribName As String) As Object
+        Public Function GetAttributeValue(ByVal source As Parser.Meta.Database.Routine, ByVal AttribName As String) As Object
             Call Me.Process(source, source)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Routine, AttribName)
             If attrib Is Nothing Then
@@ -451,7 +451,7 @@ Namespace Parser.Syntax
         ''' <param name="sourceOwner"></param>
         ''' <param name="AttribName"></param>
         ''' <returns></returns>
-        Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Column,
+        Public Function GetAttributeValue(ByVal source As Parser.Meta.Database.Column,
                                           ByVal sourceOwner As IEntity,
                                           ByVal AttribName As String
                                           ) As Object
@@ -463,7 +463,7 @@ Namespace Parser.Syntax
             Return attrib.AttribVal
         End Function
 
-        Public Function GetAttributeValue(ByVal source As Boston.Parser.Meta.Database.Parameter, ByVal sourceOwner As IEntity, ByVal AttribName As String) As Object
+        Public Function GetAttributeValue(ByVal source As Parser.Meta.Database.Parameter, ByVal sourceOwner As IEntity, ByVal AttribName As String) As Object
             Call Me.Process(source, sourceOwner)
             Dim attrib As Attrib = Me.GetAttrib(SyntaxToken.TransformTargets.Param, AttribName)
             If attrib Is Nothing Then

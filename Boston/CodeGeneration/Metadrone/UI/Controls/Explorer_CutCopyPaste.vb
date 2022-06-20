@@ -108,12 +108,12 @@ Namespace UI
         Private Sub PerformPaste(ByVal TargetNode As TreeNode)
             If Me.ClipBoard Is Nothing Then Exit Sub
 
-            If TypeOf TargetNode.Tag Is Boston.Persistence.Properties Then Exit Sub
+            If TypeOf TargetNode.Tag Is Persistence.Properties Then Exit Sub
             If TypeOf TargetNode.Tag Is Main Then Exit Sub
             If TypeOf TargetNode.Tag Is Template Then Exit Sub
             If TypeOf TargetNode.Tag Is Source Then Exit Sub
 
-            If TypeOf Me.ClipBoard.Tag Is Boston.Persistence.Properties Then Exit Sub
+            If TypeOf Me.ClipBoard.Tag Is Persistence.Properties Then Exit Sub
             If TypeOf Me.ClipBoard.Tag Is Main Then Exit Sub
 
             If TargetNode.Tag.ToString.Equals(TAG_PROJECT) Then
@@ -256,7 +256,7 @@ Namespace UI
                         Return False
                     ElseIf TypeOf Me.ClipBoard.Tag Is Template Then
                         Return False
-                    ElseIf TypeOf Me.ClipBoard.Tag Is boston.Persistence.Properties Then
+                    ElseIf TypeOf Me.ClipBoard.Tag Is Persistence.Properties Then
                         Return False
                     ElseIf TypeOf Me.ClipBoard.Tag Is Main Then
                         Return False
@@ -275,7 +275,7 @@ Namespace UI
                         Return True
                     ElseIf TypeOf Me.ClipBoard.Tag Is Template Then
                         Return True
-                    ElseIf TypeOf Me.ClipBoard.Tag Is Boston.Persistence.Properties Then
+                    ElseIf TypeOf Me.ClipBoard.Tag Is Persistence.Properties Then
                         Return False
                     ElseIf TypeOf Me.ClipBoard.Tag Is Main Then
                         Return False
@@ -294,7 +294,7 @@ Namespace UI
                         Return False
                     ElseIf TypeOf Me.ClipBoard.Tag Is Template Then
                         Return False
-                    ElseIf TypeOf Me.ClipBoard.Tag Is boston.Persistence.Properties Then
+                    ElseIf TypeOf Me.ClipBoard.Tag Is Persistence.Properties Then
                         Return False
                     ElseIf TypeOf Me.ClipBoard.Tag Is Main Then
                         Return False
@@ -313,7 +313,7 @@ Namespace UI
                         Return True
                     ElseIf TypeOf Me.ClipBoard.Tag Is Template Then
                         Return True
-                    ElseIf TypeOf Me.ClipBoard.Tag Is Boston.Persistence.Properties Then
+                    ElseIf TypeOf Me.ClipBoard.Tag Is Persistence.Properties Then
                         Return False
                     ElseIf TypeOf Me.ClipBoard.Tag Is Main Then
                         Return False

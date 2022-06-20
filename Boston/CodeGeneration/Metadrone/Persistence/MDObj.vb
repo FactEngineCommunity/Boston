@@ -10,7 +10,7 @@
 
         End Sub
 
-        Friend Sub AddPackage(ByVal Package As Boston.Parser.Bin.CompiledPackage)
+        Friend Sub AddPackage(ByVal Package As Parser.Bin.CompiledPackage)
             If Not My.Application.EXEC_SaveBin Then
                 Me.Bin = New Parser.Bin.BinObj()
                 Me.obj = Nothing
@@ -128,7 +128,7 @@
             Next
         End Sub
 
-        Friend Sub SetCompiledSources(ByVal srces As List(Of Boston.Parser.Bin.CompiledSource))
+        Friend Sub SetCompiledSources(ByVal srces As List(Of Parser.Bin.CompiledSource))
             Me.Bin.srces.Clear()
             For Each src In srces
                 Me.Bin.srces.Add(src)
@@ -138,7 +138,7 @@
             Me.obj = Tools.Compression.Compress(Tools.Reflection.ConvertObjectToBytes(Me.Bin))
         End Sub
 
-        Friend Function GetCompiledPackage(ByVal GUID As String) As Boston.Parser.Bin.CompiledPackage
+        Friend Function GetCompiledPackage(ByVal GUID As String) As Parser.Bin.CompiledPackage
             For Each p In Me.Bin.pkgs
                 If p.GUID.Equals(GUID) Then Return p
             Next

@@ -508,7 +508,7 @@ Namespace ORMQL
         Public Sub New()
 
             Try
-                Richmond.WriteToStatusBar("Creating Dynamic Classes", True)
+                Boston.WriteToStatusBar("Creating Dynamic Classes", True)
 
                 ''================================================
                 ''Create the DynamicObject for Select Statements
@@ -604,7 +604,7 @@ Namespace ORMQL
                 'Me.RenameInstanceStatement = lrORMQLRenameInstanceStatement.clone
 
 
-                Richmond.WriteToStatusBar("Dynamic Classes Created", True)
+                Boston.WriteToStatusBar("Dynamic Classes Created", True)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1276,7 +1276,7 @@ Namespace ORMQL
                 For Each lrColumn In lrselectStatement.COLUMNLIST
 
                     Dim customClass As TinyPG.ParseNode = lrColumn
-                    'MsgBox(Richmond.IsSerializable(customClass).ToString)
+                    'MsgBox(Boston.IsSerializable(customClass).ToString)
                     Dim serializer As New System.Xml.Serialization.XmlSerializer(customClass.GetType())
                     '
                     xml = New XDocument

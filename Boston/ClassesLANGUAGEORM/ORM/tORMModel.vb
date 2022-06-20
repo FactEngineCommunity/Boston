@@ -4080,13 +4080,13 @@ FinishedProcessing:
                 'Save the DictionaryEntries within the ORM Model.
                 '  NB Also maintains the MetaModelConcept table.
                 '--------------------------------------------------
-                Richmond.WriteToStatusBar("Saving Model Dictionary",, 0)
+                Boston.WriteToStatusBar("Saving Model Dictionary",, 0)
                 Call Me.SaveModelDictionary(abModelDictionaryRapidSave)
 
                 '----------------------------------------------
                 ' Save the set of Entities within the ORM Model
                 '----------------------------------------------
-                Richmond.WriteToStatusBar("Saving Entity Types",, 10)
+                Boston.WriteToStatusBar("Saving Entity Types",, 10)
                 For Each lrEntityType In Me.EntityType.OrderBy(Function(x) x.SubtypeRelationship.Count)
                     Call lrEntityType.Save(abRapidSave)
                 Next
@@ -4094,7 +4094,7 @@ FinishedProcessing:
                 '-------------------------------------------------
                 ' Save the set of Value Types within the ORM Model
                 '-------------------------------------------------
-                Richmond.WriteToStatusBar("Saving Value Types",, 20)
+                Boston.WriteToStatusBar("Saving Value Types",, 20)
                 For Each lrValueType In Me.ValueType.FindAll(Function(x) x.isDirty)
                     Call lrValueType.Save(abRapidSave)
                 Next
@@ -4102,12 +4102,12 @@ FinishedProcessing:
                 '-------------------------------------------------
                 ' Save the set of Fact Types within the ORM Model
                 '-------------------------------------------------
-                Richmond.WriteToStatusBar("Saving Fact Types",, 30)
+                Boston.WriteToStatusBar("Saving Fact Types",, 30)
                 For Each lrFactType In Me.FactType
                     Call lrFactType.Save(abRapidSave)
                 Next
 
-                Richmond.WriteToStatusBar("Saving Role Constraints",, 40)
+                Boston.WriteToStatusBar("Saving Role Constraints",, 40)
                 For Each lrRoleConstraint In Me.RoleConstraint
                     Call lrRoleConstraint.Save(abRapidSave)
                 Next
@@ -4115,7 +4115,7 @@ FinishedProcessing:
                 '----------------------------
                 'Save the ModelNote objects
                 '----------------------------
-                Richmond.WriteToStatusBar("Saving Model Notes",, 50)
+                Boston.WriteToStatusBar("Saving Model Notes",, 50)
                 For Each lrModelNote In Me.ModelNote
                     lrModelNote.Save(abRapidSave)
                 Next
@@ -4126,14 +4126,14 @@ FinishedProcessing:
 
                 Dim lrPage As FBM.Page
 
-                Richmond.WriteToStatusBar("Saving Pages",, 60)
+                Boston.WriteToStatusBar("Saving Pages",, 60)
                 For Each lrPage In Me.Page
                     If lrPage.IsDirty Or abRapidSave Then
                         lrPage.Save(abRapidSave, False, True)
                     End If
                 Next
 
-                Richmond.WriteToStatusBar("",, 0)
+                Boston.WriteToStatusBar("",, 0)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -4165,7 +4165,7 @@ FinishedProcessing:
                 Call lrExportModel.MapFromFBMModel(Me)
 
                 Dim lsFileLocationName As String = ""
-                If Richmond.IsSerializable(lrExportModel) Then
+                If Boston.IsSerializable(lrExportModel) Then
 
                     Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
 
@@ -5425,7 +5425,7 @@ FinishedProcessing:
             '20180410-VM-ToDo-Test to see if the RDF has been created for the Model.
             Me.RDSCreated = True 'For now for testing. 
 
-            Richmond.WriteToStatusBar(".")
+            Boston.WriteToStatusBar(".")
 
             Me.Loading = False
 
@@ -5435,9 +5435,9 @@ FinishedProcessing:
         Public Sub LoadFactTypesRelatedToModelElement(ByRef arModelElement As FBM.ModelObject, ByVal abLoadAssociatedInternalUniquenessConstraints As Boolean)
 
             Try
-                Richmond.WriteToStatusBar("Loading Fact Types related to the Model Element", True)
+                Boston.WriteToStatusBar("Loading Fact Types related to the Model Element", True)
                 TableFactType.GetFactTypesByModelJoinedModelElement(Me, arModelElement, True, abLoadAssociatedInternalUniquenessConstraints)
-                Richmond.WriteToStatusBar("Loaded Fact Types related to the Model Element", True)
+                Boston.WriteToStatusBar("Loaded Fact Types related to the Model Element", True)
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -5601,7 +5601,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '-------------------------------------------------------
                 Dim liInd As Integer = 0
 
-                Richmond.WriteToStatusBar("Loading the Model level Model Elements.", True)
+                Boston.WriteToStatusBar("Loading the Model level Model Elements.", True)
 
                 '-------------------------------------------------------
                 'Load the ModelDictionary (Concepts for the Model)
@@ -5613,7 +5613,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '------------------------------------
                 'Get ValueTypes
                 '------------------------------------
-                'Richmond.WriteToStatusBar("Loading the Value Types")            
+                'Boston.WriteToStatusBar("Loading the Value Types")            
                 If TableValueType.GetValueTypeCountByModel(Me.ModelId) > 0 Then
                     '-----------------------------------------------
                     'There are EntityTypes within the ORMDiagram
@@ -5629,7 +5629,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '------------------------------------
                 'Get EntityTypes
                 '------------------------------------
-                'Richmond.WriteToStatusBar("Loading the Entity Types")
+                'Boston.WriteToStatusBar("Loading the Entity Types")
                 prApplication.ThrowErrorMessage("Loading EntityTypes", pcenumErrorType.Information)
                 If TableEntityType.GetEntityTypeCountByModel(Me.ModelId) > 0 Then
                     '-----------------------------------------------
@@ -5646,7 +5646,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '------------------------------------
                 'Get FactTypes
                 '------------------------------------
-                Richmond.WriteToStatusBar("Loading the Fact Types")
+                Boston.WriteToStatusBar("Loading the Fact Types")
                 TableFactType.GetFactTypesByModel(Me, True)
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
@@ -5658,7 +5658,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '---------------------------------------------------
                 'Get RoleConstraints 
                 '---------------------------------------------------
-                'Richmond.WriteToStatusBar("Loading the Role Constraints")
+                'Boston.WriteToStatusBar("Loading the Role Constraints")
                 prApplication.ThrowErrorMessage("Loading RoleConstraints", pcenumErrorType.Information)
                 If TableRoleConstraint.getRoleConstraintCountByModel(Me) > 0 Then
                     '-----------------------------------------------
@@ -5694,7 +5694,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '------------------------------------
                 'Load the Pages for the Model
                 '------------------------------------
-                Richmond.WriteToStatusBar("Loading the Pages", True)
+                Boston.WriteToStatusBar("Loading the Pages", True)
                 prApplication.ThrowErrorMessage("Loading Pages", pcenumErrorType.Information)
 
                 If abLoadPages Then
@@ -5856,7 +5856,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                 xml = XDocument.Load(lsFileLocationName)
 
-                Richmond.WriteToStatusBar("Loading model.", True)
+                Boston.WriteToStatusBar("Loading model.", True)
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(60)
 
                 lsXSDVersionNr = xml.<Model>.@XSDVersionNr
@@ -6020,7 +6020,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     Dim lrPage As New FBM.Page(Me,
                                                loPage.Attribute("Id").Value,
                                                loPage.Attribute("Name").Value,
-                                               Richmond.GetEnumFromDescriptionAttribute(Of pcenumLanguage)(loPage.Attribute("Language").Value)
+                                               Boston.GetEnumFromDescriptionAttribute(Of pcenumLanguage)(loPage.Attribute("Language").Value)
                                                )
                     lrPage.IsDirty = False
                     larPage.Add(lrPage)

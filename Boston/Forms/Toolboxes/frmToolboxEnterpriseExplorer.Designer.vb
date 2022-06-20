@@ -98,7 +98,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.SaveFileDialog = New System.Windows.Forms.SaveFileDialog()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.TreeView = New Boston.BostonTreeView()
+        Me.TreeView = New BostonTreeView()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -623,7 +623,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'HelpProvider
         '
-        Me.HelpProvider.HelpNamespace = ".\richmondhelp\Richmond.chm"
+        Me.HelpProvider.HelpNamespace = ".\richmondhelp\Boston.chm"
         '
         'BackgroundWorkerModelLoader
         '

@@ -57,7 +57,7 @@ Namespace FBM
                     '---------------------------------------------------------------
                     'The Entity does not exist in the ERD MetaModel, so create it.
                     '---------------------------------------------------------------
-                    Richmond.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
+                    Boston.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
 
                     lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                     lsSQLQuery &= " (Element, ElementType)"
@@ -149,7 +149,7 @@ Namespace FBM
                 '--------------------------------------------
                 If arRole.Mandatory Then
 
-                    Richmond.WriteToStatusBar("Creating MandatoryConstraint for Attribute, '" & lsAttributeName & "', for Entity, '" & lsEntityName & "'", True)
+                    Boston.WriteToStatusBar("Creating MandatoryConstraint for Attribute, '" & lsAttributeName & "', for Entity, '" & lsEntityName & "'", True)
 
                     lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
                     lsSQLQuery &= " VALUES ("
@@ -249,13 +249,13 @@ Namespace FBM
 
                 '===========================================================================
                 'Move the PrimaryKey Columns of each Table to the topmost OrdinalPositions
-                Richmond.WriteToStatusBar("Moving Primary Keys to the top of each Enitity.", True)
+                Boston.WriteToStatusBar("Moving Primary Keys to the top of each Enitity.", True)
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(95)
                 For Each lrTable In Me.RDS.Table
                     Call lrTable.movePrimaryKeyColumnsToTopOrdinalPosition()
                 Next
 
-                Richmond.WriteToStatusBar("Completed creating the Entity Relationship Diagram Artifacts", True)
+                Boston.WriteToStatusBar("Completed creating the Entity Relationship Diagram Artifacts", True)
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(100)
 
                 '-------------------------------------------------------------------------------------------------
@@ -567,7 +567,7 @@ Namespace FBM
 
                         If lrORMRecordset.Facts(0).DictionarySet("Count") = 0 Then
 
-                            Richmond.WriteToStatusBar("Creating Entity, '" & lrFactType.Name & "'")
+                            Boston.WriteToStatusBar("Creating Entity, '" & lrFactType.Name & "'")
 
                             lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                             lsSQLQuery &= " (Element, ElementType)"
@@ -612,7 +612,7 @@ Namespace FBM
 
                     '        If lrORMRecordset.Facts(0).DictionarySet("Count") = 0 Then
 
-                    '            Richmond.WriteToStatusBar("Creating Entity, '" & lrFactType.Name & "'")
+                    '            Boston.WriteToStatusBar("Creating Entity, '" & lrFactType.Name & "'")
 
                     '            lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                     '            lsSQLQuery &= " (Element, ElementType)"
@@ -641,7 +641,7 @@ Namespace FBM
 
         Public Sub generateERDIndexes()
 
-            Richmond.WriteToStatusBar("Generating the Indexes.", True)
+            Boston.WriteToStatusBar("Generating the Indexes.", True)
 
             Call Me.generateIndexesForSimpleReferenceSchemes()
 
@@ -894,7 +894,7 @@ Namespace FBM
             Try
                 Dim lrFactType As FBM.FactType
 
-                Richmond.WriteToStatusBar("Creating Relationships.", True)
+                Boston.WriteToStatusBar("Creating Relationships.", True)
 
                 '----------------------------------------------------------------------------------
                 'Role is for Many-to-One Binary FactType and Role has InternalUniquenessConstraint.
@@ -1115,7 +1115,7 @@ Namespace FBM
                             lsDestinationPredicate = "unknown predicate"
                         End If
 
-                        Richmond.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
+                        Boston.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
 
                         '--------------------------------------------------------------------
                         'Create the Relation
@@ -1296,7 +1296,7 @@ Namespace FBM
                         '--------------------------------------------------------------------
                         'Create the Relation
                         '--------------------------------------------------------------------                        
-                        Richmond.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
+                        Boston.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
 
                         Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
                                                            lrOriginTable,
@@ -1474,7 +1474,7 @@ Namespace FBM
                         '--------------------------------------------------------------------
                         'Create the Relation
                         '--------------------------------------------------------------------                        
-                        Richmond.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
+                        Boston.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
 
                         lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
                                                       lrOriginTable,
@@ -1621,7 +1621,7 @@ Namespace FBM
                     Exit Sub
                 End If
 
-                Richmond.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
+                Boston.WriteToStatusBar("Creating Relationship between Entities, '" & lrOriginTable.Name & "', and , '" & lrDestinationTable.Name & "'", True)
 
                 '--------------------------------------------------------------------
                 'Create the Relation

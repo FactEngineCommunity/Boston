@@ -51,7 +51,7 @@ Namespace Parser
         Private ParseStatus As New ParserStatus()
 
         Private WithEvents Main As Parser.Syntax.Main
-        Private WithEvents Exec As Boston.Parser.Syntax.Exec_Template = Nothing
+        Private WithEvents Exec As Parser.Syntax.Exec_Template = Nothing
 
         Friend BaseOutputPath As String
 
@@ -195,7 +195,7 @@ Namespace Parser
                 'Execute in preview mode (main will ignore calls when in preview mode)
                 If Me.PreviewMode Then
                     For Each ct In Me.CompiledPackage.CompiledTemplates
-                        Me.Exec = New Boston.Parser.Syntax.Exec_Template(ct.BaseNode, Me.BaseOutputPath, Me.PreviewMode, "TEMPLATE", 1)
+                        Me.Exec = New Parser.Syntax.Exec_Template(ct.BaseNode, Me.BaseOutputPath, Me.PreviewMode, "TEMPLATE", 1)
                         Me.Exec.PreviewOutputRef = Me.PreviewOutputRef
                         Me.Exec.Process()
                         

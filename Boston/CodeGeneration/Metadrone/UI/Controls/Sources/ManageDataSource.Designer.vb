@@ -40,12 +40,12 @@
             Me.picSQLServer = New System.Windows.Forms.PictureBox()
             Me.rbSQLServer = New System.Windows.Forms.RadioButton()
             Me.pnlManagers = New System.Windows.Forms.Panel()
-            Me.ctlSQLServer = New Boston.UI.ManageDBSQLServer()
-            Me.ctlExcel = New Boston.UI.ManageDBExcel()
-            Me.ctlAccess = New Boston.UI.ManageDBAccess()
-            Me.ctlOracle = New Boston.UI.ManageDBOracle()
-            Me.ctlOLEDB = New Boston.UI.ManageDBOLEDB()
-            Me.ctlODBC = New Boston.UI.ManageDBODBC()
+            Me.ctlSQLServer = New UI.ManageDBSQLServer()
+            Me.ctlExcel = New UI.ManageDBExcel()
+            Me.ctlAccess = New UI.ManageDBAccess()
+            Me.ctlOracle = New UI.ManageDBOracle()
+            Me.ctlOLEDB = New UI.ManageDBOLEDB()
+            Me.ctlODBC = New UI.ManageDBODBC()
             Me.pnlLeft = New System.Windows.Forms.Panel()
             Me.pnlMessage = New System.Windows.Forms.Panel()
             Me.lnkMessage = New System.Windows.Forms.LinkLabel()
@@ -412,22 +412,22 @@
         Friend WithEvents Label1 As System.Windows.Forms.Label
         Friend WithEvents picSQLServer As System.Windows.Forms.PictureBox
         Friend WithEvents rbSQLServer As System.Windows.Forms.RadioButton
-        Friend WithEvents ctlSQLServer As Boston.UI.ManageDBSQLServer
+        Friend WithEvents ctlSQLServer As UI.ManageDBSQLServer
         Friend WithEvents picAccess As System.Windows.Forms.PictureBox
         Friend WithEvents rbAccess As System.Windows.Forms.RadioButton
-        Friend WithEvents ctlAccess As Boston.UI.ManageDBAccess
+        Friend WithEvents ctlAccess As UI.ManageDBAccess
         Friend WithEvents picOLEDB As System.Windows.Forms.PictureBox
         Friend WithEvents rbOLEDB As System.Windows.Forms.RadioButton
-        Friend WithEvents ctlOLEDB As Boston.UI.ManageDBOLEDB
+        Friend WithEvents ctlOLEDB As UI.ManageDBOLEDB
         Friend WithEvents picODBC As System.Windows.Forms.PictureBox
         Friend WithEvents rbODBC As System.Windows.Forms.RadioButton
-        Friend WithEvents ctlODBC As Boston.UI.ManageDBODBC
-        Friend WithEvents ctlOracle As Boston.UI.ManageDBOracle
+        Friend WithEvents ctlODBC As UI.ManageDBODBC
+        Friend WithEvents ctlOracle As UI.ManageDBOracle
         Friend WithEvents picOracle As System.Windows.Forms.PictureBox
         Friend WithEvents rbOracle As System.Windows.Forms.RadioButton
         Friend WithEvents picExcel As System.Windows.Forms.PictureBox
         Friend WithEvents rbExcel As System.Windows.Forms.RadioButton
-        Friend WithEvents ctlExcel As Boston.UI.ManageDBExcel
+        Friend WithEvents ctlExcel As UI.ManageDBExcel
         Friend WithEvents pnlManagers As System.Windows.Forms.Panel
         Friend WithEvents pnlLeft As System.Windows.Forms.Panel
         Friend WithEvents lnkMessage As System.Windows.Forms.LinkLabel

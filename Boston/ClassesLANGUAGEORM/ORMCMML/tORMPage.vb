@@ -14,7 +14,7 @@ Namespace FBM
             Try
                 lsPropertyInstanceId = arRDSColumn.Id
 
-                Richmond.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
+                Boston.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
 
                 '--------------------------------------------------------------------------------------------------
                 'The Attribute is not on the Page.
@@ -406,7 +406,7 @@ SkipAdding:
 
         ''' <summary>
         ''' Creates an Entity Relationship Diagram from an ORM-Diagram Page.
-        ''' Puts the ERD on a Page under the same Richmond.Model as the ORM-Diagram of the Page,
+        ''' Puts the ERD on a Page under the same Boston.Model as the ORM-Diagram of the Page,
         '''   and under the same Node/Section on the Model Tree.
         ''' </summary>
         Public Function CreateEntityRelationshipDiagram(ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker) As FBM.Page
@@ -437,7 +437,7 @@ SkipAdding:
                 '-------------------------------------------
                 'Get the EntityRelationshipModel Core Page
                 '-------------------------------------------
-                Richmond.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
+                Boston.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
                 aoBackgroundWorker.ReportProgress(5)
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core, _
@@ -484,7 +484,7 @@ SkipAdding:
                 '--------------------------------------------------------------------------------------------------------------
                 'Create an Entity for each FactType with a TotalInternalUniquenessConstraint or PartialButMultiRoleConstraint
                 '--------------------------------------------------------------------------------------------------------------
-                Richmond.WriteToStatusBar("Creating Entities and Relations")
+                Boston.WriteToStatusBar("Creating Entities and Relations")
 
                 Dim lasEntity As New List(Of String)
 
@@ -509,7 +509,7 @@ SkipAdding:
 
                         If lrORMRecordset("Count").Data = 0 Then
 
-                            Richmond.WriteToStatusBar("Creating Entity, '" & lrFactTypeInstance.Name & "'")
+                            Boston.WriteToStatusBar("Creating Entity, '" & lrFactTypeInstance.Name & "'")
 
                             lsSQLQuery = " SELECT *"
                             lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
@@ -572,7 +572,7 @@ SkipAdding:
                             lrORMRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             If Not lrORMRecordset1.EOF Then
-                                Richmond.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
+                                Boston.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
                                 lsSQLQuery = "ADD FACT '" & lrORMRecordset1.CurrentFact.Id & "'"
                                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                                 lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
@@ -641,7 +641,7 @@ SkipAdding:
 
                     lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Richmond.WriteToStatusBar("Adding Properties for Entity, '" & lsEntityName & "' to Page", True)
+                    Boston.WriteToStatusBar("Adding Properties for Entity, '" & lsEntityName & "' to Page", True)
 
                     While Not lrORMRecordset.EOF
 
@@ -650,7 +650,7 @@ SkipAdding:
 
                         lsPropertyInstanceId = lrORMRecordset("Attribute").Data
 
-                        Richmond.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
+                        Boston.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
 
                         lsSQLQuery = " SELECT *"
                         lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
@@ -783,7 +783,7 @@ SkipAdding:
 
                     lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Richmond.WriteToStatusBar("Adding Relations for Entity, '" & lsEntityName & "' to Page", True)
+                    Boston.WriteToStatusBar("Adding Relations for Entity, '" & lsEntityName & "' to Page", True)
 
                     While Not lrORMRecordset.EOF
 
@@ -929,7 +929,7 @@ SkipAdding:
                 Next 'lsEntityName
                 '============================================================================================================================================
 
-                Richmond.WriteToStatusBar("Completed creating the Entity Relationship Diagram, '" & lrPage.Name & "'")
+                Boston.WriteToStatusBar("Completed creating the Entity Relationship Diagram, '" & lrPage.Name & "'")
 
                 '---------------------------------
                 'Save the new Page to the database
@@ -956,7 +956,7 @@ SkipAdding:
 
         ''' <summary>
         ''' Creates an PropertGraphSchema Diagram from an ORM-Diagram Page.
-        ''' Puts the PGS-Diagram on a Page under the same Richmond.Model as the ORM-Diagram
+        ''' Puts the PGS-Diagram on a Page under the same Boston.Model as the ORM-Diagram
         '''   and under the same Node/Section on the Enterprise Model Tree.
         ''' </summary>    
         Public Function CreatePropertyGraphSchema(ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker) As FBM.Page
@@ -992,7 +992,7 @@ SkipAdding:
                 '-------------------------------------------
                 'Get the EntityRelationshipModel Core Page
                 '-------------------------------------------
-                Richmond.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
+                Boston.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
                                                pcenumCMMLCorePage.CorePropertyGraphSchema.ToString,
@@ -1019,18 +1019,18 @@ SkipAdding:
                 '  This is because there may be Attributes identified at the Model level that aren't available on the Page being processed.
                 If Not Me.Model.HasCoreModel Then
                     Call Me.Model.createEntityRelationshipArtifacts()
-                End If                
+                End If
                 '=========================================================================================
 
                 '----------------------------------------------------------------------------
                 'Create an Entity for each FactType with a TotalInternalUniquenessConstraint
                 '----------------------------------------------------------------------------
-                Richmond.WriteToStatusBar("Creating Nodes and Relations")
+                Boston.WriteToStatusBar("Creating Nodes and Relations")
 
                 '----------------------------------------------------------------------------
                 'Create an Entity for each FactType with a TotalInternalUniquenessConstraint
                 '----------------------------------------------------------------------------
-                Richmond.WriteToStatusBar("Creating Entities and Relations")
+                Boston.WriteToStatusBar("Creating Entities and Relations")
 
                 Dim lasEntity As New List(Of String)
 
@@ -1055,7 +1055,7 @@ SkipAdding:
 
                         If lrORMRecordset("Count").Data = 0 Then
 
-                            Richmond.WriteToStatusBar("Creating Entity, '" & lrFactTypeInstance.Name & "'")
+                            Boston.WriteToStatusBar("Creating Entity, '" & lrFactTypeInstance.Name & "'")
 
                             lsSQLQuery = " SELECT *"
                             lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
@@ -1124,7 +1124,7 @@ SkipAdding:
                 '            lrORMRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                 '            If Not lrORMRecordset1.EOF Then
-                '                Richmond.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
+                '                Boston.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
                 '                lsSQLQuery = "ADD FACT '" & lrORMRecordset1.CurrentFact.Id & "'"
                 '                lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                 '                lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
@@ -1167,7 +1167,7 @@ SkipAdding:
                             '---------------------------------------------------------------
                             'The Entity does not exist in the ERD MetaModel, so create it.
                             '---------------------------------------------------------------
-                            'Richmond.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
+                            'Boston.WriteToStatusBar("Creating Entity, '" & lsEntityName & "'")
 
                             'lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
                             'lsSQLQuery &= " (Element, ElementType)"
@@ -1282,7 +1282,7 @@ SkipAdding:
 
                     lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Richmond.WriteToStatusBar("Adding Properties for Entity, '" & lsEntityName & "' to Page", True)
+                    Boston.WriteToStatusBar("Adding Properties for Entity, '" & lsEntityName & "' to Page", True)
 
                     While Not lrORMRecordset.EOF
 
@@ -1291,7 +1291,7 @@ SkipAdding:
 
                         lsPropertyInstanceId = lrORMRecordset("Attribute").Data
 
-                        Richmond.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
+                        Boston.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
 
                         lsSQLQuery = " SELECT *"
                         lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
@@ -1401,7 +1401,7 @@ SkipAdding:
 
                     lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Richmond.WriteToStatusBar("Adding Relations for Entity, '" & lsEntityName & "' to Page", True)
+                    Boston.WriteToStatusBar("Adding Relations for Entity, '" & lsEntityName & "' to Page", True)
 
                     While Not lrORMRecordset.EOF
 
@@ -1542,7 +1542,7 @@ SkipAdding:
                 Next 'lsEntityName
                 '============================================================================================================================================
 
-                Richmond.WriteToStatusBar("Completed creating the Entity Relationship Diagram, '" & lrPage.Name & "'")
+                Boston.WriteToStatusBar("Completed creating the Entity Relationship Diagram, '" & lrPage.Name & "'")
 
                 '---------------------------------
                 'Save the new Page to the database

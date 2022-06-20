@@ -15,7 +15,7 @@ Namespace FBM
                 Dim lrORMRecordset As ORMQL.Recordset
                 Dim lrORMRecordset1 As ORMQL.Recordset
 
-                Richmond.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
+                Boston.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
                 aoBackgroundWorker.ReportProgress(15)
 
                 Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
@@ -54,7 +54,7 @@ Namespace FBM
                 '---------------------------------------------------
                 'Drop the Node Types onto the Page as Object Types
                 '---------------------------------------------------
-                Richmond.WriteToStatusBar("Creating Entities")
+                Boston.WriteToStatusBar("Creating Entities")
 
                 '=========================================================================================
 
@@ -78,7 +78,7 @@ Namespace FBM
 
                     If lrORMRecordset("Count").Data = 0 Then
 
-                        Richmond.WriteToStatusBar("Creating Entity, '" & lrPGSNode.Name & "'")
+                        Boston.WriteToStatusBar("Creating Entity, '" & lrPGSNode.Name & "'")
 
                         lsSQLQuery = " SELECT *"
                         lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
@@ -106,7 +106,7 @@ Namespace FBM
                 Next
 
 
-                Richmond.WriteToStatusBar("Completed creating the Entity Relationship Diagram, '" & lrPage.Name & "'")
+                Boston.WriteToStatusBar("Completed creating the Entity Relationship Diagram, '" & lrPage.Name & "'")
 
                 '---------------------------------
                 'Save the new Page to the database
@@ -147,7 +147,7 @@ Namespace FBM
                 '---------------------------------------------------
                 'Drop the Node Types onto the Page as Object Types
                 '---------------------------------------------------
-                Richmond.WriteToStatusBar("Creating Object Types")
+                Boston.WriteToStatusBar("Creating Object Types")
 
                 Dim lrEntityType As FBM.EntityType = Nothing
                 Dim lrFactType As FBM.FactType = Nothing
@@ -223,7 +223,7 @@ Namespace FBM
                 '---------------------------------------------------
                 'Drop the Relations onto the Page as Fact Types
                 '---------------------------------------------------
-                Richmond.WriteToStatusBar("Creating Object Types")
+                Boston.WriteToStatusBar("Creating Object Types")
 
                 Dim larERDRelation = From ERDRelation In Me.ERDiagram.Relation
                                      Where ERDRelation.RDSRelation IsNot Nothing
@@ -251,7 +251,7 @@ Namespace FBM
                 'Bring in Attributes from the Model level that are not at the Page level                
                 aoBackgroundWorker.ReportProgress(100)
 
-                Richmond.WriteToStatusBar("Completed creating the Object Role Model, '" & lrPage.Name & "'")
+                Boston.WriteToStatusBar("Completed creating the Object Role Model, '" & lrPage.Name & "'")
 
                 '---------------------------------
                 'Save the new Page to the database

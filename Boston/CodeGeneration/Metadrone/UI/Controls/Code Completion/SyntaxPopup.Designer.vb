@@ -32,7 +32,7 @@
             Me.imglList = New System.Windows.Forms.ImageList(Me.components)
             Me.lblDesc = New System.Windows.Forms.Label
             Me.ttFast = New System.Windows.Forms.ToolTip(Me.components)
-            Me.lst = New Boston.UI.ImageListBox
+            Me.lst = New UI.ImageListBox
             Me.pnlTitle.SuspendLayout()
             Me.SuspendLayout()
             '
@@ -151,7 +151,7 @@
         Friend WithEvents pnlTitle As System.Windows.Forms.Panel
         Friend WithEvents lblTitle As System.Windows.Forms.Label
         Friend WithEvents imglList As System.Windows.Forms.ImageList
-        Friend WithEvents lst As Boston.UI.ImageListBox
+        Friend WithEvents lst As UI.ImageListBox
         Friend WithEvents lnkCancel As System.Windows.Forms.LinkLabel
         Friend WithEvents lblDesc As System.Windows.Forms.Label
         Friend WithEvents ttFast As System.Windows.Forms.ToolTip

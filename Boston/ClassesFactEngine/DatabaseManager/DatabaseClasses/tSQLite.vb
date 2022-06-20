@@ -25,7 +25,7 @@ Namespace FactEngine
             If abCreatingNewDatabase Then Exit Sub
 
             Try
-                Dim lrSQLiteConnection = Boston.Database.CreateConnection(Me.DatabaseConnectionString)
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
                 Me.Connected = True 'Connections are actually made for each Query.
                 lrSQLiteConnection.Close()
             Catch ex As Exception
@@ -649,7 +649,7 @@ Namespace FactEngine
         Public Overrides Sub getDatabaseTypes()
 
             Try
-                Dim lsPath = Richmond.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
+                Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
                 Dim reader As System.IO.TextReader = New System.IO.StreamReader(lsPath)
 
                 Dim csvReader = New CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture)
@@ -959,7 +959,7 @@ Namespace FactEngine
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting To database.", True)
+                'Boston.WriteToStatusBar("Connecting To database.", True)
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
 
                 If lrSQLiteConnection Is Nothing Then
@@ -1419,17 +1419,17 @@ Namespace FactEngine
 
             lsSQLQuery = "UPDATE " & asTableName & vbCrLf
             lsSQLQuery &= " SET " & arColumn.Name & " = " & vbCrLf
-            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "")
+            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "")
             lsSQLQuery &= asNewValue
-            lsSQLQuery &= Richmond.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf
+            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf
             lsSQLQuery &= " WHERE "
             Dim liInd = 0
             For Each lrColumn In aarPKColumn
-                lsSQLQuery &= Richmond.returnIfTrue(liInd > 0, " AND ", "")
+                lsSQLQuery &= Boston.returnIfTrue(liInd > 0, " AND ", "")
                 lsSQLQuery &= lrColumn.Name & " = "
-                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsTextOrDate, "'", "")
+                lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsTextOrDate, "'", "")
                 lsSQLQuery &= lrColumn.TemporaryData
-                lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf
+                lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf
                 liInd += 1
             Next
 

@@ -116,9 +116,9 @@ Namespace UI
             proj.Name = Me.tvwMain.TopNode.Text
 
             For Each Node As TreeNode In MainNode.Nodes
-                If TypeOf Node.Tag Is Boston.Persistence.Properties Then
+                If TypeOf Node.Tag Is Persistence.Properties Then
                     'Properties
-                    proj.Properties = CType(Node.Tag, Boston.Persistence.Properties)
+                    proj.Properties = CType(Node.Tag, Persistence.Properties)
 
                 ElseIf Node.Tag.ToString.Equals(TAG_PROJECT_FOLDER) Then
                     'Add project folder

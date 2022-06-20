@@ -24,7 +24,7 @@ Namespace FBM
 
             'Header
             Me.HTW.Write(vbCrLf)
-            Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.div.header.txt"))
+            Me.HTW.Write(Boston.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.div.header.txt"))
             Me.HTW.Write(vbCrLf)
 
             'Overall body below header
@@ -40,20 +40,20 @@ Namespace FBM
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
 
             'Me.HTW.Write(vbCrLf)
-            'Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.homelabellink.txt"))
+            'Me.HTW.Write(Boston.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.homelabellink.txt"))
             'Me.HTW.Write(vbCrLf)
 
             Me.HTW.RenderEndTag() 'navcontainer
 
             Me.HTW.Write(vbCrLf)
-            Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.styles.txt"))
+            Me.HTW.Write(Boston.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.styles.txt"))
             Me.HTW.Write(vbCrLf)
 
             'LeftSidebar
             Me.HTW.Write("<div class=" & Chr(34) & " glossary-sidebar" & Chr(34) & ">")
             'Index controls
             'Me.HTW.Write(vbCrLf)
-            'Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.div.controls.txt"))
+            'Me.HTW.Write(Boston.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.div.controls.txt"))
             'Me.HTW.Write(vbCrLf)
 
             'Create the index
@@ -396,7 +396,7 @@ Namespace FBM
             Me.HTW = New HtmlTextWriter(Me.SW)
 
             Me.HTW.BeginRender()
-            Me.HTW.Write(Richmond.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.head.txt"))
+            Me.HTW.Write(Boston.publicFunctions.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "glossary.head.txt"))
             Me.HTW.Write(vbCrLf)
             Me.HTW.AddStyleAttribute("text-align", "left")
             Me.HTW.AddStyleAttribute("heigth", "100%")

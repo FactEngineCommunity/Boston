@@ -1251,7 +1251,7 @@ Public Class frmStateTransitionDiagram
 
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             Call prApplication.setWorkingPage(Me.zrPage)
 

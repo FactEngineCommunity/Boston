@@ -332,7 +332,7 @@ Namespace DatabaseUpgradeFunctions
 
             Try
                 'Load the Core.fbm file from <Application Directory>/coremodel/Core.fbm
-                Dim lsNewUniversityModelFile As String = Richmond.MyPath & "\coremodel\University.fbm"
+                Dim lsNewUniversityModelFile As String = Boston.MyPath & "\coremodel\University.fbm"
                 Dim objStreamReader As New StreamReader(lsNewUniversityModelFile)
 
                 lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
@@ -448,7 +448,7 @@ Namespace DatabaseUpgradeFunctions
                 Call BackupDatabase()
 
                 'Load the Core.fbm file from <Application Directory>/coremodel/Core.fbm
-                Dim lsNewCoreModelFile As String = Richmond.MyPath & "\coremodel\Core.fbm"
+                Dim lsNewCoreModelFile As String = Boston.MyPath & "\coremodel\Core.fbm"
                 Dim objStreamReader As New StreamReader(lsNewCoreModelFile)
 
                 lrSerializer = New XmlSerializer(GetType(XMLModel.Model))

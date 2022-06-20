@@ -306,7 +306,7 @@ Namespace FactEngine
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
-                'Richmond.WriteToStatusBar("Connecting to database.", True)
+                'Boston.WriteToStatusBar("Connecting to database.", True)
 
                 Dim adapter As OdbcDataAdapter = New OdbcDataAdapter(asQuery, Me.ODBCConnection)
                 Dim lrDataSet As New DataSet

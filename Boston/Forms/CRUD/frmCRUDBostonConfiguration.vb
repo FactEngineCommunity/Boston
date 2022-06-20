@@ -61,7 +61,7 @@ Public Class frmCRUDBostonConfiguration
         Me.TextBoxDatabaseConnectionString.Text = My.Settings.DatabaseConnectionString
 
         Me.LabelConfigurationFileLocation.Text = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
-        Me.LabelUserConfigurationFileLocation.Text = Richmond.GetConfigFileLocation
+        Me.LabelUserConfigurationFileLocation.Text = Boston.GetConfigFileLocation
 
         'Boston Tab
         Me.CheckBoxAutomaticallyCheckForUpdates.Checked = My.Settings.UseAutoUpdateChecker
@@ -369,7 +369,7 @@ Public Class frmCRUDBostonConfiguration
         '    lrLanguagePhrase.TokenSequence.Add(New LPIO.LPTSWS)
         '    lrModel.LanguagePhrases.Add(lrLanguagePhrase)
 
-        '    If Richmond.IsSerializable(lrModel) Then
+        '    If Boston.IsSerializable(lrModel) Then
 
         '        If DialogFolderBrowser.ShowDialog() = Windows.Forms.DialogResult.OK Then
         '            lsFolderLocation = DialogFolderBrowser.SelectedPath
@@ -472,7 +472,7 @@ Public Class frmCRUDBostonConfiguration
 
         Try
             Call DatabaseUpgradeFunctions.ReplaceCoreModel(True)
-            Richmond.WriteToStatusBar("")
+            Boston.WriteToStatusBar("")
             MsgBox("Core Metamodel Replaced.")
         Catch ex As Exception
             Dim lsMessage As String

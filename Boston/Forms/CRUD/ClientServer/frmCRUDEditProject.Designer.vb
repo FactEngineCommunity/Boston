@@ -32,10 +32,10 @@ Partial Class frmCRUDEditProject
         Me.LabelHelpTipsUser = New System.Windows.Forms.Label()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.FlexibleListBoxIncludedUser = New Boston.FlexibleListBox()
+        Me.FlexibleListBoxIncludedUser = New FlexibleListBox()
         Me.PanelInviteUser = New System.Windows.Forms.Panel()
         Me.TextBoxUserName = New System.Windows.Forms.TextBox()
-        Me.FlexibleListBox = New Boston.FlexibleListBox()
+        Me.FlexibleListBox = New FlexibleListBox()
         Me.ListBoxAvailableUsers = New System.Windows.Forms.ListBox()
         Me.ButtonIncludeUser = New System.Windows.Forms.Button()
         Me.LabelPromptAvailableUsers = New System.Windows.Forms.Label()
@@ -61,7 +61,7 @@ Partial Class frmCRUDEditProject
         Me.ListBoxIncludedGroups = New System.Windows.Forms.ListBox()
         Me.PanelInviteGroup = New System.Windows.Forms.Panel()
         Me.TextBoxGroupInvite = New System.Windows.Forms.TextBox()
-        Me.FlexibleListBoxGroupInvite = New Boston.FlexibleListBox()
+        Me.FlexibleListBoxGroupInvite = New FlexibleListBox()
         Me.ListBoxAvailableGroups = New System.Windows.Forms.ListBox()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
         Me.ComboBoxGroupPermissions = New System.Windows.Forms.ComboBox()
@@ -817,12 +817,12 @@ Partial Class frmCRUDEditProject
     Friend WithEvents ListBoxIncludedNamespaces As System.Windows.Forms.ListBox
     Friend WithEvents LabelPromptIncludedNamespaces As System.Windows.Forms.Label
     Friend WithEvents PanelInviteUser As System.Windows.Forms.Panel
-    Friend WithEvents FlexibleListBox As Boston.FlexibleListBox
+    Friend WithEvents FlexibleListBox As FlexibleListBox
     Friend WithEvents TextBoxUserName As System.Windows.Forms.TextBox
     Friend WithEvents PanelInviteGroup As System.Windows.Forms.Panel
     Friend WithEvents TextBoxGroupInvite As System.Windows.Forms.TextBox
-    Friend WithEvents FlexibleListBoxGroupInvite As Boston.FlexibleListBox
-    Friend WithEvents FlexibleListBoxIncludedUser As Boston.FlexibleListBox
+    Friend WithEvents FlexibleListBoxGroupInvite As FlexibleListBox
+    Friend WithEvents FlexibleListBoxIncludedUser As FlexibleListBox
     Friend WithEvents LabelHelpTipsUser As System.Windows.Forms.Label
     Friend WithEvents LabelHelpTipsGroup As System.Windows.Forms.Label
     Friend WithEvents LabelPromptGroupUsersInProject As System.Windows.Forms.Label

@@ -85,14 +85,14 @@ Namespace FactEngine
 
             '==========================================================
             'Populate the lrRecordset with results from the database
-            'Richmond.WriteToStatusBar("Connecting to database.", True)
+            'Boston.WriteToStatusBar("Connecting to database.", True)
 
             'Dim lrMSAccessRecordset = Database.getReaderForSQL(lrSQLiteConnection, asQuery)
 
             'Dim larFact As New List(Of FBM.Fact)
             'Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
             'Dim lrFact As FBM.Fact
-            ''Richmond.WriteToStatusBar("Reading results.", True)
+            ''Boston.WriteToStatusBar("Reading results.", True)
 
             ''=====================================================
             ''Column Names   

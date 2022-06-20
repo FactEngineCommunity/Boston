@@ -421,7 +421,7 @@ Namespace FBM
                     '---------------------------------------------------
                     'Clone the DictionaryEntries from the Copied Model
                     '---------------------------------------------------
-                    Call Richmond.WriteToStatusBar("Cloning ModelDictionary entries", True, 5)
+                    Call Boston.WriteToStatusBar("Cloning ModelDictionary entries", True, 5)
                     For Each lrDictionaryEntry In Me.Model.ModelDictionary
                         Dim lrClonedDictionaryEntry As New FBM.DictionaryEntry
                         lrClonedDictionaryEntry = lrDictionaryEntry.Clone(arModel)
@@ -431,7 +431,7 @@ Namespace FBM
                     '----------------------
                     'Clone the ValueTypes
                     '----------------------
-                    Call Richmond.WriteToStatusBar("Cloning ValueTypes", True, 32)
+                    Call Boston.WriteToStatusBar("Cloning ValueTypes", True, 32)
                     For Each lrValueTypeInstance In .ValueTypeInstance
                         lrPage.ValueTypeInstance.AddUnique(lrValueTypeInstance.Clone(lrPage, abMakeModelObjectsMDAModelElements))
                     Next
@@ -439,7 +439,7 @@ Namespace FBM
                     '-----------------------
                     'Clone the EntityTypes
                     '-----------------------
-                    Call Richmond.WriteToStatusBar("Cloning EntityTypes", True, 16)
+                    Call Boston.WriteToStatusBar("Cloning EntityTypes", True, 16)
                     For Each lrEntityTypeInstance In .EntityTypeInstance
                         lrPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance.Clone(lrPage, abAddToModel, abMakeModelObjectsMDAModelElements))
                     Next
@@ -447,7 +447,7 @@ Namespace FBM
                     '----------------------
                     'Clone the FactTypes
                     '----------------------
-                    Call Richmond.WriteToStatusBar("Cloning FactTypes", True, 48)
+                    Call Boston.WriteToStatusBar("Cloning FactTypes", True, 48)
                     For Each lrFactTypeInstance In .FactTypeInstance
                         If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
                             '--------------------------------------------------------------------------------------------------
@@ -463,7 +463,7 @@ Namespace FBM
                     '---------------------------
                     'Clone the RoleConstraints
                     '---------------------------
-                    Call Richmond.WriteToStatusBar("Cloning RoleConstraints", True, 64)
+                    Call Boston.WriteToStatusBar("Cloning RoleConstraints", True, 64)
                     For Each lrRoleConstraintInstance In .RoleConstraintInstance
                         lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance.Clone(lrPage, abMakeModelObjectsMDAModelElements))
                     Next
@@ -471,7 +471,7 @@ Namespace FBM
                     '----------------------
                     'Clone the ModelNotes
                     '----------------------
-                    Call Richmond.WriteToStatusBar("Cloning ModelNotes", True, 80)
+                    Call Boston.WriteToStatusBar("Cloning ModelNotes", True, 80)
                     For Each lrModelNoteInstance In .ModelNoteInstance
                         lrPage.ModelNoteInstance.Add(lrModelNoteInstance.Clone(lrPage))
                     Next
@@ -503,7 +503,7 @@ Namespace FBM
 
                 End With
 
-                Call Richmond.WriteToStatusBar("Pasted Page: '" & lrPage.Name & "'", True)
+                Call Boston.WriteToStatusBar("Pasted Page: '" & lrPage.Name & "'", True)
 
                 Return lrPage
 
@@ -2201,7 +2201,7 @@ NextY:
                 '------------------------------------
                 'Get ValueTypes
                 '------------------------------------
-                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Value Types")
+                'Boston.WriteToStatusBar("Loading Page: '" & Me.Name & "' Value Types")
                 'prApplication.ThrowErrorMessage("Loading Page.ValueTypes", pcenumErrorType.Information)
                 'If TableValueTypeInstance.getValueTypeInstance_count_by_page(Me) > 0 Then
                 '-----------------------------------------------
@@ -2216,7 +2216,7 @@ NextY:
                 '-----------------
                 'Get EntityTypes
                 '-----------------
-                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Entity Types")
+                'Boston.WriteToStatusBar("Loading Page: '" & Me.Name & "' Entity Types")
                 'prApplication.ThrowErrorMessage("Loading Page.EntityTypes", pcenumErrorType.Information)
                 'If TableEntityTypeInstance.getEntityTypeInstance_count_by_page(Me) > 0 Then
                 '-----------------------------------------------
@@ -2261,7 +2261,7 @@ NextY:
                 '---------------------
                 'Get RoleConstraints
                 '---------------------
-                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Role Constraints")
+                'Boston.WriteToStatusBar("Loading Page: '" & Me.Name & "' Role Constraints")
                 'prApplication.ThrowErrorMessage("Loading Page.RoleConstraints", pcenumErrorType.Information)
 
                 Me.RoleConstraintInstance = TableRoleConstraintInstance.GetRoleConstraintInstancesByPage(Me)
@@ -2280,17 +2280,17 @@ NextY:
                 '----------------
                 'Get ModelNotes
                 '----------------
-                'Richmond.WriteToStatusBar("Loading Page: '" & Me.Name & "' Model Notes")
+                'Boston.WriteToStatusBar("Loading Page: '" & Me.Name & "' Model Notes")
                 'prApplication.ThrowErrorMessage("Loading Page.ModelNotes", pcenumErrorType.Information)
                 If TableModelNoteInstance.getModelNoteInstanceCountByPage(Me) > 0 Then
                     Me.ModelNoteInstance = TableModelNoteInstance.getModelNoteInstancesByPage(Me)
                 End If
 
-                'Richmond.WriteToStatusBar(".")
+                'Boston.WriteToStatusBar(".")
                 Me.Loaded = True
                 Me.IsDirty = False
 
-                Richmond.WriteToStatusBar("Loaded Page: '" & Me.Name & "'")
+                Boston.WriteToStatusBar("Loaded Page: '" & Me.Name & "'")
 
                 If abAddToModel Then
                     SyncLock Me.Model.Page

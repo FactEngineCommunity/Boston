@@ -103,9 +103,9 @@ Namespace FEQL
                                 For Each lrColumn In lrTargetTable.getPrimaryKeyColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
                                     Dim lrBaseColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
                                     lsSQLCommand &= "[" & lrBaseColumn.Name & "] = "
-                                    lsSQLCommand &= Richmond.returnIfTrue(lrBaseColumn.DataTypeIsText, "'", "")
+                                    lsSQLCommand &= Boston.returnIfTrue(lrBaseColumn.DataTypeIsText, "'", "")
                                     lsSQLCommand &= lrRecordset2.CurrentFact.Data(liInd2).Data
-                                    lsSQLCommand &= Richmond.returnIfTrue(lrBaseColumn.DataTypeIsText, "'", "")
+                                    lsSQLCommand &= Boston.returnIfTrue(lrBaseColumn.DataTypeIsText, "'", "")
                                     liInd2 += 1
                                 Next
                         End Select
@@ -196,9 +196,9 @@ Namespace FEQL
                 For Each lrColumn In aarColumn
                     If liInd > 0 Then lsSQLQuery &= vbCrLf & " AND "
                     lsSQLQuery &= "[" & arTable.Name & "].[" & lrColumn.Name & "] = "
-                    lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                    lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                     lsSQLQuery &= aarColumn(liInd).TemporaryData
-                    lsSQLQuery &= Richmond.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                    lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                     liInd += 1
                 Next
 
@@ -285,7 +285,7 @@ Namespace FEQL
                     Throw New Exception("The database is not connected.")
                 End If
 
-                'Richmond.WriteToStatusBar("Processsing WHICH Statement.", True)
+                'Boston.WriteToStatusBar("Processsing WHICH Statement.", True)
                 Me.CREATEStatement = New FEQL.CREATEStatement
 
                 Call Me.GetParseTreeTokensReflection(Me.CREATEStatement, Me.Parsetree.Nodes(0))

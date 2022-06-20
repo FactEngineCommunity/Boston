@@ -466,7 +466,7 @@ Namespace FBM
                 '-------------------------------------------------------------------
             Else
                 Dim lsStartingPrefix As String = ""
-                lsStartingPrefix = Richmond.ConvertNumberToLetters(aiStartingPosition)
+                lsStartingPrefix = Boston.ConvertNumberToLetters(aiStartingPosition)
                 Me.KLIdentityLetter = Me.GenerateKLIdentityLetter(aarModelDictionary, aiStartingPosition + 1, lsStartingPrefix)
             End If
 

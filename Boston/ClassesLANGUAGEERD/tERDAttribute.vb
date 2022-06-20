@@ -167,9 +167,9 @@ Namespace ERD
         ''' <remarks></remarks>
         Public Relation As ERD.Relation
 
-        Public Overrides Property ModelError() As System.Collections.Generic.List(Of Boston.FBM.ModelError)
+        Public Overrides Property ModelError() As System.Collections.Generic.List(Of FBM.ModelError)
             Get
-                Dim larModelError As New List(Of Boston.FBM.ModelError)
+                Dim larModelError As New List(Of FBM.ModelError)
 
                 If Me.Column.ActiveRole.JoinsValueType IsNot Nothing Then
                     larModelError.AddRange(Me.Column.ActiveRole.JoinsValueType.ModelError)
@@ -189,7 +189,7 @@ Namespace ERD
 
                 Return larModelError
             End Get
-            Set(value As System.Collections.Generic.List(Of Boston.FBM.ModelError))
+            Set(value As System.Collections.Generic.List(Of FBM.ModelError))
                 'Nothing to do here. See getter above.
             End Set
         End Property

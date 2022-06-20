@@ -1545,6 +1545,7 @@
     <Compile Include="ModulesPublic\PublicConstantsODBC.vb" />
     <Compile Include="ModulesPublic\publicDatabase.vb" />
     <Compile Include="ModulesPublic\publicFBMConstants.vb" />
+    <Compile Include="ModulesPublic\PublicImageProcessing.vb" />
     <Compile Include="ModulesPublic\publicORMFunctions.vb" />
     <Compile Include="ModulesPublic\publicPermutations.vb" />
     <Compile Include="ModulesPublic\publicAccessControl.vb" />

@@ -500,7 +500,7 @@ MoveNext:
 
                 If Not lREcordset.EOF Then
 
-                    Richmond.WriteToStatusBar("Found " & lREcordset.RecordCount.ToString & " related Fact Types.", True)
+                    Boston.WriteToStatusBar("Found " & lREcordset.RecordCount.ToString & " related Fact Types.", True)
                     While Not lREcordset.EOF
                         lrFactType = New FBM.FactType
                         lrFactType.isDirty = False
@@ -509,7 +509,7 @@ MoveNext:
 
                         If arModel.FactType.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then GoTo SkipFactType
 
-                        Richmond.WriteToStatusBar("Getting Fact Type details for Fact Type: " & lrFactType.Id, True)
+                        Boston.WriteToStatusBar("Getting Fact Type details for Fact Type: " & lrFactType.Id, True)
                         Call TableFactType.GetFactTypeDetailsByModel(lrFactType, abAddToModel, True)
 
                         larFactType.Add(lrFactType)

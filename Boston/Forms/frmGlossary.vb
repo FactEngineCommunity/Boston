@@ -1135,7 +1135,7 @@ Public Class frmGlossary
             Dim loComputer = New Microsoft.VisualBasic.Devices.Computer()
             Try
                 loComputer.FileSystem.CreateDirectory(Path.GetDirectoryName(lsFileLocationName) & "\glossaryfiles")
-                loComputer.FileSystem.CopyDirectory(Richmond.MyPath & "\glossaryfiles", Path.GetDirectoryName(lsFileLocationName) & "\glossaryfiles", True)
+                loComputer.FileSystem.CopyDirectory(Boston.MyPath & "\glossaryfiles", Path.GetDirectoryName(lsFileLocationName) & "\glossaryfiles", True)
             Catch ex As Exception
                 MsgBox(ex.Message)
             End Try

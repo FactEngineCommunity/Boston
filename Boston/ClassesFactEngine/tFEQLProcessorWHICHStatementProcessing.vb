@@ -271,7 +271,7 @@
                         End Select
 
                         If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                            lrQueryEdge.InjectsQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                            lrQueryEdge.InjectsQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
                             If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
                                 lrQueryEdge.InjectsQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
                             End If
@@ -325,7 +325,7 @@
 
                 Next
 
-                'Richmond.WriteToStatusBar("Generating SQL", True)                
+                'Boston.WriteToStatusBar("Generating SQL", True)                
                 Dim larQueryEdgeTypes = {FactEngine.pcenumWhichClauseType.ISClause, FactEngine.pcenumWhichClauseType.ISNOTClause}
 
                 'Try and fix ambiguities for PartialFactTypeMatch queries.
@@ -597,7 +597,7 @@
             End If
 
             If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
                 If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
                     arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
                 End If
@@ -775,7 +775,7 @@
             End If
 
             If arWHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(arWHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(arWHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
                 If arWHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
                     arQueryEdge.TargetNode.MathNumber = CDbl(arWHICHCLAUSE.MATHCLAUSE.NUMBER)
                 End If
@@ -783,7 +783,7 @@
 
             If arWHICHCLAUSE.KEYWDNO IsNot Nothing Then
                 arQueryEdge.IsSubQueryLeader = True
-                arQueryEdge.SubQueryAlias = Richmond.RandomString(5)
+                arQueryEdge.SubQueryAlias = Boston.RandomString(5)
             ElseIf arQueryGraph.QueryEdges.Count > 0 Then
                 If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
                     arQueryEdge.IsPartOfSubQuery = True
@@ -906,7 +906,7 @@
             'Subquery
             If arWHICHCLAUSE.KEYWDNO IsNot Nothing Then
                 arQueryEdge.IsSubQueryLeader = True
-                arQueryEdge.SubQueryAlias = Richmond.RandomString(5)
+                arQueryEdge.SubQueryAlias = Boston.RandomString(5)
             ElseIf arQueryGraph.QueryEdges.Count > 0 Then
                 If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
                     arQueryEdge.IsPartOfSubQuery = True
@@ -1311,7 +1311,7 @@
             End If
 
             If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                arQueryEdge.TargetNode.MathFunction = Richmond.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
                 If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
                     arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
                 End If
@@ -1335,7 +1335,7 @@
 
             If arWHICHCLAUSE.KEYWDNO IsNot Nothing Then
                 arQueryEdge.IsSubQueryLeader = True
-                arQueryEdge.SubQueryAlias = Richmond.RandomString(5)
+                arQueryEdge.SubQueryAlias = Boston.RandomString(5)
             ElseIf arQueryGraph.QueryEdges.Count > 0 Then
                 If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then
                     arQueryEdge.IsPartOfSubQuery = True

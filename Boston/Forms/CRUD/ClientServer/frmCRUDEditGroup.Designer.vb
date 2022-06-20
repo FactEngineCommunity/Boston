@@ -36,7 +36,7 @@ Partial Class frmCRUDEditGroup
         Me.ListBoxIncludedUsers = New System.Windows.Forms.ListBox()
         Me.PanelInviteUser = New System.Windows.Forms.Panel()
         Me.TextBoxUserName = New System.Windows.Forms.TextBox()
-        Me.FlexibleListBox = New Boston.FlexibleListBox()
+        Me.FlexibleListBox = New FlexibleListBox()
         Me.ListBoxAvailableUsers = New System.Windows.Forms.ListBox()
         Me.TextBoxGroupName = New System.Windows.Forms.TextBox()
         Me.LabelPromptGroupName = New System.Windows.Forms.Label()
@@ -250,7 +250,7 @@ Partial Class frmCRUDEditGroup
     Friend WithEvents ErrorProvider As System.Windows.Forms.ErrorProvider
     Friend WithEvents PanelInviteUser As System.Windows.Forms.Panel
     Friend WithEvents TextBoxUserName As System.Windows.Forms.TextBox
-    Friend WithEvents FlexibleListBox As Boston.FlexibleListBox
+    Friend WithEvents FlexibleListBox As FlexibleListBox
     Friend WithEvents LabelCreatedByUser As System.Windows.Forms.Label
     Friend WithEvents LabelPromptCreatedByUser As System.Windows.Forms.Label
 End Class

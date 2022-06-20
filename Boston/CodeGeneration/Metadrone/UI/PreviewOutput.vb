@@ -67,7 +67,7 @@ Namespace UI
                     'If in editor, use values there
                     If TypeOf MainForm.tcMain.TabPages(idx).Controls(0) Is UI.ManageSource Then
                         Dim tag As Object = CType(MainForm.tcMain.TabPages(idx).Controls(0), UI.ManageSource).Tag
-                        Dim s As Parser.Source.Source = CType(tag, Boston.Persistence.Source).ToParserSource
+                        Dim s As Parser.Source.Source = CType(tag, Persistence.Source).ToParserSource
                         Me.sourceParser.AddSource(s.Name, s.Provider, New Parser.Syntax.SourceTransforms(s.Name, s.Transformations))
                     End If
                 Else
@@ -131,7 +131,7 @@ Namespace UI
                         'If in editor, use values there
                         If TypeOf MainForm.tcMain.TabPages(idx).Controls(0) Is UI.ManageSource Then
                             Dim tag As Object = CType(MainForm.tcMain.TabPages(idx).Controls(0), UI.ManageSource).Tag
-                            Dim s As Parser.Source.Source = CType(tag, Boston.Persistence.Source).ToParserSource
+                            Dim s As Parser.Source.Source = CType(tag, Persistence.Source).ToParserSource
                             s.Transforms = Me.sourceParser.GetCompiledSource(s.Name).Transforms 'Pass on compiled transforms
                             Parser.PackageBuilder.AddSource(s)
                         End If
@@ -162,13 +162,13 @@ Namespace UI
             If My.Application.EXEC_ParseInThread Then
                 'Set status to running first before starting, because when during during the thread, it wasn't set yet,
                 'so it exited from the while loop prematurely
-                Me.packageParser.Status.SetParseState(Boston.Parser.PackageBuilder.ParserStatus.ProcessState.Running)
+                Me.packageParser.Status.SetParseState(Parser.PackageBuilder.ParserStatus.ProcessState.Running)
 
                 Dim t As New Threading.Thread(AddressOf Me.packageParser.Start)
                 t.Start()
                 Application.DoEvents()
 
-                While Me.packageParser.Status.ParseState = Boston.Parser.PackageBuilder.ParserStatus.ProcessState.Running
+                While Me.packageParser.Status.ParseState = Parser.PackageBuilder.ParserStatus.ProcessState.Running
                     Application.DoEvents()
                 End While
             Else
@@ -204,14 +204,14 @@ Namespace UI
         End Sub
 
         Private Sub PreviewOutput_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-            If Me.packageParser.Status.ParseState = Boston.Parser.PackageBuilder.ParserStatus.ProcessState.Running Then
+            If Me.packageParser.Status.ParseState = Parser.PackageBuilder.ParserStatus.ProcessState.Running Then
                 If MessageBox.Show("Cancel preview parsing?", "Cancel",
                                    MessageBoxButtons.OKCancel,
                                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = System.Windows.Forms.DialogResult.OK Then
                     Me.packageParser.Stop()
                     Application.DoEvents()
 
-                    While Me.packageParser.Status.ParseState = Boston.Parser.PackageBuilder.ParserStatus.ProcessState.Running
+                    While Me.packageParser.Status.ParseState = Parser.PackageBuilder.ParserStatus.ProcessState.Running
                         Application.DoEvents()
                     End While
                 Else

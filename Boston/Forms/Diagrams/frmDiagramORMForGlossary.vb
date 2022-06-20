@@ -410,7 +410,7 @@ Public Class frmDiagramORMForGlossary
 
     Private Sub frm_ORMModel_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
-        Call Directory.SetCurrentDirectory(Richmond.MyPath)
+        Call Directory.SetCurrentDirectory(Boston.MyPath)
         Dim lsl_shape_library As ShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
 
         Dim lrPage As New FBM.Page
@@ -891,7 +891,7 @@ Public Class frmDiagramORMForGlossary
                             Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
 
                             If My.Settings.ToolboxDragOffersSelection Then
-                                If Richmond.DisplayGenericSelectForm(lrGenericSelection, "Entity Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsEntityType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
+                                If Boston.DisplayGenericSelectForm(lrGenericSelection, "Entity Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsEntityType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
                                     '----------------------------------------------------
                                     'Establish a new EntityType for the dropped object
                                     '----------------------------------------------------
@@ -929,7 +929,7 @@ Public Class frmDiagramORMForGlossary
                             Dim lrGenericSelection As New tGenericSelection
 
                             If My.Settings.ToolboxDragOffersSelection Then
-                                If Richmond.DisplayGenericSelectForm(lrGenericSelection, "Value Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsValueType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
+                                If Boston.DisplayGenericSelectForm(lrGenericSelection, "Value Type", "MetaModelModelDictionary", "Symbol", "Symbol", "WHERE ModelId = '" & Trim(Me.zrPage.Model.ModelId) & "' AND IsValueType = " & True, lr_combobox_item) = Windows.Forms.DialogResult.OK Then
                                     If lrGenericSelection.SelectIndex = "0" Then
                                         '--------------------------------------------
                                         'User has elected to create a new ValueType 
@@ -1260,7 +1260,7 @@ Public Class frmDiagramORMForGlossary
             lo_point = Me.DiagramView.ClientToDoc(loMouseLocation)
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
@@ -2488,7 +2488,7 @@ Public Class frmDiagramORMForGlossary
             'lo_point = Me.ORMDiagramView.ClientToDoc(loMouseLocation)
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
@@ -2756,7 +2756,7 @@ Public Class frmDiagramORMForGlossary
             End If
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
@@ -3404,12 +3404,12 @@ Public Class frmDiagramORMForGlossary
         If IsSomething(e.Node.Tag) Then
 
             Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
 
             e.Node.Tag.x = e.Node.Bounds.X
             e.Node.Tag.y = e.Node.Bounds.Y
 
-            lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
+            lrUserAction.PostActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
             prApplication.AddUndoAction(lrUserAction)
             frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -4568,7 +4568,7 @@ Public Class frmDiagramORMForGlossary
         For Each loORMObject In Me.zrPage.SelectedObject
 
             Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
-            lrUserAction.PreActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
+            lrUserAction.PreActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
 
             '---------------------------------------------
             'Set the X,Y Co-Ordinates of the ORM Object
@@ -4582,7 +4582,7 @@ Public Class frmDiagramORMForGlossary
                     loORMObject.y = loORMObject.shape.bounds.y
             End Select
 
-            lrUserAction.PostActionModelObject = New Boston.tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
+            lrUserAction.PostActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y) 'loORMObject.Clone(Me.zrPage)
             prApplication.AddUndoAction(lrUserAction)
             frmMain.ToolStripMenuItemUndo.Enabled = True
 
@@ -5822,7 +5822,7 @@ Public Class frmDiagramORMForGlossary
 
             If IsSomething(lrToolboxForm) Then
 
-                Call Directory.SetCurrentDirectory(Richmond.MyPath)
+                Call Directory.SetCurrentDirectory(Boston.MyPath)
                 loShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
 
                 lrToolboxForm.ShapeListBox.Shapes = loShapeLibrary.Shapes

@@ -22,7 +22,7 @@ Public Class tEnterpriseEnterpriseView
     'respective ORM Model) will have a 'language_id' of UseCaseModel.
     '  This just makes it so much easier to make sure that Pages loaded under the Model node are of the same language as intended
     'by the Model node. i.e. The Page knows what Language it is, but the Model doesn't...so we must tell it. There is no other
-    'choice...other than to have multiple models per ORM model...which defeats the purpose of Richmond. 1 model...multiple model views.
+    'choice...other than to have multiple models per ORM model...which defeats the purpose of Boston. 1 model...multiple model views.
     'That's what Richmond is about...multiple interpretations (ORM, Use Case Diagram, Event Trace Diagram etc) of the same model.
     '----------------------------------------------------------------------------------------------------------------------------
 

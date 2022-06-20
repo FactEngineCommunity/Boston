@@ -1422,7 +1422,7 @@ Public Class frmDiagramPGS
             lrShapeNode.Pen.Width = 0.5
             lrShapeNode.Text = lrPageObject.Name
 
-            If Me.zrPage.SelectedObject(0).GetType Is GetType(Boston.ERD.Relation) Then
+            If Me.zrPage.SelectedObject(0).GetType Is GetType(ERD.Relation) Then
                 lrShapeNode.SetRect(New RectangleF(New PointF(lrPageObject.X, lrPageObject.Y), New SizeF(20, 20)), False)
             End If
 
@@ -2288,7 +2288,7 @@ Public Class frmDiagramPGS
             Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             loNode = Diagram.GetNodeAt(lo_point)
 
@@ -3491,8 +3491,8 @@ Public Class frmDiagramPGS
 
         Dim lr_image As Image = Diagram.CreateImage(li_rectf, 100)
 
-        lr_image = Richmond.CropImage(lr_image, Color.White, 0)
-        lr_image = Richmond.CreateFramedImage(lr_image, Color.White, 15)
+        lr_image = Boston.CropImage(lr_image, Color.White, 0)
+        lr_image = Boston.CreateFramedImage(lr_image, Color.White, 15)
 
         lr_image.Save(asFileLocation, System.Drawing.Imaging.ImageFormat.Jpeg)
 

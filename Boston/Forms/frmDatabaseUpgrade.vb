@@ -366,7 +366,7 @@ error_handler:
                 '------------------------------------------------
                 'Update the Boston DatabaseVersionNr
                 '------------------------------------------------
-                Call Richmond.UpdateDatabaseVersion(lrDatabaesUpgrade.ToVersionNr)
+                Call Boston.UpdateDatabaseVersion(lrDatabaesUpgrade.ToVersionNr)
                 Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaesUpgrade.UpgradeId)
                 Call Me.LoadDatabaseUpgradeHistory()
                 '------------------------------------------------

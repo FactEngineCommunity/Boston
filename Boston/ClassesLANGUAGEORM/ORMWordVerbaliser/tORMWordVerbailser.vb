@@ -334,7 +334,7 @@ Namespace FBM
                             End Select
 
                             Dim lsProgramDataDirectory As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\documentationfiles"
-                            Call Richmond.CreateDirectoryIfItDoesntExist(lsProgramDataDirectory)
+                            Call Boston.CreateDirectoryIfItDoesntExist(lsProgramDataDirectory)
 
                             lrForm.writeImageToFile(lsProgramDataDirectory & "\" & "entitytypeimage" & liInd & ".jpg") '"..\\..\\entitytypeimage" & liInd & ".jpg")
                             Me.Document.PutImage(lsProgramDataDirectory & "\" & "entitytypeimage" & liInd & ".jpg", 70) '"..\..\entitytypeimage" & liInd & ".jpg", 70)
@@ -528,7 +528,7 @@ Namespace FBM
                     End Select
 
                     Dim lsProgramDataDirectory As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\documentationfiles"
-                    Call Richmond.CreateDirectoryIfItDoesntExist(lsProgramDataDirectory)
+                    Call Boston.CreateDirectoryIfItDoesntExist(lsProgramDataDirectory)
 
                     lrForm.writeImageToFile(lsProgramDataDirectory & "\" & liInd.ToString & ".jpg") '"..\\..\\image" & liInd & ".jpg")
                     Me.Document.PutImage(lsProgramDataDirectory & "\" & liInd.ToString & ".jpg", 70) '"..\..\image" & liInd & ".jpg", 70)

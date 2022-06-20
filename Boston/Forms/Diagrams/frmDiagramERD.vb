@@ -2068,7 +2068,7 @@ SkipORMReadingEditor:
             Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
             '--------------------------------------------------
-            'Just to be sure...set the Richmond.WorkingProject
+            'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
             prApplication.setWorkingPage(Me.zrPage)
 
@@ -3212,8 +3212,8 @@ SkipORMReadingEditor:
 
         Dim lr_image As Image = Diagram.CreateImage(li_rectf, 100)
 
-        lr_image = Richmond.CropImage(lr_image, Color.White, 0)
-        lr_image = Richmond.CreateFramedImage(lr_image, Color.White, 15)
+        lr_image = Boston.CropImage(lr_image, Color.White, 0)
+        lr_image = Boston.CreateFramedImage(lr_image, Color.White, 15)
 
         lr_image.Save(asFileLocation, System.Drawing.Imaging.ImageFormat.Jpeg)
 

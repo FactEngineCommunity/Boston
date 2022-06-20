@@ -123,7 +123,7 @@ Namespace UI
                 Me.mniPaste.Visible = True
                 Me.mniPaste.Enabled = Me.DisablePaste(Node)
 
-            ElseIf TypeOf Node.Tag Is Boston.Persistence.Properties Then
+            ElseIf TypeOf Node.Tag Is Persistence.Properties Then
                 Me.mniOpen.Visible = True
 
             ElseIf TypeOf Node.Tag Is Main Then
@@ -175,9 +175,9 @@ Namespace UI
 
             'Add properties
             Dim propNode As New TreeNode("Properties", IMG_PROPERTIES, IMG_PROPERTIES)
-            propNode.Tag = New Boston.Persistence.Properties()
+            propNode.Tag = New Persistence.Properties()
             'Super main calling the package
-            CType(propNode.Tag, Boston.Persistence.Properties).SuperMain = Parser.Syntax.Constants.ACTION_CALL & " " & frm.txtPackageName.Text
+            CType(propNode.Tag, Persistence.Properties).SuperMain = Parser.Syntax.Constants.ACTION_CALL & " " & frm.txtPackageName.Text
             newNode.Nodes.Add(propNode)
 
             'With default Source
@@ -274,7 +274,7 @@ Namespace UI
             ElseIf Me.tvwMain.SelectedNode.Tag.ToString.Equals(TAG_PROJECT) OrElse
                    Me.tvwMain.SelectedNode.Tag.ToString.Equals(TAG_PROJECT_FOLDER) OrElse
                    TypeOf Me.tvwMain.SelectedNode.Tag Is Source OrElse
-                   TypeOf Me.tvwMain.SelectedNode.Tag Is Boston.Persistence.Properties OrElse
+                   TypeOf Me.tvwMain.SelectedNode.Tag Is Persistence.Properties OrElse
                    TypeOf Me.tvwMain.SelectedNode.Tag Is Main Then
                 'Don't allow add item to project, project folder, source, or properties/main nodes
                 frm.Type = NewItem.Types.ProjectChild
@@ -334,9 +334,9 @@ Namespace UI
 
                     'Add properties
                     Dim propNode As New TreeNode("Properties", IMG_PROPERTIES, IMG_PROPERTIES)
-                    propNode.Tag = New Boston.Persistence.Properties()
+                    propNode.Tag = New Persistence.Properties()
                     'Super main calling the package
-                    CType(propNode.Tag, Boston.Persistence.Properties).SuperMain = Parser.Syntax.Constants.ACTION_CALL & " " & frm.txtPackageName.Text
+                    CType(propNode.Tag, Persistence.Properties).SuperMain = Parser.Syntax.Constants.ACTION_CALL & " " & frm.txtPackageName.Text
                     newNode.Nodes.Add(propNode)
 
                     'With default Source
@@ -741,7 +741,7 @@ Namespace UI
                 'Get properties node
                 Dim propNode As TreeNode = Nothing
                 For Each n As TreeNode In Node.Nodes
-                    If TypeOf n.Tag Is Boston.Persistence.Properties Then
+                    If TypeOf n.Tag Is Persistence.Properties Then
                         propNode = Me.NodeClone(n)
                         Exit For
                     End If
@@ -838,7 +838,7 @@ Namespace UI
                     Node.Nodes.Add(Me.NodeClone(n))
                 Next
 
-            ElseIf TypeOf Node.Tag Is Boston.Persistence.Properties Then
+            ElseIf TypeOf Node.Tag Is Persistence.Properties Then
                 'Should not have any nodes under here
 
             ElseIf TypeOf Node.Tag Is Source Then

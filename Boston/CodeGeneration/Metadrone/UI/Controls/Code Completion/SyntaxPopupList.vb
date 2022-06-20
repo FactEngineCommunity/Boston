@@ -33,7 +33,7 @@ Namespace UI
             End Get
         End Property
 
-        Public Sub Fill(ByVal lineWords As Boston.UI.txtBox.LineWords, ByVal Context As Contexts, ByVal analysis As Parser.CodeCompletion.Analyser)
+        Public Sub Fill(ByVal lineWords As UI.txtBox.LineWords, ByVal Context As Contexts, ByVal analysis As Parser.CodeCompletion.Analyser)
             Me.Items.Clear()
 
             Select Case Context

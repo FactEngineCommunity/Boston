@@ -5,7 +5,7 @@ Public Class FBMInterfaceHost
 
     Public Sub New()
 
-        Richmond.WriteToStatusBar("Initialising Interface Host", True)
+        Boston.WriteToStatusBar("Initialising Interface Host", True)
 
     End Sub
 

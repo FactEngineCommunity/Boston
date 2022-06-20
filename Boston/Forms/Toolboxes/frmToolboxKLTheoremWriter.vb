@@ -75,10 +75,10 @@ Public Class frmToolboxKLTheoremWriter
         'ZFont
         Try
             If Not Me.zFontInstalled Then
-                Dim lbResult As Boolean = AddFontResource(Richmond.MyPath & "\zfont\ZFONT.TTF")
+                Dim lbResult As Boolean = AddFontResource(Boston.MyPath & "\zfont\ZFONT.TTF")
 
                 Dim loPrivateFontCollection = New System.Drawing.Text.PrivateFontCollection
-                loPrivateFontCollection.AddFontFile(Richmond.MyPath & "\zfont\ZFONT.TTF")
+                loPrivateFontCollection.AddFontFile(Boston.MyPath & "\zfont\ZFONT.TTF")
 
                 Me.TextBox1.Font = New Font(loPrivateFontCollection.Families(0), 11, FontStyle.Regular, GraphicsUnit.Pixel)
             Else

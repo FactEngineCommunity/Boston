@@ -113,7 +113,7 @@ Public Class frmToolbox
             Dim loShapeLibrary As ShapeLibrary
             Dim loShape As Shape
 
-            Call Directory.SetCurrentDirectory(Richmond.MyPath)
+            Call Directory.SetCurrentDirectory(Boston.MyPath)
 
             Select Case aiLanguage
                 Case Is = pcenumLanguage.ORMModel

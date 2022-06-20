@@ -159,7 +159,7 @@
 
 #End Region
 
-        Private currentScope As Boston.UI.SearchBox.SearchScopes = UI.SearchBox.SearchScopes.Project
+        Private currentScope As UI.SearchBox.SearchScopes = UI.SearchBox.SearchScopes.Project
         Private currentSearchPattern As String = ""
         Private textAlteredSoSearchAgain As Boolean = False
         Private searchDocuments As New List(Of SearchDocument)
@@ -188,13 +188,13 @@
 
                 'Build searches
                 Select Case SearchScope
-                    Case Boston.UI.SearchBox.SearchScopes.Project
+                    Case UI.SearchBox.SearchScopes.Project
                         'Build search list of entire project
                         For Each node As TreeNode In Me.tvwExplorer.Nodes
                             Call Me.GetNodes(searchText, node)
                         Next
 
-                    Case Boston.UI.SearchBox.SearchScopes.Package
+                    Case UI.SearchBox.SearchScopes.Package
                         'Build search list of the package
 
                         'Get package node to search
@@ -214,7 +214,7 @@
                             Next
                         End If
 
-                    Case Boston.UI.SearchBox.SearchScopes.CurrentDocument
+                    Case UI.SearchBox.SearchScopes.CurrentDocument
                         'Open explorer node if launched from there
                         If Me.searchingFromExplorer Then
                             Me.OpenNode(Me.tvwExplorer.SelectedNode)
@@ -241,7 +241,7 @@
 
             'Find next
             Select Case SearchScope
-                Case Boston.UI.SearchBox.SearchScopes.Project, Boston.UI.SearchBox.SearchScopes.Package
+                Case UI.SearchBox.SearchScopes.Project, UI.SearchBox.SearchScopes.Package
                     If Me.searchDocuments.Count = 0 Then
                         'No documents, report no matches
                         Me.lblSearchMessage.Text = "No matches"
@@ -299,7 +299,7 @@
                     End If
 
 
-                Case Boston.UI.SearchBox.SearchScopes.CurrentDocument
+                Case UI.SearchBox.SearchScopes.CurrentDocument
                     If Me.searchDocuments.Count = 0 Then
                         'No documents, report no matches
                         Me.lblSearchMessage.Text = "No matches"

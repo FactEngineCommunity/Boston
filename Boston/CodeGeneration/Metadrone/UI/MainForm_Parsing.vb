@@ -161,13 +161,13 @@ Namespace UI
 
         'Check tag in tab pages editor control (main, templates, etc)
         'Return index of tab page
-        Friend Function TagFoundInTabPages(ByVal Tag As Boston.Persistence.IEditorItem) As Integer
+        Friend Function TagFoundInTabPages(ByVal Tag As Persistence.IEditorItem) As Integer
             For i As Integer = 0 To Me.tcMain.TabPages.Count - 1
                 If Me.tcMain.TabPages(i).Controls.Count = 0 Then Continue For
                 If Me.tcMain.TabPages(i).Controls(0).Tag Is Nothing Then Continue For
-                If Not TypeOf Me.tcMain.TabPages(i).Controls(0).Tag Is Boston.Persistence.IEditorItem Then Continue For
+                If Not TypeOf Me.tcMain.TabPages(i).Controls(0).Tag Is Persistence.IEditorItem Then Continue For
 
-                If CType(Me.tcMain.TabPages(i).Controls(0).Tag, Boston.Persistence.IEditorItem).EditorGUID.Equals(Tag.EditorGUID) Then
+                If CType(Me.tcMain.TabPages(i).Controls(0).Tag, Persistence.IEditorItem).EditorGUID.Equals(Tag.EditorGUID) Then
                     Return i
                 End If
             Next

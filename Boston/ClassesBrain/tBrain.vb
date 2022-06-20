@@ -70,7 +70,7 @@ Public Class tBrain
 
     Private Timeout As New Timers.Timer(10)
 
-    Public VAQL As VAQL.Processor
+    Public VAQLProcessor As VAQL.Processor
     Private VAQLParser As New VAQL.Parser(New VAQL.Scanner) 'Used to parse Text input into the Brain; especially for VAQL.
     Private VAQLParsetree As New VAQL.ParseTree
 
@@ -168,25 +168,25 @@ Public Class tBrain
             Me.CommandList.Add("describe your current plan")
             Me.CommandList.Add("layout")
 
-            Richmond.WriteToStatusBar("Initialising AIML Bot", True)
+            Boston.WriteToStatusBar("Initialising AIML Bot", True)
             '========================================================================================
             'Setup the AIML bot
             '-------------------------------------------------------------------
             Dim lsAIMLConfigPath As String = ""
             Dim lsDefaultAIMLFile As String = ""
-            lsAIMLConfigPath = Richmond.MyPath & My.Settings.AIMLDirectory & "config\Settings.xml"
+            lsAIMLConfigPath = Boston.MyPath & My.Settings.AIMLDirectory & "config\Settings.xml"
             Call Me.SentenceAnalyser.loadSettings(lsAIMLConfigPath)
-            Richmond.WriteToStatusBar("AIML Bot Initialised", True)
+            Boston.WriteToStatusBar("AIML Bot Initialised", True)
 
-            Richmond.WriteToStatusBar("Loading default AIML File", True)
+            Boston.WriteToStatusBar("Loading default AIML File", True)
             '----------------------------
             'Load the default AIML file
-            lsDefaultAIMLFile = Richmond.MyPath & My.Settings.AIMLDirectory & My.Settings.DefaultAIMLFile
+            lsDefaultAIMLFile = Boston.MyPath & My.Settings.AIMLDirectory & My.Settings.DefaultAIMLFile
             Dim loader As New AIMLbot.Utils.AIMLLoader(Me.SentenceAnalyser)
             Me.SentenceAnalyser.isAcceptingUserInput = False
             loader.loadAIMLFile(lsDefaultAIMLFile)
             Me.SentenceAnalyser.isAcceptingUserInput = True
-            Richmond.WriteToStatusBar("Default AIML File Loaded", True)
+            Boston.WriteToStatusBar("Default AIML File Loaded", True)
             '========================================================================================
 
         Catch ex As Exception
@@ -2541,49 +2541,49 @@ SkipOutputChannel:
 
         Try
             Select Case aoTokenType
-                Case Is = Boston.VAQL.TokenType.KEYWDISANENTITYTYPE
+                Case Is = VAQL.TokenType.KEYWDISANENTITYTYPE
                     'Is StraightToAction
                     Call Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDISAVALUETYPE
+                Case Is = VAQL.TokenType.KEYWDISAVALUETYPE
                     'Is StraightToAction
                     Call Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent)
                     Return True
-                Case Is = Boston.VAQL.TokenType.VALUECONSTRAINTCLAUSE
+                Case Is = VAQL.TokenType.VALUECONSTRAINTCLAUSE
                     'Is StraightToAction
                     Call Me.ProcessVALUECONSTRAINTCLAUSE(abBroadcastInterfaceEvent)
                     Return True
-                Case Is = Boston.VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
+                Case Is = VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                     'Is StraightToAction
                     Call Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent)
                     Return True
-                Case Is = Boston.VAQL.TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
+                Case Is = VAQL.TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     'Is StraightToAction
                     Call Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent)
                     Return True
-                Case Is = Boston.VAQL.TokenType.FACTTYPECLAUSE
+                Case Is = VAQL.TokenType.FACTTYPECLAUSE
                     Call Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDANYNUMBEROF
+                Case Is = VAQL.TokenType.KEYWDANYNUMBEROF
                     Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDATLEASTONE
+                Case Is = VAQL.TokenType.KEYWDATLEASTONE
                     Call Me.FormulateQuestionsATLEASTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDATMOSTONE
+                Case Is = VAQL.TokenType.KEYWDATMOSTONE
                     Call Me.FormulateQuestionsATMOSTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDONE
+                Case Is = VAQL.TokenType.KEYWDONE
                     Call Me.FormulateQuestionsONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDISACONCEPT
+                Case Is = VAQL.TokenType.KEYWDISACONCEPT
                     'Is StraightToAction
                     Call Me.ProcessISACONCEPTStatement()
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDISWHERE
+                Case Is = VAQL.TokenType.KEYWDISWHERE
                     Call Me.FormulateQuestionsISWHEREStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
-                Case Is = Boston.VAQL.TokenType.KEYWDISAKINDOF
+                Case Is = VAQL.TokenType.KEYWDISAKINDOF
                     Call Me.FormulateQuestionsISAKINDOFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
             End Select
@@ -3630,7 +3630,7 @@ SkipOutputChannel:
         Dim loTokenType As VAQL.TokenType
 
         Try
-            Call Me.VAQL.ProcessVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
+            Call Me.VAQLProcessor.ProcessVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
             If Me.ProcessVAQLStatement(asFEQLStatement, loTokenType) Then
                 '----------------------------------------------------------------------------------------------
                 'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
@@ -3658,11 +3658,11 @@ SkipOutputChannel:
 
         Try
             'CodeSafe
-            If Me.VAQL Is Nothing Then
-                prApplication.Brain.VAQL = New VAQL.Processor(prApplication.WorkingModel)
+            If Me.VAQLProcessor Is Nothing Then
+                prApplication.Brain.VAQLProcessor = New VAQL.Processor(prApplication.WorkingModel)
             End If
 
-            Call Me.VAQL.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree)
+            Call Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree)
             Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False)
 
         Catch ex As Exception
@@ -3709,7 +3709,7 @@ SkipOutputChannel:
                 Dim loTokenType As VAQL.TokenType
 
                 'Determine if is a valid VAQL Statement.
-                Call Me.VAQL.ProcessVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
+                Call Me.VAQLProcessor.ProcessVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
 
                 'Process the VAQL Statement based on the primary TokenType returned (above)
                 If Me.ProcessVAQLStatement(Me.InputBuffer, loTokenType) Then

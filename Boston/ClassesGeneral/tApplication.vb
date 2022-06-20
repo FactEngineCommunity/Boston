@@ -71,16 +71,16 @@ Public Class tApplication
         Try
             Dim lrLanguageModel As FBM.Model
 
-            Richmond.WriteToStatusBar("Loading Language", True)
+            Boston.WriteToStatusBar("Loading Language", True)
             Me.Language = New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
-            Richmond.WriteToStatusBar("Language Loaded", True)
+            Boston.WriteToStatusBar("Language Loaded", True)
 
             Select Case My.Settings.DefaultLanguage
                 Case Is = pcenumNaturalLanguage.English.ToString
                     lrLanguageModel = New FBM.Model(pcenumNaturalLanguage.English.ToString, pcenumNaturalLanguage.English.ToString)
                     Me.Language.Model = lrLanguageModel
             End Select
-            Richmond.WriteToStatusBar("Created Model for Language", True)
+            Boston.WriteToStatusBar("Created Model for Language", True)
 
 
         Catch ex As Exception
