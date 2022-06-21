@@ -71,9 +71,7 @@ Partial Class frmDiagrmUMLUseCase
         Me.MorphTimer = New System.Windows.Forms.Timer(Me.components)
         Me.MorphStepTimer = New System.Windows.Forms.Timer(Me.components)
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_Actor.SuspendLayout()
         Me.ContextMenuStrip_Process.SuspendLayout()
@@ -480,8 +478,6 @@ Partial Class frmDiagrmUMLUseCase
     Friend WithEvents RemoveFromPageToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents RemoveFromPageAndModelToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator7 As ToolStripSeparator
-    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents RemoveFromPageToolStripMenuItem2 As ToolStripMenuItem
     Friend WithEvents RemoveFromPageAndModelToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator8 As ToolStripSeparator

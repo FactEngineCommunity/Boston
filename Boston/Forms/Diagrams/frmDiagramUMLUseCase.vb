@@ -789,55 +789,72 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub Diagram_LinkCreated(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkCreated
 
-        Dim loObject As Object = e.Link.Destination
-        Dim lo_dummy_object As New MindFusion.Diagramming.DummyNode(Me.Diagram)
-        Dim lrFact As New FBM.Fact
-        Dim lrFactInstance As New FBM.FactInstance
-        Dim loFirstModelElement As New Object
-        Dim loSecondModelElement As New Object
+        Try
+
+            Dim loObject As Object = e.Link.Destination
+            Dim lo_dummy_object As New MindFusion.Diagramming.DummyNode(Me.Diagram)
+            Dim lrFact As New FBM.Fact
+            Dim lrFactInstance As New FBM.FactInstance
+            Dim loFirstModelElement As New Object
+            Dim loSecondModelElement As New Object
+
+            'CodeSafe - No links from nowhere to nowhere or a link
+            If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
+            If e.Link.Destination.GetType = GetType(MindFusion.Diagramming.DummyNode) Or e.Link.Destination.GetType = GetType(MindFusion.Diagramming.ContainerNode) Then
+                Call Me.Diagram.Links.Remove(e.Link)
+                Exit Sub
+            End If
 
 
-        Select Case loObject.GetType.ToString
-            Case Is = zo_containernode.GetType.ToString, lo_dummy_object.GetType.ToString
-                Dim lo_pointf = New PointF(e.Link.Origin.Bounds.X + e.Link.Bounds.Width, e.Link.Origin.Bounds.Y + e.Link.Bounds.Height)
-                'dim lr_process_instance = New tprocess_instance
-                'Call drop_process_at_point(pr_process, lo_pointf)
-                'e.Link.Destination = lr_process_instance.shape
-        End Select
 
-        Me.Cursor = Cursors.WaitCursor
+            Select Case loObject.GetType.ToString
+                Case Is = zo_containernode.GetType.ToString, lo_dummy_object.GetType.ToString
+                    Dim lo_pointf = New PointF(e.Link.Origin.Bounds.X + e.Link.Bounds.Width, e.Link.Origin.Bounds.Y + e.Link.Bounds.Height)
+                    'dim lr_process_instance = New tprocess_instance
+                    'Call drop_process_at_point(pr_process, lo_pointf)
+                    'e.Link.Destination = lr_process_instance.shape
+            End Select
 
-        loFirstModelElement = e.Link.Origin.Tag
-        loSecondModelElement = e.Link.Destination.Tag
+            Me.Cursor = Cursors.WaitCursor
 
-        If (loFirstModelElement.ConceptType = pcenumConceptType.Actor) And (loSecondModelElement.ConceptType = pcenumConceptType.Process) Then
+            loFirstModelElement = e.Link.Origin.Tag
+            loSecondModelElement = e.Link.Destination.Tag
 
-            Dim lrCMMLActor As CMML.Actor = loFirstModelElement.CMMLActor
-            Dim lrCMMLProcess As CMML.Process = loSecondModelElement.CMMLProcess
+            If (loFirstModelElement.ConceptType = pcenumConceptType.Actor) And (loSecondModelElement.ConceptType = pcenumConceptType.Process) Then
 
-            Dim lrCMMLActorProcessRelation = New CMML.ActorProcessRelation(Me.zrPage.Model.UML, lrCMMLActor, lrCMMLProcess)
+                Dim lrCMMLActor As CMML.Actor = loFirstModelElement.CMMLActor
+                Dim lrCMMLProcess As CMML.Process = loSecondModelElement.CMMLProcess
 
-            Me.zrPage.Model.UML.addActorProcessRelation(lrCMMLActorProcessRelation)
+                Dim lrCMMLActorProcessRelation = New CMML.ActorProcessRelation(Me.zrPage.Model.UML, lrCMMLActor, lrCMMLProcess)
 
-            Me.Diagram.Links.Remove(e.Link)
+                Me.zrPage.Model.UML.addActorProcessRelation(lrCMMLActorProcessRelation)
 
-        ElseIf (loFirstModelElement.ConceptType = pcenumConceptType.Process) And (loSecondModelElement.ConceptType = pcenumConceptType.Process) Then
+                Me.Diagram.Links.Remove(e.Link)
 
-
-            Dim lrCMMLProcess1 As CMML.Process = loFirstModelElement.CMMLProcess
-            Dim lrCMMLProcess2 As CMML.Process = loSecondModelElement.CMMLProcess
-
-            Dim lrCMMLProcessProcessRelation = New CMML.ProcessProcessRelation(Me.zrPage.Model.UML, lrCMMLProcess1, lrCMMLProcess2)
-
-            Me.zrPage.Model.UML.addProcessProcessRelation(lrCMMLProcessProcessRelation)
+            ElseIf (loFirstModelElement.ConceptType = pcenumConceptType.Process) And (loSecondModelElement.ConceptType = pcenumConceptType.Process) Then
 
 
-            Me.Diagram.Links.Remove(e.Link)
+                Dim lrCMMLProcess1 As CMML.Process = loFirstModelElement.CMMLProcess
+                Dim lrCMMLProcess2 As CMML.Process = loSecondModelElement.CMMLProcess
 
-        End If
+                Dim lrCMMLProcessProcessRelation = New CMML.ProcessProcessRelation(Me.zrPage.Model.UML, lrCMMLProcess1, lrCMMLProcess2)
 
+                Me.zrPage.Model.UML.addProcessProcessRelation(lrCMMLProcessProcessRelation)
 
-        Me.Cursor = Cursors.Default
+                Me.Diagram.Links.Remove(e.Link)
+
+            End If
+
+            Me.Cursor = Cursors.Default
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -1037,27 +1054,39 @@ Public Class frmDiagrmUMLUseCase
         'NB IMPORTANT: UseCaseDiagramView.MouseDown gets processed before Diagram.NodeSelected, so management of which object
         '  is displayed in the PropertyGrid is performed in ORMDiagram.MouseDown
         '------------------------------------------------------------------------------------------
+        Try
 
-        Select Case e.Node.Tag.ConceptType
-            Case Is = pcenumConceptType.Process
-                e.Node.Pen.Color = Color.Blue
-            Case Is = pcenumConceptType.Actor
-                e.Node.Pen.Color = Color.Blue
-            Case Else
-                'Do nothing
-        End Select
+            Select Case e.Node.Tag.ConceptType
+                Case Is = pcenumConceptType.Process
+                    e.Node.Pen.Color = Color.Blue
+                Case Is = pcenumConceptType.Actor
+                    e.Node.Pen.Color = Color.Blue
+                Case Else
+                    'Do nothing
+            End Select
 
-        '----------------------------------------------------
-        'Set the ContextMenuStrip menu for the selected item
-        '----------------------------------------------------        
-        Select Case Me.zrPage.SelectedObject(0).ConceptType
-            Case Is = pcenumConceptType.Actor
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Actor
-            Case Is = pcenumConceptType.Process
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Process
-            Case Else
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-        End Select
+            '----------------------------------------------------
+            'Set the ContextMenuStrip menu for the selected item
+            '----------------------------------------------------        
+            If Me.zrPage.SelectedObject.Count > 0 Then
+                Select Case Me.zrPage.SelectedObject(0).ConceptType
+                    Case Is = pcenumConceptType.Actor
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Actor
+                    Case Is = pcenumConceptType.Process
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Process
+                    Case Else
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
+                End Select
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -2654,6 +2683,7 @@ Public Class frmDiagrmUMLUseCase
         Try
             'CodeSafe 
             If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject(0) Is Nothing Then Exit Sub
             If Me.zrPage.SelectedObject(0).GetType <> GetType(UCD.ProcessProcessRelation) Then Exit Sub
 
             Dim loUCDLink = Me.zrPage.SelectedObject(0)

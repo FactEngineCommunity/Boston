@@ -1091,7 +1091,7 @@ Public Class frmDiagramPGS
             Dim lsFactTypeName As String = ""
             Dim lrFactType As FBM.FactType
 
-            'CodeSafe
+            'CodeSafe - No links from nowhere to nowhere or a link
             If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
             If e.Link.Destination.GetType = GetType(MindFusion.Diagramming.DummyNode) Then
                 Call Me.Diagram.Links.Remove(e.Link)
@@ -3761,7 +3761,6 @@ Public Class frmDiagramPGS
                     e.Cancel = True
                     Exit Sub
             End Select
-
 
         Catch ex As Exception
             Dim lsMessage As String

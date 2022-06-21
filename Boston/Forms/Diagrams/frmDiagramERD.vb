@@ -1047,55 +1047,118 @@ SkipORMReadingEditor:
         '-------------------------
         'Create the ERD.Relation
         '-------------------------
-        Dim lrRelation As New ERD.Relation
+        Dim lsMessage As String
+        Try
+            Dim larModelElement As New List(Of FBM.ModelObject)
+            Dim lrModelElement As FBM.ModelObject = Nothing
+            Dim lsFactTypeName As String = ""
+            Dim lrFactType As FBM.FactType
 
-        lrRelation.OriginEntity = e.Link.Origin.Tag
-        lrRelation.DestinationEntity = e.Link.Destination.Tag
-        lrRelation.OriginMultiplicity = pcenumCMMLMultiplicity.One
-        lrRelation.DestinationMultiplicity = pcenumCMMLMultiplicity.One
-        lrRelation.OriginAttribute = lrRelation.OriginEntity.TableShape.Item(0, e.Link.OriginIndex).Tag
-        lrRelation.DestinationAttribute = lrRelation.DestinationEntity.TableShape.Item(0, e.Link.DestinationIndex).Tag
+            'CodeSafe - No links from nowhere to nowhere or a link
+            If e.Link.Origin.GetType = GetType(MindFusion.Diagramming.DummyNode) Then Exit Sub
+            If e.Link.Destination.GetType = GetType(MindFusion.Diagramming.DummyNode) Then
+                Call Me.Diagram.Links.Remove(e.Link)
+                Exit Sub
+            End If
 
-        Dim lsSQLQuery As String = ""
-        Dim lrFact As FBM.Fact
+            With New WaitCursor
 
-        lsSQLQuery = "INSERT INTO ERDRelation (ModelObject, Relation)"
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " VALUES ("
-        lsSQLQuery &= "'" & lrRelation.OriginEntity.Name & "'"
-        lsSQLQuery &= ",'" & lrRelation.DestinationEntity.Name & "')"
+                lrModelElement = e.Link.Origin.Tag.RDSTable.FBMModelElement
+                larModelElement.Add(lrModelElement)
+                lsFactTypeName.AppendString(lrModelElement.Id & "RelatesTo")
 
-        lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If lrModelElement.ModelError.Find(Function(x) x.ErrorId = "105") IsNot Nothing Then
+                    lsMessage = "You should create a Primary Reference Scheme for the Node Type, " & lrModelElement.Id & ", as soon as possible."
+                    lsMessage.AppendDoubleLineBreak("A Node Type without a Primary Reference Scheme is like a Table without a Primary Key, or a graph database Node Type without a unique identifier for Nodes at the data level.")
+                    MsgBox(lsMessage)
+                End If
 
-        '-------------------------------
-        'Create a Concept for the Fact
-        '-------------------------------
-        Dim lrConcept As New FBM.Concept(lrFact.Id)
-        lrConcept.Save()
+                lrModelElement = e.Link.Destination.Tag.RDSTable.FBMModelElement
+                larModelElement.Add(lrModelElement)
+                lsFactTypeName.AppendString(lrModelElement.Id)
 
-        '-------------------------------------------------
-        'Create a new ModelDictionary entry for the Fact
-        '-------------------------------------------------
-        Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.zrPage.Model, lrFact.Id, pcenumConceptType.Fact, "ERDRelation")
-        lrDictionaryEntry = Me.zrPage.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-        lrDictionaryEntry.isFact = True
-        lrDictionaryEntry.Save()
+                If Not lrModelElement.HasPrimaryReferenceScheme Then  'ModelError.Find(Function(x) x.ErrorId = "105") IsNot Nothing Then
+                    lsMessage = "You need to create a Primary Reference Scheme for the Node Type, " & lrModelElement.Id & "."
+                    lsMessage.AppendDoubleLineBreak("Linking to a Node Type without a Primary Reference Scheme is like referencing a Table without a Primary Key, or a graph database Node Type without a unique identifier for Nodes at the data level.")
+                    MsgBox(lsMessage)
+                    Me.zrPage.Diagram.Links.Remove(e.Link)
+                    Exit Sub
+                End If
 
-        lsSQLQuery = "INSERT INTO OriginMultiplicity (ERDRelation, Multiplicity)"
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " VALUES ("
-        lsSQLQuery &= "'" & lrFact.Id & "'"
-        lsSQLQuery &= ",'One')"
+                Dim lrModel = Me.zrPage.Model
 
-        Dim lrOriginMultiplicityFact As FBM.Fact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrFactType = lrModel.CreateFactType(lsFactTypeName, larModelElement, False, True, False, Nothing, True, Nothing)
+                Dim larRole As New List(Of FBM.Role) From {lrFactType.RoleGroup(0)}
 
-        lsSQLQuery = "INSERT INTO DestinationMultiplicity (ERDRelation, Multiplicity)"
-        lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-        lsSQLQuery &= " VALUES ("
-        lsSQLQuery &= "'" & lrFact.Id & "'"
-        lsSQLQuery &= ",'One')"
+                lrFactType.CreateInternalUniquenessConstraint(larRole, False, True, True, False, Nothing, True)
 
-        Dim lrDestinationMultiplicityFact As FBM.Fact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                larRole = New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}
+                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, New List(Of String) From {"relates to", ""})
+                lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                Me.zrPage.Diagram.Links.Remove(e.Link)
+
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
+        '20220622-VM-Pre MVC code.
+        'Dim lrRelation As New ERD.Relation
+
+        'lrRelation.OriginEntity = e.Link.Origin.Tag
+        'lrRelation.DestinationEntity = e.Link.Destination.Tag
+        'lrRelation.OriginMultiplicity = pcenumCMMLMultiplicity.One
+        'lrRelation.DestinationMultiplicity = pcenumCMMLMultiplicity.One
+        'lrRelation.OriginAttribute = lrRelation.OriginEntity.TableShape.Item(0, e.Link.OriginIndex).Tag
+        'lrRelation.DestinationAttribute = lrRelation.DestinationEntity.TableShape.Item(0, e.Link.DestinationIndex).Tag
+
+        'Dim lsSQLQuery As String = ""
+        'Dim lrFact As FBM.Fact
+
+        'lsSQLQuery = "INSERT INTO ERDRelation (ModelObject, Relation)"
+        'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+        'lsSQLQuery &= " VALUES ("
+        'lsSQLQuery &= "'" & lrRelation.OriginEntity.Name & "'"
+        'lsSQLQuery &= ",'" & lrRelation.DestinationEntity.Name & "')"
+
+        'lrFact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        ''-------------------------------
+        ''Create a Concept for the Fact
+        ''-------------------------------
+        'Dim lrConcept As New FBM.Concept(lrFact.Id)
+        'lrConcept.Save()
+
+        ''-------------------------------------------------
+        ''Create a new ModelDictionary entry for the Fact
+        ''-------------------------------------------------
+        'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.zrPage.Model, lrFact.Id, pcenumConceptType.Fact, "ERDRelation")
+        'lrDictionaryEntry = Me.zrPage.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+        'lrDictionaryEntry.isFact = True
+        'lrDictionaryEntry.Save()
+
+        'lsSQLQuery = "INSERT INTO OriginMultiplicity (ERDRelation, Multiplicity)"
+        'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+        'lsSQLQuery &= " VALUES ("
+        'lsSQLQuery &= "'" & lrFact.Id & "'"
+        'lsSQLQuery &= ",'One')"
+
+        'Dim lrOriginMultiplicityFact As FBM.Fact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        'lsSQLQuery = "INSERT INTO DestinationMultiplicity (ERDRelation, Multiplicity)"
+        'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+        'lsSQLQuery &= " VALUES ("
+        'lsSQLQuery &= "'" & lrFact.Id & "'"
+        'lsSQLQuery &= ",'One')"
+
+        'Dim lrDestinationMultiplicityFact As FBM.Fact = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
     End Sub
 
@@ -3755,4 +3818,19 @@ Aborted:
 
     End Sub
 
+    Private Sub Diagram_LinkCreating(sender As Object, e As LinkValidationEventArgs) Handles Diagram.LinkCreating
+
+        Try
+            e.Link.Pen.Color = Color.Black
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

@@ -103,7 +103,7 @@ Partial Class frmDiagramERD
         '
         Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.AddRelatedEntitiesToThisPageToolStripMenuItem, Me.ToolStripMenuItemDisplayDataIndexRelationInformation, Me.ToolStripMenuItemEntityIndexEditor, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.ToolStripMenuItemAddAttribute, Me.ToolStripMenuItemIndexManager, Me.ToolStripSeparator9, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ViewTableDataToolStripMenuItem, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Entity.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(315, 298)
+        Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(315, 276)
         '
         'MorphToToolStripMenuItem
         '
@@ -474,7 +474,7 @@ Partial Class frmDiagramERD
         'DiagramView
         '
         Me.DiagramView.AllowDrop = True
-        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.Modify
+        Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
         Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
         Me.DiagramView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
         Me.DiagramView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
