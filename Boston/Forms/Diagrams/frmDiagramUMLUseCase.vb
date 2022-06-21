@@ -1376,6 +1376,8 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub ModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
 
+        Call prApplication.setWorkingModel(Me.zrPage.Model)
+
         Call frmMain.LoadToolboxModelDictionary(True)
 
     End Sub
@@ -2204,14 +2206,6 @@ Public Class frmDiagrmUMLUseCase
 
         Dim loMenuOption As ToolStripItem
 
-        '----------------------------------------------------------------------------------
-        'Provide and option for the User to create a UCD Page for the current Process.
-        Dim lsMessage As String = "Add an &Use Case Diagram for the selected Entity Type."
-        loMenuOption = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lsMessage, My.Resources.MenuImages.UML_UseCase16x16)
-        loMenuOption.Tag = lrUCDProcess
-        AddHandler loMenuOption.Click, AddressOf Me.createUseCaseDiagramPageForProcess
-
-
         '------------------------------------------------------------------------------
         'Load the Use Case Diagrams that relate to the EntityType as selectable menuOptions
         '--------------------------------------------------------
@@ -2233,8 +2227,14 @@ Public Class frmDiagrmUMLUseCase
             loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
             AddHandler loMenuOption.Click, AddressOf Me.morphToUseCaseDiagram_Process
         Next
-#End Region
 
+        '----------------------------------------------------------------------------------
+        'Provide and option for the User to create a UCD Page for the current Process.
+        Dim lsMessage As String = "Add an &Use Case Diagram for the selected Entity Type."
+        loMenuOption = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lsMessage, My.Resources.MenuImages.UML_UseCase16x16)
+        loMenuOption.Tag = lrUCDProcess
+        AddHandler loMenuOption.Click, AddressOf Me.createUseCaseDiagramPageForProcess
+#End Region
 
         '------------------------------------------------------------------------------
         'Load the DFDDiagrams that relate to the EntityType as selectable menuOptions

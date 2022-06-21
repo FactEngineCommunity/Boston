@@ -193,24 +193,34 @@ Namespace Database
                                     If Trim(lsCommand) <> "" Then
                                         Try
                                             Call pdbConnection.Execute(lsCommand)
-                                            'Dim command As New OleDb.OleDbCommand(lsCommand)
-                                            'command.Connection = pdb_OLEDB_connection
-                                            'Call command.ExecuteNonQuery()
+
                                         Catch ex As Exception
-                                            If lrDatabaseUpgradeSQL.AllowFail Then
-                                                'Nothing to do here. E.g. An INSERT need not fail if the data already exists.
-                                            Else
-                                                Dim lsMessage1 As String
-                                                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                                                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                                                lsMessage1 &= vbCrLf & lsCommand
-                                                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                                                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                                            Try
 
-                                                GoTo error_handler
-                                            End If
+                                                Dim command As New OleDb.OleDbCommand(lsCommand, pdb_OLEDB_connection)
+                                                Call command.ExecuteNonQuery()
+
+                                            Catch ex1 As Exception
+
+                                                If lrDatabaseUpgradeSQL.AllowFail Then
+                                                    'Nothing to do here. E.g. An INSERT need not fail if the data already exists.
+                                                Else
+                                                    Dim lsMessage1 As String
+                                                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                                                    lsMessage1 = "There was an error upgrading the Boston database."
+                                                    lsMessage1.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
+                                                    lsMessage1 &= vbCrLf & lsCommand
+                                                    lsMessage1 &= vbCrLf & vbCrLf & ex1.Message
+                                                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex1.StackTrace)
+
+                                                    GoTo error_handler
+                                                End If
+                                            End Try
                                         End Try
+
+
                                     End If
                                 Next
 

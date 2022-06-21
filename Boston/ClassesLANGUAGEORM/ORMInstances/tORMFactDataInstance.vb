@@ -650,7 +650,6 @@ Namespace FBM
                     lrProcess.Id = .Concept.Symbol
                     lrProcess.Name = .Concept.Symbol
                     lrProcess.Symbol = .Data
-                    lrProcess.FactDataInstance = New FBM.FactDataInstance
                     lrProcess.FactDataInstance = Me
                     lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
                     lrProcess.Concept = .Concept

@@ -88,9 +88,10 @@ Namespace Boston
                 '------------------------------------------------
                 lsConnectionString = lsDBLocation
 
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
 
-                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
                     lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
@@ -180,8 +181,16 @@ OpenConnection:
                 'Open the (database) connection
                 '------------------------------------------------
                 pdbConnection.Open(lsConnectionString)
-                pdb_OLEDB_connection.ConnectionString = lsConnectionString
+
+#Region "OLEDB"
+                'lsDatabaseLocation
+                lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
+                lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                lrSQLConnectionStringBuilder("Provider") = "Microsoft.ACE.OLEDB.12.0" ' "Microsoft.Jet.OLEDB.4.0"
+
+                pdb_OLEDB_connection.ConnectionString = lrSQLConnectionStringBuilder.ConnectionString
                 pdb_OLEDB_connection.Open()
+#End Region
                 Return True
 
             Catch lo_ex As Exception

@@ -316,13 +316,12 @@ Namespace UCD
 
         End Sub
 
-        Public Sub SetProcessText(ByVal asNewProcessText As String)
+        Public Shadows Sub SetProcessText(ByVal asNewProcessText As String)
 
             Try
                 Me.Text = asNewProcessText
 
-                'CMML
-                Call Me.Model.updateCMMLProcessText(Me)
+                Call Me.CMMLProcess.SetProcessText(asNewProcessText)
 
             Catch ex As Exception
                 Dim lsMessage As String

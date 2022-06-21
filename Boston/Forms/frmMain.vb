@@ -85,8 +85,8 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "6.2"
-            psApplicationDatabaseVersionNr = "1.33"
+            psApplicationApplicationVersionNr = "6.3"
+            psApplicationDatabaseVersionNr = "1.34"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
             Dim loAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
@@ -320,6 +320,10 @@ ConfigurationOK:
 #End Region
 
                 Me.StatusLabelGeneralStatus.Text = "Database Opened Successfully"
+
+                '=========================================================================
+                'CodeSafe - Settings
+                My.Settings.UsecaseShapeLibrary = ".\shapelibrary\usecase.shl"
 
                 '======================================================
                 'Load the Core Model
@@ -913,7 +917,6 @@ SkipRegistrationChecking:
                 Me.DockPanel.Dispose()
             End If
         Catch
-
         End Try
 
         If My.Settings.UseClientServer Then
@@ -4054,7 +4057,9 @@ SkipRegistrationChecking:
                     '  and the Model.Save function will fail.
                     '  Therefore the very last thing to do on a database upgrade is replace the Core Metamodel.
                     '------------------------------------------------------------------------------------------------------
-                    Call DatabaseUpgradeFunctions.ReplaceCoreModel()
+                    With New WaitCursor
+                        Call DatabaseUpgradeFunctions.ReplaceCoreModel()
+                    End With
 
                     '------------------------------------------------
                     'Check to see if the user upgraded the database
