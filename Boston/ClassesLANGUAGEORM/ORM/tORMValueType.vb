@@ -205,17 +205,7 @@ Namespace FBM
         DescriptionAttribute("True if the Model Object is independent.")>
         Public Property IsIndependent As Boolean Implements iFBMIndependence.IsIndependent
             Get
-                If Me.Model Is Nothing Then
-                    Return Me._IsIndependent
-                End If
-
-                Dim laoRole = From Role In Me.Model.Role
-                              Where Role.JoinedORMObject IsNot Nothing
-                              Where Role.JoinedORMObject.Id = Me.Id
-                              Select Role
-
-                Return laoRole.Count = 0
-
+                Return Me._IsIndependent
             End Get
             Set(ByVal value As Boolean)
                 Me._IsIndependent = value

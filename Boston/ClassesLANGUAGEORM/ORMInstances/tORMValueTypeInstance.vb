@@ -304,7 +304,7 @@ Namespace FBM
                 loDroppedNode.Shape = Shapes.RoundRect
                 loDroppedNode.Pen.DashPattern = New Single() {1, 1, 1, 1}
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
-                loDroppedNode.Text = Me.Name
+                loDroppedNode.Text = Me.Name & Boston.returnIfTrue(Me.IsIndependent, " ! ", "")
                 loDroppedNode.Resize(20, 12)
                 loDroppedNode.ShadowOffsetX = 1
                 loDroppedNode.ShadowOffsetY = 1
@@ -384,7 +384,7 @@ Namespace FBM
                 'Set the size of the ValueTypeInstance
                 '---------------------------------------
                 G = Me.Page.Form.CreateGraphics
-                liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name & Boston.returnIfTrue(Me.IsIndependent, " ! ", "")), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                 Dim loRectangle As New Rectangle(Me.X, Me.Y, liValueTypeNameStringSize.Width + 4, liValueTypeNameStringSize.Height + 4)
                 Me.Shape.SetRect(loRectangle, False)
 
@@ -731,6 +731,8 @@ RemoveAnyway:
 
             Me.IsIndependent = abNewIsIndependent
 
+            Call Me.RefreshShape()
+
         End Sub
 
         Private Sub _ValueType_LongDescriptionChanged(asLongDescription As String) Handles _ValueType.LongDescriptionChanged
@@ -891,7 +893,6 @@ RemoveAnyway:
                                 Call Me.ValueType.SetDataTypeLength(Me.DataTypeLength)
                             End With
                         Case Is = "IsIndependent"
-                            If Me.ValueType.IsIndependent = False Then MsgBox("There are Roles joined to this Value Type, so it cannot be independent.")
                             With New WaitCursor
                                 Call Me.ValueType.SetIsIndependent(Me.IsIndependent, True)
                             End With
@@ -996,6 +997,10 @@ RemoveAnyway:
                     Else
                         Me.Shape.Pen.Color = Color.Navy
                     End If
+                End If
+
+                If Me.IsIndependent Then
+                    Me.Shape.Text = Me.Id & " !"
                 End If
 
                 If Me.Model IsNot Nothing Then
