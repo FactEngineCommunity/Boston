@@ -12,8 +12,6 @@ Public Class frmStateTransitionDiagram
     Public zrPage As FBM.Page = Nothing
     Public zoTreeNode As TreeNode = Nothing
 
-    Private morph_vector As tMorphVector
-    Private morph_shape As New ShapeNode
     Private MorphVector As New List(Of tMorphVector)
 
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
@@ -1674,8 +1672,6 @@ Public Class frmStateTransitionDiagram
             Exit Sub
         End If
 
-
-
         '-------------------------------------
         'Check that selected object is Actor
         '-------------------------------------
@@ -1695,7 +1691,9 @@ Public Class frmStateTransitionDiagram
         'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
         '  shape, and to/into another diagram starts at the MorphVector.
         '---------------------------------------------------------------------------------------------
-        Me.morph_vector = New tMorphVector(lrState.X, lrState.Y, 0, 0, 40)
+        Me.MorphVector.Clear()
+        Dim lrMorphVector As New tMorphVector(lrState.X, lrState.Y, 0, 0, 40)
+        Me.MorphVector.Add(lrMorphVector)
 
 
         '--------------------------------------------------------------
@@ -1708,10 +1706,6 @@ Public Class frmStateTransitionDiagram
         '  as selectable menuOptions
         '----------------------------------------------------                        
         larPage_list = prApplication.CMML.getORMDiagramPagesForState(lrState)
-
-        Me.morph_vector = New tMorphVector(lrState.X, lrState.Y, 0, 0, 40)
-        Me.MorphVector.Clear()
-        Me.MorphVector.Add(New tMorphVector(lrState.Shape.Bounds.X, lrState.Shape.Bounds.Y, 0, 0, 40))
 
         For Each lrPage In larPage_list
             Dim lo_menu_option As ToolStripItem
@@ -1750,23 +1744,14 @@ Public Class frmStateTransitionDiagram
 
         If prApplication.WorkingPage.SelectedObject.Count = 0 Then Exit Sub
         If prApplication.WorkingPage.SelectedObject.Count > 1 Then Exit Sub
+        Dim lrShapeNode As ShapeNode
 
         Try
-
-            '---------------------------------------------
-            'Take a copy of the selected State
-            '---------------------------------------------
-            'Me.StateTransitionDiagramView.CopyToClipboard(False)
-
             Me.HiddenDiagram.Nodes.Clear()
             Call Me.DiagramView.SendToBack()
             Call Me.HiddenDiagramView.BringToFront()
 
-
-            Dim lr_state As STD.State = prApplication.WorkingPage.SelectedObject(0)
-
-            Dim lr_shape_node As ShapeNode
-
+            Dim lrState As STD.State = prApplication.WorkingPage.SelectedObject(0)
 
             If IsSomething(frmMain.zfrmModelExplorer) Then
                 Dim lr_enterprise_view As tEnterpriseEnterpriseView
@@ -1777,12 +1762,12 @@ Public Class frmStateTransitionDiagram
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the State being morphed
                 '------------------------------------------------------------------
-                Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-                lr_page = lr_enterprise_view.Tag
-                Dim lrValueTypeInstanceList = From ValueTypeInstance In lr_page.ValueTypeInstance
-                                              Where ValueTypeInstance.ValueConstraint.Contains(lr_state.StateName)
-                                              Select New FBM.ValueTypeInstance(lr_page.Model,
-                                                                        lr_page,
+                Dim lrPage As New FBM.Page(lr_enterprise_view.Tag.Model)
+                lrPage = lr_enterprise_view.Tag
+                Dim lrValueTypeInstanceList = From ValueTypeInstance In lrPage.ValueTypeInstance
+                                              Where ValueTypeInstance.ValueConstraint.Contains(lrState.StateName)
+                                              Select New FBM.ValueTypeInstance(lrPage.Model,
+                                                                        lrPage,
                                                                         pcenumLanguage.ORMModel,
                                                                         ValueTypeInstance.Name,
                                                                         True,
@@ -1798,27 +1783,58 @@ Public Class frmStateTransitionDiagram
                 '----------------------------------------------------------------
                 'Retreive the actual ValueTypeInstance on the destination page
                 '----------------------------------------------------------------
-                lrValueTypeInstance = lr_page.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
+                lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
 
-                If lr_page.Loaded And lrValueTypeInstance.Shape IsNot Nothing Then
-                    lr_shape_node = lrValueTypeInstance.Shape.Clone(True)
-                    Me.morph_shape = lr_shape_node
+                '===================================================================================================================
+                Me.MorphVector(0).TargetText = lrValueTypeInstance.Id
+                If lrPage.FormLoaded And lrValueTypeInstance.Shape IsNot Nothing Then
+                    lrShapeNode = New ShapeNode(lrValueTypeInstance.Shape)
+                    Me.MorphVector(0).EndSize = New Rectangle(0, 0, lrValueTypeInstance.Shape.Bounds.Width, lrValueTypeInstance.Shape.Bounds.Height)
+                    lrShapeNode.Image = lrState.Shape.Image
                 Else
-                    Me.morph_shape = lr_state.Shape.Clone(True)
-                    Me.morph_shape.Shape = Shapes.RoundRect
-                    Me.morph_shape.HandlesStyle = HandlesStyle.InvisibleMove
-                    Me.morph_shape.Text = lr_state.StateName
-                    Me.morph_shape.Resize(20, 15)
+                    lrShapeNode = lrState.Shape.Clone(True)
+                    lrShapeNode.Shape = Shapes.RoundRect
+                    lrShapeNode.HandlesStyle = HandlesStyle.InvisibleMove
+                    Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 15)
+                    lrShapeNode.Resize(20, 15)
                 End If
 
-                Me.HiddenDiagram.Nodes.Add(Me.morph_shape)
+                lrShapeNode.Font = New System.Drawing.Font("Arial", 10)
+                Dim lrStringFormat = New StringFormat
+                lrStringFormat.Alignment = StringAlignment.Center
+                lrStringFormat.LineAlignment = StringAlignment.Center
+                lrShapeNode.TextFormat = lrStringFormat
+
+                If lrPage.DiagramView IsNot Nothing Then
+                    Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
+                Else
+                    Me.MorphVector(0).TargetZoomFactor = My.Settings.DefaultPageZoomFactor
+                End If
+
+                Dim liHypotenuse As Integer = 40
+                Try
+                    liHypotenuse = Math.Sqrt(Math.Abs(lrValueTypeInstance.X - lrState.Shape.Bounds.X) ^ 2 + Math.Abs(lrValueTypeInstance.Y - lrState.Shape.Bounds.Y) ^ 2)
+                Catch
+                End Try
+                Me.MorphVector(0).VectorSteps = Viev.Greater(Viev.Lesser(35, liHypotenuse), 1)
+
+
+                Me.MorphVector(0).StartPoint = New Point(lrState.Shape.Bounds.X, lrState.Shape.Bounds.Y)
+                Me.MorphVector(0).StartSize = New Rectangle(0, 0, lrState.Shape.Bounds.Width, lrState.Shape.Bounds.Height)
+                Me.MorphVector(0).Shape = lrShapeNode
+                Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
                 Me.HiddenDiagram.Invalidate()
 
-                Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrValueTypeInstance.X, lrValueTypeInstance.Y, 40)
-
-                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
                 Me.MorphTimer.Enabled = True
                 Me.MorphStepTimer.Enabled = True
+
+                Me.MorphVector(0).EndPoint = New Point(lrValueTypeInstance.X, lrValueTypeInstance.Y)
+                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+
+                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Start()
+                Me.MorphTimer.Start()
+                '===================================================================================================================                
 
             End If
 
@@ -1846,16 +1862,14 @@ Public Class frmStateTransitionDiagram
         'Paste the selected Process/Entity to the HiddenDiagramView
         '  (for animated morphing)
         '--------------------------------------------------------------
-        Dim lr_shape_node As ShapeNode
+        Dim lrShapeNode As ShapeNode
         Dim lr_link_node As New DiagramLink(Me.Diagram)
         lr_link_node = Me.Diagram.Selection.Items(0)
-        lr_shape_node = Me.HiddenDiagram.Factory.CreateShapeNode(lr_link_node.Bounds.X, lr_link_node.Bounds.Y, 20, 20)
-        lr_shape_node.Shape = Shapes.Ellipse
-        lr_shape_node.Pen.Color = Color.Black
-        lr_shape_node.Text = lr_link_node.Text
-        lr_shape_node.Visible = True
-
-        Me.morph_shape = lr_shape_node
+        lrShapeNode = Me.HiddenDiagram.Factory.CreateShapeNode(lr_link_node.Bounds.X, lr_link_node.Bounds.Y, 20, 20)
+        lrShapeNode.Shape = Shapes.Ellipse
+        lrShapeNode.Pen.Color = Color.Black
+        lrShapeNode.Text = lr_link_node.Text
+        lrShapeNode.Visible = True
 
         Me.HiddenDiagram.Invalidate()
 
@@ -1869,9 +1883,9 @@ Public Class frmStateTransitionDiagram
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Process/Entity being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-            lr_page = lr_enterprise_view.Tag
-            Dim lrProcess = From FactType In lr_page.FactTypeInstance
+            Dim lrPage As New FBM.Page(lr_enterprise_view.Tag.Model)
+            lrPage = lr_enterprise_view.Tag
+            Dim lrProcess = From FactType In lrPage.FactTypeInstance
                             From Fact In FactType.Fact
                             From RoleData In Fact.Data
                             Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Process.ToString
@@ -1884,7 +1898,7 @@ Public Class frmStateTransitionDiagram
 
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
-            Me.morph_vector = New tMorphVector(Me.morph_vector.StartPoint.X, Me.morph_vector.StartPoint.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
+            Me.MorphVector(0) = New tMorphVector(Me.MorphVector(0).StartPoint.X, Me.MorphVector(0).StartPoint.Y, lrFactDataInstance.x, lrFactDataInstance.y, 40)
             Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
             Me.MorphStepTimer.Start()
             Me.MorphTimer.Start()
@@ -1903,25 +1917,68 @@ Public Class frmStateTransitionDiagram
 
     Private Sub MorphStepTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MorphStepTimer.Tick
 
-        Dim lr_point As New Point
-        Dim lr_rect As New Rectangle
+        Dim lrPoint As New Point
+        Dim lrRectangle As New Rectangle
+        Dim lrMorphVector As tMorphVector
 
-        lr_point = Me.morph_vector.getNextMorphVectorStepPoint
+        Try
+            For Each lrMorphVector In Me.MorphVector
+                lrPoint = lrMorphVector.getNextMorphVectorStepPoint
 
-        Me.morph_shape.Move(lr_point.X, lr_point.Y)
-        Me.HiddenDiagram.Invalidate()
+                Me.HiddenDiagramView.ZoomFactor = Me.MorphVector(0).InitialZoomFactor + ((Me.MorphVector(0).VectorStep / Me.MorphVector(0).VectorSteps) * (Me.MorphVector(0).TargetZoomFactor - Me.MorphVector(0).InitialZoomFactor))
 
-        If Me.morph_vector.VectorStep > Me.morph_vector.VectorSteps Then
+                lrMorphVector.Shape.Move(lrPoint.X, lrPoint.Y)
+
+                lrRectangle = lrMorphVector.getNextMorphVectorRectangle
+                lrMorphVector.Shape.Resize(lrRectangle.Width, lrRectangle.Height)
+
+                If lrMorphVector.VectorStep > lrMorphVector.VectorSteps / 2 Then
+                    Select Case lrMorphVector.TargetShape
+                        Case Is = pcenumTargetMorphShape.Circle
+                            lrMorphVector.Shape.Shape = Shapes.Ellipse
+                            lrMorphVector.Shape.Image = My.Resources.ORMShapes.Blank
+                            lrMorphVector.Shape.Text = lrMorphVector.TargetText
+                        Case Else
+                            lrMorphVector.Shape.Shape = Shapes.RoundRect
+
+                            If lrMorphVector.TargetImage IsNot Nothing Then
+                                lrMorphVector.Shape.Image = lrMorphVector.TargetImage
+                            Else
+                                lrMorphVector.Shape.Image = Nothing
+                            End If
+
+                            lrMorphVector.Shape.Text = lrMorphVector.TargetText
+                    End Select
+                End If
+            Next
+
+            Me.HiddenDiagram.Invalidate()
+
+            '20220614-This is the best version of morphing yet.
+            If Me.MorphVector(0).VectorStep > Me.MorphVector(0).VectorSteps Then
+                Me.MorphStepTimer.Stop()
+                Me.MorphStepTimer.Enabled = False
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphStepTimer.Tag 'Me.MorphVector(0).EnterpriseTreeView.TreeNode
+                Call frmMain.zfrmModelExplorer.LoadSelectedPage(Me.MorphVector(0).ModelElementId)
+                Call Me.HiddenDiagramView.SendToBack()
+            End If
+
+        Catch ex As Exception
+
             Me.MorphStepTimer.Stop()
-            Me.MorphStepTimer.Enabled = False
-
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphVector(0).EnterpriseTreeView.TreeNode
-            Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
             Me.DiagramView.BringToFront()
             Me.Diagram.Invalidate()
-            Me.MorphTimer.Enabled = False
 
-        End If
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+        End Try
+
+
 
     End Sub
 

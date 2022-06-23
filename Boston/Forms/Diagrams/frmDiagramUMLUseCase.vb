@@ -6,6 +6,7 @@ Imports MindFusion.Diagramming.WinForms
 Imports MindFusion.Drawing
 Imports MindFusion.Diagramming.Layout
 Imports System.Threading
+Imports System.IO
 
 Public Class frmDiagrmUMLUseCase
 
@@ -192,7 +193,7 @@ Public Class frmDiagrmUMLUseCase
     Sub SetToolbox()
 
         Try
-
+            Call Directory.SetCurrentDirectory(Boston.MyPath)
             Dim lsl_shape_library As ShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.UsecaseShapeLibrary)
             Dim lo_shape As Shape
             Dim child As New frmToolbox
