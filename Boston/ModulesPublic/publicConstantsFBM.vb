@@ -11,8 +11,11 @@
         EntityRelationshipDiagram = 9
         PropertyGraphSchema = 22
         StateTransitionDiagram = 10
-        BPMN = 11
+        BPMNChoreographDiagram = 11
         CMML = 12 'Used for cloning UML.Process objects to UCD.Process objects etc.
+        BPMNConversationDiagram = 13
+        BPMNCollaborationDiagram = 14
+        BPMNProcessDigram = 15
     End Enum
 
     <Serializable()>

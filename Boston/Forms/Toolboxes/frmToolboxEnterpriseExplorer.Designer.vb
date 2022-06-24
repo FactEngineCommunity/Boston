@@ -99,6 +99,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
+        Me.AddProcessDiagramPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -224,6 +225,10 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(13, "TypeDB16x16.png")
         Me.ImageList.Images.SetKeyName(14, "Neo4j16x16.png")
         Me.ImageList.Images.SetKeyName(15, "UML-UseCase16x16.png")
+        Me.ImageList.Images.SetKeyName(16, "BPMN-ChoreographyDiagram-16x16.png")
+        Me.ImageList.Images.SetKeyName(17, "BPMN-CollaborationDiagram-16x16.png")
+        Me.ImageList.Images.SetKeyName(18, "BPMN-ConversationDiagram-16x16.png")
+        Me.ImageList.Images.SetKeyName(19, "BPMN-ProcessDiagram-16x16.png")
         '
         'CircularProgressBar
         '
@@ -310,7 +315,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 424)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 446)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -433,7 +438,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'BusinessProcessModellingNotationToolStripMenuItem
         '
-        Me.BusinessProcessModellingNotationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddBPMNPageToolStripMenuItem, Me.AddBPMNChoreographyDiagramPageToolStripMenuItem, Me.AddBPMNCollaborationDiagramPageToolStripMenuItem})
+        Me.BusinessProcessModellingNotationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddBPMNPageToolStripMenuItem, Me.AddBPMNChoreographyDiagramPageToolStripMenuItem, Me.AddBPMNCollaborationDiagramPageToolStripMenuItem, Me.AddProcessDiagramPageToolStripMenuItem})
         Me.BusinessProcessModellingNotationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.BPMN16x16
         Me.BusinessProcessModellingNotationToolStripMenuItem.Name = "BusinessProcessModellingNotationToolStripMenuItem"
         Me.BusinessProcessModellingNotationToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
@@ -449,7 +454,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'AddBPMNChoreographyDiagramPageToolStripMenuItem
         '
-        Me.AddBPMNChoreographyDiagramPageToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.BPMN_ChoreiographyDiagram_16x16
+        Me.AddBPMNChoreographyDiagramPageToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.BPMN_ChoreographyDiagram_16x16
         Me.AddBPMNChoreographyDiagramPageToolStripMenuItem.Name = "AddBPMNChoreographyDiagramPageToolStripMenuItem"
         Me.AddBPMNChoreographyDiagramPageToolStripMenuItem.Size = New System.Drawing.Size(252, 22)
         Me.AddBPMNChoreographyDiagramPageToolStripMenuItem.Text = "Add Choreography Diagram Page"
@@ -659,6 +664,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
         '
+        'AddProcessDiagramPageToolStripMenuItem
+        '
+        Me.AddProcessDiagramPageToolStripMenuItem.Image = CType(resources.GetObject("AddProcessDiagramPageToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.AddProcessDiagramPageToolStripMenuItem.Name = "AddProcessDiagramPageToolStripMenuItem"
+        Me.AddProcessDiagramPageToolStripMenuItem.Size = New System.Drawing.Size(252, 22)
+        Me.AddProcessDiagramPageToolStripMenuItem.Text = "Add &Process Diagram Page"
+        '
         'frmToolboxEnterpriseExplorer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -753,4 +765,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents AddBPMNCollaborationDiagramPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UMLToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddUseCaseDiagramToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddProcessDiagramPageToolStripMenuItem As ToolStripMenuItem
 End Class

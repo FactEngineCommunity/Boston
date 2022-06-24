@@ -1323,10 +1323,10 @@
     <Compile Include="Forms\Diagrams\frmDiagramERD.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Diagrams\frmDiagramBPMN.Designer.vb">
-      <DependentUpon>frmDiagramBPMN.vb</DependentUpon>
+    <Compile Include="Forms\Diagrams\frmDiagramBPMNCollaboration.Designer.vb">
+      <DependentUpon>frmDiagramBPMNCollaboration.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Diagrams\frmDiagramBPMN.vb">
+    <Compile Include="Forms\Diagrams\frmDiagramBPMNCollaboration.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.designer.vb">
@@ -2166,8 +2166,8 @@
       <DependentUpon>frmDiagramERD.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Diagrams\frmDiagramBPMN.resx">
-      <DependentUpon>frmDiagramBPMN.vb</DependentUpon>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramBPMNCollaboration.resx">
+      <DependentUpon>frmDiagramBPMNCollaboration.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.resx">
       <DependentUpon>frmDiagramORMforOntologyBrowser.vb</DependentUpon>
@@ -2333,7 +2333,6 @@
     <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>

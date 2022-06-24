@@ -588,6 +588,18 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumLanguage.UMLUseCaseDiagram
                     liPageMenuType = pcenumMenuType.pageUMLUseCaseDiagram
                     liImageIndex = 15
+                Case Is = pcenumLanguage.BPMNChoreographDiagram
+                    liPageMenuType = pcenumMenuType.pageBPMNChoreographyDiagram
+                    liImageIndex = 16
+                Case Is = pcenumLanguage.BPMNCollaborationDiagram
+                    liPageMenuType = pcenumMenuType.pageBPMNCollaborationDiagram
+                    liImageIndex = 17
+                Case Is = pcenumLanguage.BPMNConversationDiagram
+                    liPageMenuType = pcenumMenuType.pageBPMNConversationDiagram
+                    liImageIndex = 18
+                Case Is = pcenumLanguage.BPMNProcessDigram
+                    liPageMenuType = pcenumMenuType.pageBPMNProcessDiagram
+                    liImageIndex = 19
             End Select
             loNode = arTreeNode.Nodes.Add(Trim(arPage.PageId), Trim(arPage.Name), liImageIndex, liImageIndex)
             loNode.Tag = New tEnterpriseEnterpriseView(liPageMenuType,
@@ -747,7 +759,11 @@ Public Class frmToolboxEnterpriseExplorer
                                   pcenumMenuType.pageERD,
                                   pcenumMenuType.pagePGSDiagram,
                                   pcenumMenuType.pageSTD,
-                                  pcenumMenuType.pageUMLUseCaseDiagram
+                                  pcenumMenuType.pageUMLUseCaseDiagram,
+                                  pcenumMenuType.pageBPMNChoreographyDiagram,
+                                  pcenumMenuType.pageBPMNCollaborationDiagram,
+                                  pcenumMenuType.pageBPMNConversationDiagram,
+                                  pcenumMenuType.pageBPMNProcessDiagram
 
                             Dim lrModel As FBM.Model = loObject.Tag.Model
                             If lrModel.Page.Find(Function(x) x.Name = e.Label) IsNot Nothing Then
@@ -896,6 +912,14 @@ Public Class frmToolboxEnterpriseExplorer
                                 Case Is = pcenumMenuType.pageSTD
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Is = pcenumMenuType.pageUMLUseCaseDiagram
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
+                                Case Is = pcenumMenuType.pageBPMNChoreographyDiagram
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
+                                Case Is = pcenumMenuType.pageBPMNCollaborationDiagram
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
+                                Case Is = pcenumMenuType.pageBPMNConversationDiagram
+                                    Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
+                                Case Is = pcenumMenuType.pageBPMNProcessDiagram
                                     Me.TreeView.ContextMenuStrip = ContextMenuStrip_Page
                                 Case Else
                                     Me.TreeView.ContextMenuStrip = Nothing
@@ -1160,7 +1184,11 @@ Public Class frmToolboxEnterpriseExplorer
                                   pcenumMenuType.pageERD,
                                   pcenumMenuType.pagePGSDiagram,
                                   pcenumMenuType.pageSTD,
-                                  pcenumMenuType.pageUMLUseCaseDiagram
+                                  pcenumMenuType.pageUMLUseCaseDiagram,
+                                  pcenumMenuType.pageBPMNChoreographyDiagram,
+                                  pcenumMenuType.pageBPMNCollaborationDiagram,
+                                  pcenumMenuType.pageBPMNConversationDiagram,
+                                  pcenumMenuType.pageBPMNProcessDiagram
 
                             Dim lrPage As FBM.Page
 #Region "Page"
@@ -1264,7 +1292,11 @@ Public Class frmToolboxEnterpriseExplorer
                           pcenumMenuType.pageERD,
                           pcenumMenuType.pagePGSDiagram,
                           pcenumMenuType.pageSTD,
-                          pcenumMenuType.pageUMLUseCaseDiagram
+                          pcenumMenuType.pageUMLUseCaseDiagram,
+                          pcenumMenuType.pageBPMNChoreographyDiagram,
+                          pcenumMenuType.pageBPMNCollaborationDiagram,
+                          pcenumMenuType.pageBPMNConversationDiagram,
+                          pcenumMenuType.pageBPMNProcessDiagram
 
                     Dim lr_page As FBM.Page = ao_object.Tag
 
@@ -1570,6 +1602,18 @@ Public Class frmToolboxEnterpriseExplorer
                     Case Is = pcenumLanguage.UMLUseCaseDiagram
                         liNavigationIcon = pcenumNavigationIcons.iconUCDPage
                         liMenuType = pcenumMenuType.pageUMLUseCaseDiagram
+                    Case Is = pcenumLanguage.BPMNChoreographDiagram
+                        liNavigationIcon = pcenumNavigationIcons.iconBPMNChoreorgraphDiagram
+                        liMenuType = pcenumMenuType.pageBPMNChoreographyDiagram
+                    Case Is = pcenumLanguage.BPMNCollaborationDiagram
+                        liNavigationIcon = pcenumNavigationIcons.iconBPMNCollaborationDiagram
+                        liMenuType = pcenumMenuType.pageBPMNCollaborationDiagram
+                    Case Is = pcenumLanguage.BPMNConversationDiagram
+                        liNavigationIcon = pcenumNavigationIcons.iconBPMNConversationDiagram
+                        liMenuType = pcenumMenuType.pageBPMNConversationDiagram
+                    Case Is = pcenumLanguage.BPMNProcessDigram
+                        liNavigationIcon = pcenumNavigationIcons.iconBPMNProcessDiagram
+                        liMenuType = pcenumMenuType.pageBPMNProcessDiagram
                 End Select
 
                 Dim lrModel As FBM.Model
@@ -3403,6 +3447,14 @@ Public Class frmToolboxEnterpriseExplorer
                         Call frmMain.load_StateTransitionDiagram_view(lrPage, Me.TreeView.SelectedNode, True)
                     Case Is = pcenumLanguage.UMLUseCaseDiagram
                         Call frmMain.loadUMLUseCaseDiagramView(lrPage, Me.TreeView.SelectedNode, True)
+                    Case Is = pcenumLanguage.BPMNChoreographDiagram
+                        Call frmMain.loadBPMNChoreographyDiagramView(lrPage, Me.TreeView.SelectedNode, True)
+                    Case Is = pcenumLanguage.BPMNCollaborationDiagram
+                        Call frmMain.loadBPMNCollaborationDiagramView(lrPage, Me.TreeView.SelectedNode, True)
+                    Case Is = pcenumLanguage.BPMNConversationDiagram
+                        Call frmMain.loadBPMNConversationDiagramView(lrPage, Me.TreeView.SelectedNode, True)
+                    Case Is = pcenumLanguage.BPMNProcessDigram
+                        Call frmMain.loadBPMNProcessDiagramView(lrPage, Me.TreeView.SelectedNode, True)
                 End Select
 
                 'Select Case Me.TreeView.SelectedNode.Tag.MenuType
@@ -4841,7 +4893,7 @@ Public Class frmToolboxEnterpriseExplorer
                 Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel)
                 lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("BPMN-NewPage", 0)
-                lrPage.Language = pcenumLanguage.BPMN
+                lrPage.Language = pcenumLanguage.BPMNChoreographDiagram
 
                 Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage, False, True)
 

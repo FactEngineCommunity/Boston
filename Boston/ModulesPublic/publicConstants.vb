@@ -365,6 +365,10 @@ Public Module publicConstants
     Public Enum pcenumMenuType
         menuBoston
         modelORMModel
+        pageBPMNCollaborationDiagram
+        pageBPMNConversationDiagram
+        pageBPMNProcessDiagram
+        pageBPMNChoreographyDiagram
         pageDataFlowDiagram
         pageORMModel
         pagePGSDiagram
@@ -382,6 +386,10 @@ Public Module publicConstants
         iconERDPage = 4
         iconSTDPage = 5
         iconUCDPage = 15
+        iconBPMNChoreorgraphDiagram = 16
+        iconBPMNCollaborationDiagram = 17
+        iconBPMNConversationDiagram = 18
+        iconBPMNProcessDiagram = 19
     End Enum
 
     <Serializable()> _
