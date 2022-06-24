@@ -402,6 +402,37 @@ Namespace FBM
 
         End Function
 
+        Public Function CloneBPMNProcessProcessRelation(ByRef arPage As FBM.Page,
+                                                       Optional ByRef arProcess1 As UML.Process = Nothing,
+                                                       Optional ByRef arProcess2 As UML.Process = Nothing) As BPMN.ProcessProcessRelation
+
+            Dim lrBPMNProcessProcessRelation As New BPMN.ProcessProcessRelation(arPage.UMLDiagram, arProcess1, arProcess2)
+            Try
+                With Me
+                    lrBPMNProcessProcessRelation.Model = .Model
+                    lrBPMNProcessProcessRelation.UMLModel = arPage.UMLDiagram
+                    lrBPMNProcessProcessRelation.Page = arPage
+                    lrBPMNProcessProcessRelation.Fact = Me.Fact
+                    lrBPMNProcessProcessRelation.FactInstance = Me
+                    lrBPMNProcessProcessRelation.Concept = .Concept
+                    lrBPMNProcessProcessRelation.X = .X
+                    lrBPMNProcessProcessRelation.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrBPMNProcessProcessRelation
+
+        End Function
+
+
         Public Function CloneUCDProcessProcessRelation(ByRef arPage As FBM.Page,
                                                        Optional ByRef arProcess1 As UML.Process = Nothing,
                                                        Optional ByRef arProcess2 As UML.Process = Nothing) As UCD.ProcessProcessRelation

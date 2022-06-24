@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Event_End_Cancel_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Cancel-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Compensation_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Compensation-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Error_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Error-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Escalation_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Escalation-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Link_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Link-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Message_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Message-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Multiple_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Multiple-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_None_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-None-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Signal_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Signal-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_Terminate_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-End-Terminate-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Cancel_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Cancel-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Compensation_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Compensation-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Compensation_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Compensation-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Compensation_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Compensation-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Conditioal_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Conditioal-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Conditional_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Conditional-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Conditional_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Conditional-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Error_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Error-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Error_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Error-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Escalation_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Escalation-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Escalation_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Escalation-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Escalation_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Escalation-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Escalation_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Escalation-SubprocessNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Escalation_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Escalation-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Link_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Link-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Link_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Link-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Message_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Message-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Message_BoundaryNonInterupting___Copy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Message-BoundaryNonInterupting - Copy.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Message_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Message-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Message_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Message-SubprocessNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Message_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Message-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Multiple_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Multiple-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Multiple_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Multiple-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Multiple_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Multiple-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Multiple_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Multiple-SubprocessNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Multiple_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Multiple-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_None_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-None-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_ParallelMultiple_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-ParallelMultiple-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_ParallelMultiple_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-ParallelMultiple-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_ParallelMultiple_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-ParallelMultiple-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Parallel_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Parallel-SubprocessNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Signal_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Signal-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Signal_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Signal-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Signal_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Signal-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Signal_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Signal-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Signal_Subprocess_NonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Signal-Subprocess-NonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Signal_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Signal-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Timer_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Timer-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Timer_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Timer-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Timer_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Timer-SubprocessNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Interpediate_Timer_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Interpediate-Timer-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Interpediate_Timer_Caching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Interpediate-Timer-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Conditional_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Conditional-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Conditional_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Conditional-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Message_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Message-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Message_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Message-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Multiple_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Multiple-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Multiple_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Multiple-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_None_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-None-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_ParallelMultiple_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-ParallelMultiple-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_ParallelMultiple_SubprocessInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-ParallelMultiple-SubprocessInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Signal_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Signal-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Start_Timer_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Start-Timer-Standard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Gateway_Complex" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Gateway-Complex.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Gateway_Exclusive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Gateway-Exclusive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Gateway_Inclusive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Gateway-Inclusive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Gateway_Parallel" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Gateway-Parallel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+</root>

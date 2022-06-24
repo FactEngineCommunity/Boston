@@ -316,7 +316,8 @@ Namespace FBM
             Me.STModel = arModel.STM
 
             Select Case aiLanguageId
-                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                Case Is = pcenumLanguage.UMLUseCaseDiagram,
+                          pcenumLanguage.BPMNCollaborationDiagram
                     Me.CMMLModel = arModel.UML
             End Select
 
@@ -3215,7 +3216,7 @@ NextY:
                     Exit Sub
                 End If
 
-                Dim laiLanguage() = {pcenumLanguage.UMLUseCaseDiagram}
+                Dim laiLanguage() = {pcenumLanguage.UMLUseCaseDiagram, pcenumLanguage.BPMNCollaborationDiagram}
 
                 If Not laiLanguage.Contains(Me.Language) Then Exit Sub
 
@@ -3242,14 +3243,19 @@ NextY:
 
                     lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrUMLProcessProcessRelation As UCD.ProcessProcessRelation
                     If lrRecordset.EOF Then
                         lrFactInstance = Me.UMLDiagram.PocessToProcessRelationFTI.AddFact(arProcessProcessRelation.Fact)
                     Else
                         lrFactInstance = lrRecordset.CurrentFact
                     End If
 
-                    lrUMLProcessProcessRelation = lrFactInstance.CloneUCDProcessProcessRelation(Me, lrProcess1, lrProcess2)
+                    Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation = Nothing
+                    Select Case Me.Language
+                        Case Is = pcenumLanguage.UMLUseCaseDiagram
+                            lrUMLProcessProcessRelation = lrFactInstance.CloneUCDProcessProcessRelation(Me, lrProcess1, lrProcess2)
+                        Case Is = pcenumLanguage.BPMNCollaborationDiagram
+                            lrUMLProcessProcessRelation = lrFactInstance.CloneBPMNProcessProcessRelation(Me, lrProcess1, lrProcess2)
+                    End Select
 
                     '------------------------------------------
                     'Link the Actor to the associated Process
@@ -3265,9 +3271,7 @@ NextY:
                     lo_link.Tag = lrUMLProcessProcessRelation
 
 #End Region
-
                 End If
-
 
 
             Catch ex As Exception

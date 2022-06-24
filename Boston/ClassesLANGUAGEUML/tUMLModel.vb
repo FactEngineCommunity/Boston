@@ -1,4 +1,6 @@
-﻿Namespace UML
+﻿Imports System.Reflection
+
+Namespace UML
 
     ''' <summary>
     ''' This UseCaseModel is for a Page, and is not the tCMMLModel which is at the Model level.
@@ -56,6 +58,25 @@
             End If
 
         End Function
+
+        Public Sub Reset()
+
+            Try
+                Me.Actor.Clear()
+                Me.Process.Clear()
+                Me.ActorProcessRelation.Clear()
+                Me.ProcessProcessRelation.Clear()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
 
     End Class

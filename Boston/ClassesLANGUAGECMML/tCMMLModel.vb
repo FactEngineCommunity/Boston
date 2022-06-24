@@ -109,6 +109,7 @@ Namespace CMML
             Try
                 Me.ProcessProcessRelation.AddUnique(arCMMLProcessProcessRelation)
 
+                'CMML
                 arCMMLProcessProcessRelation.Fact = Me.Model.createCMMLProcessProcessRelation(arCMMLProcessProcessRelation)
 
                 RaiseEvent ProcessProcessRelationAdded(arCMMLProcessProcessRelation)

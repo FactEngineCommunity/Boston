@@ -113,6 +113,44 @@ Namespace UML
 
         End Sub
 
+        Public Overloads Function CloneBPMNProcess(ByRef arPage As FBM.Page) As BPMN.Process
+
+            Dim lrProcess As New BPMN.Process
+
+            Try
+                With Me
+                    lrProcess.Model = .Model
+                    lrProcess.UMLModel = .UMLModel
+                    lrProcess.Page = arPage
+                    lrProcess.Id = .Id
+                    lrProcess.Text = .Text
+                    lrProcess.CMMLProcess = .CMMLProcess
+                    lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lrProcess.FactData = Me.FactData
+                    lrProcess.Name = .Concept.Symbol
+                    lrProcess.Symbol = .Data
+                    lrProcess.FactDataInstance = Me.FactDataInstance
+                    lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
+                    lrProcess.Concept = .Concept
+                    lrProcess.Role = .Role
+                    lrProcess.X = .X
+                    lrProcess.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrProcess
+
+        End Function
+
+
         Public Overloads Function CloneUCDProcess(ByRef arPage As FBM.Page) As UCD.Process
 
             Dim lrProcess As New UCD.Process
@@ -179,7 +217,7 @@ Namespace UML
 
         End Function
 
-        Public Sub DisplayAndAssociate(Optional ByRef aoContainerNode As ContainerNode = Nothing)
+        Public Overridable Sub DisplayAndAssociate(Optional ByRef aoContainerNode As ContainerNode = Nothing)
 
             Dim loDroppedNode As New ShapeNode
 

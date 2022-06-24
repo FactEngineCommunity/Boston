@@ -2001,6 +2001,32 @@ Namespace FBM
 #End Region
 
                     lrProcess = New CMML.Process(Me.UML, lrORMRecordset("Element").Data, lsProcessText)
+
+#Region "Process Type"
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNProcessType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.ProcessType = CType([Enum].Parse(GetType(pcenumBPMNProcessType), Trim(lrORMRecordset2("ProcessType").Data)), pcenumBPMNProcessType)
+                    End If
+#End Region
+
+#Region "Gateway Type"
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNGatewayType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.GatewayType = CType([Enum].Parse(GetType(pcenumBPMNGatewayType), Trim(lrORMRecordset2("GatewayType").Data)), pcenumBPMNGatewayType)
+                    End If
+
+#End Region
+
                     Me.UML.Process.Add(lrProcess)
 
                     lrORMRecordset.MoveNext()

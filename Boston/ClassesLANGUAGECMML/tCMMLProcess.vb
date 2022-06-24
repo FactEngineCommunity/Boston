@@ -21,6 +21,9 @@ Namespace CMML
 
         Public Name As String
 
+        Public ProcessType As pcenumBPMNProcessType
+        Public GatewayType As pcenumBPMNGatewayType
+
         '20220617-VM-Can probably make these redundant/derived.
         '''' <summary>
         '''' Processes participated with by the Process

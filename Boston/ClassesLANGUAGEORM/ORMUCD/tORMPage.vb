@@ -162,6 +162,8 @@ Namespace FBM
                     Select Case aiLanguage
                         Case Is = pcenumLanguage.UMLUseCaseDiagram
                             lrProcess = lrUMLProcess.CloneUCDProcess(Me)
+                        Case Is = pcenumLanguage.BPMNCollaborationDiagram
+                            lrProcess = lrUMLProcess.CloneBPMNProcess(Me)
                     End Select
 
                     Me.UMLDiagram.Process.AddUnique(lrProcess)

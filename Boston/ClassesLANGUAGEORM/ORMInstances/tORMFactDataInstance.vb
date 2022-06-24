@@ -675,6 +675,41 @@ Namespace FBM
 
         End Function
 
+        Public Function CloneBPMNProcess(ByRef arPage As FBM.Page) As BPMN.Process
+
+            Dim lrProcess As New BPMN.Process
+
+            Try
+                With Me
+                    lrProcess.Model = .Model
+                    lrProcess.Page = arPage
+                    lrProcess.ConceptType = pcenumConceptType.Process 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lrProcess.FactData = Me.FactData
+                    lrProcess.Id = .Concept.Symbol
+                    lrProcess.Name = .Concept.Symbol
+                    lrProcess.Symbol = .Data
+                    lrProcess.FactDataInstance = Me
+                    lrProcess.JoinedObjectType = Me.Role.JoinedORMObject
+                    lrProcess.Concept = .Concept
+                    lrProcess.Role = .Role
+                    lrProcess.X = .X
+                    lrProcess.Y = .Y
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrProcess
+
+        End Function
+
+
         Public Function CloneUCDProcess(ByRef arPage As FBM.Page) As UCD.Process
 
             Dim lrProcess As New UCD.Process

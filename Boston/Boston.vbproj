@@ -1542,6 +1542,7 @@
     <Compile Include="ModulesPublic\ClientServer\tDuplexCallback.vb" />
     <Compile Include="ModulesPublic\CQL\publicFunctions.vb" />
     <Compile Include="ModulesPublic\MyMethodExtensions.vb" />
+    <Compile Include="ModulesPublic\publicBPMN.vb" />
     <Compile Include="ModulesPublic\publicConstantsAutoComplete.vb" />
     <Compile Include="ModulesPublic\publicConstantsFactEngine.vb" />
     <Compile Include="ModulesPublic\publicConstantsFBM.vb" />
@@ -1926,6 +1927,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CodeGeneration.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\BPMN.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BPMN.resx</DependentUpon>
     </Compile>
     <Compile Include="Resources\Viev.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -2396,6 +2402,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CodeGeneration.Designer.vb</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\BPMN.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BPMN.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Viev.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -3081,6 +3092,73 @@
     <None Include="Images\MenuImages\BPMN-ConversationDiagram-16x16.png" />
     <None Include="Images\MenuImages\BPMN-ChoreiographyDiagram-16x16.png" />
     <None Include="Images\CMML\ActorShapeToolbox.png" />
+    <None Include="Images\BPMN\Event-End-Cancel-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Compensation-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Error-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Escalation-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Link-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Message-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Multiple-Standard.png" />
+    <None Include="Images\BPMN\Event-End-None-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Signal-Standard.png" />
+    <None Include="Images\BPMN\Event-End-Terminate-Standard.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Cancel-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Compensation-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Compensation-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Compensation-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Conditioal-BoundaryNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Conditional-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Conditional-Caching.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Error-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Error-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Escalation-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Escalation-BoundaryNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Escalation-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Escalation-SubprocessNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Escalation-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Link-Caching.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Link-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Message-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Message-BoundaryNonInterupting - Copy.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Message-Caching.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Message-SubprocessNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Message-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Multiple-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Multiple-BoundaryNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Multiple-Caching.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Multiple-SubprocessNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Multiple-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-None-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-ParallelMultiple-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-ParallelMultiple-BoundaryNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-ParallelMultiple-Caching.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Parallel-SubprocessNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Signal-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Signal-BoundaryNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Signal-Caching.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Signal-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Signal-Subprocess-NonInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Signal-Throwing.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Timer-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Timer-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Intermediate-Timer-SubprocessNonInterupting.png" />
+    <None Include="Images\BPMN\Event-Interpediate-Timer-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\Event-Interpediate-Timer-Caching.png" />
+    <None Include="Images\BPMN\Event-Start-Conditional-Standard.png" />
+    <None Include="Images\BPMN\Event-Start-Conditional-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Start-Message-Standard.png" />
+    <None Include="Images\BPMN\Event-Start-Message-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Start-Multiple-Standard.png" />
+    <None Include="Images\BPMN\Event-Start-Multiple-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Start-None-Standard.png" />
+    <None Include="Images\BPMN\Event-Start-ParallelMultiple-Standard.png" />
+    <None Include="Images\BPMN\Event-Start-ParallelMultiple-SubprocessInterupting.png" />
+    <None Include="Images\BPMN\Event-Start-Signal-Standard.png" />
+    <None Include="Images\BPMN\Event-Start-Timer-Standard.png" />
+    <None Include="Images\BPMN\Gateway-Complex.png" />
+    <None Include="Images\BPMN\Gateway-Exclusive.png" />
+    <None Include="Images\BPMN\Gateway-Inclusive.png" />
+    <None Include="Images\BPMN\Gateway-Parallel.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />

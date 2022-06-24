@@ -140,7 +140,7 @@ Namespace BPMN
 
         End Function
 
-        Public Sub DisplayAndAssociate(Optional ByRef aoContainerNode As ContainerNode = Nothing)
+        Public Overrides Sub DisplayAndAssociate(Optional ByRef aoContainerNode As ContainerNode = Nothing)
 
             Dim loDroppedNode As New ShapeNode
 
@@ -148,18 +148,42 @@ Namespace BPMN
                 '--------------------------------------------------------------------
                 'Create a Shape for the EntityTypeInstance on the DiagramView object
                 '--------------------------------------------------------------------            
-                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 2, 2)
+                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 20, 15)
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove ''HatchHandles3 is a very professional look, or SquareHandles2
                 loDroppedNode.ToolTip = "process"
                 loDroppedNode.AllowOutgoingLinks = True
                 loDroppedNode.AllowIncomingLinks = True
+                loDroppedNode.ShadowColor = Color.White
                 loDroppedNode.Text = Me.Text 'arProcessInstance.Name            
                 loDroppedNode.Tag = New FBM.EntityTypeInstance 'loDroppedNode.Tag = New Object
                 loDroppedNode.Tag = Me
                 loDroppedNode.Obstacle = True
+                loDroppedNode.Font = New Font("Arial", 7)
+                loDroppedNode.Pen.Width = 5
                 Me.Shape = loDroppedNode
 
                 Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.BPMNCollaborationDiagram
+
+                        Select Case Me.CMMLProcess.ProcessType
+                            Case Is = pcenumBPMNProcessType.Gateway
+                                loDroppedNode.Shape = Shapes.Ellipse
+                                loDroppedNode.Resize(12, 12)
+                                loDroppedNode.Image = My.Resources.BPMN.Gateway_Exclusive
+                                loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                loDroppedNode.Text = ""
+                                loDroppedNode.Pen.Width = 0.0
+                            Case Else
+                                loDroppedNode.Shape = Shapes.RoundRect
+                                loDroppedNode.Resize(20, 15)
+                                loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.Black)
+                                loDroppedNode.Pen.Width = 0.5
+                        End Select
+
+
+
                     Case Is = pcenumLanguage.ORMModel
                         'Can delete this later. At present, if the MetaModel is shown as an ORM diagram, the Page.Language changes to ORMModel
                         ' then if you drop a Process on the Page, the Process has no default shape
@@ -184,6 +208,19 @@ Namespace BPMN
                         End If
                         loDroppedNode.Resize(20, 15)
                 End Select
+
+#Region "Snap to Grid"
+                Me.Page.Diagram.AlignToGrid = True
+                Dim ptCenter As PointF = loDroppedNode.GetCenter()
+                Dim ptAlignedCenter As PointF = Me.Page.Diagram.AlignPointToGrid(ptCenter)
+                Dim fDeltaX As Double = ptAlignedCenter.X - ptCenter.X
+                Dim fDeltaY As Double = ptAlignedCenter.Y - ptCenter.Y
+                Me.Page.Diagram.AlignToGrid = False
+
+                Dim rectBounds As RectangleF = loDroppedNode.Bounds
+                rectBounds.Offset(fDeltaX, fDeltaY)
+                loDroppedNode.Bounds = rectBounds
+#End Region
 
                 If IsSomething(aoContainerNode) Then
                     aoContainerNode.Add(loDroppedNode)
