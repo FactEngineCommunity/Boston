@@ -544,7 +544,10 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\WaitCursor.vb" />
-    <Compile Include="ClassesLANGUAGEBPMN\tBPMNModel.vb" />
+    <Compile Include="ClassesLANGUAGEBPMN\tBPMNActor.vb" />
+    <Compile Include="ClassesLANGUAGEBPMN\tBPMNActorProcessRelation.vb" />
+    <Compile Include="ClassesLANGUAGEBPMN\tBPMNProcess.vb" />
+    <Compile Include="ClassesLANGUAGEBPMN\tBPMNProcessProcessRelation.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMML.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLActor.vb" />
     <Compile Include="ClassesLANGUAGEUMLUCD\tUCDActorName.vb" />

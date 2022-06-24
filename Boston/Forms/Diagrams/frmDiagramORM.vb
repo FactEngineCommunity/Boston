@@ -273,66 +273,76 @@ Public Class frmDiagramORM
 
         Dim lrFactDataInstance As New FBM.FactDataInstance
 
-        If _col <> -1 And _row <> -1 And (Not _table Is Nothing) Then
+        Try
+            If _col <> -1 And _row <> -1 And (Not _table Is Nothing) Then
 
 
-            Dim lsDebugMessage As String = ""
+                Dim lsDebugMessage As String = ""
 
-            'CodeSafe
-            If lrFactDataInstance.Role.Role.JoinedORMObject.GetType <> GetType(FBM.ValueType) Then Exit Sub
+                lrFactDataInstance = _table(_col, _row).Tag
 
-            lrFactDataInstance = _table(_col, _row).Tag
+                'CodeSafe
+                If lrFactDataInstance.Role.Role.JoinedORMObject.GetType <> GetType(FBM.ValueType) Then Exit Sub
 
-            '-------------------------------------------------------------------------------
-            'Check if the FactData has actually changed
-            If Me.ComboBoxValueType.Text = lrFactDataInstance.FactData.Data Then
-                Call Me.Reset()
-                Me.DiagramView.Focus()
-                Exit Sub
-            Else
-                Me.zrPage.MakeDirty()
-                Call Me.EnableSaveButton()
-            End If
-
-            '--------------------------------------------
-            'Update the Instance data for the ValueType
-            '--------------------------------------------
-            Dim lrValueType As New FBM.ValueType
-            lrValueType = lrFactDataInstance.Role.Role.JoinedORMObject
-            If Not lrValueType.Instance.Exists(Function(x) x = Me.ComboBoxValueType.Text) Then
-                If lrValueType.Instance.IndexOf(lrFactDataInstance.Data) >= 0 Then
-                    lrValueType.Instance(lrValueType.Instance.IndexOf(lrFactDataInstance.Data)) = Me.ComboBoxValueType.Text
+                '-------------------------------------------------------------------------------
+                'Check if the FactData has actually changed
+                If Me.ComboBoxValueType.Text = lrFactDataInstance.FactData.Data Then
+                    Call Me.Reset()
+                    Me.DiagramView.Focus()
+                    Exit Sub
+                Else
+                    Me.zrPage.MakeDirty()
+                    Call Me.EnableSaveButton()
                 End If
+
+                '--------------------------------------------
+                'Update the Instance data for the ValueType
+                '--------------------------------------------
+                Dim lrValueType As New FBM.ValueType
+                lrValueType = lrFactDataInstance.Role.Role.JoinedORMObject
+                If Not lrValueType.Instance.Exists(Function(x) x = Me.ComboBoxValueType.Text) Then
+                    If lrValueType.Instance.IndexOf(lrFactDataInstance.Data) >= 0 Then
+                        lrValueType.Instance(lrValueType.Instance.IndexOf(lrFactDataInstance.Data)) = Me.ComboBoxValueType.Text
+                    End If
+                End If
+
+                '--------------------------------------------------
+                'Update the FactData.Data of the FactDataInstance
+                '  and the Data of the FactDataInstance
+                '--------------------------------------------------
+                lrFactDataInstance.FactData.Data = Me.ComboBoxValueType.Text
+                lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
+
+                lrFactDataInstance.Cell.Text = Me.ComboBoxValueType.Text
+
+                lrFactDataInstance.Cell.Table.ResizeToFitText(True)
+
+
+
             End If
 
-            '--------------------------------------------------
-            'Update the FactData.Data of the FactDataInstance
-            '  and the Data of the FactDataInstance
-            '--------------------------------------------------
-            lrFactDataInstance.FactData.Data = Me.ComboBoxValueType.Text
-            lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
+            Call Me.Reset()
 
-            lrFactDataInstance.Cell.Text = Me.ComboBoxValueType.Text
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
 
-            lrFactDataInstance.Cell.Table.ResizeToFitText(True)
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                Call lrFactTypeInstance.FactTable.ResortFactTable()
+            Next
 
+            '---------------------------------------------------------------------------------------------
+            'Stops bug in Mindfusion where mouse event is unhandled and DiagramView thinks user is
+            '  dragging to select DiagramNodes/Shapes
+            '---------------------------------------------------------------------------------------------
+            Me.DiagramView.Behavior = Behavior.DrawLinks
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End If
-
-        Call Me.Reset()
-
-        Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-            Call lrFactTypeInstance.FactTable.ResortFactTable()
-        Next
-
-        '---------------------------------------------------------------------------------------------
-        'Stops bug in Mindfusion where mouse event is unhandled and DiagramView thinks user is
-        '  dragging to select DiagramNodes/Shapes
-        '---------------------------------------------------------------------------------------------
-        Me.DiagramView.Behavior = Behavior.DrawLinks
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
     End Sub
 
 

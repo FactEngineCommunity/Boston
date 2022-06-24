@@ -98,9 +98,14 @@ Namespace TableModelNoteInstance
                     lrModelNoteInstance.Model = arPage.Model
                     lrModelNoteInstance.Page = arPage
                     lrModelNoteInstance.Id = lREcordset("ModelNoteId").Value
+                    lrModelNoteInstance.NoteText = Trim(lREcordset("Note").Value)
+                    lrModelNoteInstance.X = lREcordset("x").Value
+                    lrModelNoteInstance.Y = lREcordset("y").Value
+
                     lrModelNoteInstance.ModelNote = arPage.Model.ModelNote.Find(Function(x) x.Id = lrModelNoteInstance.Id)
 
-                    lrModelNoteInstance.NoteText = Trim(lREcordset("Note").Value)
+                    If lrModelNoteInstance.ModelNote Is Nothing Then GoTo SkipModelNote
+
 
                     If IsSomething(lrModelNoteInstance.ModelNote.JoinedObjectType) Then
                         lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject
@@ -116,10 +121,8 @@ Namespace TableModelNoteInstance
                         lrModelNoteInstance.JoinedObjectType = Nothing
                     End If
 
-                    lrModelNoteInstance.X = lREcordset("x").Value
-                    lrModelNoteInstance.Y = lREcordset("y").Value
-
                     getModelNoteInstancesByPage.Add(lrModelNoteInstance)
+SkipModelNote:
                     lREcordset.MoveNext()
                 End While
 

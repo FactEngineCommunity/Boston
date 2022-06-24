@@ -402,6 +402,44 @@ Namespace FBM
 
         End Function
 
+        Public Overridable Function CloneBPMNActor(ByRef arPage As FBM.Page) As BPMN.Actor
+
+            Dim lrBPMNActor As New BPMN.Actor
+
+            Try
+                With Me
+                    lrBPMNActor.Model = .Model
+                    lrBPMNActor.Page = arPage
+                    lrBPMNActor.ConceptType = pcenumConceptType.Actor 'While this is redundant, it seems that it is required for Polymorphic use under tEntity
+                    lrBPMNActor.FactData = .FactData
+                    lrBPMNActor.Name = .Concept.Symbol
+                    lrBPMNActor.FactDataInstance = New FBM.FactDataInstance
+                    lrBPMNActor.FactDataInstance = Me
+                    lrBPMNActor.JoinedObjectType = .Role.JoinedORMObject
+                    lrBPMNActor.Concept = .Concept
+                    lrBPMNActor.Role = .Role
+                    lrBPMNActor.X = .X
+                    lrBPMNActor.Y = .Y
+                    lrBPMNActor.Shape = .Shape
+                    lrBPMNActor.TableShape = .TableShape
+                    lrBPMNActor.NameShape.Actor = lrBPMNActor
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+            Return lrBPMNActor
+
+        End Function
+
+
+
         Public Overridable Function CloneUCDActor(ByRef arPage As FBM.Page) As UCD.Actor
 
             Dim lrUCDActor As New UCD.Actor

@@ -260,10 +260,10 @@ Public Class frmDiagrmUMLUseCase
 
 
             Dim lrToolboxForm As frmToolbox
-                lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
+            lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-                'ModelObjects first.
-                If Not (TypeOf (lrDroppedObject) Is MindFusion.Diagramming.Shape) Then
+            'ModelObjects first.
+            If Not (TypeOf (lrDroppedObject) Is MindFusion.Diagramming.Shape) Then
 #Region "Model Objects. I.e. Not shapes"
                 '---------------------------------------------------------------------
                 'DraggedObject is a ModelObject (from the ModelDictionary form etc),
@@ -315,7 +315,7 @@ Public Class frmDiagrmUMLUseCase
 
                 Me.zrPage.DiagramView.Focus()
 #End Region
-                End If
+            End If
 
             If loDraggedNode.Index >= 0 Then
 #Region "Shape Toolbox"
@@ -936,23 +936,33 @@ Public Class frmDiagrmUMLUseCase
 
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
 
-        Select Case e.Node.Tag.GetType
-            Case Is = GetType(UCD.Actor)
+        Try
+            Select Case e.Node.Tag.GetType
+                Case Is = GetType(UCD.Actor)
 
-                Dim lrActor As UCD.Actor = e.Node.Tag
-                Call Me.DiagramView.BeginEdit(lrActor.NameShape.Shape)
-            Case Is = GetType(UCD.Process)
+                    Dim lrActor As UCD.Actor = e.Node.Tag
+                    Call Me.DiagramView.BeginEdit(lrActor.NameShape.Shape)
+                Case Is = GetType(UCD.Process)
 
-                Dim lrProcess As UCD.Process = e.Node.Tag
-                Call Me.DiagramView.BeginEdit(lrProcess.Shape)
-        End Select
+                    Dim lrProcess As UCD.Process = e.Node.Tag
+                    Call Me.DiagramView.BeginEdit(lrProcess.Shape)
+            End Select
 
 
-        Me.DiagramView.Behavior = Behavior.DrawLinks
-        Me.Diagram.Invalidate()
-        Me.Diagram.Selection.Clear()
-        Me.Cursor = Cursors.Hand
-        Me.Diagram.Invalidate()
+            Me.DiagramView.Behavior = Behavior.DrawLinks
+            Me.Diagram.Invalidate()
+            Me.Diagram.Selection.Clear()
+            Me.Cursor = Cursors.Hand
+            Me.Diagram.Invalidate()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -2186,7 +2196,7 @@ Public Class frmDiagrmUMLUseCase
 
     End Sub
 
-    Private Sub ContextMenuStrip_Process_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip_Process.Opening
+    Private Sub ContextMenuStrip_Process_Opening(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs)
 
         Dim lr_page As FBM.Page
         Dim larPage_list As New List(Of FBM.Page)
@@ -2430,22 +2440,24 @@ Public Class frmDiagrmUMLUseCase
 
         Catch ex As Exception
             Dim lsMessage As String
-        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
     Private Sub PropertiesToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertiesToolStripMenuItem.Click
-        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
 
-        If Not IsNothing(frmMain.zfrm_properties) Then
+        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+        Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+        If lrPropertyGridForm IsNot Nothing Then
             If Me.Diagram.Selection.Items.Count > 0 Then
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(0).Tag
             Else
-                frmMain.zfrm_properties.PropertyGrid.SelectedObject = Me.zrPage.UMLDiagram
+                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.UMLDiagram
             End If
         End If
     End Sub

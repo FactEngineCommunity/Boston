@@ -5000,4 +5000,69 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub AddBPMNChoreographyDiagramPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddBPMNChoreographyDiagramPageToolStripMenuItem.Click
+
+
+
+    End Sub
+
+    Private Sub AddBPMNCollaborationDiagramPageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddBPMNCollaborationDiagramPageToolStripMenuItem.Click
+
+        Try
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
+            '==============================================================
+            'Get the Core Metamodel.Page for an EntityRelationshipDiagram
+            ' NB Is the same metamodel as used for PropertyGraphSchemas
+            '==============================================================
+            '-------------------------------------------
+            'Get the EntityRelationshipModel Core Page
+            '-------------------------------------------
+            Using lrWaitCursor As New WaitCursor
+                Dim lrPage As FBM.Page
+
+                Boston.WriteToStatusBar("Loading the MetaModel for Property Graph Schemas.")
+
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CoreBPMNDiagram.ToString,
+                                               pcenumCMMLCorePage.CoreBPMNDiagram.ToString,
+                                               pcenumLanguage.ORMModel)
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CorePropertyGraphSchema.ToString & "', in the Core Model.")
+                End If
+
+                '----------------------------------------------------
+                'Create the Page for the EntityRelationshipDiagram.
+                '----------------------------------------------------
+                Boston.WriteToStatusBar("Creating the Page.")
+                lrPage = lrCorePage.Clone(prApplication.WorkingModel)
+                lrPage.Name = prApplication.WorkingModel.CreateUniquePageName("BPMN-Collaboration-NewPage", 0)
+                lrPage.Language = pcenumLanguage.BPMNCollaborationDiagram
+
+                Call Me.AddPageToModel(Me.TreeView.SelectedNode, lrPage, False, True)
+
+                Call lrPage.Save()
+
+            End Using
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+
+
+
+    End Sub
 End Class

@@ -17,6 +17,11 @@ Public Enum pcenumCMMLRelations
         CoreP2PIsIncludes
 
         '---------------------------------------------
+        'BPMN
+        '---------------------------------------------
+        CoreBPMNCollaborationHasCoreBPMNCollaborationName
+
+        '---------------------------------------------
         'STDs (State Transition Diagrams)
         '---------------------------------------------
         CoreStateHasName

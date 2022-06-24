@@ -1837,42 +1837,51 @@ SkipRegistrationChecking:
 
     Sub loadBPMNCollaborationDiagramView(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode, Optional ByVal abLoadToolboxes As Boolean = False)
 
-        Dim child As New frmDiagrmUMLUseCase
+        Dim child As New frmDiagramBPMNCollaboration
 
-        child.MdiParent = Me
+        Try
 
-        zfrmUMLUseCaseDiagramView = child
+            child.MdiParent = Me
 
-        '----------------------------------------------------
-        'Set the TreeNode from which the form was launched,
-        '  so that when the User clicks on the Form, the
-        '  respective TreeNode in the navigation tree can
-        '  be selected/expanded etc
-        '----------------------------------------------------
-        child.zoTreeNode = ao_tree_node
-        child.zrPage = arPage
+            '----------------------------------------------------
+            'Set the TreeNode from which the form was launched,
+            '  so that when the User clicks on the Form, the
+            '  respective TreeNode in the navigation tree can
+            '  be selected/expanded etc
+            '----------------------------------------------------
+            child.zoTreeNode = ao_tree_node
+            child.zrPage = arPage
 
-        child.Show(DockPanel)
+            child.Show(DockPanel)
 
-        '---------------------------------------------------------------
-        'Reference the Form back from the Page.
-        '  The reason for this is because if the User elects to Edit a Page that is already opened for editing, then it is very easy
-        '  to find the form that the page is displayed as to set the ZOrder of that form to OnTop.
-        '---------------------------------------------------------------
-        arPage.Form = New Windows.Forms.Form
-        arPage.Form = child
-        arPage.ReferencedForm = child
-        arPage.Diagram = child.Diagram
-        arPage.DiagramView = child.DiagramView
+            '---------------------------------------------------------------
+            'Reference the Form back from the Page.
+            '  The reason for this is because if the User elects to Edit a Page that is already opened for editing, then it is very easy
+            '  to find the form that the page is displayed as to set the ZOrder of that form to OnTop.
+            '---------------------------------------------------------------
+            arPage.Form = New Windows.Forms.Form
+            arPage.Form = child
+            arPage.ReferencedForm = child
+            arPage.Diagram = child.Diagram
+            arPage.DiagramView = child.DiagramView
 
-        '---------------------------------------------------------------
-        'Setup the 'Page' title details
-        '---------------------------------------------------------------        
-        Call child.load_use_case_page(arPage, ao_tree_node)
+            '---------------------------------------------------------------
+            'Setup the 'Page' title details
+            '---------------------------------------------------------------        
+            Call child.LoadBPMNCollaborationDiagramPage(arPage)
 
-        If abLoadToolboxes Then
-            Call Me.ShowHideToolboxes(True)
-        End If
+            If abLoadToolboxes Then
+                Call Me.ShowHideToolboxes(True)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

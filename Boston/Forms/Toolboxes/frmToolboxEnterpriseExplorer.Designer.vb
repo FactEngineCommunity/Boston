@@ -67,6 +67,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.AddBPMNPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddBPMNChoreographyDiagramPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddBPMNCollaborationDiagramPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddProcessDiagramPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UMLToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddUseCaseDiagramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
@@ -99,7 +100,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
-        Me.AddProcessDiagramPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -443,7 +443,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.BusinessProcessModellingNotationToolStripMenuItem.Name = "BusinessProcessModellingNotationToolStripMenuItem"
         Me.BusinessProcessModellingNotationToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
         Me.BusinessProcessModellingNotationToolStripMenuItem.Text = "&Business Process Modelling Notation"
-        Me.BusinessProcessModellingNotationToolStripMenuItem.Visible = False
         '
         'AddBPMNPageToolStripMenuItem
         '
@@ -465,6 +464,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.AddBPMNCollaborationDiagramPageToolStripMenuItem.Name = "AddBPMNCollaborationDiagramPageToolStripMenuItem"
         Me.AddBPMNCollaborationDiagramPageToolStripMenuItem.Size = New System.Drawing.Size(252, 22)
         Me.AddBPMNCollaborationDiagramPageToolStripMenuItem.Text = "Add Collaboration Diagram Page"
+        '
+        'AddProcessDiagramPageToolStripMenuItem
+        '
+        Me.AddProcessDiagramPageToolStripMenuItem.Image = CType(resources.GetObject("AddProcessDiagramPageToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.AddProcessDiagramPageToolStripMenuItem.Name = "AddProcessDiagramPageToolStripMenuItem"
+        Me.AddProcessDiagramPageToolStripMenuItem.Size = New System.Drawing.Size(252, 22)
+        Me.AddProcessDiagramPageToolStripMenuItem.Text = "Add &Process Diagram Page"
         '
         'UMLToolStripMenuItem
         '
@@ -663,13 +669,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
-        '
-        'AddProcessDiagramPageToolStripMenuItem
-        '
-        Me.AddProcessDiagramPageToolStripMenuItem.Image = CType(resources.GetObject("AddProcessDiagramPageToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.AddProcessDiagramPageToolStripMenuItem.Name = "AddProcessDiagramPageToolStripMenuItem"
-        Me.AddProcessDiagramPageToolStripMenuItem.Size = New System.Drawing.Size(252, 22)
-        Me.AddProcessDiagramPageToolStripMenuItem.Text = "Add &Process Diagram Page"
         '
         'frmToolboxEnterpriseExplorer
         '
