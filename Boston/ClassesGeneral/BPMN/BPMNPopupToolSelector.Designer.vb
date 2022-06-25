@@ -27,27 +27,32 @@ Partial Class BPMNPopupToolSelector
         '
         'TableLayoutPanel
         '
+        Me.TableLayoutPanel.AutoSize = True
         Me.TableLayoutPanel.ColumnCount = 3
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 36.0!))
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 9.0!))
-        Me.TableLayoutPanel.Location = New System.Drawing.Point(3, 3)
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+        Me.TableLayoutPanel.Location = New System.Drawing.Point(0, 0)
+        Me.TableLayoutPanel.Margin = New System.Windows.Forms.Padding(0)
         Me.TableLayoutPanel.Name = "TableLayoutPanel"
-        Me.TableLayoutPanel.RowCount = 2
-        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel.Size = New System.Drawing.Size(115, 70)
+        Me.TableLayoutPanel.RowCount = 3
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26.0!))
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26.0!))
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26.0!))
+        Me.TableLayoutPanel.Size = New System.Drawing.Size(97, 91)
         Me.TableLayoutPanel.TabIndex = 0
         '
         'BPMNPopupToolSelector
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoSize = True
         Me.BackColor = System.Drawing.Color.Transparent
         Me.Controls.Add(Me.TableLayoutPanel)
         Me.Name = "BPMNPopupToolSelector"
-        Me.Size = New System.Drawing.Size(126, 150)
+        Me.Size = New System.Drawing.Size(118, 126)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

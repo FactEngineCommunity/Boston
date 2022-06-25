@@ -2315,6 +2315,9 @@ Public Class frmDiagramORM
                             '----------------------------------------------------------------------------
                             'Validate the Roles to which the ExternalUniquenessConstraint is connected.
                             '----------------------------------------------------------------------------
+                            '  NB If you're looking for the code the draws the line/link that follows the mouse,
+                            '    see tRoleConstraintLink's overrie of the Draw method.
+                            '--------------------------------------------------------------------------------------
                             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
                             Dim lrRoleConstraint As New FBM.RoleConstraint
 

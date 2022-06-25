@@ -2,12 +2,14 @@ Imports MindFusion.Diagramming
 Imports System.ComponentModel
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports Boston.FBM
 
 Namespace BPMN
     <Serializable()>
     Public Class Process
         Inherits UML.Process
         Implements FBM.iPageObject
+        Implements BPMN.iPageObject
 
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
@@ -24,6 +26,25 @@ Namespace BPMN
                 Return Me.Id
             End Get
         End Property
+
+        Private _IsCreatingLink As Boolean = False
+
+        Public Property IsCreatingLink As Boolean Implements iPageObject.IsCreatingLink
+            Get
+                Return Me._IsCreatingLink
+            End Get
+            Set(value As Boolean)
+                Me._IsCreatingLink = value
+            End Set
+        End Property
+
+        Public ReadOnly Property BPMNPage As Page Implements iPageObject.BPMNPage
+            Get
+                Return Me.Page
+            End Get
+        End Property
+
+        Public Shadows Shape As BPMN.ShapeNode
 
         '20220617-VM-Remove if not needed.
         '''' <summary>
@@ -148,7 +169,13 @@ Namespace BPMN
                 '--------------------------------------------------------------------
                 'Create a Shape for the EntityTypeInstance on the DiagramView object
                 '--------------------------------------------------------------------            
-                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 20, 15)
+                loDroppedNode = New BPMN.ShapeNode 'Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 20, 15)                
+                loDroppedNode.SetRect(New RectangleF(0, 0, 20, 15), False) '20220624-VM-New
+                loDroppedNode.Move(Me.X, Me.Y)
+                loDroppedNode.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                loDroppedNode.TextFormat.Alignment = StringAlignment.Center
+                loDroppedNode.TextFormat.LineAlignment = StringAlignment.Center
+                Me.Page.Diagram.Nodes.Add(loDroppedNode)  '20220624-VM-New
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove ''HatchHandles3 is a very professional look, or SquareHandles2
                 loDroppedNode.ToolTip = "process"
                 loDroppedNode.AllowOutgoingLinks = True
@@ -161,6 +188,7 @@ Namespace BPMN
                 loDroppedNode.Font = New Font("Arial", 7)
                 loDroppedNode.Pen.Width = 5
                 Me.Shape = loDroppedNode
+                Me.Shape.BPMNElement = Me  '20220624-VM-New
 
                 Select Case Me.Page.Language
                     Case Is = pcenumLanguage.BPMNCollaborationDiagram

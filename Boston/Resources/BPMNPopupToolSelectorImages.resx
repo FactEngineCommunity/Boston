@@ -118,6 +118,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Annotation_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Annotation-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Bin_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Bin-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ChangeType_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\ChangeType-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Connector_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Connector-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_End_None_Standard_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Event-End-None-Standard-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_End_Throwing_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Event-Intermediate-End-Throwing-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Gateway_Exclusive_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Gateway-Exclusive-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="More_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\More-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Task_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\PopupToolSelector\Task-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

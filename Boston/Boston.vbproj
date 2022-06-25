@@ -550,10 +550,12 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\WaitCursor.vb" />
+    <Compile Include="ClassesLANGUAGEBPMN\Interfaces\iBPMNPageObject.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNActor.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNActorProcessRelation.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNProcess.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNProcessProcessRelation.vb" />
+    <Compile Include="ClassesLANGUAGEBPMN\tBPMNShapeNode.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMML.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLActor.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLElement.vb" />
@@ -3180,6 +3182,14 @@
     <None Include="Images\BPMN\Gateway-Inclusive.png" />
     <None Include="Images\BPMN\Gateway-Parallel.png" />
     <None Include="Images\BPMN\PopupToolSelector\Task-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Annotation-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Bin-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\ChangeType-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Connector-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Event-End-None-Standard-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Event-Intermediate-End-Throwing-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Gateway-Exclusive-25x25.png" />
+    <None Include="Images\BPMN\PopupToolSelector\More-25x25.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />

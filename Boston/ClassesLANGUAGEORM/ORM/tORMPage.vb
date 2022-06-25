@@ -3268,7 +3268,7 @@ NextY:
                     Me.UMLDiagram.ProcessProcessRelation.Add(lrUMLProcessProcessRelation)
 
                     Dim lo_link As DiagramLink
-                    lo_link = Me.Diagram.Factory.CreateDiagramLink(lrProcess1.Shape, lrProcess2.Shape)
+                    lo_link = Me.Diagram.Factory.CreateDiagramLink(CType(lrProcess1, Object).Shape, CType(lrProcess2, Object).Shape)
                     lrUMLProcessProcessRelation.Link = lo_link
                     lo_link.Tag = lrUMLProcessProcessRelation
 
