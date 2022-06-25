@@ -2,6 +2,7 @@
 
 Namespace CMML
     Public Class ProcessProcessRelation
+        Inherits CMML.Element
 
         Public WithEvents CMMLModel As CMML.Model
 

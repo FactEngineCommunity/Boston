@@ -220,32 +220,23 @@ Namespace CMML
 
         End Function
 
-        Public Function CreateUniqueProcessName(ByVal arProcess As CMML.Process, Optional ByVal aiStartingInd As Integer = 0) As String
+        Public Function CreateUniqueProcessText(ByVal arProcess As CMML.Process, Optional ByVal aiStartingInd As Integer = 0) As String
 
-            Dim lsUniqueProcessName As String = ""
+            Dim lsUniqueProcessText As String = ""
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
 
             If aiStartingInd = 0 Then
-                lsUniqueProcessName = arProcess.Name
+                lsUniqueProcessText = arProcess.Text
             Else
-                lsUniqueProcessName = arProcess.Name & aiStartingInd.ToString
+                lsUniqueProcessText = arProcess.Text & aiStartingInd.ToString
             End If
 
-
-            lsSQLQuery = "SELECT COUNT(*)"
-            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-            lsSQLQuery &= " WHERE " & pcenumCMML.Element.ToString & " = '" & lsUniqueProcessName & "'"
-
-            lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-            If CInt(lrRecordset("Count").Data) > 0 Then
-
-                lsUniqueProcessName = Me.CreateUniqueProcessName(arProcess, aiStartingInd + 1)
-
+            If Me.Process.Find(Function(x) x.Text = lsUniqueProcessText) IsNot Nothing Then
+                lsUniqueProcessText = Me.CreateUniqueProcessText(arProcess, aiStartingInd + 1)
             End If
 
-            Return lsUniqueProcessName
+            Return lsUniqueProcessText
 
         End Function
 

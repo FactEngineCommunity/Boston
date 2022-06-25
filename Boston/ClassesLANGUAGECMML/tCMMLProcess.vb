@@ -6,6 +6,7 @@ Imports System.Reflection
 Namespace CMML
     <Serializable()>
     Public Class Process
+        Inherits CMML.Element
 
         Public CMMLModel As CMML.Model
 
@@ -22,7 +23,34 @@ Namespace CMML
         Public Name As String
 
         Public ProcessType As pcenumBPMNProcessType
+
+#Region "Activity - BPMN"
+        Public ActivityType As pcenumBPMNActivityType
+
+        Public ActivityMarker As pcenumBPMNActivityMarker
+
+        Public ActivityTaskType As pcenumBPMNActivityTaskType
+#End Region
+
+#Region "Conversation - BPMN"
+        Public ConversationType As pcenumBPMNConversationType
+#End Region
+
+#Region "Events - BPMN"
+
+        Public EventPosition As pcenumBPMNEventPosition
+
+        Public EventType As pcenumBPMNEventType
+
+        Public EventSubType As pcenumBPMNSubType
+#End Region
+
+#Region "Gateway - BPMN"
+
         Public GatewayType As pcenumBPMNGatewayType
+#End Region
+
+
 
         '20220617-VM-Can probably make these redundant/derived.
         '''' <summary>

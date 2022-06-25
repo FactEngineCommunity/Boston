@@ -284,6 +284,8 @@ Namespace FBM
         <NonSerialized()>
         Private _STDiagram As New STD.Diagram(Me)
 
+        <JsonIgnore()>
+        <NonSerialized()>
         Public UMLDiagram As New UML.Model
 
         Private disposedValue As Boolean

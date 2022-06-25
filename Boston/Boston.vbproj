@@ -469,6 +469,12 @@
     <Compile Include="ClassesGeneral\BostonTreeView.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\BPMN\BPMNPopupToolSelector.Designer.vb">
+      <DependentUpon>BPMNPopupToolSelector.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\BPMN\BPMNPopupToolSelector.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\classVievToopTip.vb" />
     <Compile Include="ClassesGeneral\CustomMessageBox\frmCustomerMessageBox.Designer.vb">
       <DependentUpon>frmCustomerMessageBox.vb</DependentUpon>
@@ -550,6 +556,7 @@
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNProcessProcessRelation.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMML.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLActor.vb" />
+    <Compile Include="ClassesLANGUAGECMML\tCMMLElement.vb" />
     <Compile Include="ClassesLANGUAGEUMLUCD\tUCDActorName.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLModel.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLPage.vb" />
@@ -1878,6 +1885,11 @@
     <Compile Include="ModulesPublic\publicConstantsBrain.vb" />
     <Compile Include="ModulesPublic\publicFunctions.vb" />
     <Compile Include="ModulesPublic\publicVariables.vb" />
+    <Compile Include="Resources\BPMNPopupToolSelectorImages.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BPMNPopupToolSelectorImages.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\CMMLShapes.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1947,6 +1959,9 @@
     <Compile Include="Thinfinity.VirtualUI.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ClassesGeneral\BPMN\BPMNPopupToolSelector.resx">
+      <DependentUpon>BPMNPopupToolSelector.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\CustomMessageBox\frmCustomerMessageBox.resx">
       <DependentUpon>frmCustomerMessageBox.vb</DependentUpon>
     </EmbeddedResource>
@@ -2344,6 +2359,11 @@
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\BPMNPopupToolSelectorImages.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BPMNPopupToolSelectorImages.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\CMMLShapes.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -3159,6 +3179,7 @@
     <None Include="Images\BPMN\Gateway-Exclusive.png" />
     <None Include="Images\BPMN\Gateway-Inclusive.png" />
     <None Include="Images\BPMN\Gateway-Parallel.png" />
+    <None Include="Images\BPMN\PopupToolSelector\Task-25x25.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />
