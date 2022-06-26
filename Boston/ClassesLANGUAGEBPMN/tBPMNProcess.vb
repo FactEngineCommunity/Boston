@@ -192,9 +192,49 @@ Namespace BPMN
 
                 Select Case Me.Page.Language
                     Case Is = pcenumLanguage.BPMNCollaborationDiagram
-
                         Select Case Me.CMMLProcess.ProcessType
+                            Case Is = pcenumBPMNProcessType.Event
+#Region "Event"
+                                Select Case Me.CMMLProcess.EventType
+                                    Case Is = pcenumBPMNEventType.None
+#Region "None"
+                                        Select Case Me.CMMLProcess.EventSubType
+                                            Case Is = pcenumBPMNSubType.Standard
+#Region "Standard"
+                                                Select Case Me.CMMLProcess.EventPosition
+                                                    Case Is = pcenumBPMNEventPosition.End
+#Region "End"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_None_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNSubType.Throwing
+#Region "Throwing"
+                                                Select Case Me.CMMLProcess.EventPosition
+                                                    Case Is = pcenumBPMNEventPosition.Intermediate
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_None_Throwing
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+                                                End Select
+#End Region
+                                        End Select
+#End Region
+                                End Select
+#End Region
                             Case Is = pcenumBPMNProcessType.Gateway
+#Region "Gateway"
                                 loDroppedNode.Shape = Shapes.Ellipse
                                 loDroppedNode.Resize(12, 12)
                                 loDroppedNode.Image = My.Resources.BPMN.Gateway_Exclusive
@@ -202,15 +242,16 @@ Namespace BPMN
                                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
                                 loDroppedNode.Text = ""
                                 loDroppedNode.Pen.Width = 0.0
+#End Region
                             Case Else
+#Region "Activity/Else"
                                 loDroppedNode.Shape = Shapes.RoundRect
                                 loDroppedNode.Resize(20, 15)
                                 loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
                                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.Black)
                                 loDroppedNode.Pen.Width = 0.5
+#End Region
                         End Select
-
-
 
                     Case Is = pcenumLanguage.ORMModel
                         'Can delete this later. At present, if the MetaModel is shown as an ORM diagram, the Page.Language changes to ORMModel
@@ -236,6 +277,7 @@ Namespace BPMN
                         End If
                         loDroppedNode.Resize(20, 15)
                 End Select
+
 
 #Region "Snap to Grid"
                 Me.Page.Diagram.AlignToGrid = True

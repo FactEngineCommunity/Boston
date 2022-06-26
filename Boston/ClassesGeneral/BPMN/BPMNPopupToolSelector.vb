@@ -49,6 +49,7 @@ Public Class BPMNPopupToolSelector
                 liCol = Boston.returnIfTrue((liInd Mod 3) - 1 < 0, 3, (liInd Mod 3) - 1)
 
                 Dim lrButton As New Button()
+                lrButton.Text = ""
                 lrButton.SetBounds(0, 0, 28, 28)
                 lrButton.ForeColor = Color.White
                 AddHandler lrButton.Click, AddressOf Me.Button_Click
@@ -68,8 +69,8 @@ Public Class BPMNPopupToolSelector
                         lrButton.Image = My.Resources.BPMNPopupToolSelectorImages.Task_25x25
                         lrButton.Tag = "Task"
                     Case Is = 4
-                        lrButton.Image = My.Resources.BPMNPopupToolSelectorImages.Event_Intermediate_End_Throwing_25x25
-                        lrButton.Tag = "EventIntermediateEndThrowing"
+                        lrButton.Image = My.Resources.BPMNPopupToolSelectorImages.Event_Intermediate_None_Throwing_25x25
+                        lrButton.Tag = "EventIntermediateNoneThrowing"
                     Case Is = 5
                         lrButton.Image = My.Resources.BPMNPopupToolSelectorImages.Annotation_25x25
                         lrButton.Tag = "Annotation"

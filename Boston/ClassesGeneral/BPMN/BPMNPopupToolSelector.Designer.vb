@@ -31,7 +31,7 @@ Partial Class BPMNPopupToolSelector
         Me.TableLayoutPanel.ColumnCount = 3
         Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
         Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
         Me.TableLayoutPanel.Location = New System.Drawing.Point(0, 0)
         Me.TableLayoutPanel.Margin = New System.Windows.Forms.Padding(0)
         Me.TableLayoutPanel.Name = "TableLayoutPanel"
@@ -49,6 +49,7 @@ Partial Class BPMNPopupToolSelector
         Me.AutoSize = True
         Me.BackColor = System.Drawing.Color.Transparent
         Me.Controls.Add(Me.TableLayoutPanel)
+        Me.ForeColor = System.Drawing.Color.White
         Me.Name = "BPMNPopupToolSelector"
         Me.Size = New System.Drawing.Size(118, 126)
         Me.ResumeLayout(False)

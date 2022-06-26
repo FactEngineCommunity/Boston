@@ -133,8 +133,8 @@
   <data name="Event_End_None_Standard_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\PopupToolSelector\Event-End-None-Standard-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Event_Intermediate_End_Throwing_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\BPMN\PopupToolSelector\Event-Intermediate-End-Throwing-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Event_Intermediate_None_Throwing_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\PopupToolSelector\Event-Intermediate-None-Throwing-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Gateway_Exclusive_25x25" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\PopupToolSelector\Gateway-Exclusive-25x25.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -117,9 +117,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_End_Throwing_25x25() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_None_Throwing_25x25() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_End_Throwing_25x25", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_None_Throwing_25x25", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
