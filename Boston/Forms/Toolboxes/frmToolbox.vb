@@ -59,22 +59,12 @@ Public Class frmToolbox
 
         Try
             '-----------------------------------------------------------------------------
-            'NB Each Diagram/Page form (e.g. frm_ORMModel_page) loads it's own toolbox.
+            'NB Each Diagram/Page form (e.g. frmDiagramORM) loads it's own toolbox.
             '-----------------------------------------------------------------------------
-            'Me.ToolBox.AddTab("Toolbox", -1)
+            Me.ToolBox.AddTab("Toolbox", -1)
             'Me.ToolBox.AddTab("Tab 2 (TreeView)", -1)
-            'Me.ToolBox.AddTab("Tab 3", -1)
-            'Me.ToolBox.AddTab("Tab 4", -1)
-            'Me.ToolBox.AddTab("Tab 5 (TreeView)", -1)
-
-            'Dim ToolShapeListBox As New MindFusion.Diagramming.WinForms.ShapeListBox
-
-            'ToolShapeListBox.BorderStyle = BorderStyle.None
-            'ToolShapeListBox.Dock = DockStyle.Fill
-            'Me.ToolBox(1).Control = ToolShapeListBox
-
-            'Me.ToolBox(0).Selected = True
-            'Me.ToolBox(0).Control = Me.ShapeListBox
+            Me.ToolBox(0).Selected = True
+            Me.ToolBox(0).Control = Me.ShapeListBox
 
         Catch ex As Exception
             Dim lsMessage As String

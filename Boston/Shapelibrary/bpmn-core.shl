@@ -1,22 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <shapes xmlns="http://mindfusion.org/flowchart">
-  <shape id="Actor" fill-mode="Winding">
-    <outline>      
-	  <round-rectangle x="2" y="4" w="96" h="100" r="5" dash-style="Custom" width="-1" color="#FFFFFFFF" />
-    </outline>
-    <decorations />
-    <image x="7" y="8" width="82" height="85" src="actor.png" />		
-    <textarea>
-      <arc x="13" y="9" arc-width="81" arc-height="77" start="-199.0935" sweep="379.0935" dash-style="Custom" width="-1" />
-    </textarea>  
-  </shape>
-  <shape id="Process" fill-mode="Winding">
+  <shape id="Start Event" fill-mode="Winding" display-name="Start Event">
     <outline>
-      <arc x="7" y="3" arc-width="110" arc-height="90" start="-179.1141" sweep="359.1141" dash-style="Custom" width="-1" />
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
     </outline>
-    <decorations />
-    <textarea>
-      <arc x="13" y="9" arc-width="100" arc-height="77" start="-199.0935" sweep="379.0935" dash-style="Custom" width="-1" />
-    </textarea>
+  </shape>
+  <shape id="Intermediate/Boundary Event" fill-mode="Winding" display-name="Intermediate/Boundary Event">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="End Event" fill-mode="Winding" display-name="End Event">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Gateway" fill-mode="Winding" display-name="Gateway">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Task" fill-mode="Winding" display-name="Task">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Sub Process" fill-mode="Winding" display-name="Sub Process">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Data Object Reference" fill-mode="Winding" display-name="Data Object Reference">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Data Store Reference" fill-mode="Winding" display-name="Data Store Reference">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Pool/Participant" fill-mode="Winding" display-name="Pool/Participant">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+  </shape>
+  <shape id="Group" fill-mode="Winding" display-name="Group">
+    <outline>
+      <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
   </shape>
 </shapes>

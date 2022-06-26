@@ -1947,6 +1947,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BPMN.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\BPMNToolboxShapes.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BPMNToolboxShapes.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Viev.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -2429,6 +2434,11 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>BPMN.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\BPMNToolboxShapes.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BPMNToolboxShapes.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Viev.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -3191,6 +3201,17 @@
     <None Include="Images\BPMN\PopupToolSelector\Gateway-Exclusive-25x25.png" />
     <None Include="Images\BPMN\PopupToolSelector\More-25x25.png" />
     <None Include="Images\BPMN\PopupToolSelector\Event-Intermediate-None-Throwing-25x25.png" />
+    <None Include="Images\BPMN\ToolboxShapes\DataObject.png" />
+    <None Include="Images\BPMN\ToolboxShapes\DataStore.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Event-End-None-Standard.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Event-Intermediate-Escalation-BoundaryInterupting.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Event-Start-None-Standard.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Gateway-Exclusive.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Group.png" />
+    <None Include="Images\BPMN\ToolboxShapes\PoolParticipant.png" />
+    <None Include="Images\BPMN\ToolboxShapes\SubProcess.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Task.png" />
+    <None Include="Images\BPMN\ToolboxShapes\Event-Intermediate-Boundary.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />

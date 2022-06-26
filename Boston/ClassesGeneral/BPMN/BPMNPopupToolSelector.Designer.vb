@@ -29,17 +29,17 @@ Partial Class BPMNPopupToolSelector
         '
         Me.TableLayoutPanel.AutoSize = True
         Me.TableLayoutPanel.ColumnCount = 3
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 37.0!))
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
+        Me.TableLayoutPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
         Me.TableLayoutPanel.Location = New System.Drawing.Point(0, 0)
         Me.TableLayoutPanel.Margin = New System.Windows.Forms.Padding(0)
         Me.TableLayoutPanel.Name = "TableLayoutPanel"
         Me.TableLayoutPanel.RowCount = 3
-        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26.0!))
-        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26.0!))
-        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26.0!))
-        Me.TableLayoutPanel.Size = New System.Drawing.Size(97, 91)
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27.0!))
+        Me.TableLayoutPanel.Size = New System.Drawing.Size(82, 82)
         Me.TableLayoutPanel.TabIndex = 0
         '
         'BPMNPopupToolSelector
@@ -51,7 +51,7 @@ Partial Class BPMNPopupToolSelector
         Me.Controls.Add(Me.TableLayoutPanel)
         Me.ForeColor = System.Drawing.Color.White
         Me.Name = "BPMNPopupToolSelector"
-        Me.Size = New System.Drawing.Size(118, 126)
+        Me.Size = New System.Drawing.Size(100, 101)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

@@ -28,6 +28,8 @@ Public Class BPMNPopupToolSelector
                     Call Me.SetupForBPMNActivity()
             End Select
 
+            Me.Size = New Size(Me.TableLayoutPanel.Width + 2, Me.TableLayoutPanel.Height + 2)
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -50,7 +52,7 @@ Public Class BPMNPopupToolSelector
 
                 Dim lrButton As New Button()
                 lrButton.Text = ""
-                lrButton.SetBounds(0, 0, 28, 28)
+                lrButton.Size = New Size(26, 26)
                 lrButton.ForeColor = Color.White
                 AddHandler lrButton.Click, AddressOf Me.Button_Click
                 lrButton.Dock = DockStyle.Fill

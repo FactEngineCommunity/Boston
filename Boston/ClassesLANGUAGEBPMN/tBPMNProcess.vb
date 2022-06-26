@@ -213,6 +213,17 @@ Namespace BPMN
                                                         loDroppedNode.Pen.Width = 0.0
                                                         loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
 #End Region
+                                                    Case Is = pcenumBPMNEventPosition.Start
+#Region "Start"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Start_None_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
                                                 End Select
 #End Region
                                             Case Is = pcenumBPMNSubType.Throwing

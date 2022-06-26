@@ -2344,7 +2344,6 @@ Public Class frmDiagrmUMLUseCase
             Dim loLink = Diagram.GetLinkAt(lo_point, 1)
 
             Dim lrPropertyGridForm As frmToolboxProperties
-
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
             Me.zrPage.SelectedObject.Clear()
