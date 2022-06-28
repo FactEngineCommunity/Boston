@@ -70,6 +70,35 @@ Namespace CMML
 
                 Call Me.Model.createCMMLProcess(arProcess)
 
+#Region "Activity - BPMN"
+                Call Me.Model.addCMMLProcessActivityType(arProcess, arProcess.ActivityType)
+
+                Call Me.Model.addCMMLProcessActivityMarker(arProcess, arProcess.ActivityMarker)
+
+                Call Me.Model.addCMMLProcessActivityTaskType(arProcess, arProcess.ActivityTaskType)
+#End Region
+
+#Region "Conversation - BPMN"
+                Call Me.Model.addCMMLProcessConversationType(arProcess, arProcess.ConversationType)
+#End Region
+
+#Region "Events - BPMN"
+
+                Call Me.Model.addCMMLProcessEventPosition(arProcess, arProcess.EventPosition)
+
+                Call Me.Model.addCMMLProcessEventType(arProcess, arProcess.EventType)
+
+                Call Me.Model.addCMMLProcessEventSubType(arProcess, arProcess.EventSubType)
+#End Region
+
+#Region "Gateway - BPMN"
+
+                Call Me.Model.addCMMLProcessGatewayType(arProcess, arProcess.GatewayType)
+#End Region
+
+
+
+
                 RaiseEvent ProcessAdded(arProcess)
 
             Catch ex As Exception

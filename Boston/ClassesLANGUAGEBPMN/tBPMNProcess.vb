@@ -199,7 +199,7 @@ Namespace BPMN
                                     Case Is = pcenumBPMNEventType.None
 #Region "None"
                                         Select Case Me.CMMLProcess.EventSubType
-                                            Case Is = pcenumBPMNSubType.Standard
+                                            Case Is = pcenumBPMNEventSubType.Standard
 #Region "Standard"
                                                 Select Case Me.CMMLProcess.EventPosition
                                                     Case Is = pcenumBPMNEventPosition.End
@@ -226,7 +226,7 @@ Namespace BPMN
 #End Region
                                                 End Select
 #End Region
-                                            Case Is = pcenumBPMNSubType.Throwing
+                                            Case Is = pcenumBPMNEventSubType.Throwing
 #Region "Throwing"
                                                 Select Case Me.CMMLProcess.EventPosition
                                                     Case Is = pcenumBPMNEventPosition.Intermediate

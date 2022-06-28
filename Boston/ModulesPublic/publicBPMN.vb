@@ -10,7 +10,7 @@
         Activity
         Flow
         Conversation
-        Events
+        [Event]
         Gateway
     End Enum
 
@@ -80,7 +80,7 @@
         Terminate
     End Enum
 
-    Public Enum pcenumBPMNSubType
+    Public Enum pcenumBPMNEventSubType
         Standard
         SubprocessInterupting
         SubprocessNonInterupting

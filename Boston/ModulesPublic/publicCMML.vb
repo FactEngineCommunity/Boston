@@ -22,6 +22,14 @@ Public Enum pcenumCMMLRelations
         CoreBPMNCollaborationHasCoreBPMNCollaborationName
         CoreProcessIsOfCoreBPMNGatewayType
         CoreProcessIsOfCoreBPMNProcessType
+        CoreProcessIsOfCoreBPMNActivityType
+        CoreProcessHasCoreBPMNActivityMarker
+        CoreProcessIsOfCoreBPMNProcessTaskType
+        CoreProcessIsOfCoreBPMNConversationType
+        CoreProcessIsOfCoreBPMNEventPosition
+        CoreProcessIsOfCoreBPMNEventType
+        CoreProcessIsOfCoreBPMNEventSubType
+        CoreProcessIsOfCoreBPMNTaskType
 
         '---------------------------------------------
         'STDs (State Transition Diagrams)

@@ -42,15 +42,13 @@ Namespace CMML
 
         Public EventType As pcenumBPMNEventType
 
-        Public EventSubType As pcenumBPMNSubType
+        Public EventSubType As pcenumBPMNEventSubType
 #End Region
 
 #Region "Gateway - BPMN"
 
         Public GatewayType As pcenumBPMNGatewayType
 #End Region
-
-
 
         '20220617-VM-Can probably make these redundant/derived.
         '''' <summary>
@@ -90,6 +88,14 @@ Namespace CMML
         Public Event FactChanged(ByRef arFact As FBM.Fact)
         Public Event RemovedFromModel()
         Public Event TextChanged(ByVal asNewText As String)
+        Public Event ActivityTypeChanged(aiBPMNActityType As pcenumBPMNActivityType)
+        Public Event ActivityMarkerChanged(aiBPMNActivityMarker As pcenumBPMNActivityMarker)
+        Public Event ActivityTaskTypeChanged(ByVal aiBPMNActivityTaskType As pcenumBPMNActivityTaskType)
+        Public Event ConversationTypeChanged(ByVal aiBPMNConversationType As pcenumBPMNConversationType)
+        Public Event EventPositionChanged(ByVal aiBPMNEventPosition As pcenumBPMNEventPosition)
+        Public Event EventTypeChanged(ByVal aiBPMNEventType As pcenumBPMNEventType)
+        Public Event EventSubTypeChanged(ByVal aiBPMNSubType As pcenumBPMNEventSubType)
+        Public Event GatewayTypeChanged(ByVal aiBPMNGatewayType As pcenumBPMNGatewayType)
 
         Public Sub New()
             Me.Id = System.Guid.NewGuid.ToString
@@ -197,6 +203,152 @@ Namespace CMML
             End Try
 
         End Sub
+
+
+        Public Sub SetActivityType(aiBPMNActivityType As pcenumBPMNActivityType)
+
+            Try
+                Me.ActivityType = aiBPMNActivityType
+
+                RaiseEvent ActivityTypeChanged(aiBPMNActivityType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetActivityMarker(aiBPMNActivityMarker As pcenumBPMNActivityMarker)
+
+            Try
+                Me.ActivityMarker = aiBPMNActivityMarker
+
+                RaiseEvent ActivityMarkerChanged(aiBPMNActivityMarker)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetActivityTaskType(aiBPMNActivityTaskType As pcenumBPMNActivityTaskType)
+
+            Try
+                Me.ActivityTaskType = aiBPMNActivityTaskType
+
+                RaiseEvent ActivityTaskTypeChanged(aiBPMNActivityTaskType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetConversationType(aiBPMNConversationType As pcenumBPMNConversationType)
+
+            Try
+                Me.ConversationType = aiBPMNConversationType
+
+                RaiseEvent ConversationTypeChanged(aiBPMNConversationType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetEventPosition(aiBPMNEventPosition As pcenumBPMNEventPosition)
+
+            Try
+                Me.EventPosition = aiBPMNEventPosition
+
+                RaiseEvent EventPositionChanged(aiBPMNEventPosition)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetEventType(aiBPMNEventType As pcenumBPMNEventType)
+
+            Try
+                Me.EventType = aiBPMNEventType
+
+                RaiseEvent EventTypeChanged(aiBPMNEventType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetEventSubType(aiBPMNEventSubType As pcenumBPMNEventSubType)
+
+            Try
+                Me.EventSubType = aiBPMNEventSubType
+
+                RaiseEvent EventSubTypeChanged(aiBPMNEventSubType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetGatewayType(aiBPMNGatewayType As pcenumBPMNGatewayType)
+
+            Try
+                Me.GatewayType = aiBPMNGatewayType
+
+                RaiseEvent GatewayTypeChanged(aiBPMNGatewayType)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
     End Class
 

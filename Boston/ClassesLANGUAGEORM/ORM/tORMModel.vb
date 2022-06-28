@@ -6185,20 +6185,20 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
 #Region "2.3"
             If Me.CoreVersionNumber = "2.3" Then
-#Region "Core BPMN"
-                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
-                End If
-                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-#End Region
+                '#Region "Core BPMN"
+                '                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
+                '                If lrCorePage Is Nothing Then
+                '                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
+                '                End If
+                '                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                '#End Region
 
 #Region "Core UML Use Case Diagram"
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
+                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
                 End If
-                lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
 #End Region
                 Me.CoreVersionNumber = "2.4"
                 Me.MakeDirty(False, False)
