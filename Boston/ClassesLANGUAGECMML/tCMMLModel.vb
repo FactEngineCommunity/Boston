@@ -70,6 +70,9 @@ Namespace CMML
 
                 Call Me.Model.createCMMLProcess(arProcess)
 
+                Call Me.Model.addCMMLProcessProcessType(arProcess, arProcess.ProcessType)
+
+#Region "BPMN"
 #Region "Activity - BPMN"
                 Call Me.Model.addCMMLProcessActivityType(arProcess, arProcess.ActivityType)
 
@@ -95,10 +98,7 @@ Namespace CMML
 
                 Call Me.Model.addCMMLProcessGatewayType(arProcess, arProcess.GatewayType)
 #End Region
-
-
-
-
+#End Region
                 RaiseEvent ProcessAdded(arProcess)
 
             Catch ex As Exception

@@ -228,6 +228,9 @@ Namespace CMML
             Try
                 Me.ActivityMarker = aiBPMNActivityMarker
 
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessActivityMarker(Me, aiBPMNActivityMarker)
+
                 RaiseEvent ActivityMarkerChanged(aiBPMNActivityMarker)
 
             Catch ex As Exception
@@ -245,6 +248,9 @@ Namespace CMML
 
             Try
                 Me.ActivityTaskType = aiBPMNActivityTaskType
+
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessActivityTaskType(Me, aiBPMNActivityTaskType)
 
                 RaiseEvent ActivityTaskTypeChanged(aiBPMNActivityTaskType)
 
@@ -264,6 +270,9 @@ Namespace CMML
             Try
                 Me.ConversationType = aiBPMNConversationType
 
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessConversationType(Me, aiBPMNConversationType)
+
                 RaiseEvent ConversationTypeChanged(aiBPMNConversationType)
 
             Catch ex As Exception
@@ -281,6 +290,9 @@ Namespace CMML
 
             Try
                 Me.EventPosition = aiBPMNEventPosition
+
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessEventPosition(Me, aiBPMNEventPosition)
 
                 RaiseEvent EventPositionChanged(aiBPMNEventPosition)
 
@@ -300,6 +312,9 @@ Namespace CMML
             Try
                 Me.EventType = aiBPMNEventType
 
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessEventType(Me, aiBPMNEventType)
+
                 RaiseEvent EventTypeChanged(aiBPMNEventType)
 
             Catch ex As Exception
@@ -318,6 +333,9 @@ Namespace CMML
             Try
                 Me.EventSubType = aiBPMNEventSubType
 
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessEventSubType(Me, aiBPMNEventSubType)
+
                 RaiseEvent EventSubTypeChanged(aiBPMNEventSubType)
 
             Catch ex As Exception
@@ -335,6 +353,9 @@ Namespace CMML
 
             Try
                 Me.GatewayType = aiBPMNGatewayType
+
+                'CMML
+                Call Me.CMMLModel.Model.updateCMMLProcessGatewayType(Me, aiBPMNGatewayType)
 
                 RaiseEvent GatewayTypeChanged(aiBPMNGatewayType)
 

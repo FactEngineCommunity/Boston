@@ -861,9 +861,12 @@ Namespace RDS
 
                 For Each lrSubtypeRelationship In larSubtypeRelationship
                     Dim lrSupertypeTable = lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable
-                    larSupertypeTable.AddUnique(lrSupertypeTable)
-                    If abIsRecursive Then
-                        Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+
+                    If lrSupertypeTable IsNot Nothing Then 'A Core table may have accidentally been created. Shouldn't happen but can. I.e. Skip because should be no CorrespondingRDSTable for a Core ModelElement.
+                        larSupertypeTable.AddUnique(lrSupertypeTable)
+                        If abIsRecursive Then
+                            Call lrSupertypeTable.getSupertypeTables(larSupertypeTable)
+                        End If
                     End If
                 Next
 

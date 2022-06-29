@@ -3174,518 +3174,529 @@ Public Class frmDiagramORM
         Dim lrFactType As FBM.FactType
         Dim lrFactTypeInstance As FBM.FactTypeInstance
 
-        Select Case e.KeyCode
-            Case Is = Keys.Delete
-                e.Handled = True
-            Case Is = Keys.M
-                Call frmMain.LoadToolboxModelDictionary()
-                Call Me.DiagramView.Focus()
-            Case Is = Keys.T
-                Call frmMain.LoadToolbox()
-                Call Me.SetToolbox()
-                Call Me.DiagramView.Focus()
-            Case Is = (e.Control And Keys.Right)
-                Try
-                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value + 1, Me.VerticalScroll.Value)
-                    Me.HorizontalScroll.Value += 1
-                Catch ex As Exception
-                    'No a biggie
-                End Try
-            Case Is = (e.Control And Keys.Left)
-                Try
-                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value - 1, Me.VerticalScroll.Value)
-                    Me.HorizontalScroll.Value -= 1
-                Catch ex As Exception
-                    'No a biggie
-                End Try
-            Case Is = (e.Control And Keys.Down)
-                Try
-                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.VerticalScroll.Value + 1)
-                    Me.VerticalScroll.Value += 1
-                Catch ex As Exception
-                    'Not a biggie
-                End Try
-            Case Is = (e.Control And Keys.Up)
-                Try
-                    Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.VerticalScroll.Value - 1)
-                    Me.VerticalScroll.Value -= 1
-                Catch ex As Exception
-                    'No a biggie
-                End Try
-            Case Is = Keys.Right 'Right Arrow
-                If Me.zrPage.SelectedObject.Count > 0 Then
-                    Dim loObject As Object
-                    For Each loObject In Me.zrPage.SelectedObject
-                        If loObject.ConceptType <> pcenumConceptType.Role Then
-                            loObject.shape.move((loObject.shape.bounds.x + 1), loObject.shape.bounds.y)
-                        End If
-                    Next
-                End If
+        Try
 
-
-            Case Is = Keys.Left 'Left Arrow
-                If Me.zrPage.SelectedObject.Count > 0 Then
-                    Dim loObject As Object
-                    For Each loObject In Me.zrPage.SelectedObject
-                        If loObject.ConceptType <> pcenumConceptType.Role Then
-                            loObject.shape.move((loObject.shape.bounds.x - 1), loObject.shape.bounds.y)
-                        End If
-                    Next
-                End If
-            Case Is = Keys.Up 'Up Arrow
-                If Me.zrPage.SelectedObject.Count > 0 Then
-                    Dim loObject As Object
-                    For Each loObject In Me.zrPage.SelectedObject
-                        If loObject.ConceptType <> pcenumConceptType.Role Then
-                            loObject.shape.move(loObject.shape.bounds.x, loObject.shape.bounds.y - 1)
-                        End If
-                    Next
-                End If
-            Case Is = Keys.Down 'Down Arrow
-                If Me.zrPage.SelectedObject.Count > 0 Then
-                    Dim loObject As Object
-                    For Each loObject In Me.zrPage.SelectedObject
-                        If loObject.ConceptType <> pcenumConceptType.Role Then
-                            loObject.shape.move(loObject.shape.bounds.x, loObject.shape.bounds.y + 1)
-                        End If
-                    Next
-                End If
-            Case Is = Keys.U
-                Call AddUniquenessConstraint()
-            Case Is = Keys.P
-                Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
-
-                Dim lrPropertyGridForm As frmToolboxProperties
-                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                If IsSomething(lrPropertyGridForm) Then
-                    If Me.Diagram.Selection.Items.Count = 1 Then
-                        lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
-                        Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag.Shape.Selected = True
-                    Else
-                        Call Me.DiagramView.Focus()
+            Select Case e.KeyCode
+                Case Is = Keys.Delete
+                    e.Handled = True
+                Case Is = Keys.M
+                    Call frmMain.LoadToolboxModelDictionary()
+                    Call Me.DiagramView.Focus()
+                Case Is = Keys.T
+                    Call frmMain.LoadToolbox()
+                    Call Me.SetToolbox()
+                    Call Me.DiagramView.Focus()
+                Case Is = (e.Control And Keys.Right)
+                    Try
+                        Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value + 1, Me.VerticalScroll.Value)
+                        Me.HorizontalScroll.Value += 1
+                    Catch ex As Exception
+                        'No a biggie
+                    End Try
+                Case Is = (e.Control And Keys.Left)
+                    Try
+                        Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value - 1, Me.VerticalScroll.Value)
+                        Me.HorizontalScroll.Value -= 1
+                    Catch ex As Exception
+                        'No a biggie
+                    End Try
+                Case Is = (e.Control And Keys.Down)
+                    Try
+                        Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.VerticalScroll.Value + 1)
+                        Me.VerticalScroll.Value += 1
+                    Catch ex As Exception
+                        'Not a biggie
+                    End Try
+                Case Is = (e.Control And Keys.Up)
+                    Try
+                        Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.VerticalScroll.Value - 1)
+                        Me.VerticalScroll.Value -= 1
+                    Catch ex As Exception
+                        'No a biggie
+                    End Try
+                Case Is = Keys.Right 'Right Arrow
+                    If Me.zrPage.SelectedObject.Count > 0 Then
+                        Dim loObject As Object
+                        For Each loObject In Me.zrPage.SelectedObject
+                            If loObject.ConceptType <> pcenumConceptType.Role Then
+                                loObject.shape.move((loObject.shape.bounds.x + 1), loObject.shape.bounds.y)
+                            End If
+                        Next
                     End If
-                End If
 
-            Case Is = Keys.R
+
+                Case Is = Keys.Left 'Left Arrow
+                    If Me.zrPage.SelectedObject.Count > 0 Then
+                        Dim loObject As Object
+                        For Each loObject In Me.zrPage.SelectedObject
+                            If loObject.ConceptType <> pcenumConceptType.Role Then
+                                loObject.shape.move((loObject.shape.bounds.x - 1), loObject.shape.bounds.y)
+                            End If
+                        Next
+                    End If
+                Case Is = Keys.Up 'Up Arrow
+                    If Me.zrPage.SelectedObject.Count > 0 Then
+                        Dim loObject As Object
+                        For Each loObject In Me.zrPage.SelectedObject
+                            If loObject.ConceptType <> pcenumConceptType.Role Then
+                                loObject.shape.move(loObject.shape.bounds.x, loObject.shape.bounds.y - 1)
+                            End If
+                        Next
+                    End If
+                Case Is = Keys.Down 'Down Arrow
+                    If Me.zrPage.SelectedObject.Count > 0 Then
+                        Dim loObject As Object
+                        For Each loObject In Me.zrPage.SelectedObject
+                            If loObject.ConceptType <> pcenumConceptType.Role Then
+                                loObject.shape.move(loObject.shape.bounds.x, loObject.shape.bounds.y + 1)
+                            End If
+                        Next
+                    End If
+                Case Is = Keys.U
+                    Call AddUniquenessConstraint()
+                Case Is = Keys.P
+                    Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+                    Dim lrPropertyGridForm As frmToolboxProperties
+                    lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                    If IsSomething(lrPropertyGridForm) Then
+                        If Me.Diagram.Selection.Items.Count = 1 Then
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
+                            Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag.Shape.Selected = True
+                        Else
+                            Call Me.DiagramView.Focus()
+                        End If
+                    End If
+
+                Case Is = Keys.R
 #Region "R-For Role"
 
-                Dim larSameFactType = From SelectedObject In Me.zrPage.SelectedObject
-                                      Where SelectedObject.GetType = GetType(FBM.RoleInstance)
-                                      Where Me.zrPage.SelectedObject.Contains(SelectedObject.FactType)
-                                      Select SelectedObject
+                    Dim larSameFactType = From SelectedObject In Me.zrPage.SelectedObject
+                                          Where SelectedObject.GetType = GetType(FBM.RoleInstance)
+                                          Where Me.zrPage.SelectedObject.Contains(SelectedObject.FactType)
+                                          Select SelectedObject
 
-                If larSameFactType.Count > 0 Then
-                    Me.zrPage.SelectedObject.Remove(larSameFactType.First.FactType)
-                End If
+                    If larSameFactType.Count > 0 Then
+                        Me.zrPage.SelectedObject.Remove(larSameFactType.First.FactType)
+                    End If
 
-                '-----------------------------------------------------------
-                'The User has elected to add a Role to the Model.
-                'Create a FactType (RoleGroup) linking the selected Objects.
-                '-----------------------------------------------------------
-                If Me.zrPage.SelectedObject.Count > 0 Then
-                    If Me.zrPage.AreNoSelectedObjectsRoles() Then
-                        '----------------------------------------------------------------
-                        'User has elected to join role/s (Fact Type) to any of a set of
-                        '  - Entities
-                        '  - Value Types
-                        '  - Objectified Fact Types
-                        '----------------------------------------------------------------------------------------------
-                        'PSEUDOCODE
-                        '  * Calculate a point midway between the selected objects
-                        '  * FOREACH ORMObject WITHIN THE ORMModel.SelectedObject list
-                        '      * Create a FactType for the new FactType within the ORMModel.FactType list
-                        '      * Create a Role for the ORMObject (within the ORMModel.Role list
-                        '      * Create a RoleInstance for the ORMObject (within the ORMModel.RoleInstance list
-                        '      * Display and attach the the RoleInstance.Shape to the new RoleInstance
-                        '           (use the calculated position midway between the SelectedObject list of ORMObjects)
-                        '           (For each RoleInstance that is not the first RoleInstance created,
-                        '              attach it to the first RoleInstance)
-                        '  * LOOP
-                        '----------------------------------------------------------------------------------------------
-                        Dim liCounter As Integer = 0 'Used to count as the Roles are created
-                        Dim loObject As Object
-                        Dim loNode As New ShapeNode
+                    '-----------------------------------------------------------
+                    'The User has elected to add a Role to the Model.
+                    'Create a FactType (RoleGroup) linking the selected Objects.
+                    '-----------------------------------------------------------
+                    If Me.zrPage.SelectedObject.Count > 0 Then
+                        If Me.zrPage.AreNoSelectedObjectsRoles() Then
+                            '----------------------------------------------------------------
+                            'User has elected to join role/s (Fact Type) to any of a set of
+                            '  - Entities
+                            '  - Value Types
+                            '  - Objectified Fact Types
+                            '----------------------------------------------------------------------------------------------
+                            'PSEUDOCODE
+                            '  * Calculate a point midway between the selected objects
+                            '  * FOREACH ORMObject WITHIN THE ORMModel.SelectedObject list
+                            '      * Create a FactType for the new FactType within the ORMModel.FactType list
+                            '      * Create a Role for the ORMObject (within the ORMModel.Role list
+                            '      * Create a RoleInstance for the ORMObject (within the ORMModel.RoleInstance list
+                            '      * Display and attach the the RoleInstance.Shape to the new RoleInstance
+                            '           (use the calculated position midway between the SelectedObject list of ORMObjects)
+                            '           (For each RoleInstance that is not the first RoleInstance created,
+                            '              attach it to the first RoleInstance)
+                            '  * LOOP
+                            '----------------------------------------------------------------------------------------------
+                            Dim liCounter As Integer = 0 'Used to count as the Roles are created
+                            Dim loObject As Object
+                            Dim loNode As New ShapeNode
 
-                        '------------------------------------------------------------------
-                        'Abort if any SelectedObject is a FactType that is not Objectified.
-                        '  * The reason for this is that you cannot attach a FactType
-                        '    to a FactType that is not Objectified.
-                        '------------------------------------------------------------------
-                        For Each loObject In Me.zrPage.SelectedObject
-                            Select Case loObject.ConceptType
-                                Case Is = pcenumConceptType.FactType
-                                    If loObject.IsObjectified = False Then
-                                        MsgBox("You have a Fact Type selected which is not objectified. You may not attach a Fact Type to a Fact Type that is not first Objectified.")
-                                        Exit Sub
-                                    End If
-                            End Select
-                        Next
-
-                        '-------------------------------------------------------
-                        'Construct the FactTypeName for the new FactType as an
-                        '  almalgamation of the Names of the selected objects.
-                        '-------------------------------------------------------
-                        For Each loObject In Me.zrPage.SelectedObject
-                            Select Case loObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType, pcenumConceptType.ValueType, pcenumConceptType.FactType
-                                    lsFactTypeName &= loObject.name
-                            End Select
-                        Next
-
-                        '-------------------------------------------------------------------------
-                        'Create a list of the selected objects so that a FactType can be created
-                        '  with as many Roles (linked to the selected objects) as there are
-                        '  selected ModelObjects.
-                        '-------------------------------------------------------------------------
-                        Dim larModelObject As New List(Of FBM.ModelObject)
-                        For Each loObject In Me.zrPage.SelectedObject
-                            Select Case loObject.ConceptType
-                                Case Is = pcenumConceptType.EntityType
-                                    larModelObject.Add(loObject.EntityType)
-                                Case Is = pcenumConceptType.ValueType
-                                    larModelObject.Add(loObject.ValueType)
-                                Case Is = pcenumConceptType.FactType
-                                    larModelObject.Add(loObject.FactType)
-                            End Select
-                        Next
-
-                        '-------------------------------------------------------------------------------------------
-                        'Create a new FactType for the ORMModel with Roles joined to the list of selected objects.
-                        '-------------------------------------------------------------------------------------------
-                        lrFactType = Me.zrPage.Model.CreateFactType(lsFactTypeName, larModelObject, , , , , , Me.zrPage)
-
-                        '------------------------------------------------
-                        '  Create the FactTypeInstance for the FactType
-                        '------------------------------------------------
-                        Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
-
-                        If lrFactType.Arity = 2 Then
-#Region "New Role/FactType Arity = 2"
-                            '---------------------------------------------------------
-                            'See if optimal placement of the FactType can be found.
-                            '  i.e. Make the FactTypeInstance on the same Y-axis as
-                            '  the ModelObject with the least number of associated
-                            '  FactTypes.
-                            '---------------------------------------------------------
-                            Dim lrModelObject As New Object
-
-                            For Each lrModelObject In Me.zrPage.SelectedObject
-                                If lrModelObject.ConceptType = pcenumConceptType.ValueType Then
-                                    lo_point.Y = lrModelObject.Y
-                                End If
+                            '------------------------------------------------------------------
+                            'Abort if any SelectedObject is a FactType that is not Objectified.
+                            '  * The reason for this is that you cannot attach a FactType
+                            '    to a FactType that is not Objectified.
+                            '------------------------------------------------------------------
+                            For Each loObject In Me.zrPage.SelectedObject
+                                Select Case loObject.ConceptType
+                                    Case Is = pcenumConceptType.FactType
+                                        If loObject.IsObjectified = False Then
+                                            MsgBox("You have a Fact Type selected which is not objectified. You may not attach a Fact Type to a Fact Type that is not first Objectified.")
+                                            Exit Sub
+                                        End If
+                                End Select
                             Next
 
-                            '===========================================================================================================================
-                            'Create an initial FactTypeReading if the selected ModelObjects contains an EntityType/ObjectifiedFactType and a ValueType
-                            Dim lbContainsEntityTypeOrObjectifiedFactType As Boolean = False
-                            Dim lasConceptTypeSet = New List(Of pcenumConceptType) From {pcenumConceptType.EntityType, pcenumConceptType.FactType}
-                            Dim lrRole As FBM.Role = lrFactType.RoleGroup.Find(Function(x) lasConceptTypeSet.Contains(x.JoinedORMObject.ConceptType))
-                            lbContainsEntityTypeOrObjectifiedFactType = lrRole IsNot Nothing
-                            Select Case lrRole.JoinedORMObject
-                                Case Else
-                                    If lrRole.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
-                                        If DirectCast(lrRole.JoinedORMObject, FBM.FactType).IsObjectified Then
+                            '-------------------------------------------------------
+                            'Construct the FactTypeName for the new FactType as an
+                            '  almalgamation of the Names of the selected objects.
+                            '-------------------------------------------------------
+                            For Each loObject In Me.zrPage.SelectedObject
+                                Select Case loObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType, pcenumConceptType.ValueType, pcenumConceptType.FactType
+                                        lsFactTypeName &= loObject.name
+                                End Select
+                            Next
+
+                            '-------------------------------------------------------------------------
+                            'Create a list of the selected objects so that a FactType can be created
+                            '  with as many Roles (linked to the selected objects) as there are
+                            '  selected ModelObjects.
+                            '-------------------------------------------------------------------------
+                            Dim larModelObject As New List(Of FBM.ModelObject)
+                            For Each loObject In Me.zrPage.SelectedObject
+                                Select Case loObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        larModelObject.Add(loObject.EntityType)
+                                    Case Is = pcenumConceptType.ValueType
+                                        larModelObject.Add(loObject.ValueType)
+                                    Case Is = pcenumConceptType.FactType
+                                        larModelObject.Add(loObject.FactType)
+                                End Select
+                            Next
+
+                            '-------------------------------------------------------------------------------------------
+                            'Create a new FactType for the ORMModel with Roles joined to the list of selected objects.
+                            '-------------------------------------------------------------------------------------------
+                            lrFactType = Me.zrPage.Model.CreateFactType(lsFactTypeName, larModelObject, , , , , , Me.zrPage)
+
+                            '------------------------------------------------
+                            '  Create the FactTypeInstance for the FactType
+                            '------------------------------------------------
+                            Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
+
+                            If lrFactType.Arity = 2 Then
+#Region "New Role/FactType Arity = 2"
+                                '---------------------------------------------------------
+                                'See if optimal placement of the FactType can be found.
+                                '  i.e. Make the FactTypeInstance on the same Y-axis as
+                                '  the ModelObject with the least number of associated
+                                '  FactTypes.
+                                '---------------------------------------------------------
+                                Dim lrModelObject As New Object
+
+                                For Each lrModelObject In Me.zrPage.SelectedObject
+                                    If lrModelObject.ConceptType = pcenumConceptType.ValueType Then
+                                        lo_point.Y = lrModelObject.Y
+                                    End If
+                                Next
+
+                                '===========================================================================================================================
+                                'Create an initial FactTypeReading if the selected ModelObjects contains an EntityType/ObjectifiedFactType and a ValueType
+                                Dim lbContainsEntityTypeOrObjectifiedFactType As Boolean = False
+                                Dim lasConceptTypeSet = New List(Of pcenumConceptType) From {pcenumConceptType.EntityType, pcenumConceptType.FactType}
+                                Dim lrRole As FBM.Role = lrFactType.RoleGroup.Find(Function(x) lasConceptTypeSet.Contains(x.JoinedORMObject.ConceptType))
+                                lbContainsEntityTypeOrObjectifiedFactType = lrRole IsNot Nothing
+                                Select Case lrRole.JoinedORMObject
+                                    Case Else
+                                        If lrRole.JoinedORMObject.ConceptType = pcenumConceptType.FactType Then
+                                            If DirectCast(lrRole.JoinedORMObject, FBM.FactType).IsObjectified Then
+                                                lbContainsEntityTypeOrObjectifiedFactType = True
+                                            End If
+                                        Else
                                             lbContainsEntityTypeOrObjectifiedFactType = True
                                         End If
-                                    Else
-                                        lbContainsEntityTypeOrObjectifiedFactType = True
-                                    End If
-                            End Select
+                                End Select
 
-                            Dim lbContainsValueType As Boolean = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.ConceptType = pcenumConceptType.ValueType) IsNot Nothing
+                                Dim lbContainsValueType As Boolean = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.ConceptType = pcenumConceptType.ValueType) IsNot Nothing
 
-                            If lbContainsEntityTypeOrObjectifiedFactType And lbContainsValueType Then
+                                If lbContainsEntityTypeOrObjectifiedFactType And lbContainsValueType Then
 
-                                Dim lrSentence As New Language.Sentence("FirstObject has SecondObject", "FirstObject has SecondObject")
-                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
-                                Dim larRole As New List(Of FBM.Role)
+                                    Dim lrSentence As New Language.Sentence("FirstObject has SecondObject", "FirstObject has SecondObject")
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                    Dim larRole As New List(Of FBM.Role)
 
-                                larRole.Add(lrFactType.RoleGroup.Find(Function(x) lasConceptTypeSet.Contains(x.JoinedORMObject.ConceptType)))
-                                larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.ConceptType = pcenumConceptType.ValueType))
+                                    larRole.Add(lrFactType.RoleGroup.Find(Function(x) lasConceptTypeSet.Contains(x.JoinedORMObject.ConceptType)))
+                                    larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.ConceptType = pcenumConceptType.ValueType))
 
-                                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
 
-                                'lrFactTypeReading.IsPreferred = True
-                                'lrFactTypeReading.TypedPredicateId = lrFactType.GetTypedPredicateIdByRoleSequence(lrFactTypeReading)
-                                'lrFactTypeReading.IsPreferredForPredicate = (lrFactType.FactTypeReading.FindAll(AddressOf lrFactTypeReading.EqualsByRoleSequence).Count = 0)
+                                    'lrFactTypeReading.IsPreferred = True
+                                    'lrFactTypeReading.TypedPredicateId = lrFactType.GetTypedPredicateIdByRoleSequence(lrFactTypeReading)
+                                    'lrFactTypeReading.IsPreferredForPredicate = (lrFactType.FactTypeReading.FindAll(AddressOf lrFactTypeReading.EqualsByRoleSequence).Count = 0)
 
-                                lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
-                            End If
+                                    lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                                End If
 #End Region
-                        ElseIf lrFactType.Arity = 1 Then
-                            'Create a dummy FactTypeReading for the FactType so that a Attribute can be created for the Table in the RDS.
+                            ElseIf lrFactType.Arity = 1 Then
+                                'Create a dummy FactTypeReading for the FactType so that a Attribute can be created for the Table in the RDS.
 
-                            Dim lasPredicatePart As New List(Of String)
-                            lasPredicatePart.Add("change predicate")
-                            Dim larRole As New List(Of FBM.Role)
-                            larRole.Add(lrFactType.RoleGroup(0))
-                            Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
+                                Dim lasPredicatePart As New List(Of String)
+                                lasPredicatePart.Add("change predicate")
+                                Dim larRole As New List(Of FBM.Role)
+                                larRole.Add(lrFactType.RoleGroup(0))
+                                Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lasPredicatePart)
 
-                            lrFactType.FactTypeReading.Add(lrFactTypeReading)
+                                lrFactType.FactTypeReading.Add(lrFactTypeReading)
 
-                            'RDS
-                            Try
-                                Dim lrTable = larModelObject(0).getCorrespondingRDSTable
-                                Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
-                                Call lrTable.addColumn(lrColumn)
-                            Catch ex As Exception
-                                'Warning only. Because could be modifying the Core model, in which case there is no Table for larModelObject(0).
-                                prApplication.ThrowErrorMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
-                            End Try
+                                'RDS
+                                Try
+                                    Dim lrTable = larModelObject(0).getCorrespondingRDSTable
+                                    Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
+                                    Call lrTable.addColumn(lrColumn)
+                                Catch ex As Exception
+                                    'Warning only. Because could be modifying the Core model, in which case there is no Table for larModelObject(0).
+                                    prApplication.ThrowErrorMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
+                                End Try
 
+                            End If
+
+                            Dim loFactTypeInstancePt As New PointF(lo_point.X - 15, lo_point.Y)
+
+                            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loFactTypeInstancePt, Me.ViewFactTablesToolStripMenuItem.Checked)
+
+                            If lrFactTypeInstance.Arity = 1 Then
+                                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(4, True)
+                            End If
+
+                            '------------------------------------------------------------------------------------
+                            'Have just created a FactType so if frmToolboxModelDictionary is loaded then
+                            '  reset the zrLoadedModel to Nothing so that when the user moves the mouse over the 
+                            '  Page the ModelDictionary is reloaded.
+                            '------------------------------------------------------------------------------------
+                            Dim child As frmToolboxModelDictionary
+                            If prApplication.RightToolboxForms.FindAll(Function(x) x.Name = frmToolboxModelDictionary.Name).Count >= 1 Then
+                                child = prApplication.RightToolboxForms.Find(Function(x) x.Name = frmToolboxModelDictionary.Name)
+                                child.zrLoadedModel = Nothing
+                            End If
+
+                        ElseIf Me.zrPage.role_and_object_type_selected Then
+                            '------------------------------------------------------------------
+                            'The user has selected a Role and an EntityType/ValueType, so the user 
+                            ' wants to extend the FactType/RoleGroup of the selected Role
+                            ' to include a new Role to the selected EntityType 
+                            '------------------------------------------------------------------
+
+                            '------------------------------------------------------------------------------
+                            'PSEUDOCODE
+                            '  * Get the details of the RoleInstance that has been selected
+                            '  * Get the details of the EntityTypeInstance/ValueTypeInstance that has been selected
+                            '  * Create a new Model-level Role within the Model-level FactType of 
+                            '      the RoleInstance that has been selected, referencing the Model-level
+                            '      EntityType of the selected EntityTypeInstance
+                            '  * Create a new RoleInstance to be attached to the FactTypeInstance
+                            '      of the selected RoleInstance
+                            '  * Inject the new RoleInstance within the appropriate FactTypeInstance                        
+                            '  * Display the new RoleInstance and associated link within the Page.
+                            '------------------------------------------------------------------------------
+                            Dim lrRole As New FBM.Role
+                            Dim lrRoleInstance As New FBM.RoleInstance
+
+                            lrFactType = New FBM.FactType
+                            lrFactTypeInstance = New FBM.FactTypeInstance
+
+                            '--------------------------------------------------------------
+                            ' Get the details of the RoleInstance that has been selected.                        
+                            '--------------------------------------------------------------
+                            lrRoleInstance = Me.zrPage.GetFirstSelectedRoleInstance()
+                            lrFactTypeInstance = lrRoleInstance.FactType
+                            lrFactType = lrFactTypeInstance.FactType
+
+                            '--------------------------------------------------------------
+                            ' Get the details of the EntityTypeInstance/ValueTypeInstance
+                            '   that has been selected.
+                            '--------------------------------------------------------------
+                            Dim lrModelObjectInstance As Object
+                            lrModelObjectInstance = Me.zrPage.GetFirstSelectedModelObject()
+
+                            Me.Cursor = Cursors.WaitCursor
+                            Select Case lrModelObjectInstance.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    lrRole = lrFactType.CreateRole(lrModelObjectInstance.EntityType, True, True)
+                                Case Is = pcenumConceptType.ValueType
+                                    lrRole = lrFactType.CreateRole(lrModelObjectInstance.ValueType, True, True)
+                                Case Is = pcenumConceptType.FactType
+                                    lrRole = lrFactType.CreateRole(lrModelObjectInstance.FactType, True, True)
+                            End Select
+                            Me.Cursor = Cursors.Default
+
+                            Me.Diagram.Invalidate()
                         End If
+                    End If
+#End Region
+                Case Is = Keys.M
+                    If Me.zrPage.AreAllSelectedObjectsRoles Then
+                        Dim loObject As Object
+                        For Each loObject In Me.zrPage.SelectedObject
+                            loObject.mandatory = Not loObject.mandatory
+                            Call loObject.refresh_role_instance()
+                        Next loObject
+                    End If
+                Case Is = Keys.X
+                'See the PreviewKeyDown Event for this event
+                Case Is = (e.Alt + Keys.X)
+                'See the PreviewKeyDown Event for this event
+                Case Is = Keys.G
+#Region "G-For Ring Constraint"
+                    If Me.zrPage.SelectedObject.Count > 2 Then
+                        '--------------------------------------------------------
+                        'Ring Constraints can only be added to Binary FactTypes
+                        '--------------------------------------------------------
+                        Exit Sub
+                    End If
 
-                        Dim loFactTypeInstancePt As New PointF(lo_point.X - 15, lo_point.Y)
+                    If Me.zrPage.AreAllSelectedObjectsRoles And (Me.zrPage.SelectedObject.Count = 2) Then
 
-                        lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loFactTypeInstancePt, Me.ViewFactTablesToolStripMenuItem.Checked)
+                        If Me.zrPage.are_all_selected_roles_within_the_same_FactType Then
+                            '--------------------------------------------------------
+                            'User has selected the Roles within one binary FactType
+                            '--------------------------------------------------------
+                            lrFactTypeInstance = Me.zrPage.SelectedObject(0).FactType
 
-                        If lrFactTypeInstance.Arity = 1 Then
-                            Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(4, True)
+                            Call Me.zrPage.CreateRingConstraint(lrFactTypeInstance)
+
+                            Me.zrPage.SelectedObject.Clear()
                         End If
+                    Else
+                        Exit Sub
+                    End If
+#End Region
+                Case Is = Keys.O
+                    If Me.zrPage.AreAllSelectedObjectsRoles Then
+                        Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
+                        Dim lrRoleInstance As FBM.RoleInstance
+                        Dim larRoleInstance As New List(Of FBM.RoleInstance)
 
-                        '------------------------------------------------------------------------------------
-                        'Have just created a FactType so if frmToolboxModelDictionary is loaded then
-                        '  reset the zrLoadedModel to Nothing so that when the user moves the mouse over the 
-                        '  Page the ModelDictionary is reloaded.
-                        '------------------------------------------------------------------------------------
-                        Dim child As frmToolboxModelDictionary
-                        If prApplication.RightToolboxForms.FindAll(Function(x) x.Name = frmToolboxModelDictionary.Name).Count >= 1 Then
-                            child = prApplication.RightToolboxForms.Find(Function(x) x.Name = frmToolboxModelDictionary.Name)
-                            child.zrLoadedModel = Nothing
-                        End If
-
-                    ElseIf Me.zrPage.role_and_object_type_selected Then
-                        '------------------------------------------------------------------
-                        'The user has selected a Role and an EntityType/ValueType, so the user 
-                        ' wants to extend the FactType/RoleGroup of the selected Role
-                        ' to include a new Role to the selected EntityType 
-                        '------------------------------------------------------------------
-
-                        '------------------------------------------------------------------------------
-                        'PSEUDOCODE
-                        '  * Get the details of the RoleInstance that has been selected
-                        '  * Get the details of the EntityTypeInstance/ValueTypeInstance that has been selected
-                        '  * Create a new Model-level Role within the Model-level FactType of 
-                        '      the RoleInstance that has been selected, referencing the Model-level
-                        '      EntityType of the selected EntityTypeInstance
-                        '  * Create a new RoleInstance to be attached to the FactTypeInstance
-                        '      of the selected RoleInstance
-                        '  * Inject the new RoleInstance within the appropriate FactTypeInstance                        
-                        '  * Display the new RoleInstance and associated link within the Page.
-                        '------------------------------------------------------------------------------
-                        Dim lrRole As New FBM.Role
-                        Dim lrRoleInstance As New FBM.RoleInstance
-
-                        lrFactType = New FBM.FactType
-                        lrFactTypeInstance = New FBM.FactTypeInstance
-
-                        '--------------------------------------------------------------
-                        ' Get the details of the RoleInstance that has been selected.                        
-                        '--------------------------------------------------------------
-                        lrRoleInstance = Me.zrPage.GetFirstSelectedRoleInstance()
-                        lrFactTypeInstance = lrRoleInstance.FactType
-                        lrFactType = lrFactTypeInstance.FactType
-
-                        '--------------------------------------------------------------
-                        ' Get the details of the EntityTypeInstance/ValueTypeInstance
-                        '   that has been selected.
-                        '--------------------------------------------------------------
-                        Dim lrModelObjectInstance As Object
-                        lrModelObjectInstance = Me.zrPage.GetFirstSelectedModelObject()
-
-                        Me.Cursor = Cursors.WaitCursor
-                        Select Case lrModelObjectInstance.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                lrRole = lrFactType.CreateRole(lrModelObjectInstance.EntityType, True, True)
-                            Case Is = pcenumConceptType.ValueType
-                                lrRole = lrFactType.CreateRole(lrModelObjectInstance.ValueType, True, True)
-                            Case Is = pcenumConceptType.FactType
-                                lrRole = lrFactType.CreateRole(lrModelObjectInstance.FactType, True, True)
-                        End Select
-                        Me.Cursor = Cursors.Default
-
+                        For Each lrRoleInstance In Me.zrPage.SelectedObject
+                            larRoleInstance.AddUnique(lrRoleInstance)
+                        Next
+                        Call Me.CreateInclusiveORConstraint(larRoleInstance, lo_point)
+                    End If
+                Case Is = Keys.Add
+                    '---------------------------------
+                    'Zooming in
+                    '---------------------------------
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < 7 Then
+                        frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
+                        Me.DiagramView.ZoomFactor = frmMain.ToolStripComboBox_zoom.SelectedItem.itemdata
                         Me.Diagram.Invalidate()
                     End If
-                End If
-#End Region
-            Case Is = Keys.M
-                If Me.zrPage.AreAllSelectedObjectsRoles Then
-                    Dim loObject As Object
-                    For Each loObject In Me.zrPage.SelectedObject
-                        loObject.mandatory = Not loObject.mandatory
-                        Call loObject.refresh_role_instance()
-                    Next loObject
-                End If
-            Case Is = Keys.X
-                'See the PreviewKeyDown Event for this event
-            Case Is = (e.Alt + Keys.X)
-                'See the PreviewKeyDown Event for this event
-            Case Is = Keys.G
-#Region "G-For Ring Constraint"
-                If Me.zrPage.SelectedObject.Count > 2 Then
-                    '--------------------------------------------------------
-                    'Ring Constraints can only be added to Binary FactTypes
-                    '--------------------------------------------------------
-                    Exit Sub
-                End If
+                Case Is = Keys.Subtract
+                    '---------------------------------
+                    'Zooming Out
+                    '---------------------------------
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
+                        frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
+                        Me.DiagramView.ZoomFactor = frmMain.ToolStripComboBox_zoom.SelectedItem.itemdata
+                        Me.Diagram.Invalidate()
 
-                If Me.zrPage.AreAllSelectedObjectsRoles And (Me.zrPage.SelectedObject.Count = 2) Then
+                        Dim lrDiagramOverviewForm As frmToolboxOverview
+                        lrDiagramOverviewForm = prApplication.GetToolboxForm(frmToolboxOverview.Name)
 
-                    If Me.zrPage.are_all_selected_roles_within_the_same_FactType Then
-                        '--------------------------------------------------------
-                        'User has selected the Roles within one binary FactType
-                        '--------------------------------------------------------
-                        lrFactTypeInstance = Me.zrPage.SelectedObject(0).FactType
-
-                        Call Me.zrPage.CreateRingConstraint(lrFactTypeInstance)
-
-                        Me.zrPage.SelectedObject.Clear()
+                        If IsSomething(lrDiagramOverviewForm) Then
+                            lrDiagramOverviewForm.SetDocument(Me.DiagramView)
+                        End If
                     End If
-                Else
-                    Exit Sub
-                End If
-#End Region
-            Case Is = Keys.O
-                If Me.zrPage.AreAllSelectedObjectsRoles Then
-                    Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
-                    Dim lrRoleInstance As FBM.RoleInstance
-                    Dim larRoleInstance As New List(Of FBM.RoleInstance)
-
-                    For Each lrRoleInstance In Me.zrPage.SelectedObject
-                        larRoleInstance.AddUnique(lrRoleInstance)
-                    Next
-                    Call Me.CreateInclusiveORConstraint(larRoleInstance, lo_point)
-                End If
-            Case Is = Keys.Add
-                '---------------------------------
-                'Zooming in
-                '---------------------------------
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex < 7 Then
-                    frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
-                    Me.DiagramView.ZoomFactor = frmMain.ToolStripComboBox_zoom.SelectedItem.itemdata
-                    Me.Diagram.Invalidate()
-                End If
-            Case Is = Keys.Subtract
-                '---------------------------------
-                'Zooming Out
-                '---------------------------------
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
-                    frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
-                    Me.DiagramView.ZoomFactor = frmMain.ToolStripComboBox_zoom.SelectedItem.itemdata
-                    Me.Diagram.Invalidate()
-
-                    Dim lrDiagramOverviewForm As frmToolboxOverview
-                    lrDiagramOverviewForm = prApplication.GetToolboxForm(frmToolboxOverview.Name)
-
-                    If IsSomething(lrDiagramOverviewForm) Then
-                        lrDiagramOverviewForm.SetDocument(Me.DiagramView)
-                    End If
-                End If
-            Case Is = (e.Control And Keys.E)
-                Call Me.CreateEntityType()
-            Case Is = Keys.E
-                If e.Alt Then Exit Sub
-                If Me.zrPage.AreAllSelectedObjectsRoles Then
-                    Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
-                    Dim larRoleInstance As New List(Of FBM.RoleInstance)
-                    Dim lrRoleInstance As FBM.RoleInstance
-                    For Each lrRoleInstance In Me.zrPage.SelectedObject
-                        larRoleInstance.AddUnique(lrRoleInstance)
-                    Next
-                    Call Me.CreateEqualityConstraint(larRoleInstance, lo_point)
-                End If
-            Case Is = Keys.F
-                If Me.zrPage.AreAllSelectedObjectsRoles Then
-                    If Me.zrPage.SelectedObject.Count = 1 Then
-                        '----------------------------
-                        'User has selected one Role
-                        '----------------------------
+                Case Is = (e.Control And Keys.E)
+                    Call Me.CreateEntityType()
+                Case Is = Keys.E
+                    If e.Alt Then Exit Sub
+                    If Me.zrPage.AreAllSelectedObjectsRoles Then
+                        Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
+                        Dim larRoleInstance As New List(Of FBM.RoleInstance)
                         Dim lrRoleInstance As FBM.RoleInstance
-                        lrRoleInstance = Me.zrPage.SelectedObject(0)
-                        Call Me.CreateFrequencyConstraint(lrRoleInstance)
+                        For Each lrRoleInstance In Me.zrPage.SelectedObject
+                            larRoleInstance.AddUnique(lrRoleInstance)
+                        Next
+                        Call Me.CreateEqualityConstraint(larRoleInstance, lo_point)
                     End If
-                End If
-            Case Is = (e.Control And Keys.L)
-                Call CreateValueType()
-            Case Is = Keys.ShiftKey
-                If Me.zrPage.InternalUniquenessConstraintsExpanded Then
-                    Call contract_InternalUniquenessConstraints()
-                    Me.zrPage.InternalUniquenessConstraintsExpanded = False
-                Else
-                    Call expand_InternalUniquenessConstraints()
-                    Me.zrPage.InternalUniquenessConstraintsExpanded = True
-                End If
-            Case Is = Keys.N
-                If Me.zrPage.AreAllSelectedObjectsRoles Then
-                    Dim lrRoleInstance As FBM.RoleInstance
-                    Dim larRoleInstance As New List(Of FBM.RoleInstance)
-                    For Each lrRoleInstance In Me.zrPage.SelectedObject
-                        larRoleInstance.Add(lrRoleInstance)
-                    Next
-                    Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
-                    Call Me.CreateExternalUniquenessConstraint(larRoleInstance, lo_point)
-                End If
-            Case Is = Keys.S And Not Keys.Alt 'Subtype
-                If ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.are_all_SelectedObjects_entity_types) Or
-                   ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.areSelectedObjectsEntityTypeAndFactType) Then
+                Case Is = Keys.F
+                    If Me.zrPage.AreAllSelectedObjectsRoles Then
+                        If Me.zrPage.SelectedObject.Count = 1 Then
+                            '----------------------------
+                            'User has selected one Role
+                            '----------------------------
+                            Dim lrRoleInstance As FBM.RoleInstance
+                            lrRoleInstance = Me.zrPage.SelectedObject(0)
+                            Call Me.CreateFrequencyConstraint(lrRoleInstance)
+                        End If
+                    End If
+                Case Is = (e.Control And Keys.L)
+                    Call CreateValueType()
+                Case Is = Keys.ShiftKey
+                    If Me.zrPage.InternalUniquenessConstraintsExpanded Then
+                        Call contract_InternalUniquenessConstraints()
+                        Me.zrPage.InternalUniquenessConstraintsExpanded = False
+                    Else
+                        Call expand_InternalUniquenessConstraints()
+                        Me.zrPage.InternalUniquenessConstraintsExpanded = True
+                    End If
+                Case Is = Keys.N
+                    If Me.zrPage.AreAllSelectedObjectsRoles Then
+                        Dim lrRoleInstance As FBM.RoleInstance
+                        Dim larRoleInstance As New List(Of FBM.RoleInstance)
+                        For Each lrRoleInstance In Me.zrPage.SelectedObject
+                            larRoleInstance.Add(lrRoleInstance)
+                        Next
+                        Dim lo_point As PointF = Me.zrPage.GetMidOfSelectedObjects
+                        Call Me.CreateExternalUniquenessConstraint(larRoleInstance, lo_point)
+                    End If
+                Case Is = Keys.S And Not Keys.Alt 'Subtype
+                    If ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.are_all_SelectedObjects_entity_types) Or
+                       ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.areSelectedObjectsEntityTypeAndFactType) Then
 
-                    Dim lrEntityType_1 As New FBM.EntityTypeInstance
-                    Dim lrEntityType_2 As New FBM.EntityTypeInstance
-                    Dim lrParentModelObject As FBM.ModelObject
+                        Dim lrEntityType_1 As New FBM.EntityTypeInstance
+                        Dim lrEntityType_2 As New FBM.EntityTypeInstance
+                        Dim lrParentModelObject As FBM.ModelObject
 
-                    lrParentModelObject = Me.zrPage.SelectedObject(1)
+                        lrParentModelObject = Me.zrPage.SelectedObject(1)
 
-                    Select Case lrParentModelObject.ConceptType
-                        Case Is = pcenumConceptType.EntityType
-                            lrEntityType_1 = Me.zrPage.SelectedObject(0)
-                            lrEntityType_2 = Me.zrPage.SelectedObject(1)
-
-                            Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
-                        Case Is = pcenumConceptType.FactType
-
-                            lrFactTypeInstance = New FBM.FactTypeInstance
-                            lrFactTypeInstance = Me.zrPage.SelectedObject(1)
-
-                            If lrFactTypeInstance.IsObjectified Then
+                        Select Case lrParentModelObject.ConceptType
+                            Case Is = pcenumConceptType.EntityType
                                 lrEntityType_1 = Me.zrPage.SelectedObject(0)
-                                lrEntityType_2 = lrFactTypeInstance.ObjectifyingEntityType
+                                lrEntityType_2 = Me.zrPage.SelectedObject(1)
 
                                 Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
-                            Else
-                                '--------------------------------------------------------------------------------------------------------
-                                'Ignore, can't create a Subtype Constraint to a Parent that is not an EntityType or ObjectifiedFactType
-                                '--------------------------------------------------------------------------------------------------------
-                            End If
+                            Case Is = pcenumConceptType.FactType
 
-                    End Select
+                                lrFactTypeInstance = New FBM.FactTypeInstance
+                                lrFactTypeInstance = Me.zrPage.SelectedObject(1)
+
+                                If lrFactTypeInstance.IsObjectified Then
+                                    lrEntityType_1 = Me.zrPage.SelectedObject(0)
+                                    lrEntityType_2 = lrFactTypeInstance.ObjectifyingEntityType
+
+                                    Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
+                                Else
+                                    '--------------------------------------------------------------------------------------------------------
+                                    'Ignore, can't create a Subtype Constraint to a Parent that is not an EntityType or ObjectifiedFactType
+                                    '--------------------------------------------------------------------------------------------------------
+                                End If
+
+                        End Select
 
 
-                End If
-            Case Is = Keys.T
-                '-----------------------------------
-                'TotalInternalUniquenessConstraint
-                '-----------------------------------
-                If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
-                If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.FactType Then
-                    lrFactTypeInstance = CType(Me.zrPage.SelectedObject(0), FBM.FactTypeInstance)
+                    End If
+                Case Is = Keys.T
+                    '-----------------------------------
+                    'TotalInternalUniquenessConstraint
+                    '-----------------------------------
+                    If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+                    If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.FactType Then
+                        lrFactTypeInstance = CType(Me.zrPage.SelectedObject(0), FBM.FactTypeInstance)
 
-                    Call Me.zrPage.SelectedObject.Clear()
+                        Call Me.zrPage.SelectedObject.Clear()
 
-                    Dim larRole As New List(Of FBM.Role)
-                    Dim lrRoleInstance As New FBM.RoleInstance
+                        Dim larRole As New List(Of FBM.Role)
+                        Dim lrRoleInstance As New FBM.RoleInstance
 
-                    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                        larRole.Add(lrRoleInstance.Role)
-                    Next
+                        For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+                            larRole.Add(lrRoleInstance.Role)
+                        Next
 
-                    Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True)
+                        Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True)
 
-                    Call lrFactTypeInstance.FactType.CreateInternalUniquenessConstraint(larRole)
-                End If
-        End Select
+                        Call lrFactTypeInstance.FactType.CreateInternalUniquenessConstraint(larRole)
+                    End If
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

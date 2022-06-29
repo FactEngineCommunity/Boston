@@ -24,7 +24,7 @@ Public Enum pcenumCMMLRelations
         CoreProcessIsOfCoreBPMNProcessType
         CoreProcessIsOfCoreBPMNActivityType
         CoreProcessHasCoreBPMNActivityMarker
-        CoreProcessIsOfCoreBPMNProcessTaskType
+        CoreProcessIsOfCoreBPMNActivityTaskType
         CoreProcessIsOfCoreBPMNConversationType
         CoreProcessIsOfCoreBPMNEventPosition
         CoreProcessIsOfCoreBPMNEventType

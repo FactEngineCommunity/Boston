@@ -6185,6 +6185,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
 #Region "2.3"
             If Me.CoreVersionNumber = "2.3" Then
+                'NB Check EnterpriseExplorer createModel as well. Line 1828
                 '#Region "Core BPMN"
                 '                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
                 '                If lrCorePage Is Nothing Then

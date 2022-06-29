@@ -209,7 +209,6 @@ Namespace FBM
         Public Sub addCMMLStopState(ByRef arStopState As FBM.STM.State)
 
             Try
-
                 Dim lsSQLQuery As String
                 Dim lrFact As FBM.Fact
 
@@ -239,7 +238,7 @@ Namespace FBM
             Try
                 Dim lsSQLQuery As String
 
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNProcessTaskType.ToString
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNActivityTaskType.ToString
                 lsSQLQuery &= " (Process, ActivityTaskType)"
                 lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNActivityTaskType.ToString & ")"
 
@@ -256,6 +255,29 @@ Namespace FBM
 
         End Sub
 
+        Public Sub addCMMLProcessProcessType(ByRef arCMMLProcess As CMML.Process, aiBPMNProcessType As pcenumBPMNProcessType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNProcessType.ToString
+                lsSQLQuery &= " (Process, ProcessType)"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNProcessType.ToString & "')"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
         Public Sub addCMMLProcessActivityType(ByRef arCMMLProcess As CMML.Process, aiBPMNActivityType As pcenumBPMNActivityType)
 
             Try
@@ -263,7 +285,7 @@ Namespace FBM
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNActivityType.ToString
                 lsSQLQuery &= " (Process, ActivityType)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNActivityType.ToString & ")"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNActivityType.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -285,7 +307,7 @@ Namespace FBM
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessHasCoreBPMNActivityMarker.ToString
                 lsSQLQuery &= " (Process, ActivityMarker)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNActivityMarker.ToString & ")"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNActivityMarker.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -300,14 +322,14 @@ Namespace FBM
 
         End Sub
 
-        Public Sub addCMMLProcessEventType(ByRef arCMMLProcess As CMML.Process, aiBPMNActivityType As pcenumBPMNEventType)
+        Public Sub addCMMLProcessEventType(ByRef arCMMLProcess As CMML.Process, aiBPMNEventType As pcenumBPMNEventType)
 
             Try
                 Dim lsSQLQuery As String
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventType.ToString
-                lsSQLQuery &= " (Process, ActivityType)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNActivityType.ToString & ")"
+                lsSQLQuery &= " (Process, EventType)"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNEventType.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -329,7 +351,7 @@ Namespace FBM
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNConversationType.ToString
                 lsSQLQuery &= " (Process, ConversationType)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNConversationType.ToString & ")"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNConversationType.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -351,7 +373,7 @@ Namespace FBM
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventPosition.ToString
                 lsSQLQuery &= " (Process, EventPosition)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNEventPosition.ToString & ")"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNEventPosition.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -373,7 +395,7 @@ Namespace FBM
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventSubType.ToString
                 lsSQLQuery &= " (Process, EventSubType)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNEventSubType.ToString & ")"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNEventSubType.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -395,7 +417,7 @@ Namespace FBM
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNGatewayType.ToString
                 lsSQLQuery &= " (Process, GatewayType)"
-                lsSQLQuery &= " VALUES (" & arCMMLProcess.Id & "," & aiBPMNGatewayType.ToString & ")"
+                lsSQLQuery &= " VALUES ('" & arCMMLProcess.Id & "','" & aiBPMNGatewayType.ToString & "')"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -1608,6 +1630,11 @@ Namespace FBM
 
                 Me.ORMQL.ProcessORMQLStatement(lsSQLString)
 
+
+                lsSQLString = "REMOVE INSTANCE '" & arCMMLProcess.Id & "' FROM CoreElement"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLString)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2093,6 +2120,185 @@ Namespace FBM
 
         End Sub
 
+        Public Sub updateCMMLProcessActivityTaskType(ByRef arCMMLProcess As CMML.Process, aiBPMNActivityTaskType As pcenumBPMNActivityTaskType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNActivityTaskType.ToString
+                lsSQLQuery &= " SET ActivityTaskType = '" & aiBPMNActivityTaskType.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+        Public Sub updateCMMLProcessActivityType(ByRef arCMMLProcess As CMML.Process, aiBPMNActivityType As pcenumBPMNActivityType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNActivityType.ToString
+                lsSQLQuery &= " SET ActivityType = '" & aiBPMNActivityType.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub updateCMMLProcessActivityMarker(ByRef arCMMLProcess As CMML.Process, aiBPMNActivityMarker As pcenumBPMNActivityMarker)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessHasCoreBPMNActivityMarker.ToString
+                lsSQLQuery &= " SET ActivityMarker = '" & aiBPMNActivityMarker.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub updateCMMLProcessEventType(ByRef arCMMLProcess As CMML.Process, aiBPMNEventType As pcenumBPMNEventType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventType.ToString
+                lsSQLQuery &= " SET ActivityType = '" & aiBPMNEventType.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub updateCMMLProcessConversationType(ByRef arCMMLProcess As CMML.Process, aiBPMNConversationType As pcenumBPMNConversationType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNConversationType.ToString
+                lsSQLQuery &= " SET ConversationType = '" & aiBPMNConversationType.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub updateCMMLProcessEventPosition(ByRef arCMMLProcess As CMML.Process, aiBPMNEventPosition As pcenumBPMNEventPosition)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventPosition.ToString
+                lsSQLQuery &= " SET EventPosition = '" & aiBPMNEventPosition.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub updateCMMLProcessEventSubType(ByRef arCMMLProcess As CMML.Process, aiBPMNEventSubType As pcenumBPMNEventSubType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventSubType.ToString
+                lsSQLQuery &= " SET EventSubType = '" & aiBPMNEventSubType.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub updateCMMLProcessGatewayType(ByRef arCMMLProcess As CMML.Process, aiBPMNGatewayType As pcenumBPMNGatewayType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNGatewayType.ToString
+                lsSQLQuery &= " SET GatewayType = '" & aiBPMNGatewayType.ToString & "'"
+                lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+
         Public Sub PopulateCMMLStructureFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Try
@@ -2190,6 +2396,86 @@ Namespace FBM
                     End If
 #End Region
 
+#Region "ActivityTaskType"
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNActivityTaskType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.ActivityTaskType = CType([Enum].Parse(GetType(pcenumBPMNActivityTaskType), Trim(lrORMRecordset2("ActivityTaskType").Data)), pcenumBPMNActivityTaskType)
+                    End If
+#End Region
+
+#Region "ActivityType"
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNActivityType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.ActivityType = CType([Enum].Parse(GetType(pcenumBPMNActivityType), Trim(lrORMRecordset2("ActivityType").Data)), pcenumBPMNActivityType)
+                    End If
+#End Region
+
+#Region "ActivityMarker"
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessHasCoreBPMNActivityMarker.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.ActivityMarker = CType([Enum].Parse(GetType(pcenumBPMNActivityMarker), Trim(lrORMRecordset2("ActivityMarker").Data)), pcenumBPMNActivityMarker)
+                    End If
+#End Region
+
+#Region "EventType"
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.ActivityType = CType([Enum].Parse(GetType(pcenumBPMNEventType), Trim(lrORMRecordset2("EventType").Data)), pcenumBPMNEventType)
+                    End If
+#End Region
+
+#Region "ConversationType"
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNConversationType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.ConversationType = CType([Enum].Parse(GetType(pcenumBPMNConversationType), Trim(lrORMRecordset2("ConversationType").Data)), pcenumBPMNConversationType)
+                    End If
+#End Region
+
+#Region "EventPosition"
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventPosition.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.EventPosition = CType([Enum].Parse(GetType(pcenumBPMNEventPosition), Trim(lrORMRecordset2("EventPosition").Data)), pcenumBPMNEventPosition)
+                    End If
+#End Region
+
+#Region "EventSubType"
+
+                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventSubType.ToString
+                    lsSQLQuery &= " WHERE Process = '" & lrORMRecordset("Element").Data & "'"
+
+                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If Not lrORMRecordset2.EOF Then
+                        lrProcess.EventSubType = CType([Enum].Parse(GetType(pcenumBPMNEventSubType), Trim(lrORMRecordset2("EventSubType").Data)), pcenumBPMNEventSubType)
+                    End If
+#End Region
+
+
+
 #Region "Gateway Type"
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNGatewayType.ToString
@@ -2200,7 +2486,6 @@ Namespace FBM
                     If Not lrORMRecordset2.EOF Then
                         lrProcess.GatewayType = CType([Enum].Parse(GetType(pcenumBPMNGatewayType), Trim(lrORMRecordset2("GatewayType").Data)), pcenumBPMNGatewayType)
                     End If
-
 #End Region
 
                     Me.UML.Process.Add(lrProcess)

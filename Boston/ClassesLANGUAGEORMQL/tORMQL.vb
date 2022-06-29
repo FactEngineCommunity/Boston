@@ -1692,6 +1692,11 @@ Namespace ORMQL
                 For Each lsColumnName In lrinsertStatement.COLUMNNAMESTR
                     'lrRole.Name = lsColumnName
                     lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsColumnName) 'AddressOf lrRole.EqualsByName)
+
+                    If lrRole Is Nothing Then
+                        Throw New Exception("No Role found for RoleName: '" & lsColumnName & "'")
+                    End If
+
                     Dim lrConcept As FBM.Concept = New FBM.Concept(Trim(lrinsertStatement.VALUE(liInd).ToString))
 
                     '----------------------------------------------------------------------------------------
