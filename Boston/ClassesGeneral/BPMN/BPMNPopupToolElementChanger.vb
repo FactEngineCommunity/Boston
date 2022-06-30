@@ -2,7 +2,7 @@
 
 Public Class BPMNPopupToolElementChanger
 
-    Public Type As pcenumBPMNElementType
+    Public Type As pcenumBPMNProcessType
     Public Result As String
 
     Public mrCMMLModel As CMML.Model
@@ -24,8 +24,10 @@ Public Class BPMNPopupToolElementChanger
 
         Try
             Select Case Me.Type
-                Case Is = pcenumBPMNElementType.Activity
+                Case Is = pcenumBPMNProcessType.Activity
                     Call Me.SetupForBPMNActivity(asFilter)
+                Case Is = pcenumBPMNProcessType.Gateway
+                    Call Me.SetupForBPMNGateway(asFilter)
             End Select
 
         Catch ex As Exception
@@ -105,6 +107,60 @@ SkipItem:
 
     End Sub
 
+    Private Sub SetupForBPMNGateway(Optional asFilter As String = Nothing)
+
+        Try
+            Dim lasList() As String = {"Parallel Gateway",
+                                       "Inclusive Gateway",
+                                       "Complex Gateway",
+                                       "Event Based Gateway",
+                                       "Exclusive Gateway"
+                                        }
+
+            Me.ListBox.Items.Clear()
+
+            With Me.ListBox
+                'Fill the list-box
+                .UseCustomTabOffsets = True
+
+                With .Items
+                    For Each lsListItem In lasList
+                        If asFilter IsNot Nothing Then
+                            If lsListItem.IndexOf(asFilter, StringComparison.CurrentCultureIgnoreCase) = -1 Then
+                                GoTo SkipItem
+                            End If
+                        End If
+                        Select Case lsListItem
+                            Case Is = "Parallel Gateway"
+                                .Add("Parallel Gateway", My.Resources.BPMNElementDecorations.Gateway_Parallel,,,)
+                            Case Is = "Inclusive Gateway"
+                                .Add("Inclusive Gateway", My.Resources.BPMNElementDecorations.Gateway_Inclusive,,,)
+                            Case Is = "Complex Gateway"
+                                .Add("Complex Gateway", My.Resources.BPMNElementDecorations.Gateway_Complex,,,)
+                            Case Is = "Event Based Gateway"
+                                .Add("Event Based Gateway", My.Resources.BPMNElementDecorations.Gateway_EventBased,,,)
+                            Case Is = "Exclusive Gateway"
+                                .Add("Exclusive Gateway", My.Resources.BPMNElementDecorations.Gateway_Exclusive,,,)
+                        End Select
+SkipItem:
+                    Next
+
+                End With
+
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
     Private Sub ListBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox.SelectedIndexChanged
 
         Try
@@ -123,6 +179,16 @@ SkipItem:
                     Me.Result = "ChangeElementActivityTaskTypeScriptTask"
                 Case Is = "User Task"
                     Me.Result = "ChangeElementActivityTaskTypeUserTask"
+                Case Is = "Parallel Gateway"
+                    Me.Result = "ChangeElementGatewayTypeParallel"
+                Case Is = "Inclusive Gateway"
+                    Me.Result = "ChangeElementGatewayTypeInclusive"
+                Case Is = "Complex Gateway"
+                    Me.Result = "ChangeElementGatewayTypeComplex"
+                Case Is = "Event Based Gateway"
+                    Me.Result = "ChangeElementGatewayTypeEventBased"
+                Case Is = "Exclusive Gateway"
+                    Me.Result = "ChangeElementGatewayTypeExlusive"
             End Select
 
             Me.moDiagram.Nodes.Remove(Me.Node)

@@ -2,7 +2,7 @@
 
 Public Class BPMNPopupToolSelector
 
-    Public Type As pcenumBPMNElementType
+    Public Type As pcenumBPMNProcessType
     Public Result As String
 
     Public mrCMMLModel As CMML.Model
@@ -25,7 +25,7 @@ Public Class BPMNPopupToolSelector
 
         Try
             Select Case Me.Type
-                Case Is = pcenumBPMNElementType.Activity
+                Case Is = pcenumBPMNProcessType.Activity, pcenumBPMNProcessType.Gateway
                     Call Me.SetupForBPMNActivity()
             End Select
 
@@ -116,9 +116,11 @@ Public Class BPMNPopupToolSelector
                     'GoTo SkipPopup
                     Dim lrPopupToolElementChanger = New BPMNPopupToolElementChanger()
                     lrPopupToolElementChanger.mrCMMLModel = Me.mrCMMLModel
+                    lrPopupToolElementChanger.Type = Me.Type
                     Dim liX, liY As Integer
                     Select Case Me.Type
-                        Case Is = pcenumBPMNElementType.Activity
+                        Case Is = pcenumBPMNProcessType.Activity,
+                                  pcenumBPMNProcessType.Gateway
                             liX = Me.Node.Bounds.X
                             liY = Me.Node.Bounds.Y + Me.Node.Bounds.Height + 2
                     End Select
@@ -126,7 +128,7 @@ Public Class BPMNPopupToolSelector
                     lrPopupToolElementChanger.mrPage = Me.mrPage
                     lrPopupToolElementChanger.Tag = lrPopupToolElementChanger
                     If Me.mrPage.Form.mrPopupToolElementChanger IsNot Nothing Then
-                        Me.mrPage.Form.Diagram.Nodes.Remove(Me.mrPage.Form.mrPopupToolElementChanger.Node)
+                        Me.mrPage.Diagram.Nodes.Remove(Me.mrPage.Form.mrPopupToolElementChanger.Node)
                     End If
                     Me.mrPage.Form.mrPopupToolElementChanger = lrPopupToolElementChanger
                     Dim lrControlNode As New MindFusion.Diagramming.WinForms.ControlNode(Me.mrPage.DiagramView, lrPopupToolElementChanger)

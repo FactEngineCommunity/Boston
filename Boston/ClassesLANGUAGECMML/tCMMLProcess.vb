@@ -13,6 +13,8 @@ Namespace CMML
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
 
+        Public ProcessType As pcenumBPMNProcessType
+
         Public Id As String
 
         ''' <summary>
@@ -21,8 +23,6 @@ Namespace CMML
         Public Text As String
 
         Public Name As String
-
-        Public ProcessType As pcenumBPMNProcessType
 
 #Region "Activity - BPMN"
         Public ActivityType As pcenumBPMNActivityType

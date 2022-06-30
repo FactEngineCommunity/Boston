@@ -2,17 +2,19 @@
 
     Public Enum pcenumBPMNProcessType
         Activity
-        [Event]
-        Gateway
-    End Enum
-
-    Public Enum pcenumBPMNElementType
-        Activity
         Flow
         Conversation
         [Event]
         Gateway
     End Enum
+
+    'Public Enum pcenumBPMNElementType
+    '    Activity
+    '    Flow
+    '    Conversation
+    '    [Event]
+    '    Gateway
+    'End Enum
 
 #Region "Activity - BPMN"
     Public Enum pcenumBPMNActivityType
