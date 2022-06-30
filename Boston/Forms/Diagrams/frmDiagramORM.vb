@@ -2721,9 +2721,14 @@ Public Class frmDiagramORM
 
                         Dim larRole As New List(Of FBM.Role)
                         Dim lrRoleConstraintRoleInd As FBM.RoleConstraintRole
-                        For Each lrRoleConstraintRoleInd In lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole
-                            larRole.Add(lrRoleConstraintRoleInd.Role)
-                        Next
+                        If lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count > 1 Then
+                            larRole.Add(lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath(lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count - 1))
+                        Else
+                            For Each lrRoleConstraintRoleInd In lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole
+                                larRole.Add(lrRoleConstraintRoleInd.Role)
+                            Next
+                        End If
+
                         larRole.Add(lrRoleInstance.Role)
 
                         Dim liJoinPathError As pcenumJoinPathError = pcenumJoinPathError.None

@@ -16,6 +16,8 @@ Namespace BPMN
 
         Public Shadows WithEvents CMMLProcess As CMML.Process
 
+        Public TaskTypeShape As ShapeNode
+
         <XmlIgnore()>
         <CategoryAttribute("Process"),
         Browsable(True),
@@ -188,7 +190,7 @@ Namespace BPMN
                 loDroppedNode.Font = New Font("Arial", 7)
                 loDroppedNode.Pen.Width = 5
                 Me.Shape = loDroppedNode
-                Me.Shape.BPMNElement = Me  '20220624-VM-New
+                Me.Shape.BPMNElement = Me  '20220624-VM-New                
 
                 Select Case Me.Page.Language
                     Case Is = pcenumLanguage.BPMNCollaborationDiagram
@@ -261,6 +263,18 @@ Namespace BPMN
                                 loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
                                 loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.Black)
                                 loDroppedNode.Pen.Width = 0.5
+
+                                Dim loTaskTypeNode = New BPMN.ShapeNode 'Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 20, 15)                
+                                loTaskTypeNode.SetRect(New RectangleF(0, 0, 4, 4), False) '20220624-VM-New
+                                loTaskTypeNode.Move(Me.X + 1, Me.Y + 1)
+                                loTaskTypeNode.Pen = New MindFusion.Drawing.Pen(Color.White, 0.0002)
+                                loTaskTypeNode.Transparent = True
+                                loTaskTypeNode.Visible = False
+                                loTaskTypeNode.Locked = True
+                                Me.Page.Diagram.Nodes.Add(loTaskTypeNode)
+                                loTaskTypeNode.AttachTo(loDroppedNode, AttachToNode.TopCenter)
+                                loTaskTypeNode.ImageAlign = MindFusion.Drawing.ImageAlign.Fit
+                                Me.TaskTypeShape = loTaskTypeNode
 #End Region
                         End Select
 

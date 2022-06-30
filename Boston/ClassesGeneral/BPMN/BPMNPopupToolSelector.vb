@@ -11,6 +11,7 @@ Public Class BPMNPopupToolSelector
 
     Public mrPage As FBM.Page
     Public Node As MindFusion.Diagramming.WinForms.ControlNode
+    Public AttachedToNode As MindFusion.Diagramming.ShapeNode
 
     Private Delegate Sub MyDelegate(ByRef arPage As FBM.Page, ByRef asInstructionType As String)
 
@@ -109,10 +110,47 @@ Public Class BPMNPopupToolSelector
         Try
             Me.Result = CType(sender, Button).Tag
 
-            Me.moDiagram.Nodes.Remove(Me.Node)
+            If Me.Result = "ChangeType" Then
+#Region "Element Changer"
+                Try
+                    'GoTo SkipPopup
+                    Dim lrPopupToolElementChanger = New BPMNPopupToolElementChanger()
+                    lrPopupToolElementChanger.mrCMMLModel = Me.mrCMMLModel
+                    Dim liX, liY As Integer
+                    Select Case Me.Type
+                        Case Is = pcenumBPMNElementType.Activity
+                            liX = Me.Node.Bounds.X
+                            liY = Me.Node.Bounds.Y + Me.Node.Bounds.Height + 2
+                    End Select
+                    lrPopupToolElementChanger.moDiagram = Me.moDiagram
+                    lrPopupToolElementChanger.mrPage = Me.mrPage
+                    lrPopupToolElementChanger.Tag = lrPopupToolElementChanger
+                    If Me.mrPage.Form.mrPopupToolElementChanger IsNot Nothing Then
+                        Me.mrPage.Form.Diagram.Nodes.Remove(Me.mrPage.Form.mrPopupToolElementChanger.Node)
+                    End If
+                    Me.mrPage.Form.mrPopupToolElementChanger = lrPopupToolElementChanger
+                    Dim lrControlNode As New MindFusion.Diagramming.WinForms.ControlNode(Me.mrPage.DiagramView, lrPopupToolElementChanger)
+                    lrPopupToolElementChanger.Node = lrControlNode
+                    Me.mrPage.Diagram.Nodes.Add(lrControlNode)
+                    lrControlNode.AttachTo(Me.AttachedToNode, MindFusion.Diagramming.AttachToNode.TopCenter)
+                    Call lrControlNode.Move(liX, liY)
+SkipPopup:
 
-            Dim delegate1 As MyDelegate = New MyDelegate(AddressOf frmDiagramBPMNCollaboration.ProcessPopupToolSelector)
-            delegate1(Me.mrPage, Me.Result)
+                Catch ex As Exception
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End Try
+#End Region
+            Else
+                Me.moDiagram.Nodes.Remove(Me.Node)
+
+                Dim delegate1 As MyDelegate = New MyDelegate(AddressOf frmDiagramBPMNCollaboration.ProcessPopupToolSelector)
+                delegate1(Me.mrPage, Me.Result)
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

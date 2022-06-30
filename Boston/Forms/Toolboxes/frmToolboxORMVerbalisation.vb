@@ -601,7 +601,6 @@ Public Class frmToolboxORMVerbalisation
             lrVerbaliser.HTW.WriteBreak()
 
             Dim liInd As Integer = 0
-            Dim lrModelObject As FBM.ModelObject
             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
             Dim lrCommonModelObject As FBM.ModelObject = Nothing

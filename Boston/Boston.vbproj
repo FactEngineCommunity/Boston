@@ -133,6 +133,9 @@
       <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ExtListAndCombo">
+      <HintPath>..\Dependencies\ExtListAndCombo.dll</HintPath>
+    </Reference>
     <Reference Include="Fastenshtein, Version=1.0.0.7, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fastenshtein.1.0.0.7\lib\net452\Fastenshtein.dll</HintPath>
     </Reference>
@@ -468,6 +471,12 @@
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ClassesGeneral\BPMN\BPMNPopupToolElementChanger.Designer.vb">
+      <DependentUpon>BPMNPopupToolElementChanger.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\BPMN\BPMNPopupToolElementChanger.vb">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\BPMN\BPMNPopupToolSelector.Designer.vb">
       <DependentUpon>BPMNPopupToolSelector.vb</DependentUpon>
@@ -1952,6 +1961,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BPMNToolboxShapes.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\BPMNElementDecorations.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BPMNElementDecorations.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Viev.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1966,6 +1980,9 @@
     <Compile Include="Thinfinity.VirtualUI.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ClassesGeneral\BPMN\BPMNPopupToolElementChanger.resx">
+      <DependentUpon>BPMNPopupToolElementChanger.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\BPMN\BPMNPopupToolSelector.resx">
       <DependentUpon>BPMNPopupToolSelector.vb</DependentUpon>
     </EmbeddedResource>
@@ -2439,6 +2456,11 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>BPMNToolboxShapes.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\BPMNElementDecorations.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BPMNElementDecorations.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Viev.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -3212,6 +3234,16 @@
     <None Include="Images\BPMN\ToolboxShapes\SubProcess.png" />
     <None Include="Images\BPMN\ToolboxShapes\Task.png" />
     <None Include="Images\BPMN\ToolboxShapes\Event-Intermediate-Boundary.png" />
+    <None Include="Images\BPMN\ElementDecorations\CallActivity-25x25 - Copy.png" />
+    <None Include="Images\BPMN\ElementDecorations\Task-25x25.png" />
+    <None Include="Images\BPMN\ElementDecorations\TaskType-Manual.png" />
+    <None Include="Images\BPMN\ElementDecorations\TaskType-Receive.png" />
+    <None Include="Images\BPMN\ElementDecorations\TaskType-Script.png" />
+    <None Include="Images\BPMN\ElementDecorations\TaskType-Send.png" />
+    <None Include="Images\BPMN\ElementDecorations\TaskType-Service.png" />
+    <None Include="Images\BPMN\ElementDecorations\TaskType-User.png" />
+    <None Include="Images\BPMN\ElementDecorations\CallActivity-25x25.png" />
+    <None Include="Images\BPMN\ElementDecorations\BusinessRule-25x25.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />

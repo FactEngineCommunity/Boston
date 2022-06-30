@@ -24,6 +24,8 @@ Namespace BPMN
                 liCentreX = Me.Bounds.X + (Me.Bounds.Width / 2)
                 liCentreY = (Me.Bounds.Y + (Me.Bounds.Height / 2))
 
+                If Me.BPMNElement Is Nothing Then GoTo SkipLinkCreating
+
                 If Me.BPMNElement.IsCreatingLink Then
 
                     liX = Math.Abs(liCentreX - pt2.X)
@@ -58,6 +60,7 @@ Namespace BPMN
                     graphics.DrawLine(lrPen, pt1, loMousePoint)
 
                 End If
+SkipLinkCreating:
 
             Catch ex As Exception
                 Dim lsMessage1 As String
