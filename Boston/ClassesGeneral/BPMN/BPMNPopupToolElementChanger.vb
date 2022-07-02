@@ -179,7 +179,7 @@ SkipItem:
                             "Event Start Multiple Subprocess Interupting",
                             "Event Start None Standard",
                             "Event Start Parallel Multiple Standard",
-                            "Event Start ParallelMultiple Subprocess Interupting",
+                            "Event Start Parallel Multiple Subprocess Interupting",
                             "Event Start Signal Standard",
                             "Event Start Timer Standard"
                                         }
