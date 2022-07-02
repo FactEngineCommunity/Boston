@@ -2030,17 +2030,29 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Error)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
+
                 Case Is = "ChangeElementEventIntermediateEscalationBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Escalation_BoundaryInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Escalation)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
+
                 Case Is = "ChangeElementEventIntermediateEscalationBoundaryNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Escalation_BoundaryNonInterupting
-                    lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
+                    'lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Escalation)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryNonInterupting)
 
                 Case Is = "ChangeElementEventIntermediateEscalationSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2048,11 +2060,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Escalation)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
+
                 Case Is = "ChangeElementEventIntermediateEscalationSubprocessNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Escalation_SubprocessNonInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Escalation)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessNonInterupting)
 
                 Case Is = "ChangeElementEventIntermediateEscalationThrowing"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2060,11 +2080,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Escalation)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Throwing)
+
                 Case Is = "ChangeElementEventIntermediateLinkCatching"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Link_Catching
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Link)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Catching)
 
                 Case Is = "ChangeElementEventIntermediateLinkThrowing"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2072,11 +2100,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Link)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Throwing)
+
                 Case Is = "ChangeElementEventIntermediateMessageBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Message_BoundaryInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
 
                 Case Is = "ChangeElementEventIntermediateMessageBoundaryNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2084,11 +2120,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryNonInterupting)
+
                 Case Is = "ChangeElementEventIntermediateMessageCatching"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Message_Catching
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Catching)
 
                 Case Is = "ChangeElementEventIntermediateMessageSubprocessNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2096,11 +2140,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessNonInterupting)
+
                 Case Is = "ChangeElementEventIntermediateMessageThrowing"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Message_Throwing
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Throwing)
 
                 Case Is = "ChangeElementEventIntermediateMultipleBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2108,11 +2160,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
+
                 Case Is = "ChangeElementEventIntermediateMultipleBoundaryNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Multiple_BoundaryNonInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryNonInterupting)
 
                 Case Is = "ChangeElementEventIntermediateMultipleCatching"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2120,11 +2180,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Catching)
+
                 Case Is = "ChangeElementEventIntermediateMultipleSubprocessNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Multiple_SubprocessNonInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessNonInterupting)
 
                 Case Is = "ChangeElementEventIntermediateMultipleThrowing"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2132,17 +2200,29 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Throwing)
+
                 Case Is = "ChangeElementEventIntermediateNoneThrowing"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_None_Throwing
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
-                Case Is = "ChangeElementEventIntermediateParallelSubprocessNonInterupting"
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.None)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Throwing)
+
+                Case Is = "ChangeElementEventIntermediateParallelMultipleSubprocessNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
-                    lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Parallel_SubprocessNonInterupting
+                    lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_ParallelMultiple_SubprocessNonInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.ParallelMultiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessNonInterupting)
 
                 Case Is = "ChangeElementEventIntermediateParallelMultipleBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2150,11 +2230,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.ParallelMultiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
+
                 Case Is = "ChangeElementEventIntermediateParallelMultipleBoundaryNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_ParallelMultiple_BoundaryNonInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.ParallelMultiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryNonInterupting)
 
                 Case Is = "ChangeElementEventIntermediateParallelMultipleCatching"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2162,11 +2250,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.ParallelMultiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Catching)
+
                 Case Is = "ChangeElementEventIntermediateSignalBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Signal_BoundaryInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
 
                 Case Is = "ChangeElementEventIntermediateSignalBoundaryNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2174,11 +2270,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryNonInterupting)
+
                 Case Is = "ChangeElementEventIntermediateSignalCatching"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Signal_Catching
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Catching)
 
                 Case Is = "ChangeElementEventIntermediateSignalSubprocessNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2186,11 +2290,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessNonInterupting)
+
                 Case Is = "ChangeElementEventIntermediateSignalSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Signal_SubprocessInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
 
                 Case Is = "ChangeElementEventIntermediateSignalThrowing"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2198,11 +2310,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Throwing)
+
                 Case Is = "ChangeElementEventIntermediateTimerBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Timer_BoundaryInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
 
                 Case Is = "ChangeElementEventIntermediateTimerBoundaryNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2210,11 +2330,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryNonInterupting)
+
                 Case Is = "ChangeElementEventIntermediateTimerSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Timer_SubprocessInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
 
                 Case Is = "ChangeElementEventIntermediateTimerSubprocessNonInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2222,11 +2350,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessNonInterupting)
+
                 Case Is = "ChangeElementEventIntermediateTimerBoundaryInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Intermediate_Timer_BoundaryInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.BoundaryInterupting)
 
                 Case Is = "ChangeElementEventIntermediateTimerCatching"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2234,11 +2370,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Intermediate)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Catching)
+
                 Case Is = "ChangeElementEventStartConditionalStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Start_Conditional_Standard
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Conditional)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
 
                 Case Is = "ChangeElementEventStartConditionalSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2246,11 +2390,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Conditional)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
+
                 Case Is = "ChangeElementEventStartMessageStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Start_Message_Standard
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
 
                 Case Is = "ChangeElementEventStartMessageSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2258,11 +2410,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Message)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
+
                 Case Is = "ChangeElementEventStartMultipleStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Start_Multiple_Standard
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
 
                 Case Is = "ChangeElementEventStartMultipleSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2270,11 +2430,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Multiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
+
                 Case Is = "ChangeElementEventStartNoneStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Start_None_Standard
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.None)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
 
                 Case Is = "ChangeElementEventStartParallelMultipleStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2282,11 +2450,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.ParallelMultiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
+
                 Case Is = "ChangeElementEventStartParallelMultipleSubprocessInterupting"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Start_ParallelMultiple_SubprocessInterupting
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.ParallelMultiple)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.SubprocessInterupting)
 
                 Case Is = "ChangeElementEventStartSignalStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
@@ -2294,11 +2470,19 @@ SkipTag:
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
 
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Signal)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
+
                 Case Is = "ChangeElementEventStartTimerStandard"
                     Dim lrBPMNProcessSelected As BPMN.Process = arPage.SelectedObject(0)
                     lrBPMNProcessSelected.Shape.Image = My.Resources.BPMN.Event_Start_Timer_Standard
                     lrBPMNProcessSelected.Shape.ImageAlign = ImageAlign.Fit
                     lrBPMNProcessSelected.Shape.Visible = True
+
+                    lrBPMNProcessSelected.CMMLProcess.SetEventPosition(pcenumBPMNEventPosition.Start)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventType(pcenumBPMNEventType.Timer)
+                    lrBPMNProcessSelected.CMMLProcess.SetEventSubType(pcenumBPMNEventSubType.Standard)
 #End Region
                 Case Is = "Bin"
 #Region "Bin"

@@ -437,16 +437,6 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Parallel_SubprocessNonInterupting() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Parallel_SubprocessNonInterupting", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
         Friend Shared ReadOnly Property Event_Intermediate_ParallelMultiple_BoundaryInterupting() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_ParallelMultiple_BoundaryInterupting", resourceCulture)
@@ -470,6 +460,16 @@ Namespace My.Resources
         Friend Shared ReadOnly Property Event_Intermediate_ParallelMultiple_Catching() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_ParallelMultiple_Catching", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend Shared ReadOnly Property Event_Intermediate_ParallelMultiple_SubprocessNonInterupting() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_ParallelMultiple_SubprocessNonInterupting", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

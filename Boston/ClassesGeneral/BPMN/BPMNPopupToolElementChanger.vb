@@ -156,7 +156,7 @@ SkipItem:
                             "Event Intermediate Multiple Subprocess NonInterupting",
                             "Event Intermediate Multiple Throwing",
                             "Event Intermediate None Throwing",
-                            "Event Intermediate Parallel Subprocess NonInterupting",
+                            "Event Intermediate Parallel Multiple Subprocess NonInterupting",
                             "Event Intermediate Parallel Multiple Boundary Interupting",
                             "Event Intermediate Parallel Multiple Boundary NonInterupting",
                             "Event Intermediate Parallel Multiple Catching",
@@ -360,8 +360,8 @@ SkipItem:
                             Case Is = "Event Intermediate None Throwing"
                                 .Add("Event Intermediate None Throwing", My.Resources.BPMN.Event_Intermediate_None_Throwing,,,)
 
-                            Case Is = "Event Intermediate Parallel Subprocess NonInterupting"
-                                .Add("Event Intermediate Parallel Subprocess NonInterupting", My.Resources.BPMN.Event_Intermediate_Parallel_SubprocessNonInterupting,,,)
+                            Case Is = "Event Intermediate Parallel Multiple Subprocess NonInterupting"
+                                .Add("Event Intermediate Parallel Multiple Subprocess NonInterupting", My.Resources.BPMN.Event_Intermediate_ParallelMultiple_SubprocessNonInterupting,,,)
 
                             Case Is = "Event Intermediate Parallel Multiple Boundary Interupting"
                                 .Add("Event Intermediate Parallel Multiple Boundary Interupting", My.Resources.BPMN.Event_Intermediate_ParallelMultiple_BoundaryInterupting,,,)
@@ -658,8 +658,8 @@ SkipItem:
                 Case Is = "Event Intermediate None Throwing"
                     Me.Result = "ChangeElementEventIntermediateNoneThrowing"
 
-                Case Is = "Event Intermediate Parallel Subprocess NonInterupting"
-                    Me.Result = "ChangeElementEventIntermediateParallelSubprocessNonInterupting"
+                Case Is = "Event Intermediate Parallel Multiple Subprocess NonInterupting"
+                    Me.Result = "ChangeElementEventIntermediateParallelMultipleSubprocessNonInterupting"
 
                 Case Is = "Event Intermediate Parallel Multiple Boundary Interupting"
                     Me.Result = "ChangeElementEventIntermediateParallelMultipleBoundaryInterupting"

@@ -238,7 +238,7 @@
   <data name="Event_Intermediate_ParallelMultiple_Catching" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\Event-Intermediate-ParallelMultiple-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Event_Intermediate_Parallel_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="Event_Intermediate_ParallelMultiple_SubprocessNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\Event-Intermediate-Parallel-SubprocessNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Event_Intermediate_Signal_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
