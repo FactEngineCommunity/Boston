@@ -229,6 +229,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(17, "BPMN-CollaborationDiagram-16x16.png")
         Me.ImageList.Images.SetKeyName(18, "BPMN-ConversationDiagram-16x16.png")
         Me.ImageList.Images.SetKeyName(19, "BPMN-ProcessDiagram-16x16.png")
+        Me.ImageList.Images.SetKeyName(20, "DatabaseXML16x16.jpg")
         '
         'CircularProgressBar
         '

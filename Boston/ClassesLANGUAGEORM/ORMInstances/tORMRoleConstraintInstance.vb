@@ -623,42 +623,78 @@ Namespace FBM
             'Colours for RoleInstances (Pastel)
             Dim Values() As Integer = CType([Enum].GetValues(GetType(pcenumColourWheel)), Integer())
 
-            If Me.RoleConstraint.Argument.Count > 0 Then
-                For Each lrRoleConstraintRole In Me.RoleConstraint.RoleConstraintRole
-                    lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
-                    If lrRoleInstance IsNot Nothing And lrRoleConstraintRole.RoleConstraintArgument IsNot Nothing Then
-                        lrRoleInstance.Shape.Text = lrRoleConstraintRole.RoleConstraintArgument.SequenceNr.ToString &
-                        "." &
-                        lrRoleConstraintRole.ArgumentSequenceNr.ToString
-                    End If
-                Next
-                Dim lrArgument As FBM.RoleConstraintArgument
-                Dim lrRole As FBM.Role
+            Try
 
-                For Each lrArgument In Me.RoleConstraint.Argument
-                    If lrArgument.JoinPath IsNot Nothing Then
-                        For Each lrRole In lrArgument.JoinPath.RolePath
+
+                If Me.RoleConstraint.Argument.Count > 0 Then
+                    For Each lrRoleConstraintRole In Me.RoleConstraint.RoleConstraintRole
+                        lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                        If lrRoleInstance IsNot Nothing And lrRoleConstraintRole.RoleConstraintArgument IsNot Nothing Then
+                            lrRoleInstance.Shape.Text = lrRoleConstraintRole.RoleConstraintArgument.SequenceNr.ToString &
+                            "." &
+                            lrRoleConstraintRole.ArgumentSequenceNr.ToString
+                        End If
+                    Next
+                    Dim lrArgument As FBM.RoleConstraintArgument
+                    Dim lrRole As FBM.Role
+
+                    For Each lrArgument In Me.RoleConstraint.Argument
+                        If lrArgument.JoinPath IsNot Nothing Then
+                            Dim liInd As Integer = 1
+                            Dim loGraphics As Graphics = Me.Page.DiagramView.CreateGraphics
+                            For Each lrRole In lrArgument.JoinPath.RolePath
+                                lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
+                                If lrRoleInstance IsNot Nothing Then
+                                    lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(lrArgument.SequenceNr Mod 6)))
+                                    lrRoleInstance.Shape.Text = lrArgument.SequenceNr & "." & liInd
+                                    lrRoleInstance.Shape.Font = Boston.GetAdjustedFont(loGraphics, lrRoleInstance.Shape.Text, lrRoleInstance.Shape.Font, lrRoleInstance.Shape.Bounds.Width, 10, 6, True)
+
+                                    Dim larCommonRole = From Argument In Me.RoleConstraint.Argument
+                                                        From Role In Argument.JoinPath.RolePath
+                                                        Where Role.Id = lrRoleInstance.Id
+                                                        Select New With {.Role = Role, .ArgumentSeqNr = Argument.SequenceNr, .SequenceNr = Argument.JoinPath.RolePath.FindIndex(Function(x) x.Id = lrRoleInstance.Id)}
+
+                                    If larCommonRole.Count > 1 Then
+                                        lrRoleInstance.Shape.Text = "{..}"
+                                        Dim liInd2 = 0
+                                        lrRoleInstance.Shape.ToolTip = ""
+                                        For Each lrCommonRole In larCommonRole
+                                            lrRoleInstance.Shape.ToolTip &= lrCommonRole.ArgumentSeqNr & "." & lrCommonRole.SequenceNr + 1 & " (Argument " & lrCommonRole.ArgumentSeqNr & ", Role " & lrCommonRole.SequenceNr + 1 & ")"
+                                            If liInd2 = 0 Then lrRoleInstance.Shape.ToolTip &= vbCrLf
+                                            liInd2 += 1
+                                        Next
+                                    Else
+                                        lrRoleInstance.Shape.ToolTip = lrRoleInstance.Shape.Text & " (Argument " & lrArgument.SequenceNr & ", Role " & liInd & ")"
+                                    End If
+
+
+                                End If
+                                liInd += 1
+                            Next
+                        End If
+                    Next
+
+                End If
+
+                If Me.CurrentArgument IsNot Nothing Then
+                    If Me.CurrentArgument.JoinPath IsNot Nothing Then
+                        For Each lrRole In Me.CurrentArgument.JoinPath.RolePath
                             lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
                             If lrRoleInstance IsNot Nothing Then
-                                lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(lrArgument.SequenceNr Mod 6)))
+                                lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(Me.CurrentArgument.SequenceNr Mod 6)))
                             End If
                         Next
                     End If
-                Next
-
-            End If
-
-            If Me.CurrentArgument IsNot Nothing Then
-                If Me.CurrentArgument.JoinPath IsNot Nothing Then
-                    For Each lrRole In Me.CurrentArgument.JoinPath.RolePath
-                        lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRole.Id)
-                        If lrRoleInstance IsNot Nothing Then
-                            lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(Values(Me.CurrentArgument.SequenceNr Mod 6)))
-                        End If
-                    Next
                 End If
-            End If
 
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
         End Sub
 
         ''' <summary>
@@ -1988,14 +2024,35 @@ Namespace FBM
 
         Private Sub RoleConstraint_RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As RoleConstraintRole) Handles _RoleConstraint.RoleConstraintRoleRemoved
 
-            Dim lrRoleConstraintRoleInstanceToRemove As FBM.RoleConstraintRoleInstance
+            Dim lrRoleConstraintRoleInstanceToRemove As FBM.RoleConstraintRoleInstance = Nothing
 
             Try
                 If Me.Page Is Nothing Then
                     Exit Sub
                 End If
 
-                lrRoleConstraintRoleInstanceToRemove = Me.RoleConstraintRole.Find(Function(x) x.Role.Id = arRoleConstraintRole.Role.Id)
+                If arRoleConstraintRole.RoleConstraintArgument IsNot Nothing Then
+                    Dim larRoleConstraintRoleInstanceToRemove = From RoleConstraintRole In Me.RoleConstraintRole
+                                                                Where RoleConstraintRole.Role.Id = arRoleConstraintRole.Role.Id
+                                                                Where RoleConstraintRole.RoleConstraintRole.RoleConstraintArgument IsNot Nothing
+                                                                Where RoleConstraintRole.RoleConstraintRole.RoleConstraintArgument.Id = arRoleConstraintRole.RoleConstraintArgument.Id
+                                                                Select RoleConstraintRole
+
+                    If larRoleConstraintRoleInstanceToRemove.Count > 0 Then
+                        lrRoleConstraintRoleInstanceToRemove = larRoleConstraintRoleInstanceToRemove.First
+                    Else
+                        larRoleConstraintRoleInstanceToRemove = From RoleConstraintRole In Me.RoleConstraintRole
+                                                                Where RoleConstraintRole.Role.Id = arRoleConstraintRole.Role.Id
+                                                                Where RoleConstraintRole.RoleConstraintRole.SequenceNr = arRoleConstraintRole.SequenceNr
+                                                                Select RoleConstraintRole
+                        If larRoleConstraintRoleInstanceToRemove.Count > 0 Then
+                            lrRoleConstraintRoleInstanceToRemove = larRoleConstraintRoleInstanceToRemove.First
+                        End If
+                    End If
+                Else
+                    lrRoleConstraintRoleInstanceToRemove = Me.RoleConstraintRole.Find(Function(x) x.Role.Id = arRoleConstraintRole.Role.Id)
+                End If
+
 
                 If lrRoleConstraintRoleInstanceToRemove Is Nothing Then
                     'Have probably already removed the RoleConstraintRole. i.e. e.g. RoleConstraint.RemoveArgumentBySequenceNumber removes RoleConstraintRoles and then the Argument.

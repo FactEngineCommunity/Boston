@@ -36,6 +36,41 @@ Namespace Boston
             arr(arr.Length - 1) = item
         End Sub
 
+        Public Function GetAdjustedFont(ByVal g As Graphics, ByVal graphicString As String, ByVal originalFont As Font, ByVal containerWidth As Integer, ByVal maxFontSize As Integer, ByVal minFontSize As Integer, ByVal smallestOnFail As Boolean) As Font
+            Dim testFont As Font = Nothing
+
+            Try
+                testFont = New Font(originalFont.Name, minFontSize, originalFont.Style)
+
+                For adjustedSize As Integer = maxFontSize To minFontSize Step -1
+
+                    testFont = New Font(originalFont.Name, adjustedSize + 1, originalFont.Style)
+
+                    Dim adjustedSizeNew As SizeF = g.MeasureString(graphicString, testFont)
+
+                    If containerWidth > Convert.ToInt32(adjustedSizeNew.Width) Then
+                        Return testFont
+                    End If
+                Next
+
+                If smallestOnFail Then
+                    Return testFont
+                Else
+                    Return originalFont
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return originalFont
+            End Try
+        End Function
+
         Public Function GetConfigFileLocation() As String
 
             Return ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath.ToString

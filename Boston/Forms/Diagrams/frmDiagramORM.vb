@@ -6539,6 +6539,7 @@ Public Class frmDiagramORM
         Try
             Dim lsMessage As String = ""
             Dim lrRoleConstraintArgumentToRemove As FBM.RoleConstraintArgument
+            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
             lrRoleConstraintArgumentToRemove = sender.Tag
 
@@ -6549,10 +6550,12 @@ Public Class frmDiagramORM
             End If
 
             If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+
                 lrRoleConstraintInstance = Me.zrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrRoleConstraintArgumentToRemove.RoleConstraint.Id)
+
                 Call lrRoleConstraintInstance.ClearJoinPathBrushesForArgument(lrRoleConstraintArgumentToRemove.SequenceNr)
                 Call lrRoleConstraintArgumentToRemove.RoleConstraint.RemoveArgumentBySequenceNr(lrRoleConstraintArgumentToRemove.SequenceNr)
+
             End If
 
         Catch ex As Exception
@@ -11274,14 +11277,21 @@ SkipRemovalFromModel:
     Private Sub RemoveLinksToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveLinksToolStripMenuItem.Click
 
         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+        Dim lsMessage As String
 
         Try
-            lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
+            lsMessage = "Are you sure you want to remove all the arguments and role links for this Role Constraint?"
 
-            lrRoleConstraintInstance.RoleConstraint.RemoveRoleConstraintRoles()
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
+
+                For Each lrArgument In lrRoleConstraintInstance.RoleConstraint.Argument.ToArray
+                    lrRoleConstraintInstance.RoleConstraint.RemoveArgument(lrArgument)
+                Next
+                lrRoleConstraintInstance.RoleConstraint.RemoveRoleConstraintRoles()
+            End If
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -11615,22 +11625,35 @@ SkipRemovalFromModel:
     Private Sub RemoveAllArgumentsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemRemoveAllArguments.Click
 
         Dim lrRoleConstraint As FBM.RoleConstraint
+        Dim lsMessage As String
 
-        lrRoleConstraint = Me.ToolStripMenuItemRemoveAllArguments.Tag
+        Try
+            lrRoleConstraint = Me.ToolStripMenuItemRemoveAllArguments.Tag
 
-        Dim liInd As Integer = 1
-        For Each lrArgument In lrRoleConstraint.Argument.ToArray
-            Call lrRoleConstraint.RemoveArgument(lrArgument)
-            liInd += 1
-        Next
+            lsMessage = "Are you sure you want to remove all the arguments for this Role Constraint?"
 
-        For Each lrRoleInstance In Me.zrPage.RoleInstance
-            lrRoleInstance.Shape.Text = ""
-        Next
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
 
-        Me.zrPage.Model.MakeDirty(False, True)
+                For Each lrArgument In lrRoleConstraint.Argument.ToArray
+                    Call lrRoleConstraint.RemoveArgument(lrArgument)
+                Next
 
-        Call Me.ResetNodeAndLinkColors()
+                For Each lrRoleInstance In Me.zrPage.RoleInstance
+                    lrRoleInstance.Shape.Text = ""
+                Next
+
+                Me.zrPage.Model.MakeDirty(False, True)
+
+                Call Me.ResetNodeAndLinkColors()
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

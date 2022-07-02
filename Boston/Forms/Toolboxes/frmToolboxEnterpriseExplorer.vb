@@ -263,6 +263,11 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.Neo4j
                     loNode.ImageIndex = 14
                     loNode.SelectedImageIndex = 14
+                Case Is = pcenumDatabaseType.None
+                    If arModel.StoreAsXML Then
+                        loNode.ImageIndex = 20
+                        loNode.SelectedImageIndex = 20
+                    End If
             End Select
         End If
 
