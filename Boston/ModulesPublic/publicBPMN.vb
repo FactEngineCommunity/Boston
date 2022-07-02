@@ -1,5 +1,9 @@
 ﻿Public Module publicBPMN
 
+    Public Enum pcenumBPMNPopupToolType
+        Changer
+        Adder
+    End Enum
     Public Enum pcenumBPMNProcessType
         Activity
         Flow

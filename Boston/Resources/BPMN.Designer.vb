@@ -227,9 +227,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Conditional_Caching() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Conditional_Catching() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Conditional_Caching", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Conditional_Catching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -307,9 +307,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Link_Caching() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Link_Catching() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Link_Caching", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Link_Catching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -347,9 +347,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Message_Caching() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Message_Catching() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Message_Caching", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Message_Catching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -397,9 +397,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Multiple_Caching() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Multiple_Catching() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Multiple_Caching", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Multiple_Catching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -467,9 +467,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_ParallelMultiple_Caching() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_ParallelMultiple_Catching() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_ParallelMultiple_Caching", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_ParallelMultiple_Catching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -497,9 +497,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Signal_Caching() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Signal_Catching() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Signal_Caching", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Signal_Catching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -547,6 +547,26 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend Shared ReadOnly Property Event_Intermediate_Timer_BoundaryNonInterupting() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Timer_BoundaryNonInterupting", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend Shared ReadOnly Property Event_Intermediate_Timer_Catching() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Timer_Catching", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend Shared ReadOnly Property Event_Intermediate_Timer_SubprocessInterupting() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Timer_SubprocessInterupting", resourceCulture)
@@ -560,26 +580,6 @@ Namespace My.Resources
         Friend Shared ReadOnly Property Event_Intermediate_Timer_SubprocessNonInterupting() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Timer_SubprocessNonInterupting", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend Shared ReadOnly Property Event_Interpediate_Timer_BoundaryInterupting() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Interpediate_Timer_BoundaryInterupting", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend Shared ReadOnly Property Event_Interpediate_Timer_Caching() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Interpediate_Timer_Caching", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

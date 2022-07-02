@@ -25,7 +25,7 @@ Public Class BPMNPopupToolSelector
 
         Try
             Select Case Me.Type
-                Case Is = pcenumBPMNProcessType.Activity, pcenumBPMNProcessType.Gateway
+                Case Is = pcenumBPMNProcessType.Activity, pcenumBPMNProcessType.Gateway, pcenumBPMNProcessType.Event
                     Call Me.SetupForBPMNActivity()
             End Select
 
@@ -120,7 +120,8 @@ Public Class BPMNPopupToolSelector
                     Dim liX, liY As Integer
                     Select Case Me.Type
                         Case Is = pcenumBPMNProcessType.Activity,
-                                  pcenumBPMNProcessType.Gateway
+                                  pcenumBPMNProcessType.Gateway,
+                                  pcenumBPMNProcessType.Event
                             liX = Me.Node.Bounds.X
                             liY = Me.Node.Bounds.Y + Me.Node.Bounds.Height + 2
                     End Select

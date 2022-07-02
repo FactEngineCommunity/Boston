@@ -44,7 +44,7 @@ Partial Class BPMNPopupToolElementChanger
         '
         Me.TextBox1.Location = New System.Drawing.Point(33, 42)
         Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(231, 20)
+        Me.TextBox1.Size = New System.Drawing.Size(261, 20)
         Me.TextBox1.TabIndex = 1
         '
         'ListBox
@@ -59,12 +59,12 @@ Partial Class BPMNPopupToolElementChanger
         Me.ListBox.HighlightBackColor = System.Drawing.SystemColors.Highlight
         Me.ListBox.HighlightTextColor = System.Drawing.SystemColors.HighlightText
         Me.ListBox.ImagePadding = New System.Windows.Forms.Padding(1)
-        Me.ListBox.ImageSize = New System.Drawing.Size(16, 16)
-        Me.ListBox.ItemHeight = 18
+        Me.ListBox.ImageSize = New System.Drawing.Size(23, 23)
+        Me.ListBox.ItemHeight = 25
         Me.ListBox.Location = New System.Drawing.Point(7, 79)
         Me.ListBox.Name = "ListBox"
         Me.ListBox.SelectedItemInfo = Nothing
-        Me.ListBox.Size = New System.Drawing.Size(257, 220)
+        Me.ListBox.Size = New System.Drawing.Size(287, 229)
         Me.ListBox.TabIndex = 3
         '
         'PictureBox1
@@ -89,7 +89,7 @@ Partial Class BPMNPopupToolElementChanger
         Me.Controls.Add(Me.LabelPromptChangeElement)
         Me.ForeColor = System.Drawing.Color.White
         Me.Name = "BPMNPopupToolElementChanger"
-        Me.Size = New System.Drawing.Size(281, 326)
+        Me.Size = New System.Drawing.Size(302, 326)
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
