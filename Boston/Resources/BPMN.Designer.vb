@@ -207,9 +207,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Conditioal_BoundaryNonInterupting() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Conditional_BoundaryInterupting() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Conditioal_BoundaryNonInterupting", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Conditional_BoundaryInterupting", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -217,9 +217,9 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend Shared ReadOnly Property Event_Intermediate_Conditional_BoundaryInterupting() As System.Drawing.Bitmap
+        Friend Shared ReadOnly Property Event_Intermediate_Conditional_BoundaryNonInterupting() As System.Drawing.Bitmap
             Get
-                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Conditional_BoundaryInterupting", resourceCulture)
+                Dim obj As Object = ResourceManager.GetObject("Event_Intermediate_Conditional_BoundaryNonInterupting", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

@@ -133,7 +133,7 @@ SkipItem:
                             "Event Intermediate Compensation Boundary Interupting",
                             "Event Intermediate Compensation Subprocess Interupting",
                             "Event Intermediate Compensation Throwing",
-                            "Event Intermediate Conditioal Boundary NonInterupting",
+                            "Event Intermediate Conditional Boundary NonInterupting",
                             "Event Intermediate Conditional Boundary Interupting",
                             "Event Intermediate Conditional Catching",
                             "Event Intermediate Error Boundary Interupting",
@@ -291,8 +291,8 @@ SkipItem:
                             Case Is = "Event Intermediate Compensation Throwing"
                                 .Add("Event Intermediate Compensation Throwing", My.Resources.BPMN.Event_Intermediate_Compensation_Throwing,,,)
 
-                            Case Is = "Event Intermediate Conditioal Boundary NonInterupting"
-                                .Add("Event Intermediate Conditioal Boundary NonInterupting", My.Resources.BPMN.Event_Intermediate_Conditioal_BoundaryNonInterupting,,,)
+                            Case Is = "Event Intermediate Conditional Boundary NonInterupting"
+                                .Add("Event Intermediate Conditional Boundary NonInterupting", My.Resources.BPMN.Event_Intermediate_Conditional_BoundaryNonInterupting,,,)
 
                             Case Is = "Event Intermediate Conditional Boundary Interupting"
                                 .Add("Event Intermediate Conditional Boundary Interupting", My.Resources.BPMN.Event_Intermediate_Conditional_BoundaryInterupting,,,)
@@ -589,8 +589,8 @@ SkipItem:
                 Case Is = "Event Intermediate Compensation Throwing"
                     Me.Result = "ChangeElementEventIntermediateCompensationThrowing"
 
-                Case Is = "Event Intermediate Conditioal Boundary NonInterupting"
-                    Me.Result = "ChangeElementEventIntermediateConditioalBoundaryNonInterupting"
+                Case Is = "Event Intermediate Conditional Boundary NonInterupting"
+                    Me.Result = "ChangeElementEventIntermediateConditionalBoundaryNonInterupting"
 
                 Case Is = "Event Intermediate Conditional Boundary Interupting"
                     Me.Result = "ChangeElementEventIntermediateConditionalBoundaryInterupting"

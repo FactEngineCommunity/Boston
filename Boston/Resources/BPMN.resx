@@ -160,11 +160,11 @@
   <data name="Event_Intermediate_Compensation_Throwing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\Event-Intermediate-Compensation-Throwing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Event_Intermediate_Conditioal_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\BPMN\Event-Intermediate-Conditioal-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Event_Intermediate_Conditional_BoundaryInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\Event-Intermediate-Conditional-BoundaryInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Event_Intermediate_Conditional_BoundaryNonInterupting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\BPMN\Event-Intermediate-Conditioal-BoundaryNonInterupting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Event_Intermediate_Conditional_Catching" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\BPMN\Event-Intermediate-Conditional-Caching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

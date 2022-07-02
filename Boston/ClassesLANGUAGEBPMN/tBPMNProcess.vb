@@ -197,15 +197,18 @@ Namespace BPMN
                         Select Case Me.CMMLProcess.ProcessType
                             Case Is = pcenumBPMNProcessType.Event
 #Region "Event"
-                                Select Case Me.CMMLProcess.EventType
-                                    Case Is = pcenumBPMNEventType.None
-#Region "None"
-                                        Select Case Me.CMMLProcess.EventSubType
-                                            Case Is = pcenumBPMNEventSubType.Standard
+                                Select Case Me.CMMLProcess.EventPosition
+#Region "Position of Event"
+                                    Case Is = pcenumBPMNEventPosition.End
+#Region "End - EventPosition"
+                                        Select Case Me.CMMLProcess.EventType
+#Region "Event Type"
+                                            Case Is = pcenumBPMNEventType.None
+#Region "None - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+#Region "SubType of Event"
+                                                    Case Is = pcenumBPMNEventSubType.Standard
 #Region "Standard"
-                                                Select Case Me.CMMLProcess.EventPosition
-                                                    Case Is = pcenumBPMNEventPosition.End
-#Region "End"
                                                         loDroppedNode.Shape = Shapes.Ellipse
                                                         loDroppedNode.Resize(12, 12)
                                                         loDroppedNode.Image = My.Resources.BPMN.Event_End_None_Standard
@@ -215,8 +218,342 @@ Namespace BPMN
                                                         loDroppedNode.Pen.Width = 0.0
                                                         loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
 #End Region
-                                                    Case Is = pcenumBPMNEventPosition.Start
-#Region "Start"
+                                                    Case Is = pcenumBPMNEventSubType.Throwing
+#Region "Throwing"
+
+#End Region
+#End Region
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Cancel
+#Region "Cancel - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Cancel_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Compensation
+#Region "Compensation - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Compensation_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Error
+#Region "Error - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Error_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Escalation
+#Region "Escaltion - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Escalation_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Link
+#Region "Link - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Link_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Message
+#Region "Message - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Message_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Multiple
+#Region "Multiple - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Multiple_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Signal
+#Region "Signal - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Signal_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                            Case Is = pcenumBPMNEventType.Terminate
+#Region "Terminate - Event Type"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_End_Terminate_Standard
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+
+
+
+                                                End Select
+#End Region
+                                        End Select
+#End Region 'Event Type
+
+#End Region
+                                    Case Is = pcenumBPMNEventPosition.Intermediate
+#Region "Intermediate - EventPosition"
+                                        Select Case Me.CMMLProcess.EventType
+#Region "EventType"
+                                            Case Is = pcenumBPMNEventType.None
+#Region "None - EventType"
+                                                Select Case Me.CMMLProcess.EventSubType
+#Region "SubType of Event"
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard"
+
+
+#End Region
+                                                    Case Is = pcenumBPMNEventSubType.Throwing
+#Region "Throwing"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_None_Throwing
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                End Select
+#End Region
+#End Region
+                                            Case Is = pcenumBPMNEventType.Cancel
+#Region "Cancel - EventType"
+                                                Select Case Me.CMMLProcess.EventSubType
+#Region "SubType of Event"
+                                                    Case Is = pcenumBPMNEventSubType.BoundaryInterupting
+#Region "Boundary Interupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Cancel_BoundaryInterupting
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                End Select
+#End Region
+#End Region
+                                            Case Is = pcenumBPMNEventType.Compensation
+#Region "Compensation - EventType"
+                                                Select Case Me.CMMLProcess.EventSubType
+#Region "SubType of Event"
+                                                    Case Is = pcenumBPMNEventSubType.BoundaryInterupting
+#Region "Boundary Interupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Compensation_BoundaryInterupting
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                    Case Is = pcenumBPMNEventSubType.SubprocessInterupting
+#Region "SUbprocess Interupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Compensation_SubprocessInterupting
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                    Case Is = pcenumBPMNEventSubType.Throwing
+#Region "Throwing Interupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Compensation_Throwing
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                End Select
+#End Region
+#End Region
+                                            Case Is = pcenumBPMNEventType.Conditional
+#Region "Conditional - EventType"
+                                                Select Case Me.CMMLProcess.EventSubType
+#Region "SubType of Event"
+                                                    Case Is = pcenumBPMNEventSubType.BoundaryInterupting
+#Region "Boundary Interupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Conditional_BoundaryInterupting
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                    Case Is = pcenumBPMNEventSubType.BoundaryNonInterupting
+#Region "Boundary NonInterupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Conditional_BoundaryNonInterupting
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                    Case Is = pcenumBPMNEventSubType.Catching
+#Region "Catching"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Conditional_Catching
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                End Select
+#End Region
+#End Region
+                                            Case Is = pcenumBPMNEventType.Error
+#Region "Conditional - EventType"
+                                                Select Case Me.CMMLProcess.EventSubType
+#Region "SubType of Event"
+                                                    Case Is = pcenumBPMNEventSubType.BoundaryInterupting
+#Region "Boundary Interupting"
+                                                        loDroppedNode.Shape = Shapes.Ellipse
+                                                        loDroppedNode.Resize(12, 12)
+                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_Error_BoundaryInterupting
+                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                                                        loDroppedNode.Text = ""
+                                                        loDroppedNode.Pen.Width = 0.0
+                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
+#End Region
+                                                End Select
+#End Region
+                                        End Select
+#End Region
+#End Region
+
+#End Region
+                                    Case Is = pcenumBPMNEventPosition.Start
+#Region "Start - Event Position"
+                                        Select Case Me.CMMLProcess.EventType
+#Region "Event Type"
+                                            Case Is = pcenumBPMNEventType.None
+#Region "None - EventType"
+                                                Select Case Me.CMMLProcess.EventSubType
+                                                    Case Is = pcenumBPMNEventSubType.Standard
+#Region "Standard - Event SubType"
                                                         loDroppedNode.Shape = Shapes.Ellipse
                                                         loDroppedNode.Resize(12, 12)
                                                         loDroppedNode.Image = My.Resources.BPMN.Event_Start_None_Standard
@@ -228,24 +565,15 @@ Namespace BPMN
 #End Region
                                                 End Select
 #End Region
-                                            Case Is = pcenumBPMNEventSubType.Throwing
-#Region "Throwing"
-                                                Select Case Me.CMMLProcess.EventPosition
-                                                    Case Is = pcenumBPMNEventPosition.Intermediate
-                                                        loDroppedNode.Shape = Shapes.Ellipse
-                                                        loDroppedNode.Resize(12, 12)
-                                                        loDroppedNode.Image = My.Resources.BPMN.Event_Intermediate_None_Throwing
-                                                        loDroppedNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
-                                                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
-                                                        loDroppedNode.Text = ""
-                                                        loDroppedNode.Pen.Width = 0.0
-                                                        loDroppedNode.ImageAlign = MindFusion.Drawing.ImageAlign.BottomCenter
-                                                End Select
 #End Region
                                         End Select
 #End Region
                                 End Select
-#End Region
+
+#End Region 'Event Position
+
+#End Region 'Event
+
                             Case Is = pcenumBPMNProcessType.Gateway
 #Region "Gateway"
                                 loDroppedNode.Shape = Shapes.Ellipse
@@ -302,6 +630,7 @@ Namespace BPMN
                         End If
                         loDroppedNode.Resize(20, 15)
                 End Select
+
 
 
 #Region "Snap to Grid"

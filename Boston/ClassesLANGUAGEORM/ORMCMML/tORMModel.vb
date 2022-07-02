@@ -2193,7 +2193,7 @@ Namespace FBM
                 Dim lsSQLQuery As String
 
                 lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CoreProcessIsOfCoreBPMNEventType.ToString
-                lsSQLQuery &= " SET ActivityType = '" & aiBPMNEventType.ToString & "'"
+                lsSQLQuery &= " SET EventType = '" & aiBPMNEventType.ToString & "'"
                 lsSQLQuery &= " WHERE Process = '" & arCMMLProcess.Id & "'"
 
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -2436,7 +2436,7 @@ Namespace FBM
                     lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                     If Not lrORMRecordset2.EOF Then
-                        lrProcess.ActivityType = CType([Enum].Parse(GetType(pcenumBPMNEventType), Trim(lrORMRecordset2("EventType").Data)), pcenumBPMNEventType)
+                        lrProcess.EventType = CType([Enum].Parse(GetType(pcenumBPMNEventType), Trim(lrORMRecordset2("EventType").Data)), pcenumBPMNEventType)
                     End If
 #End Region
 
