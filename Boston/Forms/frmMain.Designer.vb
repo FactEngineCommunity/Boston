@@ -112,6 +112,9 @@ Partial Class frmMain
         Me.NamespaceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AddNamespaceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditNamespaceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemAddUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemEditUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemHelp = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutRichmondToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -161,7 +164,7 @@ Partial Class frmMain
         '
         'MenuStrip_main
         '
-        Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem, Me.ToolStripMenuItemSuperuser})
+        Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.ToolStripMenuItemUnifiedOntology, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem, Me.ToolStripMenuItemSuperuser})
         Me.MenuStrip_main.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip_main.Name = "MenuStrip_main"
         Me.MenuStrip_main.Padding = New System.Windows.Forms.Padding(4, 1, 0, 1)
@@ -634,6 +637,27 @@ Partial Class frmMain
         Me.EditNamespaceToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
         Me.EditNamespaceToolStripMenuItem.Text = "&Edit Namespace"
         '
+        'ToolStripMenuItemUnifiedOntology
+        '
+        Me.ToolStripMenuItemUnifiedOntology.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddUnifiedOntology, Me.ToolStripMenuItemEditUnifiedOntology})
+        Me.ToolStripMenuItemUnifiedOntology.Name = "ToolStripMenuItemUnifiedOntology"
+        Me.ToolStripMenuItemUnifiedOntology.Size = New System.Drawing.Size(110, 22)
+        Me.ToolStripMenuItemUnifiedOntology.Text = "&Unified Ontology"
+        '
+        'ToolStripMenuItemAddUnifiedOntology
+        '
+        Me.ToolStripMenuItemAddUnifiedOntology.Image = Global.Boston.My.Resources.Resources.Add16x16
+        Me.ToolStripMenuItemAddUnifiedOntology.Name = "ToolStripMenuItemAddUnifiedOntology"
+        Me.ToolStripMenuItemAddUnifiedOntology.Size = New System.Drawing.Size(190, 22)
+        Me.ToolStripMenuItemAddUnifiedOntology.Text = "&Add Unified Ontology"
+        '
+        'ToolStripMenuItemEditUnifiedOntology
+        '
+        Me.ToolStripMenuItemEditUnifiedOntology.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.ToolStripMenuItemEditUnifiedOntology.Name = "ToolStripMenuItemEditUnifiedOntology"
+        Me.ToolStripMenuItemEditUnifiedOntology.Size = New System.Drawing.Size(190, 22)
+        Me.ToolStripMenuItemEditUnifiedOntology.Text = "&Edit Unified Ontology"
+        '
         'HelpToolStripMenuItem
         '
         Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemHelp, Me.AboutRichmondToolStripMenuItem, Me.ToolStripSeparator13, Me.ToolStripMenuItemOpenLogFile, Me.EmailSupportvievcomToolStripMenuItem})
@@ -1074,4 +1098,7 @@ Partial Class frmMain
     Friend WithEvents ShowClientServerBroadcastTesterToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemSuperuser As ToolStripMenuItem
     Friend WithEvents ThrowTestErrorMessageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemUnifiedOntology As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemAddUnifiedOntology As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemEditUnifiedOntology As ToolStripMenuItem
 End Class

@@ -13,8 +13,8 @@ Namespace TableUnifiedOntology
                 lsSQLQuery = "INSERT INTO UnifiedOntology"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " '" & Trim(Replace(arUnifiedOntology.Id, "'", "`")) & "'"
-                lsSQLQuery &= " '" & Trim(Replace(arUnifiedOntology.Name, "'", "`")) & "'"
-                lsSQLQuery &= " '" & Trim(Replace(arUnifiedOntology.ImageFileLocationName, "'", "`")) & "'"
+                lsSQLQuery &= ",'" & Trim(Replace(arUnifiedOntology.Name, "'", "`")) & "'"
+                lsSQLQuery &= ",'" & Trim(Replace(arUnifiedOntology.ImageFileLocationName, "'", "`")) & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -207,18 +207,20 @@ Namespace TableUnifiedOntology
 
         End Function
 
-        Public Sub UpdateUnifiedOntology(ByVal arUnifiedOntology As Ontology.UnifiedOntology)
+        Public Function UpdateUnifiedOntology(ByVal arUnifiedOntology As Ontology.UnifiedOntology) As Boolean
 
             Dim lsSQLQuery As String
 
             Try
-                lsSQLQuery = " UPDATE ModelUnifiedOntology"
+                lsSQLQuery = " UPDATE UnifiedOntology"
                 lsSQLQuery &= "   SET UnifiedOntologyName = '" & Trim(Replace(arUnifiedOntology.Name, "'", "`")) & "'"
                 lsSQLQuery &= " WHERE Id = '" & Trim(Replace(arUnifiedOntology.Id, "'", "`")) & "'"
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)
                 pdbConnection.CommitTrans()
+
+                Return True
 
             Catch ex As Exception
 
@@ -227,12 +229,14 @@ Namespace TableUnifiedOntology
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, False, False, True)
 
                 pdbConnection.RollbackTrans()
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
     End Module
 End Namespace

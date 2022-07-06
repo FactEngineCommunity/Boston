@@ -1338,6 +1338,18 @@
     <Compile Include="Forms\CRUD\LANGUAGEERD\frmCRUDIndexManager.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\CRUD\UnifiedOntology\frmCRUDEditUnifiedOntology.Designer.vb">
+      <DependentUpon>frmCRUDEditUnifiedOntology.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\UnifiedOntology\frmCRUDEditUnifiedOntology.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\UnifiedOntology\frmCRUDAddUnifiedOntology.Designer.vb">
+      <DependentUpon>frmCRUDAddUnifiedOntology.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\UnifiedOntology\frmCRUDAddUnifiedOntology.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramERD.Designer.vb">
       <DependentUpon>frmDiagramERD.vb</DependentUpon>
     </Compile>
@@ -1527,6 +1539,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNotifications.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProject.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectGroup.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableGeneric.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableUnifiedOntologyModel.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUserRole.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUser.vb" />
@@ -2209,6 +2222,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDIndexManager.resx">
       <DependentUpon>frmCRUDIndexManager.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\UnifiedOntology\frmCRUDEditUnifiedOntology.resx">
+      <DependentUpon>frmCRUDEditUnifiedOntology.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\UnifiedOntology\frmCRUDAddUnifiedOntology.resx">
+      <DependentUpon>frmCRUDAddUnifiedOntology.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramERD.resx">
       <DependentUpon>frmDiagramERD.vb</DependentUpon>

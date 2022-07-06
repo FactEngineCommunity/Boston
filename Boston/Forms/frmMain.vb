@@ -661,6 +661,10 @@ SkipRegistrationChecking:
             End If
 
             '=======================================================================
+            'Unified Ontology
+            Me.ToolStripMenuItemUnifiedOntology.Visible = My.Settings.ShowUnifiedOntologyBrowser
+
+            '=======================================================================
             'Client/Server
             If My.Settings.ShowProjectUserMenuItems Then
                 Me.ToolStripMenuItemUser.Visible = True
@@ -5446,6 +5450,62 @@ SkipRegistrationChecking:
             lrModel.EntityType(0).Model = lrModel
 
             Throw New Exception("Test Error Message thrown by user in Superuser mode.")
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemAddUnifiedOntology_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAddUnifiedOntology.Click
+
+        Try
+            Call frmCRUDAddUnifiedOntology.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemEditUnifiedOntology_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEditUnifiedOntology.Click
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection()
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "Unified Ontology",
+                                               "UnifiedOntology",
+                                               "UnifiedOntologyName",
+                                               "Id",
+                                               Nothing,
+                                               Nothing,
+                                               pcenumComboBoxStyle.DropdownList,
+                                               "1",
+                                               1,
+                                               "120",
+                                               "Unified Ontology Name") = Windows.Forms.DialogResult.OK Then
+
+
+                Dim lfrmEditUnfiedOntology As New frmCRUDEditUnifiedOntology
+
+                Dim lrUnifiedOntology As New Ontology.UnifiedOntology
+                lrUnifiedOntology.Id = lrGenericSelection.SelectIndex
+                Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+                lfrmEditUnfiedOntology.moUnifiedOntology = lrUnifiedOntology
+                Call lfrmEditUnfiedOntology.ShowDialog()
+
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
