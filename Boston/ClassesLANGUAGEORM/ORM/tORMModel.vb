@@ -5847,6 +5847,11 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
                 lsFileLocationName = lsFolderLocation & "\" & lsFileName
 
+                If Not File.Exists(lsFileLocationName) Then
+                    prApplication.ThrowErrorMessage("Oops. The XML file for this Model no longer exists. Consider removing the Model from the Model Explorer.", pcenumErrorType.Warning, Nothing, False, False, True)
+                    Exit Sub
+                End If
+
                 '==================================================================================================
                 Dim xml As XDocument = Nothing
                 Dim lsXSDVersionNr As String = ""
@@ -5991,6 +5996,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
             Dim lsFolderLocation As String
             Dim lsFileName As String
             Dim lsFileLocationName As String
+            Dim lsMessage As String
 
             Try
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
@@ -6005,6 +6011,12 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                 lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
                 lsFileLocationName = lsFolderLocation & "\" & lsFileName
+
+                If Not File.Exists(lsFileLocationName) Then
+                    lsMessage = "The XML file for the Model, " & Me.Name & ", does not exist. Consider removing the Model from the Model Explorer."
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                    Exit Sub
+                End If
 
                 '==================================================================================================
                 Dim xml As XDocument = Nothing
@@ -6030,7 +6042,6 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 objStreamReader.Close()
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

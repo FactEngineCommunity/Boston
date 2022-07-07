@@ -291,7 +291,12 @@ Namespace TableModelDictionary
                         'End If
 
                         ar_model.ModelDictionary.Add(lrDictionaryEntry)
-                        ar_model.Dictionary.Add(lrDictionaryEntry.Symbol, ar_model.ModelDictionary.Count - 1)
+                        Try
+                            ar_model.Dictionary.Add(lrDictionaryEntry.Symbol, ar_model.ModelDictionary.Count - 1)
+                        Catch ex As Exception
+                            'Make sure that if is in the ModelDictionary...then is not added again.
+                        End Try
+
                         lREcordset.MoveNext()
                     End While
                 End If

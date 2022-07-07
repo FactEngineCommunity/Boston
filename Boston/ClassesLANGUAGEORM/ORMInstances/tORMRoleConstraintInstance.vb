@@ -1153,9 +1153,20 @@ Namespace FBM
                     '-----------------------------------------------------------------------
                     'Get the RoleInstance to draw the InternalUniquenessConstraint against.
                     '-----------------------------------------------------------------------
-                    lrFactTypeInstance = Me.RoleConstraintRole(0).Role.FactType
 
-                    lrRoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                    'CodeSafe
+                    Try
+                        lrFactTypeInstance = Me.RoleConstraintRole(0).Role.FactType
+                        lrRoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                    Catch ex As Exception
+                        lsMessage = "There seems to be a problem with the Role Constraint, " & Me.Id & "."
+                        lsMessage.AppendDoubleLineBreak("Please consider removing the Role Constraint from the Model from within the Model Dictionary and recreating the Role Constraint.")
+                        lsMessage.AppendDoubleLineBreak("Click [Yes] if you would like Boston to remove the Role Constraint from the Model now.")
+                        If prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                            Call Me.RoleConstraint.RemoveFromModel(True, False, True, True, True, False)
+                        End If
+                        Exit Sub
+                    End Try
 
                     '---------------------------------------------------------------------------------------------
                     'Create the ShapeNode/Shape for the actual line/s drawn for the InternalUniquenessConstraint
