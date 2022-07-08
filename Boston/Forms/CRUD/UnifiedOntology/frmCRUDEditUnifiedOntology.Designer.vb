@@ -24,6 +24,11 @@ Partial Class frmCRUDEditUnifiedOntology
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.GroupBox = New System.Windows.Forms.GroupBox()
+        Me.ButtonExcludeModel = New System.Windows.Forms.Button()
+        Me.ButtonIncludeModel = New System.Windows.Forms.Button()
+        Me.LabelPromptAvailableGroups = New System.Windows.Forms.Label()
+        Me.LabelPromptIncludedGroups = New System.Windows.Forms.Label()
+        Me.ListBoxIncludedModels = New System.Windows.Forms.ListBox()
         Me.ButtonFileSelect = New System.Windows.Forms.Button()
         Me.TextBoxImageFileLocation = New System.Windows.Forms.TextBox()
         Me.LabelPromptImageFileLocation = New System.Windows.Forms.Label()
@@ -32,12 +37,19 @@ Partial Class frmCRUDEditUnifiedOntology
         Me.ButtonOkay = New System.Windows.Forms.Button()
         Me.ButtonCancel = New System.Windows.Forms.Button()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.ListboxAvailableModels = New System.Windows.Forms.ListBox()
         Me.GroupBox.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'GroupBox
         '
+        Me.GroupBox.Controls.Add(Me.ListboxAvailableModels)
+        Me.GroupBox.Controls.Add(Me.ButtonExcludeModel)
+        Me.GroupBox.Controls.Add(Me.ButtonIncludeModel)
+        Me.GroupBox.Controls.Add(Me.LabelPromptAvailableGroups)
+        Me.GroupBox.Controls.Add(Me.LabelPromptIncludedGroups)
+        Me.GroupBox.Controls.Add(Me.ListBoxIncludedModels)
         Me.GroupBox.Controls.Add(Me.ButtonFileSelect)
         Me.GroupBox.Controls.Add(Me.TextBoxImageFileLocation)
         Me.GroupBox.Controls.Add(Me.LabelPromptImageFileLocation)
@@ -45,9 +57,54 @@ Partial Class frmCRUDEditUnifiedOntology
         Me.GroupBox.Controls.Add(Me.LabelPromptUnifiedOntologyName)
         Me.GroupBox.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox.Name = "GroupBox"
-        Me.GroupBox.Size = New System.Drawing.Size(529, 98)
+        Me.GroupBox.Size = New System.Drawing.Size(529, 451)
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
+        '
+        'ButtonExcludeModel
+        '
+        Me.ButtonExcludeModel.Location = New System.Drawing.Point(228, 153)
+        Me.ButtonExcludeModel.Name = "ButtonExcludeModel"
+        Me.ButtonExcludeModel.Size = New System.Drawing.Size(63, 25)
+        Me.ButtonExcludeModel.TabIndex = 17
+        Me.ButtonExcludeModel.Text = ">>"
+        Me.ButtonExcludeModel.UseVisualStyleBackColor = True
+        '
+        'ButtonIncludeModel
+        '
+        Me.ButtonIncludeModel.Location = New System.Drawing.Point(228, 122)
+        Me.ButtonIncludeModel.Name = "ButtonIncludeModel"
+        Me.ButtonIncludeModel.Size = New System.Drawing.Size(64, 25)
+        Me.ButtonIncludeModel.TabIndex = 16
+        Me.ButtonIncludeModel.Text = "<<"
+        Me.ButtonIncludeModel.UseVisualStyleBackColor = True
+        '
+        'LabelPromptAvailableGroups
+        '
+        Me.LabelPromptAvailableGroups.AutoSize = True
+        Me.LabelPromptAvailableGroups.Location = New System.Drawing.Point(298, 105)
+        Me.LabelPromptAvailableGroups.Name = "LabelPromptAvailableGroups"
+        Me.LabelPromptAvailableGroups.Size = New System.Drawing.Size(87, 13)
+        Me.LabelPromptAvailableGroups.TabIndex = 15
+        Me.LabelPromptAvailableGroups.Text = "Available Groups"
+        '
+        'LabelPromptIncludedGroups
+        '
+        Me.LabelPromptIncludedGroups.AutoSize = True
+        Me.LabelPromptIncludedGroups.Location = New System.Drawing.Point(3, 104)
+        Me.LabelPromptIncludedGroups.Name = "LabelPromptIncludedGroups"
+        Me.LabelPromptIncludedGroups.Size = New System.Drawing.Size(85, 13)
+        Me.LabelPromptIncludedGroups.TabIndex = 14
+        Me.LabelPromptIncludedGroups.Text = "Included Groups"
+        '
+        'ListBoxIncludedModels
+        '
+        Me.ListBoxIncludedModels.FormattingEnabled = True
+        Me.ListBoxIncludedModels.Location = New System.Drawing.Point(3, 121)
+        Me.ListBoxIncludedModels.Name = "ListBoxIncludedModels"
+        Me.ListBoxIncludedModels.Size = New System.Drawing.Size(215, 225)
+        Me.ListBoxIncludedModels.Sorted = True
+        Me.ListBoxIncludedModels.TabIndex = 13
         '
         'ButtonFileSelect
         '
@@ -118,17 +175,26 @@ Partial Class frmCRUDEditUnifiedOntology
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'frmCRUDAddUnifiedOntology
+        'ListboxAvailableModels
+        '
+        Me.ListboxAvailableModels.FormattingEnabled = True
+        Me.ListboxAvailableModels.Location = New System.Drawing.Point(301, 121)
+        Me.ListboxAvailableModels.Name = "ListboxAvailableModels"
+        Me.ListboxAvailableModels.Size = New System.Drawing.Size(215, 225)
+        Me.ListboxAvailableModels.Sorted = True
+        Me.ListboxAvailableModels.TabIndex = 18
+        '
+        'frmCRUDEditUnifiedOntology
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.ButtonCancel
-        Me.ClientSize = New System.Drawing.Size(652, 125)
+        Me.ClientSize = New System.Drawing.Size(652, 486)
         Me.ControlBox = False
         Me.Controls.Add(Me.ButtonCancel)
         Me.Controls.Add(Me.ButtonOkay)
         Me.Controls.Add(Me.GroupBox)
-        Me.Name = "frmCRUDAddUnifiedOntology"
+        Me.Name = "frmCRUDEditUnifiedOntology"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Add Unified Ontology"
         Me.GroupBox.ResumeLayout(False)
@@ -147,4 +213,10 @@ Partial Class frmCRUDEditUnifiedOntology
     Friend WithEvents LabelPromptImageFileLocation As Label
     Friend WithEvents ButtonFileSelect As Button
     Friend WithEvents ErrorProvider As ErrorProvider
+    Friend WithEvents ButtonExcludeModel As Button
+    Friend WithEvents ButtonIncludeModel As Button
+    Friend WithEvents LabelPromptAvailableGroups As Label
+    Friend WithEvents LabelPromptIncludedGroups As Label
+    Friend WithEvents ListBoxIncludedModels As ListBox
+    Friend WithEvents ListboxAvailableModels As ListBox
 End Class

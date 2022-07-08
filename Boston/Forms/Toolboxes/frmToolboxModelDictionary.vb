@@ -339,7 +339,7 @@ Public Class frmToolboxModelDictionary
         Try
             Dim loNode As New TreeNode
             Dim lrActor As CMML.Actor
-            Dim lrProcess, lrProcess1 As CMML.Process
+            Dim lrProcess As CMML.Process
 
             If prApplication.WorkingModel Is Nothing Then
                 Exit Sub

@@ -638,7 +638,11 @@ Namespace FBM
                                          Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing)
 
             Try
+                arRoleConstraintRole.isDirty = True
+
                 Me.RoleConstraintRole.Add(arRoleConstraintRole)
+
+                Call Me.makeDirty()
 
                 '=======================================================================
                 'RDS
@@ -1950,6 +1954,13 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+
+        End Sub
+
+        Public Overrides Sub makeDirty()
+
+            Me.isDirty = True
+            Call Me.Model.MakeDirty(False, False)
 
         End Sub
 

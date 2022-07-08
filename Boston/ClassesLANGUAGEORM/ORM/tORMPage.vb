@@ -2075,7 +2075,7 @@ NextY:
             Dim liInd As Integer = 0
             Dim lrFactData As FBM.FactData
 
-            Dim lrFactInstance As FBM.FactInstance
+            Dim lrFactInstance As FBM.FactInstance = Nothing
 
             Try
                 '---------------------------------------------

@@ -34,6 +34,9 @@ Public Class frmCRUDEditUnifiedOntology
             Me.TextBoxUnifiedOntologyName.Text = Me.moUnifiedOntology.Name
             Me.TextBoxImageFileLocation.Text = Me.moUnifiedOntology.ImageFileLocationName
 
+            Call Me.LoadAvailableModelsForUnifiedOntology(Me.moUnifiedOntology)
+            Call Me.LoadIncludedModelsForUnifiedOntology(Me.moUnifiedOntology)
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -44,6 +47,107 @@ Public Class frmCRUDEditUnifiedOntology
         End Try
 
     End Sub
+
+    Private Sub LoadAvailableModelsForUnifiedOntology(ByRef arUnifiedOntology As Ontology.UnifiedOntology)
+
+        Dim lsMessage As String
+        Dim lrModel As FBM.Model
+
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New ADODB.Recordset
+
+        lREcordset.ActiveConnection = pdbConnection
+        lREcordset.CursorType = pcOpenStatic
+
+        Try
+            '---------------------------------------------
+            'First get EntityTypes with no ParentEntityId
+            '---------------------------------------------
+            lsSQLQuery = " SELECT *"
+            lsSQLQuery &= "  FROM MetaModelModel"
+            lsSQLQuery &= " WHERE ModelId NOT IN (SELECT ModelId"
+            lsSQLQuery &= "                       FROM UnifiedOntologyModel"
+            lsSQLQuery &= "                       WHERE UnifiedOntologyId = '" & arUnifiedOntology.Id & "'"
+            lsSQLQuery &= "                 )"
+            lsSQLQuery &= " ORDER BY ModelName"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    lrModel = New FBM.Model
+                    lrModel.ModelId = lREcordset("ModelId").Value
+                    lrModel.Name = lREcordset("ModelName").Value
+
+                    Dim lrComboboxItem As New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                    Me.ListboxAvailableModels.Items.Add(lrComboboxItem)
+
+                    lREcordset.MoveNext()
+                End While
+            End If
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub LoadIncludedModelsForUnifiedOntology(ByRef arUnifiedOntology As Ontology.UnifiedOntology)
+
+        Dim lsMessage As String
+        Dim lrModel As FBM.Model
+
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New ADODB.Recordset
+
+        lREcordset.ActiveConnection = pdbConnection
+        lREcordset.CursorType = pcOpenStatic
+
+        Try
+            '---------------------------------------------
+            'First get EntityTypes with no ParentEntityId
+            '---------------------------------------------
+            lsSQLQuery = " SELECT *"
+            lsSQLQuery &= "  FROM MetaModelModel"
+            lsSQLQuery &= " WHERE ModelId IN (SELECT ModelId"
+            lsSQLQuery &= "                   FROM UnifiedOntologyModel"
+            lsSQLQuery &= "                   WHERE UnifiedOntologyId = '" & arUnifiedOntology.Id & "'"
+            lsSQLQuery &= "             )"
+            lsSQLQuery &= " ORDER BY ModelName"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    lrModel = New FBM.Model
+                    lrModel.ModelId = lREcordset("ModelId").Value
+                    lrModel.Name = lREcordset("ModelName").Value
+
+                    Dim lrComboboxItem As New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                    Me.ListBoxIncludedModels.Items.Add(lrComboboxItem)
+
+                    lREcordset.MoveNext()
+                End While
+            End If
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 
 
     Private Sub ButtonFileSelect_Click(sender As Object, e As EventArgs) Handles ButtonFileSelect.Click
@@ -258,4 +362,55 @@ Public Class frmCRUDEditUnifiedOntology
 
     End Sub
 
+    Private Sub ButtonIncludeModel_Click(sender As Object, e As EventArgs) Handles ButtonIncludeModel.Click
+
+        Try
+            If Me.ListboxAvailableModels.SelectedIndex = -1 Then
+                Exit Sub
+            Else
+                Dim lrModel As FBM.Model = Me.ListboxAvailableModels.SelectedItem.Tag
+
+                Dim lrComboboxItem As New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                Me.ListBoxIncludedModels.Items.Add(lrComboboxItem)
+                Me.ListboxAvailableModels.Items.RemoveAt(Me.ListboxAvailableModels.SelectedIndex)
+
+                pdbConnection.BeginTrans()
+                Call tableUnifiedOntologyModel.AddModelToUnifiedOntology(lrModel, Me.moUnifiedOntology)
+                pdbConnection.CommitTrans()
+            End If
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonExcludeModel_Click(sender As Object, e As EventArgs) Handles ButtonExcludeModel.Click
+
+        Try
+            If Me.ListBoxIncludedModels.SelectedIndex = -1 Then
+                Exit Sub
+            Else
+                Dim lrModel As FBM.Model = Me.ListBoxIncludedModels.SelectedItem.Tag
+
+                Dim lrComboboxItem As New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                Me.ListboxAvailableModels.Items.Add(lrComboboxItem)
+                Me.ListBoxIncludedModels.Items.RemoveAt(Me.ListBoxIncludedModels.SelectedIndex)
+
+                Call tableUnifiedOntologyModel.removeModelFromUnifiedOntology(lrModel, Me.moUnifiedOntology)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

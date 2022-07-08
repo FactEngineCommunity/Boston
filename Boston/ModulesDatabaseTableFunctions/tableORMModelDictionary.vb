@@ -312,6 +312,8 @@ Namespace TableModelDictionary
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of FBM.DictionaryEntry)
             End Try
 
         End Function

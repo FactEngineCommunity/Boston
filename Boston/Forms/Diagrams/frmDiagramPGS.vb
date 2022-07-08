@@ -1201,7 +1201,7 @@ Public Class frmDiagramPGS
     Private Sub Diagram_NodeSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeSelected
 
         Dim lrNode As Object
-        Dim lrPGSNodeType As PGS.Node
+        Dim lrPGSNodeType As PGS.Node = Nothing
 
         Try
 
