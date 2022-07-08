@@ -65,6 +65,7 @@ Public Module publicConstants
         ModelDoesntExist = 100
         ModelElementAlreadyExists = 101
         UndocumentedError = 1000
+        SyntaxError = 1001
     End Enum
 
     <Serializable()> _

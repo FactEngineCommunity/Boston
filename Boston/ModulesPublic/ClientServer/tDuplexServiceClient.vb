@@ -7,6 +7,27 @@ Imports System.Reflection
 
 Namespace DuplexServiceClient
 
+    Public Class DuplexServiceClientError
+
+        Public Success As Boolean = True
+        Public ErrorType As [Interface].publicConstants.pcenumErrorType = [Interface].publicConstants.pcenumErrorType.None
+        Public ErrorString As String = "No Error"
+
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal abSuccess As Boolean, aiErrorType As [Interface].publicConstants.pcenumErrorType, asErrorString As String)
+
+            Me.Success = abSuccess
+            Me.ErrorType = aiErrorType
+            Me.ErrorString = asErrorString
+        End Sub
+
+    End Class
+
     Public Class DuplexServiceClient
         Inherits DuplexClientBase(Of BostonWCFServiceLibrary.IDuplexService)
         Implements BostonWCFServiceLibrary.IDuplexService
@@ -360,12 +381,21 @@ Namespace DuplexServiceClient
                     If lrModel IsNot Nothing Then
                         Dim lrTempModel As FBM.Model = prApplication.WorkingModel
                         prApplication.WorkingModel = lrModel
-                        Call prApplication.Brain.ProcessFBMInterfaceFEKLStatement(e.Broadcast.FEKLStatement.Statement)
-                        prApplication.WorkingModel = lrTempModel
 
                         'Process FEKL Statement
-                        e.Broadcast.ErrorCode = [Interface].publicConstants.pcenumErrorType.None
-                        e.Broadcast.ErrorMessage = "Success"
+                        Dim lrDuplexServiceClientError As DuplexServiceClientError
+                        lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(e.Broadcast.FEKLStatement.Statement)
+
+                        If lrDuplexServiceClientError.Success Then
+                            e.Broadcast.ErrorCode = [Interface].publicConstants.pcenumErrorType.None
+                            e.Broadcast.ErrorMessage = "Success"
+                        Else
+                            e.Broadcast.ErrorCode = lrDuplexServiceClientError.ErrorType
+                            e.Broadcast.ErrorMessage = lrDuplexServiceClientError.ErrorString
+                        End If
+
+                        'Reset the WorkingModel
+                        prApplication.WorkingModel = lrTempModel
                     Else
                         e.Broadcast.ErrorCode = [Interface].publicConstants.pcenumErrorType.ModelDoesntExist
                         e.Broadcast.ErrorMessage = "Error. Model doesn't exist."
@@ -439,62 +469,72 @@ Namespace DuplexServiceClient
                                                 ByRef arInterfaceModel As Viev.FBM.Interface.Model,
                                                 ByRef arBroadcase As [Interface].Broadcast)
 
-            Select Case aiBroadcastType
-                Case Is = [Interface].pcenumBroadcastType.ModelSaved
-                    Call Me.HandleModelSaved(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.DeleteModel
-                    Call Me.HandleDeleteModel(arModel)
-                Case Is = [Interface].pcenumBroadcastType.AddModel
-                    Call Me.HandleAddModel(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddPage
-                    Call Me.HandleModelAddPage(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.SaveModel
-                    Call Me.HandleSaveModel(arModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddFactTypeReading
-                    Call Me.HandleModelAddFactTypeReading(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddRoleToFactType
-                    Call Me.HandleModelAddRoleToFactType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddRoleConstraint
-                    Call Me.HandleModelAddRoleConstraint(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddRoleConstraintArgument
-                    Call Me.HandleModelAddRoleConstraintArgument(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddValueType
-                    Call Me.HandleModelAddValueType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddEntityType
-                    Call Me.HandleModelAddEntityType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelAddFactType
-                    Call Me.HandleModelAddFactType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelDeleteEntityType
-                    Call Me.HandleModelDeleteEntityType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelDeleteFactType
-                    Call Me.HandleModelDeleteFactType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelDeleteFactTypeReading
-                    Call Me.HandleModelDeleteFactTypeReading(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelDeleteRoleConstraint
-                    Call Me.HandleModelDeleteRoleConstraint(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelDeleteValueType
-                    Call Me.HandleModelDeleteValueType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.PageMovePageObject
-                    Call Me.HandlePageMovePageObject(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelUpdateValueType
-                    Call Me.HandleModelUpdateValueType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelUpdateEntityType
-                    Call Me.HandleModelUpdateEntityType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelUpdateFactType
-                    Call Me.HandleModelUpdateFactType(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelUpdateFactTypeReading
-                    Call Me.HandleModelUpdateFactTypeReading(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelUpdateRole
-                    Call Me.HandleModelUpdateRole(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.ModelUpdateRoleConstraint
-                    Call Me.HandleModelUpdateRoleConstraint(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.PageDropModelElementAtPoint
-                    Call Me.HandlePageDropModelElementAtPoint(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.PageRemovePageObject
-                    Call Me.HandlePageRemovePageObject(arModel, arInterfaceModel)
-                Case Is = [Interface].pcenumBroadcastType.RoleReassignJoinedModelObject
-                    Call Me.HandleModelRoleReassignJoinedModelObject(arModel, arInterfaceModel)
-            End Select
+            Try
+                Select Case aiBroadcastType
+                    Case Is = [Interface].pcenumBroadcastType.ModelSaved
+                        Call Me.HandleModelSaved(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.DeleteModel
+                        Call Me.HandleDeleteModel(arModel)
+                    Case Is = [Interface].pcenumBroadcastType.AddModel
+                        Call Me.HandleAddModel(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddPage
+                        Call Me.HandleModelAddPage(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.SaveModel
+                        Call Me.HandleSaveModel(arModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddFactTypeReading
+                        Call Me.HandleModelAddFactTypeReading(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddRoleToFactType
+                        Call Me.HandleModelAddRoleToFactType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddRoleConstraint
+                        Call Me.HandleModelAddRoleConstraint(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddRoleConstraintArgument
+                        Call Me.HandleModelAddRoleConstraintArgument(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddValueType
+                        Call Me.HandleModelAddValueType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddEntityType
+                        Call Me.HandleModelAddEntityType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelAddFactType
+                        Call Me.HandleModelAddFactType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelDeleteEntityType
+                        Call Me.HandleModelDeleteEntityType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelDeleteFactType
+                        Call Me.HandleModelDeleteFactType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelDeleteFactTypeReading
+                        Call Me.HandleModelDeleteFactTypeReading(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelDeleteRoleConstraint
+                        Call Me.HandleModelDeleteRoleConstraint(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelDeleteValueType
+                        Call Me.HandleModelDeleteValueType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.PageMovePageObject
+                        Call Me.HandlePageMovePageObject(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelUpdateValueType
+                        Call Me.HandleModelUpdateValueType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelUpdateEntityType
+                        Call Me.HandleModelUpdateEntityType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelUpdateFactType
+                        Call Me.HandleModelUpdateFactType(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelUpdateFactTypeReading
+                        Call Me.HandleModelUpdateFactTypeReading(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelUpdateRole
+                        Call Me.HandleModelUpdateRole(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.ModelUpdateRoleConstraint
+                        Call Me.HandleModelUpdateRoleConstraint(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.PageDropModelElementAtPoint
+                        Call Me.HandlePageDropModelElementAtPoint(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.PageRemovePageObject
+                        Call Me.HandlePageRemovePageObject(arModel, arInterfaceModel)
+                    Case Is = [Interface].pcenumBroadcastType.RoleReassignJoinedModelObject
+                        Call Me.HandleModelRoleReassignJoinedModelObject(arModel, arInterfaceModel)
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -489,12 +489,6 @@ Public Class tBrain
             Me.OutputChannel.SelectionStart = Me.OutputChannel.Text.Length
             Me.OutputChannel.ScrollToCaret()
         Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
 SkipOutputChannel:
@@ -2562,8 +2556,7 @@ SkipOutputChannel:
                     Call Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent)
                     Return True
                 Case Is = VAQL.TokenType.FACTTYPECLAUSE
-                    Call Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
-                    Return True
+                    Return Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                 Case Is = VAQL.TokenType.KEYWDANYNUMBEROF
                     Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                     Return True
@@ -3652,9 +3645,10 @@ SkipOutputChannel:
 
     End Sub
 
-    Public Sub ProcessFBMInterfaceFEKLStatement(ByVal asFEKLStatement As String)
+    Public Function ProcessFBMInterfaceFEKLStatement(ByVal asFEKLStatement As String) As DuplexServiceClient.DuplexServiceClientError
 
         Dim loTokenType As VAQL.TokenType
+        Dim lrDuplexServiceClientError As New DuplexServiceClient.DuplexServiceClientError
 
         Try
             'CodeSafe
@@ -3662,8 +3656,14 @@ SkipOutputChannel:
                 prApplication.Brain.VAQLProcessor = New VAQL.Processor(prApplication.WorkingModel)
             End If
 
-            Call Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree)
-            Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False)
+            'Get the TokenType
+            If Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree) Then
+                Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True)
+            Else
+                lrDuplexServiceClientError = New DuplexServiceClient.DuplexServiceClientError(False, [Interface].publicConstants.pcenumErrorType.SyntaxError, "Syntax Error")
+            End If
+
+            Return lrDuplexServiceClientError
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -3674,7 +3674,7 @@ SkipOutputChannel:
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
-    End Sub
+    End Function
 
 
     Private Sub ProcessNaturalLanguage()

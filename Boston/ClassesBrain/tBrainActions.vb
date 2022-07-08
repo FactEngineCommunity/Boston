@@ -476,7 +476,10 @@ Partial Public Class tBrain
             End If
 
 EndProcessing:
-            Me.OutputChannel.Focus()
+            Try
+                Me.OutputChannel.Focus()
+            Catch ex As Exception
+            End Try
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -525,7 +528,7 @@ EndProcessing:
 
             lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0, True)
 
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,  )
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,  ,, abBroadcastInterfaceEvent)
 
             Dim lrRole As FBM.Role
             Dim larRole As New List(Of FBM.Role)
@@ -824,8 +827,8 @@ EndProcessing:
                 Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True, abBroadcastInterfaceEvent)
 
                 If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
-                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
-                    Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,, abBroadcastInterfaceEvent)
+                    Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, abBroadcastInterfaceEvent)
                 Else
                     Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
                     Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, "", Nothing, lrEntityType, True)
@@ -1002,7 +1005,7 @@ EndProcessing:
                         Exit Sub
                     End Try
 
-                    Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, True)
+                    Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
 
                     Dim lrModelError As New FBM.ModelError(127, lrValueType)
                     lrValueType.ModelError.RemoveAll(AddressOf lrModelError.EqualsByErrorIdModelElementId)

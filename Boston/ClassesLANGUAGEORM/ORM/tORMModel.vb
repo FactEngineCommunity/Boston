@@ -1987,21 +1987,23 @@ FinishedProcessing:
                             lrInterfaceModel.Page = lrInterfacePage
                         End If
 
-                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                        lrBroadcast.Model = lrInterfaceModel
-                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddFactType, lrBroadcast)
+                        If abBroadcastInterfaceEvent Then
+                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                            lrBroadcast.Model = lrInterfaceModel
+                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.ModelAddFactType, lrBroadcast)
 
-                        '------------------------------------------------------------------------------------------------------------------
-                        'If the FactType already has FactTypeReadings, broadcast those as well.
-                        For Each lrFactTypeReading In arFactType.FactTypeReading
-                            Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelAddFactTypeReading,
+                            '------------------------------------------------------------------------------------------------------------------
+                            'If the FactType already has FactTypeReadings, broadcast those as well.
+                            For Each lrFactTypeReading In arFactType.FactTypeReading
+                                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelAddFactTypeReading,
                                                                                 lrFactTypeReading,
                                                                                 Nothing)
-                        Next
+                            Next
+                        End If
 
                     End If
-                    '=====================================================================================
-                End If
+                        '=====================================================================================
+                    End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2589,7 +2591,8 @@ FinishedProcessing:
                                        Optional ByVal arLinkFactTypeRole As FBM.Role = Nothing,
                                        Optional ByVal abAddtoModel As Boolean = True,
                                        Optional ByRef arPage As FBM.Page = Nothing,
-                                       Optional ByVal abCreateUniqueName As Boolean = True) As FBM.FactType
+                                       Optional ByVal abCreateUniqueName As Boolean = True,
+                                       Optional abBroadcastInterfaceEvent As Boolean = True) As FBM.FactType
 
             Try
                 Dim lrModelObject As FBM.ModelObject
@@ -2647,7 +2650,7 @@ FinishedProcessing:
                         lrConceptInstance = Nothing
                     End If
 
-                    Me.AddFactType(lrFactType, abMakeModelDirty, True, lrConceptInstance)
+                    Me.AddFactType(lrFactType, abMakeModelDirty, abBroadcastInterfaceEvent, lrConceptInstance)
                 End If
 
                 '-----------------------
