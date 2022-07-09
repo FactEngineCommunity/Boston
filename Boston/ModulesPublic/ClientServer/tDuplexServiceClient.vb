@@ -422,7 +422,9 @@ Namespace DuplexServiceClient
                         If lrModel Is Nothing And
                         Not e.BroadcastType = [Interface].pcenumBroadcastType.AddModel Then Exit Sub 'Nothing more to do here.
 
-                        Call Me.HandleModelBroadcastReceived(e.BroadcastType, lrModel, lrInterfaceModel, e.Broadcast)
+                        If lrModel.Loaded Then
+                            Call Me.HandleModelBroadcastReceived(e.BroadcastType, lrModel, lrInterfaceModel, e.Broadcast)
+                        End If
                     End If
 
                 ElseIf lrInterfaceBroadcast.Invitation IsNot Nothing Then

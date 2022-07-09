@@ -9,78 +9,90 @@ Namespace DuplexServiceClient
             Dim lrInterfaceRoleConstraint As Viev.FBM.Interface.RoleConstraint
             Dim lrRoleConstraint As New FBM.RoleConstraint
 
+            Try
+                'CodeSafe
+                If Not arModel.Loaded Then Exit Sub
 
-            lrInterfaceRoleConstraint = arInterfaceModel.RoleConstraint(0)
+                lrInterfaceRoleConstraint = arInterfaceModel.RoleConstraint(0)
 
-            lrRoleConstraint.Id = lrInterfaceRoleConstraint.Id
-            lrRoleConstraint.Model = arModel
-            lrRoleConstraint.Name = lrInterfaceRoleConstraint.Name
-            lrRoleConstraint.IsMDAModelElement = lrInterfaceRoleConstraint.IsMDAModelElement
-            lrRoleConstraint.IsPreferredIdentifier = lrInterfaceRoleConstraint.IsPreferredIdentifier
-            lrRoleConstraint.ShortDescription = lrInterfaceRoleConstraint.ShortDescription
-            lrRoleConstraint.LongDescription = lrInterfaceRoleConstraint.LongDescription
-            lrRoleConstraint.MaximumFrequencyCount = lrInterfaceRoleConstraint.MaximumFrequencyCount
-            lrRoleConstraint.MinimumFrequencyCount = lrInterfaceRoleConstraint.MinimumFrequencyCount
-            lrRoleConstraint.RingConstraintType.GetByDescription(lrInterfaceRoleConstraint.RingConstraintType.ToString)
-            lrRoleConstraint.RoleConstraintType.GetByDescription(lrInterfaceRoleConstraint.RoleConstraintType.ToString)
-            lrRoleConstraint.IsDeontic = lrInterfaceRoleConstraint.IsDeontic
-            lrRoleConstraint.Cardinality = lrInterfaceRoleConstraint.Cardinality
-            lrRoleConstraint.CardinalityRangeType.GetByDescription(lrInterfaceRoleConstraint.CardinalityRangeType.ToString)
-            lrRoleConstraint.MinimumValue = lrInterfaceRoleConstraint.MinimumValue
-            lrRoleConstraint.MaximumValue = lrInterfaceRoleConstraint.MaximumValue
+                lrRoleConstraint.Id = lrInterfaceRoleConstraint.Id
+                lrRoleConstraint.Model = arModel
+                lrRoleConstraint.Name = lrInterfaceRoleConstraint.Name
+                lrRoleConstraint.IsMDAModelElement = lrInterfaceRoleConstraint.IsMDAModelElement
+                lrRoleConstraint.IsPreferredIdentifier = lrInterfaceRoleConstraint.IsPreferredIdentifier
+                lrRoleConstraint.ShortDescription = lrInterfaceRoleConstraint.ShortDescription
+                lrRoleConstraint.LongDescription = lrInterfaceRoleConstraint.LongDescription
+                lrRoleConstraint.MaximumFrequencyCount = lrInterfaceRoleConstraint.MaximumFrequencyCount
+                lrRoleConstraint.MinimumFrequencyCount = lrInterfaceRoleConstraint.MinimumFrequencyCount
+                lrRoleConstraint.RingConstraintType.GetByDescription(lrInterfaceRoleConstraint.RingConstraintType.ToString)
+                lrRoleConstraint.RoleConstraintType.GetByDescription(lrInterfaceRoleConstraint.RoleConstraintType.ToString)
+                lrRoleConstraint.IsDeontic = lrInterfaceRoleConstraint.IsDeontic
+                lrRoleConstraint.Cardinality = lrInterfaceRoleConstraint.Cardinality
+                lrRoleConstraint.CardinalityRangeType.GetByDescription(lrInterfaceRoleConstraint.CardinalityRangeType.ToString)
+                lrRoleConstraint.MinimumValue = lrInterfaceRoleConstraint.MinimumValue
+                lrRoleConstraint.MaximumValue = lrInterfaceRoleConstraint.MaximumValue
 
-            For Each lrInterfaceRoleConstraintRole In lrInterfaceRoleConstraint.RoleConstraintRoles
+                For Each lrInterfaceRoleConstraintRole In lrInterfaceRoleConstraint.RoleConstraintRoles
 
-                Dim lrRoleConstraintRole As New FBM.RoleConstraintRole
-                Dim lrRole As FBM.Role
+                    Dim lrRoleConstraintRole As New FBM.RoleConstraintRole
+                    Dim lrRole As FBM.Role
 
-                lrRoleConstraintRole.Model = arModel
+                    lrRoleConstraintRole.Model = arModel
 
-                lrRole = arModel.Role.Find(Function(x) x.Id = lrInterfaceRoleConstraintRole.RoleId)
+                    lrRole = arModel.Role.Find(Function(x) x.Id = lrInterfaceRoleConstraintRole.RoleId)
 
-                lrRoleConstraint.Role.Add(lrRole)
-                lrRoleConstraintRole.Role = lrRole
-                lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
+                    lrRoleConstraint.Role.Add(lrRole)
+                    lrRoleConstraintRole.Role = lrRole
+                    lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
 
-                If lrInterfaceRoleConstraintRole.ArgumentId <> "" Then
-                    lrRoleConstraintRole.RoleConstraintArgument = lrRoleConstraint.Argument.Find(Function(x) x.Id = lrInterfaceRoleConstraintRole.ArgumentId)
-                    lrRoleConstraintRole.RoleConstraintArgument.Id = lrInterfaceRoleConstraintRole.ArgumentId
-                    lrRoleConstraintRole.ArgumentSequenceNr = lrInterfaceRoleConstraintRole.ArgumentSequenceNr
+                    If lrInterfaceRoleConstraintRole.ArgumentId <> "" Then
+                        lrRoleConstraintRole.RoleConstraintArgument = lrRoleConstraint.Argument.Find(Function(x) x.Id = lrInterfaceRoleConstraintRole.ArgumentId)
+                        lrRoleConstraintRole.RoleConstraintArgument.Id = lrInterfaceRoleConstraintRole.ArgumentId
+                        lrRoleConstraintRole.ArgumentSequenceNr = lrInterfaceRoleConstraintRole.ArgumentSequenceNr
+                    End If
+
+                    lrRoleConstraintRole.SequenceNr = lrInterfaceRoleConstraintRole.SequenceNr
+
+                    lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                Next
+
+                If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                    lrRoleConstraint.LevelNr = lrRoleConstraint.RoleConstraintRole(0).Role.FactType.InternalUniquenessConstraint.Count + 1
                 End If
 
-                lrRoleConstraintRole.SequenceNr = lrInterfaceRoleConstraintRole.SequenceNr
+                arModel.AddRoleConstraint(lrRoleConstraint, True, False)
 
-                lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
-            Next
+                If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
 
-            If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                lrRoleConstraint.LevelNr = lrRoleConstraint.RoleConstraintRole(0).Role.FactType.InternalUniquenessConstraint.Count + 1
-            End If
+                    Dim lrFactType As FBM.FactType = lrRoleConstraint.RoleConstraintRole(0).Role.FactType
 
-            arModel.AddRoleConstraint(lrRoleConstraint, True, False)
+                    Call lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
 
-            If lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                End If
 
-                Dim lrFactType As FBM.FactType = lrRoleConstraint.RoleConstraintRole(0).Role.FactType
+                If arInterfaceModel.Page IsNot Nothing Then
+                    Dim lrPage As FBM.Page = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)
 
-                Call lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+                    Dim lrPointF As New PointF(arInterfaceModel.Page.ConceptInstance.X, arInterfaceModel.Page.ConceptInstance.Y)
+                    Select Case lrRoleConstraint.RoleConstraintType
+                        Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                            Call lrPage.DropFrequencyConstraintAtPoint(lrRoleConstraint, lrPointF)
+                        Case Else
+                            Call lrPage.DropRoleConstraintAtPoint(lrRoleConstraint, lrPointF)
+                    End Select
 
-            End If
+                End If
 
-            If arInterfaceModel.Page IsNot Nothing Then
-                Dim lrPage As FBM.Page = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)
+                Call arModel.MakeDirty(True, True)
 
-                Dim lrPointF As New PointF(arInterfaceModel.Page.ConceptInstance.X, arInterfaceModel.Page.ConceptInstance.Y)
-                Select Case lrRoleConstraint.RoleConstraintType
-                    Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                        Call lrPage.DropFrequencyConstraintAtPoint(lrRoleConstraint, lrPointF)
-                    Case Else
-                        Call lrPage.DropRoleConstraintAtPoint(lrRoleConstraint, lrPointF)
-                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            End If
-
-            Call arModel.MakeDirty(True, True)
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

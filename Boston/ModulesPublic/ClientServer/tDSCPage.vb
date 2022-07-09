@@ -36,6 +36,9 @@ Namespace DuplexServiceClient
         Private Sub HandlePageDropModelElementAtPoint(ByRef arModel As FBM.Model, ByVal arInterfaceModel As Viev.FBM.Interface.Model)
 
             Try
+                'CodeSafe
+                If Not arModel.Loaded Then Exit Sub
+
                 Dim lrPage As FBM.Page
                 lrPage = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)
 
@@ -43,6 +46,10 @@ Namespace DuplexServiceClient
                 lrInterfaceConceptInstance = arInterfaceModel.Page.ConceptInstance
 
                 Dim lrModelElement As FBM.ModelObject = arModel.GetModelObjectByName(lrInterfaceConceptInstance.ModelElementId)
+
+                'CodeSafe
+                If lrModelElement Is Nothing Then Exit Sub
+                If Not lrPage.Loaded Then Exit Sub
 
                 Select Case lrModelElement.ConceptType
                     Case Is = pcenumConceptType.ValueType
