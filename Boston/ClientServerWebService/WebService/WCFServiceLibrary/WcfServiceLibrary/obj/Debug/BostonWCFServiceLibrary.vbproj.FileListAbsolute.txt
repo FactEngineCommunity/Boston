@@ -30,4 +30,3 @@ D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\Client
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.dll
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.xml
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.pdb
-D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFServiceLibrary\WcfServiceLibrary\obj\Debug\BostonWCFServiceLibrary.vbproj.AssemblyReference.cache

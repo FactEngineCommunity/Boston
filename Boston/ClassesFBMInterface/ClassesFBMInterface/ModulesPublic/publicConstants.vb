@@ -16,6 +16,7 @@ Public Module publicConstants
         ModelAddRoleToFactType
         ModelAddModelNote
         ModelAddRoleConstraintArgument
+        ModelCreate
         ModelDeleteValueType
         ModelDeleteEntityType
         ModelDeleteFactType

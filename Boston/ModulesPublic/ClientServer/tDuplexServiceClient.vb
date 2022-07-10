@@ -376,6 +376,7 @@ Namespace DuplexServiceClient
                 lrInterfaceBroadcast = CType(e.Broadcast, Viev.FBM.Interface.Broadcast)
 
                 If e.BroadcastType = [Interface].publicConstants.pcenumBroadcastType.FEKLStatement Then
+
                     lrModel = prApplication.Models.Find(Function(x) x.ModelId = e.Broadcast.FEKLStatement.ModelId)
 
                     If lrModel IsNot Nothing Then
@@ -413,8 +414,23 @@ Namespace DuplexServiceClient
                             e.Broadcast.ErrorCode = [Interface].pcenumErrorType.ModelDoesntExist
                             e.Broadcast.ErrorMessage = "Model does not exist for name: " & lrInterfaceModel.Name
                         End If
+                    ElseIf e.BroadcastType = [Interface].pcenumBroadcastType.ModelCreate Then
+
+                        Dim lrNewModel As New FBM.Model(pcenumLanguage.ORMModel, lrInterfaceModel.Name, False)
+                        lrNewModel.ModelId = lrInterfaceModel.ModelId
+                        lrNewModel.CreatedByUserId = prApplication.User.Id
+                        lrNewModel.IsDirty = True
+                        Call lrNewModel.Save()
+
+                        If frmMain.zfrmModelExplorer IsNot Nothing Then
+                            Call frmMain.zfrmModelExplorer.AddModelToModelExplorer(lrNewModel, False)
+                        End If
+
                     Else
                         lrModel = prApplication.Models.Find(Function(x) x.ModelId = lrInterfaceModel.ModelId)
+
+                        'CodeSafe: Exit if Model is Nothing because this instance of Boston may not have the Model in the ModelExplorer
+                        If lrModel Is Nothing Then Exit Sub
 
                         'Model save method may have changed.
                         lrModel.StoreAsXML = lrInterfaceModel.StoreAsXML

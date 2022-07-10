@@ -20,6 +20,10 @@ Public Class frmToolboxClientServerBroadcastTester
                                                                  "FEKLStatement",
                                                                  [Interface].pcenumBroadcastType.FEKLStatement))
 
+            Me.ComboBoxBroadcastType.Items.Add(New tComboboxItem([Interface].pcenumBroadcastType.ModelCreate,
+                                                                 "ModelCreate",
+                                                                 [Interface].pcenumBroadcastType.ModelCreate))
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

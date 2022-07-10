@@ -23,6 +23,7 @@ Partial Class frmToolboxClientServerBroadcastTester
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox = New System.Windows.Forms.GroupBox()
+        Me.ButtonSendBroadcast = New System.Windows.Forms.Button()
         Me.ComboBoxBroadcastType = New System.Windows.Forms.ComboBox()
         Me.LabelPromptBroadcastType = New System.Windows.Forms.Label()
         Me.TextBoxClientServerResponce = New System.Windows.Forms.TextBox()
@@ -33,7 +34,6 @@ Partial Class frmToolboxClientServerBroadcastTester
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.TextBoxModelId = New System.Windows.Forms.TextBox()
         Me.LabelPromptModelId = New System.Windows.Forms.Label()
-        Me.ButtonSendBroadcast = New System.Windows.Forms.Button()
         Me.GroupBox.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -57,13 +57,23 @@ Partial Class frmToolboxClientServerBroadcastTester
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
         '
+        'ButtonSendBroadcast
+        '
+        Me.ButtonSendBroadcast.Location = New System.Drawing.Point(690, 19)
+        Me.ButtonSendBroadcast.Name = "ButtonSendBroadcast"
+        Me.ButtonSendBroadcast.Size = New System.Drawing.Size(98, 31)
+        Me.ButtonSendBroadcast.TabIndex = 10
+        Me.ButtonSendBroadcast.Text = "&Send Broadcast"
+        Me.ButtonSendBroadcast.UseVisualStyleBackColor = True
+        '
         'ComboBoxBroadcastType
         '
+        Me.ComboBoxBroadcastType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBoxBroadcastType.FormattingEnabled = True
         Me.ComboBoxBroadcastType.Location = New System.Drawing.Point(103, 81)
         Me.ComboBoxBroadcastType.Name = "ComboBoxBroadcastType"
         Me.ComboBoxBroadcastType.Size = New System.Drawing.Size(345, 21)
-        Me.ComboBoxBroadcastType.TabIndex = 9
+        Me.ComboBoxBroadcastType.TabIndex = 2
         '
         'LabelPromptBroadcastType
         '
@@ -97,7 +107,7 @@ Partial Class frmToolboxClientServerBroadcastTester
         Me.TextBoxFEKLStatement.Multiline = True
         Me.TextBoxFEKLStatement.Name = "TextBoxFEKLStatement"
         Me.TextBoxFEKLStatement.Size = New System.Drawing.Size(773, 208)
-        Me.TextBoxFEKLStatement.TabIndex = 5
+        Me.TextBoxFEKLStatement.TabIndex = 3
         '
         'LabelPromptFEKLStatement
         '
@@ -113,7 +123,7 @@ Partial Class frmToolboxClientServerBroadcastTester
         Me.TextBoxModelName.Location = New System.Drawing.Point(88, 49)
         Me.TextBoxModelName.Name = "TextBoxModelName"
         Me.TextBoxModelName.Size = New System.Drawing.Size(360, 20)
-        Me.TextBoxModelName.TabIndex = 3
+        Me.TextBoxModelName.TabIndex = 1
         '
         'LabelPromptModelName
         '
@@ -129,7 +139,7 @@ Partial Class frmToolboxClientServerBroadcastTester
         Me.TextBoxModelId.Location = New System.Drawing.Point(88, 19)
         Me.TextBoxModelId.Name = "TextBoxModelId"
         Me.TextBoxModelId.Size = New System.Drawing.Size(360, 20)
-        Me.TextBoxModelId.TabIndex = 1
+        Me.TextBoxModelId.TabIndex = 0
         '
         'LabelPromptModelId
         '
@@ -139,15 +149,6 @@ Partial Class frmToolboxClientServerBroadcastTester
         Me.LabelPromptModelId.Size = New System.Drawing.Size(51, 13)
         Me.LabelPromptModelId.TabIndex = 0
         Me.LabelPromptModelId.Text = "Model Id:"
-        '
-        'ButtonSendBroadcast
-        '
-        Me.ButtonSendBroadcast.Location = New System.Drawing.Point(690, 19)
-        Me.ButtonSendBroadcast.Name = "ButtonSendBroadcast"
-        Me.ButtonSendBroadcast.Size = New System.Drawing.Size(98, 20)
-        Me.ButtonSendBroadcast.TabIndex = 10
-        Me.ButtonSendBroadcast.Text = "&Send Broadcast"
-        Me.ButtonSendBroadcast.UseVisualStyleBackColor = True
         '
         'frmToolboxClientServerBroadcastTester
         '
