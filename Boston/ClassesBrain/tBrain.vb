@@ -2538,19 +2538,16 @@ SkipOutputChannel:
             Select Case aoTokenType
                 Case Is = VAQL.TokenType.KEYWDISANENTITYTYPE
                     'Is StraightToAction
-                    Call Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent)
-                    Return True
+                    Return Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDISAVALUETYPE
                     'Is StraightToAction
                     Return Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.VALUECONSTRAINTCLAUSE
                     'Is StraightToAction
-                    Call Me.ProcessVALUECONSTRAINTCLAUSE(abBroadcastInterfaceEvent)
-                    Return True
+                    Return Me.ProcessVALUECONSTRAINTCLAUSE(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                     'Is StraightToAction
-                    Call Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent)
-                    Return True
+                    Return Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     'Is StraightToAction
                     Call Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent)

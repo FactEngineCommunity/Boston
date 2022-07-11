@@ -446,7 +446,7 @@ Namespace DuplexServiceClient
                     End If
 
                 ElseIf lrInterfaceBroadcast.Invitation IsNot Nothing Then
-
+#Region "Invitation"
                     Dim lrInterfaceInvitation As Viev.FBM.Interface.Invitation
                     lrInterfaceInvitation = CType(e.Broadcast.Invitation, Viev.FBM.Interface.Invitation)
 
@@ -454,6 +454,7 @@ Namespace DuplexServiceClient
                     If lrInterfaceInvitation.InvitedUserId <> prApplication.User.Id Then Exit Sub
 
                     Call Me.HandleInvitationBroadcastReceived(lrInterfaceInvitation)
+#End Region
                 End If
 
             Catch ex As Exception

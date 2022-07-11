@@ -1,6 +1,7 @@
 Imports System.ComponentModel
 Imports System.Collections.Specialized
 Imports MindFusion.Diagramming
+Imports System.Reflection
 
 Namespace FBM
     <Serializable()> _
@@ -100,54 +101,68 @@ Namespace FBM
             Dim lo_Diagram As New MindFusion.Diagramming.Diagram
             Dim StringSize As New SizeF
 
-            lo_Diagram = Me.Shape.Parent
+            Try
+                'CodeSafe
+                If Me.Shape Is Nothing Then Exit Sub
+                If Me.Shape.Parent Is Nothing Then Exit Sub
 
-            If IsSomething(lo_Diagram) Then
-                '-------------
-                'Go forward
-                '-------------
-            Else
-                '------------------------------------------------------------------------
-                'Exit, because there is no ValueContraint yet set for the ValueType
-                '  so nothing to display. The ShapeNode is not associated with the
-                '  ValueConstraint until there is something to display, or after
-                '  something has been displayed. No harm in exiting here
-                '------------------------------------------------------------------------
-                Exit Sub
-            End If
+                lo_Diagram = Me.Shape.Parent
 
-            '-----------------------------------------------------------------------------------
-            'The ValueTypeConstraint enumerated e.g. "1,2,3,4", "1..2,20..22" or "value1, value2, value3" etc
-            '-----------------------------------------------------------------------------------
-            Dim ls_enumerated_value_constraint As String = Me.ValueType.EnumerateValueConstraint
+                If IsSomething(lo_Diagram) Then
+                    '-------------
+                    'Go forward
+                    '-------------
+                Else
+                    '------------------------------------------------------------------------
+                    'Exit, because there is no ValueContraint yet set for the ValueType
+                    '  so nothing to display. The ShapeNode is not associated with the
+                    '  ValueConstraint until there is something to display, or after
+                    '  something has been displayed. No harm in exiting here
+                    '------------------------------------------------------------------------
+                    Exit Sub
+                End If
 
-            If (ls_enumerated_value_constraint = "") Then
-                StringSize = lo_Diagram.MeasureString("", lo_Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-            Else
-                StringSize = lo_Diagram.MeasureString("{" & Trim(ls_enumerated_value_constraint) & "}", lo_Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-            End If
+                '-----------------------------------------------------------------------------------
+                'The ValueTypeConstraint enumerated e.g. "1,2,3,4", "1..2,20..22" or "value1, value2, value3" etc
+                '-----------------------------------------------------------------------------------
+                Dim ls_enumerated_value_constraint As String = Me.ValueType.EnumerateValueConstraint
 
-            '--------------------------------------------------------------
-            'ValueConstraint is already displayed for the ValueTypeInstance
-            '--------------------------------------------------------------
-            If ls_enumerated_value_constraint = "" Then
-                Me.Shape.Text = ""
-            Else
-                Me.Shape.Text = "{" & Trim(ls_enumerated_value_constraint) & "}"
-                Me.Shape.Resize(StringSize.Width, StringSize.Height)
+                If (ls_enumerated_value_constraint = "") Then
+                    StringSize = lo_Diagram.MeasureString("", lo_Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                Else
+                    StringSize = lo_Diagram.MeasureString("{" & Trim(ls_enumerated_value_constraint) & "}", lo_Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                End If
 
-                Me.Shape.TextColor = Color.Maroon
-                Me.Shape.Transparent = True
-                Me.Shape.Visible = True
-                Me.Shape.ZTop()
+                '--------------------------------------------------------------
+                'ValueConstraint is already displayed for the ValueTypeInstance
+                '--------------------------------------------------------------
+                If ls_enumerated_value_constraint = "" Then
+                    Me.Shape.Text = ""
+                Else
+                    Me.Shape.Text = "{" & Trim(ls_enumerated_value_constraint) & "}"
+                    Me.Shape.Resize(StringSize.Width, StringSize.Height)
 
-            End If
+                    Me.Shape.TextColor = Color.Maroon
+                    Me.Shape.Transparent = True
+                    Me.Shape.Visible = True
+                    Me.Shape.ZTop()
 
-            If (Me.Shape.Bounds.Y >= Me.ValueType.Shape.Bounds.Y) And (Me.Shape.Bounds.Y <= Me.ValueType.Shape.Bounds.Y) Then
-                Me.Shape.Move(Me.Shape.Bounds.X, Me.ValueType.Shape.Bounds.Y - 8)
-            End If
+                End If
 
-            lo_Diagram.Invalidate()
+                If (Me.Shape.Bounds.Y >= Me.ValueType.Shape.Bounds.Y) And (Me.Shape.Bounds.Y <= Me.ValueType.Shape.Bounds.Y) Then
+                    Me.Shape.Move(Me.Shape.Bounds.X, Me.ValueType.Shape.Bounds.Y - 8)
+                End If
+
+                lo_Diagram.Invalidate()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

@@ -798,7 +798,10 @@ EndProcessing:
 
     End Sub
 
-    Private Sub ProcessISANENTITYTYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessISANENTITYTYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                 Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
 
         Try
             With New WaitCursor
@@ -814,14 +817,21 @@ EndProcessing:
                 Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
                 If Me.Model.ExistsModelElement(lsEntityTypeName) Then
-                    Me.send_data("There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name")
-                    Exit Sub
+                    lsMessage = "There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name"
+                    If arDCSError IsNot Nothing Then
+                        arDCSError.Success = False
+                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDCSError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
                 End If
 
-                If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
-                    Me.send_data("I know.")
-                    Exit Sub
-                End If
+                '20220711-VM-Commented out in lieu of the above.
+                'If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsEntityTypeName And x.isEntityType) IsNot Nothing Then
+                '    Me.send_data("I know.")
+                '    Exit Sub
+                'End If
 
                 'Have already checked to see wither it is okay to create the EntityType above.
                 Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True, abBroadcastInterfaceEvent)
@@ -870,18 +880,22 @@ EndProcessing:
                 Me.Timeout.Start()
             End With
 
+            Return True
+
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
         End Try
 
-    End Sub
+    End Function
 
-    Private Sub ProcessVALUECONSTRAINTCLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessVALUECONSTRAINTCLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                  Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -899,15 +913,27 @@ EndProcessing:
                 Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUECONSTRAINTClause.MODELELEMENTNAME))
 
                 If Not Me.Model.ExistsModelElement(lsValueTypeName) Then
-                    Me.send_data("There is no Model Element with the name, '" & lsValueTypeName & "'. Try another name")
-                    Exit Sub
+                    lsMessage = "There is no Model Element with the name, '" & lsValueTypeName & "'. Try another name"
+                    If arDCSError IsNot Nothing Then
+                        arDCSError.Success = False
+                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDCSError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
                 End If
 
                 Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lsValueTypeName, True)
 
                 If Not lrModelElement.GetType = GetType(FBM.ValueType) Then
-                    Me.send_data("There is no Value Type called, '" & lsValueTypeName & "'.")
-                    Exit Sub
+                    lsMessage = "There is no Value Type called, '" & lsValueTypeName & "'."
+                    If arDCSError IsNot Nothing Then
+                        arDCSError.Success = False
+                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDCSError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
                 End If
 
                 Dim lrValueType = CType(lrModelElement, FBM.ValueType)
@@ -916,7 +942,14 @@ EndProcessing:
                 For Each lsValueConstraintValue In Me.VAQLProcessor.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE
 
                     If lrValueType.ValueConstraint.Contains(lsValueConstraintValue) Then
-                        Me.send_data("The value, " & lsValueConstraintValue & ", already exists in the Value Constraint for Value Type, " & lsValueTypeName)
+                        lsMessage = "The value, " & lsValueConstraintValue & ", already exists in the Value Constraint for Value Type, " & lsValueTypeName & "."
+                        If arDCSError IsNot Nothing Then
+                            arDCSError.Success = False
+                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDCSError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
                     Else
                         Call lrValueType.AddValueConstraint(lsValueConstraintValue)
                     End If
@@ -928,15 +961,20 @@ EndProcessing:
                 Me.Timeout.Start()
             End With
 
+            Return True
+
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
+
         End Try
 
-    End Sub
+    End Function
 
 
     Private Function ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
@@ -1224,107 +1262,135 @@ EndProcessing:
 
     End Sub
 
-    Private Sub ProcessVALUETYPEISWRITTENASStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessVALUETYPEISWRITTENASStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
-        Me.Model = prApplication.WorkingModel
-
-        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
-        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE = New Object
-        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH = New Object
-        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
-        Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER = ""
-
-        Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree.Nodes(0))
-
-        Dim lrValueTypeInstance As FBM.ValueTypeInstance
-        Dim lsValueTypeName As String = ""
-        Dim lsDataTypeName As String = ""
-        Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
-
-        lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
-
-        Dim liDataTypeLength As Integer = 0
-        Dim liDataTypePrecision As Integer = 0
-
-        If Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.GetType Is GetType(VAQL.ParseNode) Then
-            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.Nodes(0).Token.Text
-        ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.GetType Is GetType(VAQL.ParseNode) Then
-            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.Nodes(0).Token.Text
-            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
-        ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
-            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
-            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
-        End If
-
-        lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
-        If lsDataTypeName Is Nothing Then
-            Me.send_data("That's not a valid Data Type.")
-            Exit Sub
-        End If
+        Dim lsMessage As String
 
         Try
-            liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
-        Catch ex As Exception
-            Me.send_data("That's not a valid Data Type.")
-            Exit Sub
-        End Try
+            Me.Model = prApplication.WorkingModel
 
-        Dim lsActualModelElementName As String = ""
+            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
+            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE = New Object
+            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH = New Object
+            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
+            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER = ""
 
-        If Me.Model.GetConceptTypeByNameFuzzy(lsValueTypeName, lsActualModelElementName) = pcenumConceptType.ValueType Then
+            Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree.Nodes(0))
 
-            Dim lrValueType As FBM.ValueType
-            Dim liInitialDataType As pcenumORMDataType
+            Dim lrValueTypeInstance As FBM.ValueTypeInstance
+            Dim lsValueTypeName As String = ""
+            Dim lsDataTypeName As String = ""
+            Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
 
-            lrValueType = Me.Model.GetModelObjectByName(lsActualModelElementName)
-            liInitialDataType = lrValueType.DataType
+            lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
 
-            Dim lsInitialDataType = liInitialDataType.ToString
-            If lrValueType.DataTypeLength > 0 Then
-                lsInitialDataType &= "(" & lrValueType.DataTypeLength.ToString
-                If lrValueType.DataTypePrecision > 0 Then
-                    lsInitialDataType &= "," & lrValueType.DataTypePrecision.ToString
+            Dim liDataTypeLength As Integer = 0
+            Dim liDataTypePrecision As Integer = 0
+
+            If Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.GetType Is GetType(VAQL.ParseNode) Then
+                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.Nodes(0).Token.Text
+            ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.GetType Is GetType(VAQL.ParseNode) Then
+                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.Nodes(0).Token.Text
+                liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
+            ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
+                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
+                liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
+            End If
+
+            lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+            If lsDataTypeName Is Nothing Then
+                lsMessage = "That's not a valid Data Type."
+                If arDCSError IsNot Nothing Then
+                    arDCSError.Success = False
+                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDCSError.ErrorString = lsMessage
                 End If
-                lsInitialDataType &= ")"
+                Me.send_data(lsMessage)
+                Return False
             End If
 
-            Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
-
-            Dim lsNewDataType = liDataType.ToString
-            If liDataTypeLength > 0 Then
-                lsNewDataType &= "(" & liDataTypeLength.ToString
-                If liDataTypePrecision > 0 Then
-                    lsNewDataType &= "," & liDataTypePrecision.ToString
+            Try
+                liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+            Catch ex As Exception
+                lsMessage = "That's not a valid Data Type."
+                If arDCSError IsNot Nothing Then
+                    arDCSError.Success = False
+                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDCSError.ErrorString = lsMessage
                 End If
-                lsNewDataType &= ")"
-            End If
+                Me.send_data(lsMessage)
+                Return False
+            End Try
 
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
-            End If
+            Dim lsActualModelElementName As String = ""
 
-            Me.send_data("Thank you. I changed the DataType of Value Type, '" & lsActualModelElementName & "' from " & lsInitialDataType & " to " & lsNewDataType & ".", False)
-        Else
+            If Me.Model.GetConceptTypeByNameFuzzy(lsValueTypeName, lsActualModelElementName) = pcenumConceptType.ValueType Then
 
-            Me.Timeout.Stop()
+                Dim lrValueType As FBM.ValueType
+                Dim liInitialDataType As pcenumORMDataType
 
-            Dim lrValueType As FBM.ValueType
-            lrValueType = Me.Model.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
+                lrValueType = Me.Model.GetModelObjectByName(lsActualModelElementName)
+                liInitialDataType = lrValueType.DataType
 
-            If Me.Page IsNot Nothing Then
+                Dim lsInitialDataType = liInitialDataType.ToString
+                If lrValueType.DataTypeLength > 0 Then
+                    lsInitialDataType &= "(" & lrValueType.DataTypeLength.ToString
+                    If lrValueType.DataTypePrecision > 0 Then
+                        lsInitialDataType &= "," & lrValueType.DataTypePrecision.ToString
+                    End If
+                    lsInitialDataType &= ")"
+                End If
 
-                lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100))
-                Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+                Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
+
+                Dim lsNewDataType = liDataType.ToString
+                If liDataTypeLength > 0 Then
+                    lsNewDataType &= "(" & liDataTypeLength.ToString
+                    If liDataTypePrecision > 0 Then
+                        lsNewDataType &= "," & liDataTypePrecision.ToString
+                    End If
+                    lsNewDataType &= ")"
+                End If
 
                 If Me.AutoLayoutOn Then
                     Me.Page.Form.AutoLayout()
                 End If
+
+                Me.send_data("Thank you. I changed the DataType of Value Type, '" & lsActualModelElementName & "' from " & lsInitialDataType & " to " & lsNewDataType & ".", False)
+            Else
+
+                Me.Timeout.Stop()
+
+                Dim lrValueType As FBM.ValueType
+                lrValueType = Me.Model.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
+
+                If Me.Page IsNot Nothing Then
+
+                    lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100), abBroadcastInterfaceEvent)
+                    Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, abBroadcastInterfaceEvent)
+                    Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, abBroadcastInterfaceEvent)
+
+                    If Me.AutoLayoutOn Then
+                        Me.Page.Form.AutoLayout()
+                    End If
+                End If
+                Me.Timeout.Start()
+
             End If
-            Me.Timeout.Start()
 
-        End If
+            Return True
 
-    End Sub
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
+        End Try
+
+    End Function
 
 End Class

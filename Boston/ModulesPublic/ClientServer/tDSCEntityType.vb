@@ -37,40 +37,67 @@ Namespace DuplexServiceClient
 
         Private Sub HandleModelDeleteEntityType(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
 
-            Dim lrInterfaceEntityType As Viev.FBM.Interface.EntityType
-            lrInterfaceEntityType = arInterfaceModel.EntityType(0)
+            Try
+                Dim lrInterfaceEntityType As Viev.FBM.Interface.EntityType
+                lrInterfaceEntityType = arInterfaceModel.EntityType(0)
 
-            Dim lrEntityType As FBM.EntityType
-            lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrInterfaceEntityType.Id)
+                Dim lrEntityType As FBM.EntityType
+                lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrInterfaceEntityType.Id)
 
-            Call lrEntityType.RemoveFromModel(True, True, False)
+                'CodeSafe: Exit sub if nothing to remove.
+                If lrEntityType Is Nothing Then Exit Sub
+
+                Call lrEntityType.RemoveFromModel(True, True, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
         Private Sub HandleModelUpdateEntityType(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
 
-            Dim lrInterfaceEntityType As Viev.FBM.Interface.EntityType
-            lrInterfaceEntityType = arInterfaceModel.EntityType(0)
+            Try
 
-            Dim lrEntityType As FBM.EntityType
-            lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrInterfaceEntityType.Id)
+                Dim lrInterfaceEntityType As Viev.FBM.Interface.EntityType
+                lrInterfaceEntityType = arInterfaceModel.EntityType(0)
 
-            lrEntityType.PreferredIdentifierRCId = lrInterfaceEntityType.ReferenceSchemeRoleConstraintId
-            If lrEntityType.PreferredIdentifierRCId <> "" Then
-                lrEntityType.ReferenceModeRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrEntityType.PreferredIdentifierRCId)
-            End If
+                Dim lrEntityType As FBM.EntityType
+                lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrInterfaceEntityType.Id)
 
-            If lrInterfaceEntityType.Name <> lrEntityType.Name Then
-                Call lrEntityType.SetName(lrInterfaceEntityType.Name, False)
-            ElseIf lrInterfaceEntityType.IsIndependent <> lrEntityType.IsIndependent Then
-                Call lrEntityType.SetIsIndependent(lrInterfaceEntityType.IsIndependent, False)
-            ElseIf lrInterfaceEntityType.IsPersonal <> lrEntityType.IsPersonal Then
-                Call lrEntityType.SetIsPersonal(lrInterfaceEntityType.IsPersonal, False)
-            ElseIf lrInterfaceEntityType.IsAbsorbed <> lrEntityType.IsAbsorbed Then
-                Call lrEntityType.SetIsAbsorbed(lrInterfaceEntityType.IsAbsorbed, False)
-            ElseIf lrInterfaceEntityType.ReferenceMode <> lrEntityType.ReferenceMode Then
-                Call lrEntityType.SetReferenceMode(lrInterfaceEntityType.ReferenceMode, True, Nothing, False)
-            End If
+                'CodeSafe: Exit sub if nothing to remove.
+                If lrEntityType Is Nothing Then Exit Sub
+
+                lrEntityType.PreferredIdentifierRCId = lrInterfaceEntityType.ReferenceSchemeRoleConstraintId
+                If lrEntityType.PreferredIdentifierRCId <> "" Then
+                    lrEntityType.ReferenceModeRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrEntityType.PreferredIdentifierRCId)
+                End If
+
+                If lrInterfaceEntityType.Name <> lrEntityType.Name Then
+                    Call lrEntityType.SetName(lrInterfaceEntityType.Name, False)
+                ElseIf lrInterfaceEntityType.IsIndependent <> lrEntityType.IsIndependent Then
+                    Call lrEntityType.SetIsIndependent(lrInterfaceEntityType.IsIndependent, False)
+                ElseIf lrInterfaceEntityType.IsPersonal <> lrEntityType.IsPersonal Then
+                    Call lrEntityType.SetIsPersonal(lrInterfaceEntityType.IsPersonal, False)
+                ElseIf lrInterfaceEntityType.IsAbsorbed <> lrEntityType.IsAbsorbed Then
+                    Call lrEntityType.SetIsAbsorbed(lrInterfaceEntityType.IsAbsorbed, False)
+                ElseIf lrInterfaceEntityType.ReferenceMode <> lrEntityType.ReferenceMode Then
+                    Call lrEntityType.SetReferenceMode(lrInterfaceEntityType.ReferenceMode, True, Nothing, False)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

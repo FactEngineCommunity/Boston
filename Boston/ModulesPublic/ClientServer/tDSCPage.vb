@@ -7,29 +7,39 @@ Namespace DuplexServiceClient
         Private Sub HandleModelAddPage(ByRef arModel As FBM.Model, ByRef arInterfaceModel As Viev.FBM.Interface.Model)
 
             Dim lrPage As FBM.Page
-            lrPage = New FBM.Page(arModel, arInterfaceModel.Page.Id, arInterfaceModel.Page.Name, pcenumLanguage.ORMModel)
 
-            arModel.Page.AddUnique(lrPage)
+            Try
+                lrPage = New FBM.Page(arModel, arInterfaceModel.Page.Id, arInterfaceModel.Page.Name, pcenumLanguage.ORMModel)
 
-            arModel.IsDirty = True
-            lrPage.IsDirty = True
+                arModel.Page.AddUnique(lrPage)
 
-            If prApplication.WorkingProject Is Nothing Or prApplication.WorkingNamespace Is Nothing Then
-                Exit Sub
-            End If
+                arModel.IsDirty = True
+                lrPage.IsDirty = True
 
-            If prApplication.WorkingProject.Id = arInterfaceModel.ProjectId _
-                And prApplication.WorkingNamespace.Name = arInterfaceModel.Namespace Then
-
-                If frmMain.zfrmModelExplorer IsNot Nothing Then
-
-                    Dim lrModelNode As TreeNode
-                    lrModelNode = frmMain.zfrmModelExplorer.TreeView.Nodes.Find(arModel.ModelId, True)(0)
-                    Call frmMain.zfrmModelExplorer.AddPageToModel(lrModelNode, lrPage, False)
-
+                If prApplication.WorkingProject Is Nothing Or prApplication.WorkingNamespace Is Nothing Then
+                    Exit Sub
                 End If
-            End If
 
+                If prApplication.WorkingProject.Id = arInterfaceModel.ProjectId _
+                    And prApplication.WorkingNamespace.Name = arInterfaceModel.Namespace Then
+
+                    If frmMain.zfrmModelExplorer IsNot Nothing Then
+
+                        Dim lrModelNode As TreeNode
+                        lrModelNode = frmMain.zfrmModelExplorer.TreeView.Nodes.Find(arModel.ModelId, True)(0)
+                        Call frmMain.zfrmModelExplorer.AddPageToModel(lrModelNode, lrPage, False)
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -41,6 +51,9 @@ Namespace DuplexServiceClient
 
                 Dim lrPage As FBM.Page
                 lrPage = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)
+
+                'CodeSafe: Exit sub if there is no Page.
+                If lrPage Is Nothing Then Exit Sub
 
                 Dim lrInterfaceConceptInstance As Viev.FBM.Interface.ConceptInstance
                 lrInterfaceConceptInstance = arInterfaceModel.Page.ConceptInstance
@@ -88,6 +101,9 @@ Namespace DuplexServiceClient
                 Dim lrPage As FBM.Page
                 lrPage = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)
 
+                'CodeSafe: Exit sub if there is no Page.
+                If lrPage Is Nothing Then Exit Sub
+
                 Call lrPage.moveModelElement(arInterfaceModel.Page.ConceptInstance)
 
             Catch ex As Exception
@@ -106,6 +122,9 @@ Namespace DuplexServiceClient
             Try
                 Dim lrPage As FBM.Page
                 lrPage = arModel.Page.Find(Function(x) x.PageId = arInterfaceModel.Page.Id)
+
+                'CodeSafe: Exit sub if there is no Page.
+                If lrPage Is Nothing Then Exit Sub
 
                 Dim lrInterfaceConceptInstance As Viev.FBM.Interface.ConceptInstance
                 lrInterfaceConceptInstance = arInterfaceModel.Page.ConceptInstance

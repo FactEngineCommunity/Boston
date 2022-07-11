@@ -41,6 +41,9 @@ Namespace DuplexServiceClient
 
                     lrRole = arModel.Role.Find(Function(x) x.Id = lrInterfaceRoleConstraintRole.RoleId)
 
+                    'CodeSafe: Exit sub if there is no Role.
+                    If lrRole Is Nothing Then Exit Sub
+
                     lrRoleConstraint.Role.Add(lrRole)
                     lrRoleConstraintRole.Role = lrRole
                     lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
@@ -112,6 +115,9 @@ Namespace DuplexServiceClient
 
                 lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrRoleConstraint.Id)
 
+                'CodeSafe: Exit sub if there is no RoleConstraint.
+                If lrRoleConstraint Is Nothing Then Exit Sub
+
                 Dim lrRole As FBM.Role
                 Dim lrRoleConstraintRole As FBM.RoleConstraintRole
                 For Each lrInterfaceRoleConstraintRole In lrInterfaceRoleConstraint.RoleConstraintRoles
@@ -156,6 +162,9 @@ Namespace DuplexServiceClient
                                                                    lrInterfaceRCArgument.Id)
 
                 lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrRoleConstraint.Id)
+
+                'CoeSafe: Exit sub if there is no RoleConstraint.
+                If lrRoleConstraint Is Nothing Then Exit Sub
 
                 Dim lrRoleConstraintRole As FBM.RoleConstraintRole
                 For Each lrInterfaceRoleconstraintRole In lrInterfaceRCArgument.RoleConstraintRole
@@ -207,6 +216,9 @@ Namespace DuplexServiceClient
 
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrInterfaceRoleConstraint.Id)
+
+                'CoeSafe: Exit sub if there is no RoleConstraint.
+                If lrRoleConstraint Is Nothing Then Exit Sub
 
                 If lrInterfaceRoleConstraint.Name <> lrRoleConstraint.Name Then
                     Call lrRoleConstraint.SetName(lrInterfaceRoleConstraint.Name, False)
