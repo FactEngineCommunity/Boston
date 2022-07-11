@@ -939,7 +939,8 @@ EndProcessing:
     End Sub
 
 
-    Private Sub ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                               Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -959,14 +960,21 @@ EndProcessing:
                 Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISAVALUETYPEStatement.MODELELEMENTNAME))
 
                 If Me.Model.ExistsModelElement(lsValueTypeName) Then
-                    Me.send_data("There is already a Model Element with the name, '" & lsValueTypeName & "'. Try another name")
-                    Exit Sub
+                    lsMessage = "There is already a Model Element with the name, '" & lsValueTypeName & "'. Try another name"
+                    If arDCSError IsNot Nothing Then
+                        arDCSError.Success = False
+                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDCSError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
                 End If
 
-                If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsValueTypeName And x.isValueType) IsNot Nothing Then
-                    Me.send_data("I know.")
-                    Exit Sub
-                End If
+                '20220711VM-Was. But covered by the above.
+                'If Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsValueTypeName And x.isValueType) IsNot Nothing Then
+                '    Me.send_data("I know.")
+                '    Exit Sub
+                'End If
 
                 'Have already checked to see wither it is okay to create the ValueType above.
                 Dim lrValueType = Me.Model.CreateValueType(Trim(lsValueTypeName), True,,,, abBroadcastInterfaceEvent)
@@ -994,15 +1002,27 @@ EndProcessing:
 
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                     If lsDataTypeName Is Nothing Then
-                        Me.send_data("That's not a valid Data Type.")
-                        Exit Sub
+                        lsMessage = "That's not a valid Data Type."
+                        If arDCSError IsNot Nothing Then
+                            arDCSError.Success = False
+                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDCSError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
                     End If
 
                     Try
                         liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                     Catch ex As Exception
-                        Me.send_data("That's not a valid Data Type.")
-                        Exit Sub
+                        lsMessage = "That's not a valid Data Type."
+                        If arDCSError IsNot Nothing Then
+                            arDCSError.Success = False
+                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDCSError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
                     End Try
 
                     Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
@@ -1040,15 +1060,18 @@ EndProcessing:
                 Me.Timeout.Start()
             End With
 
+            Return True
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
         End Try
 
-    End Sub
+    End Function
 
     Public Sub executeStatementAddInternalUniquenessConstraint(ByRef arQuestion As tQuestion, ByVal asInputBuffer As String)
 

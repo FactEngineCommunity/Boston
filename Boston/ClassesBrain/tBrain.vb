@@ -2529,7 +2529,8 @@ SkipOutputChannel:
     Private Function ProcessVAQLStatement(ByVal asOriginalSentence As String,
                                           ByVal aoTokenType As VAQL.TokenType,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                          Optional ByVal abStraightToActionProcessing As Boolean = False) As Boolean
+                                          Optional ByVal abStraightToActionProcessing As Boolean = False,
+                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         ProcessVAQLStatement = False
 
@@ -2541,8 +2542,7 @@ SkipOutputChannel:
                     Return True
                 Case Is = VAQL.TokenType.KEYWDISAVALUETYPE
                     'Is StraightToAction
-                    Call Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent)
-                    Return True
+                    Return Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.VALUECONSTRAINTCLAUSE
                     'Is StraightToAction
                     Call Me.ProcessVALUECONSTRAINTCLAUSE(abBroadcastInterfaceEvent)
@@ -3648,7 +3648,7 @@ SkipOutputChannel:
     Public Function ProcessFBMInterfaceFEKLStatement(ByVal asFEKLStatement As String) As DuplexServiceClient.DuplexServiceClientError
 
         Dim loTokenType As VAQL.TokenType
-        Dim lrDuplexServiceClientError As New DuplexServiceClient.DuplexServiceClientError
+        Dim lrDuplexServiceClientError As New DuplexServiceClient.DuplexServiceClientError(True, [Interface].publicConstants.pcenumErrorType.None, "")
 
         Try
             'CodeSafe
@@ -3658,7 +3658,7 @@ SkipOutputChannel:
 
             'Get the TokenType
             If Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree) Then
-                Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True)
+                Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True, lrDuplexServiceClientError)
             Else
                 lrDuplexServiceClientError = New DuplexServiceClient.DuplexServiceClientError(False, [Interface].publicConstants.pcenumErrorType.SyntaxError, "Syntax Error")
             End If

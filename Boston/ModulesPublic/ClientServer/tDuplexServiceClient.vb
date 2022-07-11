@@ -376,7 +376,7 @@ Namespace DuplexServiceClient
                 lrInterfaceBroadcast = CType(e.Broadcast, Viev.FBM.Interface.Broadcast)
 
                 If e.BroadcastType = [Interface].publicConstants.pcenumBroadcastType.FEKLStatement Then
-
+#Region "FEKL Statement"
                     lrModel = prApplication.Models.Find(Function(x) x.ModelId = e.Broadcast.FEKLStatement.ModelId)
 
                     If lrModel IsNot Nothing Then
@@ -384,7 +384,7 @@ Namespace DuplexServiceClient
                         prApplication.WorkingModel = lrModel
 
                         'Process FEKL Statement
-                        Dim lrDuplexServiceClientError As DuplexServiceClientError
+                        Dim lrDuplexServiceClientError As New DuplexServiceClientError(True, [Interface].publicConstants.pcenumErrorType.None, "")
                         lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(e.Broadcast.FEKLStatement.Statement)
 
                         If lrDuplexServiceClientError.Success Then
@@ -401,12 +401,13 @@ Namespace DuplexServiceClient
                         e.Broadcast.ErrorCode = [Interface].publicConstants.pcenumErrorType.ModelDoesntExist
                         e.Broadcast.ErrorMessage = "Error. Model doesn't exist."
                     End If
-
+#End Region
                 ElseIf lrInterfaceBroadcast.Model IsNot Nothing Then
                     Dim lrInterfaceModel As Viev.FBM.Interface.Model
                     lrInterfaceModel = CType(e.Broadcast.Model, Viev.FBM.Interface.Model)
 
                     If e.BroadcastType = [Interface].pcenumBroadcastType.ModelGetModelIdByModelName Then
+#Region "GetModelId"
                         lrModel = prApplication.Models.Find(Function(x) x.Name = lrInterfaceModel.Name)
                         If lrModel IsNot Nothing Then
                             lrInterfaceModel.ModelId = lrModel.ModelId
@@ -414,8 +415,9 @@ Namespace DuplexServiceClient
                             e.Broadcast.ErrorCode = [Interface].pcenumErrorType.ModelDoesntExist
                             e.Broadcast.ErrorMessage = "Model does not exist for name: " & lrInterfaceModel.Name
                         End If
+#End Region
                     ElseIf e.BroadcastType = [Interface].pcenumBroadcastType.ModelCreate Then
-
+#Region "CreateModel"
                         Dim lrNewModel As New FBM.Model(pcenumLanguage.ORMModel, lrInterfaceModel.Name, False)
                         lrNewModel.ModelId = lrInterfaceModel.ModelId
                         lrNewModel.CreatedByUserId = prApplication.User.Id
@@ -425,7 +427,7 @@ Namespace DuplexServiceClient
                         If frmMain.zfrmModelExplorer IsNot Nothing Then
                             Call frmMain.zfrmModelExplorer.AddModelToModelExplorer(lrNewModel, False)
                         End If
-
+#End Region
                     Else
                         lrModel = prApplication.Models.Find(Function(x) x.ModelId = lrInterfaceModel.ModelId)
 
