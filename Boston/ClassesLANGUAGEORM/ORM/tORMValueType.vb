@@ -1248,7 +1248,7 @@ Namespace FBM
                             lrRole.FactType.makeDirty()
                             Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lrRole.FactType.Id)
                             Call lrModelDictionaryEntry.Save()
-                            lrRole.FactType.Save()
+                            If Not abSuppressModelSave Then lrRole.FactType.Save()
                         Next
                     End If
 
@@ -1269,7 +1269,7 @@ Namespace FBM
 
                     '-------------------------------------------------------------
                     'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
-                    Me.Model.Save()
+                    If Not abSuppressModelSave Then Me.Model.Save()
 
                     Return True
                 End If 'Me.Id <> asNewName

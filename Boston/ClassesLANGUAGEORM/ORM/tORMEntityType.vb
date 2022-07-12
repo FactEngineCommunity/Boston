@@ -2719,7 +2719,7 @@ FailsafeContinue:
 
                         Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, "", Nothing, Me, True)
                     Else
-                        lrValueType.SetName(Me.MakeReferenceModeName)
+                        lrValueType.SetName(Me.MakeReferenceModeName, abBroadcastInterfaceEvent)
                     End If
                 ElseIf abSimpleAssignment Then
                     '------------------------------------------------------------------------------------------------------------------------
@@ -3117,7 +3117,7 @@ FailsafeContinue:
                         For Each lrRole In larRole
                             lrRole.makeDirty()
                             lrRole.FactType.makeDirty()
-                            lrRole.FactType.Save()
+                            If Not abSuppressModelSave Then lrRole.FactType.Save(False)
                         Next
                     End If
 
@@ -3147,7 +3147,7 @@ FailsafeContinue:
                     For Each lrRole In Me.Model.Role.FindAll(Function(x) x.JoinedORMObject.Id = Me.Id)
                         lrRole.makeDirty()
                         lrRole.FactType.makeDirty()
-                        Call lrRole.FactType.Save()
+                        If Not abSuppressModelSave Then lrRole.FactType.Save()
                     Next
                 End If
 
@@ -3157,7 +3157,7 @@ FailsafeContinue:
                     Dim lsValueTypeName = Me.MakeReferenceModeName
                     Call Me.ReferenceModeValueType.SetName(lsValueTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
                     Dim lsFactTypeName As String = Me.Id & "Has" & Me.ReferenceModeValueType.Id
-                    Call Me.ReferenceModeFactType.setName(lsFactTypeName, abBroadcastInterfaceEvent)
+                    Call Me.ReferenceModeFactType.setName(lsFactTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
                 End If
                 '==============================================================================================
 

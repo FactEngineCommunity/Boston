@@ -2138,7 +2138,8 @@ Namespace FBM
         Public Sub ReassignJoinedModelObject(ByRef arNewJoinedModelObject As FBM.ModelObject,
                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                              Optional arConceptInstance As FBM.ConceptInstance = Nothing,
-                                             Optional abIgnoreRDSProcessing As Boolean = False)
+                                             Optional abIgnoreRDSProcessing As Boolean = False,
+                                             Optional abSuppressModelSave As Boolean = False)
 
             Try
                 '==========================================================================================
@@ -2621,7 +2622,7 @@ FinishedProcessing:
                     If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Then
                         'Likely creating a new binary FactType from the Toolbox, and still has a Role that is unjoined.
                     Else
-                        Call Me.Model.Save()
+                        If Not abSuppressModelSave Then Me.Model.Save()
                     End If
 
 

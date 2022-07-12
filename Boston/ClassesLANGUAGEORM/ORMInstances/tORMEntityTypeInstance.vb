@@ -2324,9 +2324,10 @@ MoveOn:
 
                 '------------------------------------------------------------------------------------------------------------------
                 'Refresh the FactTables for FactTypes that join to the EntityTypeInstance, to reflect the CompoundReferenceScheme
-                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                          From Role In FactTypeInstance.RoleGroup _
-                                          Where Role.JoinedORMObject.Id = Me.Id _
+                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                          From Role In FactTypeInstance.RoleGroup
+                                          Where Role.JoinedORMObject IsNot Nothing
+                                          Where Role.JoinedORMObject.Id = Me.Id
                                           Select FactTypeInstance
 
                 For Each lrFactTypeInstance In larFactTypeInstance.ToArray
@@ -2447,7 +2448,7 @@ MoveOn:
                         Me.ReferenceModeFactType.isPreferredReferenceMode = False
                         Me.ReferenceModeFactType.Visible = True
 
-                        Call Me.SetAdjoinedFactTypesBetweenModelElements(Me.ReferenceModeFactType)
+                        Call Me.SetAdjoinedFactTypesBetweenModelElements(Me.ReferenceModeFactType, False)
                         Me.ReferenceModeFactType = Nothing
                     End If
 
@@ -2624,7 +2625,8 @@ MoveOn:
         '''   and the other ModelElement of the Binary FactType
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub SetAdjoinedFactTypesBetweenModelElements(Optional arFactTypeInstance As FBM.FactTypeInstance = Nothing)
+        Public Sub SetAdjoinedFactTypesBetweenModelElements(Optional arFactTypeInstance As FBM.FactTypeInstance = Nothing,
+                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
             Dim lrFactTypeInstance As FBM.FactTypeInstance
             Dim lrLink As DiagramLink
@@ -2663,7 +2665,7 @@ MoveOn:
                                 liX = (Me.X + lrObject.X) / 2
                                 liY = (Me.Y + lrObject.Y) / 2
 
-                                lrFactTypeInstance.Move(liX, liY, True)
+                                lrFactTypeInstance.Move(liX, liY, abBroadcastInterfaceEvent)
                             End If
                         End If
                     End If

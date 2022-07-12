@@ -45,6 +45,7 @@ Namespace TableEntityTypeInstance
         Function GetEntityTypeInstancesByPage(ByRef arPage As FBM.Page) As List(Of FBM.EntityTypeInstance)
 
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrEntityType As FBM.EntityType
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
             Dim lsId As String
@@ -76,7 +77,11 @@ Namespace TableEntityTypeInstance
                         lrEntityTypeInstance.Page = arPage
                         lrEntityTypeInstance.Id = lREcordset("EntityTypeId").Value
 
-                        lrEntityTypeInstance.EntityType = arPage.Model.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                        'CodeSafe: Proceed only if EntityType is in the Model. On rare occation Page may contain artifacts that are no longer in the Model.
+                        lrEntityType = arPage.Model.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                        If lrEntityType Is Nothing Then GoTo SkipEntityTypeInstance
+
+                        lrEntityTypeInstance.EntityType = lrEntityType
                         lrEntityTypeInstance._Name = lREcordset("EntityTypeName").Value
                         lrEntityTypeInstance.ReferenceMode = Viev.NullVal(lREcordset("ReferenceMode").Value, "")
                         lrEntityTypeInstance.ShortDescription = lrEntityTypeInstance.EntityType.ShortDescription
@@ -101,6 +106,7 @@ Namespace TableEntityTypeInstance
                         lrEntityTypeInstance.Y = lREcordset("y").Value
 
                         GetEntityTypeInstancesByPage.AddUnique(lrEntityTypeInstance)
+SkipEntityTypeInstance:
                         lREcordset.MoveNext()
                     End While
 

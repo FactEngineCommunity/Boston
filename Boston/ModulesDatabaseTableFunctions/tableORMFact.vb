@@ -33,24 +33,42 @@ Namespace TableFact
 
         End Sub
 
-        Public Sub DeleteFact(ByVal arFact As FBM.Fact)
+        ''' <summary>
+        ''' Deletes a Fact from the database.
+        ''' </summary>
+        ''' <param name="arFact"></param>
+        ''' <param name="abIgnoreErrors">In DuplexClient Client/Server mode can raise 'Record is deleted' error. Set to True if this persists</param>
+        Public Sub DeleteFact(ByVal arFact As FBM.Fact, Optional ByVal abIgnoreErrors As Boolean = False)
 
-            Dim lsSQLQuery As String = ""
+            Try
 
-            lsSQLQuery = "DELETE FROM MetaModelFact"
-            lsSQLQuery &= " WHERE Symbol = '" & arFact.Symbol & "'" 'Symbol is FactId
-            lsSQLQuery &= " AND ModelId = '" & arFact.Model.ModelId & "'"
+                Dim lsSQLQuery As String = ""
 
-            pdbConnection.BeginTrans()
+                lsSQLQuery = "DELETE FROM MetaModelFact"
+                lsSQLQuery &= " WHERE Symbol = '" & arFact.Symbol & "'" 'Symbol is FactId
+                lsSQLQuery &= " AND ModelId = '" & arFact.Model.ModelId & "'"
 
-            pdbConnection.Execute(lsSQLQuery)
+                pdbConnection.BeginTrans()
 
-            '----------------------------------------------
-            'Delete the FactData associated with the Fact
-            '----------------------------------------------
-            Call TableFactData.DeleteFactDataByFact(arFact)
+                '----------------------------------------------
+                'Delete the FactData associated with the Fact
+                '----------------------------------------------
+                Call TableFactData.DeleteFactDataByFact(arFact)
 
-            pdbConnection.CommitTrans()
+                pdbConnection.Execute(lsSQLQuery)
+
+                pdbConnection.CommitTrans()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+
+                pdbConnection.RollbackTrans()
+                If Not abIgnoreErrors Then prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -93,6 +111,9 @@ Namespace TableFact
 
         Public Sub GetFactsForFactType(ByRef arFactType As FBM.FactType) 'As List(Of FBM.Fact)
 
+            Dim lrFact As FBM.Fact
+            Dim lsMessage As String
+
             Dim lsSQLQuery As String
             Dim lRecordset As New ADODB.Recordset
 
@@ -120,8 +141,7 @@ Namespace TableFact
                 If Not lRecordset.EOF Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
-                    Dim lrFactDictionaryEntry As FBM.DictionaryEntry '20220129-VM-Removed. = New FBM.DictionaryEntry(arFactType.Model, "DummyFactId", pcenumConceptType.Fact)
-                    Dim lrFact As FBM.Fact
+                    Dim lrFactDictionaryEntry As FBM.DictionaryEntry '20220129-VM-Removed. = New FBM.DictionaryEntry(arFactType.Model, "DummyFactId", pcenumConceptType.Fact)                
                     Dim liInd As Integer
                     Dim lrRole As FBM.Role
                     Dim larRoleGroup As List(Of FBM.Role) = arFactType.RoleGroup
@@ -183,12 +203,15 @@ Namespace TableFact
                 lRecordset.Close()
 
             Catch ex As Exception
-                Dim lsMessage1 As String
-                lsMessage1 = "Error: TableFact.GetFactsForFactType"
-                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                lsMessage1 &= vbCrLf & vbCrLf & "Loading Facts for FactType: '" & arFactType.Id & "'"
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                lsMessage = "Error: TableFact.GetFactsForFactType"
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage &= vbCrLf & vbCrLf & "Loading Facts for FactType: '" & arFactType.Id & "'"
+                If lrFact IsNot Nothing Then
+                    lsMessage.AppendDoubleLineBreak("Fact.Id: " & lrFact.Id)
+                End If
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
+                lRecordset.Close()
                 'GetFactsForFactType = Nothing
             End Try
 

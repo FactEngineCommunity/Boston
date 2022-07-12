@@ -515,7 +515,7 @@ Namespace FBM
                 lrFactType.Fact.Remove(Me)
 
                 If abDoDatabaseProcessing Then
-                    Call TableFact.DeleteFact(Me)
+                    Call TableFact.DeleteFact(Me, True)
 
                     '-----------------------------------------------------------------------------------------------------
                     'Models Stored as XML need to be saved to remove the appropriate ModelElements, and is a quick save.

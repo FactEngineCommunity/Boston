@@ -2889,10 +2889,15 @@ Namespace FBM
 
         End Function
 
-        Public Function getPreferredInternalUniquenessConstraint() As FBM.RoleConstraint
+        ''' <summary>
+        ''' Gets the PreferredInternalUniquenessConstraint for the FactType, if there is one.
+        ''' </summary>
+        ''' <param name="abIgnoreErrors">Needed sometimes, as in when in Client/Server DuplexClientServer model.</param>
+        ''' <returns></returns>
+        Public Function getPreferredInternalUniquenessConstraint(Optional ByVal abIgnoreErrors As Boolean = False) As FBM.RoleConstraint
 
             Try
-                If Me.InternalUniquenessConstraint.Count = 0 Then
+                If Me.InternalUniquenessConstraint.Count = 0 And Not abIgnoreErrors Then
                     Throw New Exception("Function should only be called for a Fact Type with at least one InternalUniquenessConstraint.")
 
                 ElseIf Me.InternalUniquenessConstraint.Count = 1 Then
@@ -4162,6 +4167,7 @@ Namespace FBM
         ''' Saves the FactType to the database
         ''' </summary>
         ''' <remarks></remarks>
+        ''' <param name="abIgnoreErrors">Needed in Client/Server mode when a race condition happens. E.g. On EntityType.SetName and where SuppressSave is set to True on the receiving Client.</param>
         Public Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False)
 
             Dim lrRole As FBM.Role
@@ -4555,7 +4561,7 @@ Namespace FBM
 
                     Call Me.Model.TriggerEventModelElementModified(Me)
 
-                    Me.Model.Save()
+                    If Not abSuppressModelSave Then Me.Model.Save()
 
                     Return True
                 End If 'Me.Id <> asNewName

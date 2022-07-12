@@ -2830,13 +2830,13 @@ Namespace FBM
             Dim lrConceptInstance As FBM.ConceptInstance
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTable)
-            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id, True)
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeName)
-            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id, True)
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeReading)
-            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id, True)
 
             lrConceptInstance = New FBM.ConceptInstance(Me.Model,
                                                         Me.Page,
@@ -2844,7 +2844,7 @@ Namespace FBM
                                                         pcenumConceptType.FactType,
                                                         Me.X,
                                                         Me.Y)
-            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id, True)
 
             Me.Id = Me.FactType.Id
             Me.Name = Me.FactType.Id

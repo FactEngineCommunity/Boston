@@ -2644,9 +2644,11 @@ RemoveAnyway:
                             End Select
                         End If
                     Else
-                        Dim lrExistingPreferredIndentifierRoleConstraint = Me.RoleConstraintRole(0).Role.FactType.getPreferredInternalUniquenessConstraint
-                        If (Not lrExistingPreferredIndentifierRoleConstraint Is Me) And abIsPreferredIdentifier Then
-                            Call lrExistingPreferredIndentifierRoleConstraint.SetIsPreferredIdentifier(False)
+                        Dim lrExistingPreferredIndentifierRoleConstraint = Me.RoleConstraintRole(0).Role.FactType.getPreferredInternalUniquenessConstraint(True)
+                        If lrExistingPreferredIndentifierRoleConstraint IsNot Nothing Then
+                            If (Not lrExistingPreferredIndentifierRoleConstraint Is Me) And abIsPreferredIdentifier Then
+                                Call lrExistingPreferredIndentifierRoleConstraint.SetIsPreferredIdentifier(False)
+                            End If
                         End If
                     End If
                 End If

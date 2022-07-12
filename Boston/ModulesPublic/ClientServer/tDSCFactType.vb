@@ -42,7 +42,7 @@ Namespace DuplexServiceClient
                         'VM-20180318-Add code here to join the Role to the appropriate ModelElement
                         Dim lrJoinedModelObject As FBM.ModelObject
                         lrJoinedModelObject = arModel.GetModelObjectByName(lrInterfaceRole.JoinedObjectTypeId)
-                        lrRole.ReassignJoinedModelObject(lrJoinedModelObject, False, Nothing)
+                        lrRole.ReassignJoinedModelObject(lrJoinedModelObject, False, Nothing,, True)
                     End If
                     lrFactType.RoleGroup.Add(lrRole)
                     'lrInterfaceRole.ValueConstraint   'N/A At this stage.                            

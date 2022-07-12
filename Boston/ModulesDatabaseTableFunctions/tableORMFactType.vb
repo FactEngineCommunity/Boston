@@ -4,6 +4,10 @@ Namespace TableFactType
 
     Module TableFactType
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arFactType"></param>
         Sub AddFactType(ByRef arFactType As FBM.FactType)
 
             Dim lsSQLQuery As String = ""

@@ -79,7 +79,7 @@ Namespace DuplexServiceClient
                 End If
 
                 If lrInterfaceEntityType.Name <> lrEntityType.Name Then
-                    Call lrEntityType.SetName(lrInterfaceEntityType.Name, False)
+                    Call lrEntityType.SetName(lrInterfaceEntityType.Name, False, True)
                 ElseIf lrInterfaceEntityType.IsIndependent <> lrEntityType.IsIndependent Then
                     Call lrEntityType.SetIsIndependent(lrInterfaceEntityType.IsIndependent, False)
                 ElseIf lrInterfaceEntityType.IsPersonal <> lrEntityType.IsPersonal Then
@@ -87,7 +87,7 @@ Namespace DuplexServiceClient
                 ElseIf lrInterfaceEntityType.IsAbsorbed <> lrEntityType.IsAbsorbed Then
                     Call lrEntityType.SetIsAbsorbed(lrInterfaceEntityType.IsAbsorbed, False)
                 ElseIf lrInterfaceEntityType.ReferenceMode <> lrEntityType.ReferenceMode Then
-                    Call lrEntityType.SetReferenceMode(lrInterfaceEntityType.ReferenceMode, True, Nothing, False)
+                    Call lrEntityType.SetReferenceMode(lrInterfaceEntityType.ReferenceMode, True, Nothing, False,, True)
                 End If
 
             Catch ex As Exception

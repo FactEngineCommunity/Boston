@@ -2,7 +2,8 @@
 
 Partial Public Class tBrain
 
-    Private Sub ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                                 Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
         Dim lsReferenceMode As String
@@ -38,12 +39,17 @@ Partial Public Class tBrain
                 If Me.Model.ExistsModelElement(lsEntityTypeName) Then
                     Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
                     If lrModelObject.GetType IsNot GetType(FBM.EntityType) Then
-                        Me.send_data(lsEntityTypeName & " is not an Entity Type")
-                        Exit Sub
+                        lsMessage = lsEntityTypeName & " is not an Entity Type"
+                        If arDCSError IsNot Nothing Then
+                            arDCSError.Success = False
+                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDCSError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
                     End If
                 End If
                 lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
-
 
                 If Me.Page IsNot Nothing Then
                     Select Case Me.Page.Language
@@ -101,15 +107,27 @@ Partial Public Class tBrain
 
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                     If lsDataTypeName Is Nothing Then
-                        Me.send_data("That's not a valid Data Type.")
-                        Exit Sub
+                        lsMessage = "That's not a valid Data Type."
+                        If arDCSError IsNot Nothing Then
+                            arDCSError.Success = False
+                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDCSError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
                     End If
 
                     Try
                         liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                     Catch ex As Exception
-                        Me.send_data("That's not a valid Data Type.")
-                        Exit Sub
+                        lsMessage = "That's not a valid Data Type."
+                        If arDCSError IsNot Nothing Then
+                            arDCSError.Success = False
+                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDCSError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
                     End Try
 
                     Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
@@ -123,7 +141,6 @@ Partial Public Class tBrain
                 If Not Me.Model.StoreAsXML Then
                     Call lrEntityType.ReferenceModeValueType.Save()
                     Call lrEntityType.ReferenceModeFactType.Save()
-
 
                     For Each lrInternalUniquenessConstraint In lrEntityType.ReferenceModeFactType.InternalUniquenessConstraint
                         Call lrInternalUniquenessConstraint.Save()
@@ -151,15 +168,20 @@ Partial Public Class tBrain
 
             Me.send_data("Ok")
 
+            Return True
+
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
+
         End Try
 
-    End Sub
+    End Function
 
     Public Sub executeMakeFactTypeManyToMany(ByRef arFactType As FBM.FactType)
 

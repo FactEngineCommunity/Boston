@@ -2550,8 +2550,7 @@ SkipOutputChannel:
                     Return Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     'Is StraightToAction
-                    Call Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent)
-                    Return True
+                    Return Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.FACTTYPECLAUSE
                     Return Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                 Case Is = VAQL.TokenType.KEYWDANYNUMBEROF
@@ -3669,6 +3668,8 @@ SkipOutputChannel:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return lrDuplexServiceClientError
         End Try
 
     End Function

@@ -434,7 +434,8 @@ Namespace TableConceptInstance
         End Sub
 
         Public Sub UpdateConceptInstanceByModelPageConceptTypeRoleId(ByVal arConceptInstance As FBM.ConceptInstance,
-                                                                     Optional asOldSymbol As String = Nothing)
+                                                                     Optional asOldSymbol As String = Nothing,
+                                                                     Optional abIgnoreErrors As Boolean = False)
 
             Dim lsSQLQuery As String = ""
 
@@ -464,7 +465,7 @@ Namespace TableConceptInstance
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 pdbConnection.RollbackTrans()
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                If Not abIgnoreErrors Then    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

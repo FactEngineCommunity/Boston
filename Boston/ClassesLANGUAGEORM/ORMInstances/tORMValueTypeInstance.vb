@@ -613,6 +613,7 @@ Namespace FBM
 
                 liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
                                                From Role In FactType.RoleGroup
+                                              Where Role.JoinedORMObject IsNot Nothing
                                               Where Role.JoinedORMObject.Id = Me.Id
                                                Into Count()
 
@@ -624,8 +625,7 @@ RemoveAnyway:
                     Call Me.Page.MakeDirty()
                 Else
                     lsMessage = "You cannot remove the Value Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Value Type have been removed from the Page."
-                    Throw New Exception(lsMessage)
-
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                     Return False
                 End If
 
