@@ -199,33 +199,47 @@ Partial Public Class tBrain
         End Try
     End Sub
 
-    Private Sub ProcessISACONCEPTStatement()
+    Private Function ProcessISACONCEPTStatement() As Boolean
 
-        Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME = ""
-        Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ISACONCEPTStatement, Me.VAQLParsetree.Nodes(0))
+        Try
+            Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME = ""
+            Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ISACONCEPTStatement, Me.VAQLParsetree.Nodes(0))
 
-        Dim lsConceptName As String = Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME
-        Dim lrConcept As New FBM.Concept(lsConceptName)
-        Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.GeneralConcept)
+            Dim lsConceptName As String = Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME
+            Dim lrConcept As New FBM.Concept(lsConceptName)
+            Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.GeneralConcept)
 
-        If Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-            lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-            If lrDictionaryEntry.isGeneralConcept Then
-                Me.OutputBuffer = Trim(lrDictionaryEntry.Symbol) & " is already a General Concept within the Model. But okay."
-                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            If Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+                lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+                If lrDictionaryEntry.isGeneralConcept Then
+                    Me.OutputBuffer = Trim(lrDictionaryEntry.Symbol) & " is already a General Concept within the Model. But okay."
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                Else
+                    lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
+                    Me.OutputBuffer = "Okay"
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                End If
             Else
-                lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
+                Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
+
                 Me.OutputBuffer = "Okay"
                 Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
             End If
-        Else
-            Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
 
-            Me.OutputBuffer = "Okay"
-            Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
-        End If
+            Return True
 
-    End Sub
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
+        End Try
+
+    End Function
 
     Private Sub ProcessStatementAddEntityType(ByRef arQuestion As tQuestion,
                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True)

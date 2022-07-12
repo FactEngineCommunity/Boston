@@ -2552,29 +2552,23 @@ SkipOutputChannel:
                     'Is StraightToAction
                     Return Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.FACTTYPECLAUSE
-                    Return Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
+                    Return Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDANYNUMBEROF
-                    Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
+                    Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
                     Return True
                 Case Is = VAQL.TokenType.KEYWDATLEASTONE
-                    Call Me.FormulateQuestionsATLEASTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
-                    Return True
+                    Return Me.FormulateQuestionsATLEASTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDATMOSTONE
-                    Call Me.FormulateQuestionsATMOSTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
-                    Return True
+                    Return Me.FormulateQuestionsATMOSTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDONE
-                    Call Me.FormulateQuestionsONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
-                    Return True
+                    Return Me.FormulateQuestionsONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDISACONCEPT
                     'Is StraightToAction
-                    Call Me.ProcessISACONCEPTStatement()
-                    Return True
+                    Return Me.ProcessISACONCEPTStatement()
                 Case Is = VAQL.TokenType.KEYWDISWHERE
-                    Call Me.FormulateQuestionsISWHEREStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
-                    Return True
+                    Return Me.FormulateQuestionsISWHEREStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDISAKINDOF
-                    Call Me.FormulateQuestionsISAKINDOFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing)
-                    Return True
+                    Return Me.FormulateQuestionsISAKINDOFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDCSError)
             End Select
 
         Catch ex As Exception
