@@ -165,6 +165,16 @@ Namespace FBM
             End Set
         End Property
 
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
+
         Public Sub New()
 
             Me.ValueType = New FBM.ValueType
@@ -284,6 +294,13 @@ Namespace FBM
             Return lrPageObject
 
         End Function
+
+        Public Shadows Function Equals(ByVal other As FBM.ValueTypeInstance) As Boolean
+
+            Return Me.Id = other.Id And Me.InstanceNumber = other.InstanceNumber
+
+        End Function
+
 
         Public Sub DisplayAndAssociate(Optional ByVal abForceDisplay As Boolean = False)
 
@@ -423,21 +440,21 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False) As List(Of FBM.Role)
+        Public Overloads Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False) As List(Of FBM.RoleInstance)
 
             Try
-                Dim lrRole As FBM.Role
-                Dim larReturnRoles As New List(Of FBM.Role)
+                Dim larReturnRoleInstances As New List(Of FBM.RoleInstance)
 
-                Dim larRoles = From FactType In Me.Page.FactTypeInstance.FindAll(Function(x) x.isPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes) _
-                               From Role In FactType.RoleGroup _
-                              Where Role.JoinedORMObject.Id = Me.Id _
-                             Select Role
+                Dim larRoleInstance = From FactTypeInstance In Me.Page.FactTypeInstance.FindAll(Function(x) x.isPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes)
+                                      From RoleInstance In FactTypeInstance.RoleGroup
+                                      Where RoleInstance.JoinedORMObject IsNot Nothing
+                                      Where RoleInstance.JoinedORMObject.Id = Me.Id
+                                      Select RoleInstance
 
-                For Each lrRole In larRoles
-                    larReturnRoles.Add(lrRole)
+                For Each lrRoleInstance In larRoleInstance
+                    larReturnRoleInstances.Add(lrRoleInstance)
                 Next
-                Return larReturnRoles
+                Return larReturnRoleInstances
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -615,7 +632,8 @@ Namespace FBM
                                                From Role In FactType.RoleGroup
                                               Where Role.JoinedORMObject IsNot Nothing
                                               Where Role.JoinedORMObject.Id = Me.Id
-                                               Into Count()
+                                              Where CType(Role.JoinedORMObject, Object).InstanceNumber = Me.InstanceNumber
+                                              Into Count()
 
 
                 If liFactTypeInstanceCount = 0 Then
@@ -656,6 +674,7 @@ RemoveAnyway:
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
             lrConceptInstance.ConceptType = pcenumConceptType.ValueType
+            lrConceptInstance.InstanceNumber = Me.InstanceNumber
 
             If abRapidSave Then
                 Call TableConceptInstance.AddConceptInstance(lrConceptInstance)

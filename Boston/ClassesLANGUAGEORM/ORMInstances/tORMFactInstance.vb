@@ -207,14 +207,23 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Overrides Function Clone() As Object
 
             Dim lrFactInstance As New FBM.FactInstance
             Dim lrFactDataInstance As FBM.FactDataInstance
 
             Try
-                With Me                    
-                    lrFactInstance.Model = .Model                    
+                With Me
+                    lrFactInstance.Model = .Model
                     lrFactInstance.Page = .Page
                     lrFactInstance.Id = .Id
                     lrFactInstance.Name = .Name

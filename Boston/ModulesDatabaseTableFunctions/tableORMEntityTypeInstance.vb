@@ -9,6 +9,7 @@ Namespace TableEntityTypeInstance
             lsSQLQuery &= " WHERE PageId = '" & Trim(ar_entity_type_instance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(ar_entity_type_instance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.EntityType.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & ar_entity_type_instance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
@@ -101,6 +102,7 @@ Namespace TableEntityTypeInstance
                         lrEntityTypeInstance.IsDerived = CBool(lREcordset("IsDerived").Value)
                         lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
                         lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
+                        lrEntityTypeInstance.InstanceNumber = lREcordset("InstanceNumber").Value
 
                         lrEntityTypeInstance.X = lREcordset("x").Value
                         lrEntityTypeInstance.Y = lREcordset("y").Value

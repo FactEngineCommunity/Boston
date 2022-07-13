@@ -10,6 +10,7 @@
             lsSQLQuery &= " WHERE PageId = '" & Trim(arRoleConstraintInstance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(arRoleConstraintInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.RoleConstraint.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arRoleConstraintInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
@@ -106,6 +107,7 @@
                             lrRoleConstraintInstance.RoleConstraint = arPage.Model.RoleConstraint.Find(Function(x) x.Id = lrRoleConstraintInstance.Id)
                             lrRoleConstraintInstance.RoleConstraintType = CType([Enum].Parse(GetType(pcenumRoleConstraintType), lREcordset("RoleConstraintType").Value), pcenumRoleConstraintType)
                             lrRoleConstraintInstance.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), lREcordset("RingConstraintType").Value), pcenumRingConstraintType)
+                            lrRoleConstraintInstance.InstanceNumber = lREcordset("InstanceNumber").Value
 
                             Select Case lrRoleConstraintInstance.RoleConstraintType
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint

@@ -14,8 +14,9 @@ Namespace FBM
         Sub Moved()
         Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer)
         Sub SetAppropriateColour()
-
         Sub EnableSaveButton()
+
+        Property InstanceNumber As Integer
 
         <JsonIgnore()>
         Property Shape As MindFusion.Diagramming.ShapeNode

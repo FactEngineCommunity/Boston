@@ -866,111 +866,114 @@ Namespace FBM
 
         End Function
 
-        ''' <summary>
-        ''' See also CloneInstance override.
-        ''' </summary>
-        ''' <param name="arPage"></param>
-        ''' <param name="abAddToPage"></param>
-        ''' <param name="abIgnoreSubtypeRelationships"></param>
-        ''' <returns></returns>
+        '20220713VM-Commented out because clashed with other CloneInstance by parameters when having introduced IngnoreExistingInstance
+        '''' <summary>
+        '''' See also CloneInstance override.
+        '''' </summary>
+        '''' <param name="arPage"></param>
+        '''' <param name="abAddToPage"></param>
+        '''' <param name="abIgnoreSubtypeRelationships"></param>
+        '''' <returns></returns>
+        'Public Overloads Function CloneInstance(ByRef arPage As FBM.Page,
+        '                                        ByVal abIgnoreSubtypeRelationships As Boolean,
+        '                                        Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
+
+        '    Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+
+        '    Try
+
+        '        With Me
+        '            lrEntityTypeInstance.Model = arPage.Model
+        '            lrEntityTypeInstance.Page = arPage
+        '            lrEntityTypeInstance.Id = .Id
+        '            lrEntityTypeInstance.Name = .Name
+        '            lrEntityTypeInstance.Symbol = .Symbol
+        '            lrEntityTypeInstance.GUID = .GUID
+        '            lrEntityTypeInstance.ConceptType = .ConceptType
+        '            lrEntityTypeInstance.EntityType = Me
+        '            lrEntityTypeInstance.ShortDescription = .ShortDescription
+        '            lrEntityTypeInstance.LongDescription = .LongDescription
+        '            lrEntityTypeInstance.PrimativeType = .PrimativeType
+        '            lrEntityTypeInstance.primitive_type_entity_id = .primitive_type_entity_id
+        '            lrEntityTypeInstance.ReferenceMode = .ReferenceMode
+        '            lrEntityTypeInstance.IsMDAModelElement = .IsMDAModelElement
+        '            lrEntityTypeInstance.IsIndependent = .IsIndependent
+        '            lrEntityTypeInstance.IsPersonal = .IsPersonal
+        '            lrEntityTypeInstance.IsAbsorbed = .IsAbsorbed
+        '            lrEntityTypeInstance.DerivationText = .DerivationText
+        '            lrEntityTypeInstance.DBName = .DBName
+
+        '            'CMML
+        '            lrEntityTypeInstance.IsActor = .IsActor
+
+        '            lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
+
+        '            If lrEntityTypeInstance.IsObjectifyingEntityType Then
+        '                If IsSomething(.ObjectifiedFactType) Then
+        '                    lrEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
+        '                    Dim lrFactTypeInstance As FBM.FactTypeInstance
+        '                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = .ObjectifiedFactType.Id)
+        '                    lrEntityTypeInstance.ObjectifiedFactType = lrFactTypeInstance
+        '                End If
+        '            End If
+
+        '            If abAddToPage Then
+        '                If Not arPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
+        '                    arPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+        '                End If
+        '            End If
+
+        '            If IsSomething(.ReferenceModeValueType) Then
+        '                lrEntityTypeInstance.ReferenceModeValueType = .ReferenceModeValueType.CloneInstance(arPage, abAddToPage)
+        '            End If
+        '            If IsSomething(.ReferenceModeFactType) Then
+        '                lrEntityTypeInstance.ReferenceModeFactType = .ReferenceModeFactType.CloneInstance(arPage, abAddToPage)
+        '            End If
+
+        '            If IsSomething(.ReferenceModeRoleConstraint) Then
+        '                lrEntityTypeInstance.ReferenceModeRoleConstraint = arPage.RoleConstraintInstance.Find(Function(x) x.Id = .ReferenceModeRoleConstraint.Id)
+        '            End If
+
+        '        End With
+
+        '        If Not abIgnoreSubtypeRelationships Then
+        '            For Each lrSubtypeRelationship In Me.SubtypeRelationship
+        '                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(arPage, False)
+        '                lrSubtypeRelationshipInstance.ModelElement = lrEntityTypeInstance
+        '                lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+        '            Next
+        '        End If
+
+        '        'For Each lrParentEntityType In Me.parentModelObjectList
+        '        '    '----------------------------------------------------------------------
+        '        '    'The ParentEntityType is at least part of the model under review
+        '        '    '  i.e. If currently looking at an ORM model...is within the ORM model
+        '        '    '----------------------------------------------------------------------
+        '        '    lsId = Trim(lrParentEntityType.Id)
+        '        '    lr_parentEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = Trim(lrParentEntityType.Id))
+        '        '    Dim lr_sub_type_constraint As New FBM.SubtypeRelationshipInstance(arPage, lrEntityTypeInstance, lr_parentEntityTypeInstance)
+        '        '    lrEntityTypeInstance.SubtypeRelationship.Add(lr_sub_type_constraint)
+        '        'Next
+
+        '    Catch ex As Exception
+        '        Dim lsMessage As String
+        '        lsMessage = "Error: tORMEntityType.CloneInstance:"
+        '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        '    End Try
+
+        '    Return lrEntityTypeInstance
+
+        'End Function
+
         Public Overloads Function CloneInstance(ByRef arPage As FBM.Page,
-                                                ByVal abIgnoreSubtypeRelationships As Boolean,
-                                                Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
+                                                Optional ByVal abAddToPage As Boolean = False,
+                                                Optional ByVal abIgnoreExistingInstance As Boolean = False,
+                                                Optional ByVal abIgnoreSubtypeRelationships As Boolean = False) As FBM.ModelObject
 
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
 
             Try
-
-                With Me
-                    lrEntityTypeInstance.Model = arPage.Model
-                    lrEntityTypeInstance.Page = arPage
-                    lrEntityTypeInstance.Id = .Id
-                    lrEntityTypeInstance.Name = .Name
-                    lrEntityTypeInstance.Symbol = .Symbol
-                    lrEntityTypeInstance.GUID = .GUID
-                    lrEntityTypeInstance.ConceptType = .ConceptType
-                    lrEntityTypeInstance.EntityType = Me
-                    lrEntityTypeInstance.ShortDescription = .ShortDescription
-                    lrEntityTypeInstance.LongDescription = .LongDescription
-                    lrEntityTypeInstance.PrimativeType = .PrimativeType
-                    lrEntityTypeInstance.primitive_type_entity_id = .primitive_type_entity_id
-                    lrEntityTypeInstance.ReferenceMode = .ReferenceMode
-                    lrEntityTypeInstance.IsMDAModelElement = .IsMDAModelElement
-                    lrEntityTypeInstance.IsIndependent = .IsIndependent
-                    lrEntityTypeInstance.IsPersonal = .IsPersonal
-                    lrEntityTypeInstance.IsAbsorbed = .IsAbsorbed
-                    lrEntityTypeInstance.DerivationText = .DerivationText
-                    lrEntityTypeInstance.DBName = .DBName
-
-                    'CMML
-                    lrEntityTypeInstance.IsActor = .IsActor
-
-                    lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
-
-                    If lrEntityTypeInstance.IsObjectifyingEntityType Then
-                        If IsSomething(.ObjectifiedFactType) Then
-                            lrEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
-                            Dim lrFactTypeInstance As FBM.FactTypeInstance
-                            lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = .ObjectifiedFactType.Id)
-                            lrEntityTypeInstance.ObjectifiedFactType = lrFactTypeInstance
-                        End If
-                    End If
-
-                    If abAddToPage Then
-                        If Not arPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
-                            arPage.EntityTypeInstance.Add(lrEntityTypeInstance)
-                        End If
-                    End If
-
-                    If IsSomething(.ReferenceModeValueType) Then
-                        lrEntityTypeInstance.ReferenceModeValueType = .ReferenceModeValueType.CloneInstance(arPage, abAddToPage)
-                    End If
-                    If IsSomething(.ReferenceModeFactType) Then
-                        lrEntityTypeInstance.ReferenceModeFactType = .ReferenceModeFactType.CloneInstance(arPage, abAddToPage)
-                    End If
-
-                    If IsSomething(.ReferenceModeRoleConstraint) Then
-                        lrEntityTypeInstance.ReferenceModeRoleConstraint = arPage.RoleConstraintInstance.Find(Function(x) x.Id = .ReferenceModeRoleConstraint.Id)
-                    End If
-
-                End With
-
-                If Not abIgnoreSubtypeRelationships Then
-                    For Each lrSubtypeRelationship In Me.SubtypeRelationship
-                        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(arPage, False)
-                        lrSubtypeRelationshipInstance.ModelElement = lrEntityTypeInstance
-                        lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
-                    Next
-                End If
-
-                'For Each lrParentEntityType In Me.parentModelObjectList
-                '    '----------------------------------------------------------------------
-                '    'The ParentEntityType is at least part of the model under review
-                '    '  i.e. If currently looking at an ORM model...is within the ORM model
-                '    '----------------------------------------------------------------------
-                '    lsId = Trim(lrParentEntityType.Id)
-                '    lr_parentEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = Trim(lrParentEntityType.Id))
-                '    Dim lr_sub_type_constraint As New FBM.SubtypeRelationshipInstance(arPage, lrEntityTypeInstance, lr_parentEntityTypeInstance)
-                '    lrEntityTypeInstance.SubtypeRelationship.Add(lr_sub_type_constraint)
-                'Next
-
-            Catch ex As Exception
-                Dim lsMessage As String
-                lsMessage = "Error: tORMEntityType.CloneInstance:"
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-            End Try
-
-            Return lrEntityTypeInstance
-
-        End Function
-
-        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
-
-            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
-
-            Try
-
                 With Me
                     lrEntityTypeInstance.Model = arPage.Model
                     lrEntityTypeInstance.Page = arPage
@@ -1024,13 +1027,15 @@ Namespace FBM
 
                 End With
 
+                If Not abIgnoreSubtypeRelationships Then
+                    For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(arPage, False)
+                        lrSubtypeRelationshipInstance.ModelElement = lrEntityTypeInstance
+                        lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+                    Next
+                End If
 
-                For Each lrSubtypeRelationship In Me.SubtypeRelationship
-                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(arPage, False)
-                    lrSubtypeRelationshipInstance.ModelElement = lrEntityTypeInstance
-                    lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
-                Next
-
+                '20220713-VM-Remove if not missed.
                 'For Each lrParentEntityType In Me.parentModelObjectList
                 '    '----------------------------------------------------------------------
                 '    'The ParentEntityType is at least part of the model under review

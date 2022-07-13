@@ -597,7 +597,9 @@ Namespace FBM
         End Function
 
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
-        Public Overridable Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
+        Public Overridable Function CloneInstance(ByRef arPage As FBM.Page,
+                                                  Optional ByVal abAddToPage As Boolean = False,
+                                                  Optional ByVal abIgnoreExistingInstance As Boolean = False) As FBM.ModelObject
 
             Dim lrPageObject As New FBM.PageObject
 

@@ -49,8 +49,17 @@ Namespace FBM
         Public Property X As Integer Implements FBM.iPageObject.X 'The X coordinate of the PageObject
         Public Property Y As Integer Implements FBM.iPageObject.Y 'The Y coordinate of the PageObject
 
-        <NonSerialized()> _
-        <XmlIgnore()> _
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        <NonSerialized()>
+        <XmlIgnore()>
         Public Link As DiagramLink
 
         ''' <summary>

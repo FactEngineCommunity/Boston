@@ -14,6 +14,7 @@ Namespace TableFactTypeInstance
             lrConceptInstance.Orientation = 101
             lrConceptInstance.Visible = True
             lrConceptInstance.ConceptType = pcenumConceptType.FactType
+            lrConceptInstance.InstanceNumber = arFactTypeInstance.InstanceNumber
 
             TableConceptInstance.AddConceptInstance(lrConceptInstance)
 
@@ -28,6 +29,7 @@ Namespace TableFactTypeInstance
                 lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
                 lsSQLQuery &= "   AND Symbol = '" & Trim(arFactTypeInstance.Id) & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
+                lsSQLQuery &= "   AND InstanceNumber = " & arFactTypeInstance.InstanceNumber
 
                 pdbConnection.BeginTrans()
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -57,6 +59,7 @@ Namespace TableFactTypeInstance
             lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(arFactTypeInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arFactTypeInstance.InstanceNumber
 
             lREcordset.Open(lsSQLQuery)
 
@@ -147,6 +150,7 @@ Namespace TableFactTypeInstance
                         lrFactTypeInstance.Page = arPage
                         lrFactTypeInstance.X = lREcordset("x").Value
                         lrFactTypeInstance.Y = lREcordset("y").Value
+                        lrFactTypeInstance.InstanceNumber = lREcordset("InstanceNumber").Value
                         '2022-01-28-VM-Moved to below...now get from FactType.
                         'lrFactTypeInstance.IsDerived = CBool(lREcordset("IsDerived").Value)
                         'lrFactTypeInstance.IsStored = CBool(lREcordset("IsStored").Value)
@@ -511,6 +515,7 @@ Namespace TableFactTypeInstance
                 lsSQLQuery &= "   AND PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
                 lsSQLQuery &= "   AND Symbol = '" & Replace(Trim(arFactTypeInstance.Id), "'", "`") & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
+                lsSQLQuery &= "   AND InstanceNumber = " & arFactTypeInstance.InstanceNumber
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)
@@ -528,4 +533,5 @@ Namespace TableFactTypeInstance
 
 
     End Module
+
 End Namespace

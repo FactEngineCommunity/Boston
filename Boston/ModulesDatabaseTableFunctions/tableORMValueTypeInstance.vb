@@ -7,14 +7,24 @@ Namespace TableValueTypeInstance
         Public Sub DeleteValueTypeInstance(ByVal arValueTypeInstance As FBM.ValueTypeInstance)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQUery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
             lsSQLQuery &= " WHERE PageId = '" & Trim(arValueTypeInstance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(arValueTypeInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.ValueType.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arValueTypeInstance.InstanceNumber
+
+            lsSQLQUery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQUery2 &= " WHERE PageId = '" & Trim(arValueTypeInstance.Page.PageId) & "'"
+            lsSQLQUery2 &= "    AND Symbol = '" & Trim(arValueTypeInstance.Id) & "'"
+            lsSQLQUery2 &= "    AND ConceptType = '" & pcenumConceptType.ValueType.ToString & "'"
+            lsSQLQUery2 &= "    AND InstanceNumber > " & arValueTypeInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQUery2)
             pdbConnection.CommitTrans()
 
         End Sub
@@ -108,6 +118,7 @@ Namespace TableValueTypeInstance
                         lrValueTypeInstance.LongDescription = lrValueTypeInstance.ValueType.LongDescription
                         lrValueTypeInstance.GUID = lrValueTypeInstance.ValueType.GUID
                         lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
+                        lrValueTypeInstance.InstanceNumber = lREcordset("InstanceNumber").Value
 
                         lrValueTypeInstance.X = lREcordset("x").Value
                         lrValueTypeInstance.Y = lREcordset("y").Value

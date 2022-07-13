@@ -46,6 +46,8 @@ Namespace ClientServer
         Public Function CanAlterOnProject(ByVal arProject As ClientServer.Project) As Boolean
 
             Try
+                'CodeSafe
+                If arProject Is Nothing Then Return False
                 If Me.ProjectPermission.Count = 0 Then Return False
 
                 Return Me.ProjectPermission.FindAll(Function(x) (x.Project.Id = arProject.Id) And (x.Permission = pcenumPermission.Alter)).Count > 0

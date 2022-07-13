@@ -171,6 +171,14 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
 
         Public Sub New()
             '-------------------

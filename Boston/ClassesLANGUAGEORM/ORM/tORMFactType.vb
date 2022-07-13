@@ -873,7 +873,9 @@ Namespace FBM
         ''' <param name="abAddToPage">True if the FactTypeInstance is to be added to the Page, else False</param>
         ''' <returns></returns>
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
-        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
+        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page,
+                                                Optional ByVal abAddToPage As Boolean = False,
+                                                Optional ByVal abIgnoreExistingInstance As Boolean = False) As FBM.ModelObject
 
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
             Dim lsMessage As String
@@ -939,7 +941,7 @@ Namespace FBM
                     If .ObjectifyingEntityType IsNot Nothing Then
                         lrFactTypeInstance.ObjectifyingEntityType = arPage.EntityTypeInstance.Find(Function(x) x.Id = .ObjectifyingEntityType.Id)
                         If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
-                            lrFactTypeInstance.ObjectifyingEntityType = .ObjectifyingEntityType.CloneInstance(arPage, True)
+                            lrFactTypeInstance.ObjectifyingEntityType = .ObjectifyingEntityType.CloneInstance(arPage, True, False)
                         End If
                         lrFactTypeInstance.ObjectifyingEntityType.IsObjectifyingEntityType = True
                     End If

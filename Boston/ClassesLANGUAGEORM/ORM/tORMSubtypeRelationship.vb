@@ -103,7 +103,9 @@ Namespace FBM
         ''' <param name="arPage">The Page onto which the SubtypeRelatioship is to be cloned.</param>
         ''' <param name="abAddToPage">Not used for SubtypeRelationship</param>
         ''' <returns></returns>
-        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
+        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page,
+                                                Optional ByVal abAddToPage As Boolean = False,
+                                                Optional ByVal abIgnoreExistingInstance As Boolean = False) As FBM.ModelObject
 
             Dim lrSubtypeRelationshipInstance As New FBM.SubtypeRelationshipInstance
 

@@ -833,10 +833,10 @@ Namespace FBM
                     lrEntityType = arEntityType
                 End If
 
-                'CodeSafe: Check to see if the FactType is already on the Page
+                'CodeSafe: Check to see if the EntityType is already on the Page
                 If Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) IsNot Nothing Then
                     lrEntityTypeInstance = Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
-                    Call lrEntityTypeInstance.Move(ao_pt.X, ao_pt.Y, abBroadcastInterfaceEvent)
+                    'Call lrEntityTypeInstance.Move(ao_pt.X, ao_pt.Y, abBroadcastInterfaceEvent)
                 End If
 
                 '----------------------------------------------------------------------------------------
@@ -844,6 +844,7 @@ Namespace FBM
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me, lrEntityType.Id, pcenumConceptType.EntityType)
                 lrConceptInstance.X = ao_pt.X
                 lrConceptInstance.Y = ao_pt.Y
+                lrEntityTypeInstance.InstanceNumber = Me.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityType.Id).Count + 1
 
                 If Me.Model.EntityType.Exists(AddressOf arEntityType.Equals) Then
                     '-----------------------------------------------------------------------------------------------------------------------
@@ -862,7 +863,7 @@ Namespace FBM
                 End If
 
                 lrEntityTypeInstance = New FBM.EntityTypeInstance
-                lrEntityTypeInstance = lrEntityType.CloneInstance(Me, True)
+                lrEntityTypeInstance = lrEntityType.CloneInstance(Me, True, True, False)
 
                 lrEntityTypeInstance.X = ao_pt.X
                 lrEntityTypeInstance.Y = ao_pt.Y
@@ -1568,10 +1569,11 @@ Namespace FBM
                     Me.Model.AddValueType(lrValuetype, True, True, lrConceptInstance, True)
                 End If
 
-                lrValueTypeInstance = lrValuetype.CloneInstance(Me, False)
+                lrValueTypeInstance = lrValuetype.CloneInstance(Me, False, True)
 
                 lrValueTypeInstance.X = ao_pt.X
                 lrValueTypeInstance.Y = ao_pt.Y
+                lrValueTypeInstance.InstanceNumber = Me.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueTypeInstance.Id).Count + 1
 
                 '---------------------------------------
                 'Add the ValueTypeInstance to the Page
@@ -1701,33 +1703,58 @@ Namespace FBM
         End Function
 
         Public Function GetAllPageObjects(Optional abGetRoleConstraints As Boolean = False,
-                                          Optional abGetModelNotes As Boolean = False) As List(Of Object)
+                                          Optional abGetModelNotes As Boolean = False,
+                                          Optional arModelElement As FBM.ModelObject = Nothing) As List(Of Object)
 
             Dim OutputList As New List(Of Object)
             Try
 
-                For Each lrValueTypeInstance In Me.ValueTypeInstance
-                    OutputList.Add(lrValueTypeInstance)
-                Next
-
-                For Each lrFactTypeInstance In Me.FactTypeInstance
-                    OutputList.Add(lrFactTypeInstance)
-                Next
-
-                For Each lrEntityTypeInstance In Me.EntityTypeInstance
-                    OutputList.Add(lrEntityTypeInstance)
-                Next
-
-                If abGetRoleConstraints Then
-                    For Each lrRoleConstraintInstance In Me.RoleConstraintInstance
-                        OutputList.Add(lrRoleConstraintInstance)
+                If arModelElement Is Nothing Then
+                    For Each lrValueTypeInstance In Me.ValueTypeInstance
+                        OutputList.Add(lrValueTypeInstance)
                     Next
-                End If
 
-                If abGetModelNotes Then
-                    For Each lrModelNote In Me.ModelNoteInstance
-                        OutputList.Add(lrModelNote)
+                    For Each lrFactTypeInstance In Me.FactTypeInstance
+                        OutputList.Add(lrFactTypeInstance)
                     Next
+
+                    For Each lrEntityTypeInstance In Me.EntityTypeInstance
+                        OutputList.Add(lrEntityTypeInstance)
+                    Next
+
+                    If abGetRoleConstraints Then
+                        For Each lrRoleConstraintInstance In Me.RoleConstraintInstance
+                            OutputList.AddUnique(lrRoleConstraintInstance)
+                        Next
+                    End If
+
+                    If abGetModelNotes Then
+                        For Each lrModelNote In Me.ModelNoteInstance
+                            OutputList.Add(lrModelNote)
+                        Next
+                    End If
+                Else
+                    Select Case arModelElement.ConceptType
+                        Case Is = pcenumConceptType.ValueType
+                            For Each lrValueTypeInstance In Me.ValueTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id)
+                                OutputList.Add(lrValueTypeInstance)
+                            Next
+
+                        Case Is = pcenumConceptType.EntityType
+                            For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id)
+                                OutputList.Add(lrEntityTypeInstance)
+                            Next
+
+                        Case Is = pcenumConceptType.FactType
+                            For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id)
+                                OutputList.Add(lrFactTypeInstance)
+                            Next
+
+                        Case Is = pcenumConceptType.RoleConstraint
+                            For Each lrRoleConstraintInstance In Me.RoleConstraintInstance.FindAll(Function(x) x.Id = arModelElement.Id)
+                                OutputList.AddUnique(lrRoleConstraintInstance)
+                            Next
+                    End Select
                 End If
 
                 Return OutputList
@@ -2606,12 +2633,12 @@ NextY:
 
                 Dim lrConceptInstance As New FBM.ConceptInstance
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
-                    lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactType)
+                    lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactType, arFactTypeInstance.InstanceNumber)
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageRemovePageObject, arFactTypeInstance, lrConceptInstance)
                 End If
 
                 If Me.Model IsNot Nothing Then
-                    lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
+                    lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, arFactTypeInstance.Id, pcenumConceptType.FactTypeReading, arFactTypeInstance.InstanceNumber)
                     Call TableConceptInstance.DeleteConceptInstance(lrConceptInstance)
                 End If
 
@@ -2796,7 +2823,13 @@ NextY:
                     Me.Diagram.Nodes.Remove(arValueTypeInstance.Shape)
                 End If
 
+                Dim liInstanceNumber As Integer = arValueTypeInstance.InstanceNumber
+
                 Me.ValueTypeInstance.Remove(arValueTypeInstance)
+
+                For Each lrValueTypeInstance In Me.ValueTypeInstance.FindAll(Function(x) x.InstanceNumber > liInstanceNumber)
+                    lrValueTypeInstance.InstanceNumber -= 1
+                Next
 
                 'Do database processing if necessary.
                 If abBroadcastInterfaceEvent Then

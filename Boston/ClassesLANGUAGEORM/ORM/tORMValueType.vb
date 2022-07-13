@@ -769,11 +769,13 @@ Namespace FBM
 
         End Function
 
-        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.ModelObject
+        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page,
+                                                Optional ByVal abAddToPage As Boolean = False,
+                                                Optional ByVal abIgnoreExistingInstance As Boolean = False) As FBM.ModelObject
 
             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
 
-            If arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Nothing Then
+            If Not abIgnoreExistingInstance And arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Nothing Then
                 'The ValueType already exists as an instance on the Page.
                 lrValueTypeInstance = arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id)
             Else

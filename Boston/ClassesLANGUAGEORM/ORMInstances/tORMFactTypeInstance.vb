@@ -36,7 +36,7 @@ Namespace FBM
         <XmlIgnore()> _
         Public FactTypeName As New FBM.FactTypeName
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows Property Name() As String
             Get
                 Return _Name
@@ -44,7 +44,17 @@ Namespace FBM
             Set(ByVal value As String)
                 _Name = value
             End Set
-        End Property        
+        End Property
+
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
 
         <XmlIgnore()> _
         <CategoryAttribute("Fact Type"), _
@@ -485,7 +495,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.FactTypeInstance) As Boolean Implements System.IEquatable(Of FBM.FactTypeInstance).Equals
 
-            If Me.Id = other.Id Then
+            If Me.Id = other.Id And Me.InstanceNumber = other.InstanceNumber Then
                 Return True
             Else
                 Return False
@@ -621,7 +631,7 @@ Namespace FBM
 
         Public Function CloneConceptInstance() As FBM.ConceptInstance
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType, Me.InstanceNumber)
 
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
@@ -1821,6 +1831,22 @@ Namespace FBM
                         lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.BottomCenter)
                         lrRoleInstance.Shape.Visible = lbIsVisible
                         lrRoleInstance.SequenceNr = liCounter
+
+                        'Redraw Link to nearest ConceptInstance
+                        If lrRoleInstance.JoinedORMObject IsNot Nothing Then
+                            Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject)
+                                                          Select ModelElementInstance
+
+                            If larModelElementInstance.Count > 1 Then
+
+                                Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
+                                                                      Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+
+                                lrRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                                lrRoleInstance.JoinedORMObject = larClosestModelElementInstance.First.ModelElementInstance
+                                Me.Page.Diagram.Invalidate()
+                            End If
+                        End If
                     Next
 
                     Call Me.ResetAnchorsForRoleGroup()

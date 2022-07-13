@@ -2765,7 +2765,7 @@ SkippedRole:
 
                         If IsSomething(lrEntityType) Then
                             lrEntityTypeInstance = New FBM.EntityTypeInstance
-                            lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage, True, False)
+                            lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage, True, True, False)
                             Dim lsBounds() As String
                             If lrPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
                                 lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)

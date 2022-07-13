@@ -935,6 +935,7 @@ Public Class frmDiagramORM
 
                 Select Case lrModelObject.ConceptType
                     Case Is = pcenumConceptType.EntityType 'Entity Type
+#Region "EntityType"
                         Dim lrEntityType As New FBM.EntityType
 
                         'VM-20141202-Change the below to assignment of a Clone of the EntityType
@@ -945,44 +946,47 @@ Public Class frmDiagramORM
                         '-------------------------------------------------------------------------------------
                         Dim lrEntityTypeInstance As New FBM.EntityTypeInstance(lrModel, pcenumLanguage.ORMModel, lrEntityType.Name, True)
 
-                        If IsSomething(Me.zrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)) Then
-                            MsgBox("This Page already contains the Entity Type, '" & lrEntityType.Name & "'.")
+                        '20220713-VM-Multiple instances can now be on a Page. Below If..then..else commented out.
+                        'If IsSomething(Me.zrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)) Then
+                        '    MsgBox("This Page already contains the Entity Type, '" & lrEntityType.Name & "'.")
+                        'Else
+                        '------------------------------------------------------------------------------------
+                        'Check to see if the lrEntityType is already in the ModelDictionary for the lrModel
+                        '------------------------------------------------------------------------------------
+                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType)
+                        If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+                            '--------------------------------------------------------------------------------------------------------
+                            'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary,
+                            '--------------------------------------------------------------------------------------------------------
                         Else
-                            '------------------------------------------------------------------------------------
-                            'Check to see if the lrEntityType is already in the ModelDictionary for the lrModel
-                            '------------------------------------------------------------------------------------
-                            Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType)
-                            If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-                                '--------------------------------------------------------------------------------------------------------
-                                'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary,
-                                '--------------------------------------------------------------------------------------------------------
-                            Else
-                                lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
-                            End If
-
-                            Dim loEntityTypeNameStringSize As New SizeF
-                            G = Me.zrPage.Form.CreateGraphics
-                            loEntityTypeNameStringSize = Me.zrPage.Diagram.MeasureString(Trim(Me.Name), Me.zrPage.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-
-                            loDropPtF = New Point(loPt.X - CInt(loEntityTypeNameStringSize.Width / 3), loPt.Y - 5)
-                            lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, loDropPtF, True)
-
-                            Call lrEntityTypeInstance.showSubtypeRelationships()
-
-                            '======================================================================
-                            'Save the Page
-                            Me.zrPage.Save()
-                            '---------------------------------------
-                            'Create the UserAction for the UndoLog
-                            '---------------------------------------
-                            Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.AddPageObjectToPage, Me.zrPage)
-                            lrUserAction.PreActionModelObject = lrEntityTypeInstance.Clone(Me.zrPage)
-                            lrUserAction.PostActionModelObject = lrEntityTypeInstance.Clone(Me.zrPage)
-                            prApplication.AddUndoAction(lrUserAction)
-                            frmMain.ToolStripMenuItemUndo.Enabled = True
+                            lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
                         End If
+
+                        Dim loEntityTypeNameStringSize As New SizeF
+                        G = Me.zrPage.Form.CreateGraphics
+                        loEntityTypeNameStringSize = Me.zrPage.Diagram.MeasureString(Trim(Me.Name), Me.zrPage.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+
+                        loDropPtF = New Point(loPt.X - CInt(loEntityTypeNameStringSize.Width / 3), loPt.Y - 5)
+                        lrEntityTypeInstance = Me.zrPage.DropEntityTypeAtPoint(lrEntityType, loDropPtF, True)
+
+                        Call lrEntityTypeInstance.showSubtypeRelationships()
+
+                        '======================================================================
+                        'Save the Page
+                        Me.zrPage.Save()
+                        '---------------------------------------
+                        'Create the UserAction for the UndoLog
+                        '---------------------------------------
+                        Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.AddPageObjectToPage, Me.zrPage)
+                        lrUserAction.PreActionModelObject = lrEntityTypeInstance.Clone(Me.zrPage)
+                        lrUserAction.PostActionModelObject = lrEntityTypeInstance.Clone(Me.zrPage)
+                        prApplication.AddUndoAction(lrUserAction)
+                        frmMain.ToolStripMenuItemUndo.Enabled = True
+                        'End If
                         Exit Sub
+#End Region
                     Case Is = pcenumConceptType.ValueType 'Value Type
+#Region "ValueType"
                         Dim lrValueType As New FBM.ValueType
 
                         'VM-20141202-Change the below to assignment of a Clone of the EntityType
@@ -993,40 +997,43 @@ Public Class frmDiagramORM
                         '--------------------------------------------------------------------------------
                         Dim lrValueTypeInstance As New FBM.ValueTypeInstance(Me.zrPage.Model, Me.zrPage, pcenumLanguage.ORMModel, lrValueType.Name, True)
 
-                        If IsSomething(Me.zrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)) Then
-                            MsgBox("This Page already contains the Value Type, '" & lrValueType.Name & "'.")
+                        '20220713-VM-Multiple instances can now be on a Page. Below If..then..else commented out.
+                        'If IsSomething(Me.zrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)) Then
+                        '    MsgBox("This Page already contains the Value Type, '" & lrValueType.Name & "'.")
+                        'Else                        
+
+                        '------------------------------------------------------------------------------------
+                        'Check to see if the lrValueType is already in the ModelDictionary for the lrModel
+                        '------------------------------------------------------------------------------------
+                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Name, pcenumConceptType.ValueType)
+                        If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+                            '--------------------------------------------------------------------------------------------------------
+                            'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary
+                            '--------------------------------------------------------------------------------------------------------
                         Else
-                            '------------------------------------------------------------------------------------
-                            'Check to see if the lrValueType is already in the ModelDictionary for the lrModel
-                            '------------------------------------------------------------------------------------
-                            Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Name, pcenumConceptType.ValueType)
-                            If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-                                '--------------------------------------------------------------------------------------------------------
-                                'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary
-                                '--------------------------------------------------------------------------------------------------------
-                            Else
-                                lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
-                            End If
-
-                            Dim loEntityTypeNameStringSize As New SizeF
-                            G = Me.zrPage.Form.CreateGraphics
-                            loEntityTypeNameStringSize = Me.zrPage.Diagram.MeasureString(Trim(Me.Name), Me.zrPage.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-
-                            loDropPtF = New Point(loPt.X - CInt(loEntityTypeNameStringSize.Width / 3), loPt.Y - 5)
-                            lrValueTypeInstance = Me.zrPage.DropValueTypeAtPoint(lrValueType, loDropPtF, True)
-                            Me.zrPage.Save()
-                            '---------------------------------------
-                            'Create the UserAction for the UndoLog
-                            '---------------------------------------
-                            Dim lrUserAction As New tUserAction(lrValueTypeInstance, pcenumUserAction.AddPageObjectToPage, Me.zrPage)
-                            lrUserAction.PreActionModelObject = lrValueTypeInstance.Clone(Me.zrPage)
-                            lrUserAction.PostActionModelObject = lrValueTypeInstance.Clone(Me.zrPage)
-                            prApplication.AddUndoAction(lrUserAction)
-                            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-                            Call Me.EnableSaveButton()
+                            lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
                         End If
+
+                        Dim loEntityTypeNameStringSize As New SizeF
+                        G = Me.zrPage.Form.CreateGraphics
+                        loEntityTypeNameStringSize = Me.zrPage.Diagram.MeasureString(Trim(Me.Name), Me.zrPage.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+
+                        loDropPtF = New Point(loPt.X - CInt(loEntityTypeNameStringSize.Width / 3), loPt.Y - 5)
+                        lrValueTypeInstance = Me.zrPage.DropValueTypeAtPoint(lrValueType, loDropPtF, True)
+                        Me.zrPage.Save()
+                        '---------------------------------------
+                        'Create the UserAction for the UndoLog
+                        '---------------------------------------
+                        Dim lrUserAction As New tUserAction(lrValueTypeInstance, pcenumUserAction.AddPageObjectToPage, Me.zrPage)
+                        lrUserAction.PreActionModelObject = lrValueTypeInstance.Clone(Me.zrPage)
+                        lrUserAction.PostActionModelObject = lrValueTypeInstance.Clone(Me.zrPage)
+                        prApplication.AddUndoAction(lrUserAction)
+                        frmMain.ToolStripMenuItemUndo.Enabled = True
+
+                        Call Me.EnableSaveButton()
+                        'End If
                         Exit Sub
+#End Region
                     Case Is = pcenumConceptType.FactType 'Fact Type
 
                         lrFactType = New FBM.FactType
@@ -6249,19 +6256,18 @@ Public Class frmDiagramORM
 
                     Call loORMObject.Moved()
 
+                    '--------------------------------------------------------------------------------------------
+                    'Resort the RoleGroup of any FactType associated with the ObjectTypes for asthetic reasons.
+                    '  i.e. So the Links from the Roles in the FactType are visually appealling on the Page.
+                    '------------------------------------------------------------
                     Call Me.SortJoiningFactTypes(loORMObject, False)
 
-                    '------------------------------------------------------------
-                    'Resort the RoleGroup of any FactType associated with the 
-                    '  ObjectTypes for asthetic reasons.
-                    '  i.e. So the Links from the Roles in the FactType are 
-                    '  visually appealling on the Page.
-                    '------------------------------------------------------------
-                    For Each loLink In loORMObject.shape.IncomingLinks
-                        If loLink.Origin.Tag.ConceptType = pcenumConceptType.Role Then
-                            loLink.Origin.Tag.FactType.SortRoleGroup()
-                        End If
-                    Next
+                    '20220713-VM-Commented out because should be handled by the above.
+                    'For Each loLink In loORMObject.shape.IncomingLinks
+                    '    If loLink.Origin.Tag.ConceptType = pcenumConceptType.Role Then
+                    '        loLink.Origin.Tag.FactType.SortRoleGroup()
+                    '    End If
+                    'Next
                 Case pcenumConceptType.FactType
                     lrFactTypeInstance = loORMObject
                     Call lrFactTypeInstance.Moved()
@@ -6290,7 +6296,7 @@ Public Class frmDiagramORM
     ''' </summary>
     ''' <param name="arModelObject"></param>
     ''' <remarks></remarks>
-    Private Sub SortJoiningFactTypes(ByRef arModelObject As Object,
+    Private Sub SortJoiningFactTypes(ByRef arModelObject As FBM.ModelObject,
                                      Optional ByVal abMoveFactTypeReading As Boolean = True)
 
         Dim lo_link As DiagramLink
@@ -6307,13 +6313,16 @@ Public Class frmDiagramORM
             End Select
 
 
-            For Each lo_link In arModelObject.shape.IncomingLinks
-                If lo_link.Origin.Tag.ConceptType = pcenumConceptType.Role Then
-                    '-------------------------------------------------
-                    'Sort the RoleGroup of the FactType instance
-                    ' of all FactTypes associated with the ObjectType
-                    '-------------------------------------------------
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance = lo_link.Origin.Tag.factType
+            For Each lrJoinedRole In arModelObject.GetAdjoinedRoles(True)  'lo_link In '.shape.IncomingLinks
+
+                'If lo_link.Origin.Tag.ConceptType = pcenumConceptType.Role Then
+                '-------------------------------------------------
+                'Sort the RoleGroup of the FactType instance
+                ' of all FactTypes associated with the ObjectType
+                '-------------------------------------------------
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrJoinedRole.FactType.Id) 'lo_link.Origin.Tag.factType
+
+                If lrFactTypeInstance IsNot Nothing Then
                     lrFactTypeInstance.SortRoleGroup()
 
                     '------------------------------------------------
@@ -6330,22 +6339,8 @@ Public Class frmDiagramORM
                     Next
 
                     Call lrFactTypeInstance.FindSuitableFactTypeReading(abMoveFactTypeReading)
-
-                    'lrFactTypeReading = lrFactTypeInstance.FactType.FindSuitableFactTypeReadingByRoles(larRole)
-
-                    'If IsSomething(lrFactTypeReading) Then
-                    '    lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(lo_link.Origin.Tag.factType.Page)
-                    '    lrFactTypeReadingInstance.shape = lo_link.Origin.Tag.factType.FactTypeReadingShape.shape
-                    '    lo_link.Origin.Tag.FactType.FactTypeReadingShape = lrFactTypeReadingInstance
-                    '    lo_link.Origin.Tag.FactType.FactTypeReadingShape.RefreshShape()
-                    'Else
-                    '    If IsSomething(lrFactTypeInstance.FactTypeReadingShape) Then
-                    '        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    '            lrFactTypeInstance.FactTypeReadingShape.shape.Text = ""
-                    '        End If
-                    '    End If
-                    'End If
                 End If
+
             Next
 
         Catch ex As Exception

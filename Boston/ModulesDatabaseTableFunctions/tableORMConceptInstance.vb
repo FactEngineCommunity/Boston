@@ -18,6 +18,7 @@ Namespace TableConceptInstance
                 lsSQLQuery &= ",'" & Replace(Trim(arConceptInstance.Symbol), "'", "`") & "'"
                 lsSQLQuery &= ",'" & arConceptInstance.ConceptType.ToString & "'"
                 lsSQLQuery &= ",'" & arConceptInstance.RoleId.ToString & "'"
+                lsSQLQuery &= "," & arConceptInstance.InstanceNumber
                 lsSQLQuery &= "," & arConceptInstance.X
                 lsSQLQuery &= "," & arConceptInstance.Y
                 lsSQLQuery &= ",100" '& arConceptInstance.orientation & "'"
@@ -55,6 +56,7 @@ Namespace TableConceptInstance
                 lsSQLQuery &= "   AND Symbol = '" & arConceptInstance.Symbol & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & arConceptInstance.ConceptType.ToString & "'"
                 lsSQLQuery &= "   AND RoleId = '" & arConceptInstance.RoleId & "'"
+                lsSQLQuery &= "   AND InstanceNumber = " & arConceptInstance.InstanceNumber
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)
@@ -134,6 +136,7 @@ Namespace TableConceptInstance
             lsSQLQuery &= "   AND ci.Symbol = '" & Trim(arConceptInstance.Symbol) & "'"
             lsSQLQuery &= "   AND ci.ConceptType = '" & arConceptInstance.ConceptType.ToString & "'"
             lsSQLQuery &= "   AND ci.RoleId = '" & arConceptInstance.RoleId.ToString & "'"
+            lsSQLQuery &= "   AND ci.InstanceNumber = " & arConceptInstance.InstanceNumber
 
             lREcordset.Open(lsSQLQuery)
 
@@ -169,12 +172,13 @@ Namespace TableConceptInstance
                 lREcordset.Open(lsSQLQuery)
 
                 While Not lREcordset.EOF
-                    lrConceptInstance = New FBM.ConceptInstance(arPage.Model, arPage, lREcordset("Symbol").Value)
+                    lrConceptInstance = New FBM.ConceptInstance(arPage.Model, arPage, lREcordset("Symbol").Value, lREcordset("InstanceNumber").Value)
                     lrConceptInstance.X = lREcordset("x").Value
                     lrConceptInstance.Y = lREcordset("y").Value
                     lrConceptInstance.Orientation = lREcordset("Orientation").Value
                     lrConceptInstance.Visible = lREcordset("IsVisible").Value
                     lrConceptInstance.ConceptType = CType([Enum].Parse(GetType(pcenumConceptType), Trim(lREcordset("ConceptType").Value)), pcenumConceptType)
+                    lrConceptInstance.RoleId = lREcordset("RoleId").Value
 
                     larConceptInstance.Add(lrConceptInstance)
 
@@ -201,7 +205,7 @@ Namespace TableConceptInstance
         ''' <summary>
         ''' Will return the Page from the Model, else new FBM.Page
         ''' </summary>
-        ''' <param name="lrModelDictionaryEntry"></param>
+        ''' <param name="arModelDictionaryEntry"></param>
         ''' <returns></returns>
         Public Function getPagesContainingDictionaryEntry(ByRef arModelDictionaryEntry As FBM.DictionaryEntry) As List(Of FBM.Page)
 
@@ -215,7 +219,7 @@ Namespace TableConceptInstance
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
 
-                lsSQLQuery = " SELECT ci.*, P.*"
+                lsSQLQuery = " SELECT DISTINCT ci.*, P.*"
                 lsSQLQuery &= "  FROM ModelConceptInstance ci,"
                 lsSQLQuery &= "       ModelPage P"
                 lsSQLQuery &= " WHERE ci.Symbol = '" & Trim(arModelDictionaryEntry.Symbol) & "'"
@@ -273,6 +277,7 @@ Namespace TableConceptInstance
             lsSQLQuery &= "   AND Symbol = '" & Trim(Replace(arConceptInstance.Symbol, "'", "''")) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & Trim(arConceptInstance.ConceptType.ToString) & "'"
             lsSQLQuery &= "   AND RoleId = '" & Trim(arConceptInstance.RoleId.ToString) & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arConceptInstance.InstanceNumber
 
             lREcordset.Open(lsSQLQuery)
 
@@ -416,6 +421,7 @@ Namespace TableConceptInstance
                 lsSQLQuery &= "   AND Symbol = '" & Trim(arConceptInstance.Symbol) & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & Trim(arConceptInstance.ConceptType.ToString) & "'"
                 lsSQLQuery &= "   AND RoleId = '" & Trim(arConceptInstance.RoleId.ToString) & "'"
+                lsSQLQuery &= "   AND InstanceNumber = " & arConceptInstance.InstanceNumber
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)
@@ -450,6 +456,7 @@ Namespace TableConceptInstance
                 lsSQLQuery &= "   AND PageId = '" & Trim(arConceptInstance.PageId) & "'"
                 lsSQLQuery &= "   AND ConceptType = '" & Trim(arConceptInstance.ConceptType.ToString) & "'"
                 lsSQLQuery &= "   AND RoleId = '" & Trim(arConceptInstance.RoleId.ToString) & "'"
+
                 If asOldSymbol IsNot Nothing Then
                     lsSQLQuery &= "   AND Symbol = '" & Trim(asOldSymbol) & "'"
                 End If

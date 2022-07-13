@@ -24,6 +24,16 @@ Namespace FBM
             End Set
         End Property
 
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
+
         <CategoryAttribute("Constraint Type"),
         Browsable(True),
         [ReadOnly](True),
@@ -1832,7 +1842,7 @@ Namespace FBM
 
         Public Overridable Overloads Sub Save(Optional ByVal abRapidSave As Boolean = False)
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id)
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.InstanceNumber)
             lrConceptInstance.ConceptType = pcenumConceptType.RoleConstraint
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
@@ -2144,7 +2154,9 @@ Namespace FBM
         End Sub
 
         Public Overloads Function Equals(other As RoleConstraintInstance) As Boolean Implements IEquatable(Of RoleConstraintInstance).Equals
-            Return Me.Id = other.Id
+
+            Return Me.Id = other.Id And Me.InstanceNumber = other.InstanceNumber
+
         End Function
 
         Public Sub EnableSaveButton() Implements iRoleConstraintObject.EnableSaveButton

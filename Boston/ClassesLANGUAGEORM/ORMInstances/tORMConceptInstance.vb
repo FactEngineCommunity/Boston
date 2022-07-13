@@ -35,8 +35,11 @@ Namespace FBM
         <XmlAttribute()> _
         Public Orientation As Integer
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Visible As Boolean = False
+
+        <XmlAttribute()>
+        Public InstanceNumber As Integer = 1
 
         Public Sub New()
             '-------------------
@@ -46,11 +49,13 @@ Namespace FBM
 
         Public Sub New(ByRef arModel As FBM.Model,
                        ByRef arPage As FBM.Page,
-                       ByVal asSymbol As String)
+                       ByVal asSymbol As String,
+                       Optional aiInstanceNumber As Integer = 1)
 
             Me.ModelId = arModel.ModelId
             Me.PageId = arPage.PageId
             Me.Symbol = asSymbol
+            Me.InstanceNumber = aiInstanceNumber
 
         End Sub
 
@@ -58,6 +63,7 @@ Namespace FBM
                        ByRef arPage As FBM.Page,
                        ByVal asSymbol As String,
                        ByVal aiConceptType As pcenumConceptType,
+                       ByVal aiInstanceNumber As Integer,
                        Optional ByVal aiX As Integer = 0,
                        Optional ByVal aiY As Integer = 0)
 
@@ -65,6 +71,7 @@ Namespace FBM
             Me.PageId = arPage.PageId
             Me.Symbol = asSymbol
             Me.ConceptType = aiConceptType
+            Me.InstanceNumber = aiInstanceNumber
             Me.X = aiX
             Me.Y = aiY
 

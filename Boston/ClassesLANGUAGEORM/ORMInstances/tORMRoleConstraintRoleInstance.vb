@@ -59,6 +59,15 @@ Namespace FBM
         Public Property X As Integer = 0 Implements FBM.iPageObject.X
         Public Property Y As Integer = 0 Implements FBM.iPageObject.Y
 
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Sub New()
             '--------
             'Default
