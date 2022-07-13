@@ -974,6 +974,9 @@ Public Class frmDiagramORM
                         '======================================================================
                         'Save the Page
                         Me.zrPage.Save()
+
+                        Call Me.SortJoiningFactTypes(lrEntityTypeInstance)
+
                         '---------------------------------------
                         'Create the UserAction for the UndoLog
                         '---------------------------------------

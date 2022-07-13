@@ -844,7 +844,6 @@ Namespace FBM
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me, lrEntityType.Id, pcenumConceptType.EntityType)
                 lrConceptInstance.X = ao_pt.X
                 lrConceptInstance.Y = ao_pt.Y
-                lrEntityTypeInstance.InstanceNumber = Me.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityType.Id).Count + 1
 
                 If Me.Model.EntityType.Exists(AddressOf arEntityType.Equals) Then
                     '-----------------------------------------------------------------------------------------------------------------------
@@ -867,6 +866,13 @@ Namespace FBM
 
                 lrEntityTypeInstance.X = ao_pt.X
                 lrEntityTypeInstance.Y = ao_pt.Y
+                lrEntityTypeInstance.InstanceNumber = Me.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityType.Id).Count + 1
+
+                '-------------------------------------------------------------------------------------------------------------
+                'Add the EntityTypeInstance to the Page. Do it again here (beyond CloneInstance above)
+                '  because we have only just set the InstanceNumber and CloneInstance uses AddUnique (with InstanceNumber 1)
+                '---------------------------------------
+                Me.EntityTypeInstance.Add(lrEntityTypeInstance)
 
                 If Me.DiagramView IsNot Nothing Then
 
@@ -2569,7 +2575,13 @@ NextY:
                     Me.Diagram.Nodes.Remove(arEntityTypeInstance.Shape)
                 End If
 
+                Dim lrOriginalEntityTypeInstance As FBM.EntityTypeInstance = arEntityTypeInstance
+
                 Me.EntityTypeInstance.Remove(arEntityTypeInstance)
+
+                For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.Id = lrOriginalEntityTypeInstance.Id And x.InstanceNumber > lrOriginalEntityTypeInstance.InstanceNumber)
+                    lrEntityTypeInstance.InstanceNumber -= 1
+                Next
 
                 'Do database processing if necessary.
                 If abBroadcastInterfaceEvent Then
@@ -2823,11 +2835,11 @@ NextY:
                     Me.Diagram.Nodes.Remove(arValueTypeInstance.Shape)
                 End If
 
-                Dim liInstanceNumber As Integer = arValueTypeInstance.InstanceNumber
+                Dim lrOriginalValueTypeInstance = arValueTypeInstance
 
                 Me.ValueTypeInstance.Remove(arValueTypeInstance)
 
-                For Each lrValueTypeInstance In Me.ValueTypeInstance.FindAll(Function(x) x.InstanceNumber > liInstanceNumber)
+                For Each lrValueTypeInstance In Me.ValueTypeInstance.FindAll(Function(x) x.Id = lrOriginalValueTypeInstance.Id And x.InstanceNumber > lrOriginalValueTypeInstance.InstanceNumber)
                     lrValueTypeInstance.InstanceNumber -= 1
                 Next
 

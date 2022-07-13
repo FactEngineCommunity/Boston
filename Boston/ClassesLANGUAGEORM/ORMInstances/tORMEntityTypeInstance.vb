@@ -1640,8 +1640,8 @@ MoveOn:
                             Me.Page.Diagram.Nodes.Remove(Me.EntityTypeNameShape)
                             Me.Page.Diagram.Nodes.Remove(Me.ReferenceModeShape)
                         End If
+
                         Me.Page.EntityTypeInstance.Remove(Me)
-                        Call TableEntityTypeInstance.delete_entity_type_instance(Me)
 
                         If Me.HasSimpleReferenceScheme _
                         And Me.ReferenceModeFactType IsNot Nothing _

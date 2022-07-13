@@ -1,18 +1,27 @@
 Namespace TableEntityTypeInstance
     Module ztable_entity_type_instance
 
-        Public Sub delete_entity_type_instance(ByVal ar_entity_type_instance As FBM.EntityTypeInstance)
+        Public Sub delete_entity_type_instance(ByVal arEntityTypeInstance As FBM.EntityTypeInstance)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
-            lsSQLQuery &= " WHERE PageId = '" & Trim(ar_entity_type_instance.Page.PageId) & "'"
-            lsSQLQuery &= "   AND Symbol = '" & Trim(ar_entity_type_instance.Id) & "'"
+            lsSQLQuery &= " WHERE PageId = '" & Trim(arEntityTypeInstance.Page.PageId) & "'"
+            lsSQLQuery &= "   AND Symbol = '" & Trim(arEntityTypeInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.EntityType.ToString & "'"
-            lsSQLQuery &= "   AND InstanceNumber = " & ar_entity_type_instance.InstanceNumber
+            lsSQLQuery &= "   AND InstanceNumber = " & arEntityTypeInstance.InstanceNumber
+
+            lsSQLQuery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQuery2 &= " WHERE PageId = '" & Trim(arEntityTypeInstance.Page.PageId) & "'"
+            lsSQLQuery2 &= "    AND Symbol = '" & Trim(arEntityTypeInstance.Id) & "'"
+            lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.EntityType.ToString & "'"
+            lsSQLQuery2 &= "    AND InstanceNumber > " & arEntityTypeInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery2)
             pdbConnection.CommitTrans()
 
         End Sub
