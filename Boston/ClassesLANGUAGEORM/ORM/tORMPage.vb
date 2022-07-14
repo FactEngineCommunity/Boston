@@ -1778,6 +1778,44 @@ Namespace FBM
 
         End Function
 
+        Public Function getModelElement(ByVal arModelElement As FBM.ModelObject) As FBM.ModelObject
+
+            Try
+                Dim loModelElement = CType(arModelElement, Object)
+                Select Case arModelElement.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Return Me.ValueTypeInstance.Find(Function(x) x.Id = arModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+
+                    Case Is = pcenumConceptType.EntityType
+                        Return Me.EntityTypeInstance.Find(Function(x) x.Id = arModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+
+                    Case Is = pcenumConceptType.FactType
+                        Return Me.FactTypeInstance.Find(Function(x) x.Id = arModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+
+                    Case Is = pcenumConceptType.RoleConstraint
+                        Return Me.RoleConstraintInstance.Find(Function(x) x.Id)
+
+                    Case Is = pcenumConceptType.ModelNote
+                        Return Me.ModelNoteInstance.Find(Function(x) x.Id = arModelElement.Id)
+
+                    Case Else
+                        Return Nothing
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Gets a ModelElement(Instance) on the Page for the given asModelElementId.
         ''' </summary>

@@ -125,6 +125,9 @@ Namespace FBM
 
         Public Overloads Function Equals(other As SubtypeRelationshipInstance) As Boolean Implements IEquatable(Of SubtypeRelationshipInstance).Equals
 
+            'CodeSafe
+            If Me.ModelElement Is Nothing Or Me.parentModelElement Is Nothing Then Return False
+
             Return (Me.ModelElement.Id = other.ModelElement.Id) And (Me.parentModelElement.Id = other.parentModelElement.Id)
 
         End Function
@@ -187,17 +190,17 @@ Namespace FBM
 
                 'CodeSafe
                 If Me.ModelElement Is Nothing Then
-                    Me.ModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.ModelElement.Id)
+                    Me.ModelElement = Me.Page.getModelElement(Me.ModelElement)
                 End If
 
                 If Me.parentModelElement IsNot Nothing Then
                     If Me.parentModelElement.IsObjectifyingEntityType Then
                         Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
                     Else
-                        Me.parentModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.parentModelElement.Id)
+                        Me.parentModelElement = Me.Page.getModelElement(Me.parentModelElement)
                     End If
                 Else
-                    Me.parentModelElement = Me.Page.getModelElementById(Me.SubtypeRelationship.parentModelElement.Id)
+                    Me.parentModelElement = Me.Page.getModelElement(Me.parentModelElement)
                 End If
 
                 If IsSomething(Me.parentModelElement) Then
@@ -349,6 +352,9 @@ Namespace FBM
 
         End Sub
 
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

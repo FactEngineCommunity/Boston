@@ -395,6 +395,7 @@ Namespace XMLModel
                     '  as ConceptInstances.
                     '--------------------------------------------------------------
                     For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
+
                         lrConceptInstance = lrEntityTypeInstance.CloneConceptInstance
                         '-------------------------------------
                         'Add the ConceptInstance to the Page
@@ -1128,7 +1129,7 @@ SkipModelNote:
                         lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
                         lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
                         lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
-
+                        lrValueTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
                         lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
 
                         lrValueTypeInstance.Name = lrConceptInstance.Symbol
@@ -1162,6 +1163,7 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.IsDerived = lrEntityType.IsDerived
                     lrEntityTypeInstance.DerivationText = lrEntityType.DerivationText
                     lrEntityTypeInstance.DBName = lrEntityType.DBName
+                    lrEntityTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
 
                     If lrEntityTypeInstance.EntityType.ReferenceModeValueType IsNot Nothing Then
                         lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(Function(x) x.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id)
@@ -1192,6 +1194,7 @@ SkipValueTypeInstance:
                     lrFactTypeInstance.X = lrConceptInstance.X
                     lrFactTypeInstance.Y = lrConceptInstance.Y
                     lrFactTypeInstance.DBName = lrFactType.DBName
+                    lrFactTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
 
                     If lrFactType.IsDerived Then
                         lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
@@ -1306,32 +1309,35 @@ SkipValueTypeInstance:
                 Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
                 For Each lrFactTypeInstance In larSubtypeRelationshipFactTypes.ToArray
                     Try
-                        lrModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(0).JoinedORMObject.Id)
-                        lrParentModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(1).JoinedORMObject.Id)
+                        For Each lrModelElementInstance In lrPage.GetAllPageObjects(False, False, lrFactTypeInstance.RoleGroup(0).JoinedORMObject)
+                            lrParentModelElementInstance = lrPage.getModelElement(lrFactTypeInstance.RoleGroup(1).JoinedORMObject)
 
-                        If lrParentModelElementInstance.ConceptType = pcenumConceptType.FactType Then
-                            Dim lsParentModelElementInstanceId = CType(lrParentModelElementInstance, FBM.FactTypeInstance).FactType.ObjectifyingEntityType.Id
-                            lrParentModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lsParentModelElementInstanceId)
-                        End If
+                            If lrParentModelElementInstance IsNot Nothing Then
+                                If lrParentModelElementInstance.ConceptType = pcenumConceptType.FactType Then
+                                    Dim lsParentModelElementInstanceId = CType(lrParentModelElementInstance, FBM.FactTypeInstance).FactType.ObjectifyingEntityType.Id
+                                    lrParentModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lsParentModelElementInstanceId)
+                                End If
 
-                        lrSubtypeRelationship = Nothing
-                        Select Case lrModelElementInstance.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                lrSubtypeRelationship = CType(lrModelElementInstance, FBM.EntityTypeInstance).EntityType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
-                            Case Is = pcenumConceptType.ValueType
-                                lrSubtypeRelationship = CType(lrModelElementInstance, FBM.ValueTypeInstance).ValueType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
-                        End Select
+                                lrSubtypeRelationship = Nothing
+                                Select Case lrModelElementInstance.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        lrSubtypeRelationship = CType(lrModelElementInstance, FBM.EntityTypeInstance).EntityType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                                    Case Is = pcenumConceptType.ValueType
+                                        lrSubtypeRelationship = CType(lrModelElementInstance, FBM.ValueTypeInstance).ValueType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                                End Select
 
-                        lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, True)
+                                lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, True)
+                                lrSubtypeRelationshipInstance.ModelElement = lrModelElementInstance
+                                lrSubtypeRelationshipInstance.parentModelElement = lrParentModelElementInstance
 
-                        Select Case lrModelElementInstance.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                CType(lrModelElementInstance, FBM.EntityTypeInstance).SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
-                            Case Is = pcenumConceptType.ValueType
-                                CType(lrModelElementInstance, FBM.ValueTypeInstance).SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
-                        End Select
-
-
+                                Select Case lrModelElementInstance.ConceptType
+                                    Case Is = pcenumConceptType.EntityType
+                                        CType(lrModelElementInstance, FBM.EntityTypeInstance).SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                    Case Is = pcenumConceptType.ValueType
+                                        CType(lrModelElementInstance, FBM.ValueTypeInstance).SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                End Select
+                            End If
+                        Next
 
                     Catch ex As Exception
                         lsMessage = "Problem loading Subtype Relationship for Subtype Relationship Fact Type with Id: " & lrFactTypeInstance.Id

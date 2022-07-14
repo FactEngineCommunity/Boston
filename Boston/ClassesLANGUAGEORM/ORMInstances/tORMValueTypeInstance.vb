@@ -273,7 +273,7 @@ Namespace FBM
 
         Public Function CloneConceptInstance() As FBM.ConceptInstance
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType, Me.InstanceNumber)
 
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
@@ -1366,6 +1366,16 @@ RemoveAnyway:
             End Try
 
         End Sub
+
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            If Me.Shape IsNot Nothing Then
+                Dim liMidX As Integer = Me.Shape.Bounds.X + (Me.Shape.Bounds.Width / 2)
+                Dim liMidY As Integer = Me.Shape.Bounds.Y + (Me.Shape.Bounds.Height / 2)
+                Return New Point(liMidX, liMidY)
+            Else
+                Return New Point(0, 0)
+            End If
+        End Function
 
     End Class
 

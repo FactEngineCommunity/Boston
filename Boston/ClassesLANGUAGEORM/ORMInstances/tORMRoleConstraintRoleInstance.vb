@@ -297,6 +297,10 @@ Namespace FBM
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

@@ -788,11 +788,11 @@ Namespace FBM
                         Dim lsFrequencyConstraintText As String = ""
 
                         Select Case Me.CardinalityRangeType
-                            Case Is = pcenumCardinalityRangeType.LessThanOREqual
+                            Case Is = pcenumCardinalityRangeType.LessThanOrEqual
                                 lsFrequencyConstraintText = "<=" & Me.Cardinality
                             Case Is = pcenumCardinalityRangeType.Equal
                                 lsFrequencyConstraintText = Me.Cardinality
-                            Case Is = pcenumCardinalityRangeType.GreaterThanOREqual
+                            Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual
                                 lsFrequencyConstraintText = ">=" & Me.Cardinality
                         End Select
 
@@ -1055,7 +1055,7 @@ Namespace FBM
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison
                                     Case Is = pcenumValueRangeType.GreaterThan
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_greater
-                                    Case Is = pcenumValueRangeType.GreaterThanOREqual
+                                    Case Is = pcenumValueRangeType.GreaterThanOrEqual
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_greater_equal
                                     Case Is = pcenumValueRangeType.LessThan
                                         loDroppedNode.Image = My.Resources.ORMShapes.value_comparison_less_than
@@ -2187,6 +2187,10 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
+
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

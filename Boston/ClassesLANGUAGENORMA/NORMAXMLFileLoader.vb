@@ -2765,14 +2765,13 @@ SkippedRole:
 
                         If IsSomething(lrEntityType) Then
                             lrEntityTypeInstance = New FBM.EntityTypeInstance
-                            lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage, True, True, False)
+                            lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage, False, True, False)
+                            lrEntityTypeInstance.InstanceNumber = lrPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityType.Id).Count + 1
                             Dim lsBounds() As String
-                            If lrPage.EntityTypeInstance.Exists(AddressOf lrEntityTypeInstance.Equals) Then
-                                lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
-                            Else
-                                Boston.WriteToStatusBar("Loading Entity Type Instance")
-                                lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
-                            End If
+
+                            Boston.WriteToStatusBar("Loading Entity Type Instance")
+                            lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
@@ -2781,17 +2780,19 @@ SkippedRole:
 
                         ElseIf IsSomething(lrValueType) Then
                             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
-                            lrValueTypeInstance = lrValueType.CloneInstance(lrPage)
-                            If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
-                                lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
-                            Else
-                                Boston.WriteToStatusBar("Loading Value Type Instance")
-                                lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                            End If
+                            lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
+                            lrValueTypeInstance.InstanceNumber = lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueType.Id).Count + 1
+                            'If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
+                            '    lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
+                            'Else
+                            Boston.WriteToStatusBar("Loading Value Type Instance")
+                            lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                            'End If
                             Dim lsBounds() As String
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+
                         ElseIf IsSomething(lrFactType) Then
                             lrFactTypeInstance = New FBM.FactTypeInstance
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage, False)
@@ -2923,6 +2924,7 @@ SkippedRole:
                     '-----------------------
                     'Subtype Relationships
                     '-----------------------
+#Region "Subtype Relationships"
                     Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = Nothing
                     For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.FindAll(Function(x) x.EntityType.SubtypeRelationship.Count > 0).ToArray
                         For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship
@@ -2967,7 +2969,7 @@ SkippedRole:
                             End Try
                         Next
                     Next
-
+#End Region
                     '---------------------------------------------------------------------
                     'Load the UniquenessConstraint RoleConstraintInstances for the Page.
                     '---------------------------------------------------------------------

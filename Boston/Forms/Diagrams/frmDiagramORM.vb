@@ -4770,9 +4770,13 @@ Public Class frmDiagramORM
             'frmMain.ToolStripMenuItemUndo.Enabled = True
 
             Select Case e.Node.Tag.ConceptType
-                Case Is = pcenumConceptType.EntityType,
-                          pcenumConceptType.ValueType
+                Case Is = pcenumConceptType.EntityType
                     Call Me.SortJoiningFactTypes(e.Node.Tag)
+                    Call CType(e.Node.Tag, FBM.EntityTypeInstance).ResetSubtypeRelationshipLinks()
+
+                Case Is = pcenumConceptType.ValueType
+                    Call Me.SortJoiningFactTypes(e.Node.Tag)
+
                 Case Is = pcenumConceptType.FactType
                     '-------------------------------------------------------------------
                     'Set the X,Y coordinants of the Roles within the FactType/RoleGroup
@@ -5310,7 +5314,7 @@ Public Class frmDiagramORM
             '-----------------------------------
             'Display any Subtype Relationships
             '-----------------------------------        
-            For Each lrEntityTypeInstance In arPage.EntityTypeInstance
+            For Each lrEntityTypeInstance In arPage.EntityTypeInstance.FindAll(Function(x) x.SubtypeRelationship.Count > 0)
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
@@ -5371,6 +5375,14 @@ Public Class frmDiagramORM
                 'Load the RoleConstraint
                 '-------------------------
                 Call lrModelNoteInstance.DisplayAndAssociate()
+            Next
+
+            'Reassess Role Links (join to nearest ModelElementInstance), including for SubtypeRelationships, which are a FactType
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                Call lrFactTypeInstance.SortRoleGroup()
+            Next
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+                Call lrEntityTypeInstance.ResetSubtypeRelationshipLinks()
             Next
 
             'CodeSaf-User Experience
@@ -6326,6 +6338,7 @@ Public Class frmDiagramORM
                 Dim lrFactTypeInstance As FBM.FactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrJoinedRole.FactType.Id) 'lo_link.Origin.Tag.factType
 
                 If lrFactTypeInstance IsNot Nothing Then
+
                     lrFactTypeInstance.SortRoleGroup()
 
                     '------------------------------------------------

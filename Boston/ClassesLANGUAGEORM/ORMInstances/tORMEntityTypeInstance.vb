@@ -606,7 +606,7 @@ Namespace FBM
 
         Public Function CloneConceptInstance() As FBM.ConceptInstance
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType, Me.InstanceNumber)
 
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
@@ -3067,6 +3067,56 @@ MoveOn:
             End Try
 
         End Sub
+
+        Public Sub ResetSubtypeRelationshipLinks()
+
+            Try
+                '----------------------------------------------------------------------------------------------
+                'Subtype Relationships
+#Region "Subtype Relationship Links"
+
+                For Each lrSubtypeRelationshipInstance In Me.SubtypeRelationship
+
+                    Dim lrFactTypeInstance = lrSubtypeRelationshipInstance.FactType
+
+                    If lrFactTypeInstance.RoleGroup(1).JoinedORMObject IsNot Nothing Then
+
+                        Dim larModelElementInstance = From ModelElementInstance In lrFactTypeInstance.Page.GetAllPageObjects(False, False, lrFactTypeInstance.RoleGroup(1).JoinedORMObject)
+                                                      Select ModelElementInstance
+
+                        If larModelElementInstance.Count > 1 Then
+
+                            Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
+                                                                  Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(Me.ShapeMidPoint.X - ModelElementInstance.X) ^ 2 + Math.Abs(Me.ShapeMidPoint.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+
+                            lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                            Me.Page.Diagram.Invalidate()
+                        End If
+                    End If
+                Next
+#End Region
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+
+            If Me.Shape IsNot Nothing Then
+                Dim liMidX As Integer = Me.Shape.Bounds.X + (Me.Shape.Bounds.Width / 2)
+                Dim liMidY As Integer = Me.Shape.Bounds.Y + (Me.Shape.Bounds.Height / 2)
+                Return New Point(liMidX, liMidY)
+            Else
+                Return New Point(0, 0)
+            End If
+        End Function
 
     End Class
 

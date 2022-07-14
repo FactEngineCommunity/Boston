@@ -1799,7 +1799,28 @@ Namespace FBM
             Dim lo_orm_object As New Object
 
             Try
-                If Me.Arity = 1 Then Exit Sub
+                If Me.Arity = 1 Then
+#Region "Arity=1"
+                    lrRoleInstance = Me.RoleGroup(0)
+                    'Redraw Link to nearest ConceptInstance
+                    If lrRoleInstance.JoinedORMObject IsNot Nothing Then
+                        Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject)
+                                                      Select ModelElementInstance
+
+                        If larModelElementInstance.Count > 1 Then
+
+                            Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
+                                                                  Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+
+                            lrRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                            lrRoleInstance.JoinedORMObject = larClosestModelElementInstance.First.ModelElementInstance
+                            Me.Page.Diagram.Invalidate()
+                        End If
+                    End If
+
+                    Exit Sub
+#End Region
+                End If
 
                 If IsSomething(Me.Shape) Then
                     If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Or (Me.RoleGroup.Count = 0) Then
@@ -1840,7 +1861,7 @@ Namespace FBM
                             If larModelElementInstance.Count > 1 Then
 
                                 Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
-                                                                      Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+                                                                      Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.ShapeMidPoint.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.ShapeMidPoint.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
 
                                 lrRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
                                 lrRoleInstance.JoinedORMObject = larClosestModelElementInstance.First.ModelElementInstance
@@ -1855,6 +1876,7 @@ Namespace FBM
                     End If
 
                 End If
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -3849,6 +3871,15 @@ Namespace FBM
 
         End Sub
 
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            If Me.Shape IsNot Nothing Then
+                Dim liMidX As Integer = Me.Shape.Bounds.X + (Me.Shape.Bounds.Width / 2)
+                Dim liMidY As Integer = Me.Shape.Bounds.Y + (Me.Shape.Bounds.Height / 2)
+                Return New Point(liMidX, liMidY)
+            Else
+                Return New Point(0, 0)
+            End If
+        End Function
     End Class
 
 End Namespace

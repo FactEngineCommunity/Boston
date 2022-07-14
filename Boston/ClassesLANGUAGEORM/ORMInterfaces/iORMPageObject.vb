@@ -16,6 +16,8 @@ Namespace FBM
         Sub SetAppropriateColour()
         Sub EnableSaveButton()
 
+        Function ShapeMidPoint() As Point
+
         Property InstanceNumber As Integer
 
         <JsonIgnore()>

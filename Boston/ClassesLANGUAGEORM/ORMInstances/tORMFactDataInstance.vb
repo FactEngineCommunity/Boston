@@ -1283,6 +1283,9 @@ Namespace FBM
 
         End Sub
 
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

@@ -399,6 +399,17 @@ Namespace FBM
                 End Try
             End If
         End Sub
+
+        Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
+            If Me.Shape IsNot Nothing Then
+                Dim liMidX As Integer = Me.Shape.Bounds.X + (Me.Shape.Bounds.Width / 2)
+                Dim liMidY As Integer = Me.Shape.Bounds.Y + (Me.Shape.Bounds.Height / 2)
+                Return New Point(liMidX, liMidY)
+            Else
+                Return New Point(0, 0)
+            End If
+        End Function
+
     End Class
 
 End Namespace

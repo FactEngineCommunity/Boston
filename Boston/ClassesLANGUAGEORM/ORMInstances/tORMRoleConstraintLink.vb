@@ -100,10 +100,14 @@ Namespace FBM
                     For Each lrRoleConstraintRoleInstance In Me.RoleConstraint.RoleConstraintRole
 
                         If lrRoleConstraintRoleInstance.SubtypeConstraintInstance IsNot Nothing Then
-                            liX = (lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link.Bounds.Left + _
+
+                            'CodeSafe
+                            If lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link Is Nothing Then GoTo SkipSubtypeRelationshipLink
+
+                            liX = (lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link.Bounds.Left +
                                   lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link.Bounds.Right) / 2
 
-                            liY = (lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link.Bounds.Top + _
+                            liY = (lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link.Bounds.Top +
                                   lrRoleConstraintRoleInstance.SubtypeConstraintInstance.Link.Bounds.Bottom) / 2
 
                             pt2 = New PointF(liX, liY)
@@ -127,6 +131,7 @@ Namespace FBM
                             lrPen.DashPattern = New Single() {3, 2, 3, 2}
 
                             graphics.DrawLine(lrPen, pt1, pt2)
+SkipSubtypeRelationshipLink:
                         End If
 
                     Next
