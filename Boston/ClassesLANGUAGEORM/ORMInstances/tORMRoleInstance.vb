@@ -603,7 +603,7 @@ Namespace FBM
                     '--------------------------------------------------------------------------------------
                     'Resize the FactType.Shape and reset the position of the RoleGroup within the factType
                     '--------------------------------------------------------------------------------------
-                    Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 15)
+                    Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 12 + ((Me.FactType.GetHighestConstraintLevel - 1) * 2))
 
                     Me.FactType.Shape.SetRect(lo_rectangle, False)
 

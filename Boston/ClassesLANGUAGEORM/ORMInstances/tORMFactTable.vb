@@ -56,6 +56,7 @@ Namespace FBM
             Me.Symbol = Me.FactTypeInstance.Id
             Me.Name = Me.FactTypeInstance.Id
             Me.SelectedRow = 0
+            Me.InstanceNumber = arFactTypeInstance.InstanceNumber
 
         End Sub
 

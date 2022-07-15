@@ -96,6 +96,7 @@ Namespace FBM
                 Me.Model = arFactTypeInstance.Model
                 Me.Page = arFactTypeInstance.Page
                 Me.FactType = arFactTypeInstance
+                Me.InstanceNumber = arFactTypeInstance.InstanceNumber
 
                 If arFactTypeReading Is Nothing Then
                     Me.Id = System.Guid.NewGuid.ToString

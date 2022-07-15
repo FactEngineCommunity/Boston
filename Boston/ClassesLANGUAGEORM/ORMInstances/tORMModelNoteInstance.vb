@@ -103,7 +103,7 @@ Namespace FBM
 
         Public Function CloneConceptInstance() As FBM.ConceptInstance
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType)
+            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType, 1)
 
             lrConceptInstance.Symbol = Me.ModelNote.Id
             lrConceptInstance.X = Me.X
@@ -164,14 +164,14 @@ Namespace FBM
                 loDroppedNode.HandlesStyle = HandlesStyle.HatchFrame
                 loDroppedNode.AllowIncomingLinks = False
                 loDroppedNode.AllowOutgoingLinks = True
-                loDroppedNode.Text = Trim(Me.NoteText)
+                loDroppedNode.Text = " " & Trim(Me.NoteText)
                 loDroppedNode.TextFormat.Alignment = StringAlignment.Near
                 If Me.NoteText.Length > 5 Then
                     Call loDroppedNode.ResizeToFitText(FitSize.KeepWidth)
                 Else
                     loDroppedNode.Resize(40, 10)
                 End If
-                loDroppedNode.Resize(loDroppedNode.Bounds.Width + 1, loDroppedNode.Bounds.Height + 4)
+                loDroppedNode.Resize(loDroppedNode.Bounds.Width + 1, loDroppedNode.Bounds.Height + 2)
 
                 loDroppedNode.ShadowOffsetX = 1
                 loDroppedNode.ShadowOffsetY = 1

@@ -416,10 +416,10 @@ Namespace FBM
         End Property
 
 
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
         Public Sub New()
-            '---------------------------
-            'Parameterless Constructor
-            '---------------------------
             MyBase.ConceptType = pcenumConceptType.FactType
 
             Me.m_dctd = DynamicTypeDescriptor.ProviderInstaller.Install(Me)
@@ -1032,7 +1032,8 @@ Namespace FBM
                 Next
 
                 Me.Y = Me.RoleGroup(0).Y - 3 - (Me.GetHighestConstraintLevel * 2)
-                Me.Shape.Resize(Me.Shape.Bounds.Width, 12 + 4 + ((Me.GetHighestConstraintLevel - 1) * 2))
+                '20220715-VM-Was below for Height 12 + 4 + ((Me.GetHighestConstraintLevel - 1) * 2))
+                Me.Shape.Resize(Me.Shape.Bounds.Width, 12 + ((Me.GetHighestConstraintLevel - 1) * 2))
 
                 Me.Shape.Move(Me.X, Me.Y)
                 Call Me.Shape.ZBottom()
@@ -1046,7 +1047,8 @@ Namespace FBM
 
                 If Me.FactTypeReadingShape IsNot Nothing Then
                     If Me.FactTypeReadingShape.Shape IsNot Nothing And abMoveFactTypeReadingShape Then
-                        Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        '20220715-VM-Commented out.
+                        'Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
                     End If
                 End If
 
@@ -2174,8 +2176,9 @@ Namespace FBM
                     'CodeSafe
                     If Me.Page.Diagram Is Nothing Then Exit Sub
 
-                    loFactTypeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 12, 12 + ((Me.GetHighestConstraintLevel - 1) * 1.6), Shapes.RoundRect)
-
+                    '20220715-VM-Height was 12 + (changed to 8)
+                    loFactTypeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y, 12, 0 + ((Me.GetHighestConstraintLevel - 1) * 1.6), Shapes.RoundRect)
+                    loFactTypeNode.Resize(loFactTypeNode.Bounds.Width, 12 + ((Me.GetHighestConstraintLevel - 1) * 2))
                     loFactTypeNode.HandlesStyle = HandlesStyle.InvisibleMove
                     loFactTypeNode.Pen.Color = Color.LightGray
                     loFactTypeNode.ToolTip = "Fact Type"

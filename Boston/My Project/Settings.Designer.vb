@@ -941,6 +941,18 @@ Namespace My
                 Me("BostonErrorMessagesShowStackTrace") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property NORMAImportingAlwaysCollapseReferenceMode() As Boolean
+            Get
+                Return CType(Me("NORMAImportingAlwaysCollapseReferenceMode"),Boolean)
+            End Get
+            Set
+                Me("NORMAImportingAlwaysCollapseReferenceMode") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

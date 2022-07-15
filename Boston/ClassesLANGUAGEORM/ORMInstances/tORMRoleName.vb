@@ -30,6 +30,7 @@ Namespace FBM
             Me.Model = arRoleInstance.Model
             Me.Page = arRoleInstance.Page
             Me.RoleInstance = arRoleInstance
+            Me.InstanceNumber = arRoleInstance.InstanceNumber
 
         End Sub
 

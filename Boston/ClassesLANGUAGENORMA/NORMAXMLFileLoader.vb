@@ -2705,6 +2705,7 @@ SkippedRole:
                     '---------------------------------------------
                     'Load the ModelObjectInstances onto the Page
                     '---------------------------------------------
+                    Dim lsBounds() As String
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
@@ -2712,6 +2713,7 @@ SkippedRole:
                         '-----------------------
                         'EntityType
                         '-----------------------
+#Region "Entity Type"
                         Dim lbExpandReferenceScheme As Boolean = False
                         lrEntityType = New FBM.EntityType
                         lrEntityType.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
@@ -2723,17 +2725,23 @@ SkippedRole:
                             lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrEntityType.NORMAReferenceId)
 
                             Try
-                                lbExpandReferenceScheme = CBool(lrObjectTypeShapeXElement.Attribute("ExpandRefMode").Value)
+                                If My.Settings.NORMAImportingAlwaysCollapseReferenceMode Then
+                                    lbExpandReferenceScheme = false
+                                Else
+                                    lbExpandReferenceScheme = CBool(lrObjectTypeShapeXElement.Attribute("ExpandRefMode").Value)
+                                End If
+                                
                             Catch ex As Exception
                                 'Not a Biggie
                             End Try
                         Else
                             lrEntityType = Nothing
                         End If
-
+#End Region
                         '-----------------------
                         'ValueType
                         '-----------------------
+#Region "ValueType"
                         lrValueType = New FBM.ValueType
                         lrValueType.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
@@ -2745,13 +2753,14 @@ SkippedRole:
                         Else
                             lrValueType = Nothing
                         End If
-
+#End Region
 
                         '---------------------------------------------------------------------------------------------------------------------
                         'FactType
                         '  NB Normally, should not find a FactType in <ormDiagram:ObjectTypeShape> because is in <ormDiagram:FactTypeShape>.
                         '  See further below where FactTypeInstance are loaded by searching <ormDiagram:FactTypeShape>
                         '---------------------------------------------------------------------------------------------------------------------
+#Region "FactType"
                         lrFactType = New FBM.FactType
                         lrFactType.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
@@ -2762,12 +2771,13 @@ SkippedRole:
                         Else
                             lrFactType = Nothing
                         End If
+#End Region
 
                         If IsSomething(lrEntityType) Then
+#Region "EntityType"
                             lrEntityTypeInstance = New FBM.EntityTypeInstance
                             lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage, False, True, False)
                             lrEntityTypeInstance.InstanceNumber = lrPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityType.Id).Count + 1
-                            Dim lsBounds() As String
 
                             Boston.WriteToStatusBar("Loading Entity Type Instance")
                             lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
@@ -2777,8 +2787,9 @@ SkippedRole:
                             lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
                             lrEntityTypeInstance.ExpandReferenceMode = lbExpandReferenceScheme
-
+#End Region
                         ElseIf IsSomething(lrValueType) Then
+#Region "ValueTypes"
                             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
                             lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
                             lrValueTypeInstance.InstanceNumber = lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueType.Id).Count + 1
@@ -2788,30 +2799,44 @@ SkippedRole:
                             Boston.WriteToStatusBar("Loading Value Type Instance")
                             lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
                             'End If
-                            Dim lsBounds() As String
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
-
+#End Region
                         ElseIf IsSomething(lrFactType) Then
+#Region "FactTypes"
                             lrFactTypeInstance = New FBM.FactTypeInstance
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage, False)
-                            If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                                lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                            Else
-                                Boston.WriteToStatusBar("Loading Fact Type Instance")
-                                lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
-                            End If
-                            Dim lsBounds() As String
+                            lrFactTypeInstance.InstanceNumber = lrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count + 1
+                            'If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                            '    lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                            'Else
+                            Boston.WriteToStatusBar("Loading Fact Type Instance")
+                            lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
+                            'End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+
+                            'FactTypeReadingPosition
+                            Try
+                                Dim lrFTRXElement As XElement = (lrObjectTypeShapeXElement.<ormDiagram:RelativeShapes>.<ormDiagram:ReadingShape>)(0)
+                                If lrFTRXElement IsNot Nothing Then
+                                    lsBounds = lrFTRXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                                    lrFactTypeInstance.FactTypeReadingPoint = New Point(Int(CSng(Trim(lsBounds(0))) * ldblScalar),
+                                                                                        Int(CSng(Trim(lsBounds(1))) * ldblScalar))
+                                End If
+                            Catch ex As Exception
+                                'Not a biggie
+                            End Try
                         End If
+#End Region
                     Next 'lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ObjectTypeShape>
 
                     '-----------------------------------
                     'Add FactTypeInstances to the Page
                     '-----------------------------------
+#Region "FactTypes other"
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:FactTypeShape>
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
@@ -2831,9 +2856,7 @@ SkippedRole:
                             'Clone an Instance of the FactType
                             '------------------------------------
                             '20220127-VM-Commented out below. Remove if all okay.
-                            'lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel)
-                            Dim lsBounds() As String
-
+                            'lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel)                            
                             lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel, lrFactType.Id, True) ' lrFactType.CloneInstance(lrPage, False)
                             lrFactTypeInstance.FactType = lrFactType
                             Boston.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
@@ -2857,38 +2880,28 @@ SkippedRole:
                             '-----------------------------------------------------------------------
                             'If the FactTypeInstance doesn't exist on the Page, add it to the Page
                             '-----------------------------------------------------------------------
-                            If Not lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                            '20220715-VM-Commented out check to see if already on the Page. New InstanceNumber facility now in place.
+                            'If Not lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
 
-                                '-----------------------------------------------------------------------------
-                                'Add the FactTypeInstance to the Page, because Role.CloneInstance
-                                '  automatically looks for and adds the ROleInstance to the FactTypeInstance
-                                '-----------------------------------------------------------------------------
-                                lrFactTypeInstance2 = lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
-                                lrFactTypeInstance2.FactTypeReadingPoint = lrFactTypeInstance.FactTypeReadingPoint
-                                ''-----------------------------------------------
-                                ''Create RoleInstances for the FactTypeInstance
-                                ''-----------------------------------------------
-                                'For Each lrRole In lrFactType.RoleGroup
-                                '    lrRoleInstance = lrRole.CloneInstance(lrPage, True, False)
-                                '    lrFactTypeInstance.RoleGroup.Add(lrRoleInstance)
+                            '-----------------------------------------------------------------------------
+                            'Add the FactTypeInstance to the Page, because Role.CloneInstance
+                            '  automatically looks for and adds the ROleInstance to the FactTypeInstance
+                            '-----------------------------------------------------------------------------
+                            lrFactTypeInstance2 = lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
+                            lrFactTypeInstance2.FactTypeReadingPoint = lrFactTypeInstance.FactTypeReadingPoint
 
-                                '    '---------------------------------------------------------------
-                                '    'Add the RoleInstance to the list of RoleInstances on the Page
-                                '    '---------------------------------------------------------------
-                                '    lrPage.RoleInstance.AddUnique(lrRoleInstance)
-                                'Next
-
-                                '------------------------------------
-                                'Load the FactInstances to the Page
-                                '------------------------------------
-                                For Each lrFact In lrFactType.Fact
-                                    lrFactTypeInstance.AddFact(lrFact, False)
-                                Next
-                            Else
-                                lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
-                            End If
+                            '------------------------------------
+                            'Load the FactInstances to the Page
+                            '------------------------------------
+                            For Each lrFact In lrFactType.Fact
+                                lrFactTypeInstance.AddFact(lrFact, False)
+                            Next
+                            'Else
+                            'lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
+                            'End If
                         End If 'IsSomething(lrFactType)
                     Next 'FactTypeShape in NORMA XML 
+#End Region
 
                     Dim larFaultyFactTypeInstances = From Page In arModel.Page
                                                      From FactTypeInstance In Page.FactTypeInstance
@@ -2970,9 +2983,10 @@ SkippedRole:
                         Next
                     Next
 #End Region
-                    '---------------------------------------------------------------------
-                    'Load the UniquenessConstraint RoleConstraintInstances for the Page.
-                    '---------------------------------------------------------------------
+
+                    '-----------------------------------------------------------
+                    'Internal Uniqueness Constraints (RoleConstraintInstances)
+                    '-----------------------------------------------------------
 #Region "Internal Uniqueness Constraints"
                     '20220127-VM-Commented out. Remove if all okay.
 
@@ -3008,6 +3022,7 @@ SkippedRole:
                     '------------------
                     'Model Notes
                     '------------------
+#Region "ModelNote"
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:ModelNoteShape>
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
@@ -3016,15 +3031,15 @@ SkippedRole:
 
                         lrModelNote = arModel.ModelNote.Find(Function(x) x.NORMAReferenceId = lrModelNote.NORMAReferenceId)
 
-                        Dim lsBounds() As String
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                         Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * ldblScalar), Int(CSng(Trim(lsBounds(1))) * ldblScalar))
                         Call lrPage.DropModelNoteAtPoint(lrModelNote, loPointF)
                     Next
-
+#End Region
                     '------------------
                     'Ring Constraints
                     '------------------
+#Region "RingConstraints"
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:RingConstraintShape>
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
@@ -3044,7 +3059,7 @@ SkippedRole:
                             'Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.RingConstraint)
                             'lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage, False)
                             'lrRoleConstraintInstance = lrRoleConstraintInstance.CloneRingConstraintInstance(lrPage)
-                            Dim lsBounds() As String
+
                             'If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             '    lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             'Else
@@ -3061,12 +3076,13 @@ SkippedRole:
                         Else
                             lrRoleConstraint = Nothing
                         End If
-
                     Next
+#End Region
 
                     '------------------
                     'Frequency Constraints
                     '------------------
+#Region "Frequency Constraints"
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:FrequencyConstraintShape>
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
 
@@ -3089,7 +3105,6 @@ SkippedRole:
                             'lrRoleConstraintInstance.MinimumFrequencyCount = lrRoleConstraint.MinimumFrequencyCount
                             'lrRoleConstraintInstance.MaximumFrequencyCount = lrRoleConstraint.MaximumFrequencyCount
 
-                            Dim lsBounds() As String
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
@@ -3104,10 +3119,12 @@ SkippedRole:
                         End If
 
                     Next
+#End Region
 
                     '------------------
                     'Value Constraints
                     '------------------
+#Region "ValueConstraints"
                     For Each lrObjectTypeShapeXElement In lrPageXElement.<ormDiagram:Shapes>.<ormDiagram:FactTypeShape>.<ormDiagram:RelativeShapes>.<ormDiagram:ValueConstraintShape>
 
                         lrObjectTypeXElement = lrObjectTypeShapeXElement.<ormDiagram:Subject>(0)
@@ -3129,8 +3146,6 @@ SkippedRole:
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
                         End Select
 
-
-                        Dim lsBounds() As String
                         If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                         Else
@@ -3141,6 +3156,7 @@ SkippedRole:
                         lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                         lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                     Next
+#End Region
 
                     '--------------------------
                     'Role Value Constraints 1
@@ -3161,7 +3177,6 @@ SkippedRole:
                             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                             lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
 
-                            Dim lsBounds() As String
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
@@ -3190,7 +3205,6 @@ SkippedRole:
                             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                             lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
 
-                            Dim lsBounds() As String
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
@@ -3224,7 +3238,7 @@ SkippedRole:
 
                             'Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExternalUniquenessConstraint)
                             'lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                            'Dim lsBounds() As String
+
                             'If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             '    lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             'Else
@@ -3235,7 +3249,6 @@ SkippedRole:
                             'lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             'lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
-                            Dim lsBounds() As String
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
 
                             Dim loPointF As New PointF(Int(CSng(Trim(lsBounds(0))) * ldblScalar), Int(CSng(Trim(lsBounds(1))) * ldblScalar))
@@ -3269,7 +3282,7 @@ SkippedRole:
 
                                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.SubsetConstraint)
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                                Dim lsBounds() As String
+
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
@@ -3314,7 +3327,7 @@ SkippedRole:
 
                                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.InclusiveORConstraint)
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                                Dim lsBounds() As String
+
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
@@ -3371,7 +3384,7 @@ SkippedRole:
 
                                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusiveORConstraint)
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                                Dim lsBounds() As String
+
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
@@ -3411,7 +3424,7 @@ SkippedRole:
 
                                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ExclusionConstraint)
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                                Dim lsBounds() As String
+
                                 If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                     lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                                 Else
@@ -3459,7 +3472,7 @@ SkippedRole:
 
                             Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.EqualityConstraint)
                             lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                            Dim lsBounds() As String
+
                             If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                                 lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                             Else
@@ -3499,7 +3512,7 @@ SkippedRole:
 
                         Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance(pcenumRoleConstraintType.ValueComparisonConstraint)
                         lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
-                        Dim lsBounds() As String
+
                         If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
                             lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
                         Else

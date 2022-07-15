@@ -873,9 +873,10 @@ Namespace FBM
         ''' <param name="abAddToPage">True if the FactTypeInstance is to be added to the Page, else False</param>
         ''' <returns></returns>
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
-        Public Overrides Function CloneInstance(ByRef arPage As FBM.Page,
+        Public Overloads Function CloneInstance(ByRef arPage As FBM.Page,
                                                 Optional ByVal abAddToPage As Boolean = False,
-                                                Optional ByVal abIgnoreExistingInstance As Boolean = False) As FBM.ModelObject
+                                                Optional ByVal abIgnoreExistingInstance As Boolean = False,
+                                                Optional ByVal aiInstanceNumber As Integer = 1) As FBM.ModelObject
 
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
             Dim lsMessage As String
@@ -912,6 +913,8 @@ Namespace FBM
                     lrFactTypeInstance.IsStored = .IsStored
                     lrFactTypeInstance.DerivationText = .DerivationText
                     lrFactTypeInstance.IsLinkFactType = .IsLinkFactType
+                    lrFactTypeInstance.InstanceNumber = aiInstanceNumber
+
                     If .IsLinkFactType Then
                         Dim lrPage = arPage
                         If .LinkFactTypeRole IsNot Nothing Then

@@ -163,11 +163,11 @@ Namespace FBM
                     Dim lrRoleInstance As New FBM.RoleInstance(.Model, arPage)
                     lrRoleInstance.Id = Me.Role.Id
 
-                    If abAddToPage Then
-                        lrRoleConstraintRoleInstance.Role = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-                        lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
-                    ElseIf arFactTypeInstance IsNot Nothing Then
+                    If arFactTypeInstance IsNot Nothing Then
                         lrRoleConstraintRoleInstance.Role = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleInstance.Id)
+                        lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                    ElseIf abAddToPage Then
+                        lrRoleConstraintRoleInstance.Role = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
                         lrRoleConstraintRoleInstance.Role.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
                     Else
                         'Last Resort

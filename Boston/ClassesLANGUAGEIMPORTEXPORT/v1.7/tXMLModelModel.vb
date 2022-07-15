@@ -448,7 +448,9 @@ Namespace XMLModel
                         lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
                                                                      lrFactTypeInstance.Page,
                                                                      lrFactTypeInstance.Id,
-                                                                     pcenumConceptType.FactTypeReading)
+                                                                     pcenumConceptType.FactTypeReading,
+                                                                     lrFactTypeInstance.InstanceNumber)
+
                         lrConceptInstance.X = lrFactTypeInstance.FactTypeReadingPoint.X
                         lrConceptInstance.Y = lrFactTypeInstance.FactTypeReadingPoint.Y
                         lrExportPage.ConceptInstance.Add(lrConceptInstance)
@@ -457,7 +459,8 @@ Namespace XMLModel
                         lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
                                                                      lrFactTypeInstance.Page,
                                                                      lrFactTypeInstance.Id,
-                                                                     pcenumConceptType.FactTypeName)
+                                                                     pcenumConceptType.FactTypeName,
+                                                                     lrFactTypeInstance.InstanceNumber)
                         lrConceptInstance.Visible = lrFactTypeInstance.ShowFactTypeName
                         lrConceptInstance.X = lrFactTypeInstance.FactTypeName.X
                         lrConceptInstance.Y = lrFactTypeInstance.FactTypeName.Y
@@ -1116,6 +1119,7 @@ SkipModelNote:
                 '=============================
                 'Map the ValueTypeInstances
                 '=============================
+#Region "ValueTypeInstances"
                 Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
@@ -1143,10 +1147,12 @@ SkipModelNote:
                     End Try
 SkipValueTypeInstance:
                 Next
+#End Region
 
                 '=============================
                 'Map the EntityTypeInstances
                 '=============================
+#Region "EntityTypeInstances"
                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                 Dim lrEntityType As FBM.EntityType
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
@@ -1176,10 +1182,12 @@ SkipValueTypeInstance:
 
                     lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
                 Next
+#End Region
 
                 '===========================
                 'Map the FactTypeInstances
                 '===========================
+#Region "FactTypeInstances"
                 Dim lrFactTypeInstance As FBM.FactTypeInstance
                 Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
                 Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
@@ -1189,12 +1197,10 @@ SkipValueTypeInstance:
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
                     lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
-
-                    lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True)
+                    lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True,, lrConceptInstance.InstanceNumber)
                     lrFactTypeInstance.X = lrConceptInstance.X
                     lrFactTypeInstance.Y = lrConceptInstance.Y
                     lrFactTypeInstance.DBName = lrFactType.DBName
-                    lrFactTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
 
                     If lrFactType.IsDerived Then
                         lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
@@ -1271,6 +1277,7 @@ SkipValueTypeInstance:
                         lrFactTypeInstance.FactTable.Visible = True
                     End If
                 Next
+#End Region
 
                 '===============================================================================================
                 'Populate RoleInstances that are (still) joined to Nothing
@@ -1386,19 +1393,35 @@ SkipValueTypeInstance:
                         lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
                         Try
+                            lrRoleConstraintInstance = Nothing
+
                             Select Case lrRoleConstraint.RoleConstraintType
+                                Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+
+                                    '20220716-VM-Can likely remove. All for multiple instances of the FactType on the Page.
+                                    For Each lrFactTypeInstance In lrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrRoleConstraint.Role(0).FactType.Id)
+                                        lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage, False, lrFactTypeInstance)
+                                        lrFactTypeInstance.AddInternalUniquenessConstraint(lrRoleConstraintInstance)
+                                    Next
+
                                 Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                     lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
+                                    lrRoleConstraintInstance.X = lrConceptInstance.X
+                                    lrRoleConstraintInstance.Y = lrConceptInstance.Y
+
                                 Case Is = pcenumRoleConstraintType.RoleValueConstraint
                                     lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+                                    lrRoleConstraintInstance.X = lrConceptInstance.X
+                                    lrRoleConstraintInstance.Y = lrConceptInstance.Y
+
                                 Case Else
                                     lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                                    lrRoleConstraintInstance.X = lrConceptInstance.X
+                                    lrRoleConstraintInstance.Y = lrConceptInstance.Y
+
                             End Select
 
-                            lrRoleConstraintInstance.X = lrConceptInstance.X
-                            lrRoleConstraintInstance.Y = lrConceptInstance.Y
-
-                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                            lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
                         Catch ex As Exception
                             lsMessage = "Error loading Role Constraint with Id: " & lrConceptInstance.Symbol
                             lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
