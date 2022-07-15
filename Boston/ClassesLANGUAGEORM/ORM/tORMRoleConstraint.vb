@@ -1506,7 +1506,9 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional ByVal abAddToPage As Boolean = False) As FBM.RoleConstraintInstance
+        Public Overloads Function CloneInstance(ByRef arPage As FBM.Page,
+                                                Optional ByVal abAddToPage As Boolean = False,
+                                                Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As FBM.RoleConstraintInstance
 
             Try
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
@@ -1555,8 +1557,11 @@ Namespace FBM
 
                         lrRoleInstance = New FBM.RoleInstance(.Model, arPage)
                         lrRoleInstance.Id = lrRoleConstraintRole.Role.Id
-                        lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-                        lrRoleConstraintInstance.Role.Add(lrRoleInstance)
+                        If arFactTypeInstance Is Nothing Then
+                            lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                        Else
+                            lrRoleInstance = arFactTypeInstance.RoleGroup.Find(AddressOf lrRoleInstance.Equals)
+                        End If
 
                         '--------------------------------------------------------------------
                         'Create a RoleConstraintRoleInstance for the RoleConstraintInstance

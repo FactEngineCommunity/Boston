@@ -298,15 +298,9 @@ Namespace FBM
 
         End Sub
 
-
-
         Public Shadows Function Equals(ByVal other As FBM.Role) As Boolean Implements System.IEquatable(Of FBM.Role).Equals
 
-            If Me.Id = other.Id Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.Id = other.Id
 
         End Function
 
@@ -564,7 +558,9 @@ Namespace FBM
                     Else
                         lrRoleInstance.FactType = arFactTypeInstance
                     End If
-
+                    If arFactTypeInstance IsNot Nothing Then
+                        lrRoleInstance.InstanceNumber = arFactTypeInstance.InstanceNumber
+                    End If
                     lrRoleInstance.Deontic = .Deontic
                     lrRoleInstance.Mandatory = .Mandatory
                     lrRoleInstance.SequenceNr = .SequenceNr
@@ -573,8 +569,8 @@ Namespace FBM
 
                     Select Case .TypeOfJoin
                         Case Is = pcenumRoleJoinType.EntityType
-                            lrEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id)
-                            lrRoleInstance.JoinedORMObject = lrEntityTypeInstance
+                            lrRoleInstance.JoinedORMObject = arPage.EntityTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id And x.InstanceNumber = lrRoleInstance.InstanceNumber)
+#Region "EntityType Error"
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneEntityTypeInstance(arPage)
                                 If IsSomething(abForceReferencingErrorThrowing) Then
@@ -588,8 +584,10 @@ Namespace FBM
                                     End If
                                 End If
                             End If
+#End Region
                         Case Is = pcenumRoleJoinType.ValueType
-                            lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id And x.InstanceNumber = lrRoleInstance.InstanceNumber)
+#Region "ValueType Error"
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage)
                                 If IsSomething(abForceReferencingErrorThrowing) Then
@@ -603,8 +601,10 @@ Namespace FBM
                                     End If
                                 End If
                             End If
+#End Region
                         Case Is = pcenumRoleJoinType.FactType
-                            lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(AddressOf .JoinedORMObject.EqualsByName)
+                            lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id)
+#Region "FactType Error"
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage, abAddToPage)
                                 If IsSomething(abForceReferencingErrorThrowing) Then
@@ -618,6 +618,7 @@ Namespace FBM
                                     End If
                                 End If
                             End If
+#End Region
                     End Select
 
                     If abAddToPage Then

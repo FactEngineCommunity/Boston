@@ -22,8 +22,18 @@ Namespace FBM
         <XmlIgnore()> _
         Public Page As FBM.Page
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents Role As New FBM.Role
+
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
 
         Public Shadows JoinedORMObject As New FBM.ModelObject 'WithEvents
 
@@ -168,15 +178,6 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
-            End Set
-        End Property
-
-        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
-            Get
-                Throw New NotImplementedException()
-            End Get
-            Set(value As Integer)
-                Throw New NotImplementedException()
             End Set
         End Property
 
@@ -630,8 +631,9 @@ Namespace FBM
 
                 '----------------------------------------
                 'Setup the RoleName
-                '----------------------------------------                        
-                'Me.RoleName = New FBM.RoleName(Me, Me.Name)
+                '----------------------------------------
+                'CodeSafe
+                Me.RoleName.InstanceNumber = Me.InstanceNumber
                 Call Me.RoleName.DisplayAndAssociate(Me)
 
                 '-------------------------------------------------------------

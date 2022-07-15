@@ -57,7 +57,15 @@ Namespace FBM
             Return True
         End Function
 
+
+        ''' <summary>
+        ''' NB InstanceNumber set (also) just before calling this method.
+        ''' </summary>
+        ''' <param name="arRoleInstance"></param>
         Public Sub DisplayAndAssociate(ByRef arRoleInstance As FBM.RoleInstance)
+
+            'CodeSafe
+            Me.InstanceNumber = Me.RoleInstance.InstanceNumber
 
             '----------------------------------------
             'Setup the RoleName

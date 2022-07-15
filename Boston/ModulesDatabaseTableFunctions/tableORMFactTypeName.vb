@@ -5,14 +5,24 @@
         Public Sub DeleteFactTypeNameInstance(ByVal arFactTypeNameInstance As FBM.FactTypeName)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
             lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeNameInstance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(arFactTypeNameInstance.FactTypeInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactTypeName.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arFactTypeNameInstance.InstanceNumber
+
+            lsSQLQuery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQuery2 &= " WHERE PageId = '" & Trim(arFactTypeNameInstance.Page.PageId) & "'"
+            lsSQLQuery2 &= "    AND Symbol = '" & Trim(arFactTypeNameInstance.Id) & "'"
+            lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
+            lsSQLQuery2 &= "    AND InstanceNumber > " & arFactTypeNameInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery2)
             pdbConnection.CommitTrans()
 
         End Sub
@@ -25,6 +35,7 @@
             lrConceptInstance.PageId = arFactTypeName.Page.PageId
             lrConceptInstance.Symbol = arFactTypeName.Name
             lrConceptInstance.ConceptType = pcenumConceptType.FactTypeName
+            lrConceptInstance.InstanceNumber = arFactTypeName.InstanceNumber
             lrConceptInstance.X = 0
             lrConceptInstance.Y = 0
 

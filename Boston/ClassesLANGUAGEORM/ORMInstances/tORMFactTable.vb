@@ -8,8 +8,18 @@ Namespace FBM
         Inherits FBM.PageObject
         Implements FBM.iTableNodePageObject
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactTypeInstance As FBM.FactTypeInstance
+
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
 
         <XmlIgnore()> _
         Public SelectedRow As Integer = 0

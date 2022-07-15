@@ -11,7 +11,7 @@ Namespace FBM
         <XmlIgnore()> _
         Public FactType As New FBM.FactType
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactTypeInstance As FBM.FactTypeInstance
 
         Public Shadows Property X As Integer Implements iPageObject.X
@@ -134,8 +134,8 @@ Namespace FBM
                 lrConceptInstance.X = Me.X
                 lrConceptInstance.Y = Me.Y
                 lrConceptInstance.ConceptType = pcenumConceptType.FactTypeDerivationText
+                lrConceptInstance.InstanceNumber = Me.InstanceNumber
                 lrConceptInstance.Visible = Me.FactTypeInstance.IsDerived
-
 
                 '--------------------------------------------------
                 'Make sure the new Symbol is in the Concept table

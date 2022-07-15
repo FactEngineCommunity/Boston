@@ -5,6 +5,7 @@
         Public Sub DeleteRoleConstraintInstance(ByVal arRoleConstraintInstance As FBM.RoleConstraintInstance)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
             lsSQLQuery &= " WHERE PageId = '" & Trim(arRoleConstraintInstance.Page.PageId) & "'"
@@ -12,8 +13,16 @@
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.RoleConstraint.ToString & "'"
             lsSQLQuery &= "   AND InstanceNumber = " & arRoleConstraintInstance.InstanceNumber
 
+            lsSQLQuery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQuery2 &= " WHERE PageId = '" & Trim(arRoleConstraintInstance.Page.PageId) & "'"
+            lsSQLQuery2 &= "    AND Symbol = '" & Trim(arRoleConstraintInstance.Id) & "'"
+            lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.RoleConstraint.ToString & "'"
+            lsSQLQuery2 &= "    AND InstanceNumber > " & arRoleConstraintInstance.InstanceNumber
+
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery2)
             pdbConnection.CommitTrans()
 
         End Sub

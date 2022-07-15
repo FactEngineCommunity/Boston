@@ -1016,21 +1016,11 @@ Namespace FBM
                 DropFactTypeAtPoint = Nothing
 
                 lrFactType = arFactType
-                'CodeSafe: Check to see if the FactType is already on the Page
-                If Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) IsNot Nothing Then
-
-                    If abForceDropOfRelatedModelElements Then
-                        Call Me.DropModelElementsForFactType(arFactType)
-                    End If
-
-                    Return Me.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id)
-                End If
 
                 If Me.Diagram IsNot Nothing Then
                     Me.DiagramView.Cursor = Cursors.WaitCursor
                     Me.Diagram.Invalidate()
                 End If
-
 
                 '--------------------------------------------------------------------------------
                 'Check to see if the ModelObjects joined by the FactType are loaded on the Page
@@ -1118,8 +1108,19 @@ Namespace FBM
                 lrFactTypeInstance.Y = ao_pt.Y
                 lrFactTypeInstance.isDirty = True
                 lrFactTypeInstance.Page.IsDirty = True
+                lrFactTypeInstance.InstanceNumber = Me.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count + 1
+                lrFactTypeInstance.FactTypeName.InstanceNumber = lrFactTypeInstance.InstanceNumber
+                lrFactTypeInstance.FactTable.InstanceNumber = lrFactTypeInstance.InstanceNumber
+                If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                    lrFactTypeInstance.FactTypeDerivationText.InstanceNumber = lrFactTypeInstance.InstanceNumber
+                End If
+                If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                    lrFactTypeInstance.FactTypeReadingShape.InstanceNumber = lrFactTypeInstance.InstanceNumber
+                End If
 
                 If Me.Diagram IsNot Nothing Then
+#Region "Diagram Display - Diagram IsNot Nothing"
+
                     Call lrFactTypeInstance.DisplayAndAssociate(abDisplayFactTable, My.Settings.ShowFactTypeNamesOnORMModelLoad)
 
                     '-------------------------------------------
@@ -1166,6 +1167,7 @@ Namespace FBM
                     End If
 
                     Me.DiagramView.Cursor = Cursors.Default
+#End Region
                 End If
 
                 '------------------------------------------------------------------------------
@@ -2335,11 +2337,13 @@ NextY:
                 '---------------------
                 'Get RoleConstraints
                 '---------------------
-                'Boston.WriteToStatusBar("Loading Page: '" & Me.Name & "' Role Constraints")
-                'prApplication.ThrowErrorMessage("Loading Page.RoleConstraints", pcenumErrorType.Information)
-
                 Me.RoleConstraintInstance = TableRoleConstraintInstance.GetRoleConstraintInstancesByPage(Me)
-
+                'Because of InstanceNumbers, clone for those FactTypes that have no InternalUniquenessConstraints.
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.InternalUniquenessConstraint.Count = 0)
+                    For Each lrInternalUniquenessConstraint In lrFactTypeInstance.FactType.InternalUniquenessConstraint
+                        lrFactTypeInstance.AddInternalUniquenessConstraint(lrInternalUniquenessConstraint.CloneInstance(Me, False, lrFactTypeInstance))
+                    Next
+                Next
 
                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                 For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.PreferredIdentifierRCId <> "")
@@ -2660,6 +2664,19 @@ NextY:
                     End If
                 End If
 
+                Dim lrOriginalFactTypeInstance = arFactTypeInstance
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.Id = lrOriginalFactTypeInstance.Id And x.InstanceNumber > lrOriginalFactTypeInstance.InstanceNumber)
+                    lrFactTypeInstance.InstanceNumber -= 1
+                    lrFactTypeInstance.FactTypeName.InstanceNumber -= 1
+                    lrFactTypeInstance.FactTable.InstanceNumber -= 1
+                    If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                        lrFactTypeInstance.FactTypeDerivationText.InstanceNumber -= 1
+                    End If
+                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        lrFactTypeInstance.FactTypeReadingShape.InstanceNumber -= 1
+                    End If
+                Next
+
                 'The FactTypeName is a separate Shape with its own ConceptInstance in the database.
                 Call arFactTypeInstance.FactTypeName.RemoveFromPage(abBroadcastInterfaceEvent)
 
@@ -2873,10 +2890,9 @@ NextY:
                     Me.Diagram.Nodes.Remove(arValueTypeInstance.Shape)
                 End If
 
-                Dim lrOriginalValueTypeInstance = arValueTypeInstance
-
                 Me.ValueTypeInstance.Remove(arValueTypeInstance)
 
+                Dim lrOriginalValueTypeInstance = arValueTypeInstance
                 For Each lrValueTypeInstance In Me.ValueTypeInstance.FindAll(Function(x) x.Id = lrOriginalValueTypeInstance.Id And x.InstanceNumber > lrOriginalValueTypeInstance.InstanceNumber)
                     lrValueTypeInstance.InstanceNumber -= 1
                 Next

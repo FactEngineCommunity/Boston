@@ -12,6 +12,17 @@ Namespace FBM
         <XmlIgnore()>
         Public Page As FBM.Page
 
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
+
+
         <JsonIgnore()>
         <NonSerialized(),
         XmlIgnore()>
@@ -45,15 +56,6 @@ Namespace FBM
         End Property
 
         Private Property iPageObject_Y As Integer Implements iPageObject.Y
-            Get
-                Throw New NotImplementedException()
-            End Get
-            Set(value As Integer)
-                Throw New NotImplementedException()
-            End Set
-        End Property
-
-        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
             Get
                 Throw New NotImplementedException()
             End Get

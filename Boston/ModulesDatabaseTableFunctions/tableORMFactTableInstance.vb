@@ -5,16 +5,25 @@ Namespace TableFactTableInstance
         Public Sub DeleteFactTableInstance(ByVal arFactTableInstance As FBM.FactTable)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
             lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTableInstance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(arFactTableInstance.FactTypeInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactTable.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arFactTableInstance.InstanceNumber
+
+            lsSQLQuery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQuery2 &= " WHERE PageId = '" & Trim(arFactTableInstance.Page.PageId) & "'"
+            lsSQLQuery2 &= "    AND Symbol = '" & Trim(arFactTableInstance.Id) & "'"
+            lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.FactTable.ToString & "'"
+            lsSQLQuery2 &= "    AND InstanceNumber > " & arFactTableInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery2)
             pdbConnection.CommitTrans()
-
         End Sub
 
         Function GetFactTableCountByPage(ByRef arPage As FBM.Page) As Integer
@@ -53,6 +62,7 @@ Namespace TableFactTableInstance
             lrConceptInstance.PageId = arFactTable.Page.PageId
             lrConceptInstance.Symbol = arFactTable.Id
             lrConceptInstance.ConceptType = pcenumConceptType.FactTable
+            lrConceptInstance.InstanceNumber = arFactTable.InstanceNumber
             lrConceptInstance.X = 0
             lrConceptInstance.Y = 0
 
@@ -100,6 +110,7 @@ Namespace TableFactTableInstance
                 lrFactTableInstance.Id = lRecordset("Symbol").Value
                 lrFactTableInstance.Name = lRecordset("Symbol").Value
                 lrFactTableInstance.FactTypeInstance = ar_page.FactTypeInstance.Find(Function(x) x.Id = lrFactTableInstance.Id)
+                lrFactTableInstance.InstanceNumber = lRecordset("InstanceNumber").Value
 
                 lrFactTableInstance.X = lRecordset("x").Value
                 lrFactTableInstance.Y = lRecordset("y").Value

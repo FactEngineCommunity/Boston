@@ -2,19 +2,28 @@
 
     Module TableRoleName
 
-        Public Sub delete_RoleName_instance(ByVal arRoleName_instance As FBM.RoleName)
+        Public Sub delete_RoleName_instance(ByVal arRoleNameInstance As FBM.RoleName)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
-            lsSQLQuery &= " WHERE PageId = '" & Trim(arRoleName_instance.Page.PageId) & "'"
-            lsSQLQuery &= "   AND Symbol = '" & Trim(arRoleName_instance.Name) & "'"
+            lsSQLQuery &= " WHERE PageId = '" & Trim(arRoleNameInstance.Page.PageId) & "'"
+            lsSQLQuery &= "   AND Symbol = '" & Trim(arRoleNameInstance.Name) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.RoleName.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arRoleNameInstance.InstanceNumber
+
+            lsSQLQuery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQuery2 &= " WHERE PageId = '" & Trim(arRoleNameInstance.Page.PageId) & "'"
+            lsSQLQuery2 &= "    AND Symbol = '" & Trim(arRoleNameInstance.Id) & "'"
+            lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.RoleName.ToString & "'"
+            lsSQLQuery2 &= "    AND InstanceNumber > " & arRoleNameInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery2)
             pdbConnection.CommitTrans()
-
         End Sub
 
         Public Sub GetRoleNameDetails(ByRef arRoleName As FBM.RoleName)
@@ -28,6 +37,7 @@
                 lrConceptInstance.Symbol = arRoleName.Name
                 lrConceptInstance.ConceptType = pcenumConceptType.RoleName
                 lrConceptInstance.RoleId = arRoleName.RoleInstance.Id
+                lrConceptInstance.InstanceNumber = arRoleName.InstanceNumber
                 lrConceptInstance.X = 0
                 lrConceptInstance.Y = 0
 

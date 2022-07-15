@@ -5,16 +5,25 @@
         Public Sub DeleteFactTypeDerivationTextInstance(ByVal arFactTypeDerivationTextInstance As FBM.FactTypeDerivationText)
 
             Dim lsSQLQuery As String = ""
+            Dim lsSQLQuery2 As String = ""
 
             lsSQLQuery = "DELETE FROM ModelConceptInstance"
             lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeDerivationTextInstance.Page.PageId) & "'"
             lsSQLQuery &= "   AND Symbol = '" & Trim(arFactTypeDerivationTextInstance.FactTypeInstance.Id) & "'"
             lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactTypeDerivationText.ToString & "'"
+            lsSQLQuery &= "   AND InstanceNumber = " & arFactTypeDerivationTextInstance.InstanceNumber
+
+            lsSQLQuery2 = "UPDATE ModelConceptInstance"
+            lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+            lsSQLQuery2 &= " WHERE PageId = '" & Trim(arFactTypeDerivationTextInstance.Page.PageId) & "'"
+            lsSQLQuery2 &= "    AND Symbol = '" & Trim(arFactTypeDerivationTextInstance.Id) & "'"
+            lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.FactTypeDerivationText.ToString & "'"
+            lsSQLQuery2 &= "    AND InstanceNumber > " & arFactTypeDerivationTextInstance.InstanceNumber
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery2)
             pdbConnection.CommitTrans()
-
         End Sub
 
         Public Sub GetFactTypeDerivationTextDetails(ByRef arFactTypeDerivationText As FBM.FactTypeDerivationText)
@@ -25,6 +34,7 @@
             lrConceptInstance.PageId = arFactTypeDerivationText.Page.PageId
             lrConceptInstance.Symbol = arFactTypeDerivationText.FactTypeInstance.Id
             lrConceptInstance.ConceptType = pcenumConceptType.FactTypeDerivationText
+            lrConceptInstance.InstanceNumber = arFactTypeDerivationText.InstanceNumber
             lrConceptInstance.X = 0
             lrConceptInstance.Y = 0
 

@@ -287,6 +287,7 @@ Namespace TableConceptInstance
                     arConceptInstance.Y = lREcordset("y").Value
                     arConceptInstance.Orientation = lREcordset("Orientation").Value
                     arConceptInstance.Visible = lREcordset("IsVisible").Value
+                    arConceptInstance.InstanceNumber = lREcordset("InstanceNumber").Value
                 End If
 
                 Return True

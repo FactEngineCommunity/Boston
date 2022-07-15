@@ -26,8 +26,18 @@ Namespace FBM
         <XmlIgnore()> _
         Public Shadows FactType As FBM.FactTypeInstance   'The FactType to which the FactTypeReading relates
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Page As FBM.Page
+
+        Private _InstanceNumber As Integer = 1
+        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
 
         <NonSerialized(),
         XmlIgnore()>
@@ -73,17 +83,10 @@ Namespace FBM
             End Set
         End Property
 
-        Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
-            Get
-                Throw New NotImplementedException()
-            End Get
-            Set(value As Integer)
-                Throw New NotImplementedException()
-            End Set
-        End Property
-
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
         Public Sub New()
-
         End Sub
 
         Sub New(ByRef arFactTypeInstance As FBM.FactTypeInstance, _
@@ -372,6 +375,7 @@ Namespace FBM
                 lrConceptInstance.X = Me.X
                 lrConceptInstance.Y = Me.Y
                 lrConceptInstance.ConceptType = pcenumConceptType.FactTypeReading
+                lrConceptInstance.InstanceNumber = Me.InstanceNumber
 
                 '--------------------------------------------------
                 'Make sure the new Symbol is in the Concept table
@@ -403,6 +407,7 @@ Namespace FBM
         Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
             Throw New NotImplementedException()
         End Function
+
     End Class
 
 End Namespace

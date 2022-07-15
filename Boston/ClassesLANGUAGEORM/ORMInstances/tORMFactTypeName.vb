@@ -10,8 +10,18 @@ Namespace FBM
         <XmlIgnore()> _
         Public FactType As New FBM.FactType
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public FactTypeInstance As FBM.FactTypeInstance
+
+        Private _InstanceNumber As Integer = 1
+        Public Overloads Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
+            Get
+                Return Me._InstanceNumber
+            End Get
+            Set(value As Integer)
+                Me._InstanceNumber = value
+            End Set
+        End Property
 
         Public Shadows Property X As Integer Implements FBM.iPageObject.X
         Public Shadows Property Y As Integer Implements FBM.iPageObject.Y
@@ -104,6 +114,7 @@ Namespace FBM
                 lrConceptInstance.X = Me.X
                 lrConceptInstance.Y = Me.Y
                 lrConceptInstance.ConceptType = pcenumConceptType.FactTypeName
+                lrConceptInstance.InstanceNumber = Me.InstanceNumber
                 lrConceptInstance.Visible = Me.FactTypeInstance.ShowFactTypeName
 
                 '--------------------------------------------------

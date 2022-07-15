@@ -1038,7 +1038,7 @@ Public Class frmDiagramORM
                         Exit Sub
 #End Region
                     Case Is = pcenumConceptType.FactType 'Fact Type
-
+#Region "FactType"
                         lrFactType = New FBM.FactType
 
                         lrFactType = lrModelObject
@@ -1064,82 +1064,89 @@ Public Class frmDiagramORM
                         '--------------------------------------------------------------------------------
                         Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrModel, Me.zrPage, pcenumLanguage.ORMModel, lrFactType.Name, True)
 
-                        If IsSomething(Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)) Then
-                            If lrFactTypeInstance.Shape Is Nothing Then
-                                lrFactType = Me.zrPage.Model.GetModelObjectByName(lrFactTypeInstance.Id)
-                                '===================================================================================
-                                'CodeSafe
-                                '  May be something wrong. E.g. IsPreferredReferenceMode, but is not actually.
-                                If lrFactType.IsPreferredReferenceMode Then
-                                    Dim lasRoleConstraintId = From RoleConstraint In lrFactType.InternalUniquenessConstraint
-                                                              Select RoleConstraint.Id
+#Region "Pre-InstanceNumber" '20220715-VM-Can remove if no longer needed.
+                        '======================================================================================================
+                        'If IsSomething(Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)) Then
+                        '    If lrFactTypeInstance.Shape Is Nothing Then
+                        '        lrFactType = Me.zrPage.Model.GetModelObjectByName(lrFactTypeInstance.Id)
+                        '        '===================================================================================
+                        '        'CodeSafe
+                        '        '  May be something wrong. E.g. IsPreferredReferenceMode, but is not actually.
+                        '        If lrFactType.IsPreferredReferenceMode Then
+                        '            Dim lasRoleConstraintId = From RoleConstraint In lrFactType.InternalUniquenessConstraint
+                        '                                      Select RoleConstraint.Id
 
-                                    Dim larEntityType = From EntityType In Me.zrPage.Model.EntityType
-                                                        Where lasRoleConstraintId.Contains(EntityType.PreferredIdentifierRCId)
-                                                        Select EntityType
+                        '            Dim larEntityType = From EntityType In Me.zrPage.Model.EntityType
+                        '                                Where lasRoleConstraintId.Contains(EntityType.PreferredIdentifierRCId)
+                        '                                Select EntityType
 
-                                    If larEntityType.Count = 0 Then
-                                        lrFactType.IsPreferredReferenceMode = False
-                                        Call lrFactTypeInstance.RemoveFromPage(True)
-                                        lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False, False, True)
-                                        lrFactType.makeDirty()
-                                        Dim larObjectType = From RoleInstance In lrFactTypeInstance.RoleGroup
-                                                            Select RoleInstance.JoinedORMObject
+                        '            If larEntityType.Count = 0 Then
+                        '                lrFactType.IsPreferredReferenceMode = False
+                        '                Call lrFactTypeInstance.RemoveFromPage(True)
+                        '                lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False, False, True)
+                        '                lrFactType.makeDirty()
+                        '                Dim larObjectType = From RoleInstance In lrFactTypeInstance.RoleGroup
+                        '                                    Select RoleInstance.JoinedORMObject
 
-                                        For Each lrObjectType As Object In larObjectType
-                                            If lrObjectType.Shape IsNot Nothing Then
-                                                lrObjectType.Shape.Visible = True
-                                            End If
-                                        Next
-                                    Else
-                                        Dim lrEntityTypeInstance = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = larEntityType.First.Id)
-                                        Call lrEntityTypeInstance.ExpandTheReferenceScheme()
-                                    End If
-                                End If
-                                '===================================================================================
-                            ElseIf lrFactTypeInstance.Shape.Visible = False Then
-                                Call lrFactTypeInstance.Show()
+                        '                For Each lrObjectType As Object In larObjectType
+                        '                    If lrObjectType.Shape IsNot Nothing Then
+                        '                        lrObjectType.Shape.Visible = True
+                        '                    End If
+                        '                Next
+                        '            Else
+                        '                Dim lrEntityTypeInstance = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = larEntityType.First.Id)
+                        '                Call lrEntityTypeInstance.ExpandTheReferenceScheme()
+                        '            End If
+                        '        End If
+                        '        '===================================================================================
+                        '    ElseIf lrFactTypeInstance.Shape.Visible = False Then
+                        '        Call lrFactTypeInstance.Show()
+                        '    Else
+                        '        MsgBox("This Page already contains the Fact Type, '" & lrFactType.Name & "'.")
+                        '    End If
+                        'Else
+                        '======================================================================================================
+
+#End Region
+                        '--------------------------------------------------------------------------------------
+                        'Check to see if the ModelObjects joined by the Roles of the FactType are already
+                        '  in the ModelDictionary for the lrModel, otherwise add them to the ModelDictionary
+                        '--------------------------------------------------------------------------------------
+                        Dim lrRole As FBM.Role
+                        For Each lrRole In lrFactType.RoleGroup
+                            'Because may be dropping from a different Model.
+                            lrModelObject = lrRole.JoinedORMObject
+                            Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrModelObject.Name, lrModelObject.ConceptType)
+                            If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+                                '--------------------------------------------------------------------------------------------------------
+                                'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary,
+                                '--------------------------------------------------------------------------------------------------------
                             Else
-                                MsgBox("This Page already contains the Fact Type, '" & lrFactType.Name & "'.")
+                                lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
                             End If
-                        Else
-                            '--------------------------------------------------------------------------------------
-                            'Check to see if the ModelObjects joined by the Roles of the FactType are already
-                            '  in the ModelDictionary for the lrModel, otherwise add them to the ModelDictionary
-                            '--------------------------------------------------------------------------------------
-                            Dim lrRole As FBM.Role
-                            For Each lrRole In lrFactType.RoleGroup
-                                lrModelObject = lrRole.JoinedORMObject
-                                Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrModelObject.Name, lrModelObject.ConceptType)
-                                If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-                                    '--------------------------------------------------------------------------------------------------------
-                                    'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary,
-                                    '--------------------------------------------------------------------------------------------------------
-                                Else
-                                    lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
-                                End If
-                            Next
+                        Next
 
-                            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType,
-                                                                               loPt,
-                                                                               Me.ViewFactTablesToolStripMenuItem.Checked,
-                                                                               True,
-                                                                               True)
+                        lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType,
+                                                                           loPt,
+                                                                           Me.ViewFactTablesToolStripMenuItem.Checked,
+                                                                           True,
+                                                                           True)
 
-                            Me.zrPage.Save()
+                        Me.zrPage.Save()
 
-                            '---------------------------------------
-                            'Create the UserAction for the UndoLog
-                            '---------------------------------------
-                            'Dim lrUserAction As New tUserAction(lrFactTypeInstance, pcenumUserAction.AddPageObjectToPage, Me.zrPage)
-                            'lrUserAction.PreActionModelObject = lrFactTypeInstance.Clone(Me.zrPage)
-                            'lrUserAction.PostActionModelObject = lrFactTypeInstance.Clone(Me.zrPage)
-                            'prApplication.AddUndoAction(lrUserAction)
-                            'frmMain.ToolStripMenuItemUndo.Enabled = True
+                        '---------------------------------------
+                        'Create the UserAction for the UndoLog
+                        '---------------------------------------
+                        'Dim lrUserAction As New tUserAction(lrFactTypeInstance, pcenumUserAction.AddPageObjectToPage, Me.zrPage)
+                        'lrUserAction.PreActionModelObject = lrFactTypeInstance.Clone(Me.zrPage)
+                        'lrUserAction.PostActionModelObject = lrFactTypeInstance.Clone(Me.zrPage)
+                        'prApplication.AddUndoAction(lrUserAction)
+                        'frmMain.ToolStripMenuItemUndo.Enabled = True
 
-                        End If
+                        'End If 20220715-VM-Pre InstanceNumber
 
                         Exit Sub
+#End Region
                     Case Is = pcenumConceptType.RoleConstraint
                         Dim lrRoleConstraint As New FBM.RoleConstraint
                         lrRoleConstraint = lrModelObject
@@ -5335,15 +5342,18 @@ Public Class frmDiagramORM
             '-----------------------------
             'Display the RoleConstraints
             '-----------------------------
+#Region "Role Constraints"
             'CodeSafe
             Call Me.zrPage.RemoveRoleConstraintInstancesNoLongerInModel()
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
+            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint)
                 '-------------------------
                 'Load the RoleConstraint
                 '-------------------------
                 Call lrRoleConstraintInstance.DisplayAndAssociate()
+
+                '20220715-VM-Remove if not missed. Found already commented out on this date.
                 'Select Case lrRoleConstraintInstance.RoleConstraintType
                 '    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                 '        '20211122-VM-Delete if all is well. All variants use RoleConstraintInstance.DisplayAndAssociate.
@@ -5359,8 +5369,16 @@ Public Class frmDiagramORM
                 '        'Case Else
                 '        Call lrRoleConstraintInstance.DisplayAndAssociate()
                 'End Select
-
             Next
+
+            Dim larInternalUniquenessConstraint = From FactTypeInstance In Me.zrPage.FactTypeInstance
+                                                  From InternalUniquenessConstraint In FactTypeInstance.InternalUniquenessConstraint
+                                                  Select InternalUniquenessConstraint
+
+            For Each lrInternalUniquenessConstraint In larInternalUniquenessConstraint
+                Call lrInternalUniquenessConstraint.DisplayAndAssociate()
+            Next
+#End Region
 
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Visible = True)
                 Call lrFactTypeInstance.AdjustBorderHeight()

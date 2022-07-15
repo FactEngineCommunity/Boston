@@ -24,6 +24,7 @@ Namespace TableFactTypeInstance
 
             Try
                 Dim lsSQLQuery As String = ""
+                Dim lsSQLQuery2 As String = ""
 
                 lsSQLQuery = "DELETE FROM ModelConceptInstance"
                 lsSQLQuery &= " WHERE PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
@@ -31,8 +32,16 @@ Namespace TableFactTypeInstance
                 lsSQLQuery &= "   AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
                 lsSQLQuery &= "   AND InstanceNumber = " & arFactTypeInstance.InstanceNumber
 
+                lsSQLQuery2 = "UPDATE ModelConceptInstance"
+                lsSQLQUery2 &= " SET InstanceNumber = InstanceNumber - 1"
+                lsSQLQuery2 &= " WHERE PageId = '" & Trim(arFactTypeInstance.Page.PageId) & "'"
+                lsSQLQuery2 &= "    AND Symbol = '" & Trim(arFactTypeInstance.Id) & "'"
+                lsSQLQuery2 &= "    AND ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
+                lsSQLQuery2 &= "    AND InstanceNumber > " & arFactTypeInstance.InstanceNumber
+
                 pdbConnection.BeginTrans()
                 Call pdbConnection.Execute(lsSQLQuery)
+                Call pdbConnection.Execute(lsSQLQuery2)
                 pdbConnection.CommitTrans()
 
             Catch ex As Exception
@@ -110,7 +119,7 @@ Namespace TableFactTypeInstance
         ''' <param name="arPage"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function GetFactTypeInstanceByPage(ByVal asFactTypeInstanceId As String, ByRef arPage As FBM.Page) As FBM.FactTypeInstance
+        Public Function GetFactTypeInstanceByPage(ByVal asFactTypeInstanceId As String, ByRef arPage As FBM.Page, Optional ByVal aiInstanceNumber As Integer = 1) As FBM.FactTypeInstance
 
             Dim lrRoleInstance As FBM.RoleInstance
             Dim lsMessage As String = ""
@@ -137,6 +146,7 @@ Namespace TableFactTypeInstance
                 lsSQLQuery &= "   AND ci.PageId = '" & Trim(arPage.PageId) & "'"
                 lsSQLQuery &= "   AND ci.Symbol = '" & asFactTypeInstanceId & "'"
                 lsSQLQuery &= "   AND ci.ConceptType = '" & pcenumConceptType.FactType.ToString & "'"
+                lsSQLQuery &= "   AND ci.InstanceNumber = " & aiInstanceNumber
                 lsSQLQuery &= "   AND ci.Symbol = ft.FactTypeId"
 
                 lREcordset.Open(lsSQLQuery)
@@ -160,208 +170,208 @@ Namespace TableFactTypeInstance
                         'lrFactTypeInstance.IsLinkFactType = CBool(lREcordset("IsLinkFactType").Value)
                         'If lrFactTypeInstance.IsLinkFactType Then
                         '    lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
-                        'End If
+                        'End If                        
 
-                        If arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                            '-------------------------------------------------------------------------------------------------------
-                            'The FactTypeInstance has already been added to the Page by the recursive loading of FactTypeInstances
-                            '-------------------------------------------------------------------------------------------------------
-                            Dim lrExistingFactTypeInstance As FBM.FactTypeInstance
-                            lrExistingFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                            lrExistingFactTypeInstance.X = lrFactTypeInstance.X
-                            lrExistingFactTypeInstance.Y = lrFactTypeInstance.Y
+                        '20220715-VM-Pre InstanceNumber. Remove if not needed.
+                        'If arPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                        '    '-------------------------------------------------------------------------------------------------------
+                        '    'The FactTypeInstance has already been added to the Page by the recursive loading of FactTypeInstances
+                        '    '-------------------------------------------------------------------------------------------------------
+                        '    Dim lrExistingFactTypeInstance As FBM.FactTypeInstance
+                        '    lrExistingFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                        '    lrExistingFactTypeInstance.X = lrFactTypeInstance.X
+                        '    lrExistingFactTypeInstance.Y = lrFactTypeInstance.Y
 
-                            For Each lrRoleInstance In lrExistingFactTypeInstance.RoleGroup
-                                lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
-                                Call TableRoleName.GetRoleNameDetails(lrRoleInstance.RoleName)
-                            Next
+                        '    For Each lrRoleInstance In lrExistingFactTypeInstance.RoleGroup
+                        '        lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+                        '        Call TableRoleName.GetRoleNameDetails(lrRoleInstance.RoleName)
+                        '    Next
 
-                            Return lrExistingFactTypeInstance
-                        Else
-                            lrFactTypeInstance.FactType = arPage.Model.FactType.Find(Function(x) x.Id = lrFactTypeInstance.Id)
+                        '    Return lrExistingFactTypeInstance
+                        'Else
+                        lrFactTypeInstance.FactType = arPage.Model.FactType.Find(Function(x) x.Id = lrFactTypeInstance.Id)
 
-                            lrFactTypeInstance.ShortDescription = lrFactTypeInstance.FactType.ShortDescription
-                            lrFactTypeInstance.LongDescription = lrFactTypeInstance.FactType.LongDescription
-                            lrFactTypeInstance.DBName = lrFactTypeInstance.FactType.DBName
+                        lrFactTypeInstance.ShortDescription = lrFactTypeInstance.FactType.ShortDescription
+                        lrFactTypeInstance.LongDescription = lrFactTypeInstance.FactType.LongDescription
+                        lrFactTypeInstance.DBName = lrFactTypeInstance.FactType.DBName
 
-                            lrFactTypeInstance.IsDerived = lrFactTypeInstance.FactType.IsDerived
-                            lrFactTypeInstance.IsStored = lrFactTypeInstance.FactType.IsStored
-                            lrFactTypeInstance.IsIndependent = lrFactTypeInstance.FactType.IsIndependent
-                            lrFactTypeInstance.IsSubtypeStateControlling = lrFactTypeInstance.FactType.IsSubtypeStateControlling
-                            lrFactTypeInstance.DerivationText = lrFactTypeInstance.FactType.DerivationText
-                            lrFactTypeInstance.IsLinkFactType = lrFactTypeInstance.FactType.IsLinkFactType
-                            If lrFactTypeInstance.IsLinkFactType Then
-                                lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
-                            End If
-
-                            If lrFactTypeInstance.FactType Is Nothing Then
-                                Throw New Exception("Cannot find FactType for FactTypeInstance with FactTypeId: " & lrFactTypeInstance.Id)
-                            End If
-
-
-                            lrFactTypeInstance.IsObjectified = lrFactTypeInstance.FactType.IsObjectified
-
-                            If lrFactTypeInstance.IsObjectified Then
-                                Dim lrObjectifyingEntityTypeInstance As FBM.EntityTypeInstance
-
-                                If IsSomething(lrFactTypeInstance.FactType.ObjectifyingEntityType) Then
-                                    lrObjectifyingEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id)
-                                    If IsSomething(lrObjectifyingEntityTypeInstance) Then
-                                        '---------------------------------------------
-                                        'All okay. Found the EntityType on the Page.
-                                        '---------------------------------------------
-                                    Else
-                                        lrObjectifyingEntityTypeInstance = lrFactTypeInstance.FactType.ObjectifyingEntityType.CloneInstance(arPage, True)
-                                    End If
-                                    lrObjectifyingEntityTypeInstance.IsObjectifyingEntityType = True
-                                    lrObjectifyingEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
-                                    lrObjectifyingEntityTypeInstance.ObjectifiedFactType = lrFactTypeInstance
-                                    'lrFactTypeInstance.ObjectifyingEntityType = New FBM.EntityTypeInstance
-                                    lrFactTypeInstance.ObjectifyingEntityType = lrObjectifyingEntityTypeInstance
-                                Else
-                                    lrFactTypeInstance.ObjectifyingEntityType = Nothing
-                                End If
-                            End If
-
-                            lrFactTypeInstance.isPreferredReferenceMode = lrFactTypeInstance.FactType.IsPreferredReferenceMode
-                            lrFactTypeInstance.IsSubtypeRelationshipFactType = lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType
-
-                            '-----------------------------------------
-                            'Setup the FactTypeName for the FactType
-                            '-----------------------------------------
-                            lrFactTypeInstance.FactTypeName = New FBM.FactTypeName(arPage.Model, arPage, lrFactTypeInstance, lrFactTypeInstance.Name)
-
-                            '==============================================================================================================
-                            Call TableFactTypeName.GetFactTypeNameDetails(lrFactTypeInstance.FactTypeName)
-
-                            'FactTypeReadingPoint
-                            Dim lrFTRConceptInstance As New FBM.ConceptInstance(lrFactTypeInstance.Model, lrFactTypeInstance.Page, lrFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
-                            Call TableConceptInstance.ExistsConceptInstance(lrFTRConceptInstance)
-                            lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFTRConceptInstance.X, lrFTRConceptInstance.Y)
-
-                            If lrFactTypeInstance.DerivationText <> "" Then
-                                lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(arPage.Model,
-                                                                                                        arPage,
-                                                                                                        lrFactTypeInstance)
-                                Call TableFactTypeDerivationText.GetFactTypeDerivationTextDetails(lrFactTypeInstance.FactTypeDerivationText)
-                            End If
-
-                            '-------------------------------------------------------------
-                            'The Model must already have been loaded before loading the 
-                            '  Page, so get the RoleGroup/RoleInstances from the model.
-                            '-------------------------------------------------------------                        
-                            For Each lrRole In lrFactTypeInstance.FactType.RoleGroup
-
-                                lrRoleInstance = lrRole.CloneInstance(arPage, True, False, lrFactTypeInstance)
-
-                                'prApplication.ThrowErrorMessage("Loading Page:'" & arPage.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
-                                '20220410-VM-Replace with passing lrFactTypeInstance to lrRole.CloneInstance (above)
-                                'lrRoleInstance.FactType = lrFactTypeInstance
-
-                                If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.FactType Then
-                                    If lrRoleInstance.JoinedORMObject Is Nothing Then
-                                        lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
-
-                                        'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Facts.
-                                        '20210826-VM-Can't see why this doesn't double up the FactInstances, because GetFactTypeInstanceByPage (above) should get the Fact Instances.
-                                        lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
-                                    End If
-                                End If
-
-                                '-----------------------------------------------------------------------------------------------
-                                'CodeSafe; Make sure the RoleInstance is connected to something.
-                                If lrRoleInstance.JoinedORMObject Is Nothing Then
-                                    Select Case lrRoleInstance.TypeOfJoin
-                                        Case Is = pcenumRoleJoinType.EntityType
-                                            lrRoleInstance.JoinedORMObject = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsEntityType.Id)
-                                        Case Is = pcenumRoleJoinType.ValueType
-                                            lsMessage = "Cannot find ValueType for"
-                                            lsMessage &= vbCrLf & "FactType.Id: " & lrFactTypeInstance.FactType.Id
-                                            lsMessage &= vbCrLf & "FactType.Name: " & lrFactTypeInstance.FactType.Name
-                                            lsMessage &= vbCrLf & " Role.Id: " & lrRoleInstance.Id
-                                            lsMessage &= vbCrLf & " Page.Id: " & arPage.PageId
-                                            lsMessage &= vbCrLf & " Page.Name: " & arPage.Name
-                                            lsMessage &= vbCrLf & " ValueTypeId: (looking for) '" & lrRole.JoinedORMObject.Id & "'"
-                                            If arPage.Model.GetModelObjectByName(lrRole.JoinedORMObject.Id) IsNot Nothing Then
-                                                Call arPage.DropValueTypeAtPoint(lrRole.JoinedORMObject, New PointF(50, 50), True)
-                                            Else
-                                                Throw New Exception(lsMessage)
-                                            End If
-                                            lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsValueType.Id)
-                                        Case Is = pcenumRoleJoinType.FactType
-                                            '---------------------------------------------------------------------------------------------------
-                                            'See Below. Do not throw exception here because the FactTypeInstance may not have been loaded yet.
-                                            '---------------------------------------------------------------------------------------------------
-                                            lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
-                                            'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Factsf
-                                            lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
-                                    End Select
-                                End If
-
-                                '-----------------------------------------
-                                'Setup the RoleName for the RoleInstance
-                                '-----------------------------------------
-                                lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
-
-                                Call TableRoleName.GetRoleNameDetails(lrRoleInstance.RoleName)
-
-                                '--------------------------------------------------------------
-                                'Add the RoleInstance to the RoleGroup of the FactTypeInstance
-                                '--------------------------------------------------------------
-                                lrFactTypeInstance.RoleGroup.Add(lrRoleInstance)
-
-                                '----------------------------------------------------
-                                'Add the RoleInstance to the Page.RoleInstance group
-                                '----------------------------------------------------
-                                'SyncLock arPage.RoleInstance                                    
-                                arPage.RoleInstance.AddUnique(lrRoleInstance)
-                                'End SyncLock
-
-                                'prApplication.ThrowErrorMessage("Successfully loaded Page:'" & lrFactTypeInstance.Page.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
-                            Next
-
-                            '----------------------------------------------
-                            'Setup the FactTable for the FactTypeInstance
-                            '----------------------------------------------
-                            lrFactTypeInstance.FactTable = New FBM.FactTable(arPage, lrFactTypeInstance)
-                            Call TableFactTableInstance.GetFactTableDetails(lrFactTypeInstance.FactTable)
-
-                            If lrFactTypeInstance.IsSubtypeRelationshipFactType Then
-                                Dim lrSubtypeModelElementInstance As FBM.ModelObject
-                                Dim lrSupertypeModelElementInstance As FBM.ModelObject
-                                lrSubtypeModelElementInstance = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
-                                lrSupertypeModelElementInstance = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
-
-                                Dim lrSubtypeRelationshipInstance As New FBM.SubtypeRelationshipInstance
-                                lrSubtypeRelationshipInstance.ModelElement = lrSubtypeModelElementInstance
-                                lrSubtypeRelationshipInstance.parentModelElement = lrSupertypeModelElementInstance
-
-                                Dim larSubtypeRelationshipInstance As List(Of FBM.SubtypeRelationshipInstance) = CType(lrSubtypeModelElementInstance, Object).SubtypeRelationship
-
-                                'CodeSafe: Make sure the SubtypeRelationshipInstances are up to date
-                                For Each lrSubtypeRelationshipInstance In larSubtypeRelationshipInstance
-                                    lrSubtypeRelationshipInstance.ModelElement = arPage.getModelElementById(lrSubtypeRelationshipInstance.SubtypeRelationship.ModelElement.Id)
-                                    lrSubtypeRelationshipInstance.parentModelElement = arPage.getModelElementById(lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement.Id)
-                                Next
-
-                                lrFactTypeInstance.SubtypeRelationshipInstance = larSubtypeRelationshipInstance.Find(AddressOf lrSubtypeRelationshipInstance.Equals)
-                            End If
-
-                            '----------------------------------------------
-                            'Get the Facts (FactTypeData) for the FactType
-                            '----------------------------------------------
-                            If lrFactTypeInstance.FactType.Fact.Count > 0 Then
-                                'Only get FactInstances if the FactTypeInstance's FactType has Facts.
-                                Call tableORMFactInstance.GetFactsForFactTypeInstance(lrFactTypeInstance)
-                            End If
-                            'new threading below
-                            'Dim loFactInstanceThread As New System.Threading.Thread(AddressOf lrFactTypeInstance.GetFactInstancesFromDatabase)
-                            'loFactInstanceThread.Start()
-
-                            'SyncLock arPage.FactTypeInstance
-                            arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
-                            'End SyncLock
+                        lrFactTypeInstance.IsDerived = lrFactTypeInstance.FactType.IsDerived
+                        lrFactTypeInstance.IsStored = lrFactTypeInstance.FactType.IsStored
+                        lrFactTypeInstance.IsIndependent = lrFactTypeInstance.FactType.IsIndependent
+                        lrFactTypeInstance.IsSubtypeStateControlling = lrFactTypeInstance.FactType.IsSubtypeStateControlling
+                        lrFactTypeInstance.DerivationText = lrFactTypeInstance.FactType.DerivationText
+                        lrFactTypeInstance.IsLinkFactType = lrFactTypeInstance.FactType.IsLinkFactType
+                        If lrFactTypeInstance.IsLinkFactType Then
+                            lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
                         End If
+
+                        If lrFactTypeInstance.FactType Is Nothing Then
+                            Throw New Exception("Cannot find FactType for FactTypeInstance with FactTypeId: " & lrFactTypeInstance.Id)
+                        End If
+
+                        lrFactTypeInstance.IsObjectified = lrFactTypeInstance.FactType.IsObjectified
+
+                        If lrFactTypeInstance.IsObjectified Then
+                            Dim lrObjectifyingEntityTypeInstance As FBM.EntityTypeInstance
+
+                            If IsSomething(lrFactTypeInstance.FactType.ObjectifyingEntityType) Then
+                                lrObjectifyingEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id)
+                                If IsSomething(lrObjectifyingEntityTypeInstance) Then
+                                    '---------------------------------------------
+                                    'All okay. Found the EntityType on the Page.
+                                    '---------------------------------------------
+                                Else
+                                    lrObjectifyingEntityTypeInstance = lrFactTypeInstance.FactType.ObjectifyingEntityType.CloneInstance(arPage, True)
+                                End If
+                                lrObjectifyingEntityTypeInstance.IsObjectifyingEntityType = True
+                                lrObjectifyingEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
+                                lrObjectifyingEntityTypeInstance.ObjectifiedFactType = lrFactTypeInstance
+                                'lrFactTypeInstance.ObjectifyingEntityType = New FBM.EntityTypeInstance
+                                lrFactTypeInstance.ObjectifyingEntityType = lrObjectifyingEntityTypeInstance
+                            Else
+                                lrFactTypeInstance.ObjectifyingEntityType = Nothing
+                            End If
+                        End If
+
+                        lrFactTypeInstance.isPreferredReferenceMode = lrFactTypeInstance.FactType.IsPreferredReferenceMode
+                        lrFactTypeInstance.IsSubtypeRelationshipFactType = lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType
+
+                        '-----------------------------------------
+                        'Setup the FactTypeName for the FactType
+                        '-----------------------------------------
+                        lrFactTypeInstance.FactTypeName = New FBM.FactTypeName(arPage.Model, arPage, lrFactTypeInstance, lrFactTypeInstance.Name)
+
+                        '==============================================================================================================
+                        Call TableFactTypeName.GetFactTypeNameDetails(lrFactTypeInstance.FactTypeName)
+
+                        'FactTypeReadingPoint
+                        Dim lrFTRConceptInstance As New FBM.ConceptInstance(lrFactTypeInstance.Model, lrFactTypeInstance.Page, lrFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
+                        Call TableConceptInstance.ExistsConceptInstance(lrFTRConceptInstance)
+                        lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFTRConceptInstance.X, lrFTRConceptInstance.Y)
+
+                        If lrFactTypeInstance.DerivationText <> "" Then
+                            lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(arPage.Model,
+                                                                                                    arPage,
+                                                                                                    lrFactTypeInstance)
+                            Call TableFactTypeDerivationText.GetFactTypeDerivationTextDetails(lrFactTypeInstance.FactTypeDerivationText)
+                        End If
+
+                        '-------------------------------------------------------------
+                        'The Model must already have been loaded before loading the 
+                        '  Page, so get the RoleGroup/RoleInstances from the model.
+                        '-------------------------------------------------------------                        
+                        For Each lrRole In lrFactTypeInstance.FactType.RoleGroup
+                            lrRoleInstance = lrRole.CloneInstance(arPage, True, False, lrFactTypeInstance)
+
+                            'prApplication.ThrowErrorMessage("Loading Page:'" & arPage.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
+                            '20220410-VM-Replace with passing lrFactTypeInstance to lrRole.CloneInstance (above)
+                            'lrRoleInstance.FactType = lrFactTypeInstance
+
+                            If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                                If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                    lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
+
+                                    'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Facts.
+                                    '20210826-VM-Can't see why this doesn't double up the FactInstances, because GetFactTypeInstanceByPage (above) should get the Fact Instances.
+                                    lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
+                                End If
+                            End If
+
+                            '-----------------------------------------------------------------------------------------------
+                            'CodeSafe; Make sure the RoleInstance is connected to something.
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                Select Case lrRoleInstance.TypeOfJoin
+                                    Case Is = pcenumRoleJoinType.EntityType
+                                        lrRoleInstance.JoinedORMObject = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsEntityType.Id)
+                                    Case Is = pcenumRoleJoinType.ValueType
+                                        lsMessage = "Cannot find ValueType for"
+                                        lsMessage &= vbCrLf & "FactType.Id: " & lrFactTypeInstance.FactType.Id
+                                        lsMessage &= vbCrLf & "FactType.Name: " & lrFactTypeInstance.FactType.Name
+                                        lsMessage &= vbCrLf & " Role.Id: " & lrRoleInstance.Id
+                                        lsMessage &= vbCrLf & " Page.Id: " & arPage.PageId
+                                        lsMessage &= vbCrLf & " Page.Name: " & arPage.Name
+                                        lsMessage &= vbCrLf & " ValueTypeId: (looking for) '" & lrRole.JoinedORMObject.Id & "'"
+                                        If arPage.Model.GetModelObjectByName(lrRole.JoinedORMObject.Id) IsNot Nothing Then
+                                            Call arPage.DropValueTypeAtPoint(lrRole.JoinedORMObject, New PointF(50, 50), True)
+                                        Else
+                                            Throw New Exception(lsMessage)
+                                        End If
+                                        lrRoleInstance.JoinedORMObject = arPage.ValueTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsValueType.Id)
+                                    Case Is = pcenumRoleJoinType.FactType
+                                        '---------------------------------------------------------------------------------------------------
+                                        'See Below. Do not throw exception here because the FactTypeInstance may not have been loaded yet.
+                                        '---------------------------------------------------------------------------------------------------
+                                        lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
+                                        'Load facts from the database, because cloning the RoleInstance above loads the FactTypeInstance, but not the Factsf
+                                        lrRoleInstance.JoinsFactType.GetFactInstancesFromDatabase()
+                                End Select
+                            End If
+
+                            '-----------------------------------------
+                            'Setup the RoleName for the RoleInstance
+                            '-----------------------------------------
+                            lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+
+                            Call TableRoleName.GetRoleNameDetails(lrRoleInstance.RoleName)
+
+                            '--------------------------------------------------------------
+                            'Add the RoleInstance to the RoleGroup of the FactTypeInstance
+                            '--------------------------------------------------------------
+                            lrFactTypeInstance.RoleGroup.Add(lrRoleInstance)
+
+                            '----------------------------------------------------
+                            'Add the RoleInstance to the Page.RoleInstance group
+                            '----------------------------------------------------
+                            'SyncLock arPage.RoleInstance                                    
+                            arPage.RoleInstance.AddUnique(lrRoleInstance)
+                            'End SyncLock
+
+                            'prApplication.ThrowErrorMessage("Successfully loaded Page:'" & lrFactTypeInstance.Page.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
+                        Next
+
+                        '----------------------------------------------
+                        'Setup the FactTable for the FactTypeInstance
+                        '----------------------------------------------
+                        lrFactTypeInstance.FactTable = New FBM.FactTable(arPage, lrFactTypeInstance)
+                        Call TableFactTableInstance.GetFactTableDetails(lrFactTypeInstance.FactTable)
+
+                        If lrFactTypeInstance.IsSubtypeRelationshipFactType Then
+                            Dim lrSubtypeModelElementInstance As FBM.ModelObject
+                            Dim lrSupertypeModelElementInstance As FBM.ModelObject
+                            lrSubtypeModelElementInstance = lrFactTypeInstance.RoleGroup(0).JoinedORMObject
+                            lrSupertypeModelElementInstance = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
+
+                            Dim lrSubtypeRelationshipInstance As New FBM.SubtypeRelationshipInstance
+                            lrSubtypeRelationshipInstance.ModelElement = lrSubtypeModelElementInstance
+                            lrSubtypeRelationshipInstance.parentModelElement = lrSupertypeModelElementInstance
+
+                            Dim larSubtypeRelationshipInstance As List(Of FBM.SubtypeRelationshipInstance) = CType(lrSubtypeModelElementInstance, Object).SubtypeRelationship
+
+                            'CodeSafe: Make sure the SubtypeRelationshipInstances are up to date
+                            For Each lrSubtypeRelationshipInstance In larSubtypeRelationshipInstance
+                                lrSubtypeRelationshipInstance.ModelElement = arPage.getModelElementById(lrSubtypeRelationshipInstance.SubtypeRelationship.ModelElement.Id)
+                                lrSubtypeRelationshipInstance.parentModelElement = arPage.getModelElementById(lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement.Id)
+                            Next
+
+                            lrFactTypeInstance.SubtypeRelationshipInstance = larSubtypeRelationshipInstance.Find(AddressOf lrSubtypeRelationshipInstance.Equals)
+                        End If
+
+                        '----------------------------------------------
+                        'Get the Facts (FactTypeData) for the FactType
+                        '----------------------------------------------
+                        If lrFactTypeInstance.FactType.Fact.Count > 0 Then
+                            'Only get FactInstances if the FactTypeInstance's FactType has Facts.
+                            Call tableORMFactInstance.GetFactsForFactTypeInstance(lrFactTypeInstance)
+                        End If
+                        'new threading below
+                        'Dim loFactInstanceThread As New System.Threading.Thread(AddressOf lrFactTypeInstance.GetFactInstancesFromDatabase)
+                        'loFactInstanceThread.Start()
+
+                        'SyncLock arPage.FactTypeInstance
+                        arPage.FactTypeInstance.AddUnique(lrFactTypeInstance)
+                        'End SyncLock
+
+                        'End If '20220715-VM-Pre InstanceNumber: Commented out check for existing instance.
 
                         lREcordset.MoveNext()
                     End While
@@ -416,7 +426,7 @@ Namespace TableFactTypeInstance
 
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
-                        lrFactTypeInstance = TableFactTypeInstance.GetFactTypeInstanceByPage(Trim(lREcordset("FactTypeId").Value), arPage)
+                        lrFactTypeInstance = TableFactTypeInstance.GetFactTypeInstanceByPage(Trim(lREcordset("FactTypeId").Value), arPage, lREcordset("InstanceNumber").Value)
 
                         '-----------------------------------------------------------------------------------
                         'CodeSafe: Only add the FactTypeInstance to the Page if it was successfully loaded

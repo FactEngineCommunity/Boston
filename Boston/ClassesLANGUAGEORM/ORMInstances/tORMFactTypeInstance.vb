@@ -495,11 +495,7 @@ Namespace FBM
 
         Public Shadows Function Equals(ByVal other As FBM.FactTypeInstance) As Boolean Implements System.IEquatable(Of FBM.FactTypeInstance).Equals
 
-            If Me.Id = other.Id And Me.InstanceNumber = other.InstanceNumber Then
-                Return True
-            Else
-                Return False
-            End If
+            Return Me.Id = other.Id And Me.InstanceNumber = other.InstanceNumber
 
         End Function
 
@@ -1674,11 +1670,13 @@ Namespace FBM
             Call Me.FactTypeName.Save(abRapidSave)
 
             If Me.FactTypeReadingShape IsNot Nothing Then
+                Me.FactTypeReadingShape.FactType = Me
                 Call Me.FactTypeReadingShape.Save(abRapidSave)
             ElseIf Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
                 Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance(Me, Nothing)
                 lrFactTypeReadingInstance.X = Me.FactTypeReadingPoint.X
                 lrFactTypeReadingInstance.Y = Me.FactTypeReadingPoint.Y
+                lrFactTypeReadingInstance.InstanceNumber = Me.InstanceNumber
                 Call lrFactTypeReadingInstance.Save(abRapidSave)
             End If
 
@@ -2266,6 +2264,7 @@ Namespace FBM
                     '==========================================================================================================
                     'FactTypeDerivationText
                     If Me.FactType.IsDerived Then
+#Region "Derivation Text"
                         Dim loFactTypeDerivationTextShape As ShapeNode
                         Dim lsDerivationText As String = ""
 
@@ -2304,6 +2303,7 @@ Namespace FBM
 
                         If Me.FactTypeDerivationText Is Nothing Then
                             Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
+                            Me.FactTypeDerivationText.InstanceNumber = Me.InstanceNumber
                         End If
 
                         Me.FactTypeDerivationText.Shape = loFactTypeDerivationTextShape
@@ -2319,6 +2319,7 @@ Namespace FBM
 
                         Me.FactTypeDerivationText.Shape.Visible = Me.IsDerived
                         Call Me.FactTypeDerivationText.Shape.ZBottom()
+#End Region
                     End If
 
                     '----------------------------------------------------------------
@@ -2345,6 +2346,7 @@ Namespace FBM
                     'Display and Associate the RoleInstances of the FactTypeInstance
                     '-----------------------------------------------------------------
                     For Each lrRoleInstance In Me.RoleGroup
+                        lrRoleInstance.InstanceNumber = Me.InstanceNumber 'Used for RoleName instances.
                         '---------------------------------------------------------------------
                         'Associate the Role/RoleInstance to the FactType/FactTypeInstance
                         '---------------------------------------------------------------------
