@@ -194,10 +194,22 @@ Namespace FBM
                 Dim lrJoinedORMObject As Object = Me.JoinedObjectType
 
                 If IsSomething(lrJoinedORMObject) Then
-                    If lrJoinedORMObject.Name = "" Then
+                    If lrJoinedORMObject.Id = "" Then
                         '---------------------------------------------------------------------------
                         'The ModelNote is not joined to any ModelElement on the Page.
                     Else
+                        Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrJoinedORMObject)
+                                                      Where ModelElementInstance.Shape IsNot Nothing
+                                                      Select ModelElementInstance
+
+                        If larModelElementInstance.Count > 1 Then
+
+                            Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
+                                                                  Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(Me.X - ModelElementInstance.X) ^ 2 + Math.Abs(Me.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+
+                            lrJoinedORMObject = larClosestModelElementInstance.First
+                        End If
+
                         Dim loNode As MindFusion.Diagramming.ShapeNode = lrJoinedORMObject.Shape
                         Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
                         lo_link.Locked = True
