@@ -22,7 +22,7 @@ Namespace XMLModel
         ''' </summary>
         ''' <param name="arFBMModel">The model being mapped.</param>
         ''' <remarks></remarks>
-        Public Sub MapFromFBMModel(ByVal arFBMModel As FBM.Model)
+        Public Sub MapFromFBMModel(ByVal arFBMModel As FBM.Model, Optional ByVal abExcludedMDAModelElements As Boolean = False)
 
             Try
                 Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
@@ -36,6 +36,7 @@ Namespace XMLModel
                 '========================
                 'Process the ValueTypes
                 '========================
+#Region "ValueTypes"
                 Dim lrValueType As FBM.ValueType
                 Dim lrXMLValueType As XMLModel.ValueType
                 For Each lrValueType In arFBMModel.ValueType
@@ -52,6 +53,8 @@ Namespace XMLModel
                     lrXMLValueType.IsIndependent = lrValueType.IsIndependent
                     lrXMLValueType.GUID = lrValueType.GUID
                     lrXMLValueType.IsMDAModelElement = lrValueType.IsMDAModelElement
+
+                    If lrXMLValueType.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelValueType
 
                     Dim lsValueConstraintValue As String
 
@@ -70,8 +73,9 @@ Namespace XMLModel
                     Next
 
                     Me.ORMModel.ValueTypes.Add(lrXMLValueType)
+SkipModelLevelValueType:
                 Next
-
+#End Region
                 '========================
                 'Process the EntityTypes
                 '========================
@@ -98,6 +102,8 @@ Namespace XMLModel
                     lrXMLEntityType.IsMDAModelElement = lrEntityType.IsMDAModelElement
                     lrXMLEntityType.DBName = lrEntityType.DBName
 
+                    If lrXMLEntityType.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelEntityType
+
                     If IsSomething(lrEntityType.ReferenceModeRoleConstraint) Then
                         lrXMLEntityType.ReferenceSchemeRoleConstraintId = lrEntityType.ReferenceModeRoleConstraint.Id
                     End If
@@ -117,6 +123,7 @@ Namespace XMLModel
                     Next
 
                     Me.ORMModel.EntityTypes.Add(lrXMLEntityType)
+SkipModelLevelEntityType:
                 Next
 
                 '=======================
@@ -151,6 +158,8 @@ Namespace XMLModel
                     lrXMLFactType.IsSubtypeStateControlling = lrFactType.IsSubtypeStateControlling
                     lrXMLFactType.StoreFactCoordinates = lrFactType.StoreFactCoordinates
                     lrXMLFactType.DBName = lrFactType.DBName
+
+                    If lrXMLFactType.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelFactType
 
                     '---------------
                     'Map the Roles
@@ -236,6 +245,7 @@ Namespace XMLModel
 
 
                     Me.ORMModel.FactTypes.Add(lrXMLFactType)
+SkipModelLevelFactType:
                 Next
 
                 '------------------------------------------------------------------------------------
@@ -271,6 +281,8 @@ Namespace XMLModel
                     lrXMLRoleConstraint.LongDescription = lrRoleConstraint.LongDescription
                     lrXMLRoleConstraint.ShortDescription = lrRoleConstraint.ShortDescription
                     lrXMLRoleConstraint.IsMDAModelElement = lrRoleConstraint.IsMDAModelElement
+
+                    If lrXMLRoleConstraint.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelRoleConstraint
 
                     For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
 
@@ -316,6 +328,7 @@ Namespace XMLModel
                     Next
 
                     Me.ORMModel.RoleConstraints.Add(lrXMLRoleConstraint)
+SkipModelLevelRoleConstraint:
                 Next
 
                 '================

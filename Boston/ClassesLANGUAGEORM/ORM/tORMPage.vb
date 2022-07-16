@@ -862,7 +862,7 @@ Namespace FBM
                 End If
 
                 lrEntityTypeInstance = New FBM.EntityTypeInstance
-                lrEntityTypeInstance = lrEntityType.CloneInstance(Me, True, True, False)
+                lrEntityTypeInstance = lrEntityType.CloneInstance(Me, False, True, False)
 
                 lrEntityTypeInstance.X = ao_pt.X
                 lrEntityTypeInstance.Y = ao_pt.Y

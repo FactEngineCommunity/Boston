@@ -2833,9 +2833,9 @@ FinishedProcessing:
                    Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
 
                     'Shortcut
-                    Dim liCounter = Me.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asRootRoleConstraintName)).Count
+                    Dim liCounter = Me.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(lsTrialRoleConstraintName)).Count
                     If liCounter >= aiCounter Then
-                        aiCounter = liCounter + 1
+                        aiCounter = liCounter
                     End If
 
                     CreateUniqueRoleConstraintName = Me.CreateUniqueRoleConstraintName(asRootRoleConstraintName, aiCounter + 1)

@@ -590,10 +590,11 @@ Namespace FBM
 
         End Function
 
-        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page) As FBM.FactTypeReadingInstance
+        Public Shadows Function CloneInstance(ByRef arPage As FBM.Page, Optional arFactTypeInstance As FBM.FactTypeInstance = Nothing) As FBM.FactTypeReadingInstance
 
             Try
                 Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = arFactTypeInstance
 
                 With Me
                     lrFactTypeReadingInstance.Model = arPage.Model
@@ -603,8 +604,9 @@ Namespace FBM
                     lrFactTypeReadingInstance.FrontText = .FrontText
                     lrFactTypeReadingInstance.FollowingText = .FollowingText
                     lrFactTypeReadingInstance.PredicatePart = .PredicatePart
-                    Dim lrFactTypeInstance As New FBM.FactTypeInstance(Me.Model, arPage, pcenumLanguage.ORMModel, Me.FactType.Name, True)
-                    lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
+                    If lrFactTypeInstance Is Nothing Then
+                        lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = Me.FactType.Id)
+                    End If
                     lrFactTypeReadingInstance.FactType = lrFactTypeInstance
                 End With
 

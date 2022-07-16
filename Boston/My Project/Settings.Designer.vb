@@ -953,6 +953,18 @@ Namespace My
                 Me("NORMAImportingAlwaysCollapseReferenceMode") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ExportFBMExcludeMDAModelElements() As Boolean
+            Get
+                Return CType(Me("ExportFBMExcludeMDAModelElements"),Boolean)
+            End Get
+            Set
+                Me("ExportFBMExcludeMDAModelElements") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -2248,6 +2248,7 @@ Namespace FBM
                     '---------------------------------------------------------------------------
                     'Attach the FactTypeName ShapeNode to the FactTypeInstance ShapeNode
                     '---------------------------------------------------------------------------
+#Region "FactTypeName"
                     loFactTypeName.AttachTo(loFactTypeNode, AttachToNode.TopLeft)
 
                     '------------------------------------------------------------------------------
@@ -2263,6 +2264,7 @@ Namespace FBM
                     End If
 
                     loFactTypeName.Visible = Me.ShowFactTypeName
+#End Region
 
                     '==========================================================================================================
                     'FactTypeDerivationText
@@ -2332,6 +2334,7 @@ Namespace FBM
                     Me.FactTable.Page = Me.Page
                     Call Me.FactTable.DisplayAndAssociate(Me, abDisplayFactTable)
 
+#Region "Roles"
                     '--------------------------------------------------------------------------
                     'Sort the FactTypeInstance.RoleGroup by SequenceNr before displaying the Roles.
                     '  NB Roles have SequenceNrs so that FactTypes with multiple Roles
@@ -2381,6 +2384,7 @@ Namespace FBM
                             End If
                         End If
                     Next
+#End Region
 
                     '---------------------------------
                     'Find a suitable FactTypeReading

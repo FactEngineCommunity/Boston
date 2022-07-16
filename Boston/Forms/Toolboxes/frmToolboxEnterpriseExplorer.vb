@@ -2904,7 +2904,7 @@ Public Class frmToolboxEnterpriseExplorer
             lrExportModel.ORMModel.ModelId = lrModel.ModelId
             lrExportModel.ORMModel.Name = lrModel.Name
 
-            Call lrExportModel.MapFromFBMModel(lrModel)
+            Call lrExportModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements)
 
             Dim lsFileLocationName As String = ""
             If Boston.IsSerializable(lrExportModel) Then
