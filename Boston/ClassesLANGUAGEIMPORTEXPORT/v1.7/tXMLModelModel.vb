@@ -1190,6 +1190,7 @@ SkipValueTypeInstance:
 
                     lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityTypeInstance.EntityType.PreferredIdentifierRCId
 
+                    lrEntityTypeInstance.Visible = lrConceptInstance.Visible
                     lrEntityTypeInstance.X = lrConceptInstance.X
                     lrEntityTypeInstance.Y = lrConceptInstance.Y
 

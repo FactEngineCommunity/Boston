@@ -397,6 +397,20 @@ Namespace FBM
             End Set
         End Property
 
+        Private _Visible As Boolean = True
+
+        Public Property Visible As Boolean Implements iPageObject.Visible
+            Get
+                Return Me._Visible
+            End Get
+            Set(value As Boolean)
+                Me._Visible = value
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Visible = value
+                End If
+            End Set
+        End Property
+
         <NonSerialized(),
         XmlIgnore()>
         Public OutgoingLink As New List(Of DiagramLink) 'For when the EntityType is an Actor in a UseCaseDiagram etc
@@ -608,6 +622,7 @@ Namespace FBM
 
             Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.Id, Me.ConceptType, Me.InstanceNumber)
 
+            lrConceptInstance.Visible = Me.Visible
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
 
@@ -850,7 +865,7 @@ Namespace FBM
             Dim liGreaterWidth As Integer = 0
 
             Try
-                If Me.EntityType.IsObjectifyingEntityType Then
+                If Me.EntityType.IsObjectifyingEntityType And Not Me.Visible Then
                     '--------------------------------------------------------
                     'Objectifying EntityTypes are hidden and not displayed.
                     '--------------------------------------------------------

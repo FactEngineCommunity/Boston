@@ -64,6 +64,19 @@ Namespace FBM
             End Set
         End Property
 
+        Private _Visible As Boolean = True
+        Public Property Visible As Boolean Implements iPageObject.Visible
+            Get
+                Return Me._Visible
+            End Get
+            Set(value As Boolean)
+                Me._Visible = value
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Visible = value
+                End If
+            End Set
+        End Property
+
         Public Sub New()
 
         End Sub

@@ -2785,27 +2785,28 @@ SkippedRole:
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                            lrEntityTypeInstance.Visible = True
 
                             lrEntityTypeInstance.ExpandReferenceMode = lbExpandReferenceScheme
 #End Region
-                        ElseIf IsSomething(lrValueType) Then
+                            ElseIf IsSomething(lrValueType) Then
 #Region "ValueTypes"
-                            Dim lrValueTypeInstance As New FBM.ValueTypeInstance
-                            lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
-                            lrValueTypeInstance.InstanceNumber = lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueType.Id).Count + 1
-                            'If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
-                            '    lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
-                            'Else
-                            Boston.WriteToStatusBar("Loading Value Type Instance")
-                            lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                            'End If
-                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
-                            lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                                Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                                lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
+                                lrValueTypeInstance.InstanceNumber = lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueType.Id).Count + 1
+                                'If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
+                                '    lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
+                                'Else
+                                Boston.WriteToStatusBar("Loading Value Type Instance")
+                                lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                                'End If
+                                lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                                lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 #End Region
-                        ElseIf IsSomething(lrFactType) Then
+                            ElseIf IsSomething(lrFactType) Then
 #Region "FactTypes"
-                            lrFactTypeInstance = New FBM.FactTypeInstance
+                                lrFactTypeInstance = New FBM.FactTypeInstance
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage, False)
                             lrFactTypeInstance.InstanceNumber = lrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count + 1
                             'If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
@@ -2852,53 +2853,68 @@ SkippedRole:
                         lrFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrFactType.NORMAReferenceId)
 
                         If IsSomething(lrFactType) Then
-                            '------------------------------------
-                            'Clone an Instance of the FactType
-                            '------------------------------------
-                            '20220127-VM-Commented out below. Remove if all okay.
-                            'lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel)                            
-                            lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel, lrFactType.Id, True) ' lrFactType.CloneInstance(lrPage, False)
-                            lrFactTypeInstance.FactType = lrFactType
-                            Boston.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
+
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                            lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
-                            lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 
-                            'FactTypeReadingPosition
-                            Try
-                                Dim lrFTRXElement As XElement = (lrObjectTypeShapeXElement.<ormDiagram:RelativeShapes>.<ormDiagram:ReadingShape>)(0)
-                                If lrFTRXElement IsNot Nothing Then
-                                    lsBounds = lrFTRXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                                    lrFactTypeInstance.FactTypeReadingPoint = New Point(Int(CSng(Trim(lsBounds(0))) * ldblScalar),
+                            If lrObjectTypeShapeXElement.Attribute("DisplayAsObjectType") Is Nothing Then GoTo LoadFactTypeInstance
+
+                            If lrObjectTypeShapeXElement.Attribute("DisplayAsObjectType").Value = True Then
+                                '-------------------------------------------------------------------------------------------------------
+                                'ObjectifyingEntityType
+                                '  For some ObjectifiedFactTypes, the ObjectifyingEntityType is shown rather than the FactType itself.
+                                '-----------------------------------------------------------------------------------------------------
+                                lrEntityTypeInstance = lrFactType.ObjectifyingEntityType.CloneInstance(lrPage, False, True, False)
+                                lrEntityTypeInstance.InstanceNumber = lrPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count + 1
+
+                                lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                                lrEntityTypeInstance.Visible = True
+                                lrEntityTypeInstance.ExpandReferenceMode = False
+
+                                lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+
+                            Else
+                                '------------------------------------
+                                'Clone an Instance of the FactType
+                                '------------------------------------
+LoadFactTypeInstance:
+                                lrFactTypeInstance = New FBM.FactTypeInstance(arModel, lrPage, pcenumLanguage.ORMModel, lrFactType.Id, True)
+                                lrFactTypeInstance.FactType = lrFactType
+                                Boston.WriteToStatusBar("Loading Fact Type Instance: '" & lrFactTypeInstance.Name & "'")
+
+
+                                lrFactTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                lrFactTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+
+                                'FactTypeReadingPosition
+                                Try
+                                    Dim lrFTRXElement As XElement = (lrObjectTypeShapeXElement.<ormDiagram:RelativeShapes>.<ormDiagram:ReadingShape>)(0)
+                                    If lrFTRXElement IsNot Nothing Then
+                                        lsBounds = lrFTRXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                                        lrFactTypeInstance.FactTypeReadingPoint = New Point(Int(CSng(Trim(lsBounds(0))) * ldblScalar),
                                                                                         Int(CSng(Trim(lsBounds(1))) * ldblScalar))
-                                End If
-                            Catch ex As Exception
-                                'Not a biggie
-                            End Try
+                                    End If
+                                Catch ex As Exception
+                                    'Not a biggie
+                                End Try
+
+                                '-----------------------------------------------------------------------------
+                                'Add the FactTypeInstance to the Page, because Role.CloneInstance
+                                '  automatically looks for and adds the ROleInstance to the FactTypeInstance
+                                '-----------------------------------------------------------------------------
+                                lrFactTypeInstance2 = lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
+                                lrFactTypeInstance2.FactTypeReadingPoint = lrFactTypeInstance.FactTypeReadingPoint
+
+                                '------------------------------------
+                                'Load the FactInstances to the Page
+                                '------------------------------------
+                                For Each lrFact In lrFactType.Fact
+                                    lrFactTypeInstance2.AddFact(lrFact, False)
+                                Next
+
+                            End If
 
 
-                            '-----------------------------------------------------------------------
-                            'If the FactTypeInstance doesn't exist on the Page, add it to the Page
-                            '-----------------------------------------------------------------------
-                            '20220715-VM-Commented out check to see if already on the Page. New InstanceNumber facility now in place.
-                            'If Not lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-
-                            '-----------------------------------------------------------------------------
-                            'Add the FactTypeInstance to the Page, because Role.CloneInstance
-                            '  automatically looks for and adds the ROleInstance to the FactTypeInstance
-                            '-----------------------------------------------------------------------------
-                            lrFactTypeInstance2 = lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y), False, False, False, False)
-                            lrFactTypeInstance2.FactTypeReadingPoint = lrFactTypeInstance.FactTypeReadingPoint
-
-                            '------------------------------------
-                            'Load the FactInstances to the Page
-                            '------------------------------------
-                            For Each lrFact In lrFactType.Fact
-                                lrFactTypeInstance.AddFact(lrFact, False)
-                            Next
-                            'Else
-                            'lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
-                            'End If
                         End If 'IsSomething(lrFactType)
                     Next 'FactTypeShape in NORMA XML 
 #End Region

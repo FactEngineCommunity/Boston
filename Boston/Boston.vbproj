@@ -3363,6 +3363,7 @@
     <Content Include="ORM.ico" />
     <None Include="Resources\FactEngine.ico" />
     <None Include="Resources\transative.png" />
+    <None Include="Resources\ObjectifyingEntityTypeIndicator.png" />
     <Content Include="Shapelibrary\ORMShapes\Acyclic+Intransative.PNG" />
     <Content Include="Shapelibrary\ORMShapes\acyclic.png" />
     <Content Include="Shapelibrary\ORMShapes\acyclic_intransitive.png" />

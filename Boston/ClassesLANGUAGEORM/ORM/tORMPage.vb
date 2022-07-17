@@ -806,9 +806,10 @@ Namespace FBM
 
         End Sub
 
-        Function DropEntityTypeAtPoint(ByRef arEntityType As FBM.EntityType,
-                                       ByVal ao_pt As PointF,
-                                       Optional ByVal abBroadcastInterfaceEvent As Boolean = False) As FBM.EntityTypeInstance
+        Public Function DropEntityTypeAtPoint(ByRef arEntityType As FBM.EntityType,
+                                              ByVal ao_pt As PointF,
+                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
+                                              Optional ByVal abIsVisible As Boolean = True) As FBM.EntityTypeInstance
 
             Dim lrEntityType As New FBM.EntityType
             Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
@@ -834,10 +835,11 @@ Namespace FBM
                 End If
 
                 'CodeSafe: Check to see if the EntityType is already on the Page
-                If Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) IsNot Nothing Then
-                    lrEntityTypeInstance = Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
-                    'Call lrEntityTypeInstance.Move(ao_pt.X, ao_pt.Y, abBroadcastInterfaceEvent)
-                End If
+                '20220717-VM-Removed in leiu of InstanceNumber
+                'If Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) IsNot Nothing Then
+                '    lrEntityTypeInstance = Me.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id)
+                '    'Call lrEntityTypeInstance.Move(ao_pt.X, ao_pt.Y, abBroadcastInterfaceEvent)
+                'End If
 
                 '----------------------------------------------------------------------------------------
                 'Create a ConceptInstance that can be broadcast to other ClientServer Boston instances.
@@ -861,9 +863,9 @@ Namespace FBM
                     Me.Model.AddEntityType(lrEntityType, True, True, lrConceptInstance, True)
                 End If
 
-                lrEntityTypeInstance = New FBM.EntityTypeInstance
                 lrEntityTypeInstance = lrEntityType.CloneInstance(Me, False, True, False)
 
+                lrEntityTypeInstance.Visible = abIsVisible
                 lrEntityTypeInstance.X = ao_pt.X
                 lrEntityTypeInstance.Y = ao_pt.Y
                 lrEntityTypeInstance.InstanceNumber = Me.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityType.Id).Count + 1
@@ -1069,7 +1071,7 @@ Namespace FBM
 
                     If lrFactType.IsObjectified Then
                         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                        lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, New PointF(10, 10))
+                        lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, New PointF(10, 10),, False)
                     End If
 
                     lrFactTypeInstance = arFactType.CloneInstance(Me, True)
@@ -1757,7 +1759,10 @@ Namespace FBM
                             For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id)
                                 OutputList.Add(lrFactTypeInstance)
                             Next
-
+                            'ObjectifyingEntityTypes may be displayed on the Page as a ModelElement that can be linked to.
+                            For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id)
+                                OutputList.Add(lrEntityTypeInstance)
+                            Next
                         Case Is = pcenumConceptType.RoleConstraint
                             For Each lrRoleConstraintInstance In Me.RoleConstraintInstance.FindAll(Function(x) x.Id = arModelElement.Id)
                                 OutputList.AddUnique(lrRoleConstraintInstance)

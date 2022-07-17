@@ -775,41 +775,53 @@ Namespace FBM
 
             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
 
-            If Not abIgnoreExistingInstance And arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Nothing Then
-                'The ValueType already exists as an instance on the Page.
-                lrValueTypeInstance = arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id)
-            Else
-                With Me
-                    lrValueTypeInstance.Model = arPage.Model
-                    lrValueTypeInstance.Page = arPage
-                    lrValueTypeInstance.Id = .Id
-                    lrValueTypeInstance.Name = .Name
-                    lrValueTypeInstance.Symbol = .Symbol
-                    lrValueTypeInstance.ConceptType = .ConceptType
-                    lrValueTypeInstance.ValueType = Me
-                    lrValueTypeInstance.ShortDescription = .ShortDescription
-                    lrValueTypeInstance.LongDescription = .LongDescription
-                    lrValueTypeInstance.IsIndependent = .IsIndependent
-                    lrValueTypeInstance.PrimativeType = .PrimativeType
-                    lrValueTypeInstance.DataType = .DataType
-                    lrValueTypeInstance.DataTypeLength = .DataTypeLength
-                    lrValueTypeInstance.DataTypePrecision = .DataTypePrecision
-                    lrValueTypeInstance.X = 0
-                    lrValueTypeInstance.Y = 0
+            Try
+                If Not abIgnoreExistingInstance And arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Nothing Then
+                    'The ValueType already exists as an instance on the Page.
+                    lrValueTypeInstance = arPage.ValueTypeInstance.Find(Function(x) x.Id = Me.Id)
+                Else
+                    With Me
+                        lrValueTypeInstance.Model = arPage.Model
+                        lrValueTypeInstance.Page = arPage
+                        lrValueTypeInstance.Id = .Id
+                        lrValueTypeInstance.Name = .Name
+                        lrValueTypeInstance.Symbol = .Symbol
+                        lrValueTypeInstance.ConceptType = .ConceptType
+                        lrValueTypeInstance.ValueType = Me
+                        lrValueTypeInstance.ShortDescription = .ShortDescription
+                        lrValueTypeInstance.LongDescription = .LongDescription
+                        lrValueTypeInstance.IsIndependent = .IsIndependent
+                        lrValueTypeInstance.PrimativeType = .PrimativeType
+                        lrValueTypeInstance.DataType = .DataType
+                        lrValueTypeInstance.DataTypeLength = .DataTypeLength
+                        lrValueTypeInstance.DataTypePrecision = .DataTypePrecision
+                        lrValueTypeInstance.X = 0
+                        lrValueTypeInstance.Y = 0
 
-                    Dim lsValueConstraint As String
+                        Dim lsValueConstraint As String
 
-                    For Each lsValueConstraint In Me.ValueConstraint
-                        lrValueTypeInstance.ValueConstraint.Add(lsValueConstraint)
-                    Next
+                        For Each lsValueConstraint In Me.ValueConstraint
+                            lrValueTypeInstance.ValueConstraint.Add(lsValueConstraint)
+                        Next
 
-                    If abAddToPage Then
-                        arPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                    End If
+                        If abAddToPage Then
+                            arPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                        End If
 
-                End With
-            End If
+                    End With
+                End If
 
+                Return lrValueTypeInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            End Try
 
             Return lrValueTypeInstance
 

@@ -22,7 +22,7 @@ Namespace FBM
 
         <JsonIgnore()>
         Property Shape As MindFusion.Diagramming.ShapeNode
-
+        Property Visible As Boolean
         Property X As Integer
         Property Y As Integer
     End Interface

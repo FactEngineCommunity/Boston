@@ -6865,14 +6865,34 @@ Public Class frmDiagramORM
             Case Is = 0
                 'Do Nothing
             Case Is < 0
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
-                    frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
-                End If
-            Case Is > 0
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
-                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
-                        frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
+                If Control.ModifierKeys = Keys.Control Then
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
+                        frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
                     End If
+                Else
+                    Try
+                        Me.VerticalScroll.Value = Viev.Lesser(100, Me.VerticalScroll.Value + 3)
+                        Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.DiagramView.Bounds.Height * (VerticalScroll.Value / 100))
+
+                    Catch ex As Exception
+                        'Not a biggie
+                    End Try
+                End If
+
+            Case Is > 0
+                If Control.ModifierKeys = Keys.Control Then
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
+                        If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
+                            frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
+                        End If
+                    End If
+                Else
+                    Try
+                        Me.VerticalScroll.Value = Viev.Greater(0, Me.VerticalScroll.Value - 3)
+                        Me.DiagramView.ScrollTo(Me.HorizontalScroll.Value, Me.DiagramView.Bounds.Height * (VerticalScroll.Value / 100))
+                    Catch ex As Exception
+                        'Not a biggie
+                    End Try
                 End If
         End Select
 
