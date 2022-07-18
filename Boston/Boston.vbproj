@@ -545,6 +545,7 @@
     </Compile>
     <Compile Include="ClassesGeneral\tStack.vb" />
     <Compile Include="ClassesGeneral\tTube.vb" />
+    <Compile Include="ClassesGeneral\tTuple.vb" />
     <Compile Include="ClassesGeneral\tUndoRedoObject.vb" />
     <Compile Include="ClassesGeneral\DateTimePicker.Designer.vb">
       <DependentUpon>DateTimePicker.vb</DependentUpon>
@@ -1268,6 +1269,12 @@
       <DependentUpon>frmLogin.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\CRUD\ClientServer\frmLogin.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDEditReferenceTable.Designer.vb">
+      <DependentUpon>frmCRUDEditReferenceTable.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDEditReferenceTable.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CRUD\frmCRUDModel.Designer.vb">
@@ -2175,6 +2182,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\ClientServer\frmLogin.resx">
       <DependentUpon>frmLogin.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDEditReferenceTable.resx">
+      <DependentUpon>frmCRUDEditReferenceTable.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\frmCRUDModel.resx">
       <DependentUpon>frmCRUDModel.vb</DependentUpon>

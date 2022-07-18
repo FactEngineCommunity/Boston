@@ -965,6 +965,18 @@ Namespace My
                 Me("ExportFBMExcludeMDAModelElements") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property FactEngineUseTransformations() As Boolean
+            Get
+                Return CType(Me("FactEngineUseTransformations"),Boolean)
+            End Get
+            Set
+                Me("FactEngineUseTransformations") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

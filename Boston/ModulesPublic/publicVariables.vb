@@ -29,4 +29,9 @@ Public Module publicVariables
     'Crash Reporting - Automated/Online using www.raygun.com
     Public prRaygunClient As New RaygunClient("7M0bwJKUwe7HEJZen4wOpg")
 
+    '------------------------------------------------------
+    'Reference Suite of Tables
+    '------------------------------------------------------    
+    Public prReferenceFieldValue As New tReferenceFieldValue
+
 End Module

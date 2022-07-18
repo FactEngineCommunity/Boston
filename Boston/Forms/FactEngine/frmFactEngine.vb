@@ -668,6 +668,18 @@ Public Class frmFactEngine
                 '    Exit Sub
                 'End If
 
+                If My.Settings.FactEngineUseTransformations Then
+
+                    Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                    Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation)
+
+                    For Each loTransformation In larTransformationTuples
+                        Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
+                    Next
+
+
+                End If
+
                 Me.LabelError.Text = ""
                 Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
                 If Me.TextBoxInput.SelectionLength > 0 Then

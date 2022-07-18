@@ -5518,4 +5518,21 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Private Sub EditConfigurationDataToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditConfigurationDataToolStripMenuItem.Click
+
+        Try
+            Dim lfrmCRUDReferenceData As New frmCRUDEditReferenceTable
+            Call lfrmCRUDReferenceData.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

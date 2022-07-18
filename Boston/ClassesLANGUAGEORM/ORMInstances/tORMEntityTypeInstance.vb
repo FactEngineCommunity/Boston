@@ -330,9 +330,13 @@ Namespace FBM
             End Set
         End Property
 
-        <NonSerialized(), _
-        XmlIgnore()> _
+        <NonSerialized(),
+        XmlIgnore()>
         Public EntityTypeNameShape As ShapeNode
+
+        <NonSerialized(),
+        XmlIgnore()>
+        Public ObjectifyingEntityTypeIndicatorShape As ShapeNode
 
         <NonSerialized(), _
         XmlIgnore()> _
@@ -863,6 +867,7 @@ Namespace FBM
             Dim loEntityNameWidth As New SizeF
             Dim loReferenceModeWidth As New SizeF
             Dim liGreaterWidth As Integer = 0
+            Dim loRectangle As Rectangle
 
             Try
                 If Me.EntityType.IsObjectifyingEntityType And Not Me.Visible Then
@@ -894,16 +899,37 @@ Namespace FBM
 
                     Me.Shape = loDroppedNode
 
+                    '--------------------------------------------------------------
+                    'Create the ShapeNode for the ObjectifyingEntityTypeIndicator
+                    '------------------------------------------------------------
+#Region "ObjectifyingEntityType"
+                    Dim loDroppedOETINode As ShapeNode = Nothing
+                    If Me.EntityType.IsObjectifyingEntityType And Me.Visible Then
+                        loDroppedOETINode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X + 1, Me.Y + 1, 7, 3)
+                        loDroppedOETINode.HandlesStyle = HandlesStyle.InvisibleMove
+                        loDroppedOETINode.AllowOutgoingLinks = False
+                        loDroppedOETINode.AllowIncomingLinks = True
+                        loDroppedOETINode.Pen = New MindFusion.Drawing.Pen(Color.White, 0.0002)
+                        loDroppedOETINode.Visible = True
+                        loDroppedOETINode.Tag = Nothing
+                        loDroppedOETINode.Image = My.Resources.ORMShapes.ObjectifyingEntityTypeIndicator
+                        loRectangle = New Rectangle(Me.X + 1, Me.Y + 2, 7, 3)
+                        loDroppedOETINode.SetRect(loRectangle, False)
+                        loDroppedOETINode.AttachTo(Me.Shape, AttachToNode.TopLeft)
+                        loDroppedOETINode.Move(loRectangle.X, loRectangle.Y)
+                        loDroppedOETINode.Locked = True
+                        Me.Page.Diagram.Nodes.Add(loDroppedOETINode)
+                        Me.ObjectifyingEntityTypeIndicatorShape = loDroppedOETINode
+                    End If
+#End Region
+
+
                     '---------------------------------------------
                     'Create the ShapeNode for the EntityTypeName
                     '---------------------------------------------
+#Region "EntityTypeName"
                     G = Me.Page.Form.CreateGraphics
                     Dim lsETNameText As String = Me.Name
-
-                    '20210830-VM-Not sure why this was here. Remove after time if no light is shed on why it was here.
-                    'If Me.EntityType.IsIndependent Or Me.EntityType.IsDerived Then
-                    '    lsETNameText &= "M"
-                    'End If
 
                     If Me.EntityType.IsDerived Then
                         lsETNameText &= "*"
@@ -926,23 +952,22 @@ Namespace FBM
 
                     Me.EntityTypeNameShape = loDroppedNameNode
 
-                    Dim loRectangle As New Rectangle(Me.X, Me.Y, Me.EntityTypeNameShape.Bounds.Width + 4, Me.Shape.Bounds.Height)
                     Me.Shape.SetRect(loRectangle, False)
 
                     loDroppedNameNode.AttachTo(Me.Shape, AttachToNode.TopCenter)
                     Me.Page.Diagram.Nodes.Add(loDroppedNameNode)
+#End Region
 
                     '--------------------------------------------------------------
                     'Create the ShapeNode for the ReferenceMode of the EntityType
-                    '--------------------------------------------------------------            
+                    '--------------------------------------------------------------
+#Region "ReferenceMode"
                     Dim lsReferenceMode As String = ""
 
                     liGreaterWidth = Viev.Greater(Me.Name.Length, Me.ReferenceMode.Length)
 
                     If IsSomething(Me.ReferenceModeValueType) Then
                         lsReferenceMode = "(" & Me.ReferenceMode & ")"
-                    Else
-                        lsReferenceMode = ""
                     End If
 
                     loReferenceModeStringSize = Me.Page.Diagram.MeasureString(lsReferenceMode + "M", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
@@ -964,7 +989,7 @@ Namespace FBM
                         'All good, the Width of the EntityType.Snape(Node) is okay.
                         '------------------------------------------------------------
                     Else
-                        loRectangle = New Rectangle(Me.X, Me.Y, Me.ReferenceModeShape.Bounds.Width + 4, Me.Shape.Bounds.Height)
+                        loRectangle = New Rectangle(Me.X + Me.EntityTypeNameShape.Bounds.Width, Me.Y, Me.ReferenceModeShape.Bounds.Width + 4, Me.Shape.Bounds.Height)
                         Me.Shape.SetRect(loRectangle, False)
                     End If
 
@@ -982,56 +1007,12 @@ Namespace FBM
 
                         End If
                     End If
-
-                    '---------------------------------------------------------------------------------------------------------------
-                    'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
-                    '---------------------------------------------------------------------------------------------------------------
-                    liGreaterWidth = Greater(Me.Name.Length, lsReferenceMode.Length)
-                    If Me.Name.Length = liGreaterWidth Then
-                        liGreaterWidth = Me.EntityTypeNameShape.Bounds.Width + 4
-                        loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.Name) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                    Else
-                        liGreaterWidth = Me.ReferenceModeShape.Bounds.Width + 4
-                        loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                    End If
-                    loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                    loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M",
-                                                                         Me.Page.Diagram.Font,
-                                                                         1000,
-                                                                         System.Drawing.StringFormat.GenericDefault)
+#End Region
 
                     '-----------------------------------------------------------------------------------
                     'Set the Rectangle for the whole EntityType and the ReferenceModeShape (if needed)
                     '-----------------------------------------------------------------------------------
-                    Dim lbIsVariedReferenceSchemeSubtype As Boolean = False
-
-                    If Me.HasSimpleReferenceScheme And Me.EntityType.IsSubtype And Me.EntityType.ReferenceModeValueType IsNot Nothing Then
-                        Dim lrSupertypeEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
-                        If Me.EntityType.ReferenceModeValueType IsNot lrSupertypeEntityType.ReferenceModeValueType Then
-                            lbIsVariedReferenceSchemeSubtype = True
-                        End If
-                    End If
-
-                    If (Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype Then
-                        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
-                        Me.Shape.SetRect(loRectangle, False)
-                        loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
-                        Me.ReferenceModeShape.SetRect(loRectangle, False)
-                        Me.ReferenceModeShape.Visible = True
-                        Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
-                        Me.ReferenceModeShape.Move(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
-                                                   Me.Y + 6)
-                    Else
-                        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
-                        Me.Shape.SetRect(loRectangle, False)
-                        Me.ReferenceModeShape.Visible = False
-                    End If
-
-                    '------------------------------------------------
-                    'Set the rectangle for the EntityTypeNameShape.
-                    '------------------------------------------------
-                    loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
-                    Me.EntityTypeNameShape.SetRect(loRectangle, False)
+                    Call Me.SetShapeSizesAndPositions
 
 #Region "Derivation Text"
                     '==========================================================================================================
@@ -1096,6 +1077,94 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Private Sub SetShapeSizesAndPositions()
+
+            Try
+                Dim loRectangle As Rectangle = Nothing
+                Dim loEntityWidth As SizeF = Nothing
+                Dim lbIsVariedReferenceSchemeSubtype As Boolean = False
+                Dim liGreaterWidth As Integer
+                Dim loReferenceModeWidth As New SizeF
+                Dim lsReferenceMode As String = ""
+                Dim loEntityNameWidth As New SizeF
+                Dim lsETNameText As String = Me.Name
+
+                If Me.EntityType.IsDerived Then
+                    lsETNameText &= "*"
+                End If
+
+                If Me.IsIndependent Then
+                    lsETNameText &= "!"
+                End If
+
+                If IsSomething(Me.ReferenceModeValueType) Then
+                    lsReferenceMode = "(" & Me.ReferenceMode & ")"
+                End If
+
+                '---------------------------------------------------------------------------------------------------------------
+                'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
+                '---------------------------------------------------------------------------------------------------------------
+                liGreaterWidth = Greater(Me.Name.Length, lsReferenceMode.Length)
+                If Me.Name.Length = liGreaterWidth Then
+                    liGreaterWidth = Me.EntityTypeNameShape.Bounds.Width + 4
+                    loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.Name) + "MMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                Else
+                    liGreaterWidth = Me.ReferenceModeShape.Bounds.Width + 4
+                    loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                End If
+                loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M",
+                                                                         Me.Page.Diagram.Font,
+                                                                         1000,
+                                                                         System.Drawing.StringFormat.GenericDefault)
+
+                If Me.HasSimpleReferenceScheme And Me.EntityType.IsSubtype And Me.EntityType.ReferenceModeValueType IsNot Nothing Then
+                    Dim lrSupertypeEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
+                    If Me.EntityType.ReferenceModeValueType IsNot lrSupertypeEntityType.ReferenceModeValueType Then
+                        lbIsVariedReferenceSchemeSubtype = True
+                    End If
+                End If
+
+                If Me.IsObjectifyingEntityType And Me.Visible Then
+                    loEntityWidth = New SizeF(loEntityWidth.Width + 8, loEntityWidth.Height)
+                End If
+
+                If (Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype Then
+                    loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
+                    Me.Shape.SetRect(loRectangle, False)
+                    loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
+                    Me.ReferenceModeShape.SetRect(loRectangle, False)
+                    Me.ReferenceModeShape.Visible = True
+                    Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
+                    Me.ReferenceModeShape.Move(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
+                                                   Me.Y + 6)
+                Else
+                    loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
+                    Me.Shape.SetRect(loRectangle, False)
+                    Me.ReferenceModeShape.Visible = False
+                End If
+
+                '------------------------------------------------
+                'Set the rectangle for the EntityTypeNameShape.
+                '------------------------------------------------
+                If Me.IsObjectifyingEntityType And Me.Visible Then
+                    loRectangle = New Rectangle(Me.X + Me.ObjectifyingEntityTypeIndicatorShape.Bounds.Width + 1, Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                Else
+                    loRectangle = New Rectangle(Me.X + 2, Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                End If
+
+                Me.EntityTypeNameShape.SetRect(loRectangle, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -2034,66 +2103,69 @@ MoveOn:
                 Dim liGreaterWidth As Integer = 0
 
                 If IsSomething(Me.Page.Diagram) Then
-                    '------------------
-                    'Diagram is set.
-                    '------------------
-                    If IsSomething(Me.EntityTypeNameShape) Then
-                        '-------------------------------------------------------------------------------
-                        'ShapeNode does not exist for an EntityTypeInstance when cloning an EntityType
-                        '-------------------------------------------------------------------------------
-                        Dim lsETNameText As String = Trim(Me.Name)
 
-                        If Me.IsDerived Or Me.IsIndependent Then
-                            lsETNameText &= " "
-                        End If
-                        If Me.IsDerived Then
-                            lsETNameText &= "*"
-                        End If
-                        If Me.IsIndependent Then
-                            lsETNameText &= "!"
-                        End If
+                    Call Me.SetShapeSizesAndPositions()
 
-                        Me.EntityTypeNameShape.Text = lsETNameText
-                        Me.Page.Diagram.Invalidate()
+                    ''------------------
+                    ''Diagram is set.
+                    ''------------------
+                    'If IsSomething(Me.EntityTypeNameShape) Then
+                    '    '-------------------------------------------------------------------------------
+                    '    'ShapeNode does not exist for an EntityTypeInstance when cloning an EntityType
+                    '    '-------------------------------------------------------------------------------
+                    '    Dim lsETNameText As String = Trim(Me.Name)
 
-                        '---------------------------------------------------------------------------------------------------------------
-                        'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
-                        '---------------------------------------------------------------------------------------------------------------
-                        Dim lsReferenceMode As String = ""
-                        lsReferenceMode = "(" & Me.ReferenceMode & ")"
-                        liGreaterWidth = Viev.Greater(Me.Name.Length, lsReferenceMode.Length)
+                    '    If Me.IsDerived Or Me.IsIndependent Then
+                    '        lsETNameText &= " "
+                    '    End If
+                    '    If Me.IsDerived Then
+                    '        lsETNameText &= "*"
+                    '    End If
+                    '    If Me.IsIndependent Then
+                    '        lsETNameText &= "!"
+                    '    End If
 
-                        If Me.Name.Length = liGreaterWidth Then
-                            liGreaterWidth = Me.EntityTypeNameShape.Bounds.Width + 4
-                            loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.Name) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                            loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                            loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                        Else
-                            liGreaterWidth = Me.ReferenceModeShape.Bounds.Width + 4
-                            loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                            loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                            loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                        End If
+                    '    Me.EntityTypeNameShape.Text = lsETNameText
+                    '    Me.Page.Diagram.Invalidate()
 
-                        If IsSomething(Me.EntityType.ReferenceModeValueType) And Not Me.ExpandReferenceMode Then
-                            loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
-                            Me.Shape.SetRect(loRectangle, False)
-                            loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
-                            Me.EntityTypeNameShape.SetRect(loRectangle, False)
-                            loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
-                            Me.ReferenceModeShape.SetRect(loRectangle, False)
-                            Me.ReferenceModeShape.Visible = True
-                            Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
-                            Me.ReferenceModeShape.Move(Me.X + (liGreaterWidth / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
-                                                       Me.Y + 6)
-                        Else
-                            loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
-                            Me.Shape.SetRect(loRectangle, False)
-                            loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
-                            Me.EntityTypeNameShape.SetRect(loRectangle, False)
-                            Me.ReferenceModeShape.Visible = False
-                        End If
-                    End If
+                    '    '---------------------------------------------------------------------------------------------------------------
+                    '    'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
+                    '    '---------------------------------------------------------------------------------------------------------------
+                    '    Dim lsReferenceMode As String = ""
+                    '    lsReferenceMode = "(" & Me.ReferenceMode & ")"
+                    '    liGreaterWidth = Viev.Greater(Me.Name.Length, lsReferenceMode.Length)
+
+                    '    If Me.Name.Length = liGreaterWidth Then
+                    '        liGreaterWidth = Me.EntityTypeNameShape.Bounds.Width + 4
+                    '        loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.Name) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    '        loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    '        loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    '    Else
+                    '        liGreaterWidth = Me.ReferenceModeShape.Bounds.Width + 4
+                    '        loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    '        loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    '        loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    '    End If
+
+                    '    If IsSomething(Me.EntityType.ReferenceModeValueType) And Not Me.ExpandReferenceMode Then
+                    '        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
+                    '        Me.Shape.SetRect(loRectangle, False)
+                    '        loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                    '        Me.EntityTypeNameShape.SetRect(loRectangle, False)
+                    '        loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
+                    '        Me.ReferenceModeShape.SetRect(loRectangle, False)
+                    '        Me.ReferenceModeShape.Visible = True
+                    '        Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
+                    '        Me.ReferenceModeShape.Move(Me.X + (liGreaterWidth / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
+                    '                                   Me.Y + 6)
+                    '    Else
+                    '        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
+                    '        Me.Shape.SetRect(loRectangle, False)
+                    '        loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                    '        Me.EntityTypeNameShape.SetRect(loRectangle, False)
+                    '        Me.ReferenceModeShape.Visible = False
+                    '    End If
+                    'End If
                 End If
 
                 Call Me.SetAppropriateColour()
