@@ -198,7 +198,7 @@ Namespace FBM
 
         <NonSerialized()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        Private _IsIndependent As Boolean = True
+        Private _IsIndependent As Boolean = False
         <XmlIgnore()>
         <CategoryAttribute("Model Object"),
         DefaultValueAttribute(False),
@@ -208,6 +208,7 @@ Namespace FBM
                 Return Me._IsIndependent
             End Get
             Set(ByVal value As Boolean)
+                If value = True Then Debugger.Break()
                 Me._IsIndependent = value
             End Set
         End Property

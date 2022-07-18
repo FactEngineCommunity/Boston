@@ -414,7 +414,7 @@ Namespace FBM
                 'Set the size of the ValueTypeInstance
                 '---------------------------------------
                 G = Me.Page.Form.CreateGraphics
-                liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name & Boston.returnIfTrue(Me.IsIndependent, " ! ", "")), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name & Boston.returnIfTrue(Me.ValueType.IsIndependent, " ! ", "")), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                 Dim loRectangle As New Rectangle(Me.X, Me.Y, liValueTypeNameStringSize.Width + 4, liValueTypeNameStringSize.Height + 4)
                 Me.Shape.SetRect(loRectangle, False)
 
