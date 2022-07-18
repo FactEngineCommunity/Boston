@@ -208,7 +208,7 @@ Namespace FBM
                 Return Me._IsIndependent
             End Get
             Set(ByVal value As Boolean)
-                If value = True Then Debugger.Break()
+                'If value = True Then Debugger.Break()
                 Me._IsIndependent = value
             End Set
         End Property

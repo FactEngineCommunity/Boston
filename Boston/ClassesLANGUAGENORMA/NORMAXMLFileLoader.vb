@@ -3159,6 +3159,7 @@ LoadFactTypeInstance:
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
                                 lrRoleConstraintInstance = lrRoleConstraintInstance.CloneValueConstraintInstance(lrPage)
                             Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleConstraint.Role(0).FactType.Id) Is Nothing Then GoTo SkipValueConstraint
                                 lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
                         End Select
 
@@ -3171,6 +3172,7 @@ LoadFactTypeInstance:
                         lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                         lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                         lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+SkipValueConstraint:
                     Next
 #End Region
 
@@ -3219,17 +3221,18 @@ LoadFactTypeInstance:
 
                         If lrRoleConstraint IsNot Nothing Then
                             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                            lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
 
-                            If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
-                                lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
-                            Else
+                            lrRoleConstraintInstance = lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrRoleConstraint.Id)
+                            If lrRoleConstraintInstance Is Nothing Then
+                                If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleConstraint.Role(0).FactType.Id) Is Nothing Then GoTo SkipRoleValueConstraint2
                                 Boston.WriteToStatusBar("Loading Role Value Constraint Instance")
+                                lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
                                 lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
                             End If
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
                             lrRoleConstraintInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrRoleConstraintInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+SkipRoleValueConstraint2:
                         End If
                     Next
 

@@ -567,6 +567,39 @@ Namespace FBM
 
         End Function
 
+        Public Sub LinkToClosestModelElements()
+
+            Try
+                If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then Exit Sub
+
+                For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
+
+                    Dim larRoleInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                          From RoleInstance In FactTypeInstance.RoleGroup
+                                          Where RoleInstance.Id = lrRoleConstraintRoleInstance.Role.Id
+                                          Select RoleInstance
+
+                    If larRoleInstance.Count > 1 Then
+
+                        Dim larClosestModelElementInstance = (From RoleInstance In larRoleInstance
+                                                              Select New With {.RoleInstance = RoleInstance, .Shape = RoleInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(Me.X - RoleInstance.X) ^ 2 + Math.Abs(Me.Y - RoleInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+
+                        lrRoleConstraintRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                        Me.Page.Diagram.Invalidate()
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Sub MouseDown() Implements FBM.iRoleConstraintObject.MouseDown
 
         End Sub

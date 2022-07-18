@@ -890,7 +890,7 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.LockToThisPositionOnPageToolStripMenuItem, Me.AddToPageToolStripMenuItem, Me.ShowInModelDictionaryToolStripMenuItem, Me.ToolStripSeparator12, Me.ShowInDiagramSpyToolStripMenuItem, Me.ToolStripSeparator30, Me.ToolStripMenuItemCopy, Me.ToolStripSeparator40, Me.ToolStripMenuItemConvertToFactType, Me.ToolStripSeparator45, Me.ExpandTheReferenceSchemeToolStripMenuItem, Me.HideTheReferenceSchemeToolStripMenuItem, Me.ToolStripSeparator32, Me.RemoveFromPageToolStripMenuItem, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
         Me.ContextMenuStrip_EntityType.Name = "ContextMenuStrip_EntityType"
-        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(234, 338)
+        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(234, 360)
         '
         'mnuOption_EntityTypeMorphTo
         '

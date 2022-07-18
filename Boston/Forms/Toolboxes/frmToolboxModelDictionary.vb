@@ -231,12 +231,20 @@ Public Class frmToolboxModelDictionary
             End If
             For Each lrFactType In larFactType
                 If lrFactType.IsObjectified Then
-                    loNode = New TreeNode
-                    loNode = Me.TreeView1.Nodes("ObjectType").Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 3, 3)
-                    loNode.Tag = lrFactType
+                    Dim loNode1 = New TreeNode
+                    loNode1 = Me.TreeView1.Nodes("ObjectType").Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 3, 3)
+                    loNode1.Tag = lrFactType
 
-                    loNode = loNode.Nodes.Add("LinkFactTypes" & lrFactType.Name, "Implied Fact Types")
+                    loNode = loNode1.Nodes.Add("LinkFactTypes" & lrFactType.Name, "Implied Fact Types")
                     loNode.Tag = "LinkFactTypesHolderNode"
+
+                    loNode = loNode1.Nodes.Add("ObjectifyingEntityType" & lrFactType.Name, "Objectifying Entity Type")
+                    loNode.Tag = "ObjectifyingEntityTypeHolderNode"
+
+
+                    loNode = loNode.Nodes.Add("EntityType" & lrFactType.ObjectifyingEntityType.Id, lrFactType.Id, 0, 0)
+                    loNode.Tag = lrFactType.ObjectifyingEntityType
+
                 Else
                     loNode = New TreeNode
                     If lrFactType.IsSubtypeRelationshipFactType Then

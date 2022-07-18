@@ -4803,6 +4803,20 @@ Public Class frmDiagramORM
             End Select
         End If
 
+        For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) Not x.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint)
+
+            Try
+                Call lrRoleConstraintInstance.LinkToClosestModelElements
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        Next
+
         '==============================================================================
         'Broadcast the moving of the Object is done in Me.SelectionMoved
         '==============================================================================
@@ -5401,6 +5415,11 @@ Public Class frmDiagramORM
             Next
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 Call lrEntityTypeInstance.ResetSubtypeRelationshipLinks()
+            Next
+
+            'Reasses Role Links for ExternalUniquenessConstraints
+            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) Not x.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint)
+                Call lrRoleConstraintInstance.LinkToClosestModelElements()
             Next
 
             'CodeSaf-User Experience
