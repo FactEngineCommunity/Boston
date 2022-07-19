@@ -401,7 +401,7 @@ Namespace FBM
             End Set
         End Property
 
-        Private _Visible As Boolean = True
+        Private _Visible As Boolean = False
         Public Property Visible As Boolean Implements iPageObject.Visible
             Get
                 Return Me._Visible
@@ -1054,8 +1054,8 @@ Namespace FBM
                 End If
 
                 For Each lrRoleInstance In Me.RoleGroup
+                    lrRoleInstance.Shape.Visible = Me.Visible
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
-                    lrRoleInstance.Shape.Visible = Me.Shape.Visible
                 Next
 
                 If Me.FactTypeName IsNot Nothing Then

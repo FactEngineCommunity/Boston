@@ -1224,6 +1224,43 @@ Namespace RDS
 
         End Sub
 
+        Public Function createDatabaseName(Optional ByVal abUseSquareBrackets As Boolean = True, Optional ByVal abRemoveWhitespace As Boolean = True) As String
+
+            Try
+                Dim lsDatabaseName As String = ""
+
+                If Me.FBMModelElement Is Nothing Then
+                    'Should only be used when reverse engineering and where the TempModel that is initially
+                    '  populated From the database does not have FBMModelElements.
+                    Return Me._DatabaseName
+                Else
+                    If Me.FBMModelElement.IsDatabaseReservedWord Then
+                        lsDatabaseName = "[" & Me.FBMModelElement.DatabaseName & "]"
+                    ElseIf abUseSquareBrackets And Me.FBMModelElement.DatabaseName.Contains(" ") Then
+                        lsDatabaseName = "[" & Me.FBMModelElement.DatabaseName & "]"
+                    Else
+                        lsDatabaseName = Me.FBMModelElement.DatabaseName
+                    End If
+                End If
+
+                If abRemoveWhitespace Then
+                    Return Viev.Strings.RemoveWhiteSpace(lsDatabaseName)
+                Else
+                    Return lsDatabaseName
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return "DummyTableName"
+            End Try
+        End Function
+
         ''' <summary>
         ''' 
         ''' </summary>

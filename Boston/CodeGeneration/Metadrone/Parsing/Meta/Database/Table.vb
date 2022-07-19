@@ -124,7 +124,16 @@ Namespace Parser.Meta.Database
                                     End If
                                     lsDestinationColumnName = lrDestinationColumn.Name
                                     lsOriginRoleName = lrOriginColumn.Role.DerivedRoleName
-                                    lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
+                                    If lrRelation.ResponsibleFactType.IsObjectified Or lrRelation.ResponsibleFactType.HasTotalRoleConstraint Or lrRelation.ResponsibleFactType.HasPartialButMultiRoleConstraint Then
+                                        If lrRelation.ResponsibleFactType.hasLinkFactTypes Then
+                                            lsDestinationRoleName = lrRelation.OriginColumns(0).Role.FactType.getLinkFactTypes().Find(Function(x) x.LinkFactTypeRole Is lrRelation.OriginColumns(0).Role).LinkFactTypeRole.DerivedRoleName
+                                        Else
+                                            lsDestinationRoleName = lrRelation.OriginColumns(0).Role.DerivedRoleName
+                                        End If
+                                    Else
+                                            lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
+                                    End If
+
                                 End If
 
                                 If Me.Relation.Find(Function(x) x.Id = lrRelation.Id) Is Nothing Then
@@ -199,7 +208,16 @@ Namespace Parser.Meta.Database
                                         lsOriginRoleName = lsDestinationRoleName
                                     Else
                                         lsDestinationRoleName = lrDestinationColumn.Role.DerivedRoleName
-                                        lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
+                                        If lrRelation.ResponsibleFactType.IsObjectified Or lrRelation.ResponsibleFactType.HasTotalRoleConstraint Or lrRelation.ResponsibleFactType.HasPartialButMultiRoleConstraint Then
+                                            If lrRelation.ResponsibleFactType.hasLinkFactTypes Then
+                                                lsDestinationRoleName = lrOriginColumn.Role.FactType.getLinkFactTypes().Find(Function(x) x.LinkFactTypeRole Is lrOriginColumn.Role).LinkFactTypeRole.DerivedRoleName
+                                            Else
+                                                lsDestinationRoleName = lrOriginColumn.Role.DerivedRoleName
+                                            End If
+                                        Else
+                                            lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
+                                        End If
+                                        'lsOriginRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrOriginColumn.Role.Id).DerivedRoleName
                                     End If
 
                                 End If

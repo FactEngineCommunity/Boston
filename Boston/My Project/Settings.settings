@@ -233,5 +233,8 @@
     <Setting Name="FactEngineUseTransformations" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="CodeGenerationUseSquareBracketsSQLTableNames" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

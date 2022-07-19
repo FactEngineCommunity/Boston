@@ -977,6 +977,18 @@ Namespace My
                 Me("FactEngineUseTransformations") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property CodeGenerationUseSquareBracketsSQLTableNames() As Boolean
+            Get
+                Return CType(Me("CodeGenerationUseSquareBracketsSQLTableNames"),Boolean)
+            End Get
+            Set
+                Me("CodeGenerationUseSquareBracketsSQLTableNames") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

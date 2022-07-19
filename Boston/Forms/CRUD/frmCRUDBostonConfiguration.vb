@@ -106,6 +106,9 @@ Public Class frmCRUDBostonConfiguration
         Me.CheckBoxUseDefaultReferenceMode.Checked = My.Settings.UseDefaultReferenceModeNewEntityTypes
         Me.TextBoxDefaultReferenceMode.Text = Trim(My.Settings.DefaultReferenceMode)
 
+        'Code Generation
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked = My.Settings.CodeGenerationUseSquareBracketsSQLTableNames
+
     End Sub
 
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -169,6 +172,10 @@ Public Class frmCRUDBostonConfiguration
                 'Modelling
                 My.Settings.UseDefaultReferenceModeNewEntityTypes = Me.CheckBoxUseDefaultReferenceMode.Checked
                 My.Settings.DefaultReferenceMode = Trim(Me.TextBoxDefaultReferenceMode.Text)
+
+                'CodeGeneration
+                'Code Generation
+                My.Settings.CodeGenerationUseSquareBracketsSQLTableNames = Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked
 
                 'Superuser Mode          
                 My.Settings.SuperuserMode = Me.CheckBoxSuperuserMode.Checked

@@ -59,6 +59,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxFactEngineShowStackTrace = New System.Windows.Forms.CheckBox()
         Me.ComboBoxFactEngineUserDateTimeFormat = New System.Windows.Forms.ComboBox()
         Me.ComboBoxFactEngineUserDateFormat = New System.Windows.Forms.ComboBox()
         Me.LabelPromptFactEngineUserDateTimeFormat = New System.Windows.Forms.Label()
@@ -88,7 +89,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.CheckBoxUseDefaultReferenceMode = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxFactEngineShowStackTrace = New System.Windows.Forms.CheckBox()
+        Me.TabPage8 = New System.Windows.Forms.TabPage()
+        Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -111,6 +114,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage7.SuspendLayout()
         Me.GroupBoxModelling.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage8.SuspendLayout()
+        Me.GroupBoxCodeGeneration.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -381,6 +386,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabControl1.Controls.Add(Me.TabPage6)
         Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage7)
+        Me.TabControl1.Controls.Add(Me.TabPage8)
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -482,6 +488,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Size = New System.Drawing.Size(597, 493)
         Me.GroupBoxFactEngine.TabIndex = 0
         Me.GroupBoxFactEngine.TabStop = False
+        '
+        'CheckBoxFactEngineShowStackTrace
+        '
+        Me.CheckBoxFactEngineShowStackTrace.AutoSize = True
+        Me.CheckBoxFactEngineShowStackTrace.Location = New System.Drawing.Point(19, 181)
+        Me.CheckBoxFactEngineShowStackTrace.Name = "CheckBoxFactEngineShowStackTrace"
+        Me.CheckBoxFactEngineShowStackTrace.Size = New System.Drawing.Size(160, 17)
+        Me.CheckBoxFactEngineShowStackTrace.TabIndex = 8
+        Me.CheckBoxFactEngineShowStackTrace.Text = "Show Stack Trace on Errors"
+        Me.CheckBoxFactEngineShowStackTrace.UseVisualStyleBackColor = True
         '
         'ComboBoxFactEngineUserDateTimeFormat
         '
@@ -778,15 +794,34 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxFactEngineShowStackTrace
+        'TabPage8
         '
-        Me.CheckBoxFactEngineShowStackTrace.AutoSize = True
-        Me.CheckBoxFactEngineShowStackTrace.Location = New System.Drawing.Point(19, 181)
-        Me.CheckBoxFactEngineShowStackTrace.Name = "CheckBoxFactEngineShowStackTrace"
-        Me.CheckBoxFactEngineShowStackTrace.Size = New System.Drawing.Size(160, 17)
-        Me.CheckBoxFactEngineShowStackTrace.TabIndex = 8
-        Me.CheckBoxFactEngineShowStackTrace.Text = "Show Stack Trace on Errors"
-        Me.CheckBoxFactEngineShowStackTrace.UseVisualStyleBackColor = True
+        Me.TabPage8.Controls.Add(Me.GroupBoxCodeGeneration)
+        Me.TabPage8.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage8.Name = "TabPage8"
+        Me.TabPage8.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage8.TabIndex = 7
+        Me.TabPage8.Text = "Code Generation"
+        Me.TabPage8.UseVisualStyleBackColor = True
+        '
+        'GroupBoxCodeGeneration
+        '
+        Me.GroupBoxCodeGeneration.Controls.Add(Me.CheckBoxCodeGenerationUseSquareBracketsTableNames)
+        Me.GroupBoxCodeGeneration.Location = New System.Drawing.Point(3, 6)
+        Me.GroupBoxCodeGeneration.Name = "GroupBoxCodeGeneration"
+        Me.GroupBoxCodeGeneration.Size = New System.Drawing.Size(600, 595)
+        Me.GroupBoxCodeGeneration.TabIndex = 0
+        Me.GroupBoxCodeGeneration.TabStop = False
+        '
+        'CheckBoxCodeGenerationUseSquareBracketsTableNames
+        '
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.AutoSize = True
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Location = New System.Drawing.Point(16, 19)
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Name = "CheckBoxCodeGenerationUseSquareBracketsTableNames"
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Size = New System.Drawing.Size(220, 17)
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.TabIndex = 0
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Text = "Use square brackets around table names"
+        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -835,6 +870,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxModelling.ResumeLayout(False)
         Me.GroupBoxModelling.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage8.ResumeLayout(False)
+        Me.GroupBoxCodeGeneration.ResumeLayout(False)
+        Me.GroupBoxCodeGeneration.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -904,4 +942,7 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxUseDefaultReferenceMode As CheckBox
     Friend WithEvents CheckBoxShowStackTrace As CheckBox
     Friend WithEvents CheckBoxFactEngineShowStackTrace As CheckBox
+    Friend WithEvents TabPage8 As TabPage
+    Friend WithEvents GroupBoxCodeGeneration As GroupBox
+    Friend WithEvents CheckBoxCodeGenerationUseSquareBracketsTableNames As CheckBox
 End Class
