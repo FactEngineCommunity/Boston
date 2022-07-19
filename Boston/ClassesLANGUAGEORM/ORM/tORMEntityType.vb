@@ -3129,7 +3129,9 @@ FailsafeContinue:
                     '====================================================================================
                     'RDS
                     Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.FBMModelElement Is Me)
-                    Call lrTable.setName(asNewName)
+                    If lrTable IsNot Nothing Then
+                        Call lrTable.setName(asNewName)
+                    End If
 
                     Me.Model.MakeDirty()
 

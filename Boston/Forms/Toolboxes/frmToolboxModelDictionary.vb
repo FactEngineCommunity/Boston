@@ -238,11 +238,11 @@ Public Class frmToolboxModelDictionary
                     loNode = loNode1.Nodes.Add("LinkFactTypes" & lrFactType.Name, "Implied Fact Types")
                     loNode.Tag = "LinkFactTypesHolderNode"
 
-                    loNode = loNode1.Nodes.Add("ObjectifyingEntityType" & lrFactType.Name, "Objectifying Entity Type")
+                    loNode = loNode1.Nodes.Add("ObjectifyingEntityType" & lrFactType.Name, "Objectifying Entity Type", 26, 26)
                     loNode.Tag = "ObjectifyingEntityTypeHolderNode"
 
 
-                    loNode = loNode.Nodes.Add("EntityType" & lrFactType.ObjectifyingEntityType.Id, lrFactType.Id, 0, 0)
+                    loNode = loNode.Nodes.Add("EntityType" & lrFactType.ObjectifyingEntityType.Id, lrFactType.Id, 26, 26)
                     loNode.Tag = lrFactType.ObjectifyingEntityType
 
                 Else

@@ -599,6 +599,8 @@ SkipModelLevelRoleConstraint:
                 'So that DictionaryEntries are dirty
                 lrModel.Loaded = True
 
+                lrModel.StoreAsXML = True
+
                 lrModel.CoreVersionNumber = Me.ORMModel.CoreVersionNumber
 
                 '==============================
@@ -1174,6 +1176,7 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.Page = lrPage
                     lrEntityTypeInstance.Id = lrConceptInstance.Symbol
                     lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                    If lrEntityType Is Nothing Then GoTo SkipEntityTypeInstance
                     lrEntityTypeInstance.EntityType = lrEntityType
                     lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
                     lrEntityTypeInstance.ReferenceMode = lrEntityType.ReferenceMode
@@ -1195,6 +1198,7 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.Y = lrConceptInstance.Y
 
                     lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+SkipEntityTypeInstance:
                 Next
 #End Region
 
@@ -1211,6 +1215,7 @@ SkipValueTypeInstance:
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
                     lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                    If lrFactType Is Nothing Then GoTo SkipFactTypeInstance
                     lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True,, lrConceptInstance.InstanceNumber)
                     lrFactTypeInstance.X = lrConceptInstance.X
                     lrFactTypeInstance.Y = lrConceptInstance.Y
@@ -1290,6 +1295,7 @@ SkipValueTypeInstance:
                         lrFactTypeInstance.FactTable.Y = lrFactTableInstance.Y
                         lrFactTypeInstance.FactTable.Visible = True
                     End If
+SkipFactTypeInstance:
                 Next
 #End Region
 

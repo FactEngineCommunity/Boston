@@ -13,6 +13,8 @@ Namespace FBM
                     For Each liFixType In aaiFixesToApply
 
                         Select Case liFixType
+                            Case Is = pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
+                                Call Me.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
                             Case Is = pcenumModelFixType.RolesWithoutJoinedORMObject
                                 Call Me.RolesWithoutJoinedORMObject()
                             Case Is = pcenumModelFixType.RelationsInvalidActiveRoleOnOriginColumns
@@ -22,7 +24,7 @@ Namespace FBM
                             Case Is = pcenumModelFixType.ColumnsWhereActiveRoleIsNothingRemoveTheColumn
                                 Call Me.ColumnsWhereActiveRoleIsNothingRemoveTheColumn()
                             Case Is = pcenumModelFixType.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn
-                                Call Me.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn
+                                Call Me.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn()
                             Case Is = pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect
                                 Call Me.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect()
                             Case Is = pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
@@ -46,13 +48,33 @@ Namespace FBM
                             Case Is = pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
                                 Call Me.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa()
                             Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
-                                Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
+                                Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount()
                         End Select
 
                     Next
 
                 End With
 
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType()
+
+            Try
+                For Each lrFactType In Me.FactType.FindAll(Function(x) x.IsObjectified)
+                    If lrFactType.ObjectifyingEntityType.Id <> lrFactType.Id Then
+                        Call lrFactType.ObjectifyingEntityType.SetName(lrFactType.Id)
+                    End If
+                Next
 
             Catch ex As Exception
                 Dim lsMessage As String

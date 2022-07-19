@@ -3231,6 +3231,7 @@ Public Class frmToolboxEnterpriseExplorer
                     With New WaitCursor
                         Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
                         lfrmFlashCard.Show(Me)
+                        lrModel.StoreAsXML = False
                         Call lrModel.Save(True, True)
                         Boston.WriteToStatusBar("Model Saved")
                     End With

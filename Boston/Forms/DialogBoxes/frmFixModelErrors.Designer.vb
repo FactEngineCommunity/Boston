@@ -96,7 +96,7 @@ Partial Class frmFixModelErrors
                 "ins nothing.", "Relational Data Structure, Tables where the number of PrimaryKey columns does not" &
                 " match the number of Roles in the PreferredIdentifier. Fix that.", "Duplicate Facts. Remove duplicates.", "RDS Tables and PGS Nodes (Nodes/Tables of ObjectifiedFactTypes) that are missing " &
                 "Relations. Add the relations.", "RDS Tables with more than one relation for the same FactType/Join. Prune extra re" &
-                "lations.", "RDS Relations, that have no OriginColumns. Try and create the OriginColumns.", "RDS Relations, where Origin Column count <> Destination Column count."})
+                "lations.", "RDS Relations, that have no OriginColumns. Try and create the OriginColumns.", "RDS Relations, where Origin Column count <> Destination Column count.", "Objectifying Entity Type Ids not the same As Objectified Fact Type Id"})
         Me.CheckedListBoxFixTypes.Location = New System.Drawing.Point(6, 70)
         Me.CheckedListBoxFixTypes.Name = "CheckedListBoxFixTypes"
         Me.CheckedListBoxFixTypes.Size = New System.Drawing.Size(950, 409)

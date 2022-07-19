@@ -268,6 +268,7 @@ Namespace RDS
                             'PSEUDOCODE
                             ' * Check whether all the ResponsibleRoles of the Columns of the Index are in the FactTypes of the Roles of the RoleConstraint
 
+                            If Me.Column(0).FactType Is Nothing Then GoTo KeepChecking1
                             If Not Me.Column(0).FactType.IsPreferredReferenceMode Then GoTo KeepChecking1
 
                             Dim liMatch = (From IdxColumn In Me.Column
@@ -305,6 +306,7 @@ KeepChecking1:
                                                Select RoleConstraint Distinct
 
                         If loRoleConstraint.Count > 0 Then
+                            If Me.Column(0).FactType Is Nothing Then GoTo Abort
                             If loRoleConstraint.Count = 2 And Me.Column(0).FactType.Is1To1BinaryFactType Then
                                 Return loRoleConstraint(1)
                             Else
@@ -346,7 +348,7 @@ KeepChecking1:
 
                         End If
                 End Select
-
+Abort:
                 Return Nothing
 
             Catch ex As Exception

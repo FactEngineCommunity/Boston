@@ -86,6 +86,10 @@ Public Class frmFixModelErrors
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount,
                                                                               "RDS Relations, where Origin Column count <> Destination Column count.",
                                                                               pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType,
+                                                                              "Objectifying Entity Type Ids Not the same As Objectified Fact Type Id.",
+                                                                              pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

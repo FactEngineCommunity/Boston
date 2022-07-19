@@ -945,6 +945,7 @@ Namespace FBM
                         lrFactTypeInstance.ObjectifyingEntityType = arPage.EntityTypeInstance.Find(Function(x) x.Id = .ObjectifyingEntityType.Id)
                         If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
                             lrFactTypeInstance.ObjectifyingEntityType = .ObjectifyingEntityType.CloneInstance(arPage, True, False)
+                            lrFactTypeInstance.ObjectifyingEntityType.Visible = False
                         End If
                         lrFactTypeInstance.ObjectifyingEntityType.IsObjectifyingEntityType = True
                     End If

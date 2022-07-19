@@ -29,6 +29,7 @@
     End Enum
 
     Public Enum pcenumModelFixType
+        ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
         RolesWithoutJoinedORMObject
         RelationsInvalidActiveRoleOnOriginColumns
         ColumnsWhereActiveRoleIsNothingTryAndFix

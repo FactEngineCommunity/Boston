@@ -1055,6 +1055,7 @@ Namespace FBM
 
                 For Each lrRoleInstance In Me.RoleGroup
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
+                    lrRoleInstance.Shape.Visible = Me.Shape.Visible
                 Next
 
                 If Me.FactTypeName IsNot Nothing Then

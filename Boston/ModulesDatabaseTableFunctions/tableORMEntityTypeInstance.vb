@@ -112,6 +112,7 @@ Namespace TableEntityTypeInstance
                         lrEntityTypeInstance.DerivationText = lrEntityTypeInstance.EntityType.DerivationText
                         lrEntityTypeInstance.DBName = lrEntityTypeInstance.EntityType.DBName
                         lrEntityTypeInstance.InstanceNumber = lREcordset("InstanceNumber").Value
+                        lrEntityTypeInstance.Visible = CBool(lREcordset("IsVisible").Value)
 
                         lrEntityTypeInstance.X = lREcordset("x").Value
                         lrEntityTypeInstance.Y = lREcordset("y").Value

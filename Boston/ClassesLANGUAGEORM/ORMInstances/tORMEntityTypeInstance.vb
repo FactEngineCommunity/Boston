@@ -1723,6 +1723,9 @@ MoveOn:
                             Me.Page.Diagram.Nodes.Remove(Me.Shape)
                             Me.Page.Diagram.Nodes.Remove(Me.EntityTypeNameShape)
                             Me.Page.Diagram.Nodes.Remove(Me.ReferenceModeShape)
+                            If Me.ObjectifyingEntityTypeIndicatorShape IsNot Nothing Then
+                                Me.Page.Diagram.Nodes.Remove(Me.ObjectifyingEntityTypeIndicatorShape)
+                            End If
                         End If
 
                         Me.Page.EntityTypeInstance.Remove(Me)
