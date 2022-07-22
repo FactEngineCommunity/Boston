@@ -529,6 +529,12 @@
     <Compile Include="ClassesGeneral\ProjectUserDetails.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\SearchTextbox\SearchTextbox.Designer.vb">
+      <DependentUpon>SearchTextbox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\SearchTextbox\SearchTextbox.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\tFlickerFreeListbox.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -1607,6 +1613,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="My Project\Resources1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="My Project\Settings.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -2026,6 +2037,9 @@
     <EmbeddedResource Include="ClassesGeneral\ProjectUserDetails.resx">
       <DependentUpon>ProjectUserDetails.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\SearchTextbox\SearchTextbox.resx">
+      <DependentUpon>SearchTextbox.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\tRichtextEditingControl.resx">
       <DependentUpon>tRichtextEditingControl.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -2411,6 +2425,7 @@
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources1.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\BPMNPopupToolSelectorImages.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -3292,6 +3307,7 @@
     <None Include="Images\MenuImages\CopyToClipboard16x16.png" />
     <None Include="Images\MenuImages\Convert16x16.jpg" />
     <None Include="Images\MenuImages\DataFlowDiagram16x16.png" />
+    <None Include="Images\MenuImages\delete10x10.png" />
     <Content Include="Images\MenuImages\dictionary16x16.png" />
     <None Include="Images\MenuImages\edit16x16.jpg" />
     <None Include="Images\MenuImages\empty16x16.jpg" />
@@ -3348,6 +3364,7 @@
     <None Include="Images\MenuImages\Table.png" />
     <None Include="Images\MenuImages\spyglass_icon.png" />
     <None Include="Images\MenuImages\TaxonomyModel16x16.png" />
+    <None Include="Images\MenuImages\Spyglass10x10.gif" />
     <Content Include="Images\MenuImages\Toolbox16x16B&amp;W.jpg" />
     <None Include="Images\MenuImages\XML16x16.png" />
     <None Include="Images\Splash\Shutterstock-144487549.jpg" />

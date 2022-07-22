@@ -232,4 +232,16 @@
   <data name="UML_UseCase16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\UML-UseCase16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Refresh_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Refresh-16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Spyglass16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Spyglass16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="delete10x10" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\delete10x10.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Spyglass10x10" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\Spyglass10x10.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

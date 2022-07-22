@@ -902,7 +902,9 @@ Namespace FBM
                             Me.Model.AddValueType(lrEntityTypeInstance.ReferenceModeValueType.ValueType, True, True, lrConceptInstance, True)
                         End If
 
-                        Call lrEntityTypeInstance.ReferenceModeValueType.DisplayAndAssociate()
+                        If lrEntityTypeInstance.ReferenceModeFactType.Visible Then
+                            Call lrEntityTypeInstance.ReferenceModeValueType.DisplayAndAssociate()
+                        End If
                     End If
 
                     If IsSomething(lrEntityTypeInstance.ReferenceModeFactType) Then
@@ -917,8 +919,8 @@ Namespace FBM
                             '  so we do the Client/Server broadcast processing here.
                             If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                                 Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageDropModelElementAtPoint,
-                                                                                    lrEntityTypeInstance.ReferenceModeFactType.FactType,
-                                                                                    lrConceptInstance)
+                                                                                lrEntityTypeInstance.ReferenceModeFactType.FactType,
+                                                                                lrConceptInstance)
                             End If
                         Else
                             '--------------------------------------------------------------
@@ -931,12 +933,19 @@ Namespace FBM
 
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
-                        lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint = lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint.OrderBy(Function(x) x.IsPreferredIdentifier).ToList
+                        lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint = lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint.OrderByDescending(Function(x) x.IsPreferredIdentifier).ToList
                         For Each lrRoleConstraintInstance In lrEntityTypeInstance.ReferenceModeFactType.InternalUniquenessConstraint
 
+                            If lrEntityTypeInstance.ReferenceModeRoleConstraint Is Nothing And lrRoleConstraintInstance.IsPreferredIdentifier Then
+                                lrEntityTypeInstance.ReferenceModeRoleConstraint = lrRoleConstraintInstance
+                            End If
                             lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, lrRoleConstraintInstance.Id, pcenumConceptType.RoleConstraint)
-                            lrConceptInstance.X = lrEntityTypeInstance.ReferenceModeRoleConstraint.X
-                            lrConceptInstance.Y = lrEntityTypeInstance.ReferenceModeRoleConstraint.Y
+                            Try
+                                lrConceptInstance.X = lrEntityTypeInstance.ReferenceModeRoleConstraint.X
+                                lrConceptInstance.Y = lrEntityTypeInstance.ReferenceModeRoleConstraint.Y
+                            Catch
+                                'If is still no ReferenceModeRoleConstraint. Points to a bigger problem with the ReferenceModeFactType.
+                            End Try
 
                             If Me.Model.RoleConstraint.Exists(AddressOf lrRoleConstraintInstance.RoleConstraint.Equals) Then
                                 '-----------------------------------------------------------------------------------------------------------------------
@@ -944,8 +953,8 @@ Namespace FBM
                                 '  so we do the Client/Server broadcast processing here.
                                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.PageDropModelElementAtPoint,
-                                                                                        lrRoleConstraintInstance.RoleConstraint,
-                                                                                        lrConceptInstance)
+                                                                                    lrRoleConstraintInstance.RoleConstraint,
+                                                                                    lrConceptInstance)
                                 End If
                             Else
                                 '--------------------------------------------------------------

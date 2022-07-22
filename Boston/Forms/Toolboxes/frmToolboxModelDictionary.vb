@@ -21,7 +21,6 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-
     Private Sub frmModelDictionaryLoad(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Call SetupForm()
@@ -165,7 +164,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub LoadORMModelDictionary()
+    Private Sub LoadORMModelDictionary(Optional ByVal asSearchString As String = Nothing)
 
         Dim loNode As TreeNode
         Dim loSubNode As TreeNode
@@ -192,7 +191,10 @@ Public Class frmToolboxModelDictionary
             Dim lrEntityType As New FBM.EntityType
             Dim larEntityType As New List(Of FBM.EntityType)
             Call prApplication.WorkingModel.EntityType.Sort(AddressOf FBM.EntityType.CompareEntityTypeNames)
-            If Me.CheckBoxShowCoreModelElements.Checked Then
+
+            If asSearchString IsNot Nothing Then
+                larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+            ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) Not x.IsObjectifyingEntityType)
             Else
                 larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) Not (x.IsMDAModelElement = True Or x.IsObjectifyingEntityType))
@@ -210,7 +212,9 @@ Public Class frmToolboxModelDictionary
             Dim lrValueType As New FBM.ValueType
             Dim larValueType As New List(Of FBM.ValueType)
             Call prApplication.WorkingModel.ValueType.Sort(AddressOf FBM.ValueType.CompareValueTypeNames)
-            If Me.CheckBoxShowCoreModelElements.Checked Then
+            If asSearchString IsNot Nothing Then
+                larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+            ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larValueType = prApplication.WorkingModel.ValueType
             Else
                 larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
@@ -224,7 +228,9 @@ Public Class frmToolboxModelDictionary
             Dim larFactType As New List(Of FBM.FactType)
             Dim lrFactType As New FBM.FactType
             Call prApplication.WorkingModel.FactType.Sort(AddressOf FBM.FactType.CompareFactTypeNames)
-            If Me.CheckBoxShowCoreModelElements.Checked Then
+            If asSearchString IsNot Nothing Then
+                larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+            ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsLinkFactType = False)
             Else
                 larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsMDAModelElement = False And x.IsLinkFactType = False)
@@ -279,7 +285,9 @@ Public Class frmToolboxModelDictionary
             Dim lrRoleConstraint As FBM.RoleConstraint
             Dim larRoleConstraint As New List(Of FBM.RoleConstraint)
             Dim liImageIndex As Integer = 0
-            If Me.CheckBoxShowCoreModelElements.Checked Then
+            If asSearchString IsNot Nothing Then
+                larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+            ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larRoleConstraint = prApplication.WorkingModel.RoleConstraint
             Else
                 larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) x.IsMDAModelElement = False)
@@ -330,6 +338,10 @@ Public Class frmToolboxModelDictionary
             End If
 
             Me.zrLoadedModel = Me.zrORMModel
+
+            If asSearchString IsNot Nothing Then
+                Me.TreeView1.ExpandAll()
+            End If
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -632,8 +644,6 @@ Public Class frmToolboxModelDictionary
             If IsSomething(Me.TreeView1.GetNodeAt(e.Location)) Then
                 Me.TreeView1.SelectedNode = Me.TreeView1.GetNodeAt(e.Location)
             End If
-
-
 
             If e.Button = Windows.Forms.MouseButtons.Right Then
                 '---------------------------------
@@ -1411,10 +1421,26 @@ Public Class frmToolboxModelDictionary
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
 
         Try
+            Call Me.LoadTree
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub LoadTree(Optional ByVal asSearchString As String = Nothing)
+
+        Try
             Call Me.TreeView1.Nodes.Clear()
             Select Case Me.ComboBox1.SelectedIndex
                 Case Is = 0
-                    Call Me.LoadORMModelDictionary()
+                    Call Me.LoadORMModelDictionary(asSearchString)
                 Case Is = 1
                     Call Me.LoadERDModelDictionary()
                 Case Is = 2
@@ -1466,4 +1492,19 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
+    Private Sub SearchTextbox1_InitiateSearch(asSearchString As String) Handles SearchTextbox1.InitiateSearch
+
+        Try
+            Call Me.LoadTree(asSearchString)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class
