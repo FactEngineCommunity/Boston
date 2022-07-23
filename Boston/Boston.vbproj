@@ -523,6 +523,12 @@
     <Compile Include="ClassesGeneral\NotificationBarGroupToProjectInvitation.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\ORM\ORMPopupToolSelector.Designer.vb">
+      <DependentUpon>ORMPopupToolSelector.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ClassesGeneral\ORM\ORMPopupToolSelector.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\ProjectUserDetails.Designer.vb">
       <DependentUpon>ProjectUserDetails.vb</DependentUpon>
     </Compile>
@@ -2034,6 +2040,9 @@
     <EmbeddedResource Include="ClassesGeneral\NotificationBarGroupToProjectInvitation.resx">
       <DependentUpon>NotificationBarGroupToProjectInvitation.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ClassesGeneral\ORM\ORMPopupToolSelector.resx">
+      <DependentUpon>ORMPopupToolSelector.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\ProjectUserDetails.resx">
       <DependentUpon>ProjectUserDetails.vb</DependentUpon>
     </EmbeddedResource>
@@ -3384,6 +3393,7 @@
     <None Include="Images\MenuImages\Verbalisation16x16.png" />
     <None Include="Images\MenuImages\UML-UseCase16x16.png" />
     <None Include="Images\MenuImages\UML16x16.png" />
+    <None Include="Images\ORMShapes\ValueTypePopupToolSelector.png" />
     <Content Include="Images\Splash\Splash.png" />
     <Content Include="Images\Splash\Splash.png" />
     <None Include="Images\Viev\VievLogoMedium.jpg" />

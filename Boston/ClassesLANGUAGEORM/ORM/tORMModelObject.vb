@@ -803,9 +803,82 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
             End Try
 
         End Function
+
+        ''' <summary>
+        ''' Adds a BinaryFactType relation between the EntityType and a ValueType. Adds the ValueType to the Model if it does not already exist.
+        ''' </summary>
+        ''' <param name="aiRelationMultiplicityValue"></param>
+        ''' <remarks></remarks>
+        Public Function AddBinaryRelationToNEwEntityType(ByVal aiRelationMultiplicityValue As pcenumBinaryRelationMultiplicityType,
+                                                         Optional ByVal abAddToModel As Boolean = False) As FBM.FactType
+
+            Try
+                '------------------------------------------------------------------------------
+                'Add the ValueType to the Model if it does not already exist within the Model
+                '------------------------------------------------------------------------------
+                Dim lrNewEntityType As FBM.EntityType = Me.Model.CreateEntityType("NewEntityType", True, True, False, False)
+
+                '---------------------------------------
+                'Create the FactType for the relation.
+                '---------------------------------------
+                Dim lrFactType As New FBM.FactType
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim lsFactTypeName As String = Me.Name & lrNewEntityType.Name
+                Dim larRole As New List(Of FBM.Role)
+
+                '---------------------------------------------------------------------
+                'Create the list of ModelObjects referenced by Roles in the FactType
+                '---------------------------------------------------------------------
+                larModelObject.Add(Me)
+                larModelObject.Add(lrNewEntityType)
+                '---------------------
+                'Create the FactType
+                '---------------------
+                lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True,,, abAddToModel)
+
+                '-----------------------------------------------------------------------------------
+                'Create the InternalUniquenessConstraint (MultiplicityConstraint) for the FactType
+                '-----------------------------------------------------------------------------------
+                Select Case aiRelationMultiplicityValue
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                        larRole.Clear()
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(lrNewEntityType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(lrNewEntityType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(lrNewEntityType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                End Select
+
+                Return lrFactType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+
+            End Try
+
+        End Function
+
 
         Public Overridable Function CanSafelyRemoveFromModel() As Boolean
             Return False

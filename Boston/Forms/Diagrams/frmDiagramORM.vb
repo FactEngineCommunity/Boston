@@ -19,6 +19,8 @@ Public Class frmDiagramORM
     Private zfrmOverview As frmToolboxOverview = New frmToolboxOverview
     Public WithEvents zrPage As FBM.Page = Nothing
 
+    Private mrPopupToolSelector As ORMPopupToolSelector = Nothing
+
     Public zoTreeNode As TreeNode = Nothing 'The TreeNode within the Enterprise viewer from which the Page was launched
     Public zrSpecialDragMode As New tSpecialDragMode
 
@@ -3871,6 +3873,14 @@ Public Class frmDiagramORM
 
             DiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
+#Region "Popup Tools for creating/changing ModelElements on the Page."
+            If Me.mrPopupToolSelector IsNot Nothing And Diagram.GetNodeAt(lo_point) Is Nothing Then
+                Me.Diagram.Nodes.Remove(Me.mrPopupToolSelector.Node)
+                Me.mrPopupToolSelector = Nothing
+            End If
+#End Region
+
+
             '---------------------------------------------------------------------------------------------------------------------
             'RichtClick handling is mostly taken care of in Diagram.NodeSelected
             '---------------------------------------------------------------------
@@ -4825,6 +4835,63 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Public Sub ProcessPopupToolSelector(ByRef arPage As FBM.Page, ByRef asInstructionType As String)
+
+        Dim lsMessage As String
+
+        'CodeSafe 
+        If arPage.SelectedObject.Count = 0 Then Exit Sub
+
+        Dim lrModelElement As FBM.ModelObject = arPage.SelectedObject(0)
+
+        Try
+            Select Case asInstructionType
+                Case Is = "EntityType"
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.EntityTypeInstance)
+
+                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+
+                            Dim lrFactType As FBM.FactType = lrEntityTypeInstance.EntityType.AddBinaryRelationToNEwEntityType(pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance = arPage.DropFactTypeAtPoint(lrFactType, New PointF(lrEntityTypeInstance.ShapeMidPoint.X + 20, lrEntityTypeInstance.ShapeMidPoint.Y), False, True, True, False, True, False, False)
+
+                            Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+
+                    End Select
+
+                Case Is = "ValueType"
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.EntityTypeInstance)
+
+                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+
+                            Dim lrValueType As FBM.ValueType = arPage.Model.CreateValueType("NewValueType", True,,,, True)
+
+                            Dim lrFactType As FBM.FactType = lrEntityTypeInstance.EntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance = arPage.DropFactTypeAtPoint(lrFactType, New PointF(lrEntityTypeInstance.ShapeMidPoint.X + 20, lrEntityTypeInstance.ShapeMidPoint.Y), False, True, True, False, True, False, False)
+
+                            Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+
+                    End Select
+
+
+            End Select
+
+SkipProcessingPopupToolSelector:
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 
     Private Sub Diagram_NodeSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeSelected
 
@@ -4916,6 +4983,50 @@ Public Class frmDiagramORM
                 End Select
 
             End If
+
+#Region "Popup Tool Selector"
+
+            Try
+                If Not My.Computer.Keyboard.ShiftKeyDown Then GoTo SkipPopup
+                'GoTo SkipPopup
+                Dim lrPopupToolSelector = New ORMPopupToolSelector()
+                lrPopupToolSelector.mrCMMLModel = Me.zrPage.Model.UML
+                Dim liX, liY As Integer
+
+                If Me.zrPage.SelectedObject.Count = 0 Then GoTo SkipPopup
+
+                Select Case Me.zrPage.SelectedObject(0).GetType
+                    Case Is = GetType(FBM.EntityTypeInstance)
+                        Dim lrEntitTypeInstance As FBM.EntityTypeInstance = Me.zrPage.SelectedObject(0)
+                        lrPopupToolSelector.msLinkedProcessId = lrEntitTypeInstance.Id
+                        lrPopupToolSelector.Type = lrEntitTypeInstance.ConceptType
+                        liX = lrEntitTypeInstance.X + lrEntitTypeInstance.Shape.Bounds.Width + 5
+                        liY = lrEntitTypeInstance.Y
+                End Select
+                lrPopupToolSelector.moDiagram = Me.Diagram
+                lrPopupToolSelector.mrPage = Me.zrPage
+                lrPopupToolSelector.Tag = lrPopupToolSelector
+                If Me.mrPopupToolSelector IsNot Nothing Then
+                    Me.Diagram.Nodes.Remove(Me.mrPopupToolSelector.Node)
+                End If
+                Me.mrPopupToolSelector = lrPopupToolSelector
+                Dim lrControlNode As New MindFusion.Diagramming.WinForms.ControlNode(Me.DiagramView, lrPopupToolSelector)
+                lrPopupToolSelector.Node = lrControlNode
+                lrPopupToolSelector.Node.SetRect(New RectangleF(liX, liY, 10, 10), False)
+                Me.zrPage.Diagram.Nodes.Add(lrControlNode)
+                Call lrControlNode.Move(liX, liY)
+                lrControlNode.AttachTo(e.Node, AttachToNode.TopCenter)
+                lrPopupToolSelector.AttachedToNode = e.Node
+SkipPopup:
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+#End Region
 
             '------------------------------------------------------
             'Set the ContextMenuStrip menu for the selected item.
@@ -9158,6 +9269,11 @@ Public Class frmDiagramORM
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
 
         Try
+            If Me.mrPopupToolSelector IsNot Nothing Then
+                Me.Diagram.Nodes.Remove(Me.mrPopupToolSelector.Node)
+                Me.mrPopupToolSelector = Nothing
+            End If
+
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
             Call lrEntityTypeInstance.RemoveFromPage(True)

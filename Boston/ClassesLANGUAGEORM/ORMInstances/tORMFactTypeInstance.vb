@@ -3758,6 +3758,8 @@ Namespace FBM
 
                 Call Me.Move(liAverageX, liAverageY, abBroadcastInterfaceEvent)
 
+                Call Me.SortRoleGroup()
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
