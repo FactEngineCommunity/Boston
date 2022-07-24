@@ -1955,7 +1955,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             'CMML
             If abAddCoreElements Then
-                Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
+                Call lrModel.AddCoreERDPGSSTMUMLModelElements(Nothing)
             End If
 
             lrModel.IsDirty = True
@@ -2827,7 +2827,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'RDS
                 If lrModel.HasCoreModel Then
                     Using lrWaitCursor As New WaitCursor
-                        Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+                        Call lrModel.PopulateAllCoreStructuresFromCoreMDAElements()
                     End Using
                 Else
                     '==================================================
@@ -3143,7 +3143,7 @@ Public Class frmToolboxEnterpriseExplorer
             'RDS
             If (lrModel.ModelId <> "Core") And lrModel.HasCoreModel Then
                 Call lrModel.performCoreManagement(False)
-                Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+                Call lrModel.PopulateAllCoreStructuresFromCoreMDAElements()
                 lrModel.RDSCreated = True
             ElseIf (lrModel.ModelId <> "Core") Then
                 '==================================================
@@ -3179,16 +3179,8 @@ Public Class frmToolboxEnterpriseExplorer
                 '==================================================
 
                 Call lrModel.createEntityRelationshipArtifacts()
-                Call lrModel.PopulateRDSStructureFromCoreMDAElements()
+                Call lrModel.PopulateAllCoreStructuresFromCoreMDAElements()
                 lrModel.RDSCreated = True
-
-                '20220129-VM-Commented out.
-                'lfrmFlashCard = New frmFlashCard
-                'lfrmFlashCard.ziIntervalMilliseconds = 3500
-                'lfrmFlashCard.zsText = "Saving model."
-                'lfrmFlashCard.Show(Me)
-                'Boston.WriteToStatusBar("Saving model.", True)
-                'Call lrModel.Save()
             End If
 
             frmMain.Cursor = Cursors.Default
@@ -4767,9 +4759,9 @@ Public Class frmToolboxEnterpriseExplorer
                 '==================================================================
                 'Create the Model
                 Dim lrModel As New FBM.Model(lsModelName, lsModelName)
-                    Call lrModel.AddCoreERDPGSAndSTDModelElements(Nothing)
+                Call lrModel.AddCoreERDPGSSTMUMLModelElements(Nothing)
 
-                    If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
+                If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
                         lrModel.ModelId = System.Guid.NewGuid.ToString
                     End If
 

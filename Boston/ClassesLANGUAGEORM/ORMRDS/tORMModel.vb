@@ -1831,7 +1831,7 @@ Namespace FBM
         ''' 
         ''' </summary>
         ''' <param name="aoBackgroundWorker">To report progress. Start at 80%.</param>
-        Public Sub PopulateRDSStructureFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+        Public Sub PopulateAllCoreStructuresFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Try
                 Me.RDSLoading = True

@@ -9023,6 +9023,7 @@ SkipPopup:
         Me.ToolStripMenuItemAddRole.Enabled = Not lrFactType.IsLinkFactType
         If lrFactTypeInstance.ShowFactTypeName Then Me.ToolStripMenuItemShowFactTypesName.Checked = True
 
+        Me.ToolStripMenuItemShowFactTypesName.Checked = lrFactTypeInstance.ShowFactTypeName
 
         '----------------------------------------------------------------------------------------------
         'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,

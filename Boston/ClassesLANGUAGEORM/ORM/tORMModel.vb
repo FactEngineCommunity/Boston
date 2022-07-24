@@ -5715,17 +5715,12 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 '--------------------------------------
                 For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
 
-                    'Dim larDictionaryEntry = From Entry In Me.ModelDictionary
-                    '                         Where Entry.Symbol = lrDictionaryEntry.Symbol
-                    '                         Select Entry
-
                     Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
                 Next
 
+#Region "Vintage Threading"
                 'Dim liModelPageCount As Integer = 0
-
                 'liModelPageCount = TablePage.GetPageCountByModel(Me.ModelId, False)
-
                 '-----------------------------------------
                 'Wait for MultiThreaded loading of Pages
                 '-----------------------------------------
@@ -5734,16 +5729,22 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 'Loop until all the Pages are loaded
                 '-------------------------------------
                 'End While
+#End Region
 
+#Region "Model Errors"
                 'Me.AllowCheckForErrors = True
                 'Dim lrValidator As New Validation.ModelValidator(Me)
                 'Call lrValidator.CheckForErrors()
+#End Region
 
 
-                If Not {"English", "Core"}.Contains(Me.ModelId) Then 'No need to modify the English or Core models
+                If Not {"English", "Core"}.Contains(Me.ModelId) Then 'Thre is no need to modify the English or Core models
+
                     If Not Me.HasCoreModel Then
-
-                        Call Me.AddCoreERDPGSAndSTDModelElements(aoBackgroundWorker)
+#Region "Has No Core Model"
+                        Call Me.AddCoreERDPGSSTMUMLModelElements(aoBackgroundWorker)
+                        Me.RDSCreated = True
+#End Region
 
                     ElseIf Me.CoreVersionNumber = "1.0" Then
                         '---------------------------------------------------------------------------------------
@@ -5764,6 +5765,11 @@ SkipModelElement: 'Because is not in the ModelDictionary
                         Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
                         Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
 
+                    ElseIf Me.CoreVersionNumber >= "2.3" Then
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                        Me.ContainsLanguage.AddUnique(pcenumLanguage.UMLUseCaseDiagram)
 
                     ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
                         'Nothing to do (at this point), because is the latest version of the Core @ 04/11/2021. See also performCoreManagement (below).
@@ -5777,18 +5783,8 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     Call Me.performCoreManagement()
 
                     '==============================================
-                    'Populate the RDS,STM data structure.
-                    'Dim loRDSThread As System.Threading.Thread
-                    'loRDSThread = New System.Threading.Thread(AddressOf Me.PopulateRDSStructureFromCoreMDAElements)
-                    'loRDSThread.Start()
-                    Me.PopulateRDSStructureFromCoreMDAElements()
-
-                    '20200113-VM-Can't have more han one thread on the ORMQL parser, call from within PopulateRDSStructureFromCoreMDAElements
-                    'Dim loSTMThread As System.Threading.Thread
-                    'loSTMThread = New System.Threading.Thread(AddressOf Me.PopulateSTMStructureFromCoreMDAElements)
-                    'loSTMThread.Start()
-
-                    'Call Me.PopulateRDSStructureFromCoreMDAElements()
+                    'Populate the RDS,STM,CMML data structure.
+                    Me.PopulateAllCoreStructuresFromCoreMDAElements()
 
                 End If
 
@@ -5936,12 +5932,14 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
 
                 '================================================================================================================
-                'RDS
+                'CMML/RDS/STM
                 If (Me.ModelId <> "Core") And Me.HasCoreModel Then
+                    'Has Core Model, perform Core management.
                     Call Me.performCoreManagement()
-                    Call Me.PopulateRDSStructureFromCoreMDAElements(aoBackgroundWorker)
+                    Call Me.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 ElseIf (Me.ModelId <> "Core") Then
+#Region "Has No Core Model"
                     '==================================================
                     'RDS - Create a CMML Page and then dispose of it.
                     Dim lrPage As FBM.Page '(lrModel)
@@ -5966,19 +5964,24 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                     'Derivations
                     lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
-
                     If lrCorePage Is Nothing Then
                         Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
                     End If
-
                     lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the CoreDerivations into the metamodel
+
+                    'UseCaseDiagrams
+                    lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
+                    If lrCorePage Is Nothing Then
+                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
+                    End If
+                    lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the CoreUMLUseCaseDiagram into the metamodel
                     '==================================================
+#End Region
 
                     Call Me.createEntityRelationshipArtifacts()
-                    Call Me.PopulateRDSStructureFromCoreMDAElements(aoBackgroundWorker)
+                    Call Me.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 End If
-
 
                 Me.IsDirty = False
                 '==================================================================================================
@@ -6051,234 +6054,6 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
-
-        End Sub
-
-        Public Sub performCoreManagement(Optional ByVal abSaveModel As Boolean = True)
-
-            Dim lsSQLQuery As String
-
-            If Me.CoreVersionNumber = "" Then
-#Region " '' CoreVesionNumber"
-                'Entity Relationship Diagrams / Property Graph Schema
-                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
-                End If
-                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
-
-                'StateTransitions
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-                End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
-                Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-
-                'CoreDerivations
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
-                End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-
-#Region "Core BPMN"
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
-                End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-#End Region
-
-#Region "Core UML Use Case Diagram"
-                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
-                End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-#End Region
-
-                Me.CoreVersionNumber = "2.3"
-                Me.MakeDirty(False, False)
-                If abSaveModel Then Call Me.Save()
-#End Region
-            ElseIf Me.CoreVersionNumber = "2.0" Then
-#Region "2.0"
-                'NB Tightly coupled to the v5.5 release of Boston.
-                'NB Must upgrade to v2.1 Core, at least nominally, because new model elements are created/copied when the user creates a STD Page.
-                '  No need to create/modify the model elements here...just need to remove the old ones.
-                'STM (State Transition Model) totally changed.
-
-                If Me.GetModelObjectByName("CoreValueTypeHasFinishCoreElementState") IsNot Nothing Then
-                    lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasFinishCoreElementState"
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                If Me.GetModelObjectByName("CoreValueTypeHasStartCoreElementState") IsNot Nothing Then
-                    lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeHasStartCoreElementState"
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                If Me.GetModelObjectByName("CoreValueTypeIsSubtypeStateControlled") IsNot Nothing Then
-                    lsSQLQuery = "REMOVE MODELELEMENT CoreValueTypeIsSubtypeStateControlled"
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                If Me.GetModelObjectByName("CoreStateTransitionIsForValueType") IsNot Nothing Then
-                    lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransitionIsForValueType"
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                If Me.GetModelObjectByName("CoreStateTransition") IsNot Nothing Then
-                    lsSQLQuery = "REMOVE MODELELEMENT CoreStateTransition"
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
-
-                'Upgrade to CoreVersionNumber, v2.1
-                Me.CoreVersionNumber = "2.1"
-
-                If abSaveModel Then Call TableModel.update_model(Me)
-
-                '==================================================
-                'CMML. STM - (State Transition Model). Create a CMML Page and then dispose of it.                
-                'For StateTransitionDiagrams
-                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-                End If
-
-                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
-                Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-#End Region
-            ElseIf Me.CoreVersionNumber = "2.1" Then
-#Region "2.1"
-                'CodeSafe
-                If Me.GetModelObjectByName(pcenumCMMLRelations.CoreValueTypeHasState.ToString) Is Nothing Then
-                    Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                    If lrCorePage Is Nothing Then
-                        Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-                    End If
-
-                    Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
-                    Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-                End If
-#End Region
-            End If
-
-#Region "2.1"
-            If Me.CoreVersionNumber = "2.1" Then
-                Dim lrFactType As FBM.FactType = Me.GetModelObjectByName("CoreERDAttribute")
-                If lrFactType.InternalUniquenessConstraint(0).Role.Count = 1 Then
-
-                    Dim lsSQLCommand = "EXTEND ROLECONSTRAINT CoreInternalUniquenessConstraint16 WITH ROLE JOINING CoreEntity IN FACTTYPE CoreERDAttribute"
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLCommand)
-                End If
-                Me.CoreVersionNumber = "2.2"
-                If abSaveModel Then Call Me.Save()
-            End If
-#End Region
-
-#Region "2.2"
-            If Me.CoreVersionNumber = "2.2" Then
-
-                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
-
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
-                End If
-
-                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-
-                Me.CoreVersionNumber = "2.3"
-                Me.MakeDirty(False, False)
-                If abSaveModel Then Call Me.Save()
-            End If
-#End Region
-
-#Region "2.3"
-            If Me.CoreVersionNumber = "2.3" Then
-                'NB Check EnterpriseExplorer createModel as well. Line 1828
-                '#Region "Core BPMN"
-                '                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
-                '                If lrCorePage Is Nothing Then
-                '                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
-                '                End If
-                '                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-                '#End Region
-
-#Region "Core UML Use Case Diagram"
-                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
-                If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
-                End If
-                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
-#End Region
-                Me.CoreVersionNumber = "2.4"
-                Me.MakeDirty(False, False)
-                If abSaveModel Then Call Me.Save()
-            End If
-#End Region
-
-        End Sub
-
-        Public Sub AddCoreERDPGSAndSTDModelElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
-
-            Dim lfrmFlashCard As New frmFlashCard
-            lfrmFlashCard.ziIntervalMilliseconds = 2600
-            lfrmFlashCard.BackColor = Color.LightGray
-            Dim lsMessage As String = ""
-            lsMessage = "Adding core data structure."
-            lfrmFlashCard.zsText = lsMessage
-            Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(frmMain)
-
-            '==================================================
-            'RDS - Create a CMML Page and then dispose of it.
-            Dim lrPage As FBM.Page
-            Dim lrCorePage As FBM.Page
-
-            'Now for ERDs/PGSs which have the same basic metamodel
-            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-            If lrCorePage Is Nothing Then
-                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
-            End If
-            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the EntityRelationshipDiagram into the core metamodel.
-
-            'Now for CoreDerivations
-            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
-            If lrCorePage Is Nothing Then
-                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
-            End If
-            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.
-
-            'Now for StateTransitionDiagrams
-            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
-            If lrCorePage Is Nothing Then
-                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
-            End If
-            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.
-            '==================================================
-
-            '----------------------------------------------------------------------------------------
-            'Populate the Facts/FactData within the ERD/PGS Model Element metamodel Model Elements.
-            Call Me.createEntityRelationshipArtifacts(aoBackgroundWorker)
-
-            Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-            Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
-            Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-
-            '------------------------------------------------------------------
-            'Set the CoreVersionNumber
-            Me.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
-            Call TableModel.update_model(Me)
-
-
-            'lfrmFlashCard = New frmFlashCard
-            'lfrmFlashCard.ziIntervalMilliseconds = 3000
-            'lfrmFlashCard.BackColor = Color.LightGray
-            'lfrmFlashCard.zsText = "Your model is ready for Entity Relationship Diagrams and Property Graph Schemas."
-            'liDialogResult = lfrmFlashCard.ShowDialog(frmMain)
 
         End Sub
 
