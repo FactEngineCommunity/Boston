@@ -1054,7 +1054,7 @@ Namespace FBM
                 End If
 
                 For Each lrRoleInstance In Me.RoleGroup
-                    lrRoleInstance.Shape.Visible = Me.Visible
+                    lrRoleInstance.Shape.Detach()
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
                 Next
 

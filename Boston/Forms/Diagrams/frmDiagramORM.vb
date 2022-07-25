@@ -2974,6 +2974,15 @@ Public Class frmDiagramORM
                 Case Is = pcenumConceptType.FactTable
                     Call e.Node.Tag.GetFactsFromTableNode()
                     e.Node.Tag.ResetBlackCellText()
+                Case Is = pcenumConceptType.FactType
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance = e.Node.Tag
+                    Call lrFactTypeInstance.NodeDeselected()
+                    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+                        Call lrRoleInstance.NodeDeselected()
+                    Next
+                Case Is = pcenumConceptType.RoleConstraintRole
+                    Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance = e.Node.Tag
+                    Call lrRoleConstraintRoleInstance.Role.NodeDeselected()
                 Case Is = pcenumConceptType.Role
                     If Not (Control.ModifierKeys = Keys.Control) Then
                         Call e.Node.Tag.NodeDeselected()
@@ -4949,6 +4958,7 @@ SkipProcessingPopupToolSelector:
                             Me.zrPage.SelectedObject.AddUnique(lrRoleInstance.FactType)
                             lrRoleInstance.FactType.Shape.Selected = True
                             lrRoleInstance.Shape.Selected = True
+                            Call lrRoleInstance.NodeSelected()
                         End If
                     Case Is = pcenumConceptType.RoleName
                         Dim lrRoleNameInstance As FBM.RoleName = CType(e.Node.Tag, FBM.RoleName)

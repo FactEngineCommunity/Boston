@@ -24,7 +24,7 @@ Public Class frmToolboxORMReadingEditor
     '----------------------------------------------------
     'Intellisense
     '----------------------------------------------------
-    Private AutoComplete As frmAutoComplete
+    Public AutoComplete As frmAutoComplete
     Public zsIntellisenseBuffer As String = ""
 
     Public WithEvents zrFactType As FBM.FactType
@@ -1071,12 +1071,19 @@ Public Class frmToolboxORMReadingEditor
         End If
         Me.AutoComplete.ListBox.Items.Clear()
 
-        If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
-            If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+        Dim lrLastToken As FTR.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
+
+        If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Or (lrLastToken = FTR.TokenType.EOF) Then
+
+            If lrLastToken = FTR.TokenType.EOF Then
+                liTokenType = FTR.TokenType.EOF
+                GoTo ProcessToken
+            ElseIf Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
                 lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
             Else
                 lsExpectedToken = Me.zrTextHighlighter.Tree.Optionals(0).ExpectedToken
             End If
+
             If lsExpectedToken <> "" Then
                 liTokenType = DirectCast([Enum].Parse(GetType(FTR.TokenType), lsExpectedToken), FTR.TokenType)
                 'MsgBox("Expecting: " & Me.zrScanner.Patterns(liTokenType).ToString)
@@ -1086,6 +1093,7 @@ Public Class frmToolboxORMReadingEditor
                 Call Me.PopulateEnterpriseAwareFromOptionals(Me.zrTextHighlighter.Tree.Optionals)
             End If
 
+ProcessToken:
             Select Case liTokenType
                 Case Is = FTR.TokenType._NONE_
                     Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
@@ -1102,7 +1110,7 @@ Public Class frmToolboxORMReadingEditor
                 Case Is = FTR.TokenType.PREDICATEPART
                     'Don't add anything
                 Case Is = FTR.TokenType.EOF
-                    'Don't add anything
+                    Call Me.PopulateEnterpriseAwareWithObjectTypes()
                 Case Is = FTR.TokenType.PREDICATESPACE
                     Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                 Case Is = FTR.TokenType.MODELELEMENTNAME
@@ -1634,4 +1642,5 @@ Public Class frmToolboxORMReadingEditor
         End If
 
     End Sub
+
 End Class

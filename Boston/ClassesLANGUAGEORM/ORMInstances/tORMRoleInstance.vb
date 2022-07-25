@@ -1394,6 +1394,17 @@ Namespace FBM
 
         Public Sub NodeSelected() Implements iPageObject.NodeSelected
 
+            Try
+                Me.Shape.Pen.Width = 0.5
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
         End Sub
 
         Public Sub ValidateAnchorPoint() Implements iRolePageObject.ValidateAnchorPoint
@@ -1402,6 +1413,7 @@ Namespace FBM
 
         Public Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
 
+            Me.Shape.Pen.Width = 0.1
             Call Me.SetAppropriateColour()
 
         End Sub

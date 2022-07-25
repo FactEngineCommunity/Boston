@@ -427,4 +427,11 @@ Public Class frmAutoComplete
 
         End Try
     End Sub
+
+    Private Sub frmAutoComplete_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
+
+        Me.Hide()
+
+    End Sub
+
 End Class

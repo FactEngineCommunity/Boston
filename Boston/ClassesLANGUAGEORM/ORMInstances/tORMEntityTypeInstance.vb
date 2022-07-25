@@ -2761,13 +2761,16 @@ MoveOn:
 
                             Dim lrObject As Object
                             lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
+                            If lrObject Is Nothing Then
+                                lrObject = lrRoleInstance.JoinedORMObject
+                            End If
 
-                            If lrObject IsNot Me Then
-                                liX = (Me.X + lrObject.X) / 2
+                            'If lrObject IsNot Me Then
+                            liX = (Me.X + lrObject.X) / 2
                                 liY = (Me.Y + lrObject.Y) / 2
 
                                 lrFactTypeInstance.Move(liX, liY, abBroadcastInterfaceEvent)
-                            End If
+                            'End If
                         End If
                     End If
                 Next

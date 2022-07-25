@@ -228,6 +228,13 @@ Public Class frmToolboxBrainBox
     Private Sub TextBox_Input_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBoxInput.GotFocus
 
         Try
+            'Not elegant, but hide the AutoComplete form in the ORMReadingEditor (in case it is open).
+            Dim lfrmORMReadingEditor As frmToolboxORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+            If lfrmORMReadingEditor IsNot Nothing Then
+                Call lfrmORMReadingEditor.AutoComplete.Hide()
+            End If
+
+
             Select Case prApplication.Brain.ThoughtMode
                 Case Is = pcenumBrainMode.ORMQL
                     If Trim(Replace(Me.TextBoxInput.Text, "ORMQL:", "")).Length = 0 Then
@@ -471,7 +478,13 @@ Public Class frmToolboxBrainBox
 
                     Me.zsIntellisenseBuffer = ""
                 Case Else
-                    zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
+                    Try
+                        zsIntellisenseBuffer = Me.TextBoxInput.Text.ToString.AppendString(LCase(e.KeyCode.ToString)).Split(" ").Last().ToLower
+                    Catch ex As Exception
+                        zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
+                    End Try
+
+
             End Select
 
         Catch ex As Exception
@@ -1175,8 +1188,14 @@ Public Class frmToolboxBrainBox
             Me.AutoComplete.Hide()
             Me.AutoComplete.ListBox.Items.Clear()
 
-            If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
-                If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+            Dim lrLastToken As VAQL.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
+
+            If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Or (lrLastToken = VAQL.TokenType.EOF) Then
+
+                If lrLastToken = VAQL.TokenType.EOF Then
+                    liTokenType = VAQL.TokenType.EOF
+                    GoTo ProcessToken
+                ElseIf Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
                     lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
                 Else
                     lsExpectedToken = Me.zrTextHighlighter.Tree.Optionals(0).ExpectedToken
@@ -1190,6 +1209,7 @@ Public Class frmToolboxBrainBox
                     Call Me.PopulateEnterpriseAwareFromOptionals(Me.zrTextHighlighter.Tree.Optionals)
                 End If
 
+ProcessToken:
                 Select Case liTokenType
                     Case Is = VAQL.TokenType.BROPEN
                         Me.AutoComplete.Enabled = True
@@ -1201,9 +1221,9 @@ Public Class frmToolboxBrainBox
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = VAQL.TokenType.BASEPRODUCTION
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                    Case Is = VAQL.TokenType.PREBOUNDREADINGTEXT, _
-                              VAQL.TokenType.POSTBOUNDREADINGTEXT, _
-                              VAQL.TokenType.FOLLOWINGREADINGTEXT, _
+                    Case Is = VAQL.TokenType.PREBOUNDREADINGTEXT,
+                              VAQL.TokenType.POSTBOUNDREADINGTEXT,
+                              VAQL.TokenType.FOLLOWINGREADINGTEXT,
                               VAQL.TokenType.FRONTREADINGTEXT
                         'Don't add anything 
                     Case Is = VAQL.TokenType.REFERENCEMODE
@@ -1213,7 +1233,7 @@ Public Class frmToolboxBrainBox
                     Case Is = VAQL.TokenType.NUMBER
                         'Don't add anything
                     Case Is = VAQL.TokenType.EOF
-                        'Don't add anything
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
                     Case Is = VAQL.TokenType.PREDICATESPACE
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = VAQL.TokenType.SPACE
@@ -1249,7 +1269,7 @@ Public Class frmToolboxBrainBox
                         Case Is = VAQL.TokenType.MODELELEMENTNAME, VAQL.TokenType.PREBOUNDREADINGTEXT
                             Me.AutoComplete.Enabled = True
                             Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
-                        Case Is = VAQL.TokenType.PREDICATEPART, _
+                        Case Is = VAQL.TokenType.PREDICATEPART,
                                   VAQL.TokenType.PREDICATESPACE
                             Me.AutoComplete.Enabled = True
                             'Call Me.AddFactTypePredicatePartsToEnterpriseAware()
