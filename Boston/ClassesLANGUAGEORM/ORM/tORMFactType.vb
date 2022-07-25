@@ -3561,6 +3561,39 @@ Namespace FBM
 
         End Function
 
+        Public Overrides Function getSubtypes(Optional ByVal abPrimarySubtypeRelationshipsOnly As Boolean = False) As List(Of FBM.ModelObject)
+
+            Try
+                Dim larModelElement As List(Of FBM.ModelObject)
+
+                If abPrimarySubtypeRelationshipsOnly Then
+                    larModelElement = (From EntityType In Me.Model.EntityType
+                                       From SubtypeRelationship In EntityType.SubtypeRelationship
+                                       Where SubtypeRelationship.parentModelElement.Id = Me.Id
+                                       Where SubtypeRelationship.IsPrimarySubtypeRelationship = True
+                                       Select SubtypeRelationship.ModelElement).ToList
+                Else
+                    larModelElement = (From EntityType In Me.Model.EntityType
+                                       From SubtypeRelationship In EntityType.SubtypeRelationship
+                                       Where SubtypeRelationship.parentModelElement.Id = Me.Id
+                                       Select SubtypeRelationship.ModelElement).ToList
+                End If
+
+                Return larModelElement
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of FBM.ModelObject)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Returns the TableName that a FactType belongs to when converting an ORMDiagram to a RelationalModel
         ''' </summary>

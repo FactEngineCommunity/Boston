@@ -3617,19 +3617,19 @@ Namespace FBM
                 For Each lrEntityTypeInstance In larEntityTypeInstance
 
                     If (Me.X - lrEntityTypeInstance.X > 0) And (Math.Abs(Me.X - lrEntityTypeInstance.X) < liRepellDistance) Then
-                        liNewX = lrEntityTypeInstance.X - 1
+                        liNewX = lrEntityTypeInstance.X - Boston.RandomInteger(1, 2)
                     Else
-                        liNewX = lrEntityTypeInstance.X + 1
+                        liNewX = lrEntityTypeInstance.X + Boston.RandomInteger(1, 2)
                     End If
 
                     If Me.Y - lrEntityTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrEntityTypeInstance.Y) < liRepellDistance) Then
-                        liNewY = lrEntityTypeInstance.Y - 1
+                        liNewY = lrEntityTypeInstance.Y - Boston.RandomInteger(1, 2)
                     Else
-                        liNewY = lrEntityTypeInstance.Y + 1
+                        liNewY = lrEntityTypeInstance.Y + Boston.RandomInteger(1, 2)
                     End If
 
                     lrEntityTypeInstance.Move(liNewX, liNewY, True)
-                    Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
 
                 Next
 
@@ -3653,7 +3653,7 @@ Namespace FBM
                     End If
 
                     lrValueTypeInstance.Move(liNewX, liNewY, True)
-                    Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
                 Next
 
                 '=========================================================
@@ -3668,19 +3668,19 @@ Namespace FBM
 
                 For Each lrFactTypeInstance In larFactTypeInstance
                     If (Me.X - lrFactTypeInstance.X > 0) And (Math.Abs(Me.X - lrFactTypeInstance.X) < liRepellDistance) Then
-                        liNewX = lrFactTypeInstance.X - 1
+                        liNewX = lrFactTypeInstance.X - Boston.RandomInteger(1, 2)
                     Else
-                        liNewX = lrFactTypeInstance.X + 1
+                        liNewX = lrFactTypeInstance.X + Boston.RandomInteger(1, 2)
                     End If
 
                     If Me.Y - lrFactTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrFactTypeInstance.Y) < liRepellDistance) Then
-                        liNewY = lrFactTypeInstance.Y - 1
+                        liNewY = lrFactTypeInstance.Y - Boston.RandomInteger(1, 2)
                     Else
-                        liNewY = lrFactTypeInstance.Y + 1
+                        liNewY = lrFactTypeInstance.Y + Boston.RandomInteger(1, 2)
                     End If
 
                     lrFactTypeInstance.Move(liNewX, liNewY, True)
-                    Call lrFactTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    Call lrFactTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
                 Next
 
             Catch ex As Exception

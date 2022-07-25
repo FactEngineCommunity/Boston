@@ -1225,7 +1225,7 @@ RemoveAnyway:
                 End If
 
                 lrEntityTypeInstance.Move(liNewX, liNewY, True)
-                Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
 
             Next
 
@@ -1250,7 +1250,7 @@ RemoveAnyway:
                 End If
 
                 lrValueTypeInstance.Move(liNewX, liNewY, True)
-                Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
             Next
         End Sub
 

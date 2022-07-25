@@ -50,6 +50,9 @@ Public Class frmCRUDBostonConfiguration
         Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
         Me.CheckBoxShowStackTrace.Checked = My.Settings.BostonErrorMessagesShowStackTrace
 
+        'Import/Export
+        Me.CheckBoxExportSuppressMDAModelElements.Checked = My.Settings.ExportFBMExcludeMDAModelElements
+
         '---------------------------------------------------------
         'Virtual Analyst
         '-----------------
@@ -146,6 +149,9 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.DatabaseConnectionString = Me.TextBoxDatabaseConnectionString.Text
                 My.Settings.DisplayBrianaVirtualAnalyst = Me.CheckBoxVirtualAnalystDisplayBriana.Checked
                 My.Settings.StartVirtualAnalystInQuietMode = Me.CheckBoxStartVirtualAnalystInQuietMode.Checked
+
+                'Import/Export
+                My.Settings.ExportFBMExcludeMDAModelElements = Me.CheckBoxExportSuppressMDAModelElements.Checked
 
                 'Error messages
                 My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked

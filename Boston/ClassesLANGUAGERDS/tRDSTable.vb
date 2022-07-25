@@ -396,6 +396,7 @@ Namespace RDS
                                   Optional abProcessCMML As Boolean = True) As Boolean
 
             Try
+
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
                 arColumn.Table = Me 'CodeSafe
 
@@ -1572,7 +1573,7 @@ Namespace RDS
                     '  E.g. If changing a Subtype EntityType to Not IsAbsorbed, a Column may be moved from a
                     '  Supertype to that Subtype, so do not want to remove the CMML.
                     Call Me.Model.Model.removeCMMLAttribute(arColumn.Table.Name, arColumn.Id)
-                Else
+                ElseIf arColumn.Table Is Me Then
                     Call Me.Model.Model.removeCMMLAttributeFromTableOnly(arColumn, Me)
                 End If
 

@@ -88,10 +88,12 @@ Partial Class frmCRUDBostonConfiguration
         Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
         Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.CheckBoxUseDefaultReferenceMode = New System.Windows.Forms.CheckBox()
-        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.TabPage8 = New System.Windows.Forms.TabPage()
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
+        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.GroupBoxImportExport = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxExportSuppressMDAModelElements = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -113,9 +115,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.SuspendLayout()
         Me.TabPage7.SuspendLayout()
         Me.GroupBoxModelling.SuspendLayout()
-        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage8.SuspendLayout()
         Me.GroupBoxCodeGeneration.SuspendLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBoxImportExport.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -677,6 +680,7 @@ Partial Class frmCRUDBostonConfiguration
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.AutoSize = True
+        Me.GroupBox4.Controls.Add(Me.GroupBoxImportExport)
         Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyReportErrorEvents)
         Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyCheckForUpdates)
         Me.GroupBox4.Controls.Add(Me.ButtonReplaceCoreMetamodel)
@@ -790,10 +794,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxUseDefaultReferenceMode.Text = "Use default &Reference Mode for new Entity Types"
         Me.CheckBoxUseDefaultReferenceMode.UseVisualStyleBackColor = True
         '
-        'ErrorProvider
-        '
-        Me.ErrorProvider.ContainerControl = Me
-        '
         'TabPage8
         '
         Me.TabPage8.Controls.Add(Me.GroupBoxCodeGeneration)
@@ -822,6 +822,30 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.TabIndex = 0
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Text = "Use square brackets around table names"
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.UseVisualStyleBackColor = True
+        '
+        'ErrorProvider
+        '
+        Me.ErrorProvider.ContainerControl = Me
+        '
+        'GroupBoxImportExport
+        '
+        Me.GroupBoxImportExport.Controls.Add(Me.CheckBoxExportSuppressMDAModelElements)
+        Me.GroupBoxImportExport.Location = New System.Drawing.Point(12, 155)
+        Me.GroupBoxImportExport.Name = "GroupBoxImportExport"
+        Me.GroupBoxImportExport.Size = New System.Drawing.Size(559, 70)
+        Me.GroupBoxImportExport.TabIndex = 5
+        Me.GroupBoxImportExport.TabStop = False
+        Me.GroupBoxImportExport.Text = "Import/Export"
+        '
+        'CheckBoxExportSuppressMDAModelElements
+        '
+        Me.CheckBoxExportSuppressMDAModelElements.AutoSize = True
+        Me.CheckBoxExportSuppressMDAModelElements.Location = New System.Drawing.Point(6, 28)
+        Me.CheckBoxExportSuppressMDAModelElements.Name = "CheckBoxExportSuppressMDAModelElements"
+        Me.CheckBoxExportSuppressMDAModelElements.Size = New System.Drawing.Size(331, 17)
+        Me.CheckBoxExportSuppressMDAModelElements.TabIndex = 0
+        Me.CheckBoxExportSuppressMDAModelElements.Text = "Fact Based model (.fbm) Export - Suppress MDA Model Elements"
+        Me.CheckBoxExportSuppressMDAModelElements.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -869,10 +893,12 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage7.ResumeLayout(False)
         Me.GroupBoxModelling.ResumeLayout(False)
         Me.GroupBoxModelling.PerformLayout()
-        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage8.ResumeLayout(False)
         Me.GroupBoxCodeGeneration.ResumeLayout(False)
         Me.GroupBoxCodeGeneration.PerformLayout()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBoxImportExport.ResumeLayout(False)
+        Me.GroupBoxImportExport.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -945,4 +971,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents TabPage8 As TabPage
     Friend WithEvents GroupBoxCodeGeneration As GroupBox
     Friend WithEvents CheckBoxCodeGenerationUseSquareBracketsTableNames As CheckBox
+    Friend WithEvents GroupBoxImportExport As GroupBox
+    Friend WithEvents CheckBoxExportSuppressMDAModelElements As CheckBox
 End Class

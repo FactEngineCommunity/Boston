@@ -691,7 +691,11 @@ Namespace FBM
             Dim liDegrees As Integer = 315
 
             Try
+                Dim larLink As New List(Of DiagramLink)
                 For Each lrLink In Me.Shape.IncomingLinks
+                    larLink.Add(lrLink)
+                Next
+                For Each lrLink In larLink 'Me.Shape.IncomingLinks
                     Dim lrFactTypeInstance As FBM.FactTypeInstance
 
                     If lrLink.Tag.ConceptType = pcenumConceptType.Role Then
@@ -725,21 +729,22 @@ Namespace FBM
                             If lrFactTypeInstance.IsBinaryFactType Then
                                 Dim lrObject As Object
                                 lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
-                                If Not lrObject.HasBeenMoved Then
-                                    liX = Viev.Greater(40, Me.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 80)
-                                    liY = Viev.Greater(40, Me.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 80)
-                                    lrObject.Shape.Move(liX, liY)
-                                    lrObject.HasBeenMoved = True
-                                    If (lrObject.ConceptType = pcenumConceptType.EntityType) Then
+                                If lrObject IsNot Nothing Then
+                                    If Not lrObject.HasBeenMoved Then
+                                        liX = Viev.Greater(40, Me.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 80)
+                                        liY = Viev.Greater(40, Me.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 80)
+                                        lrObject.Shape.Move(liX, liY)
+                                        lrObject.HasBeenMoved = True
+                                        If (lrObject.ConceptType = pcenumConceptType.EntityType) Then
 
-                                        Dim lrChildEntityTypeInstance As FBM.EntityTypeInstance
-                                        lrChildEntityTypeInstance = lrObject
+                                            Dim lrChildEntityTypeInstance As FBM.EntityTypeInstance
+                                            lrChildEntityTypeInstance = lrObject
 
-                                        Call lrChildEntityTypeInstance.AutoLayout()
+                                            Call lrChildEntityTypeInstance.AutoLayout()
 
+                                        End If
                                     End If
                                 End If
-
                             End If
                         End If 'abJustThisModelObject
                         lrFactTypeInstance.SortRoleGroup()
@@ -2879,7 +2884,7 @@ MoveOn:
                     End If
 
                     Call lrEntityTypeInstance.Move(liNewX, liNewY, True)
-                    Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    Call lrEntityTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
 
                 Next
 
@@ -2903,7 +2908,7 @@ MoveOn:
                     End If
 
                     lrValueTypeInstance.Move(liNewX, liNewY, True)
-                    Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    Call lrValueTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
                 Next
 
                 If Me.Shape IsNot Nothing Then
@@ -2922,19 +2927,19 @@ MoveOn:
 
                 For Each lrFactTypeInstance In larFactTypeInstance
                     If (Me.X - lrFactTypeInstance.X > 0) And (Math.Abs(Me.X - lrFactTypeInstance.X) < liRepellDistance) Then
-                        liNewX = lrFactTypeInstance.X - 1
+                        liNewX = lrFactTypeInstance.X - Boston.RandomInteger(1, 2)
                     Else
-                        liNewX = lrFactTypeInstance.X + 1
+                        liNewX = lrFactTypeInstance.X + Boston.RandomInteger(1, 2)
                     End If
 
                     If Me.Y - lrFactTypeInstance.Y > 0 And (Math.Abs(Me.Y - lrFactTypeInstance.Y) < liRepellDistance) Then
-                        liNewY = lrFactTypeInstance.Y - 1
+                        liNewY = lrFactTypeInstance.Y - Boston.RandomInteger(1, 2)
                     Else
-                        liNewY = lrFactTypeInstance.Y + 1
+                        liNewY = lrFactTypeInstance.Y + Boston.RandomInteger(1, 2)
                     End If
 
                     lrFactTypeInstance.Move(liNewX, liNewY, True)
-                    Call lrFactTypeInstance.RepellNeighbouringPageObjects(aiDepth)
+                    Call lrFactTypeInstance.RepellNeighbouringPageObjects(aiDepth + 1)
                 Next
 
             Catch ex As Exception
@@ -3182,7 +3187,9 @@ MoveOn:
                             Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
                                                                   Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(Me.ShapeMidPoint.X - ModelElementInstance.X) ^ 2 + Math.Abs(Me.ShapeMidPoint.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
 
-                            lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                            If larClosestModelElementInstance.Count > 0 Then
+                                lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                            End If
                             Me.Page.Diagram.Invalidate()
                         End If
                     End If

@@ -563,12 +563,16 @@ Namespace RDS
                     If Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
                         If Me.OriginColumns.Count > 0 Then
                             'Should get this far
-                            If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
+
+                            Dim lrOriginalColumn As RDS.Column = Me.OriginColumns(0)
+                            Dim lrActualTable As RDS.Table = lrOriginalColumn.Table
+
+                            If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing And (lrActualTable.Name = Me.OriginTable.Name) Then
                                 'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
-                                Dim lrOriginalColumn As RDS.Column = Me.OriginColumns(0)
+
                                 Call Me.RemoveOriginColumn(lrOriginalColumn)
                                 For Each lrColumn In arIndex.Column
-                                    Dim lrNewColumn As New RDS.Column(Me.OriginTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
+                                    Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
                                     Call Me.OriginTable.addColumn(lrNewColumn)
                                     lrNewColumn.Relation.Add(Me)
                                     Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)

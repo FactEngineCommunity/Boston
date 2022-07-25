@@ -452,7 +452,6 @@ Namespace NORMA
                         'Call Me.LoadRoleConstraintInternalUniquenessConstraint(arModel, arNORMAXMLDOC, lsPreferredIdentifierId)
 
                     End If
-
                 Next
 
                 '-----------------------------------------------------
@@ -497,6 +496,7 @@ Namespace NORMA
                                             prApplication.ThrowErrorMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
                                             GoTo SkippedSubtypeRelationship
                                         End If
+
                                 End Select
 
                             End If
@@ -514,6 +514,25 @@ Namespace NORMA
                             Catch ex As Exception
                                 lrSubtypeRelationship.IsPrimarySubtypeRelationship = False
                             End Try
+
+                            '202207250725-Vm-Keep may need. SHould by solved by RDS however
+                            If lrSubtypeRelationship.IsPrimarySubtypeRelationship And lrSubtypeRelationship.parentModelElement.GetType = GetType(FBM.EntityType) Then
+                                'Special Case - EntityType subtype of FactType, which provides ReferenceScheme
+                                Dim lrParentEntityType As FBM.EntityType = lrSubtypeRelationship.parentModelElement
+                                Dim lrTable As RDS.Table = lrParentEntityType.getCorrespondingRDSTable
+
+                                If Not lrSubtypeRelationship.parentModelElement.IsObjectifyingEntityType Then GoTo SkipAddingSupertypeColumns
+                                '20220725-VM-Don't really need this, the columns were already there.
+                                'Dim lrSubtypeTable = lrEntityType.getCorrespondingRDSTable
+
+                                'Dim lrColumnAdded As RDS.Column
+                                'For Each lrColumn In lrTable.Column
+                                '    lrColumnAdded = lrColumn.Clone(lrTable, Nothing, True)
+                                '    Call lrSubtypeTable.addColumn(lrColumnAdded)
+                                'Next
+
+SkipAddingSupertypeColumns:
+                            End If
 SkippedSubtypeRelationship:
                         Next
                     End If

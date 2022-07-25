@@ -1930,7 +1930,8 @@ Namespace FBM
                                     lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Role.Id = lrResponsibleRole.Id)
                                 End If
 
-                                Dim lrNewColumn = lrSupertypeColumn.Clone(lrTable, Nothing, True)
+                                Dim lrDummyTable As RDS.Table = lrTable
+                                Dim lrNewColumn = lrSupertypeColumn.Clone(lrDummyTable, Nothing, True)
 
                                 Dim lrExistingColumn = lrTable.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
                                 If lrExistingColumn Is Nothing Then
