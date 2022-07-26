@@ -2645,6 +2645,8 @@ SkipORMReadingEditor:
 
     Private Sub Diagram_LinkSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkSelected
 
+        Dim lsMessage As String = ""
+
         Try
             Dim lrERDLink As ERD.Link
 
@@ -2661,6 +2663,18 @@ SkipORMReadingEditor:
             '20200902-This obviously should not be the case, but it is a worse customer experience if null/nothing exceptions are thrown.
             If lrERDLink.Relation.RDSRelation Is Nothing Then Exit Sub
 
+
+            If lrERDLink.Relation.RDSRelation.DestinationColumns.Count <> lrERDLink.Relation.RDSRelation.OriginColumns.Count Then
+
+                lsMessage = "Relation doesn't have the same number of Columns in its Origin as Destination. Fixing it."
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+
+                Call Me.zrPage.Model.FixErrors(New List(Of pcenumModelFixType) From {pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount}, lrERDLink.Relation.RDSRelation)
+
+                Dim lrOriginEntity As ERD.Entity = lrERDLink.Link.Origin.Tag
+                Call lrOriginEntity.RefreshShape()
+            End If
+
             '-----------------------------------------------------------------------------------
             'Highlight the Attributes of the Relation
             Dim lrAttribute As ERD.Attribute
@@ -2668,7 +2682,8 @@ SkipORMReadingEditor:
                 'CodeSafe: Remove Attributes with no columns
                 Me.zrPage.ERDiagram.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
 
-                lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrOriginColumn.Id)
+                'Origin Attribute - LightGrey
+                lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrOriginColumn.Id And x.Entity.Name = lrERDLink.Relation.RDSRelation.OriginTable.Name)
                 Try
                     lrAttribute.Cell.TextColor = Color.White
                     lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)

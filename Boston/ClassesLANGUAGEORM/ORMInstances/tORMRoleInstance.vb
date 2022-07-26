@@ -50,6 +50,11 @@ Namespace FBM
                         Return pcenumRoleJoinType.EntityType
                     Case Is = pcenumConceptType.FactType
                         Return pcenumRoleJoinType.FactType
+                    Case Else
+                        Dim lsMessage As String = "RoleInstance.TypeOfJoin"
+                        lsMessage.AppendDoubleLineBreak("Role Instance on Fact Type," & Me.FactType.Id & ", joined to an unusual Model Element Type (i.e. Not Value Type, Entity Type or Fact Type")
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                        Return pcenumRoleJoinType.None
                 End Select
             End Get
         End Property
@@ -488,57 +493,70 @@ Namespace FBM
 
             BelongsToTable = Nothing
 
-            If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
-                'Rule 3 and part of 1
-                BelongsToTable = Me.FactType.Name
-                Exit Function
-            ElseIf Me.FactType.HasPartialButMultiRoleConstraint Then
-                'Rule 1
-                BelongsToTable = Me.FactType.Name
-                Exit Function
-            ElseIf Me.FactType.IsUnaryFactType Then
-                If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
-                    'Then role joins to entity
-                    BelongsToTable = Me.JoinsEntityType.Name
-                    Exit Function
-                ElseIf Me.TypeOfJoin = pcenumRoleJoinType.FactType Then
-                    BelongsToTable = Me.JoinsFactType.Name
-                End If
-            ElseIf Me.FactType.IsBinaryFactType Then
-                'Rules 2 and 4
-                'For ind = 1 To role_count
-                Select Case Me.TypeOfJoin
-                    Case Is = pcenumRoleJoinType.EntityType
-                        'Role joins to entity
-                        If Me.FactType.Is1To1BinaryFactType Then
-                            'Is 1:1 binary fact type
-                            'If Me.Mandatory = True Then
-                            If Me.FactType.TypeOfBinaryFactType = 1 Then
-                                'Part 1 of Rule 4
-                                BelongsToTable = Me.JoinsEntityType.Name
-                                Exit Function
-                            ElseIf Me.FactType.TypeOfBinaryFactType = 2 Then
-                                'Part 2 of Rule 4
-                                BelongsToTable = Me.FactType.Name
-                                Exit Function
-                            Else
-                                'FactType has no mandatory Roles
-                                BelongsToTable = Me.JoinsEntityType.Name
-                            End If
-                            'End If
-                        ElseIf Me.HasInternalUniquenessConstraint Then
-                            BelongsToTable = Me.JoinsEntityType.Name
-                            Exit Function                        
-                        End If
-                    Case Is = pcenumRoleJoinType.FactType
-                        'Joins nested Fact Object
-                        BelongsToTable = Me.JoinsFactType.Name
-                        Exit Function
-                    Case Is = pcenumRoleJoinType.ValueType
-                        BelongsToTable = "Mystery"
-                End Select
+            Try
 
-            End If
+                If Me.FactType.HasTotalRoleConstraint Or Me.FactType.HasPartialButMultiRoleConstraint Then
+                    'Rule 3 and part of 1
+                    BelongsToTable = Me.FactType.Name
+                    Exit Function
+                ElseIf Me.FactType.HasPartialButMultiRoleConstraint Then
+                    'Rule 1
+                    BelongsToTable = Me.FactType.Name
+                    Exit Function
+                ElseIf Me.FactType.IsUnaryFactType Then
+                    If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                        'Then role joins to entity
+                        BelongsToTable = Me.JoinsEntityType.Name
+                        Exit Function
+                    ElseIf Me.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                        BelongsToTable = Me.JoinsFactType.Name
+                    End If
+                ElseIf Me.FactType.IsBinaryFactType Then
+                    'Rules 2 and 4
+                    'For ind = 1 To role_count
+                    Select Case Me.TypeOfJoin
+                        Case Is = pcenumRoleJoinType.EntityType
+                            'Role joins to entity
+                            If Me.FactType.Is1To1BinaryFactType Then
+                                'Is 1:1 binary fact type
+                                'If Me.Mandatory = True Then
+                                If Me.FactType.TypeOfBinaryFactType = 1 Then
+                                    'Part 1 of Rule 4
+                                    BelongsToTable = Me.JoinsEntityType.Name
+                                    Exit Function
+                                ElseIf Me.FactType.TypeOfBinaryFactType = 2 Then
+                                    'Part 2 of Rule 4
+                                    BelongsToTable = Me.FactType.Name
+                                    Exit Function
+                                Else
+                                    'FactType has no mandatory Roles
+                                    BelongsToTable = Me.JoinsEntityType.Name
+                                End If
+                                'End If
+                            ElseIf Me.HasInternalUniquenessConstraint Then
+                                BelongsToTable = Me.JoinsEntityType.Name
+                                Exit Function
+                            End If
+                        Case Is = pcenumRoleJoinType.FactType
+                            'Joins nested Fact Object
+                            BelongsToTable = Me.JoinsFactType.Name
+                            Exit Function
+                        Case Is = pcenumRoleJoinType.ValueType
+                            BelongsToTable = "Mystery"
+                    End Select
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                BelongsToTable = "Mystery"
+            End Try
 
         End Function
 

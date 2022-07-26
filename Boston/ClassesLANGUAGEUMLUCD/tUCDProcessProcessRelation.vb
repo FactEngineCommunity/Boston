@@ -7,7 +7,7 @@ Namespace UCD
         Implements FBM.iPageObject
 
         Private WithEvents _CMMLProcessProcessRelation As CMML.ProcessProcessRelation
-        Public Shadows Property CMMLProcessProcessRelation As CMML.ProcessProcessRelation
+        Public Overrides Property CMMLProcessProcessRelation As CMML.ProcessProcessRelation
             Get
                 Return Me._CMMLProcessProcessRelation
             End Get

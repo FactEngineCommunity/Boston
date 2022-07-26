@@ -4,7 +4,7 @@ Namespace FBM
 
     Partial Public Class Model
 
-        Public Sub FixErrors(ByVal aaiFixesToApply As List(Of pcenumModelFixType))
+        Public Sub FixErrors(ByVal aaiFixesToApply As List(Of pcenumModelFixType), Optional ByRef arModelElementToFix As Object = Nothing)
 
             Try
 
@@ -14,7 +14,7 @@ Namespace FBM
 
                         Select Case liFixType
                             Case Is = pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
-                                Call Me.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
+                                Call Me.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType()
                             Case Is = pcenumModelFixType.RolesWithoutJoinedORMObject
                                 Call Me.RolesWithoutJoinedORMObject()
                             Case Is = pcenumModelFixType.RelationsInvalidActiveRoleOnOriginColumns
@@ -48,7 +48,7 @@ Namespace FBM
                             Case Is = pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
                                 Call Me.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa()
                             Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
-                                Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount()
+                                Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount(arModelElementToFix)
                         End Select
 
                     Next
@@ -632,34 +632,27 @@ SkipColumn2:
             End Try
         End Sub
 
-        Private Sub RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount()
+        Private Sub RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount(Optional ByRef arModelElementToFix As Object = Nothing)
 
             Try
+                Dim lrRDSRelation As RDS.Relation = arModelElementToFix
 
-                Dim larRDSRelation = From Relation In Me.RDS.Relation
-                                     Where Relation.OriginColumns.Count < Relation.DestinationColumns.Count
-                                     Select Relation
+                If arModelElementToFix Is Nothing Then
 
-                For Each lrRDSRelation In larRDSRelation.ToArray
+                    Dim larRDSRelation = From Relation In Me.RDS.Relation
+                                         Where Relation.OriginColumns.Count < Relation.DestinationColumns.Count
+                                         Select Relation
 
-                    For Each lrDestinationColumn In lrRDSRelation.DestinationColumns
-                        If lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) Is Nothing Then
-                            Try
-                                Dim lrActualColumn = (From Column In lrRDSRelation.OriginTable.Column
-                                                      Where Not lrRDSRelation.OriginColumns.Contains(Column)
-                                                      Where lrRDSRelation.DestinationColumns.Select(Function(x) x.ActiveRole.Id).Contains(Column.ActiveRole.Id)
-                                                      Select Column).First
-                                'lrRDSRelation.OriginTable.Column.Find(Function(x) x.Name = lrDestinationColumn.Name)
-                                If lrActualColumn IsNot Nothing Then
-                                    Call lrRDSRelation.AddOriginColumn(lrActualColumn)
-                                End If
-                            Catch ex As Exception
-                                'Couldn't fix it.
-                            End Try
-                        End If
+                    For Each lrRDSRelation In larRDSRelation.ToArray
+
+                        Call Me.FixRelationWhereOriginColumnCountNotEqualDestinationColumnCount(lrRDSRelation)
                     Next
 
-                Next
+                Else
+
+                    Call Me.FixRelationWhereOriginColumnCountNotEqualDestinationColumnCount(lrRDSRelation)
+
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -733,6 +726,81 @@ SkipColumn2:
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
+
+#Region "Fixes"
+
+        Private Sub FixRelationWhereOriginColumnCountNotEqualDestinationColumnCount(ByRef arRDSRelation As RDS.Relation)
+
+            Try
+                Dim lrRDSRelation As RDS.Relation = arRDSRelation
+
+                'Because are going to replace them with the PrimaryKeyIndex.Columns
+                If lrRDSRelation.DestinationTable.HasPrimaryKeyIndex And lrRDSRelation.DestinationTable IsNot Nothing Then
+
+                    For Each lrDestinationColumn In lrRDSRelation.DestinationColumns.ToArray
+                        Call lrRDSRelation.RemoveDestinationColumn(lrDestinationColumn)
+                    Next
+
+
+                    'Replacing pointers to PrimaryKey of DestinationTable. I.e. DestinationColumns
+                    If lrRDSRelation.DestinationTable.HasPrimaryKeyIndex Then
+                        For Each lrDestinationColumn In lrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                            lrRDSRelation.AddDestinationColumn(lrDestinationColumn)
+                        Next
+                    End If
+
+                End If
+
+                For Each lrDestinationColumn In lrRDSRelation.DestinationColumns
+                    If lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) Is Nothing Then
+                        Try
+                            Dim lrActualColumn = (From Column In lrRDSRelation.OriginTable.Column
+                                                  Where Not lrRDSRelation.OriginColumns.Contains(Column)
+                                                  Where lrRDSRelation.DestinationColumns.Select(Function(x) x.ActiveRole.Id).Contains(Column.ActiveRole.Id)
+                                                  Select Column).First
+                            'lrRDSRelation.OriginTable.Column.Find(Function(x) x.Name = lrDestinationColumn.Name)
+                            If lrActualColumn IsNot Nothing Then
+                                Call lrRDSRelation.AddOriginColumn(lrActualColumn)
+                            End If
+
+                        Catch ex As Exception
+                            'Couldn't fix it.
+                        End Try
+                    End If
+                Next
+
+                '20220726-VM-Doesn't seem to work.
+                'If lrRDSRelation.OriginColumns.Count <> lrRDSRelation.DestinationColumns.Count Then
+
+                '    If lrRDSRelation.DestinationTable.HasPrimaryKeyIndex Then
+                '        'Replace OriginColumns. Have already fixed DestinationColumns
+                '        For Each lrOriginColumn In lrRDSRelation.OriginColumns.ToArray
+                '            Call lrRDSRelation.RemoveOriginColumn(lrOriginColumn)
+                '            Call lrRDSRelation.OriginTable.removeColumn(lrOriginColumn)
+                '        Next
+
+                '        'Replacing pointers to PrimaryKey of DestinationTable. I.e. DestinationColumns
+                '        For Each lrDestinationColumn In lrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                '            Dim lrNewOriginColumn = lrDestinationColumn.Clone(lrRDSRelation.OriginTable, lrRDSRelation, True, True)
+                '            lrNewOriginColumn.Relation.Add(lrRDSRelation)
+                '            lrRDSRelation.OriginTable.addColumn(lrNewOriginColumn)
+                '            lrRDSRelation.AddOriginColumn(lrDestinationColumn)
+                '        Next
+                '    End If
+                'End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+#End Region
 
 
     End Class

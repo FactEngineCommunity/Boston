@@ -456,6 +456,9 @@ Namespace ERD
                         Me.TableShape.Item(0, liInd).Tag = lrERAttribute 'lrERAttribute.Column.OrdinalPosition - 1
                         Call lrERAttribute.RefreshShape()
 
+                        'CodeSafe
+                        Me.Page.ERDiagram.Attribute.AddUnique(lrERAttribute)
+
                         Try
                             Me.TableShape.ResizeToFitText(False)
                         Catch ex As Exception

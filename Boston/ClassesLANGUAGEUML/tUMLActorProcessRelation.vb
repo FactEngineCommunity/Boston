@@ -10,7 +10,15 @@ Namespace UML
 
         Public WithEvents UMLModel As UML.Model
 
-        Public WithEvents CMMLActorProcessRelation As CMML.ActorProcessRelation
+        Public WithEvents _CMMLActorProcessRelation As CMML.ActorProcessRelation
+        Public Overridable Property CMMLActorProcessRelation As CMML.ActorProcessRelation
+            Get
+                Return Me._CMMLActorProcessRelation
+            End Get
+            Set(value As CMML.ActorProcessRelation)
+                Me._CMMLActorProcessRelation = value
+            End Set
+        End Property
 
         Public Link As MindFusion.Diagramming.DiagramLink
 
@@ -72,7 +80,7 @@ Namespace UML
 
         End Sub
 
-        Private Sub CMMLActorProcessRelation_RemovedFromModel() Handles CMMLActorProcessRelation.RemovedFromModel
+        Private Sub CMMLActorProcessRelation_RemovedFromModel() Handles _CMMLActorProcessRelation.RemovedFromModel
 
             Try
                 Call Me.RemoveFromPage()

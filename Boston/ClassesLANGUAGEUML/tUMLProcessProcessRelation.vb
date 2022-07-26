@@ -10,7 +10,15 @@ Namespace UML
         Public Process1 As UML.Process
         Public Process2 As UML.Process
 
-        Public WithEvents CMMLProcessProcessRelation As CMML.ProcessProcessRelation
+        Private WithEvents _CMMLProcessProcessRelation As CMML.ProcessProcessRelation
+        Public Overridable Property CMMLProcessProcessRelation As CMML.ProcessProcessRelation
+            Get
+                Return Me._CMMLProcessProcessRelation
+            End Get
+            Set(value As CMML.ProcessProcessRelation)
+                Me._CMMLProcessProcessRelation = value
+            End Set
+        End Property
 
         Public IsIncludes As Boolean = False
         Public IsExtends As Boolean = False
@@ -92,7 +100,7 @@ Namespace UML
 
         End Sub
 
-        Private Sub CMMLProcessProcessRelation_RemovedFromModel() Handles CMMLProcessProcessRelation.RemovedFromModel
+        Private Sub CMMLProcessProcessRelation_RemovedFromModel() Handles _CMMLProcessProcessRelation.RemovedFromModel
 
             Try
                 Call Me.RemoveFromPage()

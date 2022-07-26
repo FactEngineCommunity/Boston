@@ -3364,7 +3364,7 @@ NextY:
                         lrFactInstance = lrRecordset.CurrentFact
                     End If
 
-                    Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation = Nothing
+                    Dim lrUMLProcessProcessRelation As UML.ProcessProcessRelation
                     Select Case Me.Language
                         Case Is = pcenumLanguage.UMLUseCaseDiagram
                             lrUMLProcessProcessRelation = lrFactInstance.CloneUCDProcessProcessRelation(Me, lrProcess1, lrProcess2)
@@ -3442,19 +3442,24 @@ NextY:
 
                     lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrUMLActorProcessRelation As UML.ActorProcessRelation
+                    Dim lrUMLActorProcessRelation As UML.ActorProcessRelation = Nothing
 
                     If lrRecordset.EOF Then
                         lrFactInstance = Me.UMLDiagram.ActorToProcessParticipationRelationFTI.AddFact(arActorProcessRelation.Fact)
                     Else
                         lrFactInstance = lrRecordset.CurrentFact
-                        lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me, lrActor, lrProcess)
                     End If
+
+                    Select Case Me.Language
+                        Case Is = pcenumLanguage.UMLUseCaseDiagram
+                            lrUMLActorProcessRelation = lrFactInstance.CloneUCDActorProcessRelation(Me, lrActor, lrProcess)
+                        Case Is = pcenumLanguage.BPMNCollaborationDiagram
+                            'lrUMLProcessProcessRelation = lrFactInstance.CloneBPMNActorProcessRelation(Me, lrActor, lrProcess)
+                    End Select
 
                     '------------------------------------------
                     'Link the Actor to the associated Process
                     '------------------------------------------
-                    lrUMLActorProcessRelation = lrFactInstance.CloneActorProcessRelation(Me, lrActor, lrProcess)
                     lrUMLActorProcessRelation.Fact = lrFactInstance
                     lrUMLActorProcessRelation.CMMLActorProcessRelation = arActorProcessRelation 'Me.zrPage.Model.UML.ActorProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
 

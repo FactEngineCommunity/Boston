@@ -2563,13 +2563,13 @@ Public Class frmDiagrmUMLUseCase
             Dim loProcessRelation = Me.zrPage.SelectedObject(0)
 
             Select Case loProcessRelation.GetType
-                Case Is = GetType(UML.ProcessProcessRelation)
-                    Dim lrActorProcessRelation As UML.ActorProcessRelation = loProcessRelation
+                Case Is = GetType(UCD.ActorProcessRelation)
+                    Dim lrActorProcessRelation As UCD.ActorProcessRelation = loProcessRelation
 
                     Call lrActorProcessRelation.RemoveFromPage()
 
-                Case Is = GetType(UML.ProcessProcessRelation)
-                    Dim lrProcessProcessRelation As UML.ProcessProcessRelation = loProcessRelation
+                Case Is = GetType(UCD.ProcessProcessRelation)
+                    Dim lrProcessProcessRelation As UCD.ProcessProcessRelation = loProcessRelation
 
                     Call lrProcessProcessRelation.RemoveFromPage()
             End Select

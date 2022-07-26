@@ -70,34 +70,37 @@ Namespace CMML
 
                 Call Me.Model.createCMMLProcess(arProcess)
 
-                Call Me.Model.addCMMLProcessProcessType(arProcess, arProcess.ProcessType)
+#Region "Uncomment for BPMN"
+                'Call Me.Model.addCMMLProcessProcessType(arProcess, arProcess.ProcessType)
 
-#Region "BPMN"
-#Region "Activity - BPMN"
-                Call Me.Model.addCMMLProcessActivityType(arProcess, arProcess.ActivityType)
+                '#Region "BPMN"
+                '#Region "Activity - BPMN"
+                '                Call Me.Model.addCMMLProcessActivityType(arProcess, arProcess.ActivityType)
 
-                Call Me.Model.addCMMLProcessActivityMarker(arProcess, arProcess.ActivityMarker)
+                '                Call Me.Model.addCMMLProcessActivityMarker(arProcess, arProcess.ActivityMarker)
 
-                Call Me.Model.addCMMLProcessActivityTaskType(arProcess, arProcess.ActivityTaskType)
-#End Region
+                '                Call Me.Model.addCMMLProcessActivityTaskType(arProcess, arProcess.ActivityTaskType)
+                '#End Region
 
-#Region "Conversation - BPMN"
-                Call Me.Model.addCMMLProcessConversationType(arProcess, arProcess.ConversationType)
-#End Region
+                '#Region "Conversation - BPMN"
+                '                Call Me.Model.addCMMLProcessConversationType(arProcess, arProcess.ConversationType)
+                '#End Region
 
-#Region "Events - BPMN"
+                '#Region "Events - BPMN"
 
-                Call Me.Model.addCMMLProcessEventPosition(arProcess, arProcess.EventPosition)
+                '                Call Me.Model.addCMMLProcessEventPosition(arProcess, arProcess.EventPosition)
 
-                Call Me.Model.addCMMLProcessEventType(arProcess, arProcess.EventType)
+                '                Call Me.Model.addCMMLProcessEventType(arProcess, arProcess.EventType)
 
-                Call Me.Model.addCMMLProcessEventSubType(arProcess, arProcess.EventSubType)
-#End Region
+                '                Call Me.Model.addCMMLProcessEventSubType(arProcess, arProcess.EventSubType)
+                '#End Region
 
-#Region "Gateway - BPMN"
+                '#Region "Gateway - BPMN"
 
-                Call Me.Model.addCMMLProcessGatewayType(arProcess, arProcess.GatewayType)
-#End Region
+                '                Call Me.Model.addCMMLProcessGatewayType(arProcess, arProcess.GatewayType)
+                '#End Region
+
+                '#End Region
 #End Region
                 RaiseEvent ProcessAdded(arProcess)
 
@@ -116,6 +119,7 @@ Namespace CMML
 
             Try
                 Me.ActorProcessRelation.AddUnique(arCMMLActorProcessRelation)
+                arCMMLActorProcessRelation.Actor.Process.Add(arCMMLActorProcessRelation.Process)
 
                 arCMMLActorProcessRelation.Fact = Me.Model.createCMMLActorProcessRelation(arCMMLActorProcessRelation)
 

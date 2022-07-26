@@ -2721,6 +2721,8 @@ SkippedRole:
                     lrPage = arModel.Page.Find(AddressOf lrPage.Equals) 'Because already loaded as empty shells.
                     If TablePage.ExistsPageById(lrPage.PageId) Then lrPage.PageId = System.Guid.NewGuid.ToString
 
+                    Boston.WriteToStatusBar("Loading Page: " & lrPage.Name, True, 99)
+
                     '---------------------------------------------
                     'Load the ModelObjectInstances onto the Page
                     '---------------------------------------------

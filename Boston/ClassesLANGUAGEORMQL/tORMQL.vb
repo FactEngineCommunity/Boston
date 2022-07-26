@@ -1675,7 +1675,9 @@ Namespace ORMQL
                 lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrinsertStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
 
                 If lrFactType Is Nothing Then
-                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrinsertStatement.USERTABLENAME, 100, Nothing))
+                    Dim lrParseNode = New TinyPG.ParseNode()
+                    lrParseNode.Token = New TinyPG.Token(0,0)
+                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrinsertStatement.USERTABLENAME, 100, lrParseNode))
                     Return Me.Parsetree.Errors
                     Exit Function
                 End If

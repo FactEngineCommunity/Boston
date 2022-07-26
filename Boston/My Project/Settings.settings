@@ -213,7 +213,7 @@
       <Value Profile="(Default)">.Id</Value>
     </Setting>
     <Setting Name="UseDefaultReferenceModeNewEntityTypes" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="BPMNShapeLibraryCore" Type="System.String" Scope="User">
       <Value Profile="(Default)">.\shapelibrary\bpmn-core.shl</Value>

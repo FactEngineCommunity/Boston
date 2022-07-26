@@ -5,7 +5,16 @@ Namespace UCD
         Inherits UML.ActorProcessRelation
         Implements FBM.iPageObject
 
-        Public Shadows WithEvents CMMLActorProcessRelation As CMML.ActorProcessRelation
+        Public WithEvents _CMMLActorProcessRelation As CMML.ActorProcessRelation
+
+        Public Overrides Property CMMLActorProcessRelation As CMML.ActorProcessRelation
+            Get
+                Return Me._CMMLActorProcessRelation
+            End Get
+            Set(value As CMML.ActorProcessRelation)
+                Me._CMMLActorProcessRelation = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' Parameterless Constructor
@@ -21,7 +30,7 @@ Namespace UCD
 
         End Sub
 
-        Private Sub CMMLActorProcessRelation_RemovedFromModel() Handles CMMLActorProcessRelation.RemovedFromModel
+        Private Sub CMMLActorProcessRelation_RemovedFromModel() Handles _CMMLActorProcessRelation.RemovedFromModel
 
             Try
                 Call Me.RemoveFromPage()

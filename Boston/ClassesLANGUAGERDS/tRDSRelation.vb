@@ -539,6 +539,24 @@ Namespace RDS
             End Try
         End Sub
 
+        Public Sub RemoveDestinationColumn(ByRef arColumn As RDS.Column)
+
+            Try
+                Me.DestinationColumns.Remove(arColumn)
+
+                'CMML
+                Call Me.Model.Model.removeCMMLRelationDestinationColumn(Me, arColumn)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
         Public Sub RemoveOriginColumn(ByRef arColumn As RDS.Column)
 
             Try
@@ -567,7 +585,11 @@ Namespace RDS
                             Dim lrOriginalColumn As RDS.Column = Me.OriginColumns(0)
                             Dim lrActualTable As RDS.Table = lrOriginalColumn.Table
 
-                            If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing And (lrActualTable.Name = Me.OriginTable.Name) Then
+                            'CodeSafe
+                            'Let the Supertype take care of all this.
+                            If lrActualTable.Name <> Me.OriginTable.Name Then Exit Sub
+
+                            If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
                                 'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
 
                                 Call Me.RemoveOriginColumn(lrOriginalColumn)
