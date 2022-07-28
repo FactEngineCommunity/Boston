@@ -118,6 +118,10 @@ Namespace FBM
 
                     lrSubtypeRelationshipInstance.parentModelElement = arPage.getModelElementById(.parentModelElement.Id)
 
+                    If .parentModelElement.IsObjectifyingEntityType Then
+                        lrSubtypeRelationshipInstance.parentModelElement.ObjectifiedFactType = arPage.getModelElement(.parentModelElement, True)
+                    End If
+
                     Dim lrFactTypeInstance As New FBM.FactTypeInstance
                     lrFactTypeInstance.Id = .FactType.Id
                     lrFactTypeInstance = arPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)

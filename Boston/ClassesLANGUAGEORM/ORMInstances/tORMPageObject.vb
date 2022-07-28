@@ -83,7 +83,7 @@ Namespace FBM
 
         Public Sub New(ByVal as_Symbol As String, Optional ByVal aiConceptType As pcenumConceptType = Nothing)
 
-
+            Me.Id = Trim(as_Symbol)
             Me.Symbol = Trim(as_Symbol)
 
             If IsSomething(aiConceptType) Then

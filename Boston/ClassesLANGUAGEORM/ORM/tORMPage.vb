@@ -1068,7 +1068,7 @@ Namespace FBM
                 Dim lrConceptInstance As FBM.ConceptInstance
                 If TypeOf (arFactType) Is FBM.FactTypeInstance Then
                     lrDroppedFactTypeInstance = arFactType
-                    lrFactTypeInstance = lrDroppedFactTypeInstance.Clone(Me, True)
+                    lrFactTypeInstance = lrDroppedFactTypeInstance.Clone(Me, False)
                     lrFactType = lrFactTypeInstance.FactType
                 Else
 
@@ -1083,7 +1083,7 @@ Namespace FBM
                         lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, New PointF(10, 10),, False)
                     End If
 
-                    lrFactTypeInstance = arFactType.CloneInstance(Me, True)
+                    lrFactTypeInstance = arFactType.CloneInstance(Me, False)
 
                     '----------------------------------------------------------------------------------------
                     'Create a ConceptInstance that can be broadcast to other ClientServer Boston instances.
@@ -1128,6 +1128,11 @@ Namespace FBM
                 If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
                     lrFactTypeInstance.FactTypeReadingShape.InstanceNumber = lrFactTypeInstance.InstanceNumber
                 End If
+                'Add To Page
+                Call Me.FactTypeInstance.AddUnique(lrFactTypeInstance)
+                For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+                    Me.RoleInstance.AddUnique(lrRoleInstance)
+                Next
 
                 If Me.Diagram IsNot Nothing Then
 #Region "Diagram Display - Diagram IsNot Nothing"
@@ -1794,32 +1799,60 @@ Namespace FBM
 
         End Function
 
-        Public Function getModelElement(ByVal arModelElement As FBM.ModelObject) As FBM.ModelObject
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arModelElement"></param>
+        ''' <param name="abReturnObjectifiedFactType">When getting the Supertype for a SubtypeRelationshipInstance you need to return the FactTypeInstance</param>
+        ''' <returns></returns>
+        Public Function getModelElement(ByVal arModelElement As FBM.ModelObject, Optional ByVal abReturnObjectifiedFactType As Boolean = False) As FBM.ModelObject
+
+            Dim lsMessage As String
 
             Try
-                Dim loModelElement = CType(arModelElement, Object)
+                'CodeSafe
+                If arModelElement Is Nothing Then
+                    lsMessage = "Page.GetModelElement called for Model Element that is Nothing."
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                    Return Nothing
+                End If
+
+                Dim loModelElement As Object
+
+                loModelElement = CType(arModelElement, Object)
+
+                Dim larModelLevelTypes = New List(Of Type) From {GetType(FBM.EntityType), GetType(FBM.ValueType), GetType(FBM.FactType), GetType(FBM.RoleConstraint), GetType(FBM.ModelNote)}
+                If larModelLevelTypes.Contains(arModelElement.GetType) Then
+                    loModelElement = New FBM.PageObject(arModelElement.Id, arModelElement.ConceptType)
+                    loModelElement.InstanceNumber = 1
+                End If
+
                 Select Case arModelElement.ConceptType
                     Case Is = pcenumConceptType.ValueType
-                        Return Me.ValueTypeInstance.Find(Function(x) x.Id = arModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+                        Return Me.ValueTypeInstance.Find(Function(x) x.Id = loModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
 
                     Case Is = pcenumConceptType.EntityType
-                        Return Me.EntityTypeInstance.Find(Function(x) x.Id = arModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+
+                        If arModelElement.IsObjectifyingEntityType And abReturnObjectifiedFactType Then
+                            Return Me.FactTypeInstance.Find(Function(x) x.Id = loModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+                        Else
+                            Return Me.EntityTypeInstance.Find(Function(x) x.Id = loModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+                        End If
 
                     Case Is = pcenumConceptType.FactType
-                        Return Me.FactTypeInstance.Find(Function(x) x.Id = arModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
+                        Return Me.FactTypeInstance.Find(Function(x) x.Id = loModelElement.Id And x.InstanceNumber = loModelElement.InstanceNumber)
 
                     Case Is = pcenumConceptType.RoleConstraint
                         Return Me.RoleConstraintInstance.Find(Function(x) x.Id)
 
                     Case Is = pcenumConceptType.ModelNote
-                        Return Me.ModelNoteInstance.Find(Function(x) x.Id = arModelElement.Id)
+                        Return Me.ModelNoteInstance.Find(Function(x) x.Id = loModelElement.Id)
 
                     Case Else
                         Return Nothing
                 End Select
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

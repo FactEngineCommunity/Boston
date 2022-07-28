@@ -1555,12 +1555,15 @@ Namespace FBM
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     For Each lrRoleConstraintRole In Me.RoleConstraintRole
 
-                        lrRoleInstance = New FBM.RoleInstance(.Model, arPage)
-                        lrRoleInstance.Id = lrRoleConstraintRole.Role.Id
                         If arFactTypeInstance Is Nothing Then
-                            lrRoleInstance = arPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
+                            lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                            If lrRoleInstance Is Nothing Then
+                                'This is a problem.
+                                Call arPage.DropFactTypeAtPoint(lrRoleConstraintRole.Role.FactType, New PointF(10, 10), False, False, False, False, True, True, False)
+                                lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                            End If
                         Else
-                            lrRoleInstance = arFactTypeInstance.RoleGroup.Find(AddressOf lrRoleInstance.Equals)
+                            lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
                         End If
 
                         '--------------------------------------------------------------------
@@ -1569,6 +1572,7 @@ Namespace FBM
                         lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
                         lrRoleConstraintRoleInstance.IsEntry = lrRoleConstraintRole.IsEntry
                         lrRoleConstraintRoleInstance.IsExit = lrRoleConstraintRole.IsExit
+
 
                         If lrRoleInstance.Role.FactType.IsSubtypeRelationshipFactType Then
                             lrRoleConstraintRoleInstance.SubtypeConstraintInstance = arPage.SubtypeRelationship.Find(Function(x) x.SubtypeRelationship.FactType.Id = lrRoleInstance.Role.FactType.Id)

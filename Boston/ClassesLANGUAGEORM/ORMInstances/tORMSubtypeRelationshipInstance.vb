@@ -208,18 +208,38 @@ Namespace FBM
 
                 If Me.parentModelElement IsNot Nothing Then
                     If Me.parentModelElement.IsObjectifyingEntityType Then
-                        Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
+                        Try
+                            Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
+                        Catch ex As Exception
+                            Try
+                                Dim larEntityType = From FactType In Me.Page.Model.FactType
+                                                    Where FactType.IsObjectified
+                                                    Where FactType.ObjectifyingEntityType IsNot Nothing
+                                                    Where FactType.ObjectifyingEntityType.Id = Me.SubtypeRelationship.parentModelElement.Id
+                                                    Select FactType.ObjectifyingEntityType
+
+                                Me.parentModelElement = Me.Page.getModelElementById(larEntityType.First.Id)
+                                Me.parentModelElement.ObjectifiedFactType = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.parentModelElement.Id)
+                            Catch ex1 As Exception
+                                'Didn't find it
+                            End Try
+                        End Try
+
                     Else
                         Me.parentModelElement = Me.Page.getModelElement(Me.parentModelElement)
                     End If
                 Else
-                    Me.parentModelElement = Me.Page.getModelElement(Me.parentModelElement)
+                    Me.parentModelElement = Me.Page.getModelElement(Me.SubtypeRelationship.parentModelElement, True)
                 End If
 
                 If IsSomething(Me.parentModelElement) Then
 
                     If Me.parentModelElement.IsObjectifyingEntityType Then
-                        loNode = CType(Me.parentModelElement, FBM.EntityTypeInstance).ObjectifiedFactType.Shape
+                        Try
+                            loNode = CType(Me.parentModelElement, FBM.EntityTypeInstance).ObjectifiedFactType.Shape
+                        Catch ex As Exception
+                            loNode = CType(Me.parentModelElement, Object).Shape
+                        End Try
                     Else
                         loNode = CType(Me.parentModelElement, Object).Shape
                     End If
