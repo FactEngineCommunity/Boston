@@ -85,7 +85,7 @@ Public Module publicFBMConstants
         <DataType("FloatDoublePrecision")> <Description("Numeric: Float (Double Precision)")> NumericFloatDoublePrecision
         <DataType("FloatSinglePrecistion")> <Description("Numeric: Float (Single Precision)")> NumericFloatSinglePrecision
         <DataType("Money")> <Description("Numeric: Money")> NumericMoney
-        <DataType("SignedBigInteger")> <Description("Numeric: Signed Big Integer")> NumericSignedBigInteger
+        <DataType("SignedBigInteger")> <Description("Numeric: Signed Big Integer")> NumericSignedBigInteger 'NB 'Big' is 'Large' In NORMA .orm XML file
         <DataType("SignedInteger")> <Description("Numeric: Signed Integer")> NumericSignedInteger
         <DataType("SignedSmallInteger")> <Description("Numeric: Signed Small Integer")> NumericSignedSmallInteger
         <DataType("UnsignedBigInteger")> <Description("Numeric: Unsigned Big Integer")> NumericUnsignedBigInteger

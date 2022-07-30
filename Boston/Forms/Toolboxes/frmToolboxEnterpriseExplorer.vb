@@ -2139,108 +2139,107 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lrModel As FBM.Model
 
         Try
-            With New WaitCursor
-                '-----------------------------------------
-                'Get the Model from the selected TreeNode
-                '-----------------------------------------
-                lrModel = Me.TreeView.SelectedNode.Tag.Tag
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
-                lsMessage = "Are you sure you want to delete the Model, '" & lrModel.Name & "' ?"
+            lsMessage = "Are you sure you want to delete the Model, '" & lrModel.Name & "' ?"
 
-                If MsgBox(lsMessage, MsgBoxStyle.Critical + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            If MsgBox(lsMessage, MsgBoxStyle.Critical + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
-                    Using loWaitCursor As New WaitCursor
+                With New WaitCursor
 
-                        While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
-                        End While
+                    While (lrModel.Loading And Not lrModel.Loaded) Or lrModel.Page.FindAll(Function(x) x.Loading).Count > 0
+                    End While
 
-                        While lrModel.RDSLoading
-                        End While
+                    While lrModel.RDSLoading
+                    End While
 
-                        'Call lrModel.Save()
+                    'Call lrModel.Save()
+                    Dim lrTempNode As TreeNode = Me.TreeView.SelectedNode
 
-                        Application.DoEvents()
+                    Application.DoEvents()
 
-                        '-------------------------------------
-                        'Remove all the Pages for the Model.
-                        '-------------------------------------
-                        Dim liPageCount As Integer = lrModel.Page.Count
-                        For liInd = liPageCount To 1 Step -1
-                            lrPage = lrModel.Page(liInd - 1)
+                    '-------------------------------------
+                    'Remove all the Pages for the Model.
+                    '-------------------------------------
+                    Dim liPageCount As Integer = lrModel.Page.Count
+                    For liInd = liPageCount To 1 Step -1
+                        lrPage = lrModel.Page(liInd - 1)
 
-                            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                            Dim loTreeNode As TreeNode
-                            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
-                                                                       lrPage,
-                                                                       lrPage.Model.ModelId,
-                                                                       lrPage.Language,
-                                                                       Nothing, lrPage.PageId)
+                        Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                        Dim loTreeNode As TreeNode
+                        lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                                   lrPage,
+                                                                   lrPage.Model.ModelId,
+                                                                   lrPage.Language,
+                                                                   Nothing, lrPage.PageId)
 
-                            If IsSomething(prPageNodes.Find(AddressOf lr_enterprise_view.Equals)) Then
+                        If IsSomething(prPageNodes.Find(AddressOf lr_enterprise_view.Equals)) Then
 
-                                loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
+                            loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
 
-                                If loTreeNode Is Nothing Then
-                                    Throw New System.Exception("Cannot find TreeNode for Page")
-                                End If
-
-                                If IsSomething(lrPage.Form) Then
-                                    lrPage.IsDirty = False
-                                    Call lrPage.Form.Close()
-                                End If
-
-                                loTreeNode.Remove()
-
+                            If loTreeNode Is Nothing Then
+                                Throw New System.Exception("Cannot find TreeNode for Page")
                             End If
-                            'lrPage.RemoveFromModel()
-                            lrModel.Page.RemoveAt(liInd - 1)
-                        Next
 
-                        Application.DoEvents()
-
-                        Try
-                            Call lrModel.RemoveFromDatabase()
-                        Catch ex As Exception
-                            If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-
-                                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                                lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
-
-                                Dim lsDatabaseLocation As String = lrSQLConnectionStringBuilder("Data Source")
-                                Dim dbe As New DAO.DBEngine
-                                Dim db As DAO.Database
-                                db = dbe.OpenDatabase(lsDatabaseLocation)
-                                dbe.SetOption(DAO.SetOptionEnum.dbMaxLocksPerFile, 200000)
-                                db.Execute("DELETE FROM MetaModelModel WHERE ModelId = '" & lrModel.ModelId & "'")
+                            If IsSomething(lrPage.Form) Then
+                                lrPage.IsDirty = False
+                                Call lrPage.Form.Close()
                             End If
-                        End Try
 
-                        prApplication.Models.Remove(lrModel)
+                            loTreeNode.Remove()
 
-                        '=================================
-                        'Remove then readd handler. Stops the previous Model from being loaded unintentionally.
-                        RemoveHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
-
-                        Dim lrTempNode As TreeNode = Me.TreeView.SelectedNode
-                        lrTempNode.Remove()
-                        Me.TreeView.SelectedNode = Me.TreeView.Nodes(0)
-
-                        AddHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
-                        '=================================
-
-                        Dim lrInterfaceModel As New Viev.FBM.Interface.Model
-                        lrInterfaceModel.ModelId = lrModel.ModelId
-
-                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                            lrBroadcast.Model = lrInterfaceModel
-                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.DeleteModel, lrBroadcast)
                         End If
+                        'lrPage.RemoveFromModel()
+                        lrModel.Page.RemoveAt(liInd - 1)
+                    Next
 
-                    End Using
+                    Application.DoEvents()
 
-                End If
-            End With
+                    Try
+                        Call lrModel.RemoveFromDatabase()
+                    Catch ex As Exception
+                        If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+
+                            Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                            lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+                            Dim lsDatabaseLocation As String = lrSQLConnectionStringBuilder("Data Source")
+                            Dim dbe As New DAO.DBEngine
+                            Dim db As DAO.Database
+                            db = dbe.OpenDatabase(lsDatabaseLocation)
+                            dbe.SetOption(DAO.SetOptionEnum.dbMaxLocksPerFile, 200000)
+                            db.Execute("DELETE FROM MetaModelModel WHERE ModelId = '" & lrModel.ModelId & "'")
+                        End If
+                    End Try
+
+                    prApplication.Models.Remove(lrModel)
+
+                    '=================================
+                    'Remove then readd handler. Stops the previous Model from being loaded unintentionally.
+                    RemoveHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
+
+                    lrTempNode.Remove()
+                    Me.TreeView.SelectedNode = Me.TreeView.Nodes(0)
+
+                    AddHandler Me.TreeView.AfterSelect, AddressOf TreeView1_AfterSelect
+                    '=================================
+
+                    Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                    lrInterfaceModel.ModelId = lrModel.ModelId
+
+                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                        lrBroadcast.Model = lrInterfaceModel
+                        Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.DeleteModel, lrBroadcast)
+                    End If
+
+                End With
+
+            End If
+
 
         Catch ex As Exception
             Dim lsMessage1 As String

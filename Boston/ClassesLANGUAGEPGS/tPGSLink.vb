@@ -313,6 +313,10 @@ Namespace PGS
                             Me.Link.BaseShape = ArrowHead.PointerArrow
                             Me.Link.BaseShapeSize = 2
                         Else
+                            Me.Link.HeadShape = ArrowHead.PointerArrow
+                            If Me.RDSRelation.ResponsibleFactType.Is1To1BinaryFactType Then
+                                Me.Link.HeadShape = ArrowHead.None
+                            End If
                             Me.Link.BaseShape = ArrowHead.None
                         End If
                     End If

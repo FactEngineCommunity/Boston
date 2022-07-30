@@ -2379,7 +2379,7 @@ Namespace FBM
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
                 End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
+                lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
                 Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
 
                 'CoreDerivations
