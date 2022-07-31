@@ -2989,6 +2989,36 @@ FinishedProcessing:
 
         End Function
 
+        Public Function CreateSubtypeRelationshipForFactType(ByRef arFactType As FBM.FactType, ByVal abBroadcastInterfaceEvent As Boolean) As FBM.SubtypeRelationshipInstance
+
+            Try
+                Dim lrModelElement1 As FBM.ModelObject = arFactType.RoleGroup(0).JoinedORMObject
+                Dim lrModelElement2 As FBM.ModelObject = arFactType.RoleGroup(1).JoinedORMObject
+
+                Select Case lrModelElement1.GetType
+                    Case = GetType(FBM.EntityType)
+                        Dim lrEntityType As FBM.EntityType = lrModelElement1
+                        Call lrEntityType.CreateSubtypeRelationship(lrModelElement2,
+                                                                    False,
+                                                                    arFactType.RoleGroup(0).Id,
+                                                                    arFactType.RoleGroup(1).Id,
+                                                                    abBroadcastInterfaceEvent,
+                                                                    arFactType)
+
+                End Select
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
         Public Sub GenerateTestCases()
             '-------------------------------------------------
             'Automatically generates TestCases for the Model

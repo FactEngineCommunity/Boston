@@ -2581,7 +2581,7 @@ MoveOn:
 
         End Sub
 
-        Private Sub _EntityType_SubtypeConstraintAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship) Handles _EntityType.SubtypeRelationshipAdded
+        Private Sub _EntityType_SubtypeConstraintAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean) Handles _EntityType.SubtypeRelationshipAdded
 
             Try
                 '-----------------------------------------------------------------------------------------------------------
@@ -2601,7 +2601,7 @@ MoveOn:
                 'CodeSafe
                 If Me.Page IsNot Nothing Then
                     Dim lrFactType = lrSubtypeRelationshipInstance.SubtypeRelationship.FactType
-                    Dim lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, New PointF(0, 0), False,, True, False)
+                    Dim lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, New PointF(0, 0), False,, , abBroadcastInterfaceEvent, False)
                     lrFactTypeInstance.SubtypeRelationshipInstance = lrSubtypeRelationshipInstance
                     Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
                 End If
@@ -2622,7 +2622,6 @@ MoveOn:
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
-
 
         End Sub
 

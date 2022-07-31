@@ -9,6 +9,11 @@ Namespace DuplexServiceClient
             Try
                 Dim lrInterfaceFactType As Viev.FBM.Interface.FactType = arInterfaceModel.FactType(0)
 
+                'CodeSafe: Don't add FactType twice.
+                If arModel.FactType.Find(Function(x) x.Id = lrInterfaceFactType.Id) IsNot Nothing Then
+                    Exit Sub
+                End If
+
                 Dim lrFactType As New FBM.FactType(arModel,
                                                    lrInterfaceFactType.Name,
                                                    True)
@@ -49,6 +54,12 @@ Namespace DuplexServiceClient
                 Next
 
                 arModel.AddFactType(lrFactType, True, False, Nothing)
+
+                '==================================================================
+                'Subtype Relationship
+                If lrFactType.IsSubtypeRelationshipFactType Then
+                    Call arModel.CreateSubtypeRelationshipForFactType(lrFactType, False)
+                End If
 
                 If arInterfaceModel.Page IsNot Nothing Then
 

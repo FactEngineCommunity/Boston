@@ -279,7 +279,7 @@ Namespace FBM
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         'Public Event NameChanged(ByVal asNewName As String)
-        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
+        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
         Public Event ReferenceModeChanged(ByVal asNewReferenceMode As String, ByVal abSimpleAssignment As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event ReferenceModeFactTypeChanged(ByRef arNewReferenceModeFactType As FBM.FactType)
@@ -1614,7 +1614,8 @@ Namespace FBM
                                                             Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
                                                             Optional ByVal asSubtypeRoleId As String = Nothing,
                                                             Optional ByVal asSupertypeRoleId As String = Nothing,
-                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
+                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                            Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.tSubtypeRelationship
 
             Try
                 Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
@@ -1631,60 +1632,68 @@ Namespace FBM
                 'Create a FactType for the SubtypeConstraint
                 '---------------------------------------------
 #Region "Create the FactType for the SubtypeRelationship"
-                Dim lsFactTypeName As String = ""
-                Dim larModelObject As New List(Of FBM.ModelObject)
-                Dim larRole As New List(Of FBM.Role)
+                If arUsingFactType Is Nothing Then
 
-                larModelObject.Add(Me)
-                If arParentModelElement.IsObjectifyingEntityType Then
-                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
-                    larModelObject.Add(arParentModelElement.ObjectifiedFactType)
+                    Dim lsFactTypeName As String = ""
+                    Dim larModelObject As New List(Of FBM.ModelObject)
+                    Dim larRole As New List(Of FBM.Role)
+
+                    larModelObject.Add(Me)
+                    If arParentModelElement.IsObjectifyingEntityType Then
+                        lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
+                        larModelObject.Add(arParentModelElement.ObjectifiedFactType)
+                    Else
+                        lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
+                        larModelObject.Add(arParentModelElement)
+                    End If
+
+                    lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False,,, False,,, False)
+                    lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
+
+                    lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
+                    lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
+
+                    If asSubtypeRoleId IsNot Nothing Then
+                        lrSubtypeRelationship.FactType.RoleGroup(0).Id = asSubtypeRoleId
+                    End If
+
+                    If asSupertypeRoleId IsNot Nothing Then
+                        lrSubtypeRelationship.FactType.RoleGroup(1).Id = asSupertypeRoleId
+                    End If
+
+                    lrSubtypeRelationship.FactType.RoleGroup(0).Mandatory = True
+
+                    Me.Model.AddFactType(lrSubtypeRelationship.FactType,, abBroadcastInterfaceEvent)
+
+#Region "FactTypeReading"
+                    Dim lrFactTypeReading As FBM.FactTypeReading
+                    Dim lasPredicatePart As New List(Of String)
+                    lasPredicatePart.Add("is")
+                    lasPredicatePart.Add("")
+
+                    larRole.Clear()
+                    larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                    larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                    lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+                    lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+
+                    larRole.Clear()
+                    larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                    larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                    lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
+                    lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
+#End Region
+
+                    larRole.Clear()
+                    larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
+                    lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, arParentModelElement.GetTopmostSupertype)
+
+                    larRole.Clear()
+                    larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
+                    lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
                 Else
-                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
-                    larModelObject.Add(arParentModelElement)
+                    lrSubtypeRelationship.FactType = arUsingFactType
                 End If
-
-                lrSubtypeRelationship.FactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, False,,, False)
-                Me.Model.AddFactType(lrSubtypeRelationship.FactType,, abBroadcastInterfaceEvent)
-                lrSubtypeRelationship.FactType.IsSubtypeRelationshipFactType = True
-
-                lrSubtypeRelationship.FactType.RoleGroup(0).Name = "Subtype"
-                lrSubtypeRelationship.FactType.RoleGroup(1).Name = "Supertype"
-
-                If asSubtypeRoleId IsNot Nothing Then
-                    lrSubtypeRelationship.FactType.RoleGroup(0).Id = asSubtypeRoleId
-                End If
-
-                If asSupertypeRoleId IsNot Nothing Then
-                    lrSubtypeRelationship.FactType.RoleGroup(1).Id = asSupertypeRoleId
-                End If
-
-                lrSubtypeRelationship.FactType.RoleGroup(0).Mandatory = True
-
-                larRole.Clear()
-                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
-                lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True, True, arParentModelElement.GetTopmostSupertype)
-
-                larRole.Clear()
-                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
-                lrSubtypeRelationship.FactType.CreateInternalUniquenessConstraint(larRole, False, False, True)
-
-                Dim lrFactTypeReading As FBM.FactTypeReading
-                Dim lasPredicatePart As New List(Of String)
-                lasPredicatePart.Add("is")
-                lasPredicatePart.Add("")
-
-                larRole.Clear()
-                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
-                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
-                lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
-                lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
-
-                larRole.Clear()
-                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(1))
-                larRole.Add(lrSubtypeRelationship.FactType.RoleGroup(0))
-                lrFactTypeReading = New FBM.FactTypeReading(lrSubtypeRelationship.FactType, larRole, lasPredicatePart)
-                lrSubtypeRelationship.FactType.FactTypeReading.Add(lrFactTypeReading)
 #End Region
 
                 If Me.SubtypeRelationship.Count = 0 Then
@@ -1703,7 +1712,7 @@ Namespace FBM
                     Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
                 End If
 
-                RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
+                RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship, abBroadcastInterfaceEvent)
                 Call Me.Model.TriggerSubtypeRelationshipAdded(lrSubtypeRelationship)
 
                 '=========================================================================

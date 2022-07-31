@@ -481,7 +481,8 @@ Namespace FBM
                                                             Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
                                                             Optional ByVal asSubtypeRoleId As String = Nothing,
                                                             Optional ByVal asSupertypeRoleId As String = Nothing,
-                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
+                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                            Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.tSubtypeRelationship
 
             Try
 

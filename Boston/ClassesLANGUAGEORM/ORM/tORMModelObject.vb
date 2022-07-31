@@ -893,12 +893,14 @@ Namespace FBM
         ''' <param name="abIsPrimarySubtypeRelationship"></param>
         ''' <param name="asSubtypeRoleId">Used when importing NORMA .orm files.</param>
         ''' <param name="asSupertypeRoleId">Used when importing NORMA .orm files.</param>
+        ''' <param name="abCreateFactType">False if called from DuplexServiceClient when a SubtypeRelationshipFactType has been received for adding to the Model.</param>
         ''' <returns></returns>
         Public Overridable Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
                                                               Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
                                                               Optional ByVal asSubtypeRoleId As String = Nothing,
                                                               Optional ByVal asSupertypeRoleId As String = Nothing,
-                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As FBM.tSubtypeRelationship
+                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                              Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.tSubtypeRelationship
 
             Return Nothing
         End Function
