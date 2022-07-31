@@ -220,7 +220,7 @@ Namespace VAQL
         ClearUndo()
 
         AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
+        AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
         AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
         AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
@@ -336,24 +336,27 @@ Namespace VAQL
         ''' this method is not used internally. 
         ''' </summary>
         Public Sub HighlightText()
-        SyncLock treelock
-            textChanged = True
-            currentText = Trim(Textbox.Text)
-        End SyncLock
-    End Sub
 
-    Private Sub HighlightTextInternal()
+            SyncLock treelock
+                textChanged = True
+                currentText = Textbox.Text
+            End SyncLock
+
+        End Sub
+
+        Private Sub HighlightTextInternal()
         ' highlight the text (used internally only)
         Lock()
 
         Dim hscroll As Integer = HScrollPos
         Dim vscroll As Integer = VScrollPos
 
-        Dim selstart As Integer = Textbox.SelectionStart
+            Dim selstart As Integer = Textbox.SelectionStart
 
-        HighlighTextCore()
+            HighlighTextCore()
 
-        Textbox.[Select](selstart, 0)
+
+                Textbox.[Select](selstart, 0)
 
         HScrollPos = hscroll
         VScrollPos = vscroll
@@ -437,20 +440,22 @@ Namespace VAQL
                 Continue While
             End If
 
-            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
 
-            SyncLock treelock
-                If textChanged Then
-                    Continue While
-                Else
-                    ' assign new tree
-                    Tree = _tree
+                SyncLock treelock
+                    If textChanged Then
+                        Continue While
+                    Else
+                        ' assign new tree
+                        Tree = _tree
+                    End If
+                End SyncLock
+
+
+                If _tree.Errors.Count = 0 Then
+                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
                 End If
-            End SyncLock
-
-
-            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-        End While
+            End While
     End Sub
 
 
