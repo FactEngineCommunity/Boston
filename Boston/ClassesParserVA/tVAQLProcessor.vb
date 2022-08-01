@@ -132,6 +132,90 @@ Namespace VAQL
 
     End Class
 
+    Public Class IdentifierModelElementClause
+
+        Private _MODELELEMENT As ModelElementClause = Nothing
+        Public Property MODELELEMENT As ModelElementClause
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As ModelElementClause)
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _VALUE As String = Nothing
+        Public Property VALUE As String
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As String)
+                Me._VALUE = value
+            End Set
+        End Property
+
+        Private _VALUELIST As ValueListClause = Nothing
+
+        Public Property VALUELIST As ValueListClause
+            Get
+                Return Me._VALUELIST
+            End Get
+            Set(value As ValueListClause)
+                Me._VALUELIST = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class ValueListClause
+
+        Private _MODELELEMENT As ModelElementClause = Nothing
+        Public Property MODELELEMENT As ModelElementClause
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As ModelElementClause)
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _VALUE As String = Nothing
+        Public Property VALUE As String
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As String)
+                Me._VALUE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class FactStatement
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _IDENTIFIERMODELELEMENT As New List(Of IdentifierModelElementClause)
+        Public Property IDENTIFIERMODELELEMENT As List(Of IdentifierModelElementClause)
+            Get
+                Return Me._IDENTIFIERMODELELEMENT
+            End Get
+            Set(value As List(Of IdentifierModelElementClause))
+                Me._IDENTIFIERMODELELEMENT = value
+            End Set
+        End Property
+
+        Private _PREDICATECLAUSE As New List(Of PredicateClause)
+        Public Property PREDICATECLAUSE As List(Of PredicateClause)
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As List(Of PredicateClause))
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class FactTypeReadingStatement
 
         Private _FRONTREADINGTEXT As String
@@ -647,6 +731,7 @@ Namespace VAQL
         Private Parser As New VAQL.Parser(New VAQL.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         Private Parsetree As New VAQL.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 
+        Public FACTStatement As New VAQL.FactStatement
         Public ISACONCEPTStatement As New VAQL.IsAConceptStatement
         Public ISANENTITYTYPEStatement As New VAQL.IsAnEntityTypeStatement
         Public ISAVALUETYPEStatement As New VAQL.IsAValueTypeStatement
@@ -662,7 +747,6 @@ Namespace VAQL
         Public VALUETYPEISWRITTENASStatement As New VAQL.ValueTypeIsWrittenAsStatement
         Public VALUETYPEWRITTENASClause As New VAQL.ValueTypeWrittenAsClause
         Public VALUECONSTRAINTClause As New VAQL.ValueConstraintClause
-
 
         Public Sub New()
 
@@ -1070,6 +1154,10 @@ Namespace VAQL
                 Else
                     If Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then
                         aoTokenType = TokenType.VALUETYPEISWRITTENASCLAUSE
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.FACTSTMT) Then
+                        aoTokenType = TokenType.FACTSTMT
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUECONSTRAINTCLAUSE) Then

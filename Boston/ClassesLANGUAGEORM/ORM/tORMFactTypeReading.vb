@@ -59,6 +59,13 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
+        Public ReadOnly Property ModelObjects() As List(Of FBM.ModelObject)
+            Get
+                Return Me.PredicatePart.Select(Function(x) x.Role.JoinedORMObject).ToList
+            End Get
+        End Property
+
         'New model
         Public FactTypeReadingRole As List(Of FBM.FactTypeReadingRole)
 

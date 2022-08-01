@@ -254,13 +254,15 @@ Namespace VAQL
 
             '=============================
             If e.KeyCode = Keys.Space Then
-                DoAction(Textbox.Rtf, Textbox.SelectionStart)
-                HighlightText()
+                If Me.Tree.errors.Count = 0 Then
+                    DoAction(Textbox.Rtf, Textbox.SelectionStart)
+                    HighlightText()
+                End If
             End If
             '=============================
 
-        ' undo/redo
-        If e.KeyValue = 89 AndAlso e.Control Then
+            ' undo/redo
+            If e.KeyValue = 89 AndAlso e.Control Then
             Redo()
             ' CTRL-Y
         End If
@@ -336,10 +338,12 @@ Namespace VAQL
         ''' this method is not used internally. 
         ''' </summary>
         Public Sub HighlightText()
+
             SyncLock treelock
                 textChanged = True
                 currentText = Textbox.Text
             End SyncLock
+
         End Sub
 
         Private Sub HighlightTextInternal()
@@ -349,11 +353,12 @@ Namespace VAQL
         Dim hscroll As Integer = HScrollPos
         Dim vscroll As Integer = VScrollPos
 
-        Dim selstart As Integer = Textbox.SelectionStart
+            Dim selstart As Integer = Textbox.SelectionStart
 
-        HighlighTextCore()
+            HighlighTextCore()
 
-        Textbox.[Select](selstart, 0)
+
+                Textbox.[Select](selstart, 0)
 
         HScrollPos = hscroll
         VScrollPos = vscroll
@@ -437,20 +442,22 @@ Namespace VAQL
                 Continue While
             End If
 
-            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
 
-            SyncLock treelock
-                If textChanged Then
-                    Continue While
-                Else
-                    ' assign new tree
-                    Tree = _tree
+                SyncLock treelock
+                    If textChanged Then
+                        Continue While
+                    Else
+                        ' assign new tree
+                        Tree = _tree
+                    End If
+                End SyncLock
+
+
+                If _tree.Errors.Count = 0 Then
+                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
                 End If
-            End SyncLock
-
-
-            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-        End While
+            End While
     End Sub
 
 

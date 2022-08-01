@@ -397,6 +397,9 @@ Namespace VAQL
                 Case TokenType.FRONTREADINGTEXTCLAUSE
                     Value = EvalFRONTREADINGTEXTCLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.IDENTIFIERMODELELEMENT
+                    Value = EvalIDENTIFIERMODELELEMENT(tree, paramlist)
+                    Exit Select
                 Case TokenType.ISACONCEPTCLAUSE
                     Value = EvalISACONCEPTCLAUSE(tree, paramlist)
                     Exit Select
@@ -435,6 +438,9 @@ Namespace VAQL
                     Exit Select
                 Case TokenType.VALUETYPEWRITTENASCLAUSE
                     Value = EvalVALUETYPEWRITTENASCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.FACTSTMT
+                    Value = EvalFACTSTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.FACTTYPEIDENTIFICATION
                     Value = EvalFACTTYPEIDENTIFICATION(tree, paramlist)
@@ -554,6 +560,10 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalIDENTIFIERMODELELEMENT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalISACONCEPTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -603,6 +613,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalVALUETYPEWRITTENASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

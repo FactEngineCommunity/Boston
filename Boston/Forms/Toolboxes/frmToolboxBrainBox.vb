@@ -1256,8 +1256,12 @@ ProcessToken:
 
                     lrParseNode = Me.zrTextHighlighter.GetCurrentContext
                     If lrParseNode.Token.Type = VAQL.TokenType.EOF Then
-                        If lrParseNode.Parent.Nodes.Count > 1 Then
-                            lsCurrentTokenType = Me.zrTextHighlighter.FindNode(lrParseNode.Parent.Nodes(lrParseNode.Parent.Nodes.Count - 1), 0).Token.Type
+                        If lrParseNode.Parent IsNot Nothing Then
+                            If lrParseNode.Parent.Nodes.Count > 1 Then
+                                lsCurrentTokenType = Me.zrTextHighlighter.FindNode(lrParseNode.Parent.Nodes(lrParseNode.Parent.Nodes.Count - 1), 0).Token.Type
+                            End If
+                        Else
+                            lsCurrentTokenType = lrParseNode.Token.Type
                         End If
                     Else
                         lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type

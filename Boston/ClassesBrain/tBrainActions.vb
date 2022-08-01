@@ -415,6 +415,201 @@ Partial Public Class tBrain
         End Try
     End Sub
 
+    Private Function ProcessFactStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
+        Dim lrPGSNodeType As PGS.Node = Nothing
+
+        Try
+            Me.Model = prApplication.WorkingModel
+
+            Dim lrFact As FBM.Fact
+            Dim lrFactType As FBM.FactType
+            Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+            Me.VAQLProcessor.FACTStatement = New VAQL.FactStatement
+
+            Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.FACTStatement, Me.VAQLParsetree.Nodes(0))
+
+#Region "Get Fact Type"
+
+            Dim lsFactTypeReading As String = ""
+
+            Dim liInd = 0
+            For Each lrIdentifierModelElement In Me.VAQLProcessor.FACTStatement.IDENTIFIERMODELELEMENT
+
+                lsFactTypeReading &= lrIdentifierModelElement.MODELELEMENT.PREBOUNDREADINGTEXT
+                lsFactTypeReading &= lrIdentifierModelElement.MODELELEMENT.MODELELEMENTNAME
+                lsFactTypeReading &= lrIdentifierModelElement.MODELELEMENT.POSTBOUNDREADINGTEXT
+                lsFactTypeReading &= " "
+
+                If liInd < Me.VAQLProcessor.FACTStatement.IDENTIFIERMODELELEMENT.Count - 1 Then
+                    For Each lsPredicatePart In Me.VAQLProcessor.FACTStatement.PREDICATECLAUSE(liInd).PREDICATEPART
+                        lsFactTypeReading &= Trim(lsPredicatePart) & " "
+                    Next
+                End If
+
+                liInd += 1
+            Next
+
+            Dim lsReturnErrorMessage As String = ""
+
+            lrFactType = Me.Model.getFactTypeByNaturalLanguageFactTypeReading(lsFactTypeReading, Nothing, True, lsReturnErrorMessage)
+
+            If lrFactType Is Nothing Then
+                lsMessage = lsReturnErrorMessage
+                If arDCSError IsNot Nothing Then
+                    arDCSError.Success = False
+                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDCSError.ErrorString = lsMessage
+                End If
+                Me.send_data(lsMessage)
+                Return False
+            End If
+
+#Region "Create the Fact"
+
+            Dim lrFactData As New FBM.FactData
+
+            Try
+                '--------------------------------
+                'Add a new Fact to the FactType
+                '--------------------------------
+                Dim lrRole As New FBM.Role
+
+                lrFact = Me.Model.CreateFact(lrFactType)
+                Call lrFact.makeDirty() 'Because we want this fact saved to the database
+
+                '---------------------------------
+                'Ad the new Fact to the FactType
+                '---------------------------------
+                lrFactType.AddFact(lrFact)
+
+                liInd = 0
+                For Each lrFactData In lrFact.Data
+                    lrFactData.setData(Me.VAQLProcessor.FACTStatement.IDENTIFIERMODELELEMENT(liInd).VALUE, pcenumConceptType.Value, True)
+                    liInd += 1
+                Next
+
+                Call Me.Model.checkForErrors()
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+
+                If arDCSError IsNot Nothing Then
+                    arDCSError.Success = False
+                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDCSError.ErrorString = lsMessage
+                End If
+                Me.send_data(lsMessage)
+
+                Return Nothing
+            End Try
+
+#End Region
+
+            '========================================================
+
+
+#End Region
+
+            'Dim lsFactTypeName As String = Trim(Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(0).MODELELEMENTNAME)
+            'Dim lsActualModelElementName As String = ""
+
+            'Dim lrModelObject = Me.Model.GetModelObjectByName(lsFactTypeName)
+
+            'If Me.Model.GetConceptTypeByNameFuzzy(lsFactTypeName, lsActualModelElementName) = pcenumConceptType.FactType Then
+            '    '---------------------------------------------------------
+            '    'Great! The name identified by the user is an EntityType
+            '    '---------------------------------------------------------
+
+            '    lsFactTypeName = lsActualModelElementName
+            '    lrModelObject = Me.Model.GetModelObjectByName(lsFactTypeName)
+
+            'ElseIf lrModelObject Is Nothing Then
+            '    lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
+            '    If arDCSError IsNot Nothing Then
+            '        arDCSError.Success = False
+            '        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+            '        arDCSError.ErrorString = lsMessage
+            '    End If
+            '    Me.send_data(lsMessage)
+            '    Return False
+
+            'ElseIf lrModelObject.GetType IsNot GetType(FBM.FactType) Then
+            '    lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
+            '    If arDCSError IsNot Nothing Then
+            '        arDCSError.Success = False
+            '        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+            '        arDCSError.ErrorString = lsMessage
+            '    End If
+            '    Me.send_data(lsMessage)
+            '    Return False
+
+            'End If
+
+            'lrFactType = lrModelObject
+
+            ''=========================================================================
+            ''Create the Internal Uniqueness Constraint
+
+            'Dim larRole As New List(Of FBM.Role)
+
+
+            'For liInd = 1 To Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT.Count - 1
+
+            '    Dim lsModelElementName = Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(liInd).MODELELEMENTNAME
+            '    lrModelObject = Me.Model.GetModelObjectByName(lsModelElementName)
+
+            '    If lrModelObject Is Nothing Then
+            '        lsMessage = lsModelElementName & " is not a Object Type in the Model."
+            '        If arDCSError IsNot Nothing Then
+            '            arDCSError.Success = False
+            '            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+            '            arDCSError.ErrorString = lsMessage
+            '        End If
+            '        Me.send_data(lsMessage)
+            '        Return False
+            '    ElseIf lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName) Is Nothing Then
+            '        lsMessage = lsModelElementName & " is not a Object Type that plays any Role in the Fact Type, " & lrFactType.Id & "."
+            '        If arDCSError IsNot Nothing Then
+            '            arDCSError.Success = False
+            '            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+            '            arDCSError.ErrorString = lsMessage
+            '        End If
+            '        Me.send_data(lsMessage)
+            '        Return False
+            '    Else
+            '        larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName))
+            '    End If
+            'Next
+
+            'If Not Me.Model.StoreAsXML Then
+            '    Call lrFact.Save()
+            'End If
+
+            Me.send_data("Ok")
+
+            Return True
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return False
+
+        End Try
+
+    End Function 'Fact Statement
+
+
     Private Function ProcessISACONCEPTStatement() As Boolean
 
         Try

@@ -2536,6 +2536,9 @@ SkipOutputChannel:
 
         Try
             Select Case aoTokenType
+                Case Is = VAQL.TokenType.FACTSTMT
+                    'Is StraightToAction
+                    Return Me.ProcessFactStatement(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.KEYWDISANENTITYTYPE
                     'Is StraightToAction
                     Return Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent, arDCSError)
@@ -3721,7 +3724,7 @@ SkipOutputChannel:
             '----------------------------------------------------------------------------------------------------------
             'Check that no "Special Characters" appear in the "Sentence"....because the Brain doesn't understand them.
             '----------------------------------------------------------------------------------------------------------
-            Dim loRegularExpression As Regex = New Regex("^[a-zA-Z0-9 (),]*$")
+            Dim loRegularExpression As Regex = New Regex("^[a-zA-Z0-9 ()\',\.]*$")
             If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
                 '----------------------------------------------------------------
                 'Great, the sentence doesn't contain characters like '/*-+@&$#%
@@ -3739,7 +3742,7 @@ SkipOutputChannel:
             '  have come from a mistyped VAQL Statement (i.e. that was not picked up in the code above).
             '  i.e. At this stage we're handing over to regular language processing that expects no special characters at all.
             '-------------------------------------------------------------------------------------------------------------------
-            loRegularExpression = New Regex("^[a-zA-Z0-9 ,]*$")
+            loRegularExpression = New Regex("^[a-zA-Z0-9 ()\',\.]*$")
             If (loRegularExpression.IsMatch(Me.InputBuffer)) Then
                 '----------------------------------------------------------------
                 'Great, the sentence doesn't contain characters like '/*-+@&$#%
