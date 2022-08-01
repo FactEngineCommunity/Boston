@@ -363,6 +363,9 @@ Namespace FBM
                 Dim lrNode As PGS.Node
 
                 'CodeSafe
+                If arTable Is Nothing Then Return Nothing
+
+                'CodeSafe
                 Dim lsTableName = arTable.Name
                 lrNode = Me.ERDiagram.Entity.Find(Function(x) x.Name = lsTableName)
                 If lrNode IsNot Nothing Then

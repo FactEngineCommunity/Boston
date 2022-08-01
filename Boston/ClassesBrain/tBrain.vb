@@ -2548,6 +2548,9 @@ SkipOutputChannel:
                 Case Is = VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                     'Is StraightToAction
                     Return Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent, arDCSError)
+                Case Is = VAQL.TokenType.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE
+                    'Is StraightToAction
+                    Return Me.ProcessOBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDCSError)
                 Case Is = VAQL.TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     'Is StraightToAction
                     Return Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDCSError)

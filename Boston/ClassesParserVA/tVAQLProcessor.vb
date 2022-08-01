@@ -416,6 +416,21 @@ Namespace VAQL
 
     End Class
 
+    Public Class ObjectifiedFactTypeIsIdentifiedByItsStatement
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _MODELELEMENT As New List(Of ModelElementClause)
+        Public Property MODELELEMENT As List(Of ModelElementClause)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of ModelElementClause))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class ValueConstraintClause
 
         Private _MODELELEMENTNAME As String
@@ -640,6 +655,7 @@ Namespace VAQL
         Public ATMOSTONEStatement As New VAQL.AtMostOneStatement
         Public PREDICATEPARTClause As New VAQL.PredicatePartClause
         Public ENTITYTYPEISIDENTIFIEDBYITSStatement As New VAQL.EntityTypeIsIdentifiedByItsStatement
+        Public OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement As New VAQL.ObjectifiedFactTypeIsIdentifiedByItsStatement
         Public FACTTYPEREADINGStatement As New VAQL.FactTypeReadingStatement
         Public MODELELEMENTClause As New VAQL.ModelElementClause
         Public MODELELEMENTTYPEClause As New VAQL.ModelElementTypeClause
@@ -1062,6 +1078,10 @@ Namespace VAQL
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.KEYWDISAKINDOF) Then
                         aoTokenType = TokenType.KEYWDISAKINDOF
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE) Then
+                        aoTokenType = TokenType.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE) Then

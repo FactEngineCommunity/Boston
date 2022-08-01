@@ -343,6 +343,15 @@ Namespace VAQL
             Dim Value As Object = Nothing
 
             Select Case Token.Type
+                Case TokenType.ADDITIONALVALUE
+                    Value = EvalADDITIONALVALUE(tree, paramlist)
+                    Exit Select
+                Case TokenType.VALUELIST
+                    Value = EvalVALUELIST(tree, paramlist)
+                    Exit Select
+                Case TokenType.VALUESTRING
+                    Value = EvalVALUESTRING(tree, paramlist)
+                    Exit Select
                 Case TokenType.NATURALLANGUAGEPROMPT
                     Value = EvalNATURALLANGUAGEPROMPT(tree, paramlist)
                     Exit Select
@@ -378,6 +387,9 @@ Namespace VAQL
                     Exit Select
                 Case TokenType.ENTITYTYPEIDENTIFIEDBYITSCLAUSE
                     Value = EvalENTITYTYPEIDENTIFIEDBYITSCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.FACTCLAUSE
+                    Value = EvalFACTCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.FACTTYPECLAUSE
                     Value = EvalFACTTYPECLAUSE(tree, paramlist)
@@ -470,7 +482,19 @@ Namespace VAQL
             Return lrParseNode
         End Function
 
-                Protected Overridable Function EvalNATURALLANGUAGEPROMPT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+                Protected Overridable Function EvalADDITIONALVALUE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalVALUELIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalVALUESTRING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalNATURALLANGUAGEPROMPT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -515,6 +539,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalENTITYTYPEIDENTIFIEDBYITSCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
