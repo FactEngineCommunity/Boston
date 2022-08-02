@@ -481,16 +481,16 @@ Partial Public Class tBrain
                 lrFact = Me.Model.CreateFact(lrFactType)
                 Call lrFact.makeDirty() 'Because we want this fact saved to the database
 
-                '---------------------------------
-                'Ad the new Fact to the FactType
-                '---------------------------------
-                lrFactType.AddFact(lrFact)
-
                 liInd = 0
                 For Each lrFactData In lrFact.Data
                     lrFactData.setData(Me.VAQLProcessor.FACTStatement.IDENTIFIERMODELELEMENT(liInd).VALUE, pcenumConceptType.Value, True)
                     liInd += 1
                 Next
+
+                '---------------------------------
+                'Ad the new Fact to the FactType
+                '---------------------------------
+                lrFactType.AddFact(lrFact, True)
 
                 Call Me.Model.checkForErrors()
 

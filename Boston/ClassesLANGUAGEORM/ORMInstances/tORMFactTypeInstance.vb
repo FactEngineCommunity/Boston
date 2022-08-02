@@ -3893,6 +3893,30 @@ Namespace FBM
                 Return New Point(0, 0)
             End If
         End Function
+
+        Private Sub _FactType_FactTableUpdated(ByRef arFact As Fact, abAddToPage As Boolean) Handles _FactType.FactTableUpdated
+
+
+            Try
+                'CodeSafe
+                If Me.Page Is Nothing Then Exit Sub
+                If Me.Page.Diagram Is Nothing Then Exit Sub
+                If Me.FactTable Is Nothing Then Exit Sub
+                If Me.FactTable.TableShape Is Nothing Then Exit Sub
+
+                Call Me.AddFact(arFact, True)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

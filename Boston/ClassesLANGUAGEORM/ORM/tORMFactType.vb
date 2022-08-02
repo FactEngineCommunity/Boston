@@ -325,7 +325,7 @@ Namespace FBM
 
         Public Shadows Event Updated()
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
-        Public Event FactTableUpdated()
+        Public Event FactTableUpdated(ByRef arFact As FBM.Fact, ByVal abAddToPage As Boolean)
         Public Event IUConstraintAdded(ByRef arFactType As FBM.FactType, ByRef arRoleConstraint As FBM.RoleConstraint)
         Public Event IUConstraintRemoved(ByRef arFactType As FBM.FactType, ByVal arRoleConstraint As FBM.RoleConstraint)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
@@ -1138,7 +1138,7 @@ Namespace FBM
         End Sub
 
 
-        Public Sub AddFact(ByVal arFact As FBM.Fact)
+        Public Sub AddFact(ByVal arFact As FBM.Fact, Optional ByVal abAddToPages As Boolean = False)
 
             Dim lrFactData As FBM.FactData
 
@@ -1174,7 +1174,7 @@ Namespace FBM
                     End If
                 End If
 
-                RaiseEvent FactTableUpdated()
+                RaiseEvent FactTableUpdated(arFact, abAddToPages)
 
 
                 Me.Model.MakeDirty(False, False)
