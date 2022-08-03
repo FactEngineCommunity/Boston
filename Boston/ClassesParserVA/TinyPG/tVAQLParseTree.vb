@@ -189,7 +189,7 @@ Namespace VAQL
         Return Nodes(0).Eval(Me, paramlist)
         End Function
 
-        Public Overloads Function Clone() As Object
+        Public Overloads Function Clone(Optional ByVal abLeaveOptionals As Boolean = False) As Object
             Dim lrTree As New ParseTree
             Dim lrParseError As ParseError
             Dim lrToken As Token
@@ -210,7 +210,10 @@ Namespace VAQL
                         'Move on
                     End Try
 
-                    lrTree.Optionals = New ParseErrors
+                    If Not abLeaveOptionals Then
+                        lrTree.Optionals = New ParseErrors
+                    End If
+
                     Try
                         For Each lrParseError In .Optionals
                             lrTree.Optionals.Add(lrParseError.Clone)
@@ -234,9 +237,9 @@ Namespace VAQL
 
                     lrTree.Token = .Token.Clone
 
-                    Catch ex As Exception
-                        'Not much we can do here
-                    End Try
+                Catch ex As Exception
+                    'Not much we can do here
+                End Try
             End With
 
             Return lrTree
