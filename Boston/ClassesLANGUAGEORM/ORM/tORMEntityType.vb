@@ -1587,14 +1587,16 @@ Namespace FBM
                 'End If
                 '====================================================================================
                 Me.isDirty = True
-                Me.Model.MakeDirty()
+                Me._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.EntityTypeRequiresReferenceSchemeError)
+                Me.Model.MakeDirty
+
 
                 RaiseEvent PreferredIdentifierRCIdChanged(Me.PreferredIdentifierRCId)
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage = "Error:  " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try

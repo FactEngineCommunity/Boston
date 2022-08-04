@@ -738,10 +738,10 @@ RemoveAnyway:
             Me.DataTypeLength = Me.ValueType.DataTypeLength
             Me.DataTypePrecision = Me.ValueType.DataTypePrecision
 
-            Dim lrModelError As New FBM.ModelError("127", Me.ValueType)
+            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.DataTypeNotSpecifiedError, Me.ValueType)
             lrModelError.Description = "Data Type Not Specified Error - Value Type: '" & Me.ValueType.Name & "'."
 
-            Me.ValueType.ModelError.Remove(lrModelError)
+            Me.ValueType._ModelError.Remove(lrModelError)
 
             Call Me.SetAppropriateColour()
 

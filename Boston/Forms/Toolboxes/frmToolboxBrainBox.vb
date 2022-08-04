@@ -371,7 +371,7 @@ Public Class frmToolboxBrainBox
                     '============================================
                     'If Optionals exist, then show AutoComplete
 
-                    Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text)
+                    Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text & " ")
                     If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
                         Call Me.ProcessAutoComplete()
                         e.Handled = True
@@ -597,6 +597,8 @@ Public Class frmToolboxBrainBox
         Try
 
             If (e.KeyCode = Keys.Down Or Trim(Me.TextBoxInput.Text) <> "NL:") And Not e.KeyCode = Keys.Space Then
+                Call Me.ProcessAutoComplete(e)
+            ElseIf Me.TextBoxInput.Text(Me.TextBoxInput.Text.Length - 1) = " " Then
                 Call Me.ProcessAutoComplete(e)
             End If
 
@@ -1076,6 +1078,12 @@ Public Class frmToolboxBrainBox
             Dim lbStartsWith As Boolean = False
             lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
 
+            Dim larModelElementParts() = Split(zsIntellisenseBuffer, "-")
+            Try
+                zsIntellisenseBuffer = larModelElementParts(1)
+            Catch ex As Exception
+            End Try
+
             For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
                 If zsIntellisenseBuffer.Length > 0 Then
                     If lrValueType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
@@ -1181,11 +1189,11 @@ Public Class frmToolboxBrainBox
             '-------------------
             'Get the ParseTree
             '-------------------
-            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text)
+            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.TextBoxInput.Text & " ")
 
             Call Me.CheckStartProductions(Me.zrTextHighlighter.Tree)
 
-            Me.AutoComplete.Hide()
+            'Me.AutoComplete.Hide()
             Me.AutoComplete.ListBox.Items.Clear()
 
             Dim lrLastToken As VAQL.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
@@ -1327,13 +1335,13 @@ ProcessToken:
                     'End If
 
                     Me.AutoComplete.Owner = Me
-                    'Me.AutoComplete.Show()
 
                     Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
                     lo_point.X += Me.TextBoxInput.Bounds.X
                     lo_point.Y += Me.TextBoxInput.Bounds.Y
                     lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 24
                     Me.AutoComplete.Location = PointToScreen(lo_point)
+                    Me.AutoComplete.Show()
                 End If
 
                 If e IsNot Nothing Then
@@ -1353,6 +1361,8 @@ ProcessToken:
                                   VAQL.TokenType.PREDICATESPACE
                             Me.AutoComplete.Enabled = True
                             'Call Me.AddFactTypeReadingsToEnterpriseAware()
+                        Case Is = VAQL.TokenType.MODELELEMENTNAME
+                            Me.AutoComplete.Enabled = True
                         Case Else
                             Me.AutoComplete.Enabled = False
                     End Select
@@ -1377,7 +1387,7 @@ ProcessToken:
             ElseIf (Me.AutoComplete.Enabled = True) And (Me.AutoComplete.ListBox.Items.Count > 0) Then
                 Me.AutoComplete.Owner = Me
                 Me.AutoComplete.zrCallingForm = Me
-                Me.AutoComplete.Show()
+                Me.AutoComplete.ListBox.Focus()
                 If e IsNot Nothing Then
                     e.Handled = True
                 End If
@@ -1392,7 +1402,7 @@ ProcessToken:
                         Me.AutoComplete.ListBox.SelectedIndex = 0
                     End If
                 End If
-            Else
+            ElseIf Not Me.AutoComplete.Enabled Then
                 Me.TextBoxInput.Focus()
             End If
 

@@ -1513,7 +1513,7 @@ EndProcessing:
                     Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
 
                     Dim lrModelError As New FBM.ModelError(127, lrValueType)
-                    lrValueType.ModelError.RemoveAll(AddressOf lrModelError.EqualsByErrorIdModelElementId)
+                    lrValueType._ModelError.RemoveAll(AddressOf lrModelError.EqualsByErrorIdModelElementId)
                     Call Me.Model.RemoveModelError(lrModelError)
                 Else
                     lsMessage = "Remember that you can set the Data Type for the Value Type by saying something like:"

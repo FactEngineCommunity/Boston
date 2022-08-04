@@ -254,10 +254,8 @@ Namespace VAQL
 
             '=============================
             If e.KeyCode = Keys.Space Then
-                If Me.Tree.errors.Count = 0 Then
-                    DoAction(Textbox.Rtf, Textbox.SelectionStart)
-                    HighlightText()
-                End If
+                DoAction(Textbox.Rtf, Textbox.SelectionStart)
+                HighlightText()
             End If
             '=============================
 

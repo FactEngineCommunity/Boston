@@ -1126,7 +1126,7 @@ Namespace FBM
                     Me.ModelError.AddUnique(lrModelError)
                     Me.Model.AddModelError(lrModelError)
                 Case Else
-                    Me.ModelError.RemoveAll(Function(x) x.ErrorId = 127)
+                    Me._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.DataTypeNotSpecifiedError)
             End Select
 
 

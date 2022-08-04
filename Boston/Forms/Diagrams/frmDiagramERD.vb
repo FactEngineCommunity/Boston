@@ -1067,7 +1067,7 @@ SkipORMReadingEditor:
                 larModelElement.Add(lrModelElement)
                 lsFactTypeName.AppendString(lrModelElement.Id & "RelatesTo")
 
-                If lrModelElement.ModelError.Find(Function(x) x.ErrorId = "105") IsNot Nothing Then
+                If lrModelElement.ModelError.Find(Function(x) x.ErrorId = pcenumModelErrors.EntityTypeRequiresReferenceSchemeError) IsNot Nothing Then
                     lsMessage = "You should create a Primary Reference Scheme for the Node Type, " & lrModelElement.Id & ", as soon as possible."
                     lsMessage.AppendDoubleLineBreak("A Node Type without a Primary Reference Scheme is like a Table without a Primary Key, or a graph database Node Type without a unique identifier for Nodes at the data level.")
                     MsgBox(lsMessage)

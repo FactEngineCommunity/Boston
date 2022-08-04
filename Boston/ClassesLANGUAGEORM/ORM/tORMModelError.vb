@@ -9,11 +9,11 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public _error_id As String = ""
-        Public Property ErrorId() As String
+        Public Property ErrorId() As pcenumModelErrors
             Get
                 Return _error_id
             End Get
-            Set(ByVal Value As String)
+            Set(ByVal Value As pcenumModelErrors)
                 _error_id = Value
             End Set
         End Property
@@ -39,7 +39,7 @@ Namespace FBM
             '-------------------
         End Sub
 
-        Public Sub New(ByVal asErrorId As String, _
+        Public Sub New(ByVal asErrorId As pcenumModelErrors,
                        ByRef arModelObject As FBM.ModelObject)
 
             Me.ErrorId = asErrorId

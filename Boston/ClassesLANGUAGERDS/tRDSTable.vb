@@ -1541,6 +1541,9 @@ Namespace RDS
                                 Optional abIsReferenceModeColumn As Boolean = False)
 
             Try
+                'CodeSafe
+                If arColumn Is Nothing Then Exit Sub
+
                 Dim lrColumn As RDS.Column = arColumn
 
                 Me.Column.Remove(arColumn)

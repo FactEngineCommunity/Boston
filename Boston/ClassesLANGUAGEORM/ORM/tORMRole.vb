@@ -55,6 +55,12 @@ Namespace FBM
             End Set
         End Property
 
+        Public ReadOnly Property InternalUniquenessConstraint As List(Of FBM.RoleConstraint)
+            Get
+                Return Me.FactType.InternalUniquenessConstraint.FindAll(Function(x) x.Role.Contains(Me))
+            End Get
+        End Property
+
         <XmlIgnore()>
         Public ReadOnly Property DerivedRoleName As String
             Get

@@ -404,8 +404,8 @@ SkipThat:
                                         lrFactDataInstance.Cell.Text = "Error: No matching Fact."
                                     Else
                                         lsMessage = "Error: Could not find Fact for Role/FactData referencing Facts in a Fact Type"
-                                        lsMessage &= vbCrLf & "Role.JoinsFactType.Id: " & lrFactDataInstance.Role.JoinedORMObject.Id
-                                        lsMessage &= vbCrLf & "Joined Fact.Id: " & lrFactDataInstance.Data
+                                        lsMessage.AppendDoubleLineBreak("Role.JoinsFactType.Id: " & lrFactDataInstance.Role.JoinedORMObject.Id)
+                                        lsMessage.AppendLine("Joined Fact.Id: " & lrFactDataInstance.Data)
                                         Throw New System.Exception(lsMessage)
                                     End If
                                 End If
@@ -440,6 +440,7 @@ SkipThat:
                 lsMessage1 &= vbCrLf & vbCrLf & loErr.Message
                 lsMessage1 &= vbCrLf & vbCrLf & "FactTypeName: " & Me.FactTypeInstance.Name
                 lsMessage1 &= vbCrLf & vbCrLf & "PageId: " & Me.FactTypeInstance.Page.PageId
+                lsMessage1 &= vbCrLf & vbCrLf & "PageId: " & Me.FactTypeInstance.Page.Name
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, loErr.StackTrace)
             End Try
 

@@ -1412,6 +1412,36 @@ MoveOn:
 
         End Sub
 
+        ''' <summary>
+        ''' Hides the EntityTypeInstance and associated shapes
+        ''' </summary>
+        Public Sub Hide()
+
+            Try
+                If Me.Page IsNot Nothing Then
+                    If Me.Page.Diagram IsNot Nothing Then
+                        Me.Shape.Visible = False
+                        Me.EntityTypeNameShape.Visible = False
+                        If Me.ObjectifyingEntityTypeIndicatorShape IsNot Nothing Then
+                            Me.ObjectifyingEntityTypeIndicatorShape.Visible = False
+                        End If
+                        If Me.ReferenceModeShape IsNot Nothing Then
+                            Me.ReferenceModeShape.Visible = False
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Overloads Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False) As List(Of FBM.RoleInstance)
 
             Try
@@ -1904,7 +1934,7 @@ MoveOn:
                                     Call Me.SetPropertyAttributes(Me, "DataTypeLength", False)
                             End Select
                             If Me.EntityType.HasSimpleReferenceScheme Then
-                                Me.EntityType.ModelError.RemoveAll(Function(x) x.ErrorId = 127)
+                                Me.EntityType._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.DataTypeNotSpecifiedError)
                                 Me.EntityType.ReferenceModeValueType.SetDataType(Me._DataType)
                             End If
                         Case Is = "DataTypeLength"

@@ -3904,8 +3904,9 @@ Namespace FBM
                     Dim lrResponsibleRole As FBM.Role = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
                     Dim lrOriginalTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrResponsibleRole.JoinedORMObject.Id)
                     lrColumn = lrOriginalTable.Column.Find(Function(x) x.Role Is lrResponsibleRole)
-                    Call lrOriginalTable.removeColumn(lrColumn, abAddToConnectedDatabase)
-
+                    If lrColumn IsNot Nothing Then
+                        Call lrOriginalTable.removeColumn(lrColumn, abAddToConnectedDatabase)
+                    End If
                     For Each lrRole In Me.RoleGroup
                         Select Case lrRole.TypeOfJoin
                             Case Is = pcenumRoleJoinType.ValueType
@@ -3916,7 +3917,7 @@ Namespace FBM
                     Next
 
                 Else
-                    Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                        Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
                     If lrTable IsNot Nothing Then
 
@@ -4006,6 +4007,7 @@ Namespace FBM
                     'Because the Relations are no longer for an RDSRelation Table, but the ModelObject/Table on the Many side of the FactType.
                     Call Me.Model.removeRDSRelationsForLinkFactTypesForFactType(Me)
                     Dim lrRole = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+                    Call Me.Model.DoRDSProcessingForRoleConstraint(lrRole.InternalUniquenessConstraint(0), False, Nothing)
                     Call Me.Model.generateRelationForManyTo1BinaryFactType(lrRole)
                 Else
                     Call Me.Model.moveRelationsOfLinkFactTypesToRespectiveFactType(Me)
@@ -4018,8 +4020,10 @@ Namespace FBM
 
                 'RDS-Remove the RDSRelation Table if the FactType is a ManyTo1BinaryFactType
                 If Me.IsManyTo1BinaryFactType Or Me.Is1To1BinaryFactType Then
-                    Dim lrRDSRelationTable = Me.getCorrespondingRDSTable
-                    Call Me.Model.RDS.removeTable(lrRDSRelationTable) 'Because is no longer needed for anything.
+                    Dim lrRDSRelationTable = Me.getCorrespondingRDSTable(Nothing, True)
+                    If lrRDSRelationTable IsNot Nothing Then
+                        Call Me.Model.RDS.removeTable(lrRDSRelationTable) 'Because is no longer needed for anything.
+                    End If
                 End If
 
                 RaiseEvent ObjectificationRemoved()

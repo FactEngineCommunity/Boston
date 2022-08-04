@@ -2687,7 +2687,7 @@ Namespace FBM
 
                 Dim lrModelError As New FBM.ModelError(115, Me.FactType)
                 lrModelError = Me.FactType.ModelError.Find(Function(x) x.ErrorId = lrModelError.ErrorId And x.ModelObject.Id = Me.FactType.Id)
-                Me.FactType.ModelError.Remove(lrModelError)
+                Me.FactType._ModelError.Remove(lrModelError)
                 Call Me.Model.RemoveModelError(lrModelError)
 
                 Call Me.SetAppropriateColour()
@@ -2800,8 +2800,8 @@ Namespace FBM
                     Call Me.AdjustBorderHeight()
                 End If
 
-                Dim lrModelError As FBM.ModelError = Me.FactType.ModelError.Find(Function(x) x.ErrorId = 106)
-                Call Me.FactType.ModelError.Remove(lrModelError)
+                Dim lrModelError As FBM.ModelError = Me.FactType.ModelError.Find(Function(x) x.ErrorId = pcenumModelErrors.FactTypeRequiresInternalUniquenessConstraintError)
+                Call Me.FactType._ModelError.Remove(lrModelError)
                 Call Me.Model.RemoveModelError(lrModelError)
 
                 Call Me.SetAppropriateColour()
@@ -2958,6 +2958,12 @@ Namespace FBM
                 Me.Model.Save()
             End If
 
+            If Me.Page IsNot Nothing Then
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.ObjectifyingEntityType.Hide
+                End If
+            End If
+
             If IsSomething(Me.Shape) Then
                 Me.Shape.Pen.Color = Color.Black
 
@@ -3108,16 +3114,6 @@ Namespace FBM
 
                 Me.FactTypeNameShape.Text = Me.FactType.Name
 
-                '-----------------------------------------------------------
-                'Update the FactTable within the FactTypeInstance on the
-                '  current page
-                '-----------------------------------------------------------
-                If Me.Page.Loaded Then
-                    If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
-                        Call Me.FactTable.ResortFactTable()
-                    End If
-                End If
-
                 '-----------------------------------------------------------------------
                 'Check to see if any of the Facts have been removed at the Model level
                 '-----------------------------------------------------------------------
@@ -3139,6 +3135,16 @@ Namespace FBM
                         Call Me.FactTable.ResortFactTable()
                     End If
                 Next
+
+                '-----------------------------------------------------------
+                'Update the FactTable within the FactTypeInstance on the
+                '  current page
+                '-----------------------------------------------------------
+                If Me.Page.Loaded Then
+                    If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
+                        Call Me.FactTable.ResortFactTable(True)
+                    End If
+                End If
 
                 Me.Page.MakeDirty()
 

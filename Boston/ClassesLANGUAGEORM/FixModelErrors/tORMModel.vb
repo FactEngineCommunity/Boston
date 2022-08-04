@@ -430,7 +430,7 @@ Namespace FBM
 
             Try
                 Dim larDuplicateFactFactType = From FactType In Me.FactType
-                                               Where FactType.ModelError.FindAll(Function(x) x.ErrorId = 100).Count > 0
+                                               Where FactType.ModelError.FindAll(Function(x) x.ErrorId = pcenumModelErrors.PopulationUniquenessError).Count > 0
                                                Select FactType
 
                 For Each lrFactType In larDuplicateFactFactType

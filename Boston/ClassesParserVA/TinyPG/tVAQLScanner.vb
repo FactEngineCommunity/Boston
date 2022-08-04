@@ -129,7 +129,7 @@ Namespace VAQL
             Patterns.Add(TokenType.PREBOUNDREADINGTEXT, regex)
             Tokens.Add(TokenType.PREBOUNDREADINGTEXT)
 
-            regex = new Regex("(?!([a-z]+\-))(?!([a-z\s]+$))([a-z]+[^\-])", RegexOptions.Compiled)
+            regex = new Regex("(?!([a-z]+\-))(?!([a-z]+$))([a-z]+[^\-])", RegexOptions.Compiled)
             Patterns.Add(TokenType.PREDICATEPART, regex)
             Tokens.Add(TokenType.PREDICATEPART)
 

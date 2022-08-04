@@ -9011,7 +9011,6 @@ SkipPopup:
 
         Me.ContextMenuStrip_FactType.ImageScalingSize = New Drawing.Size(16, 16)
 
-
         If Me.zrPage.SelectedObject.Count = 0 Then
             Exit Sub
         End If
@@ -9029,6 +9028,13 @@ SkipPopup:
 
         lrFactType = lrFactTypeInstance.FactType
         lr_model = lrFactType.Model
+
+        'Objectification MenuItem
+        If lrFactType.IsObjectified Then
+            Me.mnuOption_IsObjectified.Text = "Remove Objectification"
+        Else
+            Me.mnuOption_IsObjectified.Text = "Objectify the Fact Type"
+        End If
 
         Me.ToolStripMenuItemAddRole.Enabled = Not lrFactType.IsLinkFactType
         If lrFactTypeInstance.ShowFactTypeName Then Me.ToolStripMenuItemShowFactTypesName.Checked = True
