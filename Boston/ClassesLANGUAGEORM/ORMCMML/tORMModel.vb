@@ -1223,6 +1223,10 @@ Namespace FBM
 
                     Dim lrFactType = arFactType
 
+                    'CodeSafe
+                    If lrFactType.RoleGroup.Count = 0 Then Exit Sub
+                    If lrFactType.RoleGroup(0).JoinedORMObject Is Nothing Then Throw New ApplicationException("The Unary Role on Fact Type, " & lrFactType.Id & ", is not joined to anything. Consider removing the Role.")
+
                     Dim lrTable As RDS.Table = Me.RDS.Table.Find(Function(x) x.Name = lrFactType.RoleGroup(0).JoinedORMObject.Id)
 
                     If lrTable Is Nothing Then
@@ -1245,6 +1249,15 @@ Namespace FBM
                 Else
                     Throw New Exception("FactType is not Unary")
                 End If
+
+            Catch appEx As ApplicationException
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = appEx.Message
+                lsMessage.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
+
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
 
             Catch ex As Exception
                 Dim lsMessage1 As String

@@ -2876,6 +2876,7 @@ FailsafeContinue:
             Try
                 Dim larFactType = From FactType In Me.Model.FactType
                                   From Role In FactType.RoleGroup
+                                  Where Role.JoinedORMObject IsNot Nothing
                                   Where Role.JoinedORMObject.Id = Me.Id
                                   Select FactType
 

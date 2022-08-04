@@ -1787,24 +1787,29 @@ Namespace FBM
             'Used predominantly to see which Entity of a binary FactType
             'owns the uniqueness constraint (Role can't be part of 1:1 binary fact type)
             '-------------------------------------------------------------------------------
-            
+
             HasInternalUniquenessConstraint = False
 
-            Dim larRoleConstraintRole = From RoleConstraint In Me.Model.RoleConstraint
-                                        From RoleConstraintRole In RoleConstraint.RoleConstraintRole _
-                                        Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
-                                        And RoleConstraintRole.Role.Id = Me.Id _
-                                        Select RoleConstraintRole
+            Try
 
-            Return larRoleConstraintRole.Count > 0
+                Dim larRoleConstraintRole = From RoleConstraint In Me.Model.RoleConstraint
+                                            From RoleConstraintRole In RoleConstraint.RoleConstraintRole
+                                            Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
+                                            And RoleConstraintRole.Role.Id = Me.Id
+                                            Select RoleConstraintRole
 
-            'Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-            'For Each lrRoleConstraintRole In Me.RoleConstraintRole
-            '    If lrRoleConstraintRole.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-            '        HasInternalUniquenessConstraint = True
-            '        Exit Function
-            '    End If
-            'Next
+                Return larRoleConstraintRole.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
 
         End Function
 

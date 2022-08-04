@@ -1676,8 +1676,13 @@ Namespace ORMQL
 
                 If lrFactType Is Nothing Then
                     Dim lrParseNode = New TinyPG.ParseNode()
-                    lrParseNode.Token = New TinyPG.Token(0,0)
-                    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrinsertStatement.USERTABLENAME, 100, lrParseNode))
+                    lrParseNode.Token = New TinyPG.Token(0, 0)
+                    Try
+                        Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrinsertStatement.USERTABLENAME, 100, lrParseNode))
+                    Catch ex As Exception
+                        Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: <Unknown>", 100, lrParseNode))
+                    End Try
+
                     Return Me.Parsetree.Errors
                     Exit Function
                 End If

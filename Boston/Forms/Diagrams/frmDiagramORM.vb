@@ -3120,9 +3120,14 @@ Public Class frmDiagramORM
             Dim loDiagramView As DiagramView = e.EditControl.Parent
             Dim loRectangle As New Rectangle(e.Node.Bounds.X, e.Node.Bounds.Y, e.Node.Bounds.Width, e.Node.Bounds.Height)
 
-            e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
-            e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
-
+            'CodeSafe
+            If loDiagramView Is Nothing Then
+                e.EditControl.Width = 20
+                e.EditControl.Height = 8
+            Else
+                e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
+                e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -8863,9 +8868,10 @@ SkipPopup:
         Dim lo_menu_option As ToolStripItem
 
         Try
-            If Me.zrPage.SelectedObject.Count = 0 Then
-                Exit Sub
-            End If
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(FBM.ValueType) Then Exit Sub
+
 
             lrValueType = Me.zrPage.SelectedObject(0).ValueType
             lrValueTypeInstance = Me.zrPage.SelectedObject(0)
@@ -8966,7 +8972,7 @@ SkipPopup:
                     'lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
                     lo_menu_option = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
                     lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler lo_menu_option.Click, AddressOf Me.MorphToSTDiagram
+                    AddHandler lo_menu_option.Click, AddressOf Me.morphToSTDiagram
                 End If
             Next
 
@@ -10923,6 +10929,9 @@ SkipRemovalFromModel:
             If Me.zrPage.Model.HasCoreModel Then
                 Me.ERDiagramToolStripMenu.Visible = True
             End If
+
+            'CodeSafe
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(FBM.EntityTypeInstance) Then Exit Sub
 
             lrEntityType = Me.zrPage.SelectedObject(0).EntityType
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)

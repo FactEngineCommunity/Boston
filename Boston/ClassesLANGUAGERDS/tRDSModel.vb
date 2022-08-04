@@ -447,6 +447,9 @@ Namespace RDS
         Public Sub removeTable(ByRef arTable As RDS.Table)
 
             Try
+                'CodeSafe
+                If arTable Is Nothing Then Exit Sub
+
                 Dim lrTable As RDS.Table = arTable
                 '-----------------------------------------------------------------------------------------------------
                 'Indexes

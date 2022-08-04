@@ -2770,6 +2770,10 @@ NextY:
         Public Sub RemoveRoleInstance(ByRef arRoleInstance As FBM.RoleInstance)
 
             Try
+                'CodeSafe
+                If Me.Diagram Is Nothing Then Exit Sub
+                If arRoleInstance Is Nothing Then Exit Sub
+
                 Me.Diagram.Nodes.Remove(arRoleInstance.Shape)
             Catch ex As Exception
                 Dim lsMessage As String

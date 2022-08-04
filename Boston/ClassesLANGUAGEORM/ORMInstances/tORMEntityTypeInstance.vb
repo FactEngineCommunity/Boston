@@ -1200,12 +1200,15 @@ Namespace FBM
             Try
                 Dim loRectangle As Rectangle
 
-                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                          From Role In FactTypeInstance.FactType.RoleGroup _
+                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                          From Role In FactTypeInstance.FactType.RoleGroup
+                                          Where Role.JoinedORMObject IsNot Nothing
                                           Where Role.JoinedORMObject.Id = Me.Id _
-                                          And FactTypeInstance.isPreferredReferenceMode = True _
+                                          And FactTypeInstance.isPreferredReferenceMode = True
                                           Select FactTypeInstance Distinct
 
+                'CodeSafe
+                If larFactTypeInstance.Count = 0 Then Exit Sub
 
                 Me.ReferenceModeShape.Visible = True
 
@@ -2467,7 +2470,9 @@ MoveOn:
                                           Select FactTypeInstance
 
                 For Each lrFactTypeInstance In larFactTypeInstance.ToArray
-                    Call lrFactTypeInstance.FactTable.ResortFactTable()
+                    If lrFactTypeInstance.FactTable IsNot Nothing Then
+                        Call lrFactTypeInstance.FactTable.ResortFactTable()
+                    End If
                 Next
 
                 Call Me.RefreshShape()

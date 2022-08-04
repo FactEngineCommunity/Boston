@@ -3984,6 +3984,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Sub RemoveObjectification(ByVal abBroadcastInterfaceEvent As Boolean)
 
+            Dim lsMessage As String = ""
+
             Try
                 Me.IsObjectified = False
 
@@ -4027,8 +4029,14 @@ Namespace FBM
 
                 RaiseEvent ObjectificationRemoved()
 
-                Call Me.ObjectifyingEntityType.RemoveFromModel(True, False, abBroadcastInterfaceEvent)
-                Me.ObjectifyingEntityType = Nothing
+                Try
+                    Call Me.ObjectifyingEntityType.RemoveFromModel(True, False, abBroadcastInterfaceEvent)
+                    Me.ObjectifyingEntityType = Nothing
+                Catch ex As Exception
+                    lsMessage = "Error trying to remove the Objectifying Entity Type for Objectified Fact Type, '" & Me.Id & "'."
+                    prApplication.ThrowErrorMessage(lsmessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                End Try
+
 
                 '------------------------------------------------------------------------------------------------------------
                 'Save the FactType because there's a need to remove the ObjectifyingEntityType reference from the FactType.
@@ -4044,6 +4052,8 @@ Namespace FBM
                 If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
                 End If
+
+
 
             Catch ex As Exception
                 Dim lsMessage1 As String

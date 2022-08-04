@@ -2488,13 +2488,18 @@ Public Class frmDiagramPGS
         Dim lrCell As MindFusion.Diagramming.TableNode.Cell
         Dim liInd As Integer = 0
 
-        If Me.PropertyTableNode IsNot Nothing Then
-            For liInd = 0 To Me.PropertyTableNode.RowCount - 1
-                lrCell = Me.PropertyTableNode.Item(0, liInd)
-                lrCell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
-                lrCell.TextColor = Color.Black
-            Next
-        End If
+        Try
+            If Me.PropertyTableNode IsNot Nothing Then
+                For liInd = 0 To Me.PropertyTableNode.RowCount - 1
+                    lrCell = Me.PropertyTableNode.Item(0, liInd)
+                    lrCell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                    lrCell.TextColor = Color.Black
+                Next
+            End If
+        Catch ex As Exception
+            'Not a biggie.
+        End Try
+
 
     End Sub
 
@@ -2555,33 +2560,35 @@ Public Class frmDiagramPGS
                 lrLink.TextStyle = LinkTextStyle.Rotate
                 Dim lrPGSLink As PGS.Link = lrLink.Tag
 
+                If lrPGSLink IsNot Nothing Then
+
 #Region "Experimental - Link Fact Types as dashed lines"
 
-                Dim lrFactType As FBM.FactType
+                    Dim lrFactType As FBM.FactType
 
-                If lrPGSLink.Relation.IsPGSRelationNode Or lrPGSLink.RDSRelation.ResponsibleFactType.isRDSTable Then
+                    If lrPGSLink.Relation.IsPGSRelationNode Or lrPGSLink.RDSRelation.ResponsibleFactType.isRDSTable Then
 
-                    If lrPGSLink.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                        If lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                            lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
-                            If lrFactType.getCorrespondingRDSTable(Nothing, True).isPGSRelation Then
-                                'SimplePredicate                                
-                                lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
+                        If lrPGSLink.RDSRelation.ResponsibleFactType.IsObjectified Or lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            If lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                                lrFactType = lrPGSLink.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                                If lrFactType.getCorrespondingRDSTable(Nothing, True).isPGSRelation Then
+                                    'SimplePredicate                                
+                                    lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
+                                Else
+                                    lrPGSLink.Link.Pen = loPen
+                                End If
                             Else
-                                lrPGSLink.Link.Pen = loPen
+                                lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
                             End If
                         Else
                             lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
                         End If
-                    Else
-                        lrPGSLink.Link.Pen.DashStyle = DashStyle.Solid
+                    ElseIf lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        lrPGSLink.Link.Pen = loPen
                     End If
-                ElseIf lrPGSLink.RDSRelation.ResponsibleFactType.IsLinkFactType Then
-                    lrPGSLink.Link.Pen = loPen
-                End If
 #End Region
 
-                If lrPGSLink IsNot Nothing Then
+
                     Call lrPGSLink.setPredicate()
 
                     Call lrPGSLink.setHeadShapes()
@@ -4049,6 +4056,9 @@ Aborted:
         Try
             Dim lrPGSRelation As ERD.Relation
 
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+
             With New WaitCursor
                 lrPGSRelation = Me.zrPage.SelectedObject(0)
                 Dim lrFactType As FBM.FactType = Nothing
@@ -4103,6 +4113,10 @@ FinishedPretesting:
         Dim lsMessage As String
 
         Try
+            'CodeSafe
+            If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(ERD.Relation) Then Exit Sub
+
             lrPGSRelation = Me.zrPage.SelectedObject(0)
 
             If lrPGSRelation.ActualPGSNode Is Nothing Then
@@ -4958,6 +4972,9 @@ EndProcessing:
         Dim lrPGSNode As New PGS.Node
 
         Try
+            'CodeSafe
+            If Me.Diagram.Selection.Items.Count = 0 Then Exit Sub
+
             '-------------------------
             'Get the selected PGS Node            
             lrPGSNode = Me.Diagram.Selection.Items(0).Tag

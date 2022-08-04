@@ -640,7 +640,12 @@ SkipRegistrationChecking:
                 Me.ToolStripMenuItemPage.Visible = True
                 Me.ToolStripMenuItemToolbox.Enabled = True
                 Me.ToolStripLabelPrompt_zoom.Enabled = True
-                Me.ToolStripComboBox_zoom.Enabled = True
+                Try
+                    Me.ToolStripComboBox_zoom.Enabled = True
+                Catch ex As Exception
+                    'Because may be trouble when ComboBoxZoom enabled. Not a biggie.
+                End Try
+
                 Me.ToolStripMenuItemDiagramOverview.Enabled = True
                 Me.ToolStripMenuItemKLTheoremWriter.Enabled = True
                 Me.ToolStripMenuItemEdit.Visible = True

@@ -1022,13 +1022,12 @@ Namespace FBM
                 '-----------------------------------------------------------
                 'CodeSafe: Sometimes gets called when removing a FactType.
                 If Me.RoleGroup.Count = 0 Then Exit Sub
-
-                Dim lrRoleInstance As FBM.RoleInstance
-
                 If Me.Shape Is Nothing Then Exit Sub
 
                 'VM-20180330-ToDo: This next line might never allow anything through. Test and remove if necessary
                 If Me.Shape.Parent Is Nothing Then Exit Sub
+
+                Dim lrRoleInstance As FBM.RoleInstance
 
                 For Each lrRoleInstance In Me.RoleGroup
                     lrRoleInstance.Shape.Detach()
@@ -1407,7 +1406,7 @@ Namespace FBM
 
                 If FindSuitableFactTypeReading Is Nothing _
                     And Me.FactTypeReadingShape IsNot Nothing Then
-                    If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                    If Me.FactTypeReadingShape.Shape IsNot Nothing And Me.Page.Diagram IsNot Nothing Then
                         Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
                         Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance(Me, Nothing)
                         Call Me.FactTypeReadingShape.DisplayAndAssociate()
@@ -1555,12 +1554,14 @@ Namespace FBM
             Dim liInd As Integer = 0
 
             Try
+                'CodeSafe
+                If arRoleInstance Is Nothing Then Exit Sub
 
                 Dim lsRoleId As String = arRoleInstance.Id
-                Dim larFactDataInstance = From f In Me.Fact, _
-                                             fdi In f.Data _
-                                            Where fdi.Role.Id = lsRoleId _
-                                            Select fdi
+                Dim larFactDataInstance = From f In Me.Fact,
+                                             fdi In f.Data
+                                          Where fdi.Role.Id = lsRoleId
+                                          Select fdi
 
                 Me.Page.RemoveRoleInstance(arRoleInstance)
                 Me.RoleGroup.Remove(arRoleInstance)
@@ -1832,6 +1833,7 @@ Namespace FBM
                         'Likely that the user has dragged a multiRole FactType onto the canvas and hasn't
                         '  joined at least one of the Roles to a ModelObject yet.
                         '------------------------------------------------------------------------------------
+                        Exit Sub
                     ElseIf Me.DoAllRolesLinkToSameModelObject Then
                         '----------------------------------------------------------------------
                         'Don't sort the RoleGroup of the FactType, because

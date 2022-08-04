@@ -822,7 +822,13 @@ Namespace FBM
                             End Try
                             lsMessage = "Tried to DisplayAndAssociate RoleConstraintInstance of RoleConstraintType: InternalUniquenessConstraint, where there are no Roles associated with the RoleConstraintInstance (i.e. RoleConstraint.Role.Count = 0):"
                             lsMessage &= vbCrLf & "RoleConstraint.Id: " & Me.Id
-                            Throw New Exception(lsMessage)
+                            lsMessage.AppendDoubleLineBreak("Do you want Boston to remove this Role Constrataint? (recommended)")
+
+                            If prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                Me.RoleConstraint.RemoveFromModel(True, False, True, True, True, False)
+                            End If
+
+                            Exit Sub
                         End If
 #End Region
                     Case Is = pcenumRoleConstraintType.FrequencyConstraint
