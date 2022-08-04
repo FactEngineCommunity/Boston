@@ -964,8 +964,10 @@ Namespace FBM
 
             Me.Page.FactInstance.Add(lrFactInstance)
 
-            If IsSomething(Me.FactTable) And abResortFactTable Then
-                Call Me.FactTable.ResortFactTable()
+            If IsSomething(Me.FactTable) And abResortFactTable And Me.Page.Diagram IsNot Nothing Then
+                If Me.FactTable.TableShape.Visible And Me.Page.Diagram.Nodes.Contains(Me.FactTable.TableShape) Then
+                    Call Me.FactTable.ResortFactTable()
+                End If
                 'Me.FactTable.TableShape.ResizeToFitText(True)
             End If
 
@@ -1874,7 +1876,9 @@ Namespace FBM
 
                     Call Me.ResetAnchorsForRoleGroup()
                     If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
-                        Call Me.FactTable.ResortFactTable()
+                        If Me.FactTable.TableShape.Visible Then
+                            Call Me.FactTable.ResortFactTable()
+                        End If
                     End If
 
                 End If

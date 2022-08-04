@@ -625,6 +625,9 @@ Namespace FBM
                                 End If
                             End If
 #End Region
+                        Case Is = Nothing
+                            lrRoleInstance.JoinedORMObject = Nothing
+
                     End Select
 
                     If abAddToPage Then

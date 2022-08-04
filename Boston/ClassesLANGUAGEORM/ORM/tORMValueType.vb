@@ -618,6 +618,7 @@ Namespace FBM
 
             Dim larRoles = From FactType In Me.Model.FactType
                            From Role In FactType.RoleGroup
+                           Where Role.TypeOfJoin = pcenumRoleJoinType.ValueType
                            Where Role.JoinedORMObject Is Me
                            Select Role
 

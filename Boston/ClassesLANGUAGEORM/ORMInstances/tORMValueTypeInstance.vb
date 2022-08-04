@@ -644,6 +644,7 @@ Namespace FBM
                 liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
                                                From Role In FactType.RoleGroup
                                               Where Role.JoinedORMObject IsNot Nothing
+                                              Where Role.Role.TypeOfJoin = pcenumRoleJoinType.ValueType
                                               Where Role.JoinedORMObject.Id = Me.Id
                                               Where CType(Role.JoinedORMObject, Object).InstanceNumber = Me.InstanceNumber
                                               Into Count()

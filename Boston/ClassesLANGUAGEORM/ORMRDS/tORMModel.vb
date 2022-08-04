@@ -1866,7 +1866,7 @@ Namespace FBM
                     If lrModelElement Is Nothing Then
                         'This is dire. Create a dummy FBMEntityType for the Table, and add the EntityType to the Model. 
                         '  The user can then elect to delete the EntityType/Table if it shouldn't be in the model
-                        Dim lrEntityType = Me.CreateEntityType(lrORMRecordset("Element").Data, True)
+                        Dim lrEntityType = Me.CreateEntityType(lrORMRecordset("Element").Data, True, False, False, True)
                         lrModelElement = lrEntityType
 
                         'Let the user know what happened.

@@ -235,6 +235,11 @@ Namespace TableFactType
                     arFactType.IsLinkFactType = CBool(lREcordset("IsLinkFactType").Value)
                     If arFactType.IsLinkFactType Then
                         arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
+                        If arFactType.LinkFactTypeRole Is Nothing Then
+                            Debugger.Break()
+                        ElseIf Not arFactType.LinkFactTypeRole.FactType.IsObjectified Then
+                            Debugger.Break()
+                        End If
                     End If
                     arFactType.GUID = lREcordset("GUID").Value
                     arFactType.IsIndependent = CBool(lREcordset("IsIndependent").Value)

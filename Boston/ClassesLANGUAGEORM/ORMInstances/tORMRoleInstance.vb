@@ -43,13 +43,15 @@ Namespace FBM
                 If Me.JoinedORMObject Is Nothing Then
                     Return pcenumRoleJoinType.None
                 End If
-                Select Case Me.JoinedORMObject.ConceptType
-                    Case Is = pcenumConceptType.ValueType
+                Select Case Me.JoinedORMObject.GetType
+                    Case Is = GetType(FBM.ValueTypeInstance)
                         Return pcenumRoleJoinType.ValueType
-                    Case Is = pcenumConceptType.EntityType
+                    Case Is = GetType(FBM.EntityTypeInstance)
                         Return pcenumRoleJoinType.EntityType
-                    Case Is = pcenumConceptType.FactType
+                    Case Is = GetType(FBM.FactTypeInstance)
                         Return pcenumRoleJoinType.FactType
+                    Case Is = GetType(FBM.ModelObject)
+                        Return Nothing
                     Case Else
                         Dim lsMessage As String = "RoleInstance.TypeOfJoin"
                         lsMessage.AppendDoubleLineBreak("Role Instance on Fact Type," & Me.FactType.Id & ", joined to an unusual Model Element Type (i.e. Not Value Type, Entity Type or Fact Type")

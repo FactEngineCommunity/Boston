@@ -350,6 +350,10 @@ SkipThat:
 
                 For Each lrFactInstance In Me.FactTypeInstance.Fact
                     For liInd = 0 To (Me.FactTypeInstance.Arity - 1)
+
+                        'CodeSafe
+                        lrFactInstance.FactType = Me.FactTypeInstance
+
                         '---------------------------------------------------------------------------------------------
                         'Find the RoleData based on the Role at the liInd position in the FactTypeInstance.RoleGroup
                         '---------------------------------------------------------------------------------------------

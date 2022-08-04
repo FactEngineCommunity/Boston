@@ -959,8 +959,7 @@ Namespace FBM
                     For Each lrRole In .RoleGroup
                         '----------------------------------------------------
                         'Initiate a new instances of the RoleInstance struct
-                        '----------------------------------------------------
-                        lrRoleInstance = New FBM.RoleInstance
+                        '----------------------------------------------------                        
                         lrRoleInstance = lrRole.CloneInstance(arPage, abAddToPage)
                         lrRoleInstance.FactType = lrFactTypeInstance
                         lrFactTypeInstance.RoleGroup.AddUnique(lrRoleInstance)

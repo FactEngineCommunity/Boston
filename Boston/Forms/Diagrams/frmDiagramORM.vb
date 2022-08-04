@@ -12849,12 +12849,16 @@ SkipRemovalFromModel:
 
                     Dim lrModel = Me.zrPage.Model
 
-                    Dim lrEntityType = lrModel.CreateEntityType(lrValueTypeInstance.Id, True, True)
+                    Dim lrEntityType = lrModel.CreateEntityType(lrValueTypeInstance.Id, True, True, True, True)
 
-                    Dim larRole = From Role In lrModel.Role
-                                  Where Role.JoinedORMObject Is lrValueTypeInstance.ValueType
-                                  Select Role
+                    Dim larRole = (From FactType In lrModel.FactType
+                                   From Role In FactType.RoleGroup
+                                   Where Role.JoinedORMObject IsNot Nothing
+                                   Where Role.TypeOfJoin = pcenumRoleJoinType.ValueType
+                                   Where Role.JoinedORMObject.Id = lrValueTypeInstance.ValueType.Id
+                                   Select Role).ToList
 
+                    'Drop EntityTypeInstances on relevant Pages.
                     Call lrValueTypeInstance.ValueType.TriggerChangedToEntityType(lrEntityType)
 
                     For Each lrRole In larRole
@@ -12862,6 +12866,8 @@ SkipRemovalFromModel:
                     Next
 
                     Call lrValueTypeInstance.ValueType.RemoveFromModel()
+
+
 
                 Catch ex As Exception
 
