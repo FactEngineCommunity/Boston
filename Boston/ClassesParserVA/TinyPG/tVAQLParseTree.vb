@@ -210,10 +210,6 @@ Namespace VAQL
                         'Move on
                     End Try
 
-                    If Not abLeaveOptionals Then
-                        lrTree.Optionals = New ParseErrors
-                    End If
-
                     Try
                         For Each lrParseError In .Optionals
                             lrTree.Optionals.Add(lrParseError.Clone)
