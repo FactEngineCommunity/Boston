@@ -14,7 +14,7 @@ Namespace TableReferenceTable
             lsSQLQuery = "INSERT INTO ReferenceTable"
             lsSQLQuery &= " VALUES ("
             lsSQLQuery &= l_reference_table_id & ","
-            lsSQLQuery &= "'" & l_reference_table.name & "'" & ","
+            lsSQLQuery &= "'" & l_reference_table.name & "'" & ",0)"
 
             pdbConnection.Execute(lsSQLQuery)
 

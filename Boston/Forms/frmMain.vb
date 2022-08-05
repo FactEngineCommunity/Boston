@@ -4200,28 +4200,63 @@ SkipRegistrationChecking:
 
                     If My.Settings.SilentDatabaseUpgrade Then
 
+#Region "Show FlashCard"
                         Dim lfrmFlashCard As New frmFlashCard
                         lfrmFlashCard.ziIntervalMilliseconds = 2600
                         lfrmFlashCard.BackColor = Color.LightGray
                         lsMessage = "Upgrading the database. This won't take too long."
                         lfrmFlashCard.zsText = lsMessage
                         Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
+#End Region
+
+                        Dim lsSQLFilePath = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\TempFiles\"
+                        System.IO.Directory.CreateDirectory(lsSQLFilePath)
+
+                        Call prApplication.CloseDatabase()
+
+                        Try
+                            System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
+                        Catch ex As Exception
+                        End Try
+                        Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read)
+                        System.IO.File.Copy(prApplication.DatabaseLocationName, lsSQLFilePath & "boston.mdb", True)
+
+                        Call Boston.OpenDatabase(lsSQLFilePath & "boston.mdb")
 
                         Dim lrDatabaseUpgrade As New DatabaseUpgrade.Upgrade
                         While tableDatabaseUpgrade.GetNextRequiredUpgrade(lrDatabaseUpgrade, True) IsNot Nothing
-                            If Database.Database.PerformNextRequiredDatabaseUpgrade(lrDatabaseUpgrade.UpgradeId, lrDatabaseUpgrade.FromVersionNr, lrDatabaseUpgrade.ToVersionNr) Then
-                                '------------------------------------------------
-                                'Update the Boston DatabaseVersionNr
-                                '------------------------------------------------
-                                Call Boston.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
-                                Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaseUpgrade.UpgradeId)
 
-                                'CodeSafe
-                                Call tableDatabaseUpgrade.MarkAllPreviousDatabaseUpgradesSuccessful(lrDatabaseUpgrade.UpgradeId)
-                            Else
-                                Throw New Exception("Failed Database Upgrade: From version: " & lrDatabaseUpgrade.FromVersionNr & " to version: " & lrDatabaseUpgrade.ToVersionNr)
-                            End If
+                            lfrmFlashCard.ziIntervalMilliseconds = 1600
+                            lsMessage = "Upgrading the database from Version " & lrDatabaseUpgrade.FromVersionNr & " to Version " & lrDatabaseUpgrade.ToVersionNr
+                            lfrmFlashCard.zsText = lsMessage
+                            liDialogResult = lfrmFlashCard.ShowDialog(Me, "LightGray")
+
+                            With New WaitCursor
+
+                                If Database.Database.PerformNextRequiredDatabaseUpgrade(lrDatabaseUpgrade.UpgradeId, lrDatabaseUpgrade.FromVersionNr, lrDatabaseUpgrade.ToVersionNr) Then
+                                    '------------------------------------------------
+                                    'Update the Boston DatabaseVersionNr
+                                    '------------------------------------------------
+                                    Call Boston.UpdateDatabaseVersion(lrDatabaseUpgrade.ToVersionNr)
+                                    Call tableDatabaseUpgrade.MarkUpgradeAsSuccessfulImplementation(lrDatabaseUpgrade.UpgradeId)
+
+                                    'CodeSafe
+                                    Call tableDatabaseUpgrade.MarkAllPreviousDatabaseUpgradesSuccessful(lrDatabaseUpgrade.UpgradeId)
+                                Else
+                                    Throw New Exception("Failed Database Upgrade: From version: " & lrDatabaseUpgrade.FromVersionNr & " to version: " & lrDatabaseUpgrade.ToVersionNr)
+                                End If
+
+                            End With
+
                         End While
+
+                        prApplication.CloseDatabase()
+                        Boston.WaitForFile(prApplication.DatabaseLocationName, IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
+                        System.IO.File.Copy(lsSQLFilePath & "boston.mdb", prApplication.DatabaseLocationName, True)
+                        Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
+                        System.IO.File.Delete(lsSQLFilePath & "boston.mdb")
+                        System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
+                        Boston.OpenDatabase(prApplication.DatabaseLocationName)
 
                         lfrmFlashCard.ziIntervalMilliseconds = 5600
                         lfrmFlashCard.BackColor = Color.LightGray

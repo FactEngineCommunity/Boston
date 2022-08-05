@@ -134,8 +134,12 @@ Namespace Database
             Dim lrRecordset As New ADODB.Recordset
 
             Dim transaction As OleDb.OleDbTransaction = Nothing
+            Dim locker As Object = New Object()
+
+            Call Boston.WriteToStatusBar("Perforing database upgrade from Version " & asFromVersionNr & " to Version " & asToVersionNr & ".", True)
 
             Try
+                Dim lsSQLFilePath = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\TempFiles\"
 
                 lrRecordset.ActiveConnection = pdbDatabaseUpgradeConnection
                 lrRecordset.CursorType = pcOpenStatic
@@ -185,70 +189,72 @@ Namespace Database
 
 
                         Select Case lrDatabaseUpgradeSQL.UpgradeType
-                            Case Is = 1 'STRAIGHT SQL STATEMENT
+#Region "Old 1"
+                            'Case Is = 1 'STRAIGHT SQL STATEMENT
 
-                                Dim lsUpgradeSQLCommands() = lsUpgradeSQL.Split(";")
+                            '    Dim lsUpgradeSQLCommands() = lsUpgradeSQL.Split(";")
 
-                                For Each lsCommand In lsUpgradeSQLCommands
-                                    If Trim(lsCommand) <> "" Then
-                                        Try
-                                            Call pdbConnection.Execute(lsCommand)
+                            '    For Each lsCommand In lsUpgradeSQLCommands
+                            '        If Trim(lsCommand) <> "" Then
+                            '            Try
+                            '                Call pdbConnection.Execute(lsCommand)
 
-                                        Catch ex As Exception
+                            '            Catch ex As Exception
 
-                                            Try
+                            '                Try
 
-                                                Dim command As New OleDb.OleDbCommand(lsCommand, pdb_OLEDB_connection)
-                                                Call command.ExecuteNonQuery()
+                            '                    Dim command As New OleDb.OleDbCommand(lsCommand, pdb_OLEDB_connection)
+                            '                    Call command.ExecuteNonQuery()
 
-                                            Catch ex1 As Exception
+                            '                Catch ex1 As Exception
 
-                                                If lrDatabaseUpgradeSQL.AllowFail Then
-                                                    'Nothing to do here. E.g. An INSERT need not fail if the data already exists.
-                                                Else
-                                                    Dim lsMessage1 As String
-                                                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                            '                    If lrDatabaseUpgradeSQL.AllowFail Then
+                            '                        'Nothing to do here. E.g. An INSERT need not fail if the data already exists.
+                            '                    Else
+                            '                        Dim lsMessage1 As String
+                            '                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                                                    lsMessage1 = "There was an error upgrading the Boston database."
-                                                    lsMessage1.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
-                                                    lsMessage1 &= vbCrLf & lsCommand
-                                                    lsMessage1 &= vbCrLf & vbCrLf & ex1.Message
-                                                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex1.StackTrace)
+                            '                        lsMessage1 = "There was an error upgrading the Boston database."
+                            '                        lsMessage1.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
+                            '                        lsMessage1 &= vbCrLf & lsCommand
+                            '                        lsMessage1 &= vbCrLf & vbCrLf & ex1.Message
+                            '                        prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex1.StackTrace)
 
-                                                    GoTo error_handler
-                                                End If
-                                            End Try
-                                        End Try
-
-
-                                    End If
-                                Next
-
-                            Case Is = 2 'SQL ADD COLUMN WITH ORDINAL POSITION OF FIELD
-
-                                Try
-                                    pdbConnection.Execute(lsUpgradeSQL)
-                                Catch ex As Exception
-
-                                    If lrDatabaseUpgradeSQL.AllowFail Then
-                                        'Nothing to do here. E.g. Some INSERT statements are okay to fail because the data already exists in the database.
-                                    Else
-                                        Throw New Exception(ex.Message, ex.InnerException)
-                                    End If
-                                End Try
+                            '                        GoTo error_handler
+                            '                    End If
+                            '                End Try
+                            '            End Try
 
 
-                                lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully executed SQL"
-                                lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDef"
-                                lsStallMessage = lsStallMessage & vbCrLf & "Stall: Attempting to set OrdinalPosition: " & lrDatabaseUpgradeSQL.OrdinalPosition
+                            '        End If
+                            '    Next
+#End Region
+#Region "Old 2"
+                            'Case Is = 2 'SQL ADD COLUMN WITH ORDINAL POSITION OF FIELD
 
-                            '----------------------------------------------------------------------------------------------
-                            'VM-20160518-Drop this code. ADO.Net does not support TableDefs. This was old DAO code, which
-                            '  is no longer supported. There is no way to change the ordinal position of a field in a table with ADO.Net
-                            'pdbConnection.TableDefs(Trim(lrDatabaseUpgradeSQL.TableName)).Fields(Trim(lrDatabaseUpgradeSQL.FieldName)).OrdinalPosition = lrDatabaseUpgradeSQL.OrdinalPosition
-                            'lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully changed ordinal position"
-                            'lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDefs"
+                            '    Try
+                            '        pdbConnection.Execute(lsUpgradeSQL)
+                            '    Catch ex As Exception
 
+                            '        If lrDatabaseUpgradeSQL.AllowFail Then
+                            '            'Nothing to do here. E.g. Some INSERT statements are okay to fail because the data already exists in the database.
+                            '        Else
+                            '            Throw New Exception(ex.Message, ex.InnerException)
+                            '        End If
+                            '    End Try
+
+
+                            '    lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully executed SQL"
+                            '    lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDef"
+                            '    lsStallMessage = lsStallMessage & vbCrLf & "Stall: Attempting to set OrdinalPosition: " & lrDatabaseUpgradeSQL.OrdinalPosition
+
+                            ''----------------------------------------------------------------------------------------------
+                            ''VM-20160518-Drop this code. ADO.Net does not support TableDefs. This was old DAO code, which
+                            ''  is no longer supported. There is no way to change the ordinal position of a field in a table with ADO.Net
+                            ''pdbConnection.TableDefs(Trim(lrDatabaseUpgradeSQL.TableName)).Fields(Trim(lrDatabaseUpgradeSQL.FieldName)).OrdinalPosition = lrDatabaseUpgradeSQL.OrdinalPosition
+                            ''lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully changed ordinal position"
+                            ''lsStallMessage = lsStallMessage & vbCrLf & "Stall: Successfully refreshed TableDefs"
+#End Region
                             Case Is = 3 'SQL CREATE TABLE
                                 pdbConnection.Execute(lsUpgradeSQL)
 
@@ -266,6 +272,7 @@ Namespace Database
                                 pdbConnection.Execute(lsUpgradeSQL)
 
                             Case Is = 7 'EXECUTE CODE WITHIN Boston
+#Region "7"
                                 '-------------------------------------------------------------
                                 'Because it is known in advance and on release which code
                                 '  must be executed to fulfill a release...then it must be
@@ -283,8 +290,9 @@ Namespace Database
                                     GoTo error_handler
                                 End If
                                 transaction = pdb_OLEDB_connection.BeginTransaction()
-
+#End Region
                             Case Is = 8 'Create Proceedure
+#Region "8"
                                 'NB Can use
                                 'CREATE VIEW MDB AS
                                 'Select *
@@ -301,6 +309,45 @@ Namespace Database
                                 Dim cmd As New ADODB.Command
                                 cmd.CommandText = "strSQLStatement"
                                 cat.Procedures.Append("ProcedureName", cmd)
+#End Region
+                            Case Is = 1, 2, 9
+                                'Use DBWConsole
+
+                                Try
+                                    SyncLock locker
+
+                                        Threading.Thread.Sleep(3500)
+
+                                        Try
+                                            Boston.WaitForFile(lsSQLFilePath & "\script.sql", IO.FileMode.Open, IO.FileAccess.Write, IO.FileShare.ReadWrite)
+                                            System.IO.File.Delete(lsSQLFilePath & "\script.sql")
+                                        Catch ex As Exception
+                                            'Not a biggie.
+                                        End Try
+
+                                        Using streamWriter As New System.IO.StreamWriter(lsSQLFilePath & "\script.sql", False)
+
+                                            streamWriter.WriteLine(lsUpgradeSQL & ";")
+                                            streamWriter.Close()
+                                        End Using
+
+                                        Dim lsShellCommand As String = Boston.MyPath & "\dbwconsole\DBWConsole.exe " & lsSQLFilePath & "script.sql " & lsSQLFilePath & "boston.mdb"
+
+                                        Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
+                                        Shell(lsShellCommand, lrDatabaseUpgradeSQL.AllowFail)
+
+                                    End SyncLock
+
+                                Catch ex As Exception
+
+                                    If lrDatabaseUpgradeSQL.AllowFail Then
+                                        'Nothing to do here. E.g. Some INSERT statements are okay to fail because the data already exists in the database.
+                                    Else
+                                        Throw New Exception(ex.Message & vbCrLf & vbCrLf & ex.StackTrace, ex.InnerException)
+                                    End If
+                                End Try
+
+
                         End Select
 
                         lrRecordset.MoveNext()
@@ -308,7 +355,6 @@ Namespace Database
 
                     pdbConnection.CommitTrans()
                     'Call transaction.Commit()
-
 
                     PerformNextRequiredDatabaseUpgrade = True
                     lrRecordset.Close()

@@ -17,6 +17,41 @@ Public Class tApplication
     Public DatabaseVersionNr As String = ""    'Set in frmMain.Load
     'NB To access the CoreVersionNumber, look to prApplication.CMML.Core.CoreVersionNumber. I.e. Is a function of the Core that ships with Boston or as updated by an upgrade.
 
+    Public Sub CloseDatabase()
+
+        Try
+            Try
+                pdbConnection.Close()
+                pdb_OLEDB_connection.Close()
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Public ReadOnly Property DatabaseLocationName As String
+        Get
+            If Not My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then Throw New Exception("Not using a MSJet database.")
+
+            Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+
+            lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
+            Return lrSQLConnectionStringBuilder("Data Source")
+
+        End Get
+
+    End Property
+
+
     Public SoftwareCategory As pcenumSoftwareCategory = pcenumSoftwareCategory.Professional
 
     Public User As ClientServer.User

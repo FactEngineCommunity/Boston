@@ -77,9 +77,33 @@ Namespace Boston
 
         End Function
 
+        Public Sub WaitForFile(ByVal fullPath As String, ByVal mode As FileMode, ByVal access As FileAccess, ByVal share As FileShare)
+            Try
+                For numTries As Integer = 0 To 10 - 1
+                    Dim fs As FileStream = Nothing
+
+                    Try
+                        fs = New FileStream(fullPath, mode, access, share)
+                        fs.Dispose()
+                    Catch __unusedIOException1__ As IOException
+
+                        If fs IsNot Nothing Then
+                            fs.Dispose()
+                        End If
+
+                        System.Threading.Thread.Sleep(50)
+                    End Try
+                Next
+
+            Catch ex As Exception
+            Finally
+                System.Threading.Thread.Sleep(50)
+            End Try
+        End Sub
+
         Public Function returnIfTrue(ByVal abBoolValue As Boolean,
-                                     ByVal asReturnString As String,
-                                     ByVal asAlternateString As String) As String
+                                     ByVal asReturnString As Object,
+                                     ByVal asAlternateString As Object) As Object
 
             If abBoolValue Then
                 Return asReturnString
@@ -89,10 +113,9 @@ Namespace Boston
 
         End Function
 
-        Public Function OpenDatabase() As Boolean
+        Public Function OpenDatabase(Optional ByVal asDatabaseLocationFile As String = Nothing) As Boolean
 
             Dim lsMessage As String = ""
-            Dim lsDBLocation As String
             Dim lsConnectionString As String
             Dim lsDatabaseLocation As String = ""
             Dim lsLocalDatabaseLocation As String = ""
@@ -103,11 +126,12 @@ Namespace Boston
                 'Define the location of your database
                 'as follows if you want to use a relative folder.
                 '------------------------------------------------
-                lsDBLocation = Trim(My.Settings.DatabaseConnectionString)
+                lsConnectionString = Trim(My.Settings.DatabaseConnectionString)
 
                 '-------------------------------------------
                 'Sample Database ConnectionStrings
                 '-------------------------------------------
+#Region "Exapmle Database ConnectionStrings"
                 'SQL Server Connection String Sample
                 'DRIVER=SQL Server;UID=s2\vmorgante;PWD=cisco1;Trusted_Connection=;DATABASE=PreviewDialler;WSID=SIS2WKVM;APP=Microsoft Office 2003;SERVER=SIS2DB02;Description=PreviewDialler
                 'lrSQLConnectionStringBuilder used to interogate the connection string.
@@ -117,20 +141,20 @@ Namespace Boston
                 'MDB Connection String Sample
                 'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\Program Files\PreviewDialler\database\PREVIEWDIALLER.mdb
                 '-------------------------------------------
+#End Region
 
                 '------------------------------------------------
                 'Construct the connection string
-                '------------------------------------------------
-                lsConnectionString = lsDBLocation
-
+                '------------------------------------------------                 
                 Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
 
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                    lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                    lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
                     lsDataProvider = lrSQLConnectionStringBuilder("Provider")
+                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
 
                     If Not System.IO.File.Exists(lsDatabaseLocation) Then
                         '-----------------------------------
@@ -215,6 +239,7 @@ OpenConnection:
                 '------------------------------------------------
                 'Open the (database) connection
                 '------------------------------------------------
+                lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
                 pdbConnection.Open(lsConnectionString)
 
 #Region "OLEDB"

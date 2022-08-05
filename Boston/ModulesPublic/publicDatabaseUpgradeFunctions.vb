@@ -444,6 +444,8 @@ Namespace DatabaseUpgradeFunctions
             Dim lrNewCoreModel As New FBM.Model
 
             Try
+                Boston.WriteToStatusBar("Replacing Core Model.", True)
+
                 'Backup the database
                 Call BackupDatabase()
 

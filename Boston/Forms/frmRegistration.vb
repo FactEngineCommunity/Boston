@@ -45,6 +45,8 @@ Public Class frmRegistration
             lsMessage.AppendLine("Subscription Type:" & lrRegistrationResult.SubscriptionType)
             lsMessage.AppendLine("Registered To Date: " & lrRegistrationResult.RegisteredToDate)
 
+            Me.LabelRegistrationStatus.ForeColor = Boston.returnIfTrue(lrRegistrationResult.IsRegistered, Color.MediumSeaGreen, Color.Black)
+
             Me.LabelRegistrationStatus.Text = lsMessage
 
         Catch ex As Exception
@@ -122,7 +124,7 @@ Public Class frmRegistration
             Dim lfrmFlashCard As New frmFlashCard
             lfrmFlashCard.ziIntervalMilliseconds = 1500
             lfrmFlashCard.zsText = "Saved to clipboard."
-            lfrmFlashCard.Show(frmMain)
+            lfrmFlashCard.Show(frmMain, "White")
 
         Catch ex As Exception
             Dim lsMessage As String

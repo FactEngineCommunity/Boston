@@ -30,6 +30,9 @@ Partial Class frmRegistration
         Me.LabelRegistrationStatus = New System.Windows.Forms.Label()
         Me.ButtonSaveRegistrationKey = New System.Windows.Forms.Button()
         Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.ToolStripStatusLabelHintApplicationCopyIcon = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'LabelPromptApplicationKey
@@ -78,6 +81,7 @@ Partial Class frmRegistration
         'LabelRegistrationStatus
         '
         Me.LabelRegistrationStatus.AutoSize = True
+        Me.LabelRegistrationStatus.ForeColor = System.Drawing.SystemColors.ControlText
         Me.LabelRegistrationStatus.Location = New System.Drawing.Point(113, 77)
         Me.LabelRegistrationStatus.Name = "LabelRegistrationStatus"
         Me.LabelRegistrationStatus.Size = New System.Drawing.Size(119, 13)
@@ -104,11 +108,27 @@ Partial Class frmRegistration
         Me.ButtonCopyModelIdToClipboard.TabIndex = 13
         Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
         '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabelHintApplicationCopyIcon})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 176)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(626, 22)
+        Me.StatusStrip1.TabIndex = 14
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'ToolStripStatusLabelHintApplicationCopyIcon
+        '
+        Me.ToolStripStatusLabelHintApplicationCopyIcon.Name = "ToolStripStatusLabelHintApplicationCopyIcon"
+        Me.ToolStripStatusLabelHintApplicationCopyIcon.Size = New System.Drawing.Size(388, 17)
+        Me.ToolStripStatusLabelHintApplicationCopyIcon.Text = "Click on the clipboard icon to copy the Application Key to the clipboard."
+        '
         'frmRegistration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(626, 198)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.ButtonCopyModelIdToClipboard)
         Me.Controls.Add(Me.ButtonSaveRegistrationKey)
         Me.Controls.Add(Me.LabelRegistrationStatus)
@@ -123,6 +143,8 @@ Partial Class frmRegistration
         Me.Name = "frmRegistration"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Boston Registration"
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -136,4 +158,6 @@ Partial Class frmRegistration
     Friend WithEvents LabelRegistrationStatus As Label
     Friend WithEvents ButtonSaveRegistrationKey As Button
     Friend WithEvents ButtonCopyModelIdToClipboard As Button
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents ToolStripStatusLabelHintApplicationCopyIcon As ToolStripStatusLabel
 End Class

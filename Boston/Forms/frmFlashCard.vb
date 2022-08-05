@@ -1,7 +1,66 @@
-﻿Public Class frmFlashCard
+﻿Imports System.Reflection
+
+Public Class frmFlashCard
 
     Public zsText As String = ""
     Public ziIntervalMilliseconds As Nullable(Of Integer) = Nothing
+
+    Public Overloads Function Show(ByVal asOwner As IWin32Window, Optional ByVal asColor As String = "Gray")
+
+        Try
+            Dim loColor As Color
+            Select Case asColor
+                Case Is = "LightGray"
+                    loColor = Color.LightGray
+                Case Is = "White"
+                    loColor = Color.White
+                Case Else
+                    loColor = Color.LightGray
+            End Select
+
+            Me.Label1.BackColor = loColor
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+        Return MyBase.ShowDialog()
+
+    End Function
+
+    Public Overloads Function ShowDialog(ByVal asOwner As IWin32Window, Optional ByVal asColor As String = "Gray")
+
+        Call MyBase.ShowDialog(asOwner)
+        Try
+            Dim loColor As Color
+            Select Case asColor
+                Case Is = "LightGray"
+                    loColor = Color.LightGray
+                Case Is = "White"
+                    loColor = Color.White
+                Case Else
+                    loColor = Color.LightGray
+            End Select
+
+            Me.Label1.BackColor = loColor
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+        Return MyBase.ShowDialog()
+
+    End Function
 
     Private Sub frmFlashCard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 

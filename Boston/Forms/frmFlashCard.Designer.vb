@@ -34,7 +34,9 @@ Partial Class frmFlashCard
         '
         'Label1
         '
+        Me.Label1.BackColor = System.Drawing.SystemColors.Control
         Me.Label1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Label1.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Label1.Location = New System.Drawing.Point(0, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(374, 102)

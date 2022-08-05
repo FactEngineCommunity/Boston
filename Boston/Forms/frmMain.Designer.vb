@@ -91,6 +91,7 @@ Partial Class frmMain
         Me.LogFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteLogFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RegistrationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditConfigurationDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemAddUser = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditUserToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -156,7 +157,6 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
-        Me.EditConfigurationDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -511,6 +511,12 @@ Partial Class frmMain
         Me.RegistrationToolStripMenuItem.Name = "RegistrationToolStripMenuItem"
         Me.RegistrationToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
         Me.RegistrationToolStripMenuItem.Text = "&Registration"
+        '
+        'EditConfigurationDataToolStripMenuItem
+        '
+        Me.EditConfigurationDataToolStripMenuItem.Name = "EditConfigurationDataToolStripMenuItem"
+        Me.EditConfigurationDataToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
+        Me.EditConfigurationDataToolStripMenuItem.Text = "Edit Configuration Data"
         '
         'ToolStripMenuItemUser
         '
@@ -956,12 +962,6 @@ Partial Class frmMain
         'TimerNotifications
         '
         Me.TimerNotifications.Interval = 5000
-        '
-        'EditConfigurationDataToolStripMenuItem
-        '
-        Me.EditConfigurationDataToolStripMenuItem.Name = "EditConfigurationDataToolStripMenuItem"
-        Me.EditConfigurationDataToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
-        Me.EditConfigurationDataToolStripMenuItem.Text = "Edit Configuration Data"
         '
         'frmMain
         '

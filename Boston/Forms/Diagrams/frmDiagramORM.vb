@@ -3866,6 +3866,101 @@ Public Class frmDiagramORM
 
     End Sub
 
+    Private Sub SelectNode(ByVal arShapeNode As ShapeNode)
+
+        Try
+            Dim loNode = arShapeNode
+
+            Select Case loNode.Tag.ConceptType
+                Case Is = pcenumConceptType.EntityType
+                    loNode.Pen.Color = Color.Blue
+                    loNode.Selected = True
+                    Me.Diagram.AllowUnconnectedLinks = False
+                    Me.Diagram.AllowUnanchoredLinks = False
+                Case Is = pcenumConceptType.EntityTypeName
+                    loNode.Selected = True
+                Case Is = pcenumConceptType.ValueType
+                    loNode.Pen.Color = Color.Blue
+                    loNode.Selected = True
+
+                Case Is = pcenumConceptType.FactType
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance
+                    lrFactTypeInstance = loNode.Tag
+                    Call lrFactTypeInstance.MouseDown()
+                    loNode.Selected = True
+                Case Is = pcenumConceptType.FactTypeName
+                    loNode.Selected = True
+                Case Is = pcenumConceptType.FactTypeReading
+                    loNode.Selected = True
+                    Dim lrFactTypeReading As FBM.FactTypeReadingInstance = loNode.Tag
+                    lrFactTypeReading.Shape.Detach()
+                    lrFactTypeReading.Shape.AllowOutgoingLinks = False
+                    lrFactTypeReading.Shape.Locked = False
+                    lrFactTypeReading.Shape.EnabledHandles = True
+                Case Is = pcenumConceptType.EntityTypeDerivationText
+                    loNode.Selected = True
+                Case Is = pcenumConceptType.FactTypeDerivationText
+                    loNode.Selected = True
+                Case Is = pcenumConceptType.RoleName
+                    loNode.Selected = True
+                Case Is = pcenumConceptType.RoleConstraint
+                    loNode.Selected = True
+                    Me.Diagram.AllowUnconnectedLinks = True
+                    Me.Diagram.AllowUnanchoredLinks = True
+                Case Is = pcenumConceptType.Role
+                    '-----------------------------------------------------------------------
+                    'Deselect the Role.FactType from the list of ORMModel.SelectedObjects
+                    '  because the user clicked on the Role rather than the FactType,
+                    '  but the FactType is added to the ORMModel.SelectedObjects
+                    '  when the 'Shape' is 'Selected' so that the 'Group' is selected for 
+                    '  dragging purposes.
+                    '-----------------------------------------------------------------------                            
+                    Me.zrPage.SelectedObject.Remove(loNode.Tag.factType)
+                    Me.Diagram.AllowUnconnectedLinks = True
+                    Me.Diagram.AllowUnanchoredLinks = True
+                    loNode.Locked = False
+                    loNode.AllowOutgoingLinks = True
+
+                    Dim lrRoleInstance As FBM.RoleInstance
+                    lrRoleInstance = loNode.Tag
+
+                    If IsSomething(lrRoleInstance.Link) Then
+                        lrRoleInstance.Link.Pen.Color = Color.LightGray
+                    End If
+                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                    For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+                        If IsSomething(lrEntityTypeInstance.Shape) Then
+                            lrEntityTypeInstance.Shape.AllowIncomingLinks = True
+                        End If
+                    Next
+
+                Case Is = pcenumConceptType.RoleConstraint
+                    Select Case loNode.Tag.RoleConstraintType
+                        Case Is = pcenumRoleConstraintType.RingConstraint,
+                                  pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.ExternalUniquenessConstraint
+
+                            '----------------------------
+                            'Mouse is over an ShapeNode
+                            '----------------------------
+                            Me.Diagram.AllowUnconnectedLinks = True
+                            Me.DiagramView.DrawLinkCursor = Cursors.Hand
+                            Cursor.Show()
+                    End Select
+                Case Is = pcenumConceptType.ModelNote
+                    loNode.Selected = True
+            End Select
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
     Private Sub ORMDiagramView_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseDown
 
         '----------------------------------------------------------------------------------------
@@ -3912,16 +4007,17 @@ Public Class frmDiagramORM
                     'Special handling for FactTypes.
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
                     '------------------------------------------------------------------------------------
-                    loSelectedNode.Selected = True
-                        If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
-                            Me.zrPage.SelectedObject.Clear()
-                            Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
-                            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
-                        End If
+                    If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
+                        Me.zrPage.SelectedObject.Clear()
+                        Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
                     End If
-
-                    Exit Sub
+                    Call Me.SelectNode(loSelectedNode)
+                    loSelectedNode.Selected = True
                 End If
+
+                Exit Sub
+            End If
 
                 '--------------------------------------------------
                 'Just to be sure...set the Boston.WorkingPage
@@ -4077,85 +4173,7 @@ Public Class frmDiagramORM
                         '-----------------------------------------------
                         'Select the ShapeNode/ORMObject just clicked on
                         '-----------------------------------------------                                                      
-                        Select Case loNode.Tag.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                loNode.Pen.Color = Color.Blue
-                                loNode.Selected = True
-                                Me.Diagram.AllowUnconnectedLinks = False
-                                Me.Diagram.AllowUnanchoredLinks = False
-                            Case Is = pcenumConceptType.EntityTypeName
-                                loNode.Selected = True
-                            Case Is = pcenumConceptType.ValueType
-                                loNode.Pen.Color = Color.Blue
-                                loNode.Selected = True
-
-                            Case Is = pcenumConceptType.FactType
-                                Dim lrFactTypeInstance As FBM.FactTypeInstance
-                                lrFactTypeInstance = loNode.Tag
-                                Call lrFactTypeInstance.MouseDown()
-                                loNode.Selected = True
-                            Case Is = pcenumConceptType.FactTypeName
-                                loNode.Selected = True
-                            Case Is = pcenumConceptType.FactTypeReading
-                                loNode.Selected = True
-                                Dim lrFactTypeReading As FBM.FactTypeReadingInstance = loNode.Tag
-                                lrFactTypeReading.Shape.Detach()
-                                lrFactTypeReading.Shape.AllowOutgoingLinks = False
-                                lrFactTypeReading.Shape.Locked = False
-                                lrFactTypeReading.Shape.EnabledHandles = True
-                            Case Is = pcenumConceptType.EntityTypeDerivationText
-                                loNode.Selected = True
-                            Case Is = pcenumConceptType.FactTypeDerivationText
-                                loNode.Selected = True
-                            Case Is = pcenumConceptType.RoleName
-                                loNode.Selected = True
-                            Case Is = pcenumConceptType.RoleConstraint
-                                loNode.Selected = True
-                                Me.Diagram.AllowUnconnectedLinks = True
-                                Me.Diagram.AllowUnanchoredLinks = True
-                            Case Is = pcenumConceptType.Role
-                                '-----------------------------------------------------------------------
-                                'Deselect the Role.FactType from the list of ORMModel.SelectedObjects
-                                '  because the user clicked on the Role rather than the FactType,
-                                '  but the FactType is added to the ORMModel.SelectedObjects
-                                '  when the 'Shape' is 'Selected' so that the 'Group' is selected for 
-                                '  dragging purposes.
-                                '-----------------------------------------------------------------------                            
-                                Me.zrPage.SelectedObject.Remove(loNode.Tag.factType)
-                                Me.Diagram.AllowUnconnectedLinks = True
-                                Me.Diagram.AllowUnanchoredLinks = True
-                                loNode.Locked = False
-                                loNode.AllowOutgoingLinks = True
-
-                                Dim lrRoleInstance As FBM.RoleInstance
-                                lrRoleInstance = loNode.Tag
-
-                                If IsSomething(lrRoleInstance.Link) Then
-                                    lrRoleInstance.Link.Pen.Color = Color.LightGray
-                                End If
-                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                                For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                                    If IsSomething(lrEntityTypeInstance.Shape) Then
-                                        lrEntityTypeInstance.Shape.AllowIncomingLinks = True
-                                    End If
-                                Next
-
-                            Case Is = pcenumConceptType.RoleConstraint
-                                Select Case loNode.Tag.RoleConstraintType
-                                    Case Is = pcenumRoleConstraintType.RingConstraint,
-                                              pcenumRoleConstraintType.ExclusionConstraint,
-                                              pcenumRoleConstraintType.ExternalUniquenessConstraint
-
-                                        '----------------------------
-                                        'Mouse is over an ShapeNode
-                                        '----------------------------
-                                        Me.Diagram.AllowUnconnectedLinks = True
-                                        Me.DiagramView.DrawLinkCursor = Cursors.Hand
-                                        Cursor.Show()
-                                End Select
-                            Case Is = pcenumConceptType.ModelNote
-                                loNode.Selected = True
-                        End Select
+                        Call Me.SelectNode(loNode)
 
                         '-------------------------------------------------------
                         'Reset the MultiSelectionPerformed flag on the ORMModel
