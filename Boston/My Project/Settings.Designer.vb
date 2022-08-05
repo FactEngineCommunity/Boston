@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1.33")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1.34")>  _
         Public Property DatabaseVersionNumber() As String
             Get
                 Return CType(Me("DatabaseVersionNumber"),String)
@@ -344,7 +344,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property DisplayLanguageModel() As Boolean
             Get
                 Return CType(Me("DisplayLanguageModel"),Boolean)

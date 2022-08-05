@@ -203,7 +203,7 @@
                             'Create the RoleConstraintRoleInstance/s
                             '-----------------------------------------
                             For Each lrRoleConstraintRole In lrRoleConstraintInstance.RoleConstraint.RoleConstraintRole
-                                lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(arPage)
+                                lrRoleConstraintRoleInstance = lrRoleConstraintRole.CloneInstance(arPage, lrRoleConstraintInstance)
                                 lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
 
                                 If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint Then

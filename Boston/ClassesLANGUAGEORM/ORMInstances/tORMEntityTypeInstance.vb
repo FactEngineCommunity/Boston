@@ -1610,23 +1610,34 @@ MoveOn:
             '-----------------------------------------
             Dim lrConceptInstance As New FBM.ConceptInstance
 
-            lrConceptInstance.ModelId = Me.Model.ModelId
-            lrConceptInstance.PageId = Me.Page.PageId
-            lrConceptInstance.Symbol = Me.Id
-            lrConceptInstance.X = Me.X
-            lrConceptInstance.Y = Me.Y
-            lrConceptInstance.ConceptType = pcenumConceptType.EntityType
-            lrConceptInstance.InstanceNumber = Me.InstanceNumber
+            Try
 
-            If abRapidSave Then
-                Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
-            Else
-                If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
-                    Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
-                Else
+                lrConceptInstance.ModelId = Me.Model.ModelId
+                lrConceptInstance.PageId = Me.Page.PageId
+                lrConceptInstance.Symbol = Me.Id
+                lrConceptInstance.X = Me.X
+                lrConceptInstance.Y = Me.Y
+                lrConceptInstance.ConceptType = pcenumConceptType.EntityType
+                lrConceptInstance.InstanceNumber = Me.InstanceNumber
+
+                If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                Else
+                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
+                        Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
+                    Else
+                        Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
+                    End If
                 End If
-            End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 

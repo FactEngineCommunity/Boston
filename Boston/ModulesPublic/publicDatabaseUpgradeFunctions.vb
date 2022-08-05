@@ -476,6 +476,9 @@ Namespace DatabaseUpgradeFunctions
                     'Replace the in-memory Core model (prApplication.CMML.Core) with the newly loaded Core model.
                     prApplication.CMML.Core = lrNewCoreModel
 
+                    'Store in the database
+                    prApplication.CMML.Core.StoreAsXML = False
+
                     '* Save the in-memory Core model (prApplication.CMML.Core) to the database.
                     Call prApplication.CMML.Core.Save()
                 End If

@@ -2385,7 +2385,7 @@ Namespace FBM
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
                 End If
-                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
 
                 'StateTransitions
                 lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
@@ -2400,14 +2400,14 @@ Namespace FBM
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
                 End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
 
 #Region "Core BPMN"
                 lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreBPMNDiagram.ToString)
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
                 End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
 #End Region
 
 #Region "Core UML Use Case Diagram"
@@ -2415,7 +2415,7 @@ Namespace FBM
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
                 End If
-                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
 #End Region
 
                 Me.CoreVersionNumber = "2.3"
@@ -2468,7 +2468,7 @@ Namespace FBM
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
                 End If
 
-                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
+                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
                 Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
 #End Region
             ElseIf Me.CoreVersionNumber = "2.1" Then
@@ -2481,7 +2481,7 @@ Namespace FBM
                         Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
                     End If
 
-                    Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
+                    Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.
                     Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
                 End If
 #End Region
@@ -2509,7 +2509,7 @@ Namespace FBM
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
                 End If
 
-                Dim lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
 
                 Me.CoreVersionNumber = "2.3"
                 Me.MakeDirty(False, False)

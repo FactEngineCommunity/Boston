@@ -18,11 +18,11 @@ Namespace TableConceptInstance
                 lsSQLQuery &= ",'" & Replace(Trim(arConceptInstance.Symbol), "'", "`") & "'"
                 lsSQLQuery &= ",'" & arConceptInstance.ConceptType.ToString & "'"
                 lsSQLQuery &= ",'" & arConceptInstance.RoleId.ToString & "'"
-                lsSQLQuery &= "," & arConceptInstance.InstanceNumber
                 lsSQLQuery &= "," & arConceptInstance.X
                 lsSQLQuery &= "," & arConceptInstance.Y
                 lsSQLQuery &= ",100" '& arConceptInstance.orientation & "'"
                 lsSQLQuery &= "," & arConceptInstance.Visible
+                lsSQLQuery &= "," & arConceptInstance.InstanceNumber
                 lsSQLQuery &= ")"
 
 
@@ -270,32 +270,43 @@ Namespace TableConceptInstance
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
 
-            lsSQLQuery = " SELECT *"
-            lsSQLQuery &= "  FROM ModelConceptInstance"
-            lsSQLQuery &= " WHERE ModelId = '" & Trim(arConceptInstance.ModelId) & "'"
-            lsSQLQuery &= "   AND PageId = '" & Trim(arConceptInstance.PageId) & "'"
-            lsSQLQuery &= "   AND Symbol = '" & Trim(Replace(arConceptInstance.Symbol, "'", "''")) & "'"
-            lsSQLQuery &= "   AND ConceptType = '" & Trim(arConceptInstance.ConceptType.ToString) & "'"
-            lsSQLQuery &= "   AND RoleId = '" & Trim(arConceptInstance.RoleId.ToString) & "'"
-            lsSQLQuery &= "   AND InstanceNumber = " & arConceptInstance.InstanceNumber
+            Try
 
-            lREcordset.Open(lsSQLQuery)
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM ModelConceptInstance"
+                lsSQLQuery &= " WHERE ModelId = '" & Trim(arConceptInstance.ModelId) & "'"
+                lsSQLQuery &= "   AND PageId = '" & Trim(arConceptInstance.PageId) & "'"
+                lsSQLQuery &= "   AND Symbol = '" & Trim(Replace(arConceptInstance.Symbol, "'", "''")) & "'"
+                lsSQLQuery &= "   AND ConceptType = '" & Trim(arConceptInstance.ConceptType.ToString) & "'"
+                lsSQLQuery &= "   AND RoleId = '" & Trim(arConceptInstance.RoleId.ToString) & "'"
+                lsSQLQuery &= "   AND InstanceNumber = " & arConceptInstance.InstanceNumber
 
-            If Not lREcordset.EOF Then
-                If abReturnExistingConceptInstance Then
-                    arConceptInstance.X = lREcordset("x").Value
-                    arConceptInstance.Y = lREcordset("y").Value
-                    arConceptInstance.Orientation = lREcordset("Orientation").Value
-                    arConceptInstance.Visible = lREcordset("IsVisible").Value
-                    arConceptInstance.InstanceNumber = lREcordset("InstanceNumber").Value
+                lREcordset.Open(lsSQLQuery)
+
+                If Not lREcordset.EOF Then
+                    If abReturnExistingConceptInstance Then
+                        arConceptInstance.X = lREcordset("x").Value
+                        arConceptInstance.Y = lREcordset("y").Value
+                        arConceptInstance.Orientation = lREcordset("Orientation").Value
+                        arConceptInstance.Visible = lREcordset("IsVisible").Value
+                        arConceptInstance.InstanceNumber = lREcordset("InstanceNumber").Value
+                    End If
+
+                    Return True
+                Else
+                    Return False
                 End If
 
-                Return True
-            Else
-                Return False
-            End If
+                lREcordset.Close()
 
-            lREcordset.Close()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Function
 

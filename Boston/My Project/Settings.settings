@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DatabaseVersionNumber" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.33</Value>
+      <Value Profile="(Default)">1.34</Value>
     </Setting>
     <Setting Name="DisplayStatusBar" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -75,7 +75,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="DisplayLanguageModel" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SilentPreConfiguration" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
