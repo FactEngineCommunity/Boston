@@ -1999,7 +1999,7 @@ Namespace FBM
                         Catch ex As Exception
 
                             If My.Settings.AutomaticallyDeleteTroublesomeColumns Then
-                                Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                                'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
                             Else
 
                                 Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId

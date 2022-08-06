@@ -1377,9 +1377,10 @@ Namespace FBM
                 Dim lrRole As FBM.Role
                 Dim larReturnRoles As New List(Of FBM.Role)
 
-                Dim larRoles = From FactType In Me.Model.FactType.FindAll(Function(x) x.IsPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes) _
-                               From Role In FactType.RoleGroup _
-                               Where Role.JoinedORMObject.Id = Me.Id _
+                Dim larRoles = From FactType In Me.Model.FactType.FindAll(Function(x) x.IsPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes)
+                               From Role In FactType.RoleGroup
+                               Where Role.JoinedORMObject IsNot Nothing
+                               Where Role.JoinedORMObject.Id = Me.Id
                                Select Role
 
                 For Each lrRole In larRoles

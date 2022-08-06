@@ -2934,12 +2934,12 @@ FailsafeContinue:
                     lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = Me.Id)
                     lrFact.Data.Add(New FBM.FactData(lrRole, New FBM.Concept(Trim(asInstance))))
 
-                    lrFactType.RemoveFactByData(lrFact, True)
+                    lrFactType.RemoveFactByData(lrFact, True, Not Me.Model.StoreAsXML)
                 Next
 
                 Me.Instance.Remove(asInstance)
 
-                For Each lrEntityType In Me.getSubtypes
+                For Each lrEntityType In Me.getSubtypes.ToArray
                     Call lrEntityType.removeInstance(asInstance)
                 Next
 

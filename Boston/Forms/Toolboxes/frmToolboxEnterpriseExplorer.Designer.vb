@@ -316,7 +316,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 424)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 446)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -444,6 +444,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.BusinessProcessModellingNotationToolStripMenuItem.Name = "BusinessProcessModellingNotationToolStripMenuItem"
         Me.BusinessProcessModellingNotationToolStripMenuItem.Size = New System.Drawing.Size(269, 22)
         Me.BusinessProcessModellingNotationToolStripMenuItem.Text = "&Business Process Modelling Notation"
+        Me.BusinessProcessModellingNotationToolStripMenuItem.Visible = False
         '
         'AddBPMNPageToolStripMenuItem
         '

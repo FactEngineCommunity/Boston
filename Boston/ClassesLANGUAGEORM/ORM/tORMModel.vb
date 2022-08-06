@@ -148,6 +148,18 @@ Namespace FBM
             End Set
         End Property
 
+        Public ReadOnly Property ModelElements As List(Of FBM.ModelObject)
+            Get
+                Dim larModelElment As New List(Of FBM.ModelObject)
+                larModelElment.AddRange(Me.ValueType)
+                larModelElment.AddRange(Me.EntityType)
+                larModelElment.AddRange(Me.FactType)
+                larModelElment.AddRange(Me.RoleConstraint)
+                larModelElment.AddRange(Me.ModelNote)
+                Return larModelElment
+            End Get
+        End Property
+
         <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -603,6 +615,23 @@ Namespace FBM
             Return lrORMModel
 
         End Function
+
+        Public Sub CreateModelDictionaryEntryForModelElement(ByRef arModelElement As FBM.ModelObject)
+
+            Try
+
+                Call Me.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me, arModelElement.Id, arModelElement.ConceptType,,, True, True, arModelElement.DBName))
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
 
         Public Sub AddEntityType(ByRef arEntityType As FBM.EntityType,
                                  Optional ByVal abMakeModelDirty As Boolean = False,

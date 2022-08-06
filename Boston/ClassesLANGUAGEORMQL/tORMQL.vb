@@ -825,6 +825,8 @@ Namespace ORMQL
 
                 Call lrModelElement.removeInstance(lrRemoveInstanceStatement.VALUE)
 
+                Call Me.Model.Save()
+
                 Return True
 
             Catch ex As Exception

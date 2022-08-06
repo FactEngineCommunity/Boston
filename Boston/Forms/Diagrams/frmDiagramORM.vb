@@ -4827,6 +4827,8 @@ Public Class frmDiagramORM
                     Call Me.SortJoiningFactTypes(e.Node.Tag)
 
                 Case Is = pcenumConceptType.FactType
+                    Call Me.SortJoiningFactTypes(e.Node.Tag)
+
                     '-------------------------------------------------------------------
                     'Set the X,Y coordinants of the Roles within the FactType/RoleGroup
                     '-------------------------------------------------------------------
@@ -6495,12 +6497,12 @@ SkipPopup:
     Private Sub SortJoiningFactTypes(ByRef arModelObject As FBM.ModelObject,
                                      Optional ByVal abMoveFactTypeReading As Boolean = True)
 
-        Dim lo_link As DiagramLink
 
         Try
             Select Case arModelObject.ConceptType
                 Case Is = pcenumConceptType.EntityType,
-                          pcenumConceptType.ValueType
+                          pcenumConceptType.ValueType,
+                          pcenumConceptType.FactType
                     '------------------------------------------------
                     'All okay
                     '------------------------------------------------

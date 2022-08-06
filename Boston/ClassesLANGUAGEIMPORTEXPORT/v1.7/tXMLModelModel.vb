@@ -1645,6 +1645,12 @@ SkipFactTypeInstance:
 
                 If arXMlFactType Is Nothing Then
                     lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
+
+                    If arXMlFactType Is Nothing Then
+                        'Something has gone wrong. Create an EntityType for the FactType
+                        arFactType = Nothing
+                        Exit Sub
+                    End If
                 Else
                     lrXMLFactType = arXMlFactType
                 End If
@@ -1733,6 +1739,13 @@ KeepLooking:
                         If lrRole.JoinedORMObject Is Nothing Then
                             lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
                             Me.GetFactTypeDetails(lrRole.JoinsFactType)
+
+                            If lrRole.JoinedORMObject Is Nothing Then
+                                'Something has gone wrong. Create a DummyEntityType
+                                lrRole.JoinedORMObject = New FBM.EntityType(lrRole.Model, pcenumLanguage.ORMModel, lrXMLRole.JoinedObjectTypeId, lrXMLRole.JoinedObjectTypeId)
+                                prApplication.ThrowErrorMessage("There was a problem finding the Object Type, " & lrXMLRole.JoinedObjectTypeId & ", so a dummy Entity Type has been created in its place.", pcenumErrorType.Warning, Nothing, False, False, True)
+                                lrRole.Model.AddEntityType(lrRole.JoinedORMObject,, False, Nothing, True, True)
+                            End If
                         End If
                     End If
 FoundModelElement:

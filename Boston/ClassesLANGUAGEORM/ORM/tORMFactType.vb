@@ -1485,7 +1485,7 @@ Namespace FBM
 
         End Function
 
-        Public Sub RemoveFactByData(ByVal arFact As FBM.Fact, ByVal ab_delete_all As Boolean)
+        Public Sub RemoveFactByData(ByVal arFact As FBM.Fact, ByVal ab_delete_all As Boolean, Optional ByVal abDoDatabaseProcessing As Boolean = True)
 
             '---------------------------------------------------------------------------------------
             'PSEUDOCODE
@@ -1525,7 +1525,7 @@ Namespace FBM
 
                             RaiseEvent FactRemoved(lrFact)
 
-                            Call lrFact.RemoveFromModel(ab_delete_all) 'Permanently deletes the Fact from the database.
+                            Call lrFact.RemoveFromModel(ab_delete_all,, abDoDatabaseProcessing) 'Permanently deletes the Fact from the database.
 
                             '--------------------------------------------------------
                             'Cascading delete of Facts referencing the Fact removed
@@ -1558,7 +1558,7 @@ Namespace FBM
                         If IsSomething(Me.ObjectifyingEntityType) Then
                             Me.ObjectifyingEntityType.Instance.Remove(lrFact.Id)
                         End If
-                        Call lrFact.RemoveFromModel() 'Permanently deletes the Fact from the database.
+                        Call lrFact.RemoveFromModel(, False, abDoDatabaseProcessing) 'Permanently deletes the Fact from the database.
 
                         For Each lrFactData In lrFact.Data
                             lrDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lrFactData.Data, pcenumConceptType.Value)

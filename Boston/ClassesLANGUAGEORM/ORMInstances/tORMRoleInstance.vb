@@ -43,6 +43,7 @@ Namespace FBM
                 If Me.JoinedORMObject Is Nothing Then
                     Return pcenumRoleJoinType.None
                 End If
+RetryTypeOfJoin:
                 Select Case Me.JoinedORMObject.GetType
                     Case Is = GetType(FBM.ValueTypeInstance)
                         Return pcenumRoleJoinType.ValueType
@@ -50,15 +51,43 @@ Namespace FBM
                         Return pcenumRoleJoinType.EntityType
                     Case Is = GetType(FBM.FactTypeInstance)
                         Return pcenumRoleJoinType.FactType
+                    Case Is = GetType(FBM.FactType)
+                        Return pcenumRoleJoinType.FactType
                     Case Is = GetType(FBM.ModelObject)
                         Return Nothing
                     Case Else
-                        Dim lsMessage As String = "RoleInstance.TypeOfJoin"
-                        lsMessage.AppendDoubleLineBreak("Role Instance on Fact Type," & Me.FactType.Id & ", joined to an unusual Model Element Type (i.e. Not Value Type, Entity Type or Fact Type")
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
-                        Return pcenumRoleJoinType.None
+                        'Try and fix the problem.
+                        Dim lrPageObject As FBM.ModelObject
+                        Try
+                            lrPageObject = Me.Page.GetAllPageObjects(False, False, Me.JoinedORMObject).First
+                            Me.JoinedORMObject = lrPageObject
+                            GoTo RetryTypeOfJoin
+                        Catch
+                            Dim lrModelElement As FBM.ModelObject
+
+                            Dim larModelElement = From ModelElement In Me.Model.ModelElements
+                                                  Where Me.Model.ModelDictionary.FindAll(Function(x) x.Symbol = ModelElement.Id).Count = 0
+                                                  Select ModelElement
+
+                            For Each lrModelElement In larModelElement
+                                Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model, lrModelElement.Id, lrModelElement.ConceptType,,, True, True, lrModelElement.DBName))
+                            Next
+
+                            lrModelElement = Me.Model.GetModelObjectByName(Me.JoinedORMObject.Id)
+
+                            If lrModelElement Is Nothing Then
+                                lrModelElement = Me.Model.CreateEntityType(Me.JoinedORMObject.Id, True, False, False, False)
+                            End If
+
+                            lrPageObject = Me.Page.DropModelElementAtPoint(lrModelElement, New PointF(10, 10), False, True)
+                            Me.JoinedORMObject = lrPageObject
+                            GoTo RetryTypeOfJoin
+
+                        End Try
                 End Select
+
             End Get
+
         End Property
 
         <XmlIgnore()>
