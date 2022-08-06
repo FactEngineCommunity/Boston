@@ -1423,13 +1423,15 @@ MoveOn:
             Try
                 If Me.Page IsNot Nothing Then
                     If Me.Page.Diagram IsNot Nothing Then
-                        Me.Shape.Visible = False
-                        Me.EntityTypeNameShape.Visible = False
-                        If Me.ObjectifyingEntityTypeIndicatorShape IsNot Nothing Then
-                            Me.ObjectifyingEntityTypeIndicatorShape.Visible = False
-                        End If
-                        If Me.ReferenceModeShape IsNot Nothing Then
-                            Me.ReferenceModeShape.Visible = False
+                        If Me.Shape IsNot Nothing Then
+                            Me.Shape.Visible = False
+                            Me.EntityTypeNameShape.Visible = False
+                            If Me.ObjectifyingEntityTypeIndicatorShape IsNot Nothing Then
+                                Me.ObjectifyingEntityTypeIndicatorShape.Visible = False
+                            End If
+                            If Me.ReferenceModeShape IsNot Nothing Then
+                                Me.ReferenceModeShape.Visible = False
+                            End If
                         End If
                     End If
                 End If

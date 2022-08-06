@@ -765,7 +765,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
         End Try
 
     End Sub
@@ -801,46 +801,56 @@ Public Class frmToolboxModelDictionary
         Dim lrModel As FBM.Model
         Dim lrPage As FBM.Page
 
+        Try
 
-        lrModel = prApplication.WorkingModel
+            lrModel = prApplication.WorkingModel
 
-        aoMenuStripItem.DropDownItems.Clear()
+            aoMenuStripItem.DropDownItems.Clear()
 
-        Dim lsWorkingPageId As String = Nothing
-        If prApplication.WorkingPage IsNot Nothing Then
-            lsWorkingPageId = prApplication.WorkingPage.PageId
-        End If
+            Dim lsWorkingPageId As String = Nothing
+            If prApplication.WorkingPage IsNot Nothing Then
+                lsWorkingPageId = prApplication.WorkingPage.PageId
+            End If
 
-        Dim larPage = From Page In lrModel.Page _
-                      From ValueTypeInstance In Page.ValueTypeInstance _
-                      Where (ValueTypeInstance.Id = asValueTypeId) _
-                      Select Page Distinct _
-                      Order By Page.Name
+            Dim larPage = From Page In lrModel.Page
+                          From ValueTypeInstance In Page.ValueTypeInstance
+                          Where (ValueTypeInstance.Id = asValueTypeId)
+                          Select Page Distinct
+                          Order By Page.Name
 
-        If IsSomething(larPage) Then
-            For Each lrPage In larPage
+            If IsSomething(larPage) Then
+                For Each lrPage In larPage
 
+                    Dim loToolStripMenuItem As ToolStripMenuItem
+                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
+                                                               Nothing, lrPage.PageId)
+
+                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asValueTypeId)
+                    loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
+                    loToolStripMenuItem.Tag = lr_enterprise_view
+
+                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                Next
+            Else
                 Dim loToolStripMenuItem As ToolStripMenuItem
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add("Not yet added to a page")
+                loToolStripMenuItem.Enabled = False
+            End If
 
-                lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                           lrPage, _
-                                                           lrPage.Model.ModelId, _
-                                                           pcenumLanguage.ORMModel, _
-                                                           Nothing, lrPage.PageId)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asValueTypeId)
-                loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                loToolStripMenuItem.Tag = lr_enterprise_view
-
-                AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
-            Next
-        Else
-            Dim loToolStripMenuItem As ToolStripMenuItem
-            loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add("Not yet added to a page")
-            loToolStripMenuItem.Enabled = False
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+        End Try
 
     End Sub
 

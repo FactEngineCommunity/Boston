@@ -832,6 +832,8 @@ Namespace FBM
                                                     ByVal abIsSubtypeRelationshipSubtypeRole As Boolean,
                                                     ByRef arTopmostSupertypeModelObject As FBM.ModelObject)
 
+            Dim lsMessage As String = ""
+
             Try
 
                 If (Not arRoleConstraint.IsMDAModelElement) _
@@ -935,7 +937,10 @@ Namespace FBM
                                         lrModelObject = Me.GetModelObjectByName(lsTableName).GetTopmostNonAbsorbedSupertype
                                         lrTable = Me.RDS.getTableByName(lrModelObject.Id)
                                     Catch
-                                        Throw New Exception("No Model Element found for (possibly new) Table Name:" & lsTableName)
+                                        lsMessage = "No Model Element found for (possibly new) Table Name:" & lsTableName
+                                        lsMessage.AppendDoubleLineBreak("Could not create an Attribute based on the Role Constraint for table: " & lsTableName)
+                                        lsMessage.AppendDoubleLineBreak("Consider recreating the Role Constraint or the Relation.")
+                                        Throw New ApplicationException(lsMessage)
                                     End Try
 
                                     If lrTable Is Nothing Then
@@ -1559,9 +1564,14 @@ Namespace FBM
                     End If 'Is Internal Uniqueness Constraint
                 End If
 
+            Catch appEx As ApplicationException
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & appEx.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
             Catch ex As Exception
-                Dim lsMessage As String
+
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

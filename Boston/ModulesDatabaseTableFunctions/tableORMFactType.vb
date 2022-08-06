@@ -236,7 +236,7 @@ Namespace TableFactType
                     If arFactType.IsLinkFactType Then
                         arFactType.LinkFactTypeRole = arFactType.Model.Role.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
                         If arFactType.LinkFactTypeRole Is Nothing Then
-                            Debugger.Break()
+                            arFactType.IsLinkFactType = False
                         ElseIf Not arFactType.LinkFactTypeRole.FactType.IsObjectified Then
                             Debugger.Break()
                         End If

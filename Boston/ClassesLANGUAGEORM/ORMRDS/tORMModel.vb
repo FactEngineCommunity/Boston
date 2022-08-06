@@ -1413,6 +1413,13 @@ Namespace FBM
                         '  the topmost Supertype.
                         '---------------------------------------------------------------------------------------------------                                
                         Dim lrDestinationModelObject As FBM.ModelObject = Me.GetModelObjectByName(lrDestinationTable.Name)
+                        If lrDestinationModelObject Is Nothing Then
+                            lrDestinationModelObject = lrDestinationTable.FBMModelElement
+                            If lrDestinationModelObject Is Nothing Then
+                                Throw New ApplicationException("Could not find Object Type for Destination Table: " & lrDestinationTable.Name)
+                            End If
+                        End If
+
                         lrEntityType = New FBM.EntityType
                         Select Case lrDestinationModelObject.ConceptType
                             Case Is = pcenumConceptType.EntityType
@@ -1563,6 +1570,17 @@ Namespace FBM
                 End Select 'GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject.ConceptType
 
                 Return lrRelation
+
+            Catch appEx As ApplicationException
+
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & appEx.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, Nothing, False, False, True)
+
+                Return Nothing
 
             Catch ex As Exception
                 Dim lsMessage1 As String

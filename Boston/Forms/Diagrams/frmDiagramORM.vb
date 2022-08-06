@@ -11353,6 +11353,11 @@ SkipRemovalFromModel:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            Finally
+                Me.CircularProgressBar.Value = 0
+                Me.CircularProgressBar.Text = "0%"
+                Me.CircularProgressBar.Invalidate()
+                Me.CircularProgressBar.SendToBack()
             End Try
 
         End With

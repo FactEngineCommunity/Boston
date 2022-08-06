@@ -924,6 +924,7 @@ SkipAdding:
                         End If 'Destination Entity is on the Page.
 
                         lrORMRecordset.MoveNext()
+SkipRelation:
                     End While
 
                 Next 'lsEntityName

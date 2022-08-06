@@ -3836,6 +3836,8 @@ Namespace FBM
                              Optional ByVal abAddToConnectedDatabase As Boolean = False)
 
             Try
+                Dim lrTable As RDS.Table
+
                 If arObjectifyingEntityType Is Nothing Then
                     Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Me.Id, False,,, True)
                     Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
@@ -3861,7 +3863,7 @@ Namespace FBM
                 'RDS
                 If Me.IsManyTo1BinaryFactType Or Me.Is1To1BinaryFactType Then
 
-                    Dim lrTable As New RDS.Table(Me.Model.RDS, Me.Name, Me)
+                    lrTable = New RDS.Table(Me.Model.RDS, Me.Name, Me)
 
                     Dim larColumn As New List(Of RDS.Column)
 
@@ -3911,12 +3913,15 @@ Namespace FBM
                             Case Is = pcenumRoleJoinType.ValueType
                                 'Do nothing
                             Case Else
-                                Call lrRole.JoinedORMObject.getCorrespondingRDSTable.TriggerJoinedFactTpeObjectified(Me)
+                                lrTable = lrRole.JoinedORMObject.getCorrespondingRDSTable
+                                If lrTable IsNot Nothing Then
+                                    Call lrTable.TriggerJoinedFactTpeObjectified(Me)
+                                End If
                         End Select
                     Next
 
                 Else
-                        Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+                    lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
 
                     If lrTable IsNot Nothing Then
 

@@ -2423,9 +2423,12 @@ Namespace FBM
         Private Sub MakeVisible()
 
             Try
-                If IsSomething(Me.Shape) Then
-                    Me.Shape.Visible = True                    
+                'CodeSafe
+                If Me.Page.Diagram Is Nothing Then Exit Sub
 
+                If IsSomething(Me.Shape) Then
+
+                    Me.Shape.Visible = True
                     Me.FactTypeNameShape.Visible = True
 
                     If Me.FactTypeReadingShape IsNot Nothing Then
@@ -2442,19 +2445,26 @@ Namespace FBM
                         lrRoleInstance.Link.Visible = True
                         For Each lrRoleConstraintInstance In lrRoleInstance.RoleConstraint
                             For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                                lrRoleConstraintRoleInstance.Shape.Visible = True
+                                If lrRoleConstraintInstance.Shape IsNot Nothing Then
+                                    lrRoleConstraintRoleInstance.Shape.Visible = True
+                                End If
                             Next
                         Next
                         If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
                             Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
                             lrValueTypeInstance.X = Me.X + (3 * Me.Shape.Bounds.Width)
                             lrValueTypeInstance.Y = Me.Y
-                            lrValueTypeInstance.Shape.Visible = True
+                            If lrValueTypeInstance.Shape IsNot Nothing Then
+                                lrValueTypeInstance.Shape.Visible = True
+                            End If
                         End If
                     Next
                     For Each lrRoleConstraintInstance In Me.InternalUniquenessConstraint
                         For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                            lrRoleConstraintRoleInstance.Shape.Visible = True
+                            If lrRoleConstraintRoleInstance.Shape IsNot Nothing Then
+                                lrRoleConstraintRoleInstance.Shape.Visible = True
+                            End If
+
                         Next
                     Next
                 End If
@@ -2717,7 +2727,11 @@ Namespace FBM
                 '------------------------------------------------------------------------------------------------
                 If Me.FactTypeReadingShape IsNot Nothing Then
                     If Me.FactTypeReadingShape.Equals(arFactTypeReading) Then
-                        Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.shape)
+                        If Me.Page IsNot Nothing Then
+                            If Me.Page.Diagram IsNot Nothing Then
+                                Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
+                            End If
+                        End If
                         Me.FactTypeReadingShape = arFactTypeReading.CloneInstance(Me.Page)
                         Me.FactTypeReadingShape.DisplayAndAssociate()
                     End If
@@ -2954,6 +2968,7 @@ Namespace FBM
                 '-------------------------------------------------------------------------------------------
                 'The Objectifying EntityType is already on the Page.
                 '-----------------------------------------------------
+                Me.ObjectifyingEntityType = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.FactType.ObjectifyingEntityType.Id)
             Else
                 lrEntityTypeInstance = Me.FactType.ObjectifyingEntityType.CloneInstance(Me.Page, True)
 
@@ -3880,7 +3895,7 @@ Namespace FBM
                 Dim lrObjectifyingEntityTypeInstance = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lsObjectifyingEntityTypeId)
 
                 If lrObjectifyingEntityTypeInstance Is Nothing Then
-                    lrObjectifyingEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(arNewObjectifyingEntityType, New PointF(10, 10), True)
+                    lrObjectifyingEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(arNewObjectifyingEntityType, New PointF(10, 10), True, False)
                 End If
 
                 Me.ObjectifyingEntityType = lrObjectifyingEntityTypeInstance
