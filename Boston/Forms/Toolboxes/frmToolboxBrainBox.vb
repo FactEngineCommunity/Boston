@@ -940,7 +940,7 @@ Public Class frmToolboxBrainBox
 
     End Function
 
-    Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String, Optional ByVal aoTagObject As Object = Nothing)
+    Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String, Optional ByVal aoTagObject As Object = Nothing, Optional ByVal abInsertAtBeginning As Boolean = False)
 
         Dim lrListItem As tComboboxItem
 
@@ -948,7 +948,11 @@ Public Class frmToolboxBrainBox
             lrListItem = New tComboboxItem(asEAItem, asEAItem, aoTagObject)
 
             If (asEAItem <> "") And Not (Me.AutoComplete.ListBox.FindStringExact(asEAItem) >= 0) Then
-                Me.AutoComplete.ListBox.Items.Add(lrListItem)
+                If abInsertAtBeginning Then
+                    Me.AutoComplete.ListBox.Items.Insert(0, lrListItem)
+                Else
+                    Me.AutoComplete.ListBox.Items.Add(lrListItem)
+                End If
             End If
         Catch ex As Exception
             Dim lsMessage As String
@@ -1090,7 +1094,7 @@ Public Class frmToolboxBrainBox
             For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
                 If zsIntellisenseBuffer.Length > 0 Then
                     If lrValueType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
-                        Call Me.AddEnterpriseAwareItem(lrValueType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                        Call Me.AddEnterpriseAwareItem(lrValueType.Name, VAQL.TokenType.MODELELEMENTNAME, True)
                     End If
                 Else
                     Call Me.AddEnterpriseAwareItem(lrValueType.Name, VAQL.TokenType.MODELELEMENTNAME)
@@ -1100,20 +1104,20 @@ Public Class frmToolboxBrainBox
             For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
                 If zsIntellisenseBuffer.Length > 0 Then
                     If lrEntityType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
-                        Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                        Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME, True)
                     End If
                 Else
-                    'Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                    Call Me.AddEnterpriseAwareItem(lrEntityType.Name, VAQL.TokenType.MODELELEMENTNAME)
                 End If
             Next
 
             For Each lrFactType In prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsMDAModelElement = False And x.IsObjectified = True)
                 If zsIntellisenseBuffer.Length > 0 Then
                     If lrFactType.Name.ToLower.StartsWith(zsIntellisenseBuffer) Then
-                        Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                        Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME, True)
                     End If
                 Else
-                    'Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
+                    Call Me.AddEnterpriseAwareItem(lrFactType.Name, VAQL.TokenType.MODELELEMENTNAME)
                 End If
             Next
 
@@ -1246,7 +1250,7 @@ ProcessToken:
                     Case Is = VAQL.TokenType.NUMBER
                         'Don't add anything
                     Case Is = VAQL.TokenType.EOF
-                        Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
+                        'Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
                     Case Is = VAQL.TokenType.PREDICATESPACE
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = VAQL.TokenType.SPACE

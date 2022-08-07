@@ -3235,6 +3235,12 @@ MoveOn:
                                                                   Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(Me.ShapeMidPoint.X - ModelElementInstance.X) ^ 2 + Math.Abs(Me.ShapeMidPoint.Y - ModelElementInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
 
                             If larClosestModelElementInstance.Count > 0 Then
+
+                                'CodeSafe
+                                If lrSubtypeRelationshipInstance.Link Is Nothing Then
+                                    Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                                End If
+
                                 lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
                             End If
                             Me.Page.Diagram.Invalidate()

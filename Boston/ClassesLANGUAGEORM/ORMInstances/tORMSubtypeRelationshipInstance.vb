@@ -207,9 +207,13 @@ Namespace FBM
                 End If
 
                 If Me.parentModelElement IsNot Nothing Then
-                    If Me.parentModelElement.IsObjectifyingEntityType Then
+                    If Me.SubtypeRelationship.parentModelElement.IsObjectifyingEntityType Then
                         Try
-                            Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
+                            Try
+                                Me.parentModelElement = Me.Page.GetAllPageObjects(False, False, Me.SubtypeRelationship.parentModelElement.ObjectifiedFactType).First
+                            Catch ex As Exception
+                                Me.parentModelElement = Me.Page.getModelElementById(CType(Me.SubtypeRelationship.parentModelElement, FBM.EntityType).ObjectifiedFactType.Id)
+                            End Try
                         Catch ex As Exception
                             Try
                                 Dim larEntityType = From FactType In Me.Page.Model.FactType

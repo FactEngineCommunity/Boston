@@ -145,7 +145,8 @@ Public Class frmToolboxModelDictionary
                 loNode.Tag = lrEntity
 
                 For Each lrAttribute In lrEntity.Column
-                    loColumnNode = loNode.Nodes.Add("Attribute" & lrAttribute.Name, lrAttribute.Name, 14, 14)
+                    Dim liImageInd = Boston.returnIfTrue(lrAttribute.isPartOfPrimaryKey, 27, 14)
+                    loColumnNode = loNode.Nodes.Add("Attribute" & lrAttribute.Name, lrAttribute.Name, liImageInd, liImageInd)
                     loColumnNode.Tag = lrAttribute
                 Next
 
@@ -446,7 +447,8 @@ Public Class frmToolboxModelDictionary
                 loNode.Tag = lrEntity
 
                 For Each lrAttribute In lrEntity.Column
-                    loColumnNode = loNode.Nodes.Add("Attribute" & lrAttribute.Name, lrAttribute.Name, 14, 14)
+                    Dim liImageInd = Boston.returnIfTrue(lrAttribute.isPartOfPrimaryKey, 27, 14)
+                    loColumnNode = loNode.Nodes.Add("Attribute" & lrAttribute.Name, lrAttribute.Name, liImageInd, liImageInd)
                     loColumnNode.Tag = lrAttribute
                 Next
 
