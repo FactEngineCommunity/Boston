@@ -1235,7 +1235,7 @@ Public Class frmDiagramORMForOntologyBrowser
                                                                     Nothing,
                                                                     lrEntityType)
 
-                            lrEntityTypeInstance.EntityType.ModelError.Add(lrModelError)
+                            lrEntityTypeInstance.EntityType._ModelError.Add(lrModelError)
                             Me.zrPage.Model.AddModelError(lrModelError)
 
                             Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.AddNewPageObjectToPage, Me.zrPage)

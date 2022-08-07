@@ -7,6 +7,7 @@ Namespace RDS
     <Serializable()>
     Public Class Relation
         Implements IEquatable(Of RDS.Relation)
+        Implements IDisposable
 
         Public Model As RDS.Model
 
@@ -61,6 +62,7 @@ Namespace RDS
         <XmlIgnore()>
         <NonSerialized()>
         Public WithEvents ResponsibleFactType As FBM.FactType
+        Private disposedValue As Boolean
 
         ''' <summary>
         ''' Used with PGS Links. A PGS Link may be a LinkFactType but its UltimateFactType is its ObjectifiedFactType
@@ -437,17 +439,43 @@ Namespace RDS
 
         Public Sub triggerRemovedFromModel()
 
+            'CodeSafe
+            'Remove the Relation from all associated Columns
+            Dim larColumn = From Table In Me.Model.Table
+                            From Column In Table.Column
+                            Where Column.Relation.Contains(Me)
+                            Select Column
+
+            For Each lrColumn In larColumn.ToArray
+                Call lrColumn.Relation.Remove(Me)
+            Next
+
             RaiseEvent RemovedFromModel()
+
+            Me.Dispose()
 
         End Sub
 
         Private Sub ResponsibleFactType_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleFactType.RemovedFromModel
 
             Try
+                'CodeSafe
+                'Remove the Relation from all associated Columns
+                Dim larColumn = From Table In Me.Model.Table
+                                From Column In Table.Column
+                                Where Column.Relation.Contains(Me)
+                                Select Column
+
+                For Each lrColumn In larColumn.ToArray
+                    Call lrColumn.Relation.Remove(Me)
+                Next
 
                 Me.Model.Relation.Remove(Me)
 
                 RaiseEvent RemovedFromModel()
+
+                Me.Dispose()
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -576,71 +604,125 @@ Namespace RDS
         End Sub
 
         Public Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles DestinationTable.IndexModified
+
             Try
+                'CodeSafe
+                If Not Me.Model.Relation.Contains(Me) Then Exit Sub
+
+
+                Dim lrOriginalColumn As RDS.Column = Nothing
+                Dim lrActualTable As RDS.Table = Nothing
+
                 If arIndex.IsPrimaryKey Then
-                    If Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
-                        If Me.OriginColumns.Count > 0 Then
-                            'Should get this far
 
-                            Dim lrOriginalColumn As RDS.Column = Me.OriginColumns(0)
-                            Dim lrActualTable As RDS.Table = lrOriginalColumn.Table
+                    If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
+                        'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
 
-                            'CodeSafe
-                            'Let the Supertype take care of all this.
-                            If lrActualTable.Name <> Me.OriginTable.Name Then Exit Sub
+                        lrOriginalColumn = Me.OriginColumns(0)
+                        lrActualTable = lrOriginalColumn.Table
 
-                            If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
-                                'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
+                        Call Me.RemoveOriginColumn(lrOriginalColumn) 'Because the Column needs to be one that points to the Role of the PreferredIdentifier of the ReferenceScheme of the EntityType
 
-                                Call Me.RemoveOriginColumn(lrOriginalColumn)
-                                For Each lrColumn In arIndex.Column
-                                    Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
-                                    Call Me.OriginTable.addColumn(lrNewColumn)
-                                    lrNewColumn.Relation.Add(Me)
-                                    Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
-                                    Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
-                                Next
-                                Call Me.OriginTable.removeColumn(lrOriginalColumn)
-                            End If
+                        For Each lrDestinationColumn In Me.DestinationColumns.ToArray
+                            Call Me.RemoveDestinationColumn(lrDestinationColumn)
+                        Next
 
-                            Dim lbColumnsArePartOfPrimaryKey As Boolean = False
-                            Dim lrIndex As RDS.Index = arIndex
-                            If Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).Count > 0 Then
-                                Dim lrPrimaryKeyIndex As RDS.Index = Nothing
-                                lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
-                                For Each lrColumn In Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).ToArray
-                                    If lrColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
-                                    Me.OriginColumns.Remove(lrColumn)
-                                    Me.OriginTable.removeColumn(lrColumn)
-                                    If lrPrimaryKeyIndex IsNot Nothing Then
-                                        lrPrimaryKeyIndex.removeColumn(lrColumn)
-                                    End If
-                                Next
+                        For Each lrColumn In arIndex.Column
+                            Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
+                            Call Me.OriginTable.addColumn(lrNewColumn)
+                            lrNewColumn.Relation.Add(Me)
+                            Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count + 1)
+                            Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count + 1)
+                        Next
 
-                                '20220226-VM-Found this commented out. If not missed after a while, delete.
-                                'Was possibly replaced by Me.DestinationTable.IndexColumnAdded method functionality. Either way, was found like this Feb 2022.
-                                'If lbColumnsArePartOfPrimaryKey Then
-                                '    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
-                                'End If
+                        Call Me.OriginTable.removeColumn(lrOriginalColumn)
+                    Else
+                        lrOriginalColumn = Me.OriginColumns(0)
+                        lrActualTable = lrOriginalColumn.Table
 
-                                'For Each lrColumn In arIndex.Column
+                        For Each lrDestinationColumn In Me.DestinationColumns.ToArray
+                            Call Me.RemoveDestinationColumn(lrDestinationColumn)
+                        Next
 
-                                '    Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
-                                '    lrNewColumn.Relation.AddUnique(Me)
+                        For Each lrOriginColumn In Me.OriginColumns.ToArray
+                            Call Me.RemoveOriginColumn(lrOriginColumn)
+                            Call Me.OriginTable.removeColumn(lrOriginColumn)
+                        Next
 
-                                '    If Me.OriginTable.addColumn(lrNewColumn) Then
-                                '        Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
-                                '        Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
+                        For Each lrColumn In arIndex.Column
+                            Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
+                            Call Me.OriginTable.addColumn(lrNewColumn)
+                            lrNewColumn.Relation.Add(Me)
+                            Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count + 1)
+                            Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count + 1)
+                        Next
 
-                                '        If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
-                                '            lrPrimaryKeyIndex.addColumn(lrNewColumn)
-                                '        End If
-                                '    End If
-                                'Next
-                            End If
-                        End If
+                        '20220807-VM-Testing out something (the above)
+                        'ElseIf Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
+                        '    If Me.OriginColumns.Count > 0 Then
+                        '        'Should get this far
+
+                        '        lrOriginalColumn = Me.OriginColumns(0)
+                        '        lrActualTable = lrOriginalColumn.Table
+
+                        '        'CodeSafe
+                        '        'Let the Supertype take care of all this.
+                        '        If lrActualTable.Name <> Me.OriginTable.Name Then Exit Sub
+
+                        '        If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
+                        '            'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
+
+                        '            Call Me.RemoveOriginColumn(lrOriginalColumn)
+
+                        '            For Each lrColumn In arIndex.Column
+                        '                Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
+                        '                Call Me.OriginTable.addColumn(lrNewColumn)
+                        '                lrNewColumn.Relation.Add(Me)
+                        '                Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                        '                Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
+                        '            Next
+                        '            Call Me.OriginTable.removeColumn(lrOriginalColumn)
+                        '        End If
+
+                        '        Dim lbColumnsArePartOfPrimaryKey As Boolean = False
+                        '        Dim lrIndex As RDS.Index = arIndex
+                        '        If Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).Count > 0 Then
+                        '            Dim lrPrimaryKeyIndex As RDS.Index = Nothing
+                        '            lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+                        '            For Each lrColumn In Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).ToArray
+                        '                If lrColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
+                        '                Me.OriginColumns.Remove(lrColumn)
+                        '                Me.OriginTable.removeColumn(lrColumn)
+                        '                If lrPrimaryKeyIndex IsNot Nothing Then
+                        '                    lrPrimaryKeyIndex.removeColumn(lrColumn)
+                        '                End If
+                        '            Next
+
+                        '            '20220226-VM-Found this commented out. If not missed after a while, delete.
+                        '            'Was possibly replaced by Me.DestinationTable.IndexColumnAdded method functionality. Either way, was found like this Feb 2022.
+                        '            'If lbColumnsArePartOfPrimaryKey Then
+                        '            '    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+                        '            'End If
+
+                        '            'For Each lrColumn In arIndex.Column
+
+                        '            '    Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
+                        '            '    lrNewColumn.Relation.AddUnique(Me)
+
+                        '            '    If Me.OriginTable.addColumn(lrNewColumn) Then
+                        '            '        Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                        '            '        Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
+
+                        '            '        If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
+                        '            '            lrPrimaryKeyIndex.addColumn(lrNewColumn)
+                        '            '        End If
+                        '            '    End If
+                        '            'Next
+                        '        End If
                     End If
                 End If
+
+
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -758,6 +840,30 @@ Namespace RDS
 
         End Sub
 
+        Protected Overridable Sub Dispose(disposing As Boolean)
+            If Not disposedValue Then
+                If disposing Then
+                    ' TODO: dispose managed state (managed objects)
+                End If
+
+                ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                ' TODO: set large fields to null
+                disposedValue = True
+            End If
+        End Sub
+
+        ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
+        ' Protected Overrides Sub Finalize()
+        '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+        '     Dispose(disposing:=False)
+        '     MyBase.Finalize()
+        ' End Sub
+
+        Public Sub Dispose() Implements IDisposable.Dispose
+            ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+            Dispose(disposing:=True)
+            GC.SuppressFinalize(Me)
+        End Sub
     End Class
 
 End Namespace

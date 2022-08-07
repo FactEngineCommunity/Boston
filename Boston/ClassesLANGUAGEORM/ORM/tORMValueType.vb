@@ -471,7 +471,7 @@ Namespace FBM
                                                   Nothing,
                                                   Me)
 
-                Me.ModelError.Add(lrModelError)
+                Me._ModelError.Add(lrModelError)
                 Me.Model.AddModelError(lrModelError)
 
             End If
@@ -1124,7 +1124,7 @@ Namespace FBM
                                                           Nothing,
                                                           Me)
 
-                    Me.ModelError.AddUnique(lrModelError)
+                    Me._ModelError.AddUnique(lrModelError)
                     Me.Model.AddModelError(lrModelError)
                 Case Else
                     Me._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.DataTypeNotSpecifiedError)
@@ -1134,18 +1134,33 @@ Namespace FBM
             Me.isDirty = True
             Me.Model.Save()
 
+            Dim larColumn As Object
+
             'Database synchronisation
             If Me.Model.IsDatabaseSynchronised Then
 
-                Dim larColumn = From Table In Me.Model.RDS.Table
-                                From Column In Table.Column
-                                Where Column.ActiveRole.JoinedORMObject Is Me
-                                Select Column
+                larColumn = From Table In Me.Model.RDS.Table
+                            From Column In Table.Column
+                            Where Column.ActiveRole IsNot Nothing
+                            Where Column.ActiveRole.JoinedORMObject Is Me
+                            Select Column
 
                 For Each lrColumn In larColumn
                     Call Me.Model.RDS.columnSetDataType(lrColumn, Me.DataType, Me.DataTypeLength, Me.DataTypePrecision)
                 Next
             End If
+
+            'RDS
+            larColumn = From Table In Me.Model.RDS.Table
+                        From Column In Table.Column
+                        Where Column.ActiveRole IsNot Nothing
+                        Where Column.ActiveRole.JoinedORMObject IsNot Nothing
+                        Where Column.ActiveRole.JoinedORMObject.Id = Me.Id
+                        Select Column
+
+            For Each lrColumn In larColumn
+                Call lrColumn.TriggerDataTypeSet
+            Next
 
         End Sub
 
@@ -1366,7 +1381,7 @@ Namespace FBM
 
         Public Sub AddModelError(ByRef arModelError As ModelError) Implements iValidationErrorHandler.AddModelError
 
-            Me.ModelError.Add(arModelError)
+            Me._ModelError.Add(arModelError)
             RaiseEvent ModelErrorAdded(arModelError)
 
         End Sub

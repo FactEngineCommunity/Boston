@@ -1119,7 +1119,7 @@ Namespace FBM
                 End If
             End If
 
-            If IsSomething(Me.FactTable) Then
+            If IsSomething(Me.FactTable) And Not Me.FactType.IsMDAModelElement Then
                 Call Me.FactTable.ResortFactTable()
             End If
 
@@ -2816,7 +2816,7 @@ Namespace FBM
                 Me.InternalUniquenessConstraint.Add(lrRoleConstraintInstance)
 
                 If IsSomething(Me.Shape) Then
-                    lrRoleConstraintInstance.DisplayAndAssociate()
+                    If lbAddToPage Then lrRoleConstraintInstance.DisplayAndAssociate()
                     Call Me.AdjustBorderHeight()
                 End If
 

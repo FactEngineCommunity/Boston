@@ -3398,7 +3398,7 @@ SkipSettingReferenceModeObjects:
 
         Public Sub AddModelError(ByRef arModelError As ModelError) Implements iValidationErrorHandler.AddModelError
 
-            Me.ModelError.Add(arModelError)
+            Me._ModelError.Add(arModelError)
             RaiseEvent ModelErrorAdded(arModelError)
 
         End Sub

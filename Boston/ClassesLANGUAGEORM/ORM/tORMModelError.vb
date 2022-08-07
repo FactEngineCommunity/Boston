@@ -75,8 +75,8 @@ Namespace FBM
             End If
 
             If abAddToModelElementAndModel Then
-                arModelObject.ModelError.Add(Me)
-                arModelObject.Model.ModelError.Add(Me)
+                arModelObject._ModelError.Add(Me)
+                arModelObject.Model._ModelError.Add(Me)
             End If
 
         End Sub

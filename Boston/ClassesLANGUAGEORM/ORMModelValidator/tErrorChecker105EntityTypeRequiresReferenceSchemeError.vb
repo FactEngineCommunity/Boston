@@ -45,9 +45,13 @@ Namespace Validation
                                                           Nothing,
                                                           lrEntityType)
 
-                        lrEntityType.ModelError.Add(lrModelError)
+                        lrEntityType._ModelError.Add(lrModelError)
 
                         Me.Model.AddModelError(lrModelError)
+                    Else
+                        'CodeSafe
+                        lrEntityType._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.EntityTypeRequiresReferenceSchemeError)
+
                     End If
                 Next
 

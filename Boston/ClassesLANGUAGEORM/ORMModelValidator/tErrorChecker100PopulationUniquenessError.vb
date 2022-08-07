@@ -107,10 +107,10 @@ Namespace Validation
                                                                       Nothing,
                                                                       lrFactType)
                                     For Each lrRole In lrInternalUniquenessConstraint.Role
-                                        lrFact.GetFactDataByRoleId(lrRole.Id).ModelError.Add(lrModelError)
+                                        lrFact.GetFactDataByRoleId(lrRole.Id)._ModelError.Add(lrModelError)
                                     Next
 
-                                    lrFactType.ModelError.Add(lrModelError)
+                                    lrFactType._ModelError.Add(lrModelError)
                                     lrFact.AddModelError(lrModelError)
                                     Me.Model.AddModelError(lrModelError)
                                 End If

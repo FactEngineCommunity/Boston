@@ -1374,7 +1374,7 @@ SkipFactTypeInstance:
                                                            lsMessage,
                                                            Nothing,
                                                            Nothing)
-                            arModel.ModelError.Add(lrModelError)
+                            arModel._ModelError.Add(lrModelError)
                         Else
                             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                         End If
@@ -1450,7 +1450,7 @@ SkipFactTypeInstance:
                                                            lsMessage,
                                                            Nothing,
                                                            Nothing)
-                                arModel.ModelError.Add(lrModelError)
+                                arModel._ModelError.Add(lrModelError)
                             Else
                                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                             End If
@@ -1479,7 +1479,7 @@ SkipFactTypeInstance:
                                                            lsMessage,
                                                            Nothing,
                                                            Nothing)
-                            arModel.ModelError.Add(lrModelError)
+                            arModel._ModelError.Add(lrModelError)
                         Else
                             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                         End If
@@ -1505,7 +1505,7 @@ SkipFactTypeInstance:
                                                            lsMessage,
                                                            Nothing,
                                                            Nothing)
-                    arModel.ModelError.Add(lrModelError)
+                    arModel._ModelError.Add(lrModelError)
                 Else
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 End If
@@ -1521,7 +1521,7 @@ SkipFactTypeInstance:
                                        asErrorMessage,
                                        Nothing,
                                        Nothing)
-                arModel.ModelError.Add(lrModelError)
+                arModel._ModelError.Add(lrModelError)
 
             Catch ex As Exception
                 Dim lsMessage As String

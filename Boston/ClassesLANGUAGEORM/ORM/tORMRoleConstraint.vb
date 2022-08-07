@@ -2804,7 +2804,7 @@ RemoveAnyway:
 
         Public Sub AddModelError(ByRef arModelError As ModelError) Implements iValidationErrorHandler.AddModelError
 
-            Me.ModelError.AddUnique(arModelError)
+            Me._ModelError.AddUnique(arModelError)
             RaiseEvent ModelErrorAdded(arModelError)
 
         End Sub

@@ -503,6 +503,7 @@ Namespace ERD
             Me.PartOfPrimaryKey = abContributesToPrimaryKey
 
             Call Me.RefreshShape()
+            Call Me.Entity.RefreshShape
 
         End Sub
 
@@ -646,6 +647,23 @@ Namespace ERD
             End Try
 
         End Sub
+
+        Private Sub Column_DataTypeChanged() Handles Column.DataTypeChanged
+
+            Try
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

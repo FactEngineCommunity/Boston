@@ -32,7 +32,7 @@ Namespace Validation
                                                           Nothing,
                                                           lrValueType)
 
-                        lrValueType.ModelError.Add(lrModelError)
+                        lrValueType._ModelError.Add(lrModelError)
                         Me.Model.AddModelError(lrModelError)
 
                     End If

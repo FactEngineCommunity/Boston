@@ -581,6 +581,9 @@ Public Class frmToolboxBrainBox
 
         Try
             Me.TextBox_Output.ScrollToCaret()
+
+            Me.AutoComplete.Hide()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1238,6 +1241,8 @@ ProcessToken:
                         'Don't add anything
                     Case Is = VAQL.TokenType.PREDICATEPART
                         'Don't add anything
+                    Case Is = VAQL.TokenType.UNARYPREDICATEPART
+                        'Don't add anything
                     Case Is = VAQL.TokenType.NUMBER
                         'Don't add anything
                     Case Is = VAQL.TokenType.EOF
@@ -1306,8 +1311,11 @@ ProcessToken:
                     End If
                 End If
 
-
-                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+                If (Me.zrTextHighlighter.Tree.Errors.Count = 0 And Me.zrTextHighlighter.Tree.Optionals.Count = 0) Then
+                    Me.AutoComplete.Hide()
+                    Me.TextBoxInput.Focus()
+                    Exit Sub
+                ElseIf Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
 
                     Dim myP As Point = Me.TextBox_Output.GetPositionFromCharIndex(Me.TextBox_Output.Text.Length) ' RichTextBox1.SelectionStart
 

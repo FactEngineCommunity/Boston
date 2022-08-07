@@ -603,7 +603,7 @@ Namespace FBM
                 Next
 
                 For Each lrModelError In .ModelError
-                    lrORMModel.ModelError.Add(lrModelError.Clone())
+                    lrORMModel._ModelError.Add(lrModelError.Clone())
                 Next
 
                 For Each lrPage In .Page
@@ -739,7 +739,7 @@ Namespace FBM
         Public Sub AddModelError(ByRef arModelError As FBM.ModelError)
 
             If Not Me.ModelError.Exists(AddressOf arModelError.Equals) Then
-                Me.ModelError.AddUnique(arModelError)
+                Me._ModelError.AddUnique(arModelError)
             End If
 
             RaiseEvent ModelErrorAdded()
@@ -3309,7 +3309,7 @@ Namespace FBM
 
                 Dim lsNewUniqueName As String = ""
 
-                lsNewUniqueName = Me.CreateUniqueRoleConstraintName(lrRoleConstraint.Name, 1)
+                lsNewUniqueName = Me.CreateUniqueRoleConstraintName(lrRoleConstraint.Name, 0)
 
                 '--------------------------------------------------------------------
                 'Create the FBM.RoleConstraint to return (with the lsNewUniqueName)

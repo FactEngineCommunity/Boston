@@ -504,6 +504,8 @@ Namespace NORMA
                             Dim lsSubtypeRoleId As String = loElement.<orm:FactRoles>.<orm:SubtypeMetaRole>.AsEnumerable.First.Attribute("id").Value
                             Dim lsSupertypeRoleId As String = loElement.<orm:FactRoles>.<orm:SupertypeMetaRole>.AsEnumerable.First.Attribute("id").Value
 
+                            Boston.WriteToStatusBar("Creating Subtype Relationship between " & lrEntityType.Id & " and " & lrSupertypeEntityType.Id)
+
                             Dim lrSubtypeRelationship As FBM.tSubtypeRelationship = Nothing
                             lrSubtypeRelationship = lrEntityType.CreateSubtypeRelationship(lrSupertypeEntityType,
                                                                                            False,

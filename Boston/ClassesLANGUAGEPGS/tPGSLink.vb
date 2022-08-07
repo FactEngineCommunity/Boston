@@ -304,7 +304,12 @@ Namespace PGS
                         End If
 
                     ElseIf Me.Relation.IsPGSRelationNode Then
-                        If Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
+                        If Me.RDSRelation.ResponsibleFactType.HasPartialButMultiRoleConstraint Or Me.RDSRelation.ResponsibleFactType.HasTotalRoleConstraint Then
+                            Me.Link.BaseShape = ArrowHead.PointerArrow
+                            Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                            Me.Link.HeadShape = ArrowHead.PointerArrow
+                            Me.Link.HeadShapeSize = Me.Link.HeadShapeSize
+                        ElseIf Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
                             Me.Link.BaseShape = ArrowHead.PointerArrow
                             Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
                         End If

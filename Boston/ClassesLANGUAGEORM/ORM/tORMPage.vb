@@ -2712,17 +2712,6 @@ NextY:
                 End If
 
                 Dim lrOriginalFactTypeInstance = arFactTypeInstance
-                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.Id = lrOriginalFactTypeInstance.Id And x.InstanceNumber > lrOriginalFactTypeInstance.InstanceNumber)
-                    lrFactTypeInstance.InstanceNumber -= 1
-                    lrFactTypeInstance.FactTypeName.InstanceNumber -= 1
-                    lrFactTypeInstance.FactTable.InstanceNumber -= 1
-                    If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
-                        lrFactTypeInstance.FactTypeDerivationText.InstanceNumber -= 1
-                    End If
-                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
-                        lrFactTypeInstance.FactTypeReadingShape.InstanceNumber -= 1
-                    End If
-                Next
 
                 'The FactTypeName is a separate Shape with its own ConceptInstance in the database.
                 Call arFactTypeInstance.FactTypeName.RemoveFromPage(abBroadcastInterfaceEvent)
@@ -2736,6 +2725,18 @@ NextY:
                 Next
 
                 Me.FactTypeInstance.RemoveAll(AddressOf arFactTypeInstance.Equals)
+
+                For Each lrFactTypeInstance In Me.FactTypeInstance.FindAll(Function(x) x.Id = lrOriginalFactTypeInstance.Id And x.InstanceNumber > lrOriginalFactTypeInstance.InstanceNumber)
+                    lrFactTypeInstance.InstanceNumber -= 1
+                    lrFactTypeInstance.FactTypeName.InstanceNumber -= 1
+                    lrFactTypeInstance.FactTable.InstanceNumber -= 1
+                    If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                        lrFactTypeInstance.FactTypeDerivationText.InstanceNumber -= 1
+                    End If
+                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        lrFactTypeInstance.FactTypeReadingShape.InstanceNumber -= 1
+                    End If
+                Next
 
                 'Do database processing if necessary.
                 If abBroadcastInterfaceEvent Then

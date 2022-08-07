@@ -825,7 +825,7 @@ Namespace ORMQL
 
                 Call lrModelElement.removeInstance(lrRemoveInstanceStatement.VALUE)
 
-                Call Me.Model.Save()
+                If Me.Model.StoreAsXML Then Me.Model.Save()
 
                 Return True
 

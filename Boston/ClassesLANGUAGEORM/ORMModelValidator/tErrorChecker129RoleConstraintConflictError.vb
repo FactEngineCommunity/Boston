@@ -45,7 +45,7 @@ Namespace Validation
                                                                           Nothing,
                                                                           lrRoleConstraint)
 
-                                        lrRoleConstraint.ModelError.Add(lrModelError)
+                                        lrRoleConstraint._ModelError.Add(lrModelError)
                                         Me.Model.AddModelError(lrModelError)
                                     End If
                                 End If
@@ -63,7 +63,7 @@ Namespace Validation
                                                                   Nothing,
                                                                   lrRoleConstraint)
 
-                                lrRoleConstraint.ModelError.Add(lrModelError)
+                                lrRoleConstraint._ModelError.Add(lrModelError)
                                 Me.Model.AddModelError(lrModelError)
                             End If
 
@@ -79,7 +79,7 @@ Namespace Validation
                                                                   Nothing,
                                                                   lrRoleConstraint)
 
-                                lrRoleConstraint.ModelError.Add(lrModelError)
+                                lrRoleConstraint._ModelError.Add(lrModelError)
                                 Me.Model.AddModelError(lrModelError)
 
                             End If
