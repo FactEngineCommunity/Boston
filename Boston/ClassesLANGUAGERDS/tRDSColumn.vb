@@ -6,17 +6,18 @@ Namespace RDS
     <Serializable()> _
     Public Class Column
         Implements IEquatable(Of RDS.Column)
+        Implements IDisposable
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public Model As RDS.Model
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public Table As RDS.Table
 
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public Index As New List(Of RDS.Index)
 
         Public Relation As New List(Of RDS.Relation)
@@ -39,57 +40,57 @@ Namespace RDS
         <XmlIgnore()>
         Public AsName As String = Nothing
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public OrdinalPosition As Integer = 1
 
-        <XmlElement()> _
+        <XmlElement()>
         Public DataType As RDS.DataType
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public DataTypeName As String
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ODBCDataType As Integer = 0
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Nullable As Boolean = False
 
         Public IsMandatory As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public IsNullable As Boolean = False
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public TableCategory As String
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public TableSchema As String
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ColumnSize As Integer
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public BufferLength As Integer
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public DecimalDigits As Integer
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public NumPrecRadix As Integer
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Remarks As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ColumnDef As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public SQLDataType As Integer = 0
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public SQLDateTimeSub As String = ""
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public CharOctetLength As Integer = 0
 
         <XmlAttribute()>
@@ -112,16 +113,16 @@ Namespace RDS
         '''   Column is derived.
         ''' </summary>
         ''' <remarks></remarks>        
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public FactType As FBM.FactType
 
         ''' <summary>
         ''' The Role that was responsible for the derivation of the Column.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public WithEvents Role As FBM.Role
 
         ''' <summary>
@@ -259,7 +260,7 @@ Namespace RDS
         ''' FactEngine specific. Used to tell the type of Node for each result in the Query.
         ''' </summary>
         Public GraphNodeType As String = ""
-
+        Private disposedValue As Boolean
         Public Event ActiveRoleChanged()
         Public Event AddedToPrimaryKey()
         Public Event DataTypeChanged()
@@ -882,7 +883,7 @@ Namespace RDS
                         If Me.Model.Model.DatabaseConnection Is Nothing Then
                             Throw New Exception("No database connection has been established.")
                         End If
-                    ElseIf Me.Model.model.DatabaseConnection.Connected = False Then
+                    ElseIf Me.Model.Model.DatabaseConnection.Connected = False Then
                         Throw New Exception("The database is not connected.")
                     End If
 
@@ -977,6 +978,30 @@ Namespace RDS
 
         End Sub
 
+        Protected Overridable Sub Dispose(disposing As Boolean)
+            If Not disposedValue Then
+                If disposing Then
+                    Me.Relation.Clear()
+                End If
+
+                ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                ' TODO: set large fields to null
+                disposedValue = True
+            End If
+        End Sub
+
+        ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
+        ' Protected Overrides Sub Finalize()
+        '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+        '     Dispose(disposing:=False)
+        '     MyBase.Finalize()
+        ' End Sub
+
+        Public Sub Dispose() Implements IDisposable.Dispose
+            ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+            Dispose(disposing:=True)
+            GC.SuppressFinalize(Me)
+        End Sub
     End Class
 
 End Namespace

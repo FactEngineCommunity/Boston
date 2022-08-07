@@ -1498,7 +1498,7 @@ Namespace FBM
 
         End Sub
 
-        Public Sub removeCMMLAttribute(ByVal asEntityName As String, ByVal asAttributeId As String)
+        Public Sub removeCMMLAttribute(ByVal asAttributeId As String)
 
             Dim lsSQLQuery As String
 

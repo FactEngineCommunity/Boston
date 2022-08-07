@@ -1575,8 +1575,9 @@ Namespace RDS
                     'If Column is from another Table, may want to keep it (RemoveResidualCMML = False).
                     '  E.g. If changing a Subtype EntityType to Not IsAbsorbed, a Column may be moved from a
                     '  Supertype to that Subtype, so do not want to remove the CMML.
-                    Call Me.Model.Model.removeCMMLAttribute(arColumn.Table.Name, arColumn.Id)
+                    Call Me.Model.Model.removeCMMLAttribute(arColumn.Id)
                 Else
+                    'As description above.
                     Call Me.Model.Model.removeCMMLAttributeFromTableOnly(arColumn, Me)
                 End If
 
@@ -1598,6 +1599,10 @@ Namespace RDS
 
                 If Me.Column.Count = 0 And Not abIsReferenceModeColumn Then
                     Call Me.Model.removeTable(Me)
+                End If
+
+                If arColumn.Table Is Me And Not abRemoveResidualCMML Then
+                    arColumn.Dispose()
                 End If
 
             Catch ex As Exception

@@ -2041,7 +2041,7 @@ Namespace FBM
                                                                         True,
                                                                         MessageBoxButtons.YesNo) = DialogResult.Yes Then
                                     '20210813-VM-If this gets out of hand, remove this functionality.
-                                    Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                                    Call Me.removeCMMLAttribute(lsColumnId)
                                 End If
                             End If
                         End Try
