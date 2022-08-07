@@ -2430,6 +2430,7 @@ Namespace FBM
                     lsMessage.AppendDoubleLineBreak("Boston will remove this Relation from the Relational View as a precaution. Determine which Relation is missing and try and remake the Relation from the Object-Role Model view.")
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                     Dim lrRelation As New RDS.Relation
+                    lrRelation.Model = Me.RDS
                     lrRelation.Id = asRelationId
                     Me.RDS.removeRelation(lrRelation)
                 End Try

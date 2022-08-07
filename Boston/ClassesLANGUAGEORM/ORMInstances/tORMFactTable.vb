@@ -324,6 +324,9 @@ SkipThat:
             Dim lsMessage As String = ""
 
             Try
+                'CodeSafe
+                If Not Me.Page.Language = pcenumLanguage.ORMModel Then Exit Sub
+
 
                 '---------------------------------------------------------------------
                 'Make sure that the Row/Column dimentions of the FactTable match the

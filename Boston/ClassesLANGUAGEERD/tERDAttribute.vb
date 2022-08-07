@@ -417,42 +417,44 @@ Namespace ERD
             Try
                 Me.Mandatory = abMandatoryStatus
 
-                If abMandatoryStatus = True Then
+                '20220808-VM-Taken care of at the RDS level. Column.SetMandatory
+                'If abMandatoryStatus = True Then
 
-                    lsSQLQuery = "SELECT COUNT(*)"
-                    lsSQLQuery &= " FROM CoreIsMandatory"
-                    lsSQLQuery &= " WHERE IsMandatory = '" & Me.Id & "'"
+                '    lsSQLQuery = "SELECT COUNT(*)"
+                '    lsSQLQuery &= " FROM CoreIsMandatory"
+                '    lsSQLQuery &= " WHERE IsMandatory = '" & Me.Id & "'"
 
-                    lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                '    lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If lrORMRecordset("Count").Data = 0 Then
+                '    If lrORMRecordset("Count").Data = 0 Then
 
-                        lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
-                        lsSQLQuery &= " VALUES ("
-                        lsSQLQuery &= " '" & Me.Data & "'"
-                        lsSQLQuery &= " )"
+                '        lsSQLQuery = "INSERT INTO CoreIsMandatory (IsMandatory)"
+                '        lsSQLQuery &= " VALUES ("
+                '        lsSQLQuery &= " '" & Me.Id & "'"
+                '        lsSQLQuery &= " )"
 
-                        lrFact = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                '        lrFact = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lsSQLQuery = "ADD FACT '" & lrFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                '        '20220808-VM-Removed. CMML Pages (E.g. ERD View) no longer use CMML data on the Page itself for Attributes.
+                '        'lsSQLQuery = "ADD FACT '" & lrFact.Id & "'"
+                '        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                '        'lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    Else
-                        lsSQLQuery = "ADD FACT '" & lrORMRecordset.Facts(0).Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                '        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                '        'Else
+                '        '    lsSQLQuery = "ADD FACT '" & lrORMRecordset.Facts(0).Id & "'"
+                '        '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                '        '    lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    End If
+                '        '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                '    End If
 
-                Else
-                    lsSQLQuery = "DELETE FROM CoreIsMandatory"
-                    lsSQLQuery &= " WHERE IsMandatory = '" & Me.Id & "'"
+                'Else
+                '    lsSQLQuery = "DELETE FROM CoreIsMandatory"
+                '    lsSQLQuery &= " WHERE IsMandatory = '" & Me.Id & "'"
 
-                    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                End If
+                '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                'End If
 
                 Call Me.RefreshShape()
 

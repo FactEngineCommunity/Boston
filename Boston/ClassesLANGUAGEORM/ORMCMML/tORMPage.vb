@@ -2931,8 +2931,13 @@ SkipRelation:
 
                             lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            lrDestinationNode.Symbol = lrRecordset1("Entity").Data
-                            lrDestinationNode = Me.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
+                            Try
+                                lrDestinationNode.Symbol = lrRecordset1("Entity").Data
+                                lrDestinationNode = Me.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
+                            Catch ex As Exception
+                                GoTo SkipRelation
+                            End Try
+
                         Else '=2
                             lrOriginNode = New PGS.Node
                             lrDestinationNode = New PGS.Node
@@ -3025,20 +3030,20 @@ SkipRelation:
                                 If lrRelation.Link IsNot Nothing Then
                                     If lrRelation.Link.Link IsNot Nothing Then
                                         If Me.Diagram.Links.Contains(lrRelation.Link.Link) Then
-                                            GoTo MoveOn
+                                            GoTo SkipRelation
                                         End If
 
                                     End If
                                 End If
                             Catch ex As Exception
-                                GoTo MoveOn
+                                GoTo SkipRelation
                             End Try
 
                             Dim lrLink As PGS.Link
                             lrLink = New PGS.Link(Me, lrFactInstance, lrOriginNode, lrDestinationNode, Nothing, Nothing, lrRelation)
                             lrLink.DisplayAndAssociate()
                         End If
-MoveOn:
+SkipRelation:
                         lrRecordset.MoveNext()
                     End While
 

@@ -393,7 +393,8 @@ Namespace RDS
         ''' <param name="abAddToDatabase">True if the column is to be added to the connected database.</param>
         Public Function addColumn(ByRef arColumn As RDS.Column,
                                   Optional abAddToDatabase As Boolean = False,
-                                  Optional abProcessCMML As Boolean = True) As Boolean
+                                  Optional abProcessCMML As Boolean = True,
+                                  Optional abForceAdd As Boolean = False) As Boolean
 
             Try
 
@@ -401,7 +402,7 @@ Namespace RDS
                 arColumn.Table = Me 'CodeSafe
 
                 'CodeSafe: Don't add the Column if it already exists.
-                If Me.Column.Contains(arColumn) Then
+                If Me.Column.Contains(arColumn) And Not abForceAdd Then
                     Return False
                 End If
 
@@ -1538,7 +1539,8 @@ Namespace RDS
         Public Sub removeColumn(ByRef arColumn As RDS.Column,
                                 Optional abRemoveFromDatabase As Boolean = False,
                                 Optional abRemoveResidualCMML As Boolean = True,
-                                Optional abIsReferenceModeColumn As Boolean = False)
+                                Optional abIsReferenceModeColumn As Boolean = False,
+                                Optional abById As Boolean = False)
 
             Try
                 'CodeSafe
@@ -1546,7 +1548,11 @@ Namespace RDS
 
                 Dim lrColumn As RDS.Column = arColumn
 
-                Me.Column.Remove(arColumn)
+                If abById Then
+                    Me.Column.RemoveAll(Function(x) x.Id = lrColumn.Id)
+                Else
+                    Me.Column.Remove(arColumn)
+                End If
 
                 Dim lrRemovedColumn As RDS.Column = arColumn
                 For Each lrColumn In Me.Column.FindAll(Function(x) x.OrdinalPosition > lrRemovedColumn.OrdinalPosition)

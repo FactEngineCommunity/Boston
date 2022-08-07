@@ -3153,7 +3153,9 @@ Namespace FBM
                         '------------------------------------------------
                     Else
                         Call Me.RemoveFact(lrFactInstance)
-                        Call Me.FactTable.ResortFactTable()
+                        If Me.Page.Language = pcenumLanguage.ORMModel Then
+                            Call Me.FactTable.ResortFactTable()
+                        End If
                     End If
                 Next
 

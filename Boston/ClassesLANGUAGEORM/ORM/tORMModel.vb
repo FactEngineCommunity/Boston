@@ -5490,6 +5490,22 @@ Namespace FBM
 
                         ExistsModelElement = True
                     End If
+                Else
+                    'CodeSafe
+                    Dim larModelElement = From ValueType In Me.ValueType
+                                          From EntityType In Me.EntityType
+                                          From FactType In Me.FactType
+                                          From RoleConstraint In Me.RoleConstraint
+                                          From ModelNote In Me.ModelNote
+                                          Where ValueType.Id = asModelElementName Or
+                                                EntityType.Id = asModelElementName Or
+                                                FactType.Id = asModelElementName Or
+                                                RoleConstraint.Id = asModelElementName Or
+                                                ModelNote.Id = asModelElementName
+                                          Select True
+
+                    ExistsModelElement = larModelElement.Count > 0
+
                 End If
 
             Catch ex As Exception

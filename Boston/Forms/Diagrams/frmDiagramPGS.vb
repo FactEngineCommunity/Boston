@@ -194,6 +194,13 @@ Public Class frmDiagramPGS
             End If
         End If
 
+        '-----------------------------------------------------------------------------------------------------------
+        'If the Virtual Analyst toolbox is loaded, set the Brain's Page (of the toolbox) to the Page of this form.
+        '-----------------------------------------------------------------------------------------------------------
+        If prApplication.ToolboxForms.FindAll(Function(x) x.Name = frmToolboxBrainBox.Name).Count > 0 Then
+            prApplication.Brain.Page = Me.zrPage
+        End If
+
     End Sub
 
     Private Sub frmDiagramERD_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -323,6 +330,14 @@ Public Class frmDiagramPGS
             '   with the corresponding 'object' within the ORMModelPage object
             '------------------------------------------------------------------------------
             Dim lrFactDataInstance As New FBM.FactDataInstance(Me.zrPage)
+
+            '-----------------------------------------------------------------------------------------------------------
+            'If the Virtual Analyst toolbox is loaded, set the Brain's Page (of the toolbox) to the Page of this form.
+            '-----------------------------------------------------------------------------------------------------------
+            If prApplication.ToolboxForms.FindAll(Function(x) x.Name = frmToolboxBrainBox.Name).Count > 0 Then
+                prApplication.Brain.Page = Me.zrPage
+                prApplication.Brain.Model = Me.zrPage.Model
+            End If
 
             '--------------------
             'Load the Entities.
@@ -2444,6 +2459,7 @@ Public Class frmDiagramPGS
                 Call prApplication.setWorkingPage(Me.zrPage)
 
                 If prApplication.ToolboxForms.FindAll(Function(x) x.Name = frmToolboxBrainBox.Name).Count > 0 Then
+                    prApplication.Brain.Model = Me.zrPage.Model
                     prApplication.Brain.Page = Me.zrPage
                 End If
 

@@ -439,20 +439,30 @@ Namespace RDS
 
         Public Sub triggerRemovedFromModel()
 
-            'CodeSafe
-            'Remove the Relation from all associated Columns
-            Dim larColumn = From Table In Me.Model.Table
-                            From Column In Table.Column
-                            Where Column.Relation.Contains(Me)
-                            Select Column
+            Try
+                'CodeSafe
+                'Remove the Relation from all associated Columns
+                Dim larColumn = From Table In Me.Model.Table
+                                From Column In Table.Column
+                                Where Column.Relation.Contains(Me)
+                                Select Column
 
-            For Each lrColumn In larColumn.ToArray
-                Call lrColumn.Relation.Remove(Me)
-            Next
+                For Each lrColumn In larColumn.ToArray
+                    Call lrColumn.Relation.Remove(Me)
+                Next
 
-            RaiseEvent RemovedFromModel()
+                RaiseEvent RemovedFromModel()
 
-            Me.Dispose()
+                Me.Dispose()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
 
         End Sub
 
@@ -644,17 +654,19 @@ Namespace RDS
                             Call Me.RemoveDestinationColumn(lrDestinationColumn)
                         Next
 
-                        For Each lrOriginColumn In Me.OriginColumns.ToArray
-                            Call Me.RemoveOriginColumn(lrOriginColumn)
-                            Call Me.OriginTable.removeColumn(lrOriginColumn)
-                        Next
+                        Dim larColumnsToRemove = Me.OriginColumns.ToList
 
                         For Each lrColumn In arIndex.Column
                             Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
-                            Call Me.OriginTable.addColumn(lrNewColumn)
+                            Call Me.OriginTable.addColumn(lrNewColumn,,, True)
                             lrNewColumn.Relation.Add(Me)
                             Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count + 1)
                             Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count + 1)
+                        Next
+
+                        For Each lrOriginColumn In larColumnsToRemove
+                            Call Me.RemoveOriginColumn(lrOriginColumn)
+                            Call Me.OriginTable.removeColumn(lrOriginColumn,,,, True)
                         Next
 
                         '20220807-VM-Testing out something (the above)
@@ -746,6 +758,8 @@ Namespace RDS
 
                     lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
 
+                    Dim larOriginTableColumnsToRemove As New List(Of RDS.Column)
+
                     Dim larColumn = From Column In Me.OriginColumns
                                     Where Column.ActiveRole.JoinedORMObject.Id = lrIndex.Table.Name And Column.ActiveRole.JoinsEntityType IsNot Nothing
                                     Select Column
@@ -761,7 +775,7 @@ Namespace RDS
                             lrPrimaryKeyIndex.removeColumn(lrActualColumn)
                         End If
                         Me.RemoveOriginColumn(lrColumn)
-                        Me.OriginTable.removeColumn(lrActualColumn)
+                        larOriginTableColumnsToRemove.Add(lrActualColumn)
                     Next
 
                     If lbColumnsArePartOfPrimaryKey Then
@@ -786,6 +800,10 @@ Namespace RDS
                         If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
                             lrPrimaryKeyIndex.addColumn(lrNewColumn)
                         End If
+                    Next
+
+                    For Each lrActualTableColumn In larOriginTableColumnsToRemove
+                        Me.OriginTable.removeColumn(lrActualTableColumn)
                     Next
                 End If
 
