@@ -1715,7 +1715,9 @@ Public Class frmToolboxEnterpriseExplorer
             Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
         End If
 
-        Call frmMain.LoadToolboxModelDictionary()
+        Dim lfrmToolboxModelDictionary As frmToolboxModelDictionary = frmMain.LoadToolboxModelDictionary()
+        lfrmToolboxModelDictionary.zrORMModel = lrModel
+        lfrmToolboxModelDictionary.zrLoadedModel = lrModel
 
     End Sub
 

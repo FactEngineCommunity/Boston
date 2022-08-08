@@ -49,6 +49,8 @@ Partial Class frmToolboxBrainBox
         '
         Me.TextBox_Output.BackColor = System.Drawing.Color.Ivory
         Me.TextBox_Output.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBox_Output.Font = New System.Drawing.Font("Cambria Math", 10.75!)
+        Me.TextBox_Output.ForeColor = System.Drawing.Color.RoyalBlue
         Me.TextBox_Output.HideSelection = False
         Me.TextBox_Output.Location = New System.Drawing.Point(0, 0)
         Me.TextBox_Output.Name = "TextBox_Output"

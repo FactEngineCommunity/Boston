@@ -350,9 +350,9 @@ Public Class tBrain
         'Me.outputchannel.text &= vbCrLf
         Try
             If ab_is_echo Then
-                Me.OutputChannel.SelectionColor = Color.Black
+                Me.OutputChannel.SelectionColor = Color.DarkGray
             Else
-                Me.OutputChannel.SelectionColor = Color.Blue
+                Me.OutputChannel.SelectionColor = Color.RoyalBlue
             End If
 
             Me.OutputChannel.AppendText(lsString & vbCrLf)
@@ -371,7 +371,7 @@ Public Class tBrain
             Select Case aiExpectedResponseType
                 Case Is = pcenumExpectedResponseType.YesNo
 #Region "Yes/No Response"
-                    Dim Button1 = New Button ' Create new instance
+                    Dim Button1 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button1.Size = New System.Drawing.Size(75, 27) ' give the button a size
                     Button1.Text = "Yes" ' set the button text
                     Button1.UseVisualStyleBackColor = True ' make it look windows like
@@ -382,9 +382,9 @@ Public Class tBrain
 
                     Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position
                     Me.OutputChannel.Controls.Add(Button1) ' get it inside the rich text box
-                    Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top) ' set the button position
+                    Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
-                    Dim Button2 = New Button ' Create new instance
+                    Dim Button2 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button2.Size = New System.Drawing.Size(75, 27) ' give the button a size
                     Button2.Text = "No" ' set the button text
                     Button2.UseVisualStyleBackColor = True ' make it look windows like
@@ -394,7 +394,7 @@ Public Class tBrain
                     AddHandler Button2.Click, AddressOf Me.ResponseButton_Click
 
                     Me.OutputChannel.Controls.Add(Button2) ' get it inside the rich text box
-                    Button2.Location = New Point(Button1.Left + Button1.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
+                    Button2.Location = New Point(Button1.Left + Button1.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
                     Me.ResponseButtons.Add(Button1)
                     Me.ResponseButtons.Add(Button2)
@@ -404,7 +404,7 @@ Public Class tBrain
 #End Region
                 Case Is = pcenumExpectedResponseType.ATMOSTONEONEMANYTOMANY
 #Region "ATMOSTONEONEMANYTOMANY"
-                    Dim Button1 = New Button ' Create new instance
+                    Dim Button1 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button1.Size = New System.Drawing.Size(95, 27) ' give the button a size
                     Button1.Text = "AT MOST ONE" ' set the button text
                     Button1.UseVisualStyleBackColor = True ' make it look windows like
@@ -415,9 +415,9 @@ Public Class tBrain
 
                     Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position
                     Me.OutputChannel.Controls.Add(Button1) ' get it inside the rich text box
-                    Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top) ' set the button position
+                    Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
-                    Dim Button2 = New Button ' Create new instance
+                    Dim Button2 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button2.Size = New System.Drawing.Size(75, 27) ' give the button a size
                     Button2.Text = "ONE" ' set the button text
                     Button2.UseVisualStyleBackColor = True ' make it look windows like
@@ -427,9 +427,9 @@ Public Class tBrain
                     AddHandler Button2.Click, AddressOf Me.ResponseButton_Click
 
                     Me.OutputChannel.Controls.Add(Button2) ' get it inside the rich text box
-                    Button2.Location = New Point(Button1.Left + Button1.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
+                    Button2.Location = New Point(Button1.Left + Button1.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
-                    Dim Button3 = New Button ' Create new instance
+                    Dim Button3 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button3.Size = New System.Drawing.Size(125, 27) ' give the button a size
                     Button3.Text = "Many to Many" ' set the button text
                     Button3.UseVisualStyleBackColor = True ' make it look windows like
@@ -439,9 +439,9 @@ Public Class tBrain
                     AddHandler Button3.Click, AddressOf Me.ResponseButton_Click
 
                     Me.OutputChannel.Controls.Add(Button3) ' get it inside the rich text box
-                    Button3.Location = New Point(Button2.Left + Button2.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
+                    Button3.Location = New Point(Button2.Left + Button2.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
-                    Dim Button4 = New Button ' Create new instance
+                    Dim Button4 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button4.Size = New System.Drawing.Size(125, 27) ' give the button a size
                     Button4.Text = "Abort" ' set the button text
                     Button4.UseVisualStyleBackColor = True ' make it look windows like
@@ -451,7 +451,7 @@ Public Class tBrain
                     AddHandler Button4.Click, AddressOf Me.ResponseButton_Click
 
                     Me.OutputChannel.Controls.Add(Button4) ' get it inside the rich text box
-                    Button4.Location = New Point(Button3.Left + Button3.Width + 10, pos.Y + Me.OutputChannel.Top) ' set the button position
+                    Button4.Location = New Point(Button3.Left + Button3.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
                     Me.ResponseButtons.Add(Button1)
                     Me.ResponseButtons.Add(Button2)
@@ -474,7 +474,7 @@ Public Class tBrain
         '======================================================================
         '20200725-VM Test to see if can limit the number of lines in the textbox
         Try
-            Dim numOfLines As Integer = 10
+            Dim numOfLines As Integer = 8
             Dim loTextBox As RichTextBox = Me.OutputChannel
             Dim lines As List(Of String) = loTextBox.Lines.ToList
             If (lines.Count > numOfLines) And Not abSuppressLineLimit Then

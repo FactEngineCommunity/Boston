@@ -338,6 +338,10 @@ Namespace PGS
 
         End Sub
 
+        ''' <summary>
+        ''' 20220808-VM- Role.JoinedORMObject error.
+        '''         Introduced lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey Or x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType))
+        ''' </summary>
         Public Sub setPredicate()
 
             Try
@@ -434,7 +438,14 @@ Namespace PGS
                         lrRDSTable = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id).getCorrespondingRDSTable
                     End If
 
-                    For Each lrColumn In lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey Or x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType))
+                    Dim larColumn = From Column In lrRDSTable.Column
+                                    Where Column.Role.JoinedORMObject IsNot Nothing
+                                    Where Column.isPartOfPrimaryKey Or
+                                        Column.Role.JoinedORMObject.GetType = GetType(FBM.ValueType)
+                                    Select Column
+
+                    '20220808-VM-Was lrRDSTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey Or x.Role.JoinedORMObject.GetType = GetType(FBM.ValueType))
+                    For Each lrColumn In larColumn
                         '============================================================
                         'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
                         '    'Don't show the Column

@@ -1583,6 +1583,12 @@ Public Class frmDiagramPGS
 
     End Sub
 
+
+    ''' <summary>
+    ''' 20220808-VM-Fixed morphing for Links (PGSRelationNodes). Was trying to create the morph node without a shape. Added: lrNode.Shape = Me.HiddenDiagram.Factory.CreateShapeNode(lrRectangleF)
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Public Sub morphToORMDiagram(ByVal sender As Object, ByVal e As EventArgs)
 
         Dim item As ToolStripItem = CType(sender, ToolStripItem)
@@ -1612,11 +1618,13 @@ Public Class frmDiagramPGS
                 lrNode.X = lrRelation.Link.Link.Bounds.X
                 lrNode.Y = lrRelation.Link.Link.Bounds.Y
 
-                lrNode.shape.SetRect(New RectangleF(lrRelation.Link.Link.Bounds.X,
+                Dim lrRectangleF As New RectangleF(lrRelation.Link.Link.Bounds.X,
                                      lrRelation.Link.Link.Bounds.Y,
                                      lrRelation.Link.Link.Bounds.Width,
-                                     lrRelation.Link.Link.Bounds.Height),
-                                     False)
+                                     lrRelation.Link.Link.Bounds.Height)
+
+                lrNode.Shape = Me.HiddenDiagram.Factory.CreateShapeNode(lrRectangleF)
+                lrNode.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
 
                 loDiagrammingShape = Shapes.RoundRect
             End If
@@ -2292,6 +2300,8 @@ Public Class frmDiagramPGS
 
         Dim lo_point As System.Drawing.PointF
         Dim loNode As DiagramNode = Nothing
+        Dim loLink As DiagramLink = Nothing
+        Dim lrPGSRelation As PGS.Link = Nothing
 
         Try
             'Me.DiagramView.Behavior = Behavior.DrawLinks
@@ -2300,12 +2310,19 @@ Public Class frmDiagramPGS
 
             lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
+            loNode = Diagram.GetNodeAt(lo_point)
+            loLink = Diagram.GetLinkAt(lo_point, 2)
+
+            If loLink IsNot Nothing Then
+                lrPGSRelation = loLink.Tag
+            End If
+
             Me.DiagramView.SmoothingMode = SmoothingMode.AntiAlias
 
             '--------------------------------------------------
             'Just to be sure...set the Boston.WorkingProject
             '--------------------------------------------------
-            loNode = Diagram.GetNodeAt(lo_point)
+
 
             Call prApplication.setWorkingPage(Me.zrPage)
 
@@ -2321,7 +2338,30 @@ Public Class frmDiagramPGS
                 Next
             End If
 
-            If IsSomething(loNode) And (e.Button = Windows.Forms.MouseButtons.Left) Then
+            If e.Button = Windows.Forms.MouseButtons.Right Then
+                '------------------------------------------------
+                'Keep, so that ContextMenu is not changed from
+                '  how set in Diagram.NodeSelected
+                '-----------------------------------------------
+                Me.DiagramView.ContextMenuStrip = Nothing
+                Me.zrPage.SelectedObject.Clear()
+
+                If loNode IsNot Nothing Then
+                    If loNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
+                        loNode.Selected = True
+                        Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
+                        Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
+                    End If
+                ElseIf lrPGSRelation IsNot Nothing Then
+
+                    lrPGSRelation.Link.Selected = True
+                    Me.zrPage.SelectedObject.AddUnique(lrPGSRelation.Relation)
+                    Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Relation
+                Else
+                    Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram
+                End If
+
+            ElseIf IsSomething(loNode) And (e.Button = Windows.Forms.MouseButtons.Left) Then
 
                 If 1 = 0 Then
                     '----------------------------------------
@@ -2346,6 +2386,7 @@ Public Class frmDiagramPGS
                     '----------------------------------------------------                 
                     If loNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
                         loNode.Selected = True
+                        Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                     End If
 
                 End If
@@ -2379,7 +2420,8 @@ Public Class frmDiagramPGS
                 '-------------------------
                 Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Relation
 
-                Dim lrPGSRelation As PGS.Link = Diagram.GetLinkAt(lo_point, 2).Tag
+                Me.zrPage.SelectedObject.Clear()
+                Me.zrPage.SelectedObject.AddUnique(loLink.Tag)
 
                 If lrPGSRelation Is Nothing Then Exit Sub
 
@@ -2443,18 +2485,6 @@ Public Class frmDiagramPGS
                     End If
                 End If
 
-            ElseIf e.Button = Windows.Forms.MouseButtons.Right Then
-                '------------------------------------------------
-                'Keep, so that ContextMenu is not changed from
-                '  how set in Diagram.NodeSelected
-                '-----------------------------------------------
-                If loNode IsNot Nothing Then
-                    If loNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
-                        Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Node
-                    Else
-                        Me.DiagramView.ContextMenuStrip = Nothing
-                    End If
-                End If
             Else
                 Call prApplication.setWorkingPage(Me.zrPage)
 
@@ -2477,11 +2507,7 @@ Public Class frmDiagramPGS
                 '---------------------------
                 Me.zrPage.SelectedObject.Clear()
 
-                'Me.Diagram.Selection.Clear()
-
                 Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-
-                'Me.Diagram.AllowUnconnectedLinks = False
 
                 Call Me.resetNodeAndLinkColors()
             End If
@@ -2673,7 +2699,7 @@ Public Class frmDiagramPGS
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
         End Try
 
     End Sub
@@ -3323,7 +3349,12 @@ Public Class frmDiagramPGS
                 Exit Sub
             End If
 
-            lrRelation = Me.zrPage.SelectedObject(0)
+            Try
+                lrRelation = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                MsgBox("No relation selected. Try again.")
+                Exit Sub
+            End Try
 
             Me.ToolStripSeparator8.Visible = My.Settings.SuperuserMode
             Me.ToolStripMenuItemRelationRemoveFromPage.Visible = lrRelation.IsPGSRelationNode

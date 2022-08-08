@@ -555,6 +555,9 @@
     <Compile Include="ClassesGeneral\tRichtextEditingControl.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\tRoundedButton.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ClassesGeneral\tStack.vb" />
     <Compile Include="ClassesGeneral\tTube.vb" />
     <Compile Include="ClassesGeneral\tTuple.vb" />

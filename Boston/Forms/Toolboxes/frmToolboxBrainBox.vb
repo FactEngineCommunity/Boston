@@ -432,20 +432,25 @@ Public Class frmToolboxBrainBox
                     '----------------------------------
                     'Send data to the Boston.Brain
                     '----------------------------------
-                    Me.inputbuffer.Add(Me.TextBoxInput.Text)
+                    Select Case LCase(Trim(Me.TextBoxInput.Text))
+                        Case Is = "yes", "no", "abort"
+                        Case Else
+                            Me.inputbuffer.Add(Me.TextBoxInput.Text)
+                    End Select
+
                     If Me.inputbuffer.Count >= 10 Then
-                        Me.inputbuffer.RemoveAt(0)
-                    End If
+                            Me.inputbuffer.RemoveAt(0)
+                        End If
 
-                    If CheckIfModelPageSelected() Then
-                        prApplication.Brain.receive_data(Trim(Me.TextBoxInput.Text))
-                    End If
+                        If CheckIfModelPageSelected() Then
+                            prApplication.Brain.receive_data(Trim(Me.TextBoxInput.Text))
+                        End If
 
-                    Me.TextBoxInput.Clear()
-                    Call Me.SetThoughtModeCursor()
-                    e.SuppressKeyPress = True
+                        Me.TextBoxInput.Clear()
+                        Call Me.SetThoughtModeCursor()
+                        e.SuppressKeyPress = True
 
-                    Me.zsIntellisenseBuffer = ""
+                        Me.zsIntellisenseBuffer = ""
                 'Case Is = Keys.OemPeriod  '(e.KeyChar = ".") Then
                 '    '-------------------------------------------------------------------------------------
                 '    'User wants to view the EnterpriseAware listbox. Has hit the '.' key on their keypad
@@ -472,20 +477,20 @@ Public Class frmToolboxBrainBox
 
                 '    e.Handled = True
                 '    e.SuppressKeyPress = True
-                Case Is = Keys.Shift, Keys.ShiftKey
+                        Case Is = Keys.Shift, Keys.ShiftKey
                 'Do nothing
-                Case Is = Keys.Space, Keys.OemMinus
+                        Case Is = Keys.Space, Keys.OemMinus
 
-                    Me.zsIntellisenseBuffer = ""
-                Case Else
-                    Try
-                        zsIntellisenseBuffer = Me.TextBoxInput.Text.ToString.AppendString(LCase(e.KeyCode.ToString)).Split(" ").Last().ToLower
-                    Catch ex As Exception
-                        zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
-                    End Try
+                            Me.zsIntellisenseBuffer = ""
+                        Case Else
+                            Try
+                                zsIntellisenseBuffer = Me.TextBoxInput.Text.ToString.AppendString(LCase(e.KeyCode.ToString)).Split(" ").Last().ToLower
+                            Catch ex As Exception
+                                zsIntellisenseBuffer &= LCase(e.KeyCode.ToString)
+                            End Try
 
 
-            End Select
+                    End Select
 
         Catch ex As Exception
             Dim lsMessage As String

@@ -467,16 +467,19 @@ Public Class tApplication
                                       Optional ByRef aiMessageBoxButtons As MessageBoxButtons = MessageBoxButtons.OK) As DialogResult
 
         Dim lsStackTrace As String = ""
+        Dim lsErrorMessage As String = Nothing
 
         Try
             asErrorMessage.AppendLine("")
+
+            lsErrorMessage = asErrorMessage
 
             If My.Settings.UseAutomatedErrorReporting Then
                 asErrorMessage.AppendDoubleLineBreak("Boston will send this error to FactEngine to be fixed. Automatic error reporting is turned on.")
             End If
 
             If (IsSomething(asStackTrace) And abShowStackTrace) And My.Settings.BostonErrorMessagesShowStackTrace Then
-                asErrorMessage &= vbCrLf & vbCrLf & "Stack Trace: " & asStackTrace
+                asErrorMessage &= vbCrLf & "Stack Trace: " & asStackTrace
             ElseIf IsSomething(asStackTrace) And abShowStackTrace And Not My.Settings.BostonErrorMessagesShowStackTrace Then
                 lsStackTrace = ""
                 'Add nothing
@@ -542,6 +545,7 @@ Public Class tApplication
                         '-----------------------
                         Call prLogger.WriteToErrorLog(asErrorMessage, "", "Critial Error")
 
+#Region "RayGun"
                         If My.Settings.UseAutomatedErrorReporting Then
                             Try
                                 Throw New Exception(asErrorMessage)
@@ -553,71 +557,81 @@ Public Class tApplication
                                 End Try
                             End Try
                         End If
+#End Region
 
                         If My.Settings.ThrowCriticalDebugMessagesToScreen Then
 
                             If abAbortApplication Then asErrorMessage &= vbCrLf & vbCrLf & "This is a critical error. Boston will now close."
 
-                            '============================================================================================
-                            Dim lrCustomMessageBox As New frmCustomMessageBox
+                            If My.Settings.BostonErrorMessagesShowFlashCard And My.Settings.UseAutomatedErrorReporting Then
+                                Dim lfrmFlashCard As New frmFlashCard
+                                lfrmFlashCard.ziIntervalMilliseconds = 1500
+                                lfrmFlashCard.zsText = "Oops. There was an error. Sending to FactEngine. Thank you!" & vbCrLf & vbCrLf & lsErrorMessage
+                                lfrmFlashCard.Show(frmMain, "LightGray")
+                            Else
+#Region "Custom Dialog"
+                                '============================================================================================
+                                Dim lrCustomMessageBox As New frmCustomMessageBox
 
-                            lrCustomMessageBox.LeftJustify = True
-                            lrCustomMessageBox.Message = asErrorMessage
+                                lrCustomMessageBox.LeftJustify = True
+                                lrCustomMessageBox.Message = asErrorMessage
 
-                            Select Case aiMessageBoxButtons
-                                Case Is = MessageBoxButtons.OK
-                                    lrCustomMessageBox.ButtonText.Add("OK")
-                                    If Not My.Settings.UseAutomatedErrorReporting Then
-                                        lrCustomMessageBox.ButtonText.Add("OK. And Turn on Automatic Error Reporting.")
-                                    End If
-                                Case Is = MessageBoxButtons.OKCancel
-                                    lrCustomMessageBox.ButtonText.Add("OK")
-                                    lrCustomMessageBox.ButtonText.Add("Cancel")
-                                Case Is = MessageBoxButtons.YesNo
-                                    lrCustomMessageBox.ButtonText.Add("Yes")
-                                    lrCustomMessageBox.ButtonText.Add("No")
-                                Case Is = MessageBoxButtons.YesNoCancel
-                                    lrCustomMessageBox.ButtonText.Add("Yes")
-                                    lrCustomMessageBox.ButtonText.Add("No")
-                                    lrCustomMessageBox.ButtonText.Add("Cancel")
-                                Case Is = MessageBoxButtons.RetryCancel
-                                    lrCustomMessageBox.ButtonText.Add("Retry")
-                                    lrCustomMessageBox.ButtonText.Add("Cancel")
-                                Case Is = MessageBoxButtons.AbortRetryIgnore
-                                    lrCustomMessageBox.ButtonText.Add("Abort")
-                                    lrCustomMessageBox.ButtonText.Add("Retry")
-                                    lrCustomMessageBox.ButtonText.Add("Ignore")
-                            End Select
+                                Select Case aiMessageBoxButtons
+                                    Case Is = MessageBoxButtons.OK
+                                        lrCustomMessageBox.ButtonText.Add("OK")
+                                        If Not My.Settings.UseAutomatedErrorReporting Then
+                                            lrCustomMessageBox.ButtonText.Add("OK. And Turn on Automatic Error Reporting.")
+                                        End If
+                                    Case Is = MessageBoxButtons.OKCancel
+                                        lrCustomMessageBox.ButtonText.Add("OK")
+                                        lrCustomMessageBox.ButtonText.Add("Cancel")
+                                    Case Is = MessageBoxButtons.YesNo
+                                        lrCustomMessageBox.ButtonText.Add("Yes")
+                                        lrCustomMessageBox.ButtonText.Add("No")
+                                    Case Is = MessageBoxButtons.YesNoCancel
+                                        lrCustomMessageBox.ButtonText.Add("Yes")
+                                        lrCustomMessageBox.ButtonText.Add("No")
+                                        lrCustomMessageBox.ButtonText.Add("Cancel")
+                                    Case Is = MessageBoxButtons.RetryCancel
+                                        lrCustomMessageBox.ButtonText.Add("Retry")
+                                        lrCustomMessageBox.ButtonText.Add("Cancel")
+                                    Case Is = MessageBoxButtons.AbortRetryIgnore
+                                        lrCustomMessageBox.ButtonText.Add("Abort")
+                                        lrCustomMessageBox.ButtonText.Add("Retry")
+                                        lrCustomMessageBox.ButtonText.Add("Ignore")
+                                End Select
 
-                            Select Case lrCustomMessageBox.ShowDialog
-                                Case Is = "OK"
-                                    aiMessageResponse = MsgBoxResult.Ok
-                                Case Is = "OK. And Turn on Automatic Error Reporting."
-                                    My.Settings.UseAutomatedErrorReporting = True
-                                    aiMessageResponse = MsgBoxResult.Ok
+                                Select Case lrCustomMessageBox.ShowDialog
+                                    Case Is = "OK"
+                                        aiMessageResponse = MsgBoxResult.Ok
+                                    Case Is = "OK. And Turn on Automatic Error Reporting."
+                                        My.Settings.UseAutomatedErrorReporting = True
+                                        aiMessageResponse = MsgBoxResult.Ok
 #Region "Send the message to FactEngine"
-                                    Try
-                                        Throw New Exception(asErrorMessage)
-                                    Catch ex As Exception
                                         Try
-                                            prRaygunClient.Send(ex)
-                                        Catch ex1 As Exception
-                                            'Should not get here, but have insurance.
+                                            Throw New Exception(asErrorMessage)
+                                        Catch ex As Exception
+                                            Try
+                                                prRaygunClient.Send(ex)
+                                            Catch ex1 As Exception
+                                                'Should not get here, but have insurance.
+                                            End Try
                                         End Try
-                                    End Try
 #End Region
-                                Case Is = "No"
-                                    aiMessageResponse = MsgBoxResult.No
-                                Case Is = "Yes"
-                                    aiMessageResponse = MsgBoxResult.Yes
-                                Case Is = "Cancel"
-                                    aiMessageResponse = MsgBoxResult.Cancel
-                                Case Is = "Abort"
-                                    aiMessageResponse = MsgBoxResult.Abort
-                                Case Is = "Retry"
-                                    aiMessageResponse = MsgBoxResult.Retry
-                            End Select
-                            '============================================================================================
+                                    Case Is = "No"
+                                        aiMessageResponse = MsgBoxResult.No
+                                    Case Is = "Yes"
+                                        aiMessageResponse = MsgBoxResult.Yes
+                                    Case Is = "Cancel"
+                                        aiMessageResponse = MsgBoxResult.Cancel
+                                    Case Is = "Abort"
+                                        aiMessageResponse = MsgBoxResult.Abort
+                                    Case Is = "Retry"
+                                        aiMessageResponse = MsgBoxResult.Retry
+                                End Select
+                                '============================================================================================
+#End Region
+                            End If
 
                             'aiMessageResponse = MsgBox(asErrorMessage, MsgBoxStyle.Critical + aiMessageBoxButtons)
 

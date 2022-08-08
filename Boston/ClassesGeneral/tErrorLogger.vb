@@ -70,13 +70,25 @@ Public Class tErrorLogger
 
                     SyncLock Me.syncObject
                         'log it
-                        Dim fs1 As FileStream = New FileStream(Me.ErrorLogFilePath & "errlog.txt", FileMode.Append, FileAccess.Write)
+                        Dim lsFileLocationName As String = Me.ErrorLogFilePath & "errlog.txt"
+
+                        Dim LongString As String = Nothing
+
+                        Using sreader As New StreamReader(lsFileLocationName)
+                            LongString = sreader.ReadToEnd()
+                        End Using
+
+                        File.Delete(lsFileLocationName)
+
+                        Dim fs1 As FileStream = New FileStream(lsFileLocationName, FileMode.Append, FileAccess.Write)
                         Dim s1 As StreamWriter = New StreamWriter(fs1)
+
                         s1.Write("Title: " & title & vbCrLf)
-                        s1.Write("Message: " & msg & vbCrLf)
+                        s1.Write("Message: " & Trim(msg) & vbCrLf)
                         s1.Write("StackTrace: " & stkTrace & vbCrLf)
                         s1.Write("Date/Time: " & DateTime.Now.ToString() & ":" & DateTime.UtcNow.Millisecond & vbCrLf)
                         s1.Write("===========================================================================================" & vbCrLf)
+                        s1.Write(vbCrLf & LongString)
                         s1.Close()
                         fs1.Close()
                     End SyncLock

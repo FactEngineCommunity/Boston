@@ -238,7 +238,8 @@ Namespace TableFactType
                         If arFactType.LinkFactTypeRole Is Nothing Then
                             arFactType.IsLinkFactType = False
                         ElseIf Not arFactType.LinkFactTypeRole.FactType.IsObjectified Then
-                            Debugger.Break()
+                            '20220808-VM-Keep here for further testing.
+                            'Debugger.Break()
                         End If
                     End If
                     arFactType.GUID = lREcordset("GUID").Value

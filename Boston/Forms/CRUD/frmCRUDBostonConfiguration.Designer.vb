@@ -43,6 +43,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelDatabaseType = New System.Windows.Forms.Label()
         Me.ComboBoxDatabaseType = New System.Windows.Forms.ComboBox()
         Me.GroupBoxDebugging = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxUseFlashCardErrorMessages = New System.Windows.Forms.CheckBox()
         Me.CheckBoxShowStackTrace = New System.Windows.Forms.CheckBox()
         Me.CheckBoxThrowCriticalDebugMessagesToScreen = New System.Windows.Forms.CheckBox()
         Me.CheckBoxThrowInformationDebugMessagesToScreen = New System.Windows.Forms.CheckBox()
@@ -78,6 +79,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.GroupBoxImportExport = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxExportSuppressMDAModelElements = New System.Windows.Forms.CheckBox()
         Me.CheckBoxAutomaticallyReportErrorEvents = New System.Windows.Forms.CheckBox()
         Me.CheckBoxAutomaticallyCheckForUpdates = New System.Windows.Forms.CheckBox()
         Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
@@ -92,8 +95,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.GroupBoxImportExport = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxExportSuppressMDAModelElements = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -113,12 +114,12 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox5.SuspendLayout()
         Me.TabPage5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
+        Me.GroupBoxImportExport.SuspendLayout()
         Me.TabPage7.SuspendLayout()
         Me.GroupBoxModelling.SuspendLayout()
         Me.TabPage8.SuspendLayout()
         Me.GroupBoxCodeGeneration.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBoxImportExport.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -231,7 +232,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox1.Controls.Add(Me.CheckBoxStartVirtualAnalystInQuietMode)
         Me.GroupBox1.Controls.Add(Me.CheckBoxVirtualAnalystDisplayBriana)
         Me.GroupBox1.Controls.Add(Me.ButtonImportLanguageRules)
-        Me.GroupBox1.Location = New System.Drawing.Point(17, 263)
+        Me.GroupBox1.Location = New System.Drawing.Point(17, 265)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(443, 114)
         Me.GroupBox1.TabIndex = 13
@@ -316,6 +317,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxDebugging
         '
+        Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxUseFlashCardErrorMessages)
         Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxShowStackTrace)
         Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxThrowCriticalDebugMessagesToScreen)
         Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxThrowInformationDebugMessagesToScreen)
@@ -323,10 +325,20 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxDebugging.Controls.Add(Me.LabelPrompt_StrategyTerm)
         Me.GroupBoxDebugging.Location = New System.Drawing.Point(17, 112)
         Me.GroupBoxDebugging.Name = "GroupBoxDebugging"
-        Me.GroupBoxDebugging.Size = New System.Drawing.Size(443, 128)
+        Me.GroupBoxDebugging.Size = New System.Drawing.Size(443, 147)
         Me.GroupBoxDebugging.TabIndex = 11
         Me.GroupBoxDebugging.TabStop = False
         Me.GroupBoxDebugging.Text = "Error Management:"
+        '
+        'CheckBoxUseFlashCardErrorMessages
+        '
+        Me.CheckBoxUseFlashCardErrorMessages.AutoSize = True
+        Me.CheckBoxUseFlashCardErrorMessages.Location = New System.Drawing.Point(25, 122)
+        Me.CheckBoxUseFlashCardErrorMessages.Name = "CheckBoxUseFlashCardErrorMessages"
+        Me.CheckBoxUseFlashCardErrorMessages.Size = New System.Drawing.Size(189, 17)
+        Me.CheckBoxUseFlashCardErrorMessages.TabIndex = 16
+        Me.CheckBoxUseFlashCardErrorMessages.Text = "Use Flash Card for Error Messages"
+        Me.CheckBoxUseFlashCardErrorMessages.UseVisualStyleBackColor = True
         '
         'CheckBoxShowStackTrace
         '
@@ -694,6 +706,26 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.TabIndex = 0
         Me.GroupBox4.TabStop = False
         '
+        'GroupBoxImportExport
+        '
+        Me.GroupBoxImportExport.Controls.Add(Me.CheckBoxExportSuppressMDAModelElements)
+        Me.GroupBoxImportExport.Location = New System.Drawing.Point(12, 155)
+        Me.GroupBoxImportExport.Name = "GroupBoxImportExport"
+        Me.GroupBoxImportExport.Size = New System.Drawing.Size(559, 70)
+        Me.GroupBoxImportExport.TabIndex = 5
+        Me.GroupBoxImportExport.TabStop = False
+        Me.GroupBoxImportExport.Text = "Import/Export"
+        '
+        'CheckBoxExportSuppressMDAModelElements
+        '
+        Me.CheckBoxExportSuppressMDAModelElements.AutoSize = True
+        Me.CheckBoxExportSuppressMDAModelElements.Location = New System.Drawing.Point(6, 28)
+        Me.CheckBoxExportSuppressMDAModelElements.Name = "CheckBoxExportSuppressMDAModelElements"
+        Me.CheckBoxExportSuppressMDAModelElements.Size = New System.Drawing.Size(331, 17)
+        Me.CheckBoxExportSuppressMDAModelElements.TabIndex = 0
+        Me.CheckBoxExportSuppressMDAModelElements.Text = "Fact Based model (.fbm) Export - Suppress MDA Model Elements"
+        Me.CheckBoxExportSuppressMDAModelElements.UseVisualStyleBackColor = True
+        '
         'CheckBoxAutomaticallyReportErrorEvents
         '
         Me.CheckBoxAutomaticallyReportErrorEvents.AutoSize = True
@@ -827,26 +859,6 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'GroupBoxImportExport
-        '
-        Me.GroupBoxImportExport.Controls.Add(Me.CheckBoxExportSuppressMDAModelElements)
-        Me.GroupBoxImportExport.Location = New System.Drawing.Point(12, 155)
-        Me.GroupBoxImportExport.Name = "GroupBoxImportExport"
-        Me.GroupBoxImportExport.Size = New System.Drawing.Size(559, 70)
-        Me.GroupBoxImportExport.TabIndex = 5
-        Me.GroupBoxImportExport.TabStop = False
-        Me.GroupBoxImportExport.Text = "Import/Export"
-        '
-        'CheckBoxExportSuppressMDAModelElements
-        '
-        Me.CheckBoxExportSuppressMDAModelElements.AutoSize = True
-        Me.CheckBoxExportSuppressMDAModelElements.Location = New System.Drawing.Point(6, 28)
-        Me.CheckBoxExportSuppressMDAModelElements.Name = "CheckBoxExportSuppressMDAModelElements"
-        Me.CheckBoxExportSuppressMDAModelElements.Size = New System.Drawing.Size(331, 17)
-        Me.CheckBoxExportSuppressMDAModelElements.TabIndex = 0
-        Me.CheckBoxExportSuppressMDAModelElements.Text = "Fact Based model (.fbm) Export - Suppress MDA Model Elements"
-        Me.CheckBoxExportSuppressMDAModelElements.UseVisualStyleBackColor = True
-        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -890,6 +902,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
+        Me.GroupBoxImportExport.ResumeLayout(False)
+        Me.GroupBoxImportExport.PerformLayout()
         Me.TabPage7.ResumeLayout(False)
         Me.GroupBoxModelling.ResumeLayout(False)
         Me.GroupBoxModelling.PerformLayout()
@@ -897,8 +911,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration.ResumeLayout(False)
         Me.GroupBoxCodeGeneration.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBoxImportExport.ResumeLayout(False)
-        Me.GroupBoxImportExport.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -973,4 +985,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxCodeGenerationUseSquareBracketsTableNames As CheckBox
     Friend WithEvents GroupBoxImportExport As GroupBox
     Friend WithEvents CheckBoxExportSuppressMDAModelElements As CheckBox
+    Friend WithEvents CheckBoxUseFlashCardErrorMessages As CheckBox
 End Class

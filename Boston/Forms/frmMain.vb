@@ -1411,7 +1411,7 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Sub LoadToolboxModelDictionary(Optional abRefreshModelDictionary As Boolean = False)
+    Public Function LoadToolboxModelDictionary(Optional abRefreshModelDictionary As Boolean = False) As frmToolboxModelDictionary
 
         Dim child As New frmToolboxModelDictionary
 
@@ -1445,6 +1445,8 @@ SkipRegistrationChecking:
                 prApplication.RightToolboxForms.Add(child)
             End If
 
+            Return child
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1452,8 +1454,11 @@ SkipRegistrationChecking:
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
-    End Sub
+
+    End Function
 
     Sub focusFactTypeReadingToolbox()
 
@@ -3216,18 +3221,38 @@ SkipRegistrationChecking:
 
     End Sub
 
+    ''' <summary>
+    ''' 20220808-VM-Was crashing from within the frmDiagramORMGlossaryView.
+    '''         Added Try...Catch
+    ''' </summary>
+    ''' <param name="arPage"></param>
     Public Sub hide_unnecessary_forms(ByRef arPage As FBM.Page)
 
-        If IsSomething(arPage) Then
-            Select Case arPage.Language
-                Case Is = pcenumLanguage.ORMModel
-                    If IsSomething(Me.zfrm_orm_reading_editor) Then
-                        If Me.zfrm_orm_reading_editor.Visible = False Then
-                            Call Me.zfrm_orm_reading_editor.Show()
+        Try
+            If IsSomething(arPage) Then
+                Select Case arPage.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        If IsSomething(Me.zfrm_orm_reading_editor) Then
+                            If Me.zfrm_orm_reading_editor.Visible = False Then
+                                Try
+                                    Call Me.zfrm_orm_reading_editor.Show()
+                                Catch ex As Exception
+                                    'Not a biggie. 20220808-VM-Was crashing from within the frmDiagramORMGlossaryView
+                                End Try
+
+                            End If
                         End If
-                    End If
-            End Select
-        End If
+                End Select
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

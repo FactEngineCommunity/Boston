@@ -4637,7 +4637,13 @@ Namespace FBM
                 '  i.e. It's easier and safer to simply save the whole model.
                 '------------------------------------------------------------------------------------
                 If Not Me.Model.StoreAsXML Then
-                    For Each lrRole In Me.Model.Role.FindAll(Function(x) x.JoinedORMObject.Id = Me.Id)
+
+                    Dim larRole = From Role In Me.Model.Role
+                                  Where Role.JoinedORMObject IsNot Nothing
+                                  Where Role.JoinedORMObject.Id = Me.Id
+                                  Select Role
+
+                    For Each lrRole In larRole
 
                         lrRole.makeDirty()
                         Call lrRole.Save()

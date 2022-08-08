@@ -989,6 +989,18 @@ Namespace My
                 Me("CodeGenerationUseSquareBracketsSQLTableNames") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property BostonErrorMessagesShowFlashCard() As Boolean
+            Get
+                Return CType(Me("BostonErrorMessagesShowFlashCard"),Boolean)
+            End Get
+            Set
+                Me("BostonErrorMessagesShowFlashCard") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

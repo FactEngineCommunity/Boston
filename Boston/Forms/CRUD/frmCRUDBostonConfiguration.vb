@@ -49,6 +49,7 @@ Public Class frmCRUDBostonConfiguration
         Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked = My.Settings.ThrowCriticalDebugMessagesToScreen
         Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
         Me.CheckBoxShowStackTrace.Checked = My.Settings.BostonErrorMessagesShowStackTrace
+        Me.CheckBoxUseFlashCardErrorMessages.Checked = My.Settings.BostonErrorMessagesShowFlashCard
 
         'Import/Export
         Me.CheckBoxExportSuppressMDAModelElements.Checked = My.Settings.ExportFBMExcludeMDAModelElements
@@ -161,6 +162,7 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.RequireLoginAtStartup = Me.CheckBoxEnableClientServer.Checked
                 My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
                 My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
+                My.Settings.BostonErrorMessagesShowFlashCard = Me.CheckBoxUseFlashCardErrorMessages.Checked
 
                 'FactEngine
                 My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked

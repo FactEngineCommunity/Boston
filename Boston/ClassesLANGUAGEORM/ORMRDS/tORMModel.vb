@@ -2621,7 +2621,12 @@ Namespace FBM
 
                         lrRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
+                        Try
+                            lrDictionary.Add(CInt(lrRecordset2("OrdinalPosition").Data), lrRecordset1("Attribute").Data)
+                        Catch ex As Exception
+                            'not ideal, but don't stop here
+                            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+                        End Try
 
                         lrRecordset1.MoveNext()
                     End While

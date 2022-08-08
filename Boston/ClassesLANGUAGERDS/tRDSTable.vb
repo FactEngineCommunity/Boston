@@ -1532,6 +1532,8 @@ Namespace RDS
 
         ''' <summary>
         ''' Removes a Column from the table.
+        ''' 
+        ''' 20220808-VM-Commented-out/removed removal of table if no columns...because an EntityType without a ReferenceMode is none the less a Table.
         ''' </summary>
         ''' <param name="arColumn">The actual Column object to be removed from the Table.</param>
         ''' <param name="abRemoveResidualCMML">Use False if the CMML for the Column/Attribute/Property is to be kept.</param>
@@ -1604,7 +1606,8 @@ Namespace RDS
                 End If
 
                 If Me.Column.Count = 0 And Not abIsReferenceModeColumn Then
-                    Call Me.Model.removeTable(Me)
+                    '20220808-VM-Commented-out/removed...because an EntityType without a ReferenceMode is none the less a Table.
+                    'Call Me.Model.removeTable(Me)
                 End If
 
                 If arColumn.Table Is Me And Not abRemoveResidualCMML Then
