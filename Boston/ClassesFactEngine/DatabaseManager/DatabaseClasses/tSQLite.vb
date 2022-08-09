@@ -48,7 +48,17 @@ Namespace FactEngine
                 lsSQLCommand &= " ADD COLUMN "
                 lsSQLCommand &= Me.generateSQLColumnDefinition(arColumn)
 
-                Me.GONonQuery(lsSQLCommand)
+                Dim lrRecordset As ORMQL.Recordset = Nothing
+
+                Try
+                    lrRecordset = Me.GONonQuery(lsSQLCommand)
+                Catch ex As Exception
+                    MsgBox(ex.Message)
+                End Try
+
+                If lrRecordset.ErrorReturned Then
+                    MsgBox(lrRecordset.ErrorString)
+                End If
 
             Catch ex As Exception
 

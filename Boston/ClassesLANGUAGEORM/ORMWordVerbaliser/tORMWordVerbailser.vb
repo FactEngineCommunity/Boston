@@ -27,9 +27,12 @@ Namespace FBM
         Dim subscript As New Font("Helvetica", 4, FontStyle.Regular)
         Dim FontString As New Font("Helvetica", 10, FontStyle.Regular)
 
-        Public Sub New(ByRef rd As Gios.Word.WordDocument)
+        Public Form As Windows.Forms.Form
+
+        Public Sub New(ByRef rd As Gios.Word.WordDocument, ByRef arForm As Windows.Forms.Form)
 
             Me.Document = rd
+            Me.Form = arForm
 
         End Sub
 
@@ -225,25 +228,25 @@ Namespace FBM
                     saveFileDialog.CheckPathExists = False
                     saveFileDialog.CreatePrompt = False
 
+                    If saveFileDialog.ShowDialog(Me.Form) = DialogResult.OK Then
 
-                    Call saveFileDialog.ShowDialog(frmMain)
+                        If saveFileDialog.FileName <> "" Then
+                            Try
 
-                    If saveFileDialog.FileName <> "" Then
-                        lsFileName = saveFileDialog.FileName
-                        Me.Document.SaveToFile(saveFileDialog.FileName) '"..\\..\\Example1.doc")
+                                lsFileName = saveFileDialog.FileName
+                                Me.Document.SaveToFile(saveFileDialog.FileName) '"..\\..\\Example1.doc")
+
+                                If lsFileName <> "" Then
+                                    System.Diagnostics.Process.Start(lsFileName) ' "..\..\Example1.doc")
+                                End If
+                            Catch ex As Exception
+                                MsgBox("Couldn't open the file.")
+                            End Try
+                        End If
                     End If
 
                 Catch ex As Exception
                     MsgBox("Couldn't save the document. Check to see if you already have the document open.")
-                End Try
-
-                'Open the document in WoMe.Document.
-                Try
-                    If lsFileName <> "" Then
-                        System.Diagnostics.Process.Start(lsFileName) ' "..\..\Example1.doc")
-                    End If
-                Catch ex As Exception
-                    MsgBox("Couldn't open the file.")
                 End Try
 
             Catch ex As Exception

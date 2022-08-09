@@ -4420,6 +4420,9 @@ Public Class frmToolboxEnterpriseExplorer
             With New WaitCursor
 
                 Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+
+                prApplication.WorkingModel = lrModel
+
                 If Not lrModel.Loaded Then
                     Call Me.DoModelLoading(lrModel)
                     Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
@@ -4429,7 +4432,7 @@ Public Class frmToolboxEnterpriseExplorer
                 End While
 
                 Dim rd As Gios.Word.WordDocument = New WordDocument(WordDocumentFormat.Letter_8_5x11)
-                Dim lrFBMWordVerbaliser As New FBM.ORMWordVerbailser(rd)
+                Dim lrFBMWordVerbaliser As New FBM.ORMWordVerbailser(rd, Me)
 
                 Dim lrFrmGetDocumentGenerationSettings As New frmDocumentGeneratorSettings
                 lrFrmGetDocumentGenerationSettings.zrORMWordVerbaliser = lrFBMWordVerbaliser

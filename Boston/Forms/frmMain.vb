@@ -817,6 +817,17 @@ SkipRegistrationChecking:
 
             ElseIf prApplication.ActivePages.Count = 1 Then
 
+                If prApplication.WorkingModel Is Nothing Then
+                    Try
+                        If prApplication.ActivePages.Count > 0 Then
+                            Dim lrObject As Object = prApplication.ActivePages(0)
+                            prApplication.WorkingModel = lrObject.zrPage.Model
+                        End If
+                    Catch ex As Exception
+                        'Not a biggie at this stage.
+                    End Try
+                End If
+
                 Call Me.loadToolboxErrorListForm(prApplication.ActivePages(0).Pane)
 
                 Select Case prApplication.ActivePages(0).GetType
@@ -843,6 +854,7 @@ SkipRegistrationChecking:
                         Call Me.loadToolboxORMReadingEditor(lfrmPGSDiagram.zrPage, prApplication.ActivePages(0).Pane)
                         Call Me.loadToolboxORMVerbalisationForm(lfrmPGSDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
                         Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxRichmondBrainBox(lfrmPGSDiagram.zrPage, prApplication.ActivePages(0).Pane)
                         Call Me.LoadToolboxModelDictionary()
                         If IsNothing(zfrm_toolbox) And My.Settings.LoadToolboxWithPage Then
                             Call Me.LoadToolbox()
@@ -858,6 +870,7 @@ SkipRegistrationChecking:
                         Call Me.loadToolboxORMReadingEditor(lfrmERDiagram.zrPage, prApplication.ActivePages(0).Pane)
                         Call Me.loadToolboxORMVerbalisationForm(lfrmERDiagram.zrPage.Model, prApplication.ActivePages(0).Pane)
                         Call Me.LoadToolboxPropertyWindow(prApplication.ActivePages(0).Pane)
+                        Call Me.loadToolboxRichmondBrainBox(lfrmERDiagram.zrPage, prApplication.ActivePages(0).Pane)
                         Call Me.LoadToolboxModelDictionary()
 
                     Case Is = GetType(frmStateTransitionDiagram)
