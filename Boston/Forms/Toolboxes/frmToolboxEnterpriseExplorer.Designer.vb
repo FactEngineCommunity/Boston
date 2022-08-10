@@ -100,6 +100,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
+        Me.ToNORMAormFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -546,7 +547,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ImportExportToolStripMenuItem
         '
-        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem})
+        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem, Me.ToNORMAormFileToolStripMenuItem})
         Me.ImportExportToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ImportExport16x16
         Me.ImportExportToolStripMenuItem.Name = "ImportExportToolStripMenuItem"
         Me.ImportExportToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
@@ -557,7 +558,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItem12.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FromORMCMMLFileToolStripMenuItem})
         Me.ToolStripMenuItem12.Image = Global.Boston.My.Resources.MenuImages.Import16x16
         Me.ToolStripMenuItem12.Name = "ToolStripMenuItem12"
-        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(135, 22)
+        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(182, 22)
         Me.ToolStripMenuItem12.Text = "&Import"
         Me.ToolStripMenuItem12.Visible = False
         '
@@ -572,14 +573,14 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ExportTestingToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ExportTestingToolStripMenuItem.Name = "ExportTestingToolStripMenuItem"
-        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
         Me.ExportTestingToolStripMenuItem.Text = "To .&fbm File"
         '
         'TocqlFileToolStripMenuItem
         '
         Me.TocqlFileToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.CQL16x16
         Me.TocqlFileToolStripMenuItem.Name = "TocqlFileToolStripMenuItem"
-        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
         Me.TocqlFileToolStripMenuItem.Text = "To .&cql File"
         Me.TocqlFileToolStripMenuItem.Visible = False
         '
@@ -671,6 +672,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
+        '
+        'ToNORMAormFileToolStripMenuItem
+        '
+        Me.ToNORMAormFileToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.NORMA16x16
+        Me.ToNORMAormFileToolStripMenuItem.Name = "ToNORMAormFileToolStripMenuItem"
+        Me.ToNORMAormFileToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.ToNORMAormFileToolStripMenuItem.Text = "To NORMA .orm File"
         '
         'frmToolboxEnterpriseExplorer
         '
@@ -767,4 +775,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents UMLToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddUseCaseDiagramToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddProcessDiagramPageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToNORMAormFileToolStripMenuItem As ToolStripMenuItem
 End Class

@@ -10,6 +10,9 @@ Imports Microsoft.VisualBasic
 Imports System.Configuration
 Imports System.Text
 Imports System.Xml.Serialization
+Imports System.Drawing
+Imports System.Drawing.Drawing2D
+Imports System.Drawing.Imaging
 
 Namespace Boston
 
@@ -100,6 +103,28 @@ Namespace Boston
                 System.Threading.Thread.Sleep(50)
             End Try
         End Sub
+
+        Public Function ResizeImage(ByVal image As Image, ByVal width As Integer, ByVal height As Integer) As Bitmap
+            Dim destRect = New Rectangle(0, 0, width, height)
+            Dim destImage = New Bitmap(width, height)
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution)
+
+            Using lrgraphics = Graphics.FromImage(destImage)
+                lrgraphics.CompositingMode = CompositingMode.SourceCopy
+                lrgraphics.CompositingQuality = CompositingQuality.HighQuality
+                lrgraphics.InterpolationMode = InterpolationMode.HighQualityBicubic
+                lrgraphics.SmoothingMode = SmoothingMode.HighQuality
+                lrgraphics.PixelOffsetMode = PixelOffsetMode.HighQuality
+
+                Using wrapMode = New ImageAttributes()
+                    wrapMode.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipX)
+                    lrgraphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode)
+                End Using
+            End Using
+
+            Return destImage
+
+        End Function
 
         Public Function returnIfTrue(ByVal abBoolValue As Boolean,
                                      ByVal asReturnString As Object,

@@ -584,6 +584,18 @@
     <Compile Include="ClassesLANGUAGECMML\tCMML.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLActor.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLElement.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMDiagram.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMDiagramDisplay.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMDiagram\ORMDiagramShapes.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMDocument.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMErrorDisplayFilter.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelConstraints.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelDatatypes.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelEntityType.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelFacts.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelObjectifiedType.vb" />
+    <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEUMLUCD\tUCDActorName.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLModel.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLPage.vb" />
@@ -2532,6 +2544,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClassesLANGUAGENORMA\ClassesNORMA\NORMAXSD\DiagramDisplay.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ClassesLANGUAGENORMA\ClassesNORMA\NORMAXSD\ORM2Core.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ClassesLANGUAGENORMA\ClassesNORMA\NORMAXSD\ORM2Diagram.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ClassesLANGUAGENORMA\ClassesNORMA\NORMAXSD\ORM2Root.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ClassesLANGUAGENORMA\ClassesNORMA\README.md" />
     <None Include="CodeGeneration\bin\Release\Metadrone.exe.config" />
     <None Include="CodeGeneration\bin\Release\Metadrone.settings" />
     <None Include="CodeGeneration\Metadrone\app.config" />

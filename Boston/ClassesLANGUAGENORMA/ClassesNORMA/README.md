@@ -1,0 +1,1 @@
+Folder for NORMA class structures, the objects of which can be serialised to a NORMA .orm file.

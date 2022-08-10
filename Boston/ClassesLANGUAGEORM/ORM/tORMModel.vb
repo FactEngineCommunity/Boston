@@ -215,9 +215,13 @@ Namespace FBM
             End Get
         End Property
 
+        <NonSerialized>
         Private FTRScanner As FTR.Scanner
+        <NonSerialized>
         Private FTRProcessor As New FTR.Processor 'Used for parsing FTR texts as input by the user. 
+        <NonSerialized>
         Private FTRParser As New FTR.Parser(New FTR.Scanner)
+        <NonSerialized>
         Private FTRParseTree As New FTR.ParseTree
 
         <NonSerialized()>

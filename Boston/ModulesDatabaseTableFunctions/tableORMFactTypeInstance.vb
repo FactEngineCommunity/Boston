@@ -226,8 +226,8 @@ Namespace TableFactTypeInstance
                                 lrObjectifyingEntityTypeInstance.IsObjectifyingEntityType = True
                                 lrObjectifyingEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
                                 lrObjectifyingEntityTypeInstance.ObjectifiedFactType = lrFactTypeInstance
-                                'lrFactTypeInstance.ObjectifyingEntityType = New FBM.EntityTypeInstance
                                 lrFactTypeInstance.ObjectifyingEntityType = lrObjectifyingEntityTypeInstance
+                                lrObjectifyingEntityTypeInstance.Visible = False
                             Else
                                 lrFactTypeInstance.ObjectifyingEntityType = Nothing
                             End If

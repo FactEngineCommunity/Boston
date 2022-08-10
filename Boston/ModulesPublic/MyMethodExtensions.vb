@@ -7,6 +7,18 @@ Imports System.Text.RegularExpressions
 Module MyMethodExtensions
 
     ''' <summary>
+    ''' Add/Append and item to an array.
+    ''' </summary>
+    ''' <typeparam name="T"></typeparam>
+    ''' <param name="arr"></param>
+    ''' <param name="item"></param>
+    <Extension()>
+    Public Sub Add(Of T)(ByRef arr As T(), item As T)
+        Array.Resize(arr, arr.Length + 1)
+        arr(arr.Length - 1) = item
+    End Sub
+
+    ''' <summary>
     ''' Truncates a string to a max number of characters.
     ''' NB Can also use Strings.Left(str,int)
     ''' </summary>

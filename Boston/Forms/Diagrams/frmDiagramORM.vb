@@ -8055,20 +8055,26 @@ SkipPopup:
 
     Public Sub writeImageToFile(ByVal asFileLocation As String)
 
-        Dim li_rectf As New RectangleF
-        li_rectf = Me.Diagram.GetContentBounds(False, True)
+        Dim liRectf As New RectangleF
+        liRectf = Me.Diagram.GetContentBounds(False, True)
 
         'Dim lo_image_processor As New t_image_processor(Diagram.CreateImage(li_rectf, 100))
 
-        Dim lr_image As Image = Diagram.CreateImage(li_rectf, 100)
+        Dim lrImage As Image = Diagram.CreateImage(liRectf, 100)
 
-        lr_image = Me.CropImage(lr_image, Color.White, 0)
-        lr_image = Me.CreateFramedImage(lr_image, Color.White, 15)
+        Dim ldblHeight As Double
 
-        lr_image.Save(asFileLocation, System.Drawing.Imaging.ImageFormat.Jpeg)
+        If lrImage.Width > 600 Then
+            ldblHeight = (CDbl(600) / lrImage.Width) * lrImage.Height
+            lrImage = Boston.ResizeImage(lrImage, 600, CInt(ldblHeight))
+        End If
+
+        lrImage = Me.CropImage(lrImage, Color.White, 0)
+        lrImage = Me.CreateFramedImage(lrImage, Color.White, 15)
+
+        lrImage.Save(asFileLocation, System.Drawing.Imaging.ImageFormat.Jpeg)
 
     End Sub
-
 
     Private Sub ModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ModelDictionaryToolStripMenuItem.Click
 

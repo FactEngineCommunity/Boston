@@ -17,6 +17,38 @@ Namespace XMLModel
         Public ORMModel As New XMLModel.ORMModel
         Public ORMDiagram As New List(Of XMLModel.Page)
 
+        Private Function FactTypeIsReferenceModeFactType(ByVal asXMLFactTypeId As String) As Boolean
+
+            Try
+                Dim larFactType = From EntityType In Me.ORMModel.EntityTypes
+                                  From RoleConstraint In Me.ORMModel.RoleConstraints
+                                  From FactType In Me.ORMModel.FactTypes
+                                  From Role In FactType.RoleGroup
+                                  Where FactType.Id = asXMLFactTypeId
+                                  Where EntityType.ReferenceSchemeRoleConstraintId IsNot Nothing
+                                  Where EntityType.ReferenceSchemeRoleConstraintId = RoleConstraint.Id
+                                  Where RoleConstraint.IsPreferredUniqueness
+                                  Where RoleConstraint.RoleConstraintRoles(0).RoleId = Role.Id
+                                  Where RoleConstraint.RoleConstraintRoles.Count = 1
+                                  Where FactType.RoleGroup.Count = 2
+                                  Select FactType
+
+                Return larFactType.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+
         ''' <summary>
         ''' Maps an instance of FBM.Model to this class.
         ''' </summary>
@@ -357,6 +389,8 @@ SkipModelLevelRoleConstraint:
                 Dim lrPage As FBM.Page
 
                 For Each lrPage In arFBMModel.Page
+
+                    If lrPage.Language <> pcenumLanguage.ORMModel And My.Settings.ExportFBMExcludeMDAModelElements Then Continue For
 
                     Dim lrExportPage As New XMLModel.Page
 
@@ -1514,6 +1548,1254 @@ SkipFactTypeInstance:
             End Try
         End Function
 
+        ''' <summary>
+        ''' Maps an instance of this class to an instance of FBM.Model
+        ''' </summary>
+        ''' <param name="arNORMADocument">The FBM Model to map to.</param>
+        ''' <param name="aoBackgroundWorker">For reporting progress. Start at 60%.</param>        
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function MapToNORMAORMModel(Optional ByRef arNORMADocument As NORMA.ORMDocument = Nothing,
+                                           Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing
+                                           ) As NORMA.ORMDocument
+
+            Try
+
+                Dim lsMessage As String = ""
+                Dim lrORMDocument As New NORMA.ORMDocument
+                Dim lrModel As New NORMA.ORMModel
+
+                'Variables for the FBM model element types.
+                Dim lrFBMValueType As XMLModel.ValueType = Nothing
+                Dim lrFBMEntityType As XMLModel.EntityType
+                Dim lrFBMFactType As XMLModel.FactType
+                Dim lrFBMRoleConstraint As XMLModel.RoleConstraint
+                Dim lrFBMRoleConstraintRole As XMLModel.RoleConstraintRole
+
+                If arNORMADocument IsNot Nothing Then
+                    lrORMDocument = arNORMADocument
+                    lrModel = arNORMADocument.ORMModel
+                    lrModel.Id = "_" & Me.ORMModel.ModelId.ToUpper()
+                    lrModel.Name = Me.ORMModel.Name
+                Else
+                    lrModel = New NORMA.ORMModel(Me.ORMModel.ModelId.ToUpper(), Me.ORMModel.Name)
+                End If
+
+                '==============================
+                'Create the DataTypes
+                '==============================
+#Region "DataTypes"
+                lrORMDocument.ORMModel.DataTypes = New NORMA.ORMModelDataTypes
+
+                lrORMDocument.ORMModel.DataTypes.UnspecifiedDataType = New NORMA.Model.UnspecifiedDataType
+                lrORMDocument.ORMModel.DataTypes.AutoCounterNumericDataType = New NORMA.Model.AutoCounterNumericDataType()
+                lrORMDocument.ORMModel.DataTypes.FixedLengthTextDataType = New NORMA.Model.FixedLengthTextDataType()
+                lrORMDocument.ORMModel.DataTypes.DateTemporalDataType = New NORMA.Model.DateTemporalDataType()
+                lrORMDocument.ORMModel.DataTypes.VariableLengthTextDataType = New NORMA.Model.VariableLengthTextDataType
+                lrORMDocument.ORMModel.DataTypes.LargeLengthTextDataType = New NORMA.Model.LargeLengthTextDataType
+                lrORMDocument.ORMModel.DataTypes.SignedIntegerNumericDataType = New NORMA.Model.SignedIntegerNumericDataType
+                lrORMDocument.ORMModel.DataTypes.SignedSmallIntegerNumericDataType = New NORMA.Model.SignedSmallIntegerNumericDataType
+                lrORMDocument.ORMModel.DataTypes.SignedLargeIntegerNumericDataType = New NORMA.Model.SignedLargeIntegerNumericDataType
+                lrORMDocument.ORMModel.DataTypes.UnsignedTinyIntegerNumericDataType = New NORMA.Model.UnsignedTinyIntegerNumericDataType
+                lrORMDocument.ORMModel.DataTypes.UnsignedSmallIntegerNumericDataType = New NORMA.Model.UnsignedSmallIntegerNumericDataType
+                lrORMDocument.ORMModel.DataTypes.UnsignedIntegerNumericDataType = New NORMA.Model.UnsignedIntegerNumericDataType
+                lrORMDocument.ORMModel.DataTypes.AutoCounterNumericDataType = New NORMA.Model.AutoCounterNumericDataType
+                lrORMDocument.ORMModel.DataTypes.FloatingPointNumericDataType = New NORMA.Model.FloatingPointNumericDataType
+                lrORMDocument.ORMModel.DataTypes.SinglePrecisionFloatingPointNumericDataType = New NORMA.Model.SinglePrecisionFloatingPointNumericDataType
+                lrORMDocument.ORMModel.DataTypes.DoublePrecisionFloatingPointNumericDataType = New NORMA.Model.DoublePrecisionFloatingPointNumericDataType
+                lrORMDocument.ORMModel.DataTypes.DecimalNumericDataType = New NORMA.Model.DecimalNumericDataType
+                lrORMDocument.ORMModel.DataTypes.MoneyNumericDataType = New NORMA.Model.MoneyNumericDataType
+                lrORMDocument.ORMModel.DataTypes.FixedLengthRawDataDataType = New NORMA.Model.FixedLengthRawDataDataType
+                lrORMDocument.ORMModel.DataTypes.VariableLengthRawDataDataType = New NORMA.Model.VariableLengthRawDataDataType
+                lrORMDocument.ORMModel.DataTypes.LargeLengthRawDataDataType = New NORMA.Model.LargeLengthRawDataDataType
+                lrORMDocument.ORMModel.DataTypes.PictureRawDataDataType = New NORMA.Model.PictureRawDataDataType
+                lrORMDocument.ORMModel.DataTypes.OleObjectRawDataDataType = New NORMA.Model.OleObjectRawDataDataType
+                lrORMDocument.ORMModel.DataTypes.AutoTimestampTemporalDataType = New NORMA.Model.AutoTimestampTemporalDataType
+                lrORMDocument.ORMModel.DataTypes.TimeTemporalDataType = New NORMA.Model.TimeTemporalDataType
+                lrORMDocument.ORMModel.DataTypes.DateTemporalDataType = New NORMA.Model.DateTemporalDataType
+                lrORMDocument.ORMModel.DataTypes.DateAndTimeTemporalDataType = New NORMA.Model.DateAndTimeTemporalDataType
+                lrORMDocument.ORMModel.DataTypes.TrueOrFalseLogicalDataType = New NORMA.Model.TrueOrFalseLogicalDataType
+                lrORMDocument.ORMModel.DataTypes.YesOrNoLogicalDataType = New NORMA.Model.YesOrNoLogicalDataType
+                lrORMDocument.ORMModel.DataTypes.RowIdOtherDataType = New NORMA.Model.RowIdOtherDataType
+                lrORMDocument.ORMModel.DataTypes.ObjectIdOtherDataType = New NORMA.Model.ObjectIdOtherDataType
+#End Region
+
+                '==============================
+                'Create ALLCAPS GUIDs
+                '==============================
+#Region "Create ALLCAPS Ids"
+                For Each lrFBMValueType In Me.ORMModel.ValueTypes
+                    lrFBMValueType.GUID = System.Guid.NewGuid.ToString.ToUpper
+                Next
+                For Each lrFBMEntityType In Me.ORMModel.EntityTypes
+                    lrFBMEntityType.GUID = System.Guid.NewGuid.ToString.ToUpper
+                    'lrFBMEntityType.ReferenceModeValueTypeId = lrFBMEntityType.ReferenceModeValueTypeId.ToUpper
+                    'lrFBMEntityType.ReferenceSchemeRoleConstraintId = lrFBMEntityType.ReferenceSchemeRoleConstraintId.ToUpper
+                Next
+                For Each lrFBMFactType In Me.ORMModel.FactTypes
+                    lrFBMFactType.GUID = System.Guid.NewGuid.ToString.ToUpper
+
+                    For Each lrFBMRole In lrFBMFactType.RoleGroup
+                        lrFBMRole.Id = lrFBMRole.Id.ToUpper
+                    Next
+
+                    For Each lrFBMFactTypeReading In lrFBMFactType.FactTypeReadings
+                        lrFBMFactTypeReading.Id = lrFBMFactTypeReading.Id.ToUpper
+                        For Each lrFBMPredicatePart In lrFBMFactTypeReading.PredicateParts
+                            lrFBMPredicatePart.Role_Id = lrFBMPredicatePart.Role_Id.ToUpper
+                        Next
+                    Next
+                Next
+                For Each lrFBMRoleConstraint In Me.ORMModel.RoleConstraints
+                    lrFBMRoleConstraint.GUID = System.Guid.NewGuid.ToString.ToUpper
+
+                    For Each lrFBMRoleConstraintRole In lrFBMRoleConstraint.RoleConstraintRoles
+                        lrFBMRoleConstraintRole.RoleId = lrFBMRoleConstraintRole.RoleId.ToUpper
+                    Next
+                Next
+#End Region
+
+                '==============================
+                'Map the ValueTypes
+                '==============================
+#Region "ValueTypes"
+                Dim lrValueType As NORMA.Model.ValueType = Nothing
+                Dim lsValueTypeConstraintValue As String = ""
+
+                For Each lrFBMValueType In Me.ORMModel.ValueTypes
+
+                    lrValueType = New NORMA.Model.ValueType
+                    lrValueType.Id = "_" & lrFBMValueType.GUID
+                    lrValueType.Name = lrFBMValueType.Name
+
+                    Dim lsDataTypeRef As String = ""
+                    Select Case lrFBMValueType.DataType
+                        Case Is = pcenumORMDataType.DataTypeNotSet
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.UnspecifiedDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.NumericAutoCounter
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.AutoCounterNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.TextFixedLength
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.FixedLengthTextDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.NumericFloatCustomPrecision
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.FloatingPointNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                            lrValueType.ConceptualDataType.Length = lrFBMValueType.DataTypePrecision
+                        Case Is = pcenumORMDataType.TemporalDate
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.DateTemporalDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.TextVariableLength
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.VariableLengthTextDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, Nothing, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.TextLargeLength
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.LargeLengthTextDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, Nothing, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.NumericSignedInteger
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.SignedIntegerNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.NumericSignedSmallInteger
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.SignedSmallIntegerNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.NumericSignedBigInteger
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.SignedLargeIntegerNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.NumericUnsignedTinyInteger
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.UnsignedTinyIntegerNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.NumericUnsignedSmallInteger
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.UnsignedSmallIntegerNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.NumericUnsignedInteger
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.UnsignedIntegerNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.NumericFloatSinglePrecision
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.SinglePrecisionFloatingPointNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, Nothing)
+                        Case Is = pcenumORMDataType.NumericFloatDoublePrecision
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.DoublePrecisionFloatingPointNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, Nothing)
+                        Case Is = pcenumORMDataType.NumericDecimal
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.DecimalNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.NumericMoney
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.MoneyNumericDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, lrFBMValueType.DataTypePrecision, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.RawDataFixedLength
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.FixedLengthRawDataDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, Nothing, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.RawDataVariableLength
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.VariableLengthRawDataDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef, Nothing, lrFBMValueType.DataTypeLength)
+                        Case Is = pcenumORMDataType.RawDataLargeLength
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.LargeLengthRawDataDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.RawDataPicture
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.PictureRawDataDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.RawDataOLEObject
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.OleObjectRawDataDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.TemporalAutoTimestamp
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.AutoTimestampTemporalDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.TemporalTime
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.TimeTemporalDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.TemporalDateAndTime
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.DateAndTimeTemporalDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.LogicalTrueFalse
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.TrueOrFalseLogicalDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.LogicalYesNo
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.YesOrNoLogicalDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.OtherRowID
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.RowIdOtherDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Is = pcenumORMDataType.OtherObjectID
+                            lsDataTypeRef = lrORMDocument.ORMModel.DataTypes.ObjectIdOtherDataType.Id
+                            lrValueType.ConceptualDataType = New NORMA.Model.ValueType.ValueTypeConceptualDataType(lsDataTypeRef)
+                        Case Else
+                            Throw New NotImplementedException($"No implementation is found for {lrFBMValueType.DataType} in 'ValueType'")
+                    End Select
+
+                    'lrValueType.IsIndependent = lrFBMValueType.IsIndependent
+
+                    ''==============================
+                    ''check and apply the ValueConstraint if available
+                    ''==============================
+                    'If Not IsNothing(lrFBMValueType.ValueConstraint) AndAlso lrFBMValueType.ValueConstraint.Count > 0 Then
+                    '    lrValueType.ValueRestriction.ValueConstraint = New NORMA.Model.ValueType.ValueTypeRestrictionValueConstraint()
+                    '    For Each lsValueTypeConstraintValue In lrFBMValueType.ValueConstraint
+                    '        lrValueType.ValueConstraint.Add(lsValueTypeConstraintValue)
+                    '        lrValueType.Instance.Add(lsValueTypeConstraintValue)
+                    '    Next
+                    'End If
+
+                    lrModel.Objects.Items.Add(lrValueType)
+SkipValueType:
+                Next
+#End Region
+
+                '                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(62)
+
+                '==============================
+                'Map the EntityTypes
+                '==============================
+#Region "EntityTypes"
+                Dim lrEntityType As NORMA.Model.EntityType
+
+                For Each lrFBMEntityType In Me.ORMModel.EntityTypes
+
+                    lrEntityType = New NORMA.Model.EntityType
+                    lrEntityType.Id = "_" & lrFBMEntityType.GUID
+                    lrEntityType.Name = lrFBMEntityType.Name
+
+                    'lrEntityType.DerivationText = lrFBMEntityType.DerivationText
+                    ''lrEntityType.ShortDescription = 
+                    ''lrEntityType.LongDescription = 
+                    'lrEntityType.IsObjectifyingEntityType = lrFBMEntityType.IsObjectifyingEntityType
+                    'lrEntityType.IsAbsorbed = lrFBMEntityType.IsAbsorbed
+
+                    lrEntityType._ReferenceMode = lrFBMEntityType.ReferenceMode.TrimStart("."c)
+                    'If lrFBMEntityType.ReferenceModeValueTypeId = "" Then
+                    '    lrEntityType.ReferenceModeValueType = Nothing
+                    'Else
+                    '    lrEntityType.ReferenceModeValueType = New FBM.ValueType
+                    '    lrEntityType.ReferenceModeValueType.Id = lrFBMEntityType.ReferenceModeValueTypeId
+                    '    lrEntityType.ReferenceModeValueType = lrModel.ValueType.Find(AddressOf lrEntityType.ReferenceModeValueType.Equals)
+                    'End If
+
+                    'lrEntityType.PreferredIdentifierRCId = lrFBMEntityType.ReferenceSchemeRoleConstraintId
+
+                    ''------------------------------------------------
+                    ''Link to the Concept within the ModelDictionary
+                    ''------------------------------------------------
+                    'Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True, True, lrEntityType.DBName)
+                    'lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True,, True,, True)
+
+                    'lrEntityType.Concept = lrDictionaryEntry.Concept
+
+                    lrModel.Objects.Items.Add(lrEntityType)
+SkipEntityType:
+                Next
+#End Region
+
+                '                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(64)
+
+                '==============================
+                'Map the FactTypes
+                '==============================
+#Region "FactTypes"
+                Dim lrFactType As NORMA.Model.Fact
+
+                For Each lrFBMFactType In Me.ORMModel.FactTypes
+
+                    If lrFBMFactType.IsObjectified Then
+                        Dim larExistingFactType = From lrObject In arNORMADocument.ORMModel.Objects.Items
+                                                  Where GetType(NORMA.Model.ObjectifiedType) = lrObject.GetType AndAlso lrObject.Name = lrFBMFactType.Id
+                                                  Select lrObject
+
+                        If larExistingFactType.Count > 0 Then Continue For
+                    End If
+
+                    lrFactType = New NORMA.Model.Fact("_" & lrFBMFactType.GUID, lrFBMFactType.Name)
+                    Call Me.GetNORMAFactTypeDetails(lrORMDocument, lrFactType, lrFBMFactType)
+
+                    If IsNothing(lrORMDocument.ORMModel.Facts) Then
+                        lrORMDocument.ORMModel.Facts = New NORMA.ORMModelFacts()
+                        lrORMDocument.ORMModel.Facts.Items = Array.CreateInstance(GetType(Object), 0)
+                    End If
+                    lrModel.Facts.Items.Add(lrFactType)
+
+                Next
+
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(66)
+
+                '                '==============================
+                '                'Subtype Relationships
+                '                '==============================
+#Region "Subtype Relationships"
+                '                Dim larSubtypeRelationshipFactTypes = From FactType In Me.ORMModel.FactTypes
+                '                                                      Where FactType.IsSubtypeRelationshipFactType
+                '                                                      Select FactType
+
+                '                Dim lrModelElement As FBM.ModelObject
+                '                For Each lrFBMFactType In larSubtypeRelationshipFactTypes
+
+                '                    If abSkipAlreadyLoadedModelElements Then
+                '                        'Really only ever called when using the UnifiedOntologyBrowser
+                '                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                '                        If lrModel.FactType.Find(Function(x) x.Id = lrFBMFactType.Id) IsNot Nothing Then GoTo SkipSubtypeRelationship
+                '                    End If
+
+                '                    lrFactType = New FBM.FactType(lrFBMFactType.Id, True)
+                '                    lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
+
+                '                    Dim lrParentModelElement As FBM.ModelObject
+                '                    lrModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(0).JoinedORMObject.Id)
+                '                    lrParentModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(1).JoinedORMObject.Id)
+                '                    If lrParentModelElement.GetType = GetType(FBM.FactType) Then
+                '                        lrParentModelElement = CType(lrParentModelElement, FBM.FactType).ObjectifyingEntityType
+                '                    End If
+                '                    lrModelElement.parentModelObjectList.Add(lrParentModelElement)
+                '                    lrParentModelElement.childModelObjectList.Add(lrModelElement)
+
+                '                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
+
+                '                    Select Case lrModelElement.GetType
+                '                        Case Is = GetType(FBM.EntityType)
+                '                            Dim larSubtypeRelationship = From EntityType In Me.ORMModel.EntityTypes
+                '                                                         From SubtypeRelationship In EntityType.SubtypeRelationships
+                '                                                         Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                '                                                         Select SubtypeRelationship
+                '                            Try
+                '                                lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                '                            Catch ex As Exception
+                '                                'CodeSafe
+                '                                'Not a biggie at this stage.
+                '                            End Try
+
+                '                        Case Is = GetType(FBM.ValueType)
+                '                            Dim larSubtypeRelationship = From ValueType In Me.ORMModel.ValueTypes
+                '                                                         From SubtypeRelationship In ValueType.SubtypeRelationships
+                '                                                         Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                '                                                         Select SubtypeRelationship
+                '                            Try
+                '                                lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                '                            Catch ex As Exception
+                '                                'CodeSafe
+                '                                'Not a biggie at this stage.
+                '                            End Try
+
+                '                    End Select
+
+                '                    lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
+                'SkipSubtypeRelationship:
+                '                Next
+#End Region 'Subtype Relationships
+
+#End Region
+
+                '==============================
+                'Map the RoleConstraints
+                '==============================
+#Region "RoleConstraints"
+
+                Dim lrNORMARoleConstraint As New NORMA.Model.UniquenessConstraint()
+
+                For Each lrFBMRoleConstraint In Me.ORMModel.RoleConstraints
+
+                    lrNORMARoleConstraint = New NORMA.Model.UniquenessConstraint()
+
+                    lrNORMARoleConstraint.Id = "_" & lrFBMRoleConstraint.GUID
+                    lrNORMARoleConstraint.Name = lrFBMRoleConstraint.Name
+                    lrNORMARoleConstraint.RoleSequence = New NORMA.Model.UniquenessConstraint.ConstraintRole() {}
+
+                    Select Case lrFBMRoleConstraint.RoleConstraintType
+                        Case Is = "InternalUniquenessConstraint"
+#Region "Internal Uniqueness Constraint"
+                            '================================================
+                            'Map the InternalConstraints for Fact Type
+                            '===========================================
+
+                            lrNORMARoleConstraint.IsInternal = True
+
+                            Dim lrNORMAFactType As NORMA.Model.Fact = Nothing
+
+                            For Each lrFBMRoleConstraintRole In lrFBMRoleConstraint.RoleConstraintRoles
+
+                                'FactBasedModel: The FactType and Role that the RoleConstraintRole joins to.
+                                Dim lrFBMFactTypeAndRole = (From FactType In Me.ORMModel.FactTypes
+                                                            From Role In FactType.RoleGroup
+                                                            Where Role.Id = lrFBMRoleConstraintRole.RoleId
+                                                            Select New With {.FactType = FactType, .Role = Role}).First
+
+                                'NORMA Model:
+                                Dim lrRoleAndObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
+                                                       From FactType In lrModel.Facts.Items
+                                                       From Role In CType(FactType, NORMA.Model.Fact).FactRoles
+                                                       Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
+                                                       Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
+                                                       Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+
+                                If lrRoleAndObject Is Nothing Then
+                                    lrRoleAndObject = (From ModelElement In lrModel.Facts.Items
+                                                       From FactType In lrModel.Facts.Items
+                                                       From Role In CType(FactType, NORMA.Model.Fact).FactRoles
+                                                       Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
+                                                       Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
+                                                       Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+                                End If
+
+                                lrNORMAFactType = lrRoleAndObject.FactType
+
+                                lrNORMARoleConstraint.RoleSequence.Add(New NORMA.Model.UniquenessConstraint.ConstraintRole() With {.Ref = lrRoleAndObject.Role.Id})
+
+                                If lrRoleAndObject.Role._IsMandatory Then
+                                    lrRoleAndObject.Role._Multiplicity = "ZeroToOne"
+                                Else
+                                    lrRoleAndObject.Role._Multiplicity = "ExactlyOne"
+                                End If
+
+                                If lrFBMRoleConstraint.IsPreferredUniqueness And lrFBMRoleConstraint.RoleConstraintRoles.Count = 1 And CType(lrRoleAndObject.FactType, NORMA.Model.Fact).FactRoles.Count = 2 Then
+
+                                    Dim lrNORMAObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
+                                                         From Role In CType(lrRoleAndObject.FactType, NORMA.Model.Fact).FactRoles
+                                                         Where Role.Id <> lrRoleAndObject.Role.Id
+                                                         Where ModelElement.Id = Role.RolePlayer.Ref
+                                                         Select ModelElement).First
+
+                                    lrNORMARoleConstraint.PreferredIdentifierFor = New NORMA.Model.UniquenessConstraint.ConstraintPreferredIdentifierFor()
+                                    lrNORMARoleConstraint.PreferredIdentifierFor.Ref = lrNORMAObject.Id
+
+                                    If lrNORMAObject.GetType() = GetType(NORMA.Model.EntityType) Then
+                                        CType(lrNORMAObject, NORMA.Model.EntityType).PreferredIdentifier = New NORMA.Model.EntityType.EntityTypePreferredIdentifier()
+                                        CType(lrNORMAObject, NORMA.Model.EntityType).PreferredIdentifier.Ref = lrNORMARoleConstraint.Id
+                                    End If
+
+                                End If
+
+                            Next
+
+                            If IsNothing(lrNORMAFactType.InternalConstraints) Then
+                                lrNORMAFactType.InternalConstraints = New NORMA.Model.Fact.FactInternalConstraints()
+                                lrNORMAFactType.InternalConstraints.Items = New List(Of Object)
+                            End If
+                            lrNORMAFactType.InternalConstraints.Items.Add(New NORMA.Model.Fact.FactInternalConstraints.UniquenessConstraint() With {.Ref = lrNORMARoleConstraint.Id})
+
+                            If IsNothing(arNORMADocument.ORMModel.Constraints) Then
+                                arNORMADocument.ORMModel.Constraints = New NORMA.ORMModelConstraints()
+                                arNORMADocument.ORMModel.Constraints.Items = New List(Of Object)
+                            End If
+                            arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
+#End Region 'Enternal Uniqueness Constraint
+                        Case "ExternalUniquenessConstraint"
+#Region "External Uniqueness Constraint"
+
+                            lrNORMARoleConstraint.IsInternal = False
+
+                            '================================================
+                            'Map the External Uniqueness Constraint
+                            '========================================
+                            For Each lrFBMRoleConstraintRole In lrFBMRoleConstraint.RoleConstraintRoles
+
+                                'FactBasedModel: The FactType and Role that the RoleConstraintRole joins to.
+                                Dim lrFBMFactTypeAndRole = (From FactType In Me.ORMModel.FactTypes
+                                                            From Role In FactType.RoleGroup
+                                                            Where Role.Id = lrFBMRoleConstraintRole.RoleId
+                                                            Select New With {.FactType = FactType, .Role = Role}).First
+
+                                'NORMA Model:
+                                Dim lrRoleAndObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
+                                                       From FactType In lrModel.Facts.Items
+                                                       From Role In CType(FactType, NORMA.Model.Fact).FactRoles
+                                                       Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
+                                                       Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
+                                                       Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+
+                                If lrRoleAndObject Is Nothing Then
+                                    lrRoleAndObject = (From ModelElement In lrModel.Facts.Items
+                                                       From FactType In lrModel.Facts.Items
+                                                       From Role In CType(FactType, NORMA.Model.Fact).FactRoles
+                                                       Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
+                                                       Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
+                                                       Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+                                End If
+
+                                lrNORMARoleConstraint.RoleSequence.Add(New NORMA.Model.UniquenessConstraint.ConstraintRole() With {.Ref = lrRoleAndObject.Role.Id})
+
+                                If lrRoleAndObject.Role._IsMandatory Then
+                                    lrRoleAndObject.Role._Multiplicity = "ZeroToOne"
+                                Else
+                                    lrRoleAndObject.Role._Multiplicity = "ExactlyOne"
+                                End If
+
+                                If lrFBMRoleConstraint.IsPreferredUniqueness Then
+
+                                    Dim lrNORMAObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
+                                                         From Role In CType(lrRoleAndObject.FactType, NORMA.Model.Fact).FactRoles
+                                                         Where Role.Id <> lrRoleAndObject.Role.Id
+                                                         Where ModelElement.Id = Role.RolePlayer.Ref
+                                                         Select ModelElement).First
+
+                                    If lrNORMARoleConstraint.PreferredIdentifierFor Is Nothing Then
+                                        CType(lrNORMAObject, NORMA.Model.EntityType).PreferredIdentifier = New NORMA.Model.EntityType.EntityTypePreferredIdentifier()
+                                        CType(lrNORMAObject, NORMA.Model.EntityType).PreferredIdentifier.Ref = lrNORMARoleConstraint.Id
+
+                                        lrNORMARoleConstraint.PreferredIdentifierFor = New NORMA.Model.UniquenessConstraint.ConstraintPreferredIdentifierFor()
+                                        lrNORMARoleConstraint.PreferredIdentifierFor.Ref = lrNORMAObject.Id
+                                    End If
+
+                                End If
+                            Next
+
+                            If IsNothing(arNORMADocument.ORMModel.Constraints) Then
+                                arNORMADocument.ORMModel.Constraints = New NORMA.ORMModelConstraints()
+                                arNORMADocument.ORMModel.Constraints.Items = New List(Of Object)
+                            End If
+
+                            arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
+#End Region 'External Uniqueness Constraint
+                        Case Else
+                            Continue For
+                    End Select
+
+#Region "Old Boston code"
+
+                    '                    lrRoleConstraint = New FBM.RoleConstraint
+                    '                    lrRoleConstraint.Id = lrFBMRoleConstraint.Id
+                    '                    lrRoleConstraint.Model = lrModel
+                    '                    lrRoleConstraint.Name = lrFBMRoleConstraint.Name
+                    '                    'lrRoleConstraint.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
+                    '                    'lrRoleConstraint.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
+                    '                    lrRoleConstraint.ConceptType = pcenumConceptType.RoleConstraint
+                    '                    lrRoleConstraint.RoleConstraintType = CType([Enum].Parse(GetType(pcenumRoleConstraintType), lrFBMRoleConstraint.RoleConstraintType), pcenumRoleConstraintType)
+                    '                    lrRoleConstraint.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), lrFBMRoleConstraint.RingConstraintType), pcenumRingConstraintType)
+                    '                    'lrRoleConstraint.LevelNr = <See right down the bottom of this method>
+                    '                    lrRoleConstraint.IsPreferredIdentifier = lrFBMRoleConstraint.IsPreferredUniqueness
+                    '                    lrRoleConstraint.IsDeontic = lrFBMRoleConstraint.IsDeontic
+                    '                    lrRoleConstraint.Cardinality = lrFBMRoleConstraint.Cardinality
+                    '                    lrRoleConstraint.MaximumFrequencyCount = lrFBMRoleConstraint.MaximumFrequencyCount
+                    '                    lrRoleConstraint.MinimumFrequencyCount = lrFBMRoleConstraint.MinimumFrequencyCount
+                    '                    Select Case lrFBMRoleConstraint.CardinalityRangeType
+                    '                        Case Is = pcenumCardinalityRangeType.LessThanOrEqual.ToString
+                    '                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
+                    '                        Case Is = pcenumCardinalityRangeType.Equal.ToString
+                    '                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
+                    '                        Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual.ToString
+                    '                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
+                    '                        Case Is = pcenumCardinalityRangeType.Between.ToString
+                    '                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
+                    '                    End Select
+                    '
+                    '                    '----------------------------------------------------------
+                    '                    'Get the RoleConstraintRole list for the RoleConstraint.
+                    '                    '  NB the SequenceNr of a RoleConstraintRole is 'not' the same as a SequenceNr on a Role.
+                    '                    '  SequenceNr on a RoleConstraintRole is many things, but
+                    '                    '  relates particularly to DataIn, DataOut integrity matching.
+                    '                    '----------------------------------------------------------
+
+                    '=======================================================================================================
+                    '                        lrRoleConstraintRole = New FBM.RoleConstraintRole
+                    '                        lrRoleConstraintRole.Model = lrModel
+                    '                        lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
+                    '                        lrRoleConstraintRole.SequenceNr = lrFBMRoleConstraintRole.SequenceNr
+                    '                        lrRoleConstraintRole.IsEntry = lrFBMRoleConstraintRole.IsEntry
+                    '                        lrRoleConstraintRole.IsExit = lrFBMRoleConstraintRole.IsExit
+
+
+                    '                        lrRole.Id = lrFBMRoleConstraintRole.RoleId
+
+                    '                        lrRoleConstraintRole.Role = lrModel.Role.Find(AddressOf lrRole.Equals)
+
+                    '                        '-------------------------------------------------------------------
+                    '                        'lrRoleConstraintRole.RoleConstraintArgument is set further below.
+                    '                        '-------------------------------------------------------------------
+                    '                        lrRoleConstraintRole.ArgumentSequenceNr = lrFBMRoleConstraintRole.ArgumentSequenceNr
+
+                    '                        lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                    '                        lrRoleConstraint.Role.Add(lrRoleConstraintRole.Role)
+                    '                        lrRoleConstraintRole.Role.RoleConstraintRole.Add(lrRoleConstraintRole)
+                    '                    Next
+
+                    '                    If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
+                    '                        prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+                    '                    Else
+                    '                        lrFactType = lrRoleConstraint.Role(0).FactType
+                    '                        lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
+
+                    '                        Select Case lrRoleConstraint.RoleConstraintType
+                    '                            Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                    '                                Call lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+                    '                        End Select
+                    '                    End If
+
+                    '                    Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
+                    '                    Dim lrFBMRoleConstraintArgument As XMLModel.RoleConstraintArgument
+                    '                    Dim lrJoinPath As FBM.JoinPath
+                    '                    Dim lrFBMRoleReference As XMLModel.RoleReference
+
+                    '                    For Each lrFBMRoleConstraintArgument In lrFBMRoleConstraint.Argument
+                    '                        lrRoleConstraintArgument = New FBM.RoleConstraintArgument(lrRoleConstraint,
+                    '                                                                                  lrFBMRoleConstraintArgument.SequenceNr,
+                    '                                                                                  lrFBMRoleConstraintArgument.Id)
+                    '                        lrRoleConstraintArgument.isDirty = True
+
+                    '                        lrJoinPath = New FBM.JoinPath(lrRoleConstraintArgument)
+                    '                        lrJoinPath.JoinPathError = lrFBMRoleConstraintArgument.JoinPath.JoinPathError
+
+                    '                        For Each lrFBMRoleReference In lrFBMRoleConstraintArgument.Role
+                    '                            lrRole = New FBM.Role
+                    '                            lrRole.Id = lrFBMRoleReference.RoleId
+                    '                            lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint)
+                    '                            lrRoleConstraintRole = lrRoleConstraint.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.EqualsByRole)
+                    '                            lrRoleConstraintArgument.RoleConstraintRole.Add(lrRoleConstraintRole)
+                    '                            lrRoleConstraintRole.RoleConstraintArgument = lrRoleConstraintArgument
+                    '                        Next
+
+                    '                        For Each lrFBMRoleReference In lrFBMRoleConstraintArgument.JoinPath.RolePath
+                    '                            lrRole = New FBM.Role
+                    '                            lrRole.Id = lrFBMRoleReference.RoleId
+                    '                            lrRole = lrModel.Role.Find(AddressOf lrRole.Equals)
+                    '                            lrJoinPath.RolePath.Add(lrRole)
+                    '                        Next
+                    '                        lrRoleConstraintArgument.JoinPath = lrJoinPath
+                    '                        Call lrRoleConstraintArgument.JoinPath.ConstructFactTypePath()
+                    '                        lrRoleConstraint.Argument.Add(lrRoleConstraintArgument)
+                    '                    Next
+
+                    '                    If (lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint) And (lrRoleConstraint.Role.Count > 0) Then
+                    '                        lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
+                    '                    End If
+
+                    '                    'CodeSafe-RoleConstraint must have Roles
+                    '                    If lrRoleConstraint.Role.Count > 0 Then
+                    '                        lrModel.RoleConstraint.Add(lrRoleConstraint)
+                    '                    End If
+
+                    '                    For Each lsValueTypeConstraintValue In lrFBMRoleConstraint.ValueConstraint
+                    '                        lrRoleConstraint.ValueConstraint.Add(lsValueTypeConstraintValue)
+                    '                    Next
+                    '==============================================================
+#End Region
+
+SkipRoleConstraint:
+                Next
+
+                'If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(68)
+
+#End Region
+
+                '==============================
+                'Map the ModelNotes
+                '==============================
+#Region "ModelNotes"
+                '                Dim lrFBMModelNote As XMLModel.ModelNote
+                '                Dim lrModelNote As FBM.ModelNote
+
+                '                For Each lrFBMModelNote In Me.ORMModel.ModelNotes
+
+                '                    If abSkipAlreadyLoadedModelElements Then
+                '                        'Really only ever called when using the UnifiedOntologyBrowser
+                '                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                '                        If lrModel.ModelNote.Find(Function(x) x.Id = lrFBMModelNote.Id) IsNot Nothing Then GoTo SkipModelNote
+                '                    End If
+
+                '                    lrModelNote = New FBM.ModelNote(lrModel)
+
+                '                    lrModelNote.Id = lrFBMModelNote.Id
+                '                    lrModelNote.Text = lrFBMModelNote.Note
+
+                '                    If lrFBMModelNote.JoinedObjectTypeId = "" Then
+                '                        lrModelNote.JoinedObjectType = Nothing
+                '                    Else
+                '                        lrModelNote.JoinedObjectType = lrModel.EntityType.Find(Function(x) x.Id = lrFBMModelNote.JoinedObjectTypeId)
+                '                        If lrModelNote.JoinedObjectType Is Nothing Then
+                '                            lrModelNote.JoinedObjectType = lrModel.FactType.Find(Function(x) x.Id = lrFBMModelNote.JoinedObjectTypeId)
+                '                            If lrModelNote.JoinedObjectType Is Nothing Then
+                '                                lrModelNote.JoinedObjectType = lrModel.ValueType.Find(Function(x) x.Id = lrFBMModelNote.JoinedObjectTypeId)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                    lrModel.AddModelNote(lrModelNote, False)
+                'SkipModelNote:
+                '                Next
+
+                '                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70)
+
+                '                '----------------------------------------------------------------------------------------------
+                '                'Reference any FactType.LinkFactTypeRole values that are NOTHING
+                '                Dim larFactType = From [FactType] In lrModel.FactType
+                '                                  Where FactType.LinkFactTypeRole Is Nothing _
+                '                                  And FactType.IsLinkFactType = True
+                '                                  Select FactType
+
+                '                For Each lrFactType In larFactType
+                '                    MsgBox("Error: FactType: '" & lrFactType.Name & "' has no LinkFactTypeRole.")
+                '                Next
+#End Region
+
+                '=====================
+                'Map the Pages
+                '=====================
+                Call Me.MapToORMDiagrams(lrORMDocument, aoBackgroundWorker)
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
+
+                Return lrORMDocument
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arORMDocument">The NORMA ORM Document for which the Pages are to be inserted.</param>
+        ''' <param name="aoBackgroundWorker"></param>
+        Public Sub MapToORMDiagrams(ByRef arORMDocument As NORMA.ORMDocument,
+                                    Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+
+            Dim lrPage As NORMA.ORMDiagram.ORMDiagram = Nothing
+            'Dim lrFBMPage As XMLModel.Page
+            Dim lrORMDocument As NORMA.ORMDocument = arORMDocument
+            Dim loBackgroundWorker As System.ComponentModel.BackgroundWorker = aoBackgroundWorker
+            Try
+
+                For Each lrFBMPage In Me.ORMDiagram
+                    lrPage = Nothing
+                    lrPage = Me.MapToNORMAPage(lrFBMPage, lrORMDocument, lrPage, loBackgroundWorker, False)
+
+                    lrORMDocument.ORMDiagram.Add(lrPage)
+                Next 'XMLModel.Page
+
+#Region "2220721-VM-Use if you decide to do threading"
+                '--------------------
+                'Parallel Threading
+                '--------------------
+                'Parallel.ForEach(Me.ORMDiagram,
+                '                 Sub(lrFBMpage As XMLModel.Page)
+                '                     'lrPage = lrORMDocument.ORMDiagram.Find(Function(x) x.Id = lrFBMpage.Id)
+                '                     'If lrPage Is Nothing Then
+                '                     'lrPage = Me.MapToFBMPage(lrFBMpage, lrORMDocument,,, True)
+                '                     'Else
+                '                     'If Not lrPage.loaded Then
+                '                     lrPage = Me.MapToFBMPage(lrFBMpage, lrORMDocument, lrPage, loBackgroundWorker, True)
+                '                     'End If
+                '                     'End If
+
+                '                     'lrPage.loaded = True
+                '                     lrORMDocument.ORMDiagram.Add(lrPage)
+
+                '                 End Sub)
+#End Region
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+        Private Function MapToNORMAPage(ByRef arXMLPage As XMLModel.Page,
+                                                  ByRef arORMDocument As NORMA.ORMDocument,
+                                                  Optional ByRef arPage As NORMA.ORMDiagram.ORMDiagram = Nothing,
+                                                  Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                                                  Optional ByVal abCalledAsThread As Boolean = False) As NORMA.ORMDiagram.ORMDiagram
+
+            Dim lsMessage As String
+            Dim ldblScalar As Double = 30.5
+            Dim ldblWidthScale As Double = 12.1
+            Dim ldblFixedHeight As Double = 0.2295
+            Dim ldblEntityTypeReferenceModeHeight As Double = 0.359
+
+            Try
+                Dim lrConceptInstance As FBM.ConceptInstance = Nothing
+                Dim lrPage As NORMA.ORMDiagram.ORMDiagram = Nothing
+
+                If arPage Is Nothing Then
+                    lrPage = New NORMA.ORMDiagram.ORMDiagram '("_" & arXMLPage.Id, arXMLPage.Name)
+                End If
+                lrPage.Id = "_" & arXMLPage.Id
+                lrPage.Name = arXMLPage.Name
+                lrPage.BaseFontName = "Tahoma"
+                lrPage.BaseFontSize = "0.0972"
+                lrPage.Subject = New NORMA.ORMDiagram.Subject
+                lrPage.Subject.Ref = arORMDocument.ORMModel.Id
+                arPage = lrPage
+
+                '=============================
+                'Map the ValueTypeInstances
+                '=============================
+#Region "ValueTypeInstance"
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
+                    Try
+                        'Don't include the ValueType if it is a ReferenceModeValueType of an EntityType
+                        If Me.ValueTypeIsReferenceModeValueType(lrConceptInstance.Symbol) Then GoTo SkipValueTypeInstance
+
+                        Dim lrValueTypeInstance As New NORMA.ORMDiagram.ObjectTypeShape()
+                        lrValueTypeInstance.Subject = New NORMA.ORMDiagram.Subject
+                        lrValueTypeInstance.Subject.Ref = arORMDocument.ORMModel.Objects.Items.First(Function(x) x.Name = lrConceptInstance.Symbol).Id
+                        lrValueTypeInstance.IsExpanded = True
+
+                        Dim liWidth = Math.Max(8, TextRenderer.MeasureText(lrConceptInstance.Symbol, New Font(lrPage.BaseFontName, lrPage.BaseFontSize)).Width - 5)
+                        lrValueTypeInstance.AbsoluteBounds = $"{lrConceptInstance.X / ldblScalar}, {lrConceptInstance.Y / ldblScalar}, {liWidth / ldblWidthScale}, {ldblFixedHeight}"
+
+                        lrPage.Shapes.Items.Add(lrValueTypeInstance)
+                    Catch ex As Exception
+                        'Call Me.ReportModelLoadingError(arModel, ex.Message)
+                        GoTo SkipValueTypeInstance
+                    End Try
+SkipValueTypeInstance:
+                Next
+#End Region
+
+                '=============================
+                'Map the EntityTypeInstances
+                '=============================
+#Region "EntityTypeInstances"
+                'Dim lrEntityTypeInstance As NORMA.ORMDiagram.ObjectTypeShape = Nothing
+                'Dim lrEntityType As NORMA.Model.EntityType = Nothing
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
+                    Try
+                        Dim lrFBMEntityType As XMLModel.EntityType = Me.ORMModel.EntityTypes.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+
+                        If Not lrFBMEntityType.IsObjectifyingEntityType Then
+                            Dim lrEntityTypeInstance As New NORMA.ORMDiagram.ObjectTypeShape()
+                            lrEntityTypeInstance.Subject = New NORMA.ORMDiagram.Subject
+                            lrEntityTypeInstance.Subject.Ref = arORMDocument.ORMModel.Objects.Items.First(Function(x) x.Name = lrConceptInstance.Symbol).Id
+                            lrEntityTypeInstance.IsExpanded = True
+
+                            'Height of the EntityTypeInstance
+                            Dim ldblEntityTypeHeight As Double = Boston.returnIfTrue(lrFBMEntityType.ReferenceMode Is Nothing, ldblFixedHeight, ldblEntityTypeReferenceModeHeight)
+
+                            lrEntityTypeInstance.AbsoluteBounds = $"{lrConceptInstance.X / ldblScalar}, {lrConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblEntityTypeHeight}"
+
+                            lrPage.Shapes.Items.Add(lrEntityTypeInstance)
+                        End If
+
+                    Catch ex As Exception
+                        'Call Me.ReportModelLoadingError(arModel, ex.Message)
+                        Continue For
+                    End Try
+                    'lrEntityTypeInstance = New FBM.EntityTypeInstance
+                    'lrEntityTypeInstance.Model = arModel
+                    'lrEntityTypeInstance.Page = lrPage
+                    'lrEntityTypeInstance.id = lrConceptInstance.Symbol
+                    'lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.id)
+                    'lrEntityTypeInstance.EntityType = lrEntityType
+                    'lrEntityTypeInstance._Name = lrEntityTypeInstance.id
+                    'lrEntityTypeInstance.ReferenceMode = lrEntityType.ReferenceMode
+                    'lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityType.IsObjectifyingEntityType
+                    'lrEntityTypeInstance.IsAbsorbed = lrEntityType.IsAbsorbed
+                    'lrEntityTypeInstance.IsDerived = lrEntityType.IsDerived
+                    'lrEntityTypeInstance.DerivationText = lrEntityType.DerivationText
+                    'lrEntityTypeInstance.DBName = lrEntityType.DBName
+
+                    'If lrEntityTypeInstance.EntityType.ReferenceModeValueType IsNot Nothing Then
+                    '    lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(Function(x) x.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id)
+                    'End If
+
+                    'lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityTypeInstance.EntityType.PreferredIdentifierRCId
+
+                    'lrEntityTypeInstance.X = lrConceptInstance.X
+                    'lrEntityTypeInstance.Y = lrConceptInstance.Y
+
+                    'lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+                Next
+#End Region
+
+                '===========================
+                'Map the FactTypeInstances
+                '===========================
+#Region "FactTypeInstances"
+                Dim lrFactTypeInstance As NORMA.ORMDiagram.FactTypeShape = Nothing
+                Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance = Nothing
+                Dim lrFactTypeNameConceptInstance As FBM.ConceptInstance = Nothing
+                '                Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
+                '                Dim lrFact As FBM.Fact
+                '                Dim lrFactType As FBM.FactType
+
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
+
+                    'Don't include the FactTypeInstance if it is a ReferenceModeFactType for an EntityType.
+                    If Me.FactTypeIsReferenceModeFactType(lrConceptInstance.Symbol) Then GoTo SkipFactTypeInstance
+
+                    Try
+                        Dim lrFBMFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+
+                        lrFactTypeInstance = New NORMA.ORMDiagram.FactTypeShape
+                        lrFactTypeInstance.Subject = New NORMA.ORMDiagram.Subject
+                        Dim lrFactType As NORMA.Model.Fact = arORMDocument.ORMModel.Facts.Items.First(Function(x) x._Name = lrConceptInstance.Symbol)
+                        lrFactTypeInstance.Subject.Ref = lrFactType.Id
+                        lrFactTypeInstance.IsExpanded = True
+                        lrFactTypeInstance.AbsoluteBounds = $"{CDbl(lrConceptInstance.X / ldblScalar - (lrConceptInstance.Symbol.Length / ldblWidthScale) / 4)}, {lrConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
+
+#Region "Relative Shapes"
+                        lrFactTypeInstance.RelativeShapes = New NORMA.ORMDiagram.FactTypeShape.RelativeShape
+
+#Region "Fact Type Reading"
+                        'FactTypeReading
+                        lrFactTypeReadingConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
+                        If lrFactTypeReadingConceptInstance IsNot Nothing Then
+                            Dim lrFactTypeReadingInstance As New NORMA.ORMDiagram.FactTypeShape.RelativeShape.FactTypeReadingShape
+                            lrFactTypeReadingInstance.AbsoluteBounds = $"{lrFactTypeReadingConceptInstance.X / ldblScalar}, {lrFactTypeReadingConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
+                            lrFactTypeReadingInstance.Subject.Ref = lrFactType.ReadingOrders.Find(Function(x) x.Id = lrConceptInstance.Symbol).Id
+                            lrFactTypeInstance.RelativeShapes.ReadingShape = lrFactTypeReadingInstance
+                        End If
+#End Region
+
+#Region "Fact Type Name"
+                        'FactTypeName
+                        lrFactTypeNameConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeName And x.Symbol = lrFactType.Id)
+                        If lrFactTypeNameConceptInstance IsNot Nothing Then
+                            Dim lrFactTypeNameInstance As New NORMA.ORMDiagram.FactTypeShape.RelativeShape.FactTypeNameShape
+                            If lrFBMFactType.IsObjectified Then
+                                lrFactTypeInstance.RelativeShapes.ObjectifiedFactTypeNameShape = lrFactTypeNameInstance
+                                lrFactTypeNameInstance.AbsoluteBounds = $"{lrFactTypeNameConceptInstance.X / ldblScalar}, {lrFactTypeNameConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
+                            Else
+                                '20220728-VM-Unknown at this stage.
+                            End If
+                        End If
+#End Region
+
+#Region "Derivation Rules"
+                        '20220728-VM-Ignore at this stage. Leave out of transformation to NORMA .orm model at this stage.
+                        '                    If lrFactType.IsDerived Then
+                        '                        lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
+                        '                        If lrDerivationTextConceptInstance IsNot Nothing Then
+                        '                            lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(lrPage.Model,
+                        '                                                                                                           lrPage,
+                        '                                                                                                           lrFactTypeInstance)
+                        '                            lrFactTypeInstance.FactTypeDerivationText.X = lrDerivationTextConceptInstance.X
+                        '                            lrFactTypeInstance.FactTypeDerivationText.Y = lrDerivationTextConceptInstance.Y
+                        '                        End If
+                        '                    End If
+#End Region
+
+#End Region
+                        lrPage.Shapes.Items.Add(lrFactTypeInstance)
+                    Catch ex As Exception
+                        'Call Me.ReportModelLoadingError(arModel, ex.Message)
+                        Continue For
+                    End Try
+SkipFactTypeInstance:
+                Next
+
+
+                '----------------------------------------
+                'Get the Facts for the FactTypeInstance
+                '----------------------------------------
+#Region "Facts for FactTypeInstance"
+                '20220728-VM-Leave out of transformation to NORMA .orm model at this stage.
+                '                    Dim lrFactInstance As FBM.FactInstance
+                '                    Dim lrFactDataInstance As FBM.FactDataInstance
+                '                    For Each lrFact In lrFactType.Fact
+
+                '                        Dim lrFactConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)
+                '                        If lrFactConceptInstance IsNot Nothing Then
+                '                            '----------------------------------
+                '                            'The Fact is included on the Page
+                '                            '----------------------------------
+                '                            lrFactInstance = lrFact.CloneInstance(lrPage)
+                '                            lrFactInstance.X = lrFactConceptInstance.X
+                '                            lrFactInstance.Y = lrFactConceptInstance.Y
+                '                            lrFactInstance.isDirty = True
+                '                            For Each lrFactDataInstance In lrFactInstance.Data
+                '                                lrFactDataInstance.isDirty = True
+                '                            Next
+                '                            lrFactTypeInstance.Fact.Add(lrFactInstance)
+                '                            lrFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
+                '                            lrFactTypeInstance.isDirty = True
+
+                '                            For Each lrFactDataInstance In lrFactInstance.Data
+
+                '                                Dim lrFactDataConceptInstance As New FBM.ConceptInstance
+                '                                lrFactDataConceptInstance.Symbol = lrFactDataInstance.Data
+                '                                lrFactDataConceptInstance.RoleId = lrFactDataInstance.Role.Id
+
+                '                                lrFactDataConceptInstance = arXMLPage.ConceptInstance.Find(AddressOf lrFactDataConceptInstance.EqualsBySymbolRoleId)
+
+                '                                If lrFactDataConceptInstance IsNot Nothing Then
+                '                                    lrFactDataInstance.X = lrFactDataConceptInstance.X
+                '                                    lrFactDataInstance.Y = lrFactDataConceptInstance.Y
+                '                                End If
+                '                                lrPage.ValueInstance.AddUnique(lrFactDataInstance)
+                '                            Next
+
+                '                        End If
+
+                '                    Next
+#End Region
+
+#Region "Populate RoleInstances that are (still) joined to Nothing"
+                '===============================================================================================
+                'Populate RoleInstances that are (still) joined to Nothing
+                '===========================================================
+                '20220728-VM-Probably not needed. Leave out of transformation to NORMA .orm model at this stage.
+                '                Dim latType = {GetType(FBM.ValueTypeInstance),
+                '                                   GetType(FBM.EntityTypeInstance),
+                '                                   GetType(FBM.FactTypeInstance)}
+
+                '                Dim larRole = From Role In lrPage.RoleInstance
+                '                              Where Role.JoinedORMObject Is Nothing
+                '                              Select Role
+
+                '                Dim lrRoleInstance As FBM.RoleInstance
+
+                '                For Each lrRoleInstance In larRole
+                '                    Select Case lrRoleInstance.TypeOfJoin
+                '                        Case Is = pcenumRoleJoinType.FactType
+                '                            lrRoleInstance.JoinedORMObject = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinsFactType.Id)
+                '                    End Select
+
+                '                Next
+#End Region
+
+#End Region
+
+                '=================================================================================
+                'Map the SubtypeRelationships.
+                '=================================================================================
+#Region "SubtypeRelationships"
+                '                Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance
+                '                                                      Where FactType.IsSubtypeRelationshipFactType
+                '                                                      Select FactType
+
+                '                Dim lrModelElementInstance As FBM.ModelObject
+                '                Dim lrParentModelElementInstance As FBM.ModelObject
+                '                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                '                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+                '                For Each lrFactTypeInstance In larSubtypeRelationshipFactTypes.ToArray
+                '                    Try
+                '                        lrModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(0).JoinedORMObject.Id)
+                '                        lrParentModelElementInstance = lrPage.getModelElementById(lrFactTypeInstance.RoleGroup(1).JoinedORMObject.Id)
+
+                '                        If lrParentModelElementInstance.ConceptType = pcenumConceptType.FactType Then
+                '                            Dim lsParentModelElementInstanceId = CType(lrParentModelElementInstance, FBM.FactTypeInstance).FactType.ObjectifyingEntityType.Id
+                '                            lrParentModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lsParentModelElementInstanceId)
+                '                        End If
+
+                '                        lrSubtypeRelationship = Nothing
+                '                        Select Case lrModelElementInstance.ConceptType
+                '                            Case Is = pcenumConceptType.EntityType
+                '                                lrSubtypeRelationship = CType(lrModelElementInstance, FBM.EntityTypeInstance).EntityType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                '                            Case Is = pcenumConceptType.ValueType
+                '                                lrSubtypeRelationship = CType(lrModelElementInstance, FBM.ValueTypeInstance).ValueType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                '                        End Select
+
+                '                        lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, True)
+
+                '                        Select Case lrModelElementInstance.ConceptType
+                '                            Case Is = pcenumConceptType.EntityType
+                '                                CType(lrModelElementInstance, FBM.EntityTypeInstance).SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+                '                            Case Is = pcenumConceptType.ValueType
+                '                                CType(lrModelElementInstance, FBM.ValueTypeInstance).SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
+                '                        End Select
+
+
+
+                '                    Catch ex As Exception
+                '                        lsMessage = "Problem loading Subtype Relationship for Subtype Relationship Fact Type with Id: " & lrFactTypeInstance.Id
+                '                        lsMessage.AppendDoubleLineBreak("Page: " & lrPage.Name)
+                '                        If abCalledAsThread Then
+                '                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                '                                                           lsMessage,
+                '                                                           Nothing,
+                '                                                           Nothing)
+                '                            arModel.ModelError.Add(lrModelError)
+                '                        Else
+                '                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                '                        End If
+
+                '                    End Try
+                '                Next
+#End Region
+
+                '=============================
+                'Map the RoleConstraints
+                '=============================
+#Region "RoleConstraint"
+                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
+                    Try
+                        Dim lrFBMRoleConstraint = Me.ORMModel.RoleConstraints.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+
+                        Select Case lrFBMRoleConstraint.RoleConstraintType
+                            Case Is = "ExternalUniquenessConstraint"
+                                Dim lrRoleConstraintInstance As New NORMA.ORMDiagram.ExternalConstraintShape
+                                lrRoleConstraintInstance.Subject = New NORMA.ORMDiagram.Subject
+                                lrRoleConstraintInstance.Subject.Ref = arORMDocument.ORMModel.Constraints.Items.First(Function(x) x.Name = lrConceptInstance.Symbol).Id
+                                lrRoleConstraintInstance.IsExpanded = True
+
+                                Dim liWidth = Math.Max(8, TextRenderer.MeasureText(lrConceptInstance.Symbol, New Font(lrPage.BaseFontName, lrPage.BaseFontSize)).Width - 5)
+                                lrRoleConstraintInstance.AbsoluteBounds = $"{lrConceptInstance.X / ldblScalar}, {lrConceptInstance.Y / ldblScalar}, {"0.16"}, {"0.16"}"
+
+                                lrPage.Shapes.Items.Add(lrRoleConstraintInstance)
+                            Case Else
+                                Continue For
+                        End Select
+
+                    Catch ex As Exception
+                        'Call Me.ReportModelLoadingError(arModel, ex.Message)
+                        GoTo SkipRoleConstraintInstance
+                    End Try
+SkipRoleConstraintInstance:
+                Next
+#End Region
+
+                '===========================
+                'Map the RoleNameInstances
+                '===========================
+#Region "RoleNameInstances"
+                '                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleName)
+                '                    lrRoleInstance = lrPage.RoleInstance.Find(Function(x) x.Id = lrConceptInstance.RoleId)
+                '                    Try
+                '                        lrRoleInstance.RoleName = New FBM.RoleName(lrRoleInstance, lrRoleInstance.Name)
+                '                        lrRoleInstance.RoleName.X = lrConceptInstance.X
+                '                        lrRoleInstance.RoleName.Y = lrConceptInstance.Y
+                '                    Catch ex As Exception
+                '                        'Not worth crashing over.
+                '                    End Try
+                '                Next
+
+                '                '=================================
+                '                'Map the RoleConstraintInstances
+                '                '=================================
+                '                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                '                Dim lrRoleConstraint As FBM.RoleConstraint
+                '                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
+
+                '                    If IsSomething(lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol)) Then
+                '                        '-------------------------------------------------------------------
+                '                        'The RoleConstraintInstance has already been added to the Page.
+                '                        '  FactType.CloneInstance adds RoleConstraintInstances to the Page
+                '                        '-------------------------------------------------------------------
+                '                    Else
+                '                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+
+                '                        Try
+                '                            Select Case lrRoleConstraint.RoleConstraintType
+                '                                Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                '                                    lrRoleConstraintInstance = lrRoleConstraint.CloneFrequencyConstraintInstance(lrPage)
+                '                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                '                                    lrRoleConstraintInstance = lrRoleConstraint.CloneRoleValueConstraintInstance(lrPage)
+                '                                Case Else
+                '                                    lrRoleConstraintInstance = lrRoleConstraint.CloneInstance(lrPage)
+                '                            End Select
+
+                '                            lrRoleConstraintInstance.X = lrConceptInstance.X
+                '                            lrRoleConstraintInstance.Y = lrConceptInstance.Y
+
+                '                            lrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+                '                        Catch ex As Exception
+                '                            lsMessage = "Error loading Role Constraint with Id: " & lrConceptInstance.Symbol
+                '                            lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
+                '                            If abCalledAsThread Then
+                '                                Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                '                                                           lsMessage,
+                '                                                           Nothing,
+                '                                                           Nothing)
+                '                                arModel.ModelError.Add(lrModelError)
+                '                            Else
+                '                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                '                            End If
+                '                        End Try
+
+                '                    End If
+                '                Next
+
+                '                '============================
+                '                'Map the ModelNoteInstances
+                '                '============================
+                '                Dim lrModelNoteInstance As FBM.ModelNoteInstance
+                '                Dim lrModelNote As FBM.ModelNote
+                '                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ModelNote)
+                '                    Try
+                '                        lrModelNote = arModel.ModelNote.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+
+                '                        lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
+                '                        lrModelNoteInstance.X = lrConceptInstance.X
+                '                        lrModelNoteInstance.Y = lrConceptInstance.Y
+                '                    Catch ex As Exception
+                '                        lsMessage = "Error loading Model Note with Id: " & lrConceptInstance.Symbol
+                '                        lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
+                '                        If abCalledAsThread Then
+                '                            Dim lrModelError As New FBM.ModelError(pcenumModelErrors.ModelLoadingError,
+                '                                                           lsMessage,
+                '                                                           Nothing,
+                '                                                           Nothing)
+                '                            arModel.ModelError.Add(lrModelError)
+                '                        Else
+                '                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                '                        End If
+                '                    End Try
+
+                'Next
+#End Region
+
+                'If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70 + CInt(9 * (arModel.Page.FindAll(Function(x) x.Loaded = True).Count / arModel.Page.Count)))
+
+                Return lrPage
+
+            Catch ex As Exception
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                If abCalledAsThread Then
+                    '20220721-VM-Add code here for throwing error messages in a thread.
+                Else
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End If
+
+                Return Nothing
+
+            End Try
+
+        End Function
+
+
+
+
         Private Sub ReportModelLoadingError(ByRef arModel As FBM.Model, ByVal asErrorMessage As String)
 
             Try
@@ -1866,6 +3148,251 @@ FoundModelElement:
             End Try
 
         End Function
+
+        Public Sub GetNORMAFactTypeDetails(ByRef arNORMADocument As NORMA.ORMDocument,
+                                           ByRef arNORMAFactType As NORMA.Model.Fact,
+                                           ByVal arFBMFactType As XMLModel.FactType)
+
+            '================================================
+            'Map the PlayedRoles for Type and Roles For Fact
+            '================================================
+            Dim latType = {
+                GetType(NORMA.Model.ValueType),
+                GetType(NORMA.Model.EntityType),
+                GetType(NORMA.Model.ObjectifiedType)
+            }
+
+            Try
+
+                For Each lrFBMRole In arFBMFactType.RoleGroup
+
+                    lrFBMRole.JoinedObjectType = Me.ORMModel.getModelElementById(lrFBMRole.JoinedObjectTypeId)
+
+                    Dim lrNORMARole As New NORMA.Model.Fact.FactRole()
+                    lrNORMARole.Id = "_" & lrFBMRole.Id
+                    lrNORMARole.Name = lrFBMRole.Name
+                    lrNORMARole._IsMandatory = lrFBMRole.Mandatory
+
+                    Dim lrRoleFind = From lrObject In arNORMADocument.ORMModel.Objects.Items
+                                     Where latType.Contains(lrObject.GetType) AndAlso lrObject.Name = lrFBMRole.JoinedObjectTypeId
+                                     Select lrObject
+
+                    Dim lrJoinedORMObject = lrRoleFind.FirstOrDefault()
+
+                    If lrJoinedORMObject Is Nothing Then
+
+                        Dim lrFBMFactType As XMLModel.FactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lrFBMRole.JoinedObjectTypeId)
+                        Dim lrNORMAFactType As New NORMA.Model.Fact("_" & lrFBMFactType.GUID, lrFBMFactType.Name)
+                        Call Me.GetNORMAFactTypeDetails(arNORMADocument, lrNORMAFactType, lrFBMFactType)
+
+                        If IsNothing(arNORMADocument.ORMModel.Facts) Then
+                            arNORMADocument.ORMModel.Facts = New NORMA.ORMModelFacts()
+                            arNORMADocument.ORMModel.Facts.Items = Array.CreateInstance(GetType(Object), 0)
+                        End If
+                        arNORMADocument.ORMModel.Facts.Items.Add(lrNORMAFactType)
+
+                        lrRoleFind = From lrObject In arNORMADocument.ORMModel.Objects.Items
+                                     Where latType.Contains(lrObject.GetType) AndAlso lrObject.Name = lrFBMRole.JoinedObjectTypeId
+                                     Select lrObject
+
+                        lrJoinedORMObject = lrRoleFind.FirstOrDefault()
+
+
+                    End If
+
+                    lrNORMARole.RolePlayer = New NORMA.Model.Fact.FactRole.FactRoleRolePlayer()
+
+                    If lrJoinedORMObject IsNot Nothing Then
+                        lrNORMARole.RolePlayer.Ref = lrJoinedORMObject.Id
+
+                        Select Case lrJoinedORMObject.GetType()
+                            Case GetType(NORMA.Model.EntityType)
+                                If IsNothing(lrJoinedORMObject.PlayedRoles) Then
+                                    lrJoinedORMObject.PlayedRoles = New NORMA.Model.EntityType.EntityTypePlayedRoles()
+                                    lrJoinedORMObject.PlayedRoles.Items = New Object() {}
+                                End If
+                                CType(lrJoinedORMObject.PlayedRoles, NORMA.Model.EntityType.EntityTypePlayedRoles).Items.
+                                    Add(New NORMA.Model.EntityType.EntityTypePlayedRoles.PlayedRolesRole() With {.Ref = lrNORMARole.Id})
+                            Case GetType(NORMA.Model.ValueType)
+                                If IsNothing(lrJoinedORMObject.PlayedRoles) Then
+                                    lrJoinedORMObject.PlayedRoles = New List(Of NORMA.Model.ValueType.ValueTypeRole)
+                                End If
+                                CType(lrJoinedORMObject.PlayedRoles, List(Of NORMA.Model.ValueType.ValueTypeRole)).
+                                    Add(New NORMA.Model.ValueType.ValueTypeRole() With {.Ref = lrNORMARole.Id})
+                            Case GetType(NORMA.Model.ObjectifiedType)
+                                If IsNothing(lrJoinedORMObject.PlayedRoles) Then
+                                    lrJoinedORMObject.PlayedRoles = New List(Of NORMA.Model.ObjectifiedType.ObjectifiedTypeRole)
+                                End If
+                                CType(lrJoinedORMObject.PlayedRoles, List(Of NORMA.Model.ObjectifiedType.ObjectifiedTypeRole)).
+                                    Add(New NORMA.Model.ObjectifiedType.ObjectifiedTypeRole() With {.Ref = lrNORMARole.Id})
+                        End Select
+
+                    End If
+
+                    If IsNothing(arNORMAFactType.FactRoles) Then
+                        arNORMAFactType.FactRoles = New List(Of NORMA.Model.Fact.FactRole)
+                    End If
+                    arNORMAFactType.FactRoles.Add(lrNORMARole)
+
+                    '======================================================================
+                    'Add the MandatoryConstraint for the Role of the FactType if required
+                    '====================================================================
+#Region "Mandatory Role Constraints"
+                    Dim liMandatorySimpleCounter As Integer = 1
+                    Dim liMandatoryImpliedCounter As Integer = 1
+                    Dim lrMandatoryConstraint As New NORMA.Model.MandatoryConstraint()
+
+                    lrMandatoryConstraint.RoleSequence = New List(Of NORMA.Model.MandatoryConstraint.ConstraintRole)
+                    lrMandatoryConstraint.RoleSequence.Add(New NORMA.Model.MandatoryConstraint.ConstraintRole() With {.Ref = "_" & lrFBMRole.Id})
+
+                    If lrFBMRole.Mandatory Then
+                        lrMandatoryConstraint.Name = $"SimpleMandatoryConstraint{liMandatorySimpleCounter}"
+                        lrMandatoryConstraint.IsSimple = True
+
+                        If IsNothing(arNORMAFactType.InternalConstraints) Then
+                            arNORMAFactType.InternalConstraints = New NORMA.Model.Fact.FactInternalConstraints()
+                            arNORMAFactType.InternalConstraints.Items = New List(Of Object)
+                        End If
+
+                        arNORMAFactType.InternalConstraints.Items.Add(New NORMA.Model.Fact.FactInternalConstraints.MandatoryConstraint() With {.Ref = lrMandatoryConstraint.Id})
+
+                        If IsNothing(arNORMADocument.ORMModel.Constraints) Then
+                            arNORMADocument.ORMModel.Constraints = New NORMA.ORMModelConstraints()
+                            arNORMADocument.ORMModel.Constraints.Items = New List(Of Object)
+                        End If
+
+                        arNORMADocument.ORMModel.Constraints.Items.Add(lrMandatoryConstraint)
+                    End If
+
+#End Region 'Mandatory Role Constraints
+
+#Region "Implied Mandatory Constraint"
+                    '20220729-VM-Don't know how to do ImpliedMandatoryConstraints yet.
+                    'lrMandatoryConstraint.Name = $"ImpliedMandatoryConstraint{liMandatoryImpliedCounter}"
+                    'lrMandatoryConstraint.IsImplied = True
+                    'lrMandatoryConstraint.ImpliedByObjectType = New NORMA.Model.MandatoryConstraint.ConstraintImpliedByObjectType()
+                    'lrMandatoryConstraint.ImpliedByObjectType.Ref = lrRoleAndObject.ORMObject.Id
+#End Region
+
+                Next
+
+#Region "Objectification"
+                If arFBMFactType.IsObjectified Then
+
+                    Dim lrNORMAObjectifiedType = New NORMA.Model.ObjectifiedType()
+                    lrNORMAObjectifiedType.Name = arFBMFactType.Name
+
+                    Dim larFBMPreferredIdentifer = From InternalUniquenssConstraint In Me.ORMModel.RoleConstraints
+                                                   Where InternalUniquenssConstraint.RoleConstraintType = "InternalUniquenessConstraint"
+                                                   From RoleConstraintRole In InternalUniquenssConstraint.RoleConstraintRoles
+                                                   From Role In arFBMFactType.RoleGroup
+                                                   Where Role.Id = RoleConstraintRole.RoleId
+                                                   Where InternalUniquenssConstraint.IsPreferredUniqueness
+                                                   Select InternalUniquenssConstraint
+
+                    If larFBMPreferredIdentifer.Count > 0 Then
+                        lrNORMAObjectifiedType.PreferredIdentifier = New NORMA.Model.ObjectifiedType.ObjectifiedTypePreferredIdentifier("_" & larFBMPreferredIdentifer.First.GUID)
+                    End If
+
+                    lrNORMAObjectifiedType.NestedPredicate = New NORMA.Model.ObjectifiedType.ObjectifiedTypeNestedPredicate("_" & arFBMFactType.GUID)
+
+                    Call arNORMADocument.ORMModel.Objects.Items.Add(lrNORMAObjectifiedType)
+
+                End If
+
+#End Region
+
+                '================================================
+                'Map the Readings For Fact
+                '================================================
+#Region "Fact Type Readings"
+                For Each lrFBMReadings In arFBMFactType.FactTypeReadings
+
+                    Dim lrReadingOrder As New NORMA.Model.Fact.FactReadingOrder()
+                    lrReadingOrder.Readings = New NORMA.Model.Fact.FactReadingOrder.Reading() {}
+
+                    ' START: get and add role sequence
+                    lrReadingOrder.RoleSequence = New NORMA.Model.Fact.FactReadingOrder.Role() {}
+                    For Each lrFBMSequence In From lrFBMRoleSequence In lrFBMReadings.PredicateParts
+                                              From lrFBMRole In arFBMFactType.RoleGroup
+                                              Where lrFBMRole.Id = lrFBMRoleSequence.Role_Id
+                                              Order By lrFBMRoleSequence.SequenceNr
+                                              Select lrFBMRole
+                        lrReadingOrder.RoleSequence.Add(New NORMA.Model.Fact.FactReadingOrder.Role() With {.Ref = "_" & lrFBMSequence.Id})
+                    Next
+                    ' END: get and add role sequence
+
+                    Dim lrReading As New NORMA.Model.Fact.FactReadingOrder.Reading()
+                    lrReading.ExpandedData = New NORMA.Model.Fact.FactReadingOrder.ExpandedData()
+                    lrReadingOrder.Readings.Add(lrReading)
+
+                    Dim lsPredicate As String = lrFBMReadings.FrontReadingText
+
+                    ' START: generate reading for PredicateParts
+                    Dim liInd As Integer = 1
+                    For Each lrFBMPredicatePart In lrFBMReadings.PredicateParts
+
+                        Dim lsFollowingTextExtension As String = ""
+                        If liInd < lrFBMReadings.PredicateParts.Count Then
+                            lsFollowingTextExtension = lrFBMReadings.PredicateParts(liInd).PreboundReadingText
+                        Else
+                            lsFollowingTextExtension = lrFBMReadings.FollowingReadingText
+                        End If
+
+                        Dim lrRoleText As New NORMA.Model.Fact.FactReadingOrder.RoleText
+                        lrRoleText.RoleIndex = 0
+                        lrRoleText.FollowingText = Trim(lrFBMPredicatePart.PredicatePartText & " " & lsFollowingTextExtension)
+
+                        lrReading.ExpandedData.RoleText = lrRoleText
+
+                        '20220730-VM-Fix this.
+                        lsPredicate &= "{" & liInd - 1 & "}" & lrRoleText.FollowingText
+
+                        liInd += 1
+                    Next
+                    lrReading.Data = lsPredicate
+                    ' END: generate reading for PredicateParts
+
+                    If IsNothing(arNORMAFactType.ReadingOrders) Then
+                        arNORMAFactType.ReadingOrders = New List(Of NORMA.Model.Fact.FactReadingOrder)
+                    End If
+                    arNORMAFactType.ReadingOrders.Add(lrReadingOrder)
+                Next
+#End Region 'Fact Type Readings
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
+        Private Function ValueTypeIsReferenceModeValueType(ByVal asXMLValueTypeId As String) As Boolean
+
+            Try
+                Dim larValueType = From EntityType In Me.ORMModel.EntityTypes
+                                   Where EntityType.ReferenceModeValueTypeId IsNot Nothing
+                                   Where EntityType.ReferenceModeValueTypeId = asXMLValueTypeId
+                                   Select EntityType.ReferenceModeValueTypeId
+
+                Return larValueType.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
 
     End Class
 

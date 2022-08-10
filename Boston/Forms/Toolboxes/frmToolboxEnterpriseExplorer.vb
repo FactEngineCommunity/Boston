@@ -6,6 +6,7 @@ Imports Boston.publicFunctions
 Imports System.Reflection
 Imports System.Runtime
 Imports Gios.Word
+Imports System.Xml.Schema
 
 Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 Imports <xmlns:orm="http://schemas.neumont.edu/ORM/2006-04/ORMCore">
@@ -5067,4 +5068,75 @@ Public Class frmToolboxEnterpriseExplorer
 
 
     End Sub
+
+    Private Sub ToNORMAormFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToNORMAormFileToolStripMenuItem.Click
+
+        Try
+            Dim lrModel As FBM.Model
+            Dim lrFBMModel As New XMLModel.Model
+            Dim lrNORMADocument As NORMA.ORMDocument
+
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
+            With New WaitCursor
+
+                lrFBMModel.ORMModel.ModelId = lrModel.ModelId
+                lrFBMModel.ORMModel.Name = lrModel.Name
+
+                Boston.WriteToStatusBar("Converting the Model to the .fbm Fact-Based Model format")
+                Call lrFBMModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements)
+
+                lrModel = Me.TreeView.SelectedNode.Tag.Tag
+                If Not lrModel.Loaded Then
+                    Call Me.DoModelLoading(lrModel)
+                    Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+                End If
+
+                Boston.WriteToStatusBar("Converting the Model to the .orm NORMA format")
+                lrNORMADocument = lrFBMModel.MapToNORMAORMModel(New NORMA.ORMDocument, Nothing)
+
+                Dim lrSaveFileDialog As New SaveFileDialog()
+
+                Dim lsFileLocationName = Path.GetFileNameWithoutExtension(Me.DialogOpenFile.FileName) 'Me.mrNORMADocument.ORMModel.Name & ".orm"
+
+                lrSaveFileDialog.Filter = "NORMA ORM file (*.orm)|*.orm"
+                lrSaveFileDialog.FilterIndex = 0
+                lrSaveFileDialog.InitialDirectory = Path.GetFullPath("..\..\..\TestOutputNORMAModels-OverwiteFilesHerein")
+                lrSaveFileDialog.FileName = lsFileLocationName
+
+                If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
+                    lsFileLocationName = lrSaveFileDialog.FileName
+                Else
+                    Exit Sub
+                End If
+
+                Try
+                    Call lrNORMADocument.SerializeObject(lrNORMADocument, lsFileLocationName)
+
+                Catch ex As XmlSchemaException
+                    MessageBox.Show(ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Catch ex As Exception
+                    Debugger.Break()
+                End Try
+
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

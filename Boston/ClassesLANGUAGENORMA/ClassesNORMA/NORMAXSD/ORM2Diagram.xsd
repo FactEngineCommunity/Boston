@@ -1,0 +1,434 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema
+	targetNamespace="http://schemas.neumont.edu/ORM/2006-04/ORMDiagram"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	xmlns:orm="http://schemas.neumont.edu/ORM/2006-04/ORMCore" 
+	xmlns="http://schemas.neumont.edu/ORM/2006-04/ORMDiagram"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:annotation>
+		<xs:appinfo source="zlib/libpng License Copyright Notice">
+			Copyright © Neumont University. All rights reserved.
+
+			This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+			Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+			1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+			2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+			3. This notice may not be removed or altered from any source distribution.
+		</xs:appinfo>
+	</xs:annotation>
+
+	<xs:import namespace="http://schemas.neumont.edu/ORM/2006-04/ORMCore"/>
+	<xs:element name="ORMDiagram" type="ORMDiagramType"/>
+	<xs:complexType name="ShapeExtensionsType">
+		<xs:annotation>
+			<xs:documentation>Standard container for extension data related to the containing shape or diagram.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:any namespace="##other" processContents="strict"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ORMDiagramType">
+		<xs:sequence>
+			<xs:element name="Shapes" minOccurs="0">
+				<xs:complexType>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="ObjectTypeShape" type="ObjectTypeShapeType"/>
+						<xs:element name="FactTypeShape" type="FactTypeShapeType"/>
+						<xs:element name="ExternalConstraintShape" type="ExternalConstraintShapeType"/>
+						<xs:element name="FrequencyConstraintShape" type="FrequencyConstraintShapeType"/>
+						<xs:element name="RingConstraintShape" type="RingConstraintShapeType"/>
+						<xs:element name="ValueComparisonConstraintShape" type="ValueComparisonConstraintShapeType"/>
+						<xs:element name="ModelNoteShape" type="ModelNoteShapeType"/>
+						<xs:element ref="DiagramExtensionShape"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="Subject"/>
+			<xs:sequence>
+				<xs:element name="Extensions" type="ShapeExtensionsType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:ID" use="required"/>
+		<xs:attribute name="IsCompleteView" type="xs:boolean" use="required"/>
+		<xs:attribute name="Name" type="xs:string" use="required"/>
+		<xs:attribute name="BaseFontName" type="xs:string" use="required"/>
+		<xs:attribute name="BaseFontSize" type="xs:decimal" use="required"/>
+		<xs:attribute name="DisplayRoleNames" type="CustomDisplayRoleNamesType" default="Default"/>
+		<xs:attribute name="DisplayReverseReadings" type="CustomDisplayReverseReadingsType" default="Default"/>
+		<xs:attribute name="DisplayReadingDirection" type="CustomDisplayReadingDirectionType" default="Default"/>
+		<xs:attribute name="AutoPopulateShapes" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>If this is set to true, then all shapes in the model will be loaded onto this diagram when the diagram is first loaded. AutoPopulateShapes is never written, but is useful for importing models with no diagram information.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="ShapeType" abstract="true">
+		<xs:sequence>
+			<xs:element name="Extensions" type="ShapeExtensionsType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:ID" use="required"/>
+		<xs:attribute name="IsExpanded" type="xs:boolean"/>
+		<xs:attribute name="AbsoluteBounds" type="xs:string"/>
+	</xs:complexType>
+	<xs:element name="DiagramExtensionShape" type="ShapeType" abstract="true"/>
+	<xs:element name="ObjectTypeRelativeExtensionShape" type="ShapeType" abstract="true"/>
+	<xs:element name="FactTypeRelativeExtensionShape" type="ShapeType" abstract="true"/>
+	<xs:complexType name="ObjectTypeShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element name="RelativeShapes" minOccurs="0">
+						<xs:complexType>
+							<xs:choice minOccurs="0" maxOccurs="unbounded">
+								<xs:element name="ValueConstraintShape" type="ValueConstraintShapeType"/>
+								<xs:element name="CardinalityConstraintShape" type="CardinalityConstraintShapeType"/>
+								<xs:element ref="ObjectTypeRelativeExtensionShape"/>
+							</xs:choice>
+						</xs:complexType>
+					</xs:element>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+				<xs:attribute name="ExpandRefMode" type="xs:boolean" default="false"/>
+				<xs:attribute name="DisplayRelatedTypes" type="DisplayRelatedTypesType" default="AttachAllTypes"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FactTypeShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element name="RelativeShapes" minOccurs="0">
+						<xs:complexType>
+							<xs:choice minOccurs="0" maxOccurs="unbounded">
+								<xs:element name="ObjectifiedFactTypeNameShape" type="ObjectTypeShapeType"/>
+								<xs:element name="ReadingShape" type="ReadingShapeType"/>
+								<xs:element name="ValueConstraintShape" type="ValueConstraintShapeType"/>
+								<xs:element name="RoleNameShape" type="RoleNameShapeType"/>
+								<xs:element name="CardinalityConstraintShape" type="CardinalityConstraintShapeType"/>
+								<xs:element ref="FactTypeRelativeExtensionShape"/>
+							</xs:choice>
+						</xs:complexType>
+					</xs:element>
+					<xs:element ref="Subject"/>
+					<xs:element name="RoleDisplayOrder" minOccurs="0">
+						<xs:complexType>
+							<xs:choice minOccurs="0" maxOccurs="unbounded">
+								<xs:element name="Role">
+									<xs:complexType>
+										<xs:attribute name="ref" type="xs:IDREF"/>
+									</xs:complexType>
+								</xs:element>
+							</xs:choice>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="DisplayRoleNames" type="CustomDisplayRoleNamesType" default="Default"/>
+				<xs:attribute name="DisplayReverseReading" type="CustomDisplayReverseReadingsType" default="Default"/>
+				<xs:attribute name="DisplayReadingDirection" type="CustomDisplayReadingDirectionType" default="Default"/>
+				<xs:attribute name="ConstraintDisplayPosition" default="Top">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="Top"/>
+							<xs:enumeration value="Bottom"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="DisplayOrientation" default="Horizontal">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="Horizontal"/>
+							<xs:enumeration value="VerticalRotatedRight"/>
+							<xs:enumeration value="VerticalRotatedLeft"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="DisplayRelatedTypes" type="DisplayRelatedTypesType" default="AttachAllTypes"/>
+				<xs:attribute name="ExpandRefMode" type="xs:boolean" default="false"/>
+				<xs:attribute name="DisplayAsObjectType" type="xs:boolean" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="CustomDisplayRoleNamesType">
+		<xs:annotation>
+			<xs:documentation>Determine if role names are shown on the current ORMDiagram or FactTypeShape.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Default">
+				<xs:annotation>
+					<xs:documentation>Use the context setting, either the global state for a diagram or the diagram for a shape.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Off">
+				<xs:annotation>
+					<xs:documentation>Role name display is turned off.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="On">
+				<xs:annotation>
+					<xs:documentation>Role name display is turned on.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CustomDisplayReverseReadingsType">
+		<xs:annotation>
+			<xs:documentation>For binary fact types, determine if reverse readings are shown on the current ORMDiagram or FactTypeShape.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Default">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>Use the context setting, either the global state for a diagram or the diagram for a shape.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ShowReverseReading">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>The reverse reading (if available) is shown with the forward reading for a binary fact type.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OnlyOneReading">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>Only one reading is shown for a binary fact type.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CustomDisplayReadingDirectionType">
+		<xs:annotation>
+			<xs:documentation>Determines when a direction indicator is drawn for reading shapes on the current ORMDiagram or FactTypeShape.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Default">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>Use the context setting, either the global state for a diagram or the diagram for a shape.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Reversed">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>Display indicator for reverse readings only.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Rotated">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>Display indicator if the fact type is rotated, even if the reading order is top-down.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Always">
+				<xs:annotation>
+					<xs:documentation>
+						<xs:documentation>Always display a reading direction indicator.</xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DisplayRelatedTypesType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="AttachAllTypes">
+				<xs:annotation>
+					<xs:documentation>The shape attaches to both its supertypes and its subtypes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AttachSubtypes">
+				<xs:annotation>
+					<xs:documentation>The shape attaches to its subtypes, but not its supertypes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AttachSupertypes">
+				<xs:annotation>
+					<xs:documentation>The shape attaches to its supertypes, but not its subtypes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AttachNoTypes">
+				<xs:annotation>
+					<xs:documentation>The shape attaches to neither its subtypes nor its supertypes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ReadingShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ValueConstraintShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+				<xs:attribute name="MaximumDisplayedValues" use="optional">
+					<xs:annotation>
+						<xs:documentation>The maximum total number of values and ranges to be displayed with this shape.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:short">
+							<xs:minExclusive value="0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="MaximumDisplayedColumns" use="optional">
+					<xs:annotation>
+						<xs:documentation>The maximum number of columns to be used to display the values and ranges in this shape.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:short">
+							<xs:minExclusive value="0"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="RoleNameShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ExternalConstraintShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FrequencyConstraintShapeType">
+		<xs:complexContent>
+			<xs:extension base="ExternalConstraintShapeType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="RingConstraintShapeType">
+		<xs:complexContent>
+			<xs:extension base="ExternalConstraintShapeType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ValueComparisonConstraintShapeType">
+		<xs:complexContent>
+			<xs:extension base="ExternalConstraintShapeType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CardinalityConstraintShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ModelNoteShapeType">
+		<xs:complexContent>
+			<xs:extension base="ShapeType">
+				<xs:sequence>
+					<xs:element ref="Subject"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Subject" type="SubjectRef"/>
+	<xs:complexType name="SubjectRef">
+		<xs:attribute name="ref" type="xs:IDREF"/>
+	</xs:complexType>
+	<xs:element name="ORMDiagramDynamicColor" substitutionGroup="orm:DynamicColor"/>
+	<xs:element name="ORMDiagramDisplayOptions" type="DisplayOptionsType" substitutionGroup="orm:DisplaySetting"/>
+	<xs:complexType name="DisplayOptionsType">
+		<xs:complexContent>
+			<xs:extension base="orm:DisplaySettingType">
+				<xs:attribute name="DisplayRoleNames" default="On">
+					<xs:annotation>
+						<xs:documentation>Should role names be shown by default on ORM diagrams?</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="Off">
+								<xs:annotation>
+									<xs:documentation>Role name display is turned off.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value="On">
+								<xs:annotation>
+									<xs:documentation>Role name display is turned on.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="DisplayReverseReadings" default="ShowReverseReading">
+					<xs:annotation>
+						<xs:documentation>Should reverse readings be shown by default on ORM diagrams?</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="ShowReverseReading">
+								<xs:annotation>
+									<xs:documentation>
+										<xs:documentation>The reverse reading (if available) is shown with the forward reading for a binary fact type.</xs:documentation>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value="OnlyOneReading">
+								<xs:annotation>
+									<xs:documentation>
+										<xs:documentation>Only one reading is shown for a binary fact type.</xs:documentation>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="DisplayReadingDirection" default="Reversed">
+					<xs:annotation>
+						<xs:documentation>When should reading direction be shown with a graphical indicator on an ORM diagram?</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="Reversed">
+								<xs:annotation>
+									<xs:documentation>
+										<xs:documentation>Display indicator for reverse readings only.</xs:documentation>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value="Rotated">
+								<xs:annotation>
+									<xs:documentation>
+										<xs:documentation>Display indicator if the fact type is rotated, even if the reading order is top-down.</xs:documentation>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value="Always">
+								<xs:annotation>
+									<xs:documentation>
+										<xs:documentation>Always display a reading direction indicator.</xs:documentation>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>
