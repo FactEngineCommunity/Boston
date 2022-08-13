@@ -95,6 +95,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxFactEngineUseTransformations = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -489,6 +490,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineUseTransformations)
         Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineShowStackTrace)
         Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineUserDateTimeFormat)
         Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineUserDateFormat)
@@ -859,6 +861,16 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
+        'CheckBoxFactEngineUseTransformations
+        '
+        Me.CheckBoxFactEngineUseTransformations.AutoSize = True
+        Me.CheckBoxFactEngineUseTransformations.Location = New System.Drawing.Point(19, 204)
+        Me.CheckBoxFactEngineUseTransformations.Name = "CheckBoxFactEngineUseTransformations"
+        Me.CheckBoxFactEngineUseTransformations.Size = New System.Drawing.Size(123, 17)
+        Me.CheckBoxFactEngineUseTransformations.TabIndex = 9
+        Me.CheckBoxFactEngineUseTransformations.Text = "Use Transformations"
+        Me.CheckBoxFactEngineUseTransformations.UseVisualStyleBackColor = True
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -986,4 +998,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents GroupBoxImportExport As GroupBox
     Friend WithEvents CheckBoxExportSuppressMDAModelElements As CheckBox
     Friend WithEvents CheckBoxUseFlashCardErrorMessages As CheckBox
+    Friend WithEvents CheckBoxFactEngineUseTransformations As CheckBox
 End Class

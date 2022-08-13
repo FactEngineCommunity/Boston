@@ -58,11 +58,24 @@ Namespace Brain
 
         Public Function GetUltimateGoal() As pcenumActionType
 
-            If Me.Step.Count = 0 Then
-                Return Nothing
-            Else
-                Return Me.Step(Me.Step.Count - 1).ActionType
-            End If
+            Try
+
+                If Me.Step.Count = 0 Then
+                    Return Nothing
+                Else
+                    Return Me.Step(Me.Step.Count - 1).ActionType
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return pcenumActionType.None
+            End Try
 
         End Function
 

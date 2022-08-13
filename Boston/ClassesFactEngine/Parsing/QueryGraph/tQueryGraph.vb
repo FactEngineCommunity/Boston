@@ -1920,10 +1920,21 @@ ReturnClause:
                 Dim larRemovedDerivationNode As New List(Of FactEngine.QueryNode)
                 For Each lrDerivationNode In larDerivationNodes
                     'Get the Derivation Column
-                    Dim lrDerivationTable As RDS.Table = lrDerivationNode.QueryEdge.FBMFactType.getCorrespondingRDSTable
-                    Dim larDerivationColumn = From Column In lrDerivationTable.Column
-                                              Where Column.Role.JoinedORMObject.Id = lrDerivationNode.Name
-                                              Select Column
+                    Dim lrDerivationTable As RDS.Table = Nothing
+                    Dim larDerivationColumn As List(Of RDS.Column)
+                    If lrDerivationNode.QueryEdge.FBMFactType.IsUnaryFactType Then
+                        lrDerivationTable = lrDerivationNode.QueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.getCorrespondingRDSTable()
+
+                        larDerivationColumn = (From Column In lrDerivationTable.Column
+                                               Where Column.FactType.Id = lrDerivationNode.QueryEdge.FBMFactType.Id
+                                               Select Column).ToList
+                    Else
+                        lrDerivationTable = lrDerivationNode.QueryEdge.FBMFactType.getCorrespondingRDSTable
+
+                        larDerivationColumn = (From Column In lrDerivationTable.Column
+                                               Where Column.Role.JoinedORMObject.Id = lrDerivationNode.Name
+                                               Select Column).ToList
+                    End If
 
                     If larDerivationColumn.Count > 0 Then
                         If larDerivationColumn.First.IsDerivationParameter Then
@@ -1973,14 +1984,15 @@ ReturnClause:
                 Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing Or (x.IsRecursive And x.IsCircular))
                 Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) (x.FBMFactType.isRDSTable And
                                                                                            Not x.FBMFactType.IsDerived And
+                                                                                           Not x.FBMFactType.IsUnaryFactType And
                                                                                            Not x.IsPartialFactTypeMatch) And
                                                                                            Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) Or
                                                                                            (x.IsRecursive And (
                                                                                            x.IsCircular Or
-                                                                                           x.TargetNode.RDSTable.isCircularToTable(x.BaseNode.RDSTable))))
+                                                                                           x.HasTargetNodeCircularToTable())))
 
                 Dim larRecursiveTableQueryEdge = From QueryEdge In Me.QueryEdges
-                                                 Where QueryEdge.IsRecursive And QueryEdge.TargetNode.RDSTable.isCircularToTable(QueryEdge.BaseNode.RDSTable)
+                                                 Where QueryEdge.IsRecursive And QueryEdge.HasTargetNodeCircularToTable()
                                                  Select QueryEdge
 
                 For Each lrQueryEdge In larRecursiveTableQueryEdge
@@ -2256,7 +2268,7 @@ ReturnClause:
 
                 'PartialFactTypeMatch
                 Dim lrPartialMatchFactType As FBM.FactType = Nothing
-                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) And Not x.FBMFactType.IsDerived)
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) And Not x.FBMFactType.IsDerived And Not x.FBMFactType.IsUnaryFactType)
                     If lrQueryEdge.IsPartialFactTypeMatch Then
 
                         Dim larExistingNode = From Node In larFromNodes
@@ -2286,6 +2298,15 @@ ReturnClause:
                 Dim larWhereEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
                                                                                        x.BaseNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType) Or
                                                                                        x.IsRDSTable Or x.IsDerived)
+
+                Dim larEdgesWithDerivedFactType = (From QueryEdge In Me.QueryEdges
+                                                   Where QueryEdge.FBMFactType.IsDerived
+                                                   Select QueryEdge).ToList
+
+                For Each lrQueryEdge In larEdgesWithDerivedFactType
+                    Call larWhereEdges.AddUnique(lrQueryEdge)
+                Next
+
                 'And
                 'Not (x.IsPartialFactTypeMatch And
                 'x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))
@@ -2311,21 +2332,34 @@ ReturnClause:
                 'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
                 'BooleanPredicate edges. E.g. Protein is enzyme
-                larConditionalQueryEdges.AddRange(Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing And Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
+                Dim larRange = From QueryEdge In Me.QueryEdges
+                               Where QueryEdge.TargetNode Is Nothing
+                '20220813-VM-Was
+                'Me.QueryEdges.FindAll(Function(x) x.TargetNode Is Nothing And Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType)))
+
+                larConditionalQueryEdges.AddRange(larRange.ToList)
 
                 'ShortestPath conditionals are excluded.
                 '  E.g. For '(Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) '
                 '  the second QueryEdge conditional is taken care of in the FROM clause processing for the recursive query.
-                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNodeIsExcludedConditional)
 
                 If Not abIsStraightDerivationClause Then
                     larConditionalQueryEdges.RemoveAll(Function(x) x.FBMFactType.IsDerived)
                 End If
 
                 'Recursive NodePropertyIdentification conditionals are excluded.
-                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNode.IsExcludedConditional)
+                larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNodeIsExcludedConditional)
 
-                larWhereEdges.RemoveAll(Function(x) (Not x.IsRDSTable And x.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType)) And (x.IdentifierList.Count = 0) And (x.TargetNode.IdentifierList.Count = 0))
+                larRange = From QueryEdge In Me.QueryEdges
+                           Where QueryEdge.TargetNode IsNot Nothing
+                           Where QueryEdge.IsRDSTable
+                           Where QueryEdge.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType)
+                           Where QueryEdge.IdentifierList.Count = 0
+                           Where QueryEdge.TargetNode.IdentifierList.Count = 0
+                           Select QueryEdge
+
+                larWhereEdges.RemoveAll(Function(x) larRange.ToList.Contains(x))
 
                 If larWhereEdges.Count = 0 And larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then
                     If NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
@@ -2354,7 +2388,18 @@ ReturnClause:
 
                     Dim lrOriginTable As RDS.Table
 
-                    If lrQueryEdge.IsPartialFactTypeMatch Then 'And lrQueryEdge.TargetNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
+                    If lrQueryEdge.FBMFactType.IsUnaryFactType Then
+                        'Must be derived, because normally would have no join for a Edge that has a FactType that is a UnaryFactType, it would be a conditional.
+                        lrOriginTable = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.getCorrespondingRDSTable
+
+                        Dim liInd2 = 0
+                        For Each lrColumn In lrOriginTable.getPrimaryKeyColumns
+                            If liInd2 > 0 Then lsSQLQuery &= "AND "
+                            lsSQLQuery &= lrOriginTable.DatabaseName & "." & lrColumn.Name & " = " & lrQueryEdge.FBMFactType.Id & "." & lrColumn.Name & vbCrLf
+                            liInd2 += 1
+                        Next
+
+                    ElseIf lrQueryEdge.IsPartialFactTypeMatch Then 'And lrQueryEdge.TargetNode.FBMModelObject.GetType IsNot GetType(FBM.ValueType) Then
 #Region "Partial FactType match"
                         Dim liInd2 = 0
                         Dim lrNaryTable As RDS.Table = lrQueryEdge.FBMFactType.getCorrespondingRDSTable
@@ -2580,15 +2625,20 @@ ReturnClause:
                 Next
 
 #End Region
+                Dim lbFirstQueryEdgeIsRecursive As Boolean = False
+                If Me.QueryEdges.Count > 0 Then
+                    lbFirstQueryEdgeIsRecursive = Me.QueryEdges(0).IsRecursive
+                End If
+
                 If (Not lbAddedAND And lbIntialWhere Is Nothing And
                     (larConditionalQueryEdges.Count > 0 And larWhereEdges.Count > 0)) Or
-                    (Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive And larWhereEdges.Count > 0) Then
+                    (Me.HeadNode.HasIdentifier And Not lbFirstQueryEdgeIsRecursive And larWhereEdges.Count > 0) Then
                     lsSQLQuery &= "AND " '20211008-VM-Was "AND " and Nothing below.
                     lbIntialWhere = Nothing
                 End If
 
 #Region "WhereConditionals"
-                If Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive Then
+                If Me.HeadNode.HasIdentifier And Not lbFirstQueryEdgeIsRecursive Then
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
@@ -3092,6 +3142,7 @@ MoveForward:
                                                         Select QueryEdge.BaseNode).Union(
                                                         From QueryEdge In Me.QueryEdges
                                                         Where QueryEdge.IsSubQueryLeader Or QueryEdge.IsPartOfSubQuery
+                                                        Where QueryEdge.TargetNode IsNot Nothing
                                                         Select QueryEdge.TargetNode)
 
                                 Dim larSubQueryFBMModelElements = (From Node In larSubQueryNodes
@@ -3115,18 +3166,29 @@ MoveForward:
                                     End If
                                 Next
                             Else
-                                For Each lrRole In CType(arDerivedModelElement, FBM.FactType).RoleGroup
+                                Dim lrDerivedFactType As FBM.FactType = CType(arDerivedModelElement, FBM.FactType)
+                                For Each lrRole In lrDerivedFactType.RoleGroup
                                     Select Case lrRole.JoinedORMObject.GetType
                                         Case Is = GetType(FBM.ValueType)
                                             Dim lrVTColumn As New RDS.Column(arDerivedModelElement.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
                                             lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
                                             larColumn.Add(lrVTColumn)
                                         Case Else
-                                            For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
-                                                lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
-                                                lrProjectionColumn.AsName = arDerivedModelElement.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                                larColumn.Add(lrProjectionColumn)
-                                            Next
+                                            If arDerivedModelElement.isUnaryFactType Then
+                                                For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                                    lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
+                                                    lrProjectionColumn.AsName = lrRole.JoinedORMObject.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                                    larColumn.Add(lrProjectionColumn)
+                                                Next
+                                            Else
+                                                For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                                    lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
+                                                    lrProjectionColumn.AsName = arDerivedModelElement.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                                    larColumn.Add(lrProjectionColumn)
+                                                Next
+                                            End If
+
+
                                     End Select
                                 Next
                             End If

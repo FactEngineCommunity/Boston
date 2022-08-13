@@ -80,6 +80,12 @@ Partial Public Class tBrain
                                 Case Is = pcenumQuestionType.CreateValueType
                                     Call Me.ProcessStatementAddValueType(Me.CurrentQuestion)
 
+                                Case Is = pcenumQuestionType.CreateDerivedUnaryFactType
+                                    If Me.executeStatementAddFactType(Me.CurrentQuestion) Then
+                                        Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)
+                                        Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)
+                                    End If
+
                                 Case Is = pcenumQuestionType.CreateFactType
                                     If Me.executeStatementAddFactType(Me.CurrentQuestion) Then
                                         Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)

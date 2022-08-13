@@ -393,25 +393,31 @@ Namespace FactEngine
 
 
                 lsSQLColumnDefinition = arColumn.Name
-                lsSQLColumnDefinition &= " " & arColumn.ActiveRole.JoinsValueType.DBDataType
-                If arColumn.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
-                    If arColumn.DataTypeIsText Then
-                        lsSQLColumnDefinition &= "(" & arColumn.ActiveRole.JoinsValueType.DataTypeLength.ToString
-                        If arColumn.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
-                            lsSQLColumnDefinition &= arColumn.ActiveRole.JoinsValueType.DataTypePrecision.ToString
-                        End If
-                        lsSQLColumnDefinition &= ")"
-                    End If
-                End If
 
-                Dim larOutgoingRelation = arColumn.Relation.FindAll(Function(x) x.OriginTable Is lrColumn.Table)
-                If larOutgoingRelation.Count > 0 Then
-                    If larOutgoingRelation(0).OriginColumns.Count = 1 Then
-                        lsSQLColumnDefinition &= " REFERENCES [" & larOutgoingRelation(0).DestinationTable.Name & "]"
+                If arColumn.ActiveRole.FactType.RoleGroup.Count = 1 Then
+                    lsSQLColumnDefinition &= " INTEGER"
+                Else
+                    lsSQLColumnDefinition &= " " & arColumn.ActiveRole.JoinsValueType.DBDataType
+                    If arColumn.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                        If arColumn.DataTypeIsText Then
+                            lsSQLColumnDefinition &= "(" & arColumn.ActiveRole.JoinsValueType.DataTypeLength.ToString
+                            If arColumn.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                                lsSQLColumnDefinition &= arColumn.ActiveRole.JoinsValueType.DataTypePrecision.ToString
+                            End If
+                            lsSQLColumnDefinition &= ")"
+                        End If
                     End If
-                    If arColumn.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
-                ElseIf arColumn.Role.Mandatory Then
-                    lsSQLColumnDefinition &= " NOT NULL"
+
+                    Dim larOutgoingRelation = arColumn.Relation.FindAll(Function(x) x.OriginTable Is lrColumn.Table)
+                    If larOutgoingRelation.Count > 0 Then
+                        If larOutgoingRelation(0).OriginColumns.Count = 1 Then
+                            lsSQLColumnDefinition &= " REFERENCES [" & larOutgoingRelation(0).DestinationTable.Name & "]"
+                        End If
+                        If arColumn.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
+                    ElseIf arColumn.Role.Mandatory Then
+                        lsSQLColumnDefinition &= " NOT NULL"
+                    End If
+
                 End If
 
                 Return lsSQLColumnDefinition
@@ -439,7 +445,7 @@ Namespace FactEngine
                                                                   Optional asTableName As String = Nothing) As String
 
             Try
-                Dim lsSQLCommand As String
+                Dim lsSQLCommand As String = ""
 
                 If asTableName Is Nothing Then
                     lsSQLCommand = "CREATE TABLE [" & arTable.Name & "]"

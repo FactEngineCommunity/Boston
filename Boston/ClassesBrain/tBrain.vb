@@ -90,6 +90,7 @@ Public Class tBrain
     Private FTRParseTree As New FTR.ParseTree
 
     Private AskQuestions As Boolean = True 'TRUE if the Brain is allowed to ask questions, else FALSE (used to regulate question asking)
+    Private AskIntelligentQuestions = False 'True if the Brain can ask intelligent questions.
     Public PressForAnswer As Boolean = False
     Public ConfirmActions As Boolean = False
 
@@ -1026,8 +1027,9 @@ SkipOutputChannel:
                 Case Is = "slow it down", "slow down", "slower"
                     Me.Timeout.Interval = CInt(Me.Timeout.Interval * (3 / 2))
                 Case Is = "ask intelligent questions"
-                    'Call Me.formulate_intelligentQuestions()
-                    Me.send_data("This is turned off at the moment.")
+                    Me.AskIntelligentQuestions = True
+                    Call Me.formulate_intelligentQuestions()
+                    'Me.send_data("This is turned off at the moment.")
                     'Throw New NotImplementedException("This functionality is not yet implemented in Boston")
             End Select
 
@@ -1926,11 +1928,13 @@ SkipOutputChannel:
 
     End Sub
 
-    Private Sub formulate_question()
+    ''' <summary>
+    ''' The Brain formulates its own questions about the model that it is currently working on.
+    ''' </summary>
+    Private Sub formulate_Intelligentquestions()
+
+#Region "Types of Questions"
         '--------------------------------------------------------------------------------------
-        'The Brain formulates its own questions about the model that
-        '  it is currently working on.
-        '
         'Types of questions sought by the Brain are:
         '  1. Are all the relations between EntityTypes, ValueTypes and FactTypes identified.
         '     i.e. Seeking new relations.
@@ -1964,6 +1968,116 @@ SkipOutputChannel:
         '     i.e. Seeking specialisation
         '  4. Are there any Value constraints
         '--------------------------------------------------------------------------------------
+#End Region
+
+        Dim larUnaryFactType = From FactType In Me.Model.FactType
+                               Where Not FactType.IsMDAModelElement
+                               Where FactType.Arity = 1
+                               Select FactType
+
+        For Each lrUnaryFactType In larUnaryFactType
+            Call Me.CreateUnaryFactTypeIntelligentQuestion(lrUnaryFactType)
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' UnaryFactType - Derived
+    ''' E.g. If Paper is famous AND Person wrote Paper, asks if Person is famous
+    ''' </summary>
+    ''' <param name="arFactType"></param>
+    Public Sub CreateUnaryFactTypeIntelligentQuestion(ByRef arFactType As FBM.FactType)
+
+        Try
+            Dim liEntityTypeInd As Integer = Boston.RandomInteger(0, Me.Model.EntityType.FindAll(Function(x) Not x.IsMDAModelElement).Count - 1)
+
+            Dim lrEntityType As FBM.EntityType = Me.Model.EntityType.FindAll(Function(x) Not x.IsMDAModelElement)(liEntityTypeInd)
+
+            Dim larRole = From Role In Me.Model.Role
+                          Where Not Role.FactType.IsMDAModelElement
+                          Where Not Role.FactType.IsLinkFactType
+                          Where Role.JoinedORMObject IsNot Nothing
+                          Where Role.JoinedORMObject.Id = lrEntityType.Id
+
+            For Each lrRole In larRole
+
+                If Not lrRole.FactType.Id = arFactType.Id Then
+
+                    Dim larJoinPathRole As New List(Of FBM.Role) From {lrRole, arFactType.RoleGroup(0)}
+                    Dim liJoinPathError As New pcenumJoinPathError
+                    Dim lrRoleConstraint As New FBM.RoleConstraint(Me.Model, pcenumRoleConstraintType.ExternalUniquenessConstraint, larJoinPathRole, False, 0, False, True)
+                    If Me.Model.ExistsJoinPathForRoles(larJoinPathRole, liJoinPathError, lrRoleConstraint) Then
+                        Dim lbSuccessful As Boolean = False
+                        Dim larPathCovered As New List(Of FBM.Role)
+                        Dim larUniqueRolesCovered As New List(Of FBM.Role)
+                        Dim lrJoinPath As FBM.JoinPath = Me.Model.GetJoinPathBetweenRoles(lrRole, arFactType.RoleGroup(0), lbSuccessful, liJoinPathError, larPathCovered, lrRoleConstraint, larUniqueRolesCovered)
+
+                        Call lrJoinPath.ConstructFactTypePath()
+
+                        '==================================================
+                        'Formulate the Question
+                        Dim lsQuestion As String = ""
+
+                        lsQuestion = "If a " & arFactType.RoleGroup(0).JoinedORMObject.Id & " " & arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText & ", and a "
+
+                        lsQuestion &= lrJoinPath.GetReading
+                        lsQuestion &= " is it true that " & lrJoinPath.RolePath(0).JoinedORMObject.Id & " " & arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText
+
+                        Dim lrPlan As New Brain.Plan
+                        Dim lrFirstStep As Brain.Step
+
+                        lrFirstStep = New Brain.Step(pcenumActionType.CreateDerivedUnaryFactType, True, pcenumActionType.None, New List(Of FBM.ModelObject) From {lrEntityType}, pcenumStepFactTypeAttributes.UnaryFactType)
+                        lrPlan.AddStep(lrFirstStep)
+
+                        Dim lsSentence As String = lrEntityType.Id & " " & arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText
+                        Dim lrSentence As New Language.Sentence(lsSentence, lsSentence)
+                        lrSentence.addResolvedNounsByFBMModelObjectList(New List(Of FBM.ModelObject) From {lrEntityType})
+                        lrSentence.AddSentenceType(pcenumSentenceType.Statement)
+                        lrSentence.AllWordsIdentified.Add(lrEntityType.Id)
+                        lrSentence.ModelElement.Add(lrEntityType.Id)
+                        lrSentence.POStaggingResolved = True
+                        lrSentence.PredicatePart.Add(New Language.PredicatePart(arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText))
+
+                        Dim lrQuestion As New tQuestion(lsQuestion & "?",
+                                                        pcenumQuestionType.CreateDerivedUnaryFactType,
+                                                        pcenumExpectedResponseType.YesNo,
+                                                        New List(Of String) From {arFactType.RoleGroup(0).JoinedORMObject.Id},
+                                                        lrSentence,
+                                                        lrEntityType,
+                                                        lrPlan,
+                                                        lrFirstStep
+                                                        )
+
+
+
+                        '============================================================
+                        'Create the DerivationText
+                        Dim lsDerivationText As String = ""
+
+                        lsDerivationText = lrSentence.OriginalSentence & " IS WHERE " & lrJoinPath.GetReading
+                        lsDerivationText = lsDerivationText.Replace("that", "THAT")
+                        lsDerivationText = lsDerivationText.Replace("some", "A")
+                        lsDerivationText.ReplaceFirst("THAT", "")
+
+                        lrQuestion.DerivationText = lsDerivationText
+
+                        Me.AddQuestion(lrQuestion)
+
+                    End If
+
+
+
+                End If
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

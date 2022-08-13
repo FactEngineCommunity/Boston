@@ -81,6 +81,7 @@
         CheckWordTypeNoun
         CheckWordTypeAdjective
         CreateConcept
+        CreateDerivedUnaryFactType
         CreateEntityType
         CreateFactType
         CreateFactTypePredetermined
@@ -93,6 +94,7 @@
     End Enum
 
     Enum pcenumActionType
+        CreateDerivedUnaryFactType
         CreateValueType
         CreateEntityType
         CreateFactType
@@ -117,6 +119,7 @@
         ManyToMany
         ManyToOne
         MandatoryFirstRole
+        UnaryFactType
     End Enum
 
     Public Enum pcenumQuestionResolution

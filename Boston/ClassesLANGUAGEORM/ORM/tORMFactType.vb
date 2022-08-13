@@ -3311,7 +3311,18 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Function isRDSTable() As Boolean
 
-            Return (Me.HasTotalRoleConstraint Or Me.HasPartialButMultiRoleConstraint Or Me.IsObjectified) And Not Me.IsMDAModelElement
+            Try
+                Return (Me.HasTotalRoleConstraint Or Me.HasPartialButMultiRoleConstraint Or Me.IsObjectified) And Not Me.IsMDAModelElement
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
 
         End Function
 

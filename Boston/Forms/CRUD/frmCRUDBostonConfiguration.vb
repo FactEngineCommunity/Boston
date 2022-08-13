@@ -87,6 +87,7 @@ Public Class frmCRUDBostonConfiguration
         Me.ComboBoxFactEngineUserDateFormat.Text = My.Settings.FactEngineUserDateFormat
         Me.ComboBoxFactEngineUserDateTimeFormat.Text = My.Settings.FactEngineUserDateTimeFormat
         Me.CheckBoxFactEngineShowStackTrace.Checked = My.Settings.ShowStackTraceFactEngineQuery
+        Me.CheckBoxFactEngineUseTransformations.Checked = My.Settings.FactEngineUseTransformations
 
         'ER Diagrams
         Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
@@ -168,6 +169,7 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
                 My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
                 My.Settings.ShowStackTraceFactEngineQuery = Me.CheckBoxFactEngineShowStackTrace.Checked
+                My.Settings.FactEngineUseTransformations = Me.CheckBoxFactEngineUseTransformations.Checked
 
                 My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
 

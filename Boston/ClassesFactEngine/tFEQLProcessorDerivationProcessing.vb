@@ -151,6 +151,7 @@ Namespace FEQL
                 Dim larParameterNode = (From QueryEdge In aarParameterArray
                                         Select QueryEdge.BaseNode).Union(
                                         From QueryEdge In aarParameterArray
+                                        Where QueryEdge.TargetNode IsNot Nothing
                                         Select QueryEdge.TargetNode)
 
                 For Each lrParameterNode In larParameterNode
@@ -176,14 +177,32 @@ Namespace FEQL
                 Next
                 '==========================================================================
 
+                While lsDerivationFormula.Contains("  ")
+                    lsDerivationFormula = lsDerivationFormula.Replace("  ", " ")
+                End While
+
                 Me.Parsetree = Me.Parser.Parse(lsDerivationFormula)
                 Dim lrQueryGraph As FactEngine.QueryGraph
 
                 lrQueryGraph = Me.getQueryGraph()
+
                 Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
                 Call Me.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.Parsetree.Nodes(0))
+
                 lsSQL &= lrQueryGraph.generateSQL(lrWhichSelectStatement, False, True, arModelElement)
-                lsSQL &= ") AS " & arModelElement.getCorrespondingRDSTable.DatabaseName & vbCrLf
+
+                Dim lsDerivationTableName As String
+                If arModelElement.GetType = GetType(FBM.FactType) Then
+                    Dim lrFactType As FBM.FactType = CType(arModelElement, FBM.FactType)
+                    If lrFactType.IsUnaryFactType Then
+                        lsDerivationTableName = lrFactType.Id & vbCrLf
+                    Else
+                        lsDerivationTableName = arModelElement.getCorrespondingRDSTable.DatabaseName & vbCrLf
+                    End If
+                Else
+                    lsDerivationTableName = arModelElement.getCorrespondingRDSTable.DatabaseName & vbCrLf
+                End If
+                lsSQL &= ") AS " & lsDerivationTableName
 
                 Return lsSQL
 

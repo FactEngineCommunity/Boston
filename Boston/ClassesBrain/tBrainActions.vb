@@ -770,6 +770,11 @@ Partial Public Class tBrain
                 Next
             End If
 
+            If arQuestion.sentence.PredicatePart.Count = 1 Then
+                lsFactTypeName &= Viev.Strings.MakeCapCamelCase(arQuestion.sentence.PredicatePart(0).PredicatePartText)
+                lsFactTypeName = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            End If
+
             '==========================================================================
             'Adding the FactType to the Model is done in the 'DropFactTypeAtPoint' stage, 
             '  which also broadcasts the event if in Client/Server mode. The below just creates the FactType ready for adding to the Model.
@@ -856,6 +861,11 @@ Partial Public Class tBrain
 
             If lrFactType.Arity = 2 Then
                 Call Me.FormulateQuestionCreateInternalUniquenessConstraint(lrFactType, lrFactTypeReading)
+            End If
+
+            If arQuestion.DerivationText IsNot Nothing Then
+                lrFactType.IsDerived = True
+                lrFactType.DerivationText = arQuestion.DerivationText
             End If
 
             If Me.Page Is Nothing Then

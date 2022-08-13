@@ -5123,7 +5123,7 @@ Public Class frmToolboxEnterpriseExplorer
                 Catch ex As XmlSchemaException
                     MessageBox.Show(ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Catch ex As Exception
-                    Debugger.Break()
+                    Throw New Exception(ex.Message)
                 End Try
 
             End With

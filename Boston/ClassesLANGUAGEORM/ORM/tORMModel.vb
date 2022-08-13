@@ -5474,7 +5474,7 @@ Namespace FBM
 
         End Function
 
-        Public Function ExistsModelElement(ByVal asModelElementName As String) As Boolean
+        Public Function ExistsModelElement(ByVal asModelElementName As String, Optional abUseSafeMode As Boolean = False) As Boolean
 
             Try
                 ExistsModelElement = False
@@ -5494,7 +5494,7 @@ Namespace FBM
 
                         ExistsModelElement = True
                     End If
-                Else
+                ElseIf abUseSafeMode Then
                     'CodeSafe
                     Dim larModelElement = From ValueType In Me.ValueType
                                           From EntityType In Me.EntityType

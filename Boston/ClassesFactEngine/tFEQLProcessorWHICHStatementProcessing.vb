@@ -151,11 +151,13 @@
                     End If
                 End If
 
-                If Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
-                    lrQueryGraph.HeadNode.HasIdentifier = True
-                    For Each lsIdentifier In Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
-                        lrQueryGraph.HeadNode.IdentifierList.Add(lsIdentifier)
-                    Next
+                If Me.WHICHSELECTStatement.NODE.Count > 0 Then
+                    If Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                        lrQueryGraph.HeadNode.HasIdentifier = True
+                        For Each lsIdentifier In Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
+                            lrQueryGraph.HeadNode.IdentifierList.Add(lsIdentifier)
+                        Next
+                    End If
                 End If
 
                 lrQueryGraph.Nodes.Add(lrQueryGraph.HeadNode)

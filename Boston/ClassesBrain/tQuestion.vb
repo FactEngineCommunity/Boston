@@ -34,6 +34,11 @@ Public Class tQuestion
     ''' <remarks></remarks>
     Public Plan As Brain.Plan
 
+    ''' <summary>
+    ''' Used when Brain is asking intelligent questions. E.g. When creating a DerivedUnaryFactType, Person is Famous IS WHERE Person wrote Paper AND Paper is famous
+    ''' </summary>
+    Public DerivationText As String = Nothing
+
     Public Resolution As pcenumQuestionResolution = pcenumQuestionResolution.Unanswered
     Public AcceptedResponce As pcenumAcceptedResponce = pcenumAcceptedResponce.Unanswered
 

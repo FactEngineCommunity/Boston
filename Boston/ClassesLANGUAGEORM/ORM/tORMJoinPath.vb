@@ -143,6 +143,82 @@ Namespace FBM
 
         End Sub
 
+        ''' <summary>
+        ''' 20220813-VM-Created for the Brain creating DerivedUnaryFactType intelligent questions.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function GetReading() As String
+
+            Try
+                '--------------------------------------------------------------------------------------------------
+                'Return a Reading that is a combination of the FactTypeReadings of the FactTypes of the JoinPath.
+                '--------------------------------------------------------------------------------------------------
+                Dim lrFactType As FBM.FactType
+                Dim larRole As New List(Of FBM.Role)
+                Dim liInd As Integer = 0
+
+                Dim lrFactTypeReading As FBM.FactTypeReading
+                Dim lrLastVerbalisedRole As FBM.Role = Nothing
+                Dim lsVerbalisation As String = ""
+
+                For Each lrFactType In Me.FactTypePath
+                    larRole = Me.RolePath.FindAll(Function(x) x.FactType.Id = lrFactType.Id)
+
+                    Dim larThatOrSomeRole As New List(Of FBM.Role) From {Me.RolePath(0), Me.RolePath(Me.RolePath.Count - 1)}
+                    Dim larArgumentCommonModelObjects As New List(Of FBM.ModelObject) From {Me.RolePath(0).JoinedORMObject, Me.RolePath(Me.RolePath.Count - 1).JoinedORMObject}
+                    Dim larVerbalisedModelObject As New List(Of FBM.ModelObject)
+
+                    Select Case lrFactType.FactTypeReading.Count
+                        Case Is = 0
+                            lsVerbalisation = "No FactTypeReading exists for Fact Type, '" & Me.FactTypePath(0).Name & "'"
+                            lrLastVerbalisedRole = Nothing
+                        Case Is = 1
+                            lrFactTypeReading = lrFactType.FactTypeReading(0)
+
+                            Call lrFactTypeReading.GetReadingTextThatOrSome(larThatOrSomeRole,
+                                                                            lsVerbalisation,
+                                                                            larArgumentCommonModelObjects,
+                                                                            larVerbalisedModelObject,
+                                                                            liInd > 0,
+                                                                            lrLastVerbalisedRole)
+
+                            lrLastVerbalisedRole = lrFactTypeReading.PredicatePart(lrFactTypeReading.PredicatePart.Count - 1).Role
+                        Case Else
+
+                            lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(Me.RolePath)
+                            If lrFactTypeReading Is Nothing Then
+                                lsVerbalisation = "No suitable FactTypeReading exists for Fact Type, '" & lrFactType.Name & "'"
+                                lrLastVerbalisedRole = Nothing
+                            Else
+                                Call lrFactTypeReading.GetReadingTextThatOrSome(larThatOrSomeRole,
+                                                                                lsVerbalisation,
+                                                                                larArgumentCommonModelObjects,
+                                                                                larVerbalisedModelObject,
+                                                                                liInd > 0,
+                                                                                lrLastVerbalisedRole)
+                                lrLastVerbalisedRole = lrFactTypeReading.PredicatePart(lrFactTypeReading.PredicatePart.Count - 1).Role
+                            End If
+                    End Select
+
+                    lsVerbalisation &= " "
+                    liInd += 1
+                Next
+
+                Return lsVerbalisation
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return ""
+            End Try
+
+        End Function
+
     End Class
 
 End Namespace

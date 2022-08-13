@@ -144,7 +144,7 @@ Namespace FEQL
             Optionals = New ParseErrors()
         End Sub
 
-        Public Overloads Function MaxDistance() As Integer
+        Public Function MaxDistance() As Integer
 
             Dim lrNode As ParseNode = Nothing
             Dim liMaxDistance As Integer = 0
@@ -780,7 +780,7 @@ Namespace FEQL
             Return Value
         End Function
 
-        Public Shadows Function Equals(other As ParseNode) As Boolean Implements IEquatable(Of ParseNode).Equals
+        Public Function Equals(other As ParseNode) As Boolean Implements IEquatable(Of ParseNode).Equals
             Return Me.GUID = other.GUID
         End Function
 

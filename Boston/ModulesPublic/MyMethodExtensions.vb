@@ -239,6 +239,20 @@ Module MyMethodExtensions
     End Function
 
     <Extension()>
+    Public Function ReplaceFirst(ByRef asString As String, ByVal asFirstString As String, ByVal asReplaceString As String)
+
+        Dim pos As Integer = asString.IndexOf(asFirstString)
+
+        If pos < 0 Then
+            Return asString
+        Else
+            asString = asString.Substring(0, pos) + asReplaceString + asString.Substring(pos + asFirstString.Length)
+            Return asString
+        End If
+
+    End Function
+
+    <Extension()>
     Public Function AppendDoubleLineBreak(ByRef asString As String, ByVal asStringExtension As String) As String
 
         asString = asString & vbCrLf & vbCrLf & asStringExtension

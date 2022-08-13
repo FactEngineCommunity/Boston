@@ -189,7 +189,9 @@ Namespace FactEngine
 
                 Dim lrDummyFactType As New FBM.FactType
                 larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(0)))
-                larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+                If arTargetNode IsNot Nothing Then
+                    larRole.Add(New FBM.Role(lrDummyFactType, larModelObject(1)))
+                End If
 
                 aarModelObject = larModelObject
                 aarRole = larRole
@@ -231,7 +233,9 @@ Namespace FactEngine
                 Dim lrBaseNode As FactEngine.QueryNode = Nothing
 
                 lrFactTypeReading = Me.CreateFBMFactTypeReading(arBaseNode, arTargetNode, asPredicate, larModelObject, larRole)
-                lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
+                If arTargetNode IsNot Nothing Then
+                    lrFactTypeReading.PredicatePart(1).PreBoundText = arTargetNode.PreboundText
+                End If
 
                 '========================================================
                 Dim lrReturnFactTypeReading As FBM.FactTypeReading = Nothing
@@ -813,12 +817,12 @@ FinalCleanup:
                                                                                                         lrFactTypeReading.EqualsByRoleJoinedModelObjectSequence(x))
                     End If
                     If Me.FBMPredicatePart Is Nothing And Me.FBMFactTypeReading IsNot Nothing Then
-                        larPredicatePart = From PredicatePart In Me.FBMFactTypeReading.PredicatePart
-                                           Where PredicatePart.PredicatePartText = asPredicate
-                                           Select PredicatePart
+                        Dim larFinalPredicatePart = From PredicatePart In Me.FBMFactTypeReading.PredicatePart
+                                                    Where PredicatePart.PredicatePartText = asPredicate
+                                                    Select PredicatePart
 
-                        If larPredicatePart.Count > 0 Then
-                            Me.FBMPredicatePart = larPredicatePart.First
+                        If larFinalPredicatePart.Count > 0 Then
+                            Me.FBMPredicatePart = larFinalPredicatePart.First
                         End If
                     End If
                 End If
@@ -930,6 +934,44 @@ FinalCleanup:
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
+            End Try
+
+        End Function
+
+        Public Function HasTargetNodeCircularToTable() As Boolean
+
+            Try
+                If Me.TargetNode Is Nothing Then Return False
+
+                Return Me.TargetNode.RDSTable.isCircularToTable(Me.BaseNode.RDSTable)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+        End Function
+
+        Public Function TargetNodeIsExcludedConditional() As Boolean
+
+            Try
+                If Me.TargetNode Is Nothing Then
+                    Return False
+                Else
+                    Return Me.TargetNode.IsExcludedConditional
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

@@ -1275,9 +1275,9 @@ Namespace FBM
         ''' <param name="abDropFirstRole">If TRUE, then the first Role/ObjectType.Name is dropped and replaced by 'that'</param>
         ''' <param name="arLastVerbalisedRole">Used to determine how to structure (next) reading based on previous reading.</param>
         ''' <remarks></remarks>
-        Public Sub GetReadingTextThatOrSome(ByVal aarRole As List(Of FBM.Role), _
-                                            ByRef arVerbaliser As FBM.ORMVerbailser, _
-                                            ByRef aarArgumentCommonModelObjects As List(Of FBM.ModelObject), _
+        Public Sub GetReadingTextThatOrSome(ByVal aarRole As List(Of FBM.Role),
+                                            ByRef arVerbaliser As FBM.ORMVerbailser,
+                                            ByRef aarArgumentCommonModelObjects As List(Of FBM.ModelObject),
                                             ByRef aarVerbalisedModelObjects As List(Of FBM.ModelObject),
                                             Optional ByVal abDropFirstRole As Boolean = False,
                                             Optional ByVal arLastVerbalisedRole As FBM.Role = Nothing,
@@ -1374,8 +1374,8 @@ Namespace FBM
                         arVerbaliser.VerbaliseSubscript(lrPredicatePart.ModelObjectSubscriptNumber)
                     End If
 
-                    If ((liSequenceNr < Me.PredicatePart.Count) Or _
-                       (lrPredicatePart.PredicatePartText <> "")) And _
+                    If ((liSequenceNr < Me.PredicatePart.Count) Or
+                       (lrPredicatePart.PredicatePartText <> "")) And
                        (Not (abDropFirstRole And (liSequenceNr = 1))) Then
                         arVerbaliser.HTW.Write(" ")
                     End If
@@ -1403,6 +1403,145 @@ Namespace FBM
             End Try
 
         End Sub
+
+        ''' <summary>
+        ''' Returns the ReadingText but with either 'that' or 'some' in front of the ObjectType names.
+        ''' </summary>
+        ''' <param name="aarRole">The set of Roles that determines whether 'that' or 'some' precedes the respective ObjectType's name.</param>
+        ''' <param name="asVerbalisation">The verbalised string.</param> 
+        ''' <param name="aarArgumentCommonModelObjects">The actual terms of the argument of the Role Constraint.</param>
+        ''' <param name="abDropFirstRole">If TRUE, then the first Role/ObjectType.Name is dropped and replaced by 'that'</param>
+        ''' <param name="arLastVerbalisedRole">Used to determine how to structure (next) reading based on previous reading.</param>
+        ''' <remarks></remarks>
+        Public Sub GetReadingTextThatOrSome(ByVal aarRole As List(Of FBM.Role),
+                                            ByRef asVerbalisation As String,
+                                            ByRef aarArgumentCommonModelObjects As List(Of FBM.ModelObject),
+                                            ByRef aarVerbalisedModelObjects As List(Of FBM.ModelObject),
+                                            Optional ByVal abDropFirstRole As Boolean = False,
+                                            Optional ByVal arLastVerbalisedRole As FBM.Role = Nothing,
+                                            Optional ByVal abDropInitalThatOrSome As Boolean = False)
+
+            Try
+                '----------------------------------------------------
+                'Create the dotted reading from the PredicateParts
+                '----------------------------------------------------        
+                Dim liSequenceNr As Integer = 0
+                Dim lrPredicatePart As FBM.PredicatePart
+
+                'Subscript Numbers
+                If Me.FactType.HasMoreThanOneRoleReferencingTheSameModelObject() Then
+                    Dim lrModelObjectCountDictionary As New Dictionary(Of String, Integer)
+                    Call Me.FactType.GetReferencedModelObjectCounts(lrModelObjectCountDictionary)
+
+                    For Each lrPredicatePart In Me.PredicatePart.AsEnumerable.Reverse
+                        If lrModelObjectCountDictionary.ContainsKey(lrPredicatePart.Role.JoinedORMObject.Id) Then
+                            lrPredicatePart.ModelObjectSubscriptNumber = lrModelObjectCountDictionary.Item(lrPredicatePart.Role.JoinedORMObject.Id)
+                            lrModelObjectCountDictionary.Item(lrPredicatePart.Role.JoinedORMObject.Id) -= 1
+                        End If
+                    Next
+                End If
+
+                asVerbalisation &= Me.FrontText
+
+                For Each lrPredicatePart In Me.PredicatePart
+                    liSequenceNr += 1
+
+                    If (abDropFirstRole And (liSequenceNr = 1)) Then
+
+                        If arLastVerbalisedRole IsNot Nothing Then
+                            If arLastVerbalisedRole.JoinedORMObject.Id = lrPredicatePart.Role.JoinedORMObject.Id Then
+                                asVerbalisation &= "that "
+                            Else
+                                If aarVerbalisedModelObjects.Contains(lrPredicatePart.Role.JoinedORMObject) Then
+                                    asVerbalisation &= "and that "
+                                Else
+                                    asVerbalisation &= "and some "
+                                End If
+
+                                asVerbalisation &= lrPredicatePart.PreBoundText
+                                asVerbalisation &= lrPredicatePart.Role.JoinedORMObject.Id
+                                asVerbalisation &= lrPredicatePart.PostBoundText
+                                asVerbalisation &= " "
+                            End If
+                        ElseIf abDropInitalThatOrSome Then
+                            'Do nothing at this stage.
+                        Else
+                            asVerbalisation &= "that "
+                        End If
+
+                    ElseIf aarRole.Contains(lrPredicatePart.Role) Then
+                        If aarArgumentCommonModelObjects.Count = 0 Then
+                            asVerbalisation &= "some "
+
+                            asVerbalisation &= lrPredicatePart.PreBoundText
+                            asVerbalisation &= lrPredicatePart.Role.JoinedORMObject.Id
+                            asVerbalisation &= lrPredicatePart.PostBoundText
+
+                        ElseIf aarArgumentCommonModelObjects.FindAll(Function(x) x.Model.ModelObjectIsSubtypeOfModelObject(lrPredicatePart.Role.JoinedORMObject, x) = True).Count > 0 Then
+                            asVerbalisation &= "some "
+
+                            asVerbalisation &= lrPredicatePart.PreBoundText
+                            asVerbalisation &= lrPredicatePart.Role.JoinedORMObject.Id
+                            asVerbalisation &= lrPredicatePart.PostBoundText
+
+                            asVerbalisation &= " that is that "
+                            asVerbalisation &= aarArgumentCommonModelObjects.Find(Function(x) Me.Model.ModelObjectIsSubtypeOfModelObject(lrPredicatePart.Role.JoinedORMObject, x) = True).Id
+                        Else
+                            If liSequenceNr = 1 And abDropInitalThatOrSome Then
+                            Else
+                                asVerbalisation &= "that "
+                            End If
+
+                            asVerbalisation &= lrPredicatePart.PreBoundText
+                            asVerbalisation &= lrPredicatePart.Role.JoinedORMObject.Id
+                            asVerbalisation &= lrPredicatePart.PostBoundText
+                        End If
+                    Else
+                        If aarVerbalisedModelObjects.Contains(lrPredicatePart.Role.JoinedORMObject) Then
+                            asVerbalisation &= "that "
+                        Else
+                            asVerbalisation &= "some "
+                        End If
+
+                        asVerbalisation &= lrPredicatePart.PreBoundText
+                        asVerbalisation &= lrPredicatePart.Role.JoinedORMObject.Id
+                        asVerbalisation &= lrPredicatePart.PostBoundText
+                    End If
+
+                    If lrPredicatePart.ModelObjectSubscriptNumber > 0 Then
+                        asVerbalisation &= lrPredicatePart.ModelObjectSubscriptNumber
+                    End If
+
+                    If ((liSequenceNr < Me.PredicatePart.Count) Or
+                       (lrPredicatePart.PredicatePartText <> "")) And
+                       (Not (abDropFirstRole And (liSequenceNr = 1))) Then
+                        asVerbalisation &= " "
+                    End If
+
+                    asVerbalisation &= lrPredicatePart.PredicatePartText
+
+                    If liSequenceNr < Me.PredicatePart.Count Then
+                        asVerbalisation &= " "
+                    End If
+
+                    aarVerbalisedModelObjects.AddUnique(lrPredicatePart.Role.JoinedORMObject)
+                Next
+
+                If Me.FollowingText <> "" Then
+                    asVerbalisation &= " " & Me.FollowingText
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
 
         ''' <summary>
         ''' Returns the ReadingText but with either 'that' or 'some' in front of the ObjectType names.
