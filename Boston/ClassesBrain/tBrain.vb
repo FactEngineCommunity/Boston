@@ -507,6 +507,7 @@ SkipOutputChannel:
             End If
 
             Me.SAPI.Rate = 2
+            Me.SAPI.Voice = SAPI.GetVoices.Item(0)
             Me.SAPI.Volume = 100
             'Me.SAPI = CreateObject("SAPI.spvoice")        
             Me.SAPI.Speak(asTextToSpeak)
@@ -1028,7 +1029,8 @@ SkipOutputChannel:
                     Me.Timeout.Interval = CInt(Me.Timeout.Interval * (3 / 2))
                 Case Is = "ask intelligent questions"
                     Me.AskIntelligentQuestions = True
-                    Call Me.formulate_intelligentQuestions()
+                    Call Me.formulate_Intelligentquestions()
+                    Return True
                     'Me.send_data("This is turned off at the moment.")
                     'Throw New NotImplementedException("This functionality is not yet implemented in Boston")
             End Select
@@ -2010,7 +2012,7 @@ SkipOutputChannel:
                         Dim lbSuccessful As Boolean = False
                         Dim larPathCovered As New List(Of FBM.Role)
                         Dim larUniqueRolesCovered As New List(Of FBM.Role)
-                        Dim lrJoinPath As FBM.JoinPath = Me.Model.GetJoinPathBetweenRoles(lrRole, arFactType.RoleGroup(0), lbSuccessful, liJoinPathError, larPathCovered, lrRoleConstraint, larUniqueRolesCovered)
+                        Dim lrJoinPath As FBM.JoinPath = Me.Model.GetJoinPathBetweenRoles(lrRole, arFactType.RoleGroup(0), lbSuccessful, liJoinPathError, larPathCovered, lrRoleConstraint, larUniqueRolesCovered, True)
 
                         Call lrJoinPath.ConstructFactTypePath()
 
@@ -2020,8 +2022,15 @@ SkipOutputChannel:
 
                         lsQuestion = "If a " & arFactType.RoleGroup(0).JoinedORMObject.Id & " " & arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText & ", and a "
 
-                        lsQuestion &= lrJoinPath.GetReading
-                        lsQuestion &= " is it true that " & lrJoinPath.RolePath(0).JoinedORMObject.Id & " " & arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText
+                        Dim lrTempJoinPath As FBM.JoinPath = lrJoinPath.Clone(Me.Model, Nothing)
+                        lrTempJoinPath.RolePath.RemoveAt(lrTempJoinPath.RolePath.Count - 1)
+                        Call lrTempJoinPath.ConstructFactTypePath()
+
+                        lsQuestion &= lrTempJoinPath.GetReading
+                        lsQuestion.ReplaceFirst("that", "")
+
+                        lsQuestion &= ", is it true that " & lrJoinPath.RolePath(0).JoinedORMObject.Id & " " & arFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText
+                        lsQuestion.RemoveDoubleWhiteSpace
 
                         Dim lrPlan As New Brain.Plan
                         Dim lrFirstStep As Brain.Step
@@ -2064,11 +2073,10 @@ SkipOutputChannel:
                         Me.AddQuestion(lrQuestion)
 
                     End If
-
-
-
                 End If
             Next
+
+            Me.Timeout.Start()
 
         Catch ex As Exception
             Dim lsMessage As String

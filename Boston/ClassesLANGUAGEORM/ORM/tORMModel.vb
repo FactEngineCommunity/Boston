@@ -4908,7 +4908,8 @@ Namespace FBM
                                                 ByRef aiJoinPathError As pcenumJoinPathError,
                                                 ByRef aarPathCovered As List(Of FBM.Role),
                                                 ByVal arRoleConstraint As FBM.RoleConstraint,
-                                                ByRef aarUniqueRolesCovered As List(Of FBM.Role)) As FBM.JoinPath
+                                                ByRef aarUniqueRolesCovered As List(Of FBM.Role),
+                                                Optional abIgnoreLinkFactTypes As Boolean = False) As FBM.JoinPath
 
 
             Try
@@ -4975,9 +4976,8 @@ Namespace FBM
                             abSuccessfull = False
                         Else
 
-
-                            If Not lrRole.JoinedORMObject.GetAdjoinedRoles(True) Is Nothing Then
-                                If lrRole.JoinedORMObject.GetAdjoinedRoles(True).Count > 0 Then
+                            If lrRole.JoinedORMObject.GetAdjoinedRoles(True, abIgnoreLinkFactTypes) IsNot Nothing Then
+                                If lrRole.JoinedORMObject.GetAdjoinedRoles(True, abIgnoreLinkFactTypes).Count > 0 Then
 
                                     Dim larRole As New List(Of FBM.Role)
                                     larRole = lrRole.JoinedORMObject.GetAdjoinedRoles(True).FindAll(Function(x) x.Id <> lrRole.Id)
@@ -5032,7 +5032,8 @@ Namespace FBM
                                                                                                  aiJoinPathError,
                                                                                                  larTempPathCovered,
                                                                                                  arRoleConstraint,
-                                                                                                 aarUniqueRolesCovered))
+                                                                                                 aarUniqueRolesCovered,
+                                                                                                 abIgnoreLinkFactTypes))
                                             If abSuccessfull Then
                                                 larSuccessfulJoinPathContinuation.Add(lrContinuingJoinPath)
                                                 'aarPathCovered.AddRange(larTempPathCovered)

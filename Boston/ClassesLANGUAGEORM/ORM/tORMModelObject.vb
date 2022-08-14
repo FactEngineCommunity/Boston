@@ -1371,17 +1371,22 @@ Namespace FBM
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False) As List(Of FBM.Role)
+        Public Overridable Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False,
+                                                     Optional abIgnoreLinkFactTypes As Boolean = False) As List(Of FBM.Role)
 
             Try
                 Dim lrRole As FBM.Role
                 Dim larReturnRoles As New List(Of FBM.Role)
 
-                Dim larRoles = From FactType In Me.Model.FactType.FindAll(Function(x) x.IsPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes)
-                               From Role In FactType.RoleGroup
-                               Where Role.JoinedORMObject IsNot Nothing
-                               Where Role.JoinedORMObject.Id = Me.Id
-                               Select Role
+                Dim larRoles = (From FactType In Me.Model.FactType.FindAll(Function(x) x.IsPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes)
+                                From Role In FactType.RoleGroup
+                                Where Role.JoinedORMObject IsNot Nothing
+                                Where Role.JoinedORMObject.Id = Me.Id
+                                Select Role).ToList
+
+                If abIgnoreLinkFactTypes Then
+                    Call larRoles.RemoveAll(Function(x) x.FactType.IsLinkFactType)
+                End If
 
                 For Each lrRole In larRoles
                     larReturnRoles.Add(lrRole)

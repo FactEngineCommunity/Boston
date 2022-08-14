@@ -172,6 +172,14 @@ Partial Public Class tBrain
                                     Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)
                                     Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)
 
+                                Case Is = pcenumQuestionType.CreateDerivedUnaryFactType
+
+                                    Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)
+                                    Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)
+                                    If Me.CurrentQuestion.PlanStep.AbortPlanIfStepIsAborted Then
+                                        Call Me.AbortCurrentPlan(True)
+                                    End If
+
                                 Case Is = pcenumQuestionType.CreateFactTypeReading
                                     Call Me.OutstandingSentences.Remove(Me.CurrentQuestion.sentence)
                                     Call Me.ProcessedSentences.Add(Me.CurrentQuestion.sentence)

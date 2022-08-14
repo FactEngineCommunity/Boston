@@ -191,6 +191,17 @@ Module MyMethodExtensions
     End Function
 
     <Extension()>
+    Public Function RemoveDoubleWhiteSpace(ByRef asString As String) As String
+
+        While asString.Contains("  ")
+            asString = asString.Replace("  ", " ")
+        End While
+
+        Return asString
+
+    End Function
+
+    <Extension()>
     Public Function AppendString(ByRef asString As String, ByVal asStringExtension As String) As String
 
         asString = asString & asStringExtension
