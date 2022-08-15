@@ -154,10 +154,11 @@ Namespace FBM
                 StringSize = Me.Page.Diagram.MeasureString(Trim(lsDottedReadingText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
 
                 Dim liX, liY As Integer
-                liX = Me.FactType.Shape.Bounds.X
-                liY = Me.FactType.Shape.Bounds.Y
+                liX = Me.FactType.FactTypeReadingPoint.X 'Shape.Bounds.X
+                liY = Me.FactType.FactTypeReadingPoint.Y 'Shape.Bounds.Y
 
-                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(liX, liY + (StringSize.Height + 5), StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
+                'For Y = liY + (StringSize.Height + 8)
+                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(liX, liY, StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.Text = Trim(lsDottedReadingText)
                 loDroppedNode.TextColor = Color.Blue
@@ -186,6 +187,11 @@ Namespace FBM
                 End If
 
                 Me.Shape = loDroppedNode
+
+                'CodeSafe
+                If Not Me.FactType.ShapeIsWithinRadius(Me.ShapeMidPoint, 40) Then
+                    Call Me.Move(Me.FactType.X, Me.FactType.Y + StringSize.Height + 6, False)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -363,7 +369,7 @@ Namespace FBM
 
             Me.X = aiNewX
             Me.Y = aiNewY
-            Me.FactType.FactTypeReadingPoint = New Point(Me.X, Me.Y)
+            Me.FactType.FactTypeReadingPoint = New Point(aiNewX, aiNewY)
 
             If Me.Shape IsNot Nothing Then
                 Me.Shape.Move(aiNewX, aiNewY)
@@ -419,7 +425,13 @@ Namespace FBM
         End Sub
 
         Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
-            Throw New NotImplementedException()
+            If Me.Shape IsNot Nothing Then
+                Dim liMidX As Integer = Me.Shape.Bounds.X + (Me.Shape.Bounds.Width / 2)
+                Dim liMidY As Integer = Me.Shape.Bounds.Y + (Me.Shape.Bounds.Height / 2)
+                Return New Point(liMidX, liMidY)
+            Else
+                Return New Point(0, 0)
+            End If
         End Function
 
     End Class

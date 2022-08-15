@@ -801,6 +801,12 @@ OpenConnection:
             Return Value
         End Function
 
+        Public Function ToRadians(adblDegrees As Double) As Double
+
+            Return adblDegrees * (Math.PI / 180)
+
+        End Function
+
     End Module
 
 End Namespace

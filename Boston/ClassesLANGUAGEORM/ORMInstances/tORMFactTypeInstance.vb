@@ -1364,6 +1364,7 @@ Namespace FBM
                                 'Might not be there/Nothing
                             End Try
                             Me.FactTypeReadingShape = lrFactTypeReading.CloneInstance(Me.Page)
+                            Me.FactTypeReadingShape.FactType = Me
                             If Me.FactTypeReadingShape.FactType IsNot Nothing Then
                                 Call Me.FactTypeReadingShape.DisplayAndAssociate()
                                 Call Me.FactTypeReadingShape.RefreshShape()
@@ -1542,6 +1543,33 @@ Namespace FBM
             Me.FactTable.TableShape.CaptionHeight = 4
 
         End Sub
+
+        Public Function ShapeIsWithinRadius(ByRef arPoint As Point, ByVal aiRadius As Integer) As Boolean
+
+            Try
+                Dim lat1 As Double = CDbl(Me.ShapeMidPoint.X)
+                Dim lon1 As Double = CDbl(Me.ShapeMidPoint.Y)
+
+                Dim lat2 As Double = CDbl(arPoint.X)
+                Dim lon2 As Double = CDbl(arPoint.Y)
+
+
+                Dim liHypotenuse = Math.Sqrt(Math.Abs(lat1 - lat2) ^ 2 + Math.Abs(lon1 - lon2) ^ 2)
+
+                Return (aiRadius - liHypotenuse) > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+
+        End Function
+
 
         ''' <summary>
         ''' Removes a RoleInstance from the RoleGroup of the FactTypeInstance

@@ -6,17 +6,17 @@ Imports System.Runtime.CompilerServices
 Imports Newtonsoft.Json
 
 Namespace FBM
-    <Serializable()> _
+    <Serializable()>
     Public Class ModelObject
         Inherits FBM.Concept
         Implements IEquatable(Of FBM.ModelObject)
         Implements ICloneable
 
-        <XmlIgnore()> _
-        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Model As FBM.Model
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Overridable Property Model() As FBM.Model
             Get
                 Return Me._Model
@@ -76,9 +76,9 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlAttribute()> _
-        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlAttribute()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Name As String = ""
         <XmlIgnore()>
         <CategoryAttribute("Name"),
@@ -185,7 +185,7 @@ Namespace FBM
             End Get
         End Property
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Id As String = System.Guid.NewGuid.ToString 'The unique Identifier of the ModelObject within the Model.
 
         <XmlAttribute()>
@@ -250,19 +250,19 @@ Namespace FBM
         <XmlIgnore()>
         Public DerivationType As FactEngine.pcenumFEQLDerivationType = FactEngine.Constants.pcenumFEQLDerivationType.None
 
-        <XmlIgnore()> _
-        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ShortDescription As String = ""
-        <XmlIgnore()> _
-        <CategoryAttribute("Description (Informal)"), _
-             Browsable(True), _
-             [ReadOnly](False), _
-             BindableAttribute(True), _
-             DefaultValueAttribute(""), _
-             DesignOnly(False), _
-             DescriptionAttribute("Enter a description."), _
-             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <XmlIgnore()>
+        <CategoryAttribute("Description (Informal)"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter a description."),
+             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Shadows Property ShortDescription() As String
             Get
                 Return _ShortDescription
@@ -272,19 +272,19 @@ Namespace FBM
             End Set
         End Property
 
-        <XmlIgnore()> _
-        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _LongDescription As String = ""
-        <XmlIgnore()> _
-        <CategoryAttribute("Description (Informal)"), _
-             Browsable(True), _
-             [ReadOnly](False), _
-             BindableAttribute(True), _
-             DefaultValueAttribute(""), _
-             DesignOnly(False), _
-             DescriptionAttribute("Enter a description."), _
-             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))> _
+        <XmlIgnore()>
+        <CategoryAttribute("Description (Informal)"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter a description."),
+             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
         Public Shadows Property LongDescription() As String
             Get
                 Return _LongDescription
@@ -303,8 +303,8 @@ Namespace FBM
         Public _parentModelObjectList As New List(Of FBM.ModelObject) 'String = "" '0 -not sub type, otherwise used to store entity_id of super type, if this entity is a subtype
 
         <JsonIgnore()>
-        <XmlIgnore()> _
-        <Browsable(False)> _
+        <XmlIgnore()>
+        <Browsable(False)>
         Property parentModelObjectList() As List(Of FBM.ModelObject)
             Get
                 Dim larParentModelObjects = From SubtypeRelationship In Me.SubtypeRelationship
@@ -426,15 +426,15 @@ Namespace FBM
         ''' Used for hiding or showing property elements.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()> _
-        <NonSerialized()> _
+        <XmlIgnore()>
+        <NonSerialized()>
         Public m_dctd As DynamicTypeDescriptor.DynamicCustomTypeDescriptor
 
         ''' <summary>
         ''' Only used (at this stage) for generating CQL. Temporarily populated.
         ''' </summary>
         ''' <remarks></remarks>
-        <NonSerialized()> _
+        <NonSerialized()>
         Public PreboundReadingText As String = ""
 
 
@@ -1746,6 +1746,8 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
             End Try
 
         End Function
@@ -1761,4 +1763,5 @@ Namespace FBM
         End Sub
 
     End Class
+
 End Namespace
