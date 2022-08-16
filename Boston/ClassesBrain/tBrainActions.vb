@@ -846,6 +846,11 @@ Partial Public Class tBrain
                 Next
             End If
 
+            If arQuestion.DerivationText IsNot Nothing Then
+                lrFactType.IsDerived = True
+                lrFactType.DerivationText = arQuestion.DerivationText
+            End If
+
             If arQuestion.ObjectType IsNot Nothing Then
                 Call lrFactType.setName(lsFactTypeName, False)
             Else
@@ -861,11 +866,6 @@ Partial Public Class tBrain
 
             If lrFactType.Arity = 2 Then
                 Call Me.FormulateQuestionCreateInternalUniquenessConstraint(lrFactType, lrFactTypeReading)
-            End If
-
-            If arQuestion.DerivationText IsNot Nothing Then
-                lrFactType.IsDerived = True
-                lrFactType.DerivationText = arQuestion.DerivationText
             End If
 
             If Me.Page Is Nothing Then

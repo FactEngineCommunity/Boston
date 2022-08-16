@@ -189,7 +189,7 @@ Namespace FEQL
         Return Nodes(0).Eval(Me, paramlist)
         End Function
 
-        Public Overloads Function Clone() As Object
+        Public Overloads Function Clone(Optional ByVal abLeaveOptionals As Boolean = False) As Object
             Dim lrTree As New ParseTree
             Dim lrParseError As ParseError
             Dim lrToken As Token
@@ -210,7 +210,6 @@ Namespace FEQL
                         'Move on
                     End Try
 
-                    lrTree.Optionals = New ParseErrors
                     Try
                         For Each lrParseError In .Optionals
                             lrTree.Optionals.Add(lrParseError.Clone)
@@ -234,9 +233,9 @@ Namespace FEQL
 
                     lrTree.Token = .Token.Clone
 
-                    Catch ex As Exception
-                        'Not much we can do here
-                    End Try
+                Catch ex As Exception
+                    'Not much we can do here
+                End Try
             End With
 
             Return lrTree
@@ -759,6 +758,12 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.WHICHSELECTSTMT
                     Value = EvalWHICHSELECTSTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.ISSELECTSTMT
+                    Value = EvalISSELECTSTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.WHOSELECTSTMT
+                    Value = EvalWHOSELECTSTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.WITHPREDICATESTMT
                     Value = EvalWITHPREDICATESTMT(tree, paramlist)
@@ -1353,6 +1358,14 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalWHICHSELECTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalISSELECTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalWHOSELECTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
