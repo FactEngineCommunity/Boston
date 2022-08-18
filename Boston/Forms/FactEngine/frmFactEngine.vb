@@ -1160,6 +1160,8 @@ Public Class frmFactEngine
                     Exit Sub
                 Case Is = Keys.Down ',Keys.Space
                 Case Is = Keys.Left, Keys.Right
+                Case Is = Keys.Space
+                    Exit Sub
                 Case Else
                     Call Me.ProcessAutoComplete(e)
             End Select
@@ -1986,7 +1988,16 @@ Public Class frmFactEngine
 
             '============================================================================================
 
-            If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
+            If Me.zrTextHighlighter.Tree.Errors.Count = 0 Then
+
+                zsIntellisenseBuffer = Me.zrTextHighlighter.GetCurrentContext.Token.Text
+
+                Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes(True)
+                End Select
+
+            ElseIf (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
                 If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
                     lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
                 Else

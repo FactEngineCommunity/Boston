@@ -2928,7 +2928,7 @@ SkipRoleConstraintInstance:
                 If arXMlFactType Is Nothing Then
                     lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
 
-                    If arXMlFactType Is Nothing Then
+                    If lrXMLFactType Is Nothing Then
                         'Something has gone wrong. Create an EntityType for the FactType
                         arFactType = Nothing
                         Exit Sub

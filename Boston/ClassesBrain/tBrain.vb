@@ -3369,6 +3369,9 @@ SkipOutputChannel:
                 Me.AddQuestion(lrQuestion)
             End If
 
+            Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

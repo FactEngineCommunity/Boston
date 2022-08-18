@@ -253,7 +253,7 @@ Namespace FEQL
     Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
 
             '=============================
-            If e.KeyCode = Keys.Space Then
+            If e.KeyCode = Keys.Space And Textbox.SelectionStart >= Textbox.Text.Length Then
                 DoAction(Textbox.Rtf, Textbox.SelectionStart)
                 HighlightText()
             End If
