@@ -266,7 +266,7 @@ Namespace TableReferenceFieldValue
             Dim lsSQLQuery As String = ""
 
             lsSQLQuery = "UPDATE ReferenceFieldValue"
-            lsSQLQuery &= " SET data = '" & Trim(ar_reference_field_value.Data) & "'"
+            lsSQLQuery &= " SET data = '" & ar_reference_field_value.Data & "'"
             lsSQLQuery &= " WHERE reference_table_id = " & ar_reference_field_value.ReferenceTableId
             lsSQLQuery &= "   AND reference_field_id = " & ar_reference_field_value.ReferenceFieldId
             lsSQLQuery &= "   AND row_id = '" & Trim(ar_reference_field_value.RowId) & "'"
