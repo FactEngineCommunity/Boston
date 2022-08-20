@@ -5109,7 +5109,8 @@ Namespace FBM
 
 
         Public Function GetModelObjectByName(ByVal asModelObjectName As String,
-                                             Optional abIgnoreErrorIfNotInModel As Boolean = False) As FBM.ModelObject
+                                             Optional abIgnoreErrorIfNotInModel As Boolean = False,
+                                             Optional abSwitchLowerCaseToDictionaryEntry As Boolean = False) As FBM.ModelObject
 
             Dim lrValueType As FBM.ValueType
             Dim lrEntityType As FBM.EntityType
@@ -5123,6 +5124,8 @@ Namespace FBM
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
                     lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsModelObjectName))
+
+                    If abSwitchLowerCaseToDictionaryEntry Then lsModelObjectName = lrDictionaryEntry.Symbol
 
                     If lrDictionaryEntry IsNot Nothing Then
                         If lrDictionaryEntry.isFactType Then

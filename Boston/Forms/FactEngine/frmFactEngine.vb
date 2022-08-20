@@ -670,13 +670,27 @@ Public Class frmFactEngine
 
                 If My.Settings.FactEngineUseTransformations Then
 
+
+#Region "Substitute for ModelElement names"
+                    Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
+
+                    Dim lrModelElement As FBM.ModelObject
+                    For Each lsWord In lasWords
+                        Dim lsTempWord = lsWord.Replace(",", "")
+                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
+                        If lrModelElement IsNot Nothing Then
+                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
+                        End If
+                    Next
+#End Region
+
+
                     Dim loTransformation As Object = New System.Dynamic.ExpandoObject
                     Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation)
 
                     For Each loTransformation In larTransformationTuples
                         Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
                     Next
-
 
                 End If
 
