@@ -574,7 +574,7 @@ Namespace ERD
                     Me.Attribute.AddUnique(lrERAttribute)
 
                     If abAddToPage Then
-                        Me.Page.ERDiagram.Attribute.Add(lrERAttribute)
+                        Me.Page.ERDiagram.Attribute.AddUnique(lrERAttribute)
                     End If
                 Next
 
@@ -738,7 +738,7 @@ Namespace ERD
                 lrERAttribute.PartOfPrimaryKey = arColumn.isPartOfPrimaryKey 'ContributesToPrimaryKey 'Should also be reflected in the Index for the Column etc.
 
                 Me.Attribute.Add(lrERAttribute)
-                Me.Page.ERDiagram.Attribute.Add(lrERAttribute)
+                Me.Page.ERDiagram.Attribute.AddUnique(lrERAttribute)
 
                 '-----------------------------------------
                 'Refresh the table shape.

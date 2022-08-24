@@ -294,11 +294,14 @@ Namespace TableFactType
                             lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
                             lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
 
-                            Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True)
+                            If arFactType.IsObjectified Then lsEntityTypeId = arFactType.Id
+
+                            Dim lrEntityType = arFactType.Model.CreateEntityType(lsEntityTypeId, True, False, False, True)
                             lrEntityType.IsObjectifyingEntityType = True
                             lrEntityType.ObjectifiedFactType = arFactType
                             arFactType.Model.IsDirty = True
-
+                            arFactType.ObjectifyingEntityType = lrEntityType
+                            arFactType.isDirty = True
                             lREcordset.Close()
                             Throw New Exception(lsMessage)
                         End If

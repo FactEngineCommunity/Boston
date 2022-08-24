@@ -2437,6 +2437,7 @@ Namespace FBM
 
                 If lrDestinationTable IsNot Nothing Then
 
+#Region "Multiplicity and Mandatory"
                     '================================
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM CoreOriginMultiplicity"
@@ -2492,6 +2493,7 @@ Namespace FBM
                     If CInt(lrRecordset1("Count").Data) > 0 Then
                         lbRelationDestinationIsMandatory = True
                     End If
+#End Region
 
                     '-------------------------------------------------------------------------------
                     'Check to see whether the Relation contributes to the PrimaryKey of the Entity
@@ -2537,6 +2539,7 @@ Namespace FBM
                                                            lrFactType)
 
                     'Predicates
+#Region "Predicates"
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginPredicate.ToString
                     lsSQLQuery &= " WHERE Relation = '" & asRelationId & "'"
@@ -2555,6 +2558,7 @@ Namespace FBM
                     If Not lrRecordset1.EOF Then
                         lrRelation.DestinationPredicate = lrRecordset1("Predicate").Data
                     End If
+#End Region
 
                     '==============================================================
                     'Get the Columns and their OrdinalPositions for the Relation.
@@ -2562,6 +2566,7 @@ Namespace FBM
                     Dim lrColumn As RDS.Column
                     Dim lrDictionary As New SortedDictionary(Of Integer, String)
 
+#Region "Origin Columns"
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsPartOfRelationOrigin.ToString
                     lsSQLQuery &= " WHERE Relation = '" & lrRelation.Id & "'"
@@ -2603,7 +2608,9 @@ Namespace FBM
                             prApplication.ThrowErrorMessage("Relation: " & lrRelation.Id & ", had no origin column with " & lrDictionaryEntry.Value, pcenumErrorType.Warning, Nothing, False, False, False)
                         End If
                     Next
+#End Region
 
+#Region "Destination Columns"
                     'DestinationColumns
                     lrDictionary.Clear()
 
@@ -2646,8 +2653,10 @@ Namespace FBM
                         Catch ex As Exception
                             'CodeSafe
                             lsMessage = "Could not find Column in Destination Table, " & lrRelation.DestinationTable.Name
-                            lsMessage.AppendLine("Origin Table: " & lrRelation.OriginTable.Name)
-                            lsMessage.AppendLine("Column Id: " & lrDictionaryEntry.Value)
+                            lsMessage.AppendDoubleLineBreak("Origin Table: " & lrRelation.OriginTable.Name)
+                            lsMessage.AppendLine("Origin Column count: " & lrRelation.OriginColumns.Count)
+                            lsMessage.AppendLine("Destination Column count: " & lrRelation.DestinationColumns.Count)
+                            lsMessage.AppendDoubleLineBreak("Column Id: " & lrDictionaryEntry.Value)
                             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                         End Try
                     Next
@@ -2659,6 +2668,8 @@ Namespace FBM
                     Me.RDS.Relation.Add(lrRelation)
 
                 End If 'DestinationTable IsNot Nothing
+
+#End Region
 
             Catch AppEx As ApplicationException
 

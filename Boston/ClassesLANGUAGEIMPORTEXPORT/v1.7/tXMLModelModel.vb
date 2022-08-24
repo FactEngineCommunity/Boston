@@ -390,7 +390,7 @@ SkipModelLevelRoleConstraint:
 
                 For Each lrPage In arFBMModel.Page
 
-                    If lrPage.Language <> pcenumLanguage.ORMModel And My.Settings.ExportFBMExcludeMDAModelElements Then Continue For
+                    If lrPage.Language <> pcenumLanguage.ORMModel And abExcludedMDAModelElements Then Continue For
 
                     Dim lrExportPage As New XMLModel.Page
 

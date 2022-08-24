@@ -786,6 +786,7 @@ SkipRegistrationChecking:
             End If
             If My.Settings.SuperuserMode Then
                 Me.ToolStripMenuItemSuperuser.Visible = True
+                Me.ToolStripMenuItemEditConfigurationData.Visible = True
             End If
 
 
@@ -5598,7 +5599,7 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Private Sub EditConfigurationDataToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditConfigurationDataToolStripMenuItem.Click
+    Private Sub EditConfigurationDataToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEditConfigurationData.Click
 
         Try
             Dim lfrmCRUDReferenceData As New frmCRUDEditReferenceTable

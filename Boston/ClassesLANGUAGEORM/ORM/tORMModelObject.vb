@@ -1684,7 +1684,7 @@ Namespace FBM
 
                         If IsSomething(lrOriginalDictionaryEntry) Then
 
-                            Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, aiConceptType)
+                            Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, aiConceptType, True)
 
                             '20200928-VM-Not sure how this works
                             'Dim laiConceptType = {pcenumConceptType.ValueType, pcenumConceptType.EntityType, pcenumConceptType.FactType}

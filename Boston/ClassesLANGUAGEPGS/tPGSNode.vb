@@ -327,7 +327,7 @@ Namespace PGS
                     Me.Attribute.AddUnique(lrERAttribute)
 
                     If abAddToPage Then
-                        Me.Page.ERDiagram.Attribute.Add(lrERAttribute)
+                        Me.Page.ERDiagram.Attribute.AddUnique(lrERAttribute)
                     End If
                 Next
 

@@ -2085,7 +2085,6 @@ Namespace FBM
                     Dim lrColumnToRemove As RDS.Column = lrIndex.Column.Find(Function(x) x.Role.Id = lrOtherRoleOfFactType.Id)
 
                     If lrIndex IsNot Nothing Then
-
                         lrIndex.removeColumn(lrColumnToRemove)
 
                         If lrIndex.Column.Count = 1 Then

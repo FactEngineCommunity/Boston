@@ -397,6 +397,7 @@ Namespace RDS
                                   Optional abForceAdd As Boolean = False) As Boolean
 
             Try
+                If Me.Name = "Request" Then Debugger.Break()
 
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
                 arColumn.Table = Me 'CodeSafe
@@ -418,7 +419,7 @@ Namespace RDS
 
                     Dim lrRelation As RDS.Relation = arColumn.Role.belongsToRelation
                     If lrRelation IsNot Nothing And arColumn.Relation IsNot Nothing Then
-                        lrRelation.OriginColumns.AddUnique(arColumn)
+                        lrRelation.AddOriginColumn(arColumn) '20220823-VM-Was Relation.OriginColumn.Add
                         arColumn.Relation.AddUnique(lrRelation)
                     End If
                 End If

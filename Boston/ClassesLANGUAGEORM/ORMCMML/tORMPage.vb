@@ -1721,7 +1721,7 @@ SkipRelation:
                 If arEntityInstance.isSubtype Then
 #Region "Subtype Entity"
 
-                    Call arEntityInstance.GetAttributesFromRDSColumns()
+                    Call arEntityInstance.GetAttributesFromRDSColumns(True)
 
                     '-------------------------------------------------------------------
                     'Paint the sorted Attributes (By Ordinal Position) for each Entity
@@ -1740,128 +1740,129 @@ SkipRelation:
 #End Region
                 Else
 #Region "Non-Subtype Entity"
+                    Call arEntityInstance.GetAttributesFromRDSColumns(True)
                     '=====================
                     'Load the Attributes
                     '=====================
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM CoreERDAttribute"
-                    lsSQLQuery &= " WHERE ModelObject = '" & arEntityInstance.Name & "'"
+                    'lsSQLQuery = "SELECT *"
+                    'lsSQLQuery &= " FROM CoreERDAttribute"
+                    'lsSQLQuery &= " WHERE ModelObject = '" & arEntityInstance.Name & "'"
 
-                    lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    'lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrERAttribute As ERD.Attribute
-                    Dim lrRecordset1 As ORMQL.Recordset
+                    'Dim lrERAttribute As ERD.Attribute
+                    'Dim lrRecordset1 As ORMQL.Recordset
 
-                    While Not lrRecordset.EOF
+                    'While Not lrRecordset.EOF
 
-                        Dim lsMandatory As String = ""
+                    '    Dim lsMandatory As String = ""
 
-                        lrERAttribute = New ERD.Attribute With {
-                        .Id = lrRecordset("Attribute").Data
-                    }
+                    '    lrERAttribute = New ERD.Attribute With {
+                    '    .Id = lrRecordset("Attribute").Data
+                    '}
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    '    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
+                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'lrRecordset("Attribute")
+                    '    lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'lrRecordset("Attribute")
 
-                        lrFactDataInstance = lrFactInstance.GetFactDataInstanceByRoleName("Attribute")
-                        lrERAttribute = lrFactDataInstance.CloneAttribute(Me)
+                    '    lrFactDataInstance = lrFactInstance.GetFactDataInstanceByRoleName("Attribute")
+                    '    lrERAttribute = lrFactDataInstance.CloneAttribute(Me)
 
-                        '-------------------------------
-                        'Get the Name of the Attribute
-                        '-------------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'"
+                    '    '-------------------------------
+                    '    'Get the Name of the Attribute
+                    '    '-------------------------------
+                    '    lsSQLQuery = "SELECT *"
+                    '    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'"
 
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lrERAttribute.AttributeName = lrRecordset1("PropertyName").Data
+                    '    lrERAttribute.AttributeName = lrRecordset1("PropertyName").Data
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        '-------------------------------------------------
-                        'Check to see whether the Attribute is Mandatory
-                        '-------------------------------------------------
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM CoreIsMandatory"
-                        lsSQLQuery &= " WHERE IsMandatory = '" & lrRecordset("Attribute").Data & "'"
+                    '    '-------------------------------------------------
+                    '    'Check to see whether the Attribute is Mandatory
+                    '    '-------------------------------------------------
+                    '    lsSQLQuery = "SELECT *"
+                    '    lsSQLQuery &= " FROM CoreIsMandatory"
+                    '    lsSQLQuery &= " WHERE IsMandatory = '" & lrRecordset("Attribute").Data & "'"
 
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        If lrRecordset1.Facts.Count = 1 Then
-                            lrERAttribute.Mandatory = True
-                            lsMandatory = "*"
+                    '    If lrRecordset1.Facts.Count = 1 Then
+                    '        lrERAttribute.Mandatory = True
+                    '        lsMandatory = "*"
 
-                            lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    '        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                    '        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                    '        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        End If
+                    '        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    End If
 
-                        lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
+                    '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        'lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
+                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    'lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        '=============
-                        'Role
-                        lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
+                    '    '=============
+                    '    'Role
+                    '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        '=============
+                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    '=============
 
-                        '=============
-                        'FactType
-                        lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                        lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
+                    '    '=============
+                    '    'FactType
+                    '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
-                        lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        '=============
+                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    '    '=============
 
-                        '---------------------------------------------------
-                        'Add the Attribute to the ER Entity
-                        '---------------------------------------------------
-                        lrERAttribute.Entity = arEntityInstance
+                    '---------------------------------------------------
+                    'Add the Attribute to the ER Entity
+                    '---------------------------------------------------
+                    'lrERAttribute.Entity = arEntityInstance
 
-                        arEntityInstance.Attribute.AddUnique(lrERAttribute)
-                        Me.ERDiagram.Attribute.AddUnique(lrERAttribute)
+                    '    arEntityInstance.Attribute.AddUnique(lrERAttribute)
+                    '    Me.ERDiagram.Attribute.AddUnique(lrERAttribute)
 
-                        Dim lrColumn As RDS.Column = arEntityInstance.RDSTable.Column.Find(Function(x) x.Id = lrERAttribute.Id)
-                        lrERAttribute.Column = lrColumn
+                    '    Dim lrColumn As RDS.Column = arEntityInstance.RDSTable.Column.Find(Function(x) x.Id = lrERAttribute.Id)
+                    '    lrERAttribute.Column = lrColumn
 
-                        lrERAttribute.ActiveRole = lrColumn.ActiveRole
-                        lrERAttribute.ResponsibleRole = lrColumn.Role
+                    '    lrERAttribute.ActiveRole = lrColumn.ActiveRole
+                    '    lrERAttribute.ResponsibleRole = lrColumn.Role
 
-                        lrRecordset.MoveNext()
-                    End While
+                    '    lrRecordset.MoveNext()
+                    'End While
 
                     '-------------------------------------------------------------------
                     'Paint the sorted Attributes (By Ordinal Position) for each Entity
@@ -3353,7 +3354,7 @@ SkipRelation:
                 lrERAttribute.Entity = lrEREntity
 
                 lrEREntity.Attribute.Add(lrERAttribute)
-                Me.ERDiagram.Attribute.Add(lrERAttribute)
+                Me.ERDiagram.Attribute.AddUnique(lrERAttribute)
 
                 '=============================================================================================
                 'Paint the sorted Attributes (By Ordinal Position) for each Entity

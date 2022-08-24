@@ -370,7 +370,6 @@ Namespace RDS
                 Return ((Me.Table.Name = other.Table.Name) And (Me.Name = other.Name)) And (Me.ActiveRole.Id = other.ActiveRole.Id) And (Me.TemporaryAlias = other.TemporaryAlias) And (Me.Role.Id = other.Role.Id)
             End If
 
-
         End Function
 
         Public Function EqualsByRoleActiveRole(other As Column) As Boolean

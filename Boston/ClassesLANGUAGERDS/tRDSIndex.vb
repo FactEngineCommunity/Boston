@@ -202,7 +202,7 @@ Namespace RDS
             Return Me.Name = other.Name
         End Function
 
-        Public Sub addColumn(ByRef arColumn As RDS.Column)
+        Public Sub addColumn(ByRef arColumn As RDS.Column, Optional ByVal abIgnoreTriggerIndexModified As Boolean = False)
 
             Try
                 'CodeSafe
@@ -230,7 +230,7 @@ Namespace RDS
                     Call Me.Model.Model.DatabaseConnection.IndexAddColumn(Me, arColumn)
                 End If
 
-                Call Me.Table.triggerIndexModified(Me)
+                If Not abIgnoreTriggerIndexModified Then Call Me.Table.triggerIndexModified(Me)
                 Call Me.Table.triggerIndexColumnAdded(Me, arColumn)
 
             Catch ex As Exception

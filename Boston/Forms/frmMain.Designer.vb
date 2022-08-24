@@ -91,7 +91,7 @@ Partial Class frmMain
         Me.LogFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteLogFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RegistrationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.EditConfigurationDataToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemEditConfigurationData = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemAddUser = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditUserToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -437,7 +437,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemBoston
         '
-        Me.ToolStripMenuItemBoston.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConfigurationToolStripMenuItem, Me.ToolStripSeparator14, Me.PluginViewerToolStripMenuItem, Me.ToolStripSeparator2, Me.DatabaseToolStripMenuItem, Me.LogFileToolStripMenuItem, Me.RegistrationToolStripMenuItem, Me.EditConfigurationDataToolStripMenuItem})
+        Me.ToolStripMenuItemBoston.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConfigurationToolStripMenuItem, Me.ToolStripSeparator14, Me.PluginViewerToolStripMenuItem, Me.ToolStripSeparator2, Me.DatabaseToolStripMenuItem, Me.LogFileToolStripMenuItem, Me.RegistrationToolStripMenuItem, Me.ToolStripMenuItemEditConfigurationData})
         Me.ToolStripMenuItemBoston.Name = "ToolStripMenuItemBoston"
         Me.ToolStripMenuItemBoston.Size = New System.Drawing.Size(56, 22)
         Me.ToolStripMenuItemBoston.Text = "&Boston"
@@ -512,11 +512,12 @@ Partial Class frmMain
         Me.RegistrationToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
         Me.RegistrationToolStripMenuItem.Text = "&Registration"
         '
-        'EditConfigurationDataToolStripMenuItem
+        'ToolStripMenuItemEditConfigurationData
         '
-        Me.EditConfigurationDataToolStripMenuItem.Name = "EditConfigurationDataToolStripMenuItem"
-        Me.EditConfigurationDataToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
-        Me.EditConfigurationDataToolStripMenuItem.Text = "Edit Configuration Data"
+        Me.ToolStripMenuItemEditConfigurationData.Name = "ToolStripMenuItemEditConfigurationData"
+        Me.ToolStripMenuItemEditConfigurationData.Size = New System.Drawing.Size(198, 22)
+        Me.ToolStripMenuItemEditConfigurationData.Text = "Edit Configuration Data"
+        Me.ToolStripMenuItemEditConfigurationData.Visible = False
         '
         'ToolStripMenuItemUser
         '
@@ -1108,5 +1109,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripMenuItemUnifiedOntology As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAddUnifiedOntology As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemEditUnifiedOntology As ToolStripMenuItem
-    Friend WithEvents EditConfigurationDataToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemEditConfigurationData As ToolStripMenuItem
 End Class

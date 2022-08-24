@@ -1874,11 +1874,14 @@ ReturnClause:
                                                  Select ReturnColumn
 
                         If larCountStarColumn.Count > 0 Then
-                            lsSQLQuery &= ", COUNT(*)"
+                            lsSQLQuery &= Boston.returnIfTrue(larProjectionColumn.Count > 0, ", ", "")
+                            lsSQLQuery &= "COUNT(*)"
                             If larCountStarColumn(0).ASCLAUSE IsNot Nothing Then
                                 lsSQLQuery &= " AS " & larCountStarColumn(0).ASCLAUSE.COLUMNNAMESTR
                             End If
-                            lbRequiresGroupByClause = True
+                            If larProjectionColumn.Count > 0 Then
+                                lbRequiresGroupByClause = True
+                            End If
                         End If
                     End If
 #End Region

@@ -73,38 +73,32 @@ Public Class frmCRUDEditReferenceTable
 
     Sub populate_data_grid_for_selected_reference_table()
 
-        '--------------------------------------------
-        'Get the list of Tuples as a List(Of Object)
-        '--------------------------------------------
-        zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.reference_table_id, Me.zo_working_class)
+        Try
+            '--------------------------------------------
+            'Get the list of Tuples as a List(Of Object)
+            '--------------------------------------------
+            zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.reference_table_id, Me.zo_working_class)
 
+            '---------------------------------
+            'Bind the tuples to the DataGrid
+            '---------------------------------       
+            DataGridView1.DataSource = Nothing
+            DataGridView1.DataSource = zlo_display_list 'lrObjectList ' New DefensiveDatasource(zlo_display_list, Nothing)
 
-        'Dim lrClass As New DynamicClassLibrary.Factory.tClass
-        'Dim lrObject, lrObject2 As New Object
-        'Dim lrObjectList As Object
+            cManager = CType(DataGridView1.BindingContext(zlo_display_list), CurrencyManager)
 
-        'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("a", GetType(String)))
-        'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("b", GetType(String)))
+            If zlo_display_list.Count > 0 Then
+                Me.DataGridView1.Columns(0).Visible = False
+            End If
 
-        'lrObject = lrClass.clone
-        'lrObject2 = lrClass.clone
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        'lrObjectList = lrClass.DynamicClassList
-
-        'lrObjectList.Add(lrObject)
-        'lrObjectList.Add(lrObject2)
-
-        '---------------------------------
-        'Bind the tuples to the DataGrid
-        '---------------------------------       
-        DataGridView1.DataSource = Nothing
-        DataGridView1.DataSource = zlo_display_list 'lrObjectList ' New DefensiveDatasource(zlo_display_list, Nothing)
-
-        cManager = CType(DataGridView1.BindingContext(zlo_display_list), CurrencyManager)
-
-        If zlo_display_list.Count > 0 Then
-            Me.DataGridView1.Columns(0).Visible = False
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 

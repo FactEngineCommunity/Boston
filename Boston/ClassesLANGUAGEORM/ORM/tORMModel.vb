@@ -3409,14 +3409,19 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arDictionaryEntry"></param>
         ''' <remarks></remarks>
-        Public Sub DeprecateRealisationsForDictionaryEntry(ByRef arDictionaryEntry As FBM.DictionaryEntry, ByVal aiConceptType As pcenumConceptType)
+        Public Sub DeprecateRealisationsForDictionaryEntry(ByRef arDictionaryEntry As FBM.DictionaryEntry,
+                                                           ByVal aiConceptType As pcenumConceptType,
+                                                           Optional ByVal abUseSuppliedDictionaryEntry As Boolean = False)
 
             Try
-                Dim lrDictionarEntry As FBM.DictionaryEntry
+                Dim lrDictionarEntry As FBM.DictionaryEntry = arDictionaryEntry
 
-                lrDictionarEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                If Not abUseSuppliedDictionaryEntry Then
+                    lrDictionarEntry = Me.ModelDictionary.Find(AddressOf arDictionaryEntry.Equals)
+                End If
 
-                If IsSomething(lrDictionarEntry) Then
+
+                If lrDictionarEntry IsNot Nothing Then
 
                     Dim liConceptType As pcenumConceptType = aiConceptType 'arDictionaryEntry.ConceptType
                     Dim liInd As Integer = lrDictionarEntry.Realisations.FindLastIndex(Function(x) x = liConceptType)
@@ -4551,7 +4556,7 @@ Namespace FBM
 
                 If Me.Loaded = False Then Exit Sub
 
-                Call lrExportModel.MapFromFBMModel(Me)
+                Call lrExportModel.MapFromFBMModel(Me, False)
 
                 Dim lsFileLocationName As String = ""
                 If Boston.IsSerializable(lrExportModel) Then
@@ -5830,6 +5835,19 @@ Namespace FBM
             End If
 
             Me.Loaded = True
+
+            '20220821-VM-Keep for a year. Set ObjectifyingEntityType.Id to that of its FactType
+#Region "Fix ObjectifyingEntityTypes for v6.4"
+            Dim larEntityType = From FactType In Me.FactType
+                                Where FactType.ObjectifyingEntityType IsNot Nothing
+                                Where FactType.ObjectifyingEntityType.Id <> FactType.Id
+                                Select FactType.ObjectifyingEntityType
+
+            For Each lrEntityType In larEntityType
+                Call lrEntityType.SetName(lrEntityType.ObjectifiedFactType.Id, False, True)
+            Next
+#End Region
+
 
             '20180410-VM-ToDo-Test to see if the RDF has been created for the Model.
             Me.RDSCreated = True 'For now for testing. 

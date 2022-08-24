@@ -264,7 +264,7 @@ Public Class frmDiagramERD
                     lrEREntity.TableShape.ResizeToFitText(False)
 
                     'Add the Attribute to the Page
-                    Me.zrPage.ERDiagram.Attribute.Add(lrERAttribute)
+                    Me.zrPage.ERDiagram.Attribute.AddUnique(lrERAttribute)
                 Next
 
             Next
@@ -2663,21 +2663,22 @@ SkipORMReadingEditor:
             '20200902-This obviously should not be the case, but it is a worse customer experience if null/nothing exceptions are thrown.
             If lrERDLink.Relation.RDSRelation Is Nothing Then Exit Sub
 
-
             If lrERDLink.Relation.RDSRelation.DestinationColumns.Count <> lrERDLink.Relation.RDSRelation.OriginColumns.Count Then
 
-                lsMessage = "Relation doesn't have the same number of Columns in its Origin as Destination. Fixing it."
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                If Not My.Computer.Keyboard.CtrlKeyDown Then
+                    lsMessage = "Relation doesn't have the same number of Columns in its Origin as Destination. Fixing it."
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
 
-                Call Me.zrPage.Model.FixErrors(New List(Of pcenumModelFixType) From {pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount}, lrERDLink.Relation.RDSRelation)
+                    Call Me.zrPage.Model.FixErrors(New List(Of pcenumModelFixType) From {pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount}, lrERDLink.Relation.RDSRelation)
 
-                Dim lrOriginEntity As ERD.Entity = lrERDLink.Link.Origin.Tag
-                Call lrOriginEntity.RefreshShape()
+                    Dim lrOriginEntity As ERD.Entity = lrERDLink.Link.Origin.Tag
+                    Call lrOriginEntity.RefreshShape()
+                End If
             End If
 
-            '-----------------------------------------------------------------------------------
-            'Highlight the Attributes of the Relation
-            Dim lrAttribute As ERD.Attribute
+                '-----------------------------------------------------------------------------------
+                'Highlight the Attributes of the Relation
+                Dim lrAttribute As ERD.Attribute
             For Each lrOriginColumn In lrERDLink.Relation.RDSRelation.OriginColumns
                 'CodeSafe: Remove Attributes with no columns
                 Me.zrPage.ERDiagram.Attribute.RemoveAll(Function(x) x.Column Is Nothing)
@@ -3522,7 +3523,7 @@ SkipORMReadingEditor:
                             lrRelatedEntity.TableShape.ResizeToFitText(False)
 
                             'Add the Attribute to the Page
-                            Me.zrPage.ERDiagram.Attribute.Add(lrERAttribute)
+                            Me.zrPage.ERDiagram.Attribute.AddUnique(lrERAttribute)
                         Next
                     End If
                 Next

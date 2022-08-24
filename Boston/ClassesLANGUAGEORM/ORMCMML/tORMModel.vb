@@ -38,12 +38,12 @@ Namespace FBM
                                         ByRef arColumn As RDS.Column)
 
             Try
-
                 Dim lsSQLQuery As String
 
                 lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString & " (Index, Property) VALUES ("
                 lsSQLQuery &= "'" & arIndex.Name & "','" & arColumn.Id & "'"
                 lsSQLQuery &= ")"
+
                 Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             Catch ex As Exception

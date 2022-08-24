@@ -150,7 +150,7 @@ Namespace FBM
                         lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
                         If lrOriginalDictionaryEntry IsNot Nothing Then ' IsSomething(Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)) Then
                             'lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
-                            Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, pcenumConceptType.Value)
+                            Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, pcenumConceptType.Value, True)
                         End If
 
                         Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry,,,, True)

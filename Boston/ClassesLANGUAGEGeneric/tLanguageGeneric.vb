@@ -37,7 +37,7 @@ Namespace Language
 
 
 
-        Public Function WordIsNoun(ByVal asWord As String) As Boolean
+        Public Function WordIsNoun(ByVal asWord As String, Optional ByRef asLemma As String = Nothing) As Boolean
 
             Try
                 Dim lbIsNoun As Boolean = False
@@ -47,6 +47,19 @@ Namespace Language
                 Me.hasmatch = False
 
                 Call Me.OverviewFor(asWord, "noun", lbIsNoun, lrSearchSet, larArrayList)
+
+                If larArrayList.Count > 0 Then
+                    Try
+                        Dim enumerator As IEnumerator = larArrayList(0).morphs.Keys.GetEnumerator()
+                        enumerator.MoveNext()
+                        asLemma = enumerator.Current 'larArrayList(0).morphs.ToString
+                    Catch ex As Exception
+                        asLemma = larArrayList(0).word
+                    End Try
+
+                End If
+
+                Call Me.GetNounOverviewForWord(asWord)
 
                 Return lbIsNoun
 

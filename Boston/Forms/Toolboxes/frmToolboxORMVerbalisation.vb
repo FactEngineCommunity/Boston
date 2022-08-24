@@ -2035,6 +2035,17 @@ Public Class frmToolboxORMVerbalisation
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
+            If My.Computer.Keyboard.CtrlKeyDown Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseBlackText("Origin Column Count: ")
+                lrVerbaliser.VerbaliseBlackText(arRelation.OriginColumns.Count)
+                lrVerbaliser.VerbaliseBlackText("Destination Column Count: ")
+                lrVerbaliser.VerbaliseBlackText(arRelation.DestinationColumns.Count)
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
             Select Case arFactType.Arity
                 Case Is = 1
                 Case Is = 2

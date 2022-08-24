@@ -218,7 +218,7 @@ Namespace ERD
 
         Public Shadows Function Equals(ByVal other As Attribute) As Boolean Implements System.IEquatable(Of Attribute).Equals
 
-            If Me.Id = other.Id Then
+            If Me.Entity.Name = other.Entity.Name And Me.Column.Id = other.Column.Id Then
                 Return True
             Else
                 Return False

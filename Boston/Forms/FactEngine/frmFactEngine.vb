@@ -670,6 +670,9 @@ Public Class frmFactEngine
 
                 If My.Settings.FactEngineUseTransformations Then
 
+                    Dim lrLanguageParser As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
+
+
 
 #Region "Substitute for ModelElement names"
                     Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
@@ -677,16 +680,25 @@ Public Class frmFactEngine
                     Dim lrModelElement As FBM.ModelObject
                     For Each lsWord In lasWords
                         Dim lsTempWord = lsWord.Replace(",", "")
-                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
-                        If lrModelElement IsNot Nothing Then
-                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
+                        Dim lsLemma As String = Nothing
+                        If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Then
+
+                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
+
+                            If lrModelElement Is Nothing Then
+                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsLemma, True, True)
+                            End If
+
+                            If lrModelElement IsNot Nothing Then
+                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
+                            End If
                         End If
                     Next
 #End Region
 
 
                     Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                    Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation)
+                    Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
 
                     For Each loTransformation In larTransformationTuples
                         Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)

@@ -151,31 +151,50 @@ Namespace TableReferenceFieldValue
 
                 laaReferenceFieldList = GetReferenceFieldListByReferenceTableId(aiReferenceTableId)
 
+                Dim liFieldCount As Integer = laaReferenceFieldList.Count
+
+#Region "Check if new field added"
+                lsSQLQuery = "SELECT Max(RFV.reference_field_id) FROM ReferenceFieldValue RFV WHERE RFV.reference_table_Id = " & aiReferenceTableId
+
+                lREcordset.Open(lsSQLQuery)
+
+                Try
+                    If Not lREcordset.EOF Then
+                        liFieldCount = lREcordset(0).Value
+                    End If
+                Catch ex As Exception
+                Finally
+                    lREcordset.Close()
+                End Try
+
+
+#End Region
+
                 lsSQLQuery = "SELECT rfv1.row_id,"
-                For liInd = 1 To laaReferenceFieldList.Count
+                For liInd = 1 To liFieldCount
                     lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".data"
-                    If liInd < laaReferenceFieldList.Count Then
+                    If liInd < liFieldCount Then
                         lsSQLQuery &= ","
                     End If
                     lsOrderByClause &= liInd + 1
-                    If liInd < laaReferenceFieldList.Count Then
+                    If liInd < liFieldCount Then
                         lsOrderByClause &= ","
                     End If
                 Next
 
                 lsSQLQuery &= " FROM "
-                For liInd = 1 To laaReferenceFieldList.Count
+                For liInd = 1 To liFieldCount
                     lsSQLQuery &= "ReferenceFieldValue rfv" & Trim(CStr(liInd))
-                    If liInd < laaReferenceFieldList.Count Then
+                    If liInd < liFieldCount Then
                         lsSQLQuery &= ","
                     End If
                 Next
                 lsSQLQuery &= " WHERE "
-                For liInd = 1 To laaReferenceFieldList.Count
+                For liInd = 1 To liFieldCount
                     lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".reference_table_id = " & aiReferenceTableId
                     lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".reference_field_id = " & liInd
                     lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".row_id = rfv1.row_id"
-                    If liInd < laaReferenceFieldList.Count Then
+                    If liInd < liFieldCount Then
                         lsSQLQuery &= " AND "
                     End If
                 Next
@@ -224,6 +243,8 @@ Namespace TableReferenceFieldValue
                         loTuple_list.Add(loTupleObject)
                         lREcordset.MoveNext()
                     End While
+                    lREcordset.Close()
+                Else
                     lREcordset.Close()
                 End If
 
