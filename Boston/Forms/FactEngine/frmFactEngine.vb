@@ -13,6 +13,8 @@ Public Class frmFactEngine
     Private AutoComplete As frmAutoComplete
     Public zsIntellisenseBuffer As String = ""
 
+    Private zbTextBoxNaturalLanguageFocused As Boolean = False
+
     Public msPreviousProductionLookedFor As String
 
     Public FEQLProcessor As New FEQL.Processor(prApplication.WorkingModel)
@@ -45,6 +47,8 @@ Public Class frmFactEngine
         Me.AutoComplete.moBackgroundWorker = Me.BackgroundWorker
 
         Me.TextBoxInput.AllowDrop = True
+
+        Me.ToolStripMenuItemNaturalLanguage.Visible = My.Settings.FactEngineUseTransformations
 
         '-------------------------------------------------------
         'Setup the Text Highlighter
@@ -640,11 +644,17 @@ Public Class frmFactEngine
     Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
 
         Try
+            Dim lbNaturalLanguageTextBoxHasFocus = Me.zbTextBoxNaturalLanguageFocused
+
             If My.Computer.Keyboard.CtrlKeyDown Then
                 prApplication.WorkingModel.connectToDatabase(True)
             End If
 
-            Call Me.GO()
+            Call Me.GO(lbNaturalLanguageTextBoxHasFocus)
+
+            If Me.zbTextBoxNaturalLanguageFocused Then
+                Me.TextBoxNaturalLanguage.Focus()
+            End If
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -656,7 +666,7 @@ Public Class frmFactEngine
 
     End Sub
 
-    Private Sub GO()
+    Private Sub GO(Optional ByVal abUseNaturalLanguage As Boolean = False)
 
         Try
             With New WaitCursor
@@ -668,11 +678,15 @@ Public Class frmFactEngine
                 '    Exit Sub
                 'End If
 
+#Region "Transformations"
+                'TextBoxNaturalLanguage
                 If My.Settings.FactEngineUseTransformations Then
 
+                    If abUseNaturalLanguage Then
+                        Me.TextBoxInput.Text = Trim(Me.TextBoxNaturalLanguage.Text)
+                    End If
+
                     Dim lrLanguageParser As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
-
-
 
 #Region "Substitute for ModelElement names"
                     Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
@@ -696,7 +710,6 @@ Public Class frmFactEngine
                     Next
 #End Region
 
-
                     Dim loTransformation As Object = New System.Dynamic.ExpandoObject
                     Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
 
@@ -705,6 +718,7 @@ Public Class frmFactEngine
                     Next
 
                 End If
+#End Region
 
                 Me.LabelError.Text = ""
                 Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
@@ -1034,6 +1048,11 @@ Public Class frmFactEngine
                 Me.TabControl1.SelectedTab = Me.TabPageResults
             End If
 
+            Me.zbTextBoxNaturalLanguageFocused = False
+            Me.TextBoxInput.Focus()
+            Me.TextBoxInput.Text &= " "
+            Me.zrTextHighlighter.HighlightText()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1195,7 +1214,7 @@ Public Class frmFactEngine
             Select Case e.KeyCode
                 Case Is = Keys.F5
                     Call Me.hideAutoComplete()
-                    Call Me.GO()
+                    Call Me.GO(Me.TextBoxNaturalLanguage.Focused)
                 Case Is = Keys.Down
                     If Me.TextBoxInput.GetLineFromCharIndex(Me.TextBoxInput.SelectionStart) < Me.TextBoxInput.Lines.Count - 1 Then
                     ElseIf (Me.AutoComplete.ListBox.Items.Count > 0) Or Me.AutoComplete.Visible Then
@@ -2428,7 +2447,9 @@ Public Class frmFactEngine
     End Sub
 
     Private Sub TextBoxInput_GotFocus(sender As Object, e As EventArgs) Handles TextBoxInput.GotFocus
+
         Call Me.setAutoCompletePosition()
+
     End Sub
 
     Private Sub TextBoxInput_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBoxInput.KeyPress
@@ -3040,4 +3061,19 @@ Public Class frmFactEngine
         ToolStripMenuItemAutoCapitalise.Checked = Not ToolStripMenuItemAutoCapitalise.Checked
 
     End Sub
+
+    Private Sub ToolStripMenuItemNaturalLanguage_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemNaturalLanguage.Click
+
+        Me.ToolStripMenuItemNaturalLanguage.Checked = Not Me.ToolStripMenuItemNaturalLanguage.Checked
+
+        Me.ToolStripNaturalLanguage.Visible = Me.ToolStripMenuItemNaturalLanguage.Checked
+
+    End Sub
+
+    Private Sub TextBoxNaturalLanguage_GotFocus(sender As Object, e As EventArgs) Handles TextBoxNaturalLanguage.GotFocus
+
+        Me.zbTextBoxNaturalLanguageFocused = True
+
+    End Sub
+
 End Class
