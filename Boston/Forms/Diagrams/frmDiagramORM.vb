@@ -12973,4 +12973,35 @@ SkipRemovalFromModel:
 
     End Sub
 
+    Private Sub ViewTableDataToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewTableDataToolStripMenuItem.Click
+
+        Dim lrEntity As New ERD.Entity
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
+
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Call prApplication.WorkingModel.connectToDatabase()
+            End If
+
+            Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+            lfrmToolboxTableData.mrTable = lrEntityTypeInstance.EntityType.getCorrespondingRDSTable
+            lfrmToolboxTableData.mrModel = prApplication.WorkingModel
+            Call lfrmToolboxTableData.SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
 End Class

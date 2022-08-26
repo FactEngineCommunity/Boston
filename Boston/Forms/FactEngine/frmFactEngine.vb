@@ -717,6 +717,19 @@ Public Class frmFactEngine
                         Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
                     Next
 
+                    'Tidy up
+                    lasWords = Me.TextBoxInput.Text.Split(" ")
+
+                    For Each lsWord In lasWords
+
+                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsWord, True, True)
+
+                        If lrModelElement IsNot Nothing Then
+                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsWord, lrModelElement.Id)
+                        End If
+
+                    Next
+
                 End If
 #End Region
 
