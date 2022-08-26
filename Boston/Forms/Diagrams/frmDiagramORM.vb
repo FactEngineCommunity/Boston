@@ -849,9 +849,10 @@ Public Class frmDiagramORM
         Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.None
 
         'Help Tip
-        Me.LabelHelp.Text &= "Hint: Hold the left mouse key down and drag to select multiple objects." & vbCrLf
+        Me.LabelHelp.Text &= "Hint: Hold the left mouse key down and drag to select multiple objects."
+        Me.LabelHelp.Text.AppendLine("Hint: Hold the [Shift] key down and click on an Entity Type to see shortcut options.")
         If Me.zrPage.SelectedObject.Count = 0 Then
-            Me.LabelHelp.Text &= "Hint: Hold the [Alt] key down and drag to to pan the diagram." & vbCrLf
+            Me.LabelHelp.Text.AppendLine("Hint: Hold the [Alt] key down and drag to to pan the diagram." & vbCrLf)
             Me.LabelHelp.Text &= "Hint: Hold the [Ctrl] key down and use the arrow buttons on your keyboard to pan using your keyboard."
         End If
         Me.LabelHelp.Text &= vbCrLf
@@ -4019,10 +4020,10 @@ Public Class frmDiagramORM
                 Exit Sub
             End If
 
-                '--------------------------------------------------
-                'Just to be sure...set the Boston.WorkingPage
-                '--------------------------------------------------
-                prApplication.WorkingPage = Me.zrPage
+            '--------------------------------------------------
+            'Just to be sure...set the Boston.WorkingPage
+            '--------------------------------------------------
+            prApplication.WorkingPage = Me.zrPage
 
             If IsSomething(Diagram.GetNodeAt(lo_point)) Then
                 '----------------------------
@@ -4182,255 +4183,21 @@ Public Class frmDiagramORM
                     End If
                 End If
 
+                '-----------------------------------------------------------------------------------------------------------------------
+                'PropertiesForm load, set the 'SelectedObject' property of the PropertyGrid to the ORMModel object selected
+                '-----------------------------------------------------------------------------------------------------------------------
+#Region "Propery Grid"
+                If IsSomething(loNode) Then
+                    Dim lrModelObject As FBM.ModelObject
+                    lrModelObject = loNode.Tag
+
+                    Call Me.DoPropertiesGridProcessing(lrModelObject)
+                End If
+#End Region
+
                 'ORMDiagramView.DrawLinkCursor = Cursors.SizeAll
                 Cursor.Show()
 
-                '-----------------------------------------------------------------------------------------------------------------------
-                'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the ORMModel object selected
-                '-----------------------------------------------------------------------------------------------------------------------
-#Region "Propery Grid"
-                Dim lrPropertyGridForm As frmToolboxProperties
-                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-
-
-                If IsSomething(lrPropertyGridForm) And IsSomething(loNode) Then
-                    Dim lrModelObject As FBM.ModelObject
-                    lrModelObject = loNode.Tag
-                    lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
-                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-                    Select Case lrModelObject.ConceptType
-                        Case Is = pcenumConceptType.ValueType
-                            Dim lrValueTypeInstance As FBM.ValueTypeInstance
-                            lrValueTypeInstance = lrModelObject
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                            Select Case lrValueTypeInstance.DataType
-                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
-                                          pcenumORMDataType.NumericDecimal,
-                                          pcenumORMDataType.NumericMoney
-                                    Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
-                                    Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                Case Is = pcenumORMDataType.RawDataFixedLength,
-                                          pcenumORMDataType.RawDataLargeLength,
-                                          pcenumORMDataType.RawDataVariableLength,
-                                          pcenumORMDataType.TextFixedLength,
-                                          pcenumORMDataType.TextLargeLength,
-                                          pcenumORMDataType.TextVariableLength
-                                    Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
-                                    Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                Case Else
-                                    Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                    Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                            End Select
-                            If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
-                                lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
-                            End If
-                            lrPropertyGridForm.zrSelectedObject = lrValueTypeInstance
-                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrValueTypeInstance
-                        Case Is = pcenumConceptType.EntityType
-                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                            lrEntityTypeInstance = lrModelObject
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                            Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
-                            lrPropertyGridForm.zrSelectedObject = lrEntityTypeInstance
-                            If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
-                                Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
-                                Select Case lrEntityTypeInstance.DataType
-                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
-                                              pcenumORMDataType.NumericDecimal,
-                                              pcenumORMDataType.NumericMoney
-                                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
-                                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                    Case Is = pcenumORMDataType.RawDataFixedLength,
-                                              pcenumORMDataType.RawDataLargeLength,
-                                              pcenumORMDataType.RawDataVariableLength,
-                                              pcenumORMDataType.TextFixedLength,
-                                              pcenumORMDataType.TextLargeLength,
-                                              pcenumORMDataType.TextVariableLength
-                                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
-                                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                    Case Else
-                                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                End Select
-                            Else
-                                Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", False)
-                                Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                            End If
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeInstance
-                            lrPropertyGridForm.PropertyGrid.Refresh()
-                        Case Is = pcenumConceptType.EntityTypeName
-                            Dim lrEntityTypeName As FBM.EntityTypeName
-                            lrEntityTypeName = lrModelObject
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            If lrEntityTypeName.EntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
-                                Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
-                                Select Case lrEntityTypeName.EntityTypeInstance.DataType
-                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
-                                              pcenumORMDataType.NumericDecimal,
-                                              pcenumORMDataType.NumericMoney
-                                        Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
-                                        Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                    Case Is = pcenumORMDataType.RawDataFixedLength,
-                                              pcenumORMDataType.RawDataLargeLength,
-                                              pcenumORMDataType.RawDataVariableLength,
-                                              pcenumORMDataType.TextFixedLength,
-                                              pcenumORMDataType.TextLargeLength,
-                                              pcenumORMDataType.TextVariableLength
-                                        Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
-                                        Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                    Case Else
-                                        Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                        Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                End Select
-                            Else
-                                Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", False)
-                            End If
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeName.EntityTypeInstance
-                            lrPropertyGridForm.PropertyGrid.Refresh()
-                        Case Is = pcenumConceptType.RoleConstraintRole
-                            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-                            lrRoleConstraintRoleInstance = lrModelObject
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
-                        Case Is = pcenumConceptType.RoleConstraint
-                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                            lrRoleConstraintInstance = lrModelObject
-
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
-
-                            lrPropertyGridForm.zrSelectedObject = lrModelObject
-                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
-
-                            Select Case lrRoleConstraintInstance.RoleConstraintType
-                                Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                                    Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
-                                    lrFrequencyConstraintInstance = lrModelObject
-                                    Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
-                                    Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
-                                    Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
-                                    Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
-
-                                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrFrequencyConstraintInstance
-                                Case Is = pcenumRoleConstraintType.RoleValueConstraint
-                                    Dim lrRoleValueConstraintInstance As FBM.RoleValueConstraint
-                                    lrRoleValueConstraintInstance = lrModelObject
-                                    lrPropertyGridForm.zrSelectedObject = lrRoleValueConstraintInstance
-                                    lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
-                                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleValueConstraintInstance
-                                Case Is = pcenumRoleConstraintType.RingConstraint
-                                    Dim lrRingConstraintInstance As FBM.RingConstraint
-                                    lrRingConstraintInstance = lrModelObject
-                                    Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
-                                    Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
-                                    Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
-                                    Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
-
-                                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrRingConstraintInstance
-                                Case Else
-                                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
-                            End Select
-
-
-                        Case Is = pcenumConceptType.FactType
-                            Dim lrFactTypeInstance = CType(lrModelObject, FBM.FactTypeInstance)
-
-                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "ReferenceMode", lrFactTypeInstance.IsObjectified)
-                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", lrFactTypeInstance.IsObjectified)
-                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", lrFactTypeInstance.IsObjectified)
-                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", lrFactTypeInstance.IsObjectified)
-                            If lrFactTypeInstance.IsObjectified Then
-
-                                'CodeSafe 
-                                If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
-                                    'Try and find the ObjectifyingEntityType
-                                    lrFactTypeInstance.ObjectifyingEntityType = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id)
-
-                                    If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
-                                        Call Me.zrPage.DropEntityTypeAtPoint(lrFactTypeInstance.FactType.ObjectifyingEntityType, New PointF(10, 10), True)
-                                    End If
-                                End If
-
-
-                                If lrFactTypeInstance.ObjectifyingEntityType.EntityType.HasSimpleReferenceScheme Then
-                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", True)
-                                    Select Case lrFactTypeInstance.ObjectifyingEntityType.DataType
-                                        Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
-                                              pcenumORMDataType.NumericDecimal,
-                                              pcenumORMDataType.NumericMoney
-                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
-                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                        Case Is = pcenumORMDataType.RawDataFixedLength,
-                                              pcenumORMDataType.RawDataLargeLength,
-                                              pcenumORMDataType.RawDataVariableLength,
-                                              pcenumORMDataType.TextFixedLength,
-                                              pcenumORMDataType.TextLargeLength,
-                                              pcenumORMDataType.TextVariableLength
-                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
-                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                        Case Else
-                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                    End Select
-                                Else
-                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", False)
-                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
-                                    Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
-                                End If
-                            End If
-
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            Call lrFactTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
-                            If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
-                                lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
-                            End If
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
-
-                        Case pcenumConceptType.Role
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
-                            Dim lrRoleInstance As FBM.RoleInstance = lrModelObject
-                            lrPropertyGridForm.zrSelectedObject = lrRoleInstance
-                            lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleInstance
-                        Case Is = pcenumConceptType.ModelNote
-                            Dim lrModelNoteInstance As FBM.ModelNoteInstance = lrModelObject
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
-                            Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
-                            Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute,
-                                                                                                                                                     loMiscFilterAttribute2,
-                                                                                                                                                     loMiscFilterAttribute3,
-                                                                                                                                                     loMiscFilterAttribute4,
-                                                                                                                                                     loMiscFilterAttribute5})
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelNoteInstance
-                        Case Else
-                            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-                            Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
-                            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
-                            lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelObject
-                    End Select
-
-                End If
-#End Region
                 Me.Diagram.Invalidate()
 
             ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 1, True)) Then
@@ -4548,6 +4315,259 @@ Public Class frmDiagramORM
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
+
+    End Sub
+
+    Private Sub DoPropertiesGridProcessing(ByRef arModelElement As FBM.ModelObject)
+
+        Try
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+            If IsSomething(lrPropertyGridForm) Then
+                lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+                Select Case arModelElement.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Dim lrValueTypeInstance As FBM.ValueTypeInstance
+                        lrValueTypeInstance = arModelElement
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                        Select Case lrValueTypeInstance.DataType
+                            Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                          pcenumORMDataType.NumericDecimal,
+                                          pcenumORMDataType.NumericMoney
+                                Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
+                                Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                            Case Is = pcenumORMDataType.RawDataFixedLength,
+                                          pcenumORMDataType.RawDataLargeLength,
+                                          pcenumORMDataType.RawDataVariableLength,
+                                          pcenumORMDataType.TextFixedLength,
+                                          pcenumORMDataType.TextLargeLength,
+                                          pcenumORMDataType.TextVariableLength
+                                Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
+                                Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                            Case Else
+                                Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                Call lrValueTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                        End Select
+                        If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
+                        End If
+                        lrPropertyGridForm.zrSelectedObject = lrValueTypeInstance
+                        lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrValueTypeInstance
+                    Case Is = pcenumConceptType.EntityType
+                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                        lrEntityTypeInstance = arModelElement
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                        Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
+                        lrPropertyGridForm.zrSelectedObject = lrEntityTypeInstance
+                        If lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
+                            Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
+                            Select Case lrEntityTypeInstance.DataType
+                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
+                                              pcenumORMDataType.NumericMoney
+                                    Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
+                                    Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
+                                              pcenumORMDataType.TextVariableLength
+                                    Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
+                                    Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                Case Else
+                                    Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                    Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                            End Select
+                        Else
+                            Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataType", False)
+                            Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                            Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                        End If
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeInstance
+                        lrPropertyGridForm.PropertyGrid.Refresh()
+                    Case Is = pcenumConceptType.EntityTypeName
+                        Dim lrEntityTypeName As FBM.EntityTypeName
+                        lrEntityTypeName = arModelElement
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        If lrEntityTypeName.EntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
+                            Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", True)
+                            Select Case lrEntityTypeName.EntityTypeInstance.DataType
+                                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
+                                              pcenumORMDataType.NumericMoney
+                                    Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
+                                    Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
+                                              pcenumORMDataType.TextVariableLength
+                                    Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
+                                    Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                Case Else
+                                    Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                    Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                            End Select
+                        Else
+                            Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                            Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                            Call lrEntityTypeName.EntityTypeInstance.SetPropertyAttributes(Me, "DataType", False)
+                        End If
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeName.EntityTypeInstance
+                        lrPropertyGridForm.PropertyGrid.Refresh()
+                    Case Is = pcenumConceptType.RoleConstraintRole
+                        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                        lrRoleConstraintRoleInstance = arModelElement
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
+                    Case Is = pcenumConceptType.RoleConstraint
+                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                        lrRoleConstraintInstance = arModelElement
+
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+
+                        lrPropertyGridForm.zrSelectedObject = arModelElement
+                        lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+
+                        Select Case lrRoleConstraintInstance.RoleConstraintType
+                            Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                                Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
+                                lrFrequencyConstraintInstance = arModelElement
+                                Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
+                                Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                                Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
+                                Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
+
+                                lrPropertyGridForm.PropertyGrid.SelectedObject = lrFrequencyConstraintInstance
+                            Case Is = pcenumRoleConstraintType.RoleValueConstraint
+                                Dim lrRoleValueConstraintInstance As FBM.RoleValueConstraint
+                                lrRoleValueConstraintInstance = arModelElement
+                                lrPropertyGridForm.zrSelectedObject = lrRoleValueConstraintInstance
+                                lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                                lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleValueConstraintInstance
+                            Case Is = pcenumRoleConstraintType.RingConstraint
+                                Dim lrRingConstraintInstance As FBM.RingConstraint
+                                lrRingConstraintInstance = arModelElement
+                                Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Comparitor")
+                                Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                                Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
+                                Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
+
+                                lrPropertyGridForm.PropertyGrid.SelectedObject = lrRingConstraintInstance
+                            Case Else
+                                lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
+                        End Select
+
+
+                    Case Is = pcenumConceptType.FactType
+                        Dim lrFactTypeInstance = CType(arModelElement, FBM.FactTypeInstance)
+
+                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "ReferenceMode", lrFactTypeInstance.IsObjectified)
+                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", lrFactTypeInstance.IsObjectified)
+                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", lrFactTypeInstance.IsObjectified)
+                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", lrFactTypeInstance.IsObjectified)
+                        If lrFactTypeInstance.IsObjectified Then
+
+                            'CodeSafe 
+                            If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
+                                'Try and find the ObjectifyingEntityType
+                                lrFactTypeInstance.ObjectifyingEntityType = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id)
+
+                                If lrFactTypeInstance.ObjectifyingEntityType Is Nothing Then
+                                    Call Me.zrPage.DropEntityTypeAtPoint(lrFactTypeInstance.FactType.ObjectifyingEntityType, New PointF(10, 10), True)
+                                End If
+                            End If
+
+
+                            If lrFactTypeInstance.ObjectifyingEntityType.EntityType.HasSimpleReferenceScheme Then
+                                Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", True)
+                                Select Case lrFactTypeInstance.ObjectifyingEntityType.DataType
+                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
+                                              pcenumORMDataType.NumericMoney
+                                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", True)
+                                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
+                                              pcenumORMDataType.TextVariableLength
+                                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", True)
+                                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                    Case Else
+                                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                                End Select
+                            Else
+                                Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", False)
+                                Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", False)
+                                Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", False)
+                            End If
+                        End If
+
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
+                        If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
+                            lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
+                        End If
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = arModelElement
+
+                    Case pcenumConceptType.Role
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+                        Dim lrRoleInstance As FBM.RoleInstance = arModelElement
+                        lrPropertyGridForm.zrSelectedObject = lrRoleInstance
+                        lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleInstance
+                    Case Is = pcenumConceptType.ModelNote
+                        Dim lrModelNoteInstance As FBM.ModelNoteInstance = arModelElement
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("Name")
+                        Dim loMiscFilterAttribute4 As Attribute = New System.ComponentModel.CategoryAttribute("Description (Informal)")
+                        Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute,
+                                                                                                                                                     loMiscFilterAttribute2,
+                                                                                                                                                     loMiscFilterAttribute3,
+                                                                                                                                                     loMiscFilterAttribute4,
+                                                                                                                                                     loMiscFilterAttribute5})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrModelNoteInstance
+                    Case Else
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = arModelElement
+                End Select
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
 
     End Sub
 
@@ -4911,7 +4931,15 @@ Public Class frmDiagramORM
                             Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
 
                     End Select
+                Case Is = "Properties"
 
+                    Try
+                        Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                        Call lrPropertyGridForm.Show()
+                        Call Me.DoPropertiesGridProcessing(lrModelElement)
+                    Catch ex As Exception
+
+                    End Try
 
             End Select
 

@@ -2404,9 +2404,8 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Sub LoadToolboxPropertyWindow(ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
-                                  Optional ByRef arModelElement As FBM.ModelObject = Nothing)
-
+    Public Function LoadToolboxPropertyWindow(ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
+                                              Optional ByRef arModelElement As FBM.ModelObject = Nothing) As frmToolboxProperties
 
         Try
             Dim child As New frmToolboxProperties
@@ -2624,6 +2623,8 @@ SkipRegistrationChecking:
             End If
 #End Region
 
+            Return child
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2631,9 +2632,11 @@ SkipRegistrationChecking:
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return Nothing
         End Try
 
-    End Sub
+    End Function
 
 
 

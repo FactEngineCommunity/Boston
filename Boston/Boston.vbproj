@@ -2017,6 +2017,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>BPMNElementDecorations.resx</DependentUpon>
     </Compile>
+    <Compile Include="Resources\ORMPopupToolSelectorImages.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ORMPopupToolSelectorImages.resx</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Viev.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -2528,6 +2533,11 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>BPMNElementDecorations.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ORMPopupToolSelectorImages.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ORMPopupToolSelectorImages.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Viev.resx">
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
@@ -3402,6 +3412,7 @@
     <None Include="Images\MenuImages\spyglass_icon.png" />
     <None Include="Images\MenuImages\TaxonomyModel16x16.png" />
     <None Include="Images\MenuImages\Spyglass10x10.gif" />
+    <None Include="Images\MenuImages\Properties25x25.png" />
     <Content Include="Images\MenuImages\Toolbox16x16B&amp;W.jpg" />
     <None Include="Images\MenuImages\XML16x16.png" />
     <None Include="Images\Splash\Shutterstock-144487549.jpg" />
