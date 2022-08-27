@@ -247,7 +247,7 @@ Namespace FBM
 
             For Each lrPredicatePart In Me.PredicatePart
                 If abUseFastenshtein Then
-                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) > 4) Or
+                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) < 4) Or
                      (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
                      (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
                         Return False
@@ -273,17 +273,28 @@ Namespace FBM
         ''' </summary>
         ''' <param name="other"></param>
         ''' <returns></returns>
-        Public Function EqualsPartiallyByPredicatePartText(ByVal other As FBM.FactTypeReading) As Boolean
+        Public Function EqualsPartiallyByPredicatePartText(ByVal other As FBM.FactTypeReading,
+                                                           Optional ByVal abUseFastenstein As Boolean = False) As Boolean
 
             Dim liInd As Integer = 0
 
             For Each lrPredicatePart In other.PredicatePart
-                If (lrPredicatePart.PredicatePartText = Me.PredicatePart(0).PredicatePartText) And
-                     (lrPredicatePart.PreBoundText = Me.PredicatePart(0).PreBoundText) And
-                     (lrPredicatePart.PostBoundText = Me.PredicatePart(0).PostBoundText) Then
-                    'Only need one match for this to function to return True.
-                    Return True
+                If abUseFastenstein Then
+                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, Me.PredicatePart(0).PredicatePartText) < 4) And
+                         (lrPredicatePart.PreBoundText = Me.PredicatePart(0).PreBoundText) And
+                         (lrPredicatePart.PostBoundText = Me.PredicatePart(0).PostBoundText) Then
+                        'Only need one match for this to function to return True.
+                        Return True
+                    End If
+                Else
+                    If (lrPredicatePart.PredicatePartText = Me.PredicatePart(0).PredicatePartText) And
+                         (lrPredicatePart.PreBoundText = Me.PredicatePart(0).PreBoundText) And
+                         (lrPredicatePart.PostBoundText = Me.PredicatePart(0).PostBoundText) Then
+                        'Only need one match for this to function to return True.
+                        Return True
+                    End If
                 End If
+
                 liInd += 1
             Next
 

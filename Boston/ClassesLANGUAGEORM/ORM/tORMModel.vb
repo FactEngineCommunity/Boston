@@ -2670,7 +2670,8 @@ Namespace FBM
 
         Public Function getFactTypeByPartialMatchModelObjectsFactTypeReading(ByVal aarModelObject As List(Of FBM.ModelObject),
                                                                              ByVal arFactTypeReading As FBM.FactTypeReading,
-                                                                             Optional ByVal abReturnPartialMatchIfFound As Boolean = False) As List(Of FBM.FactType)
+                                                                             Optional ByVal abReturnPartialMatchIfFound As Boolean = False,
+                                                                             Optional ByVal abUseFastenstein As Boolean = False) As List(Of FBM.FactType)
 
             Try
                 '------------------------------------------------------
@@ -2713,7 +2714,7 @@ Namespace FBM
                             larFTRFactType = From FactType In larFactType
                                              From FactTypeReading In FactType.FactTypeReading
                                              Where arFactTypeReading.EqualsPartiallyByRoleJoinedModelObjectSequence(FactTypeReading)
-                                             Where arFactTypeReading.EqualsPartiallyByPredicatePartText(FactTypeReading)
+                                             Where arFactTypeReading.EqualsPartiallyByPredicatePartText(FactTypeReading, abUseFastenstein)
                                              Select FactType Distinct
 
                             If larFTRFactType.Count = 0 Then

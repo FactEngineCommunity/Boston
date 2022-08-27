@@ -442,6 +442,13 @@ PartialFactTypeMatch:
                 Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
                                                                                                                    lrFactTypeReading)
 
+                If Me.FBMPossibleFactTypes.Count = 0 Then
+                    'Use Fastenstein
+                    Me.FBMPossibleFactTypes = Me.QueryGraph.Model.getFactTypeByPartialMatchModelObjectsFactTypeReading(larModelObject,
+                                                                                                                       lrFactTypeReading,
+                                                                                                                       , True)
+                End If
+
                 Dim lbAmbiguousPreviousEdgeToResolve As Boolean = False
                 If Me.GetPreviousQueryEdge IsNot Nothing Then
                     If Me.GetPreviousQueryEdge.AmbiguousFactTypeMatches.Count > 0 And
@@ -466,19 +473,37 @@ PartialFactTypeMatch:
                         Else
                             lsModelElementId = arPreviousTargetNode.Name
                         End If
-                        Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
-                                                 From PredicatePart In FactTypeReading.PredicatePart
-                                                 Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
-                                                 Where PredicatePart.PredicatePartText = asPredicate
-                                                 Select FactTypeReading
+
+                        Try
+                            Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                     From PredicatePart In FactTypeReading.PredicatePart
+                                                     Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                     Where PredicatePart.PredicatePartText = asPredicate
+                                                     Select FactTypeReading
                                                                     ).First
 
-                        Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
-                                               From PredicatePart In FactTypeReading.PredicatePart
-                                               Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
-                                               Where PredicatePart.PredicatePartText = asPredicate
-                                               Select PredicatePart
-                                                                  ).First
+                            Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                   From PredicatePart In FactTypeReading.PredicatePart
+                                                   Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                   Where PredicatePart.PredicatePartText = asPredicate
+                                                   Select PredicatePart
+                                                                      ).First
+                        Catch ex As Exception
+                            Me.FBMFactTypeReading = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                     From PredicatePart In FactTypeReading.PredicatePart
+                                                     Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                     Where Fastenshtein.Levenshtein.Distance(PredicatePart.PredicatePartText, asPredicate) < 4
+                                                     Select FactTypeReading
+                                                                            ).First
+
+                            Me.FBMPredicatePart = (From FactTypeReading In Me.FBMPossibleFactTypes(0).FactTypeReading
+                                                   From PredicatePart In FactTypeReading.PredicatePart
+                                                   Where PredicatePart.Role.JoinedORMObject.Id = lsModelElementId
+                                                   Where Fastenshtein.Levenshtein.Distance(PredicatePart.PredicatePartText, asPredicate) < 4
+                                                   Select PredicatePart
+                                                                      ).First
+                        End Try
+
                     End If
 
                     If Me.FBMPossibleFactTypes.Count = 1 And lbAmbiguousPreviousEdgeToResolve Then
