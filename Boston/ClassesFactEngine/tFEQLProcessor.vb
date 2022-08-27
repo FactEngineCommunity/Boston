@@ -335,16 +335,6 @@ Namespace FEQL
             End Set
         End Property
 
-        Private _COLUMNNAMESTR As String = Nothing
-        Public Property COLUMNNAMESTR As String
-            Get
-                Return Me._COLUMNNAMESTR
-            End Get
-            Set(value As String)
-                Me._COLUMNNAMESTR = value
-            End Set
-        End Property
-
         Private _ASCLAUSE As FEQL.ASClause = Nothing
         Public Property ASCLAUSE As FEQL.ASClause
             Get
@@ -352,6 +342,16 @@ Namespace FEQL
             End Get
             Set(value As FEQL.ASClause)
                 Me._ASCLAUSE = value
+            End Set
+        End Property
+
+        Private _COLUMNNAMESTR As String = Nothing
+        Public Property COLUMNNAMESTR As String
+            Get
+                Return Me._COLUMNNAMESTR
+            End Get
+            Set(value As String)
+                Me._COLUMNNAMESTR = value
             End Set
         End Property
 
@@ -1491,39 +1491,40 @@ Namespace FEQL
                     Dim piInstance As PropertyInfo = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString)
 
                     If lrType Is GetType(String) Then
-
-                        piInstance.SetValue(ao_object, Trim(aoParseTreeNode.Token.Text))
+                        If piInstance.GetValue(ao_object) Is Nothing Then
+                            piInstance.SetValue(ao_object, Trim(aoParseTreeNode.Token.Text))
+                        End If
 
                     ElseIf lrType Is lasListOfString.GetType Then
 
 
-                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        Dim list As IList = CType(liInstance, IList)
-                        list.Add(Trim(aoParseTreeNode.Token.Text))
-                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+                            Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                            Dim list As IList = CType(liInstance, IList)
+                            list.Add(Trim(aoParseTreeNode.Token.Text))
+                            ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                    ElseIf lrType Is GetType(List(Of Object)) Then
+                        ElseIf lrType Is GetType(List(Of Object)) Then
 
-                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        Dim list As IList = CType(liInstance, IList)
-                        list.Add(aoParseTreeNode)
-                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+                            Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                            Dim list As IList = CType(liInstance, IList)
+                            list.Add(aoParseTreeNode)
+                            ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                    ElseIf lrType Is GetType(Object) Then
+                        ElseIf lrType Is GetType(Object) Then
 
-                        piInstance.SetValue(ao_object, aoParseTreeNode)
+                            piInstance.SetValue(ao_object, aoParseTreeNode)
 
-                    ElseIf lrType.Name = "List`1" Then
+                        ElseIf lrType.Name = "List`1" Then
 
-                        Dim instance = Activator.CreateInstance(lrType.GenericTypeArguments(0))
-                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
-                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                        Dim list As IList = CType(liInstance, IList)
-                        list.Add(instance)
-                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+                            Dim instance = Activator.CreateInstance(lrType.GenericTypeArguments(0))
+                            Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                            Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                            Dim list As IList = CType(liInstance, IList)
+                            list.Add(instance)
+                            ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                    Else
-                        Dim instance = Activator.CreateInstance(lrType)
+                        Else
+                            Dim instance = Activator.CreateInstance(lrType)
                         Call GetParseTreeTokensReflection(instance, loParseTreeNode)
                         piInstance.SetValue(ao_object, instance)
                     End If

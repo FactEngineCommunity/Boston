@@ -60,6 +60,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxFactEngineUseTransformations = New System.Windows.Forms.CheckBox()
         Me.CheckBoxFactEngineShowStackTrace = New System.Windows.Forms.CheckBox()
         Me.ComboBoxFactEngineUserDateTimeFormat = New System.Windows.Forms.ComboBox()
         Me.ComboBoxFactEngineUserDateFormat = New System.Windows.Forms.ComboBox()
@@ -95,7 +96,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxFactEngineUseTransformations = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -506,6 +506,17 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.TabIndex = 0
         Me.GroupBoxFactEngine.TabStop = False
         '
+        'CheckBoxFactEngineUseTransformations
+        '
+        Me.CheckBoxFactEngineUseTransformations.AutoSize = True
+        Me.CheckBoxFactEngineUseTransformations.Enabled = False
+        Me.CheckBoxFactEngineUseTransformations.Location = New System.Drawing.Point(19, 204)
+        Me.CheckBoxFactEngineUseTransformations.Name = "CheckBoxFactEngineUseTransformations"
+        Me.CheckBoxFactEngineUseTransformations.Size = New System.Drawing.Size(123, 17)
+        Me.CheckBoxFactEngineUseTransformations.TabIndex = 9
+        Me.CheckBoxFactEngineUseTransformations.Text = "Use Transformations"
+        Me.CheckBoxFactEngineUseTransformations.UseVisualStyleBackColor = True
+        '
         'CheckBoxFactEngineShowStackTrace
         '
         Me.CheckBoxFactEngineShowStackTrace.AutoSize = True
@@ -860,16 +871,6 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
-        '
-        'CheckBoxFactEngineUseTransformations
-        '
-        Me.CheckBoxFactEngineUseTransformations.AutoSize = True
-        Me.CheckBoxFactEngineUseTransformations.Location = New System.Drawing.Point(19, 204)
-        Me.CheckBoxFactEngineUseTransformations.Name = "CheckBoxFactEngineUseTransformations"
-        Me.CheckBoxFactEngineUseTransformations.Size = New System.Drawing.Size(123, 17)
-        Me.CheckBoxFactEngineUseTransformations.TabIndex = 9
-        Me.CheckBoxFactEngineUseTransformations.Text = "Use Transformations"
-        Me.CheckBoxFactEngineUseTransformations.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '

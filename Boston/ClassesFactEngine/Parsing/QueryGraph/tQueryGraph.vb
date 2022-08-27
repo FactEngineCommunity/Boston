@@ -1843,6 +1843,7 @@ ReturnClause:
                     End If
 #Region "ProjectionColums"
                     liInd = 1
+
                     Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
                     Me.ProjectionColumn = larProjectionColumn
 
@@ -1854,7 +1855,12 @@ ReturnClause:
                                 'for now
                                 lsSelectClause &= lrProjectColumn.Name
                             Else
-                                lsSelectClause &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                                If abIsStraightDerivationClause And Not lrProjectColumn.Role.FactType.IsObjectified Then
+                                    lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                                Else
+                                    lsSelectClause &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                                End If
+
                             End If
 
                         Else
@@ -3109,6 +3115,7 @@ ReturnClause:
                                 Try
                                     Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
                                     lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
+                                    lrColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
                                     larColumn.Add(lrColumn)
                                 Catch ex As Exception
                                     Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
