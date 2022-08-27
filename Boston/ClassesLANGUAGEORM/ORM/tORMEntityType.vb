@@ -3125,7 +3125,8 @@ FailsafeContinue:
                     If Me.Model.StoreAsXML Then
                         Me.Model.Save()
                     Else
-                        Call TableEntityType.UpdateEntityType(Me) 'Sets the new Name
+                        Me.isDirty = True
+                        Call Me.Save() 'Sets the new Name
 
                         Dim larRole = From Role In Me.Model.Role
                                       Where Role.JoinedORMObject Is Me

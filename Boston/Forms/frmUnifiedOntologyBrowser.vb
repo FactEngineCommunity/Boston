@@ -22,16 +22,6 @@ Public Class frmUnifiedOntologyBrowser
             Me.ToolStripStatusLabelModel.Visible = True
             Me.ToolStripStatusLabelModel.Text = "Term Count: " & Me.ListBox1.Items.Count
 
-            'Dim lsFolderLocation As String = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
-            'Dim lsFileName As String = "UnifiedOntologyBrowser.bmp"
-            'Dim lsFileLocationName As String = lsFolderLocation & "\" & lsFileName
-
-            'Try
-            '    Me.zrUnifiedOntology.Image.Save(lsFileLocationName)
-            'Catch ex As Exception
-            '    Debugger.Break()
-            'End Try
-
             Me.WebBrowser.Navigate(Me.zrUnifiedOntology.ImageFileLocationName)
 
             '======================================================================================

@@ -2178,8 +2178,7 @@ Namespace FBM
                     Try
                         Me.Dictionary.Add(lrDictionaryEntry.Symbol, Me.ModelDictionary.Count - 1)
                     Catch ex As Exception
-                        'Can ignore at this stage
-                        'Debugger.Break()
+                        'Can ignore at this stage                        
                     End Try
 
                 End If
@@ -4402,7 +4401,8 @@ Namespace FBM
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <param name="abRapidSave"></param>        
+        ''' <param name="abRapidSave">Does not check if any Model Element already exists. Used for fresh/new models.</param>        
+        ''' <param name="abForceDatabaseSave">Forces the Model do be saved to the database.</param>
         ''' <remarks></remarks>
         Sub Save(Optional ByVal abRapidSave As Boolean = False,
                  Optional ByVal abModelDictionaryRapidSave As Boolean = False,
@@ -5844,10 +5844,19 @@ Namespace FBM
                                 Select FactType.ObjectifyingEntityType
 
             For Each lrEntityType In larEntityType
-                Call lrEntityType.SetName(lrEntityType.ObjectifiedFactType.Id, False, True)
+                Call lrEntityType.SetName(lrEntityType.ObjectifiedFactType.Id, False, False)
+                lrEntityType.ObjectifiedFactType.isDirty = True
+                Me.ModelDictionary.Find(Function(x) x.Symbol = lrEntityType.ObjectifiedFactType.Id).isEntityType = True
+                Me.IsDirty = True
             Next
 #End Region
 
+            '--------------------------------------
+            'Flush unused ModelDictionary entries
+            '--------------------------------------
+            For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
+                Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
+            Next
 
             '20180410-VM-ToDo-Test to see if the RDF has been created for the Model.
             Me.RDSCreated = True 'For now for testing. 
@@ -5856,6 +5865,9 @@ Namespace FBM
 
             Me.Loading = False
 
+            If Me.IsDirty Then
+                Call Me.Save()
+            End If
 
         End Sub
 
@@ -6134,13 +6146,6 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     Call TablePage.GetPagesByModel(Me, False)
                 End If
 
-                '--------------------------------------
-                'Flush unused ModelDictionary entries
-                '--------------------------------------
-                For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
-
-                    Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
-                Next
 
 #Region "Vintage Threading"
                 'Dim liModelPageCount As Integer = 0

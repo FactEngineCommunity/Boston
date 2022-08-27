@@ -728,28 +728,31 @@ RetryTypeOfJoin:
                 If IsSomething(Me.JoinedORMObject) Then
                     Dim lrJoinedORMObject As Object = Me.JoinedORMObject
                     Dim loNode As MindFusion.Diagramming.ShapeNode = lrJoinedORMObject.shape
-                    Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
-                    lo_link.Locked = False ' was originally True
-                    lo_link.Tag = Me
-                    Me.Link = lo_link
-                    Me.Shape.OutgoingLinks.Add(lo_link)
-                    If Me.FactType.isPreferredReferenceMode Then
-                        Me.Link.Visible = False
-                    Else
-                        Me.Link.Visible = True
-                    End If
-                    Me.Link.Pen.Width = 0.3
 
-                    '---------------------
-                    'Mark Mandatory Roles
-                    '---------------------
-                    If Me.Mandatory Then
-                        lo_link.BaseShape = ArrowHead.Circle
-                    Else
-                        lo_link.BaseShape = ArrowHead.None
-                    End If
+                    If loNode IsNot Nothing Then
+                        Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
+                        lo_link.Locked = False ' was originally True
+                        lo_link.Tag = Me
+                        Me.Link = lo_link
+                        Me.Shape.OutgoingLinks.Add(lo_link)
+                        If Me.FactType.isPreferredReferenceMode Then
+                            Me.Link.Visible = False
+                        Else
+                            Me.Link.Visible = True
+                        End If
+                        Me.Link.Pen.Width = 0.3
 
-                    Me.Page.Diagram.Links.Add(lo_link)
+                        '---------------------
+                        'Mark Mandatory Roles
+                        '---------------------
+                        If Me.Mandatory Then
+                            lo_link.BaseShape = ArrowHead.Circle
+                        Else
+                            lo_link.BaseShape = ArrowHead.None
+                        End If
+
+                        Me.Page.Diagram.Links.Add(lo_link)
+                    End If
                 End If
 
                 '--------------------------------------------------------------------------------------
@@ -765,8 +768,6 @@ RetryTypeOfJoin:
                         Me.Shape.Move(Me.X, Me.FactType.RoleGroup(0).Shape.Bounds.Y)
                     End If
                 End If
-
-
 
                 '------------------------------------------
                 'Set the AnchorPatterns for the RoleGroup

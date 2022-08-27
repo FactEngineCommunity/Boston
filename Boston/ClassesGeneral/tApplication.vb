@@ -464,7 +464,8 @@ Public Class tApplication
                                       Optional ByVal abShowStackTrace As Boolean = True,
                                       Optional ByVal abAbortApplication As Boolean = False,
                                       Optional ByVal abThrowtoMSGBox As Boolean = False,
-                                      Optional ByRef aiMessageBoxButtons As MessageBoxButtons = MessageBoxButtons.OK) As DialogResult
+                                      Optional ByRef aiMessageBoxButtons As MessageBoxButtons = MessageBoxButtons.OK,
+                                      Optional ByVal abUseFlashCard As Boolean = False) As DialogResult
 
         Dim lsStackTrace As String = ""
         Dim lsErrorMessage As String = Nothing
@@ -586,8 +587,8 @@ Public Class tApplication
                                         lrCustomMessageBox.ButtonText.Add("OK")
                                         lrCustomMessageBox.ButtonText.Add("Cancel")
                                     Case Is = MessageBoxButtons.YesNo
-                                        lrCustomMessageBox.ButtonText.Add("Yes")
                                         lrCustomMessageBox.ButtonText.Add("No")
+                                        lrCustomMessageBox.ButtonText.Add("Yes")
                                     Case Is = MessageBoxButtons.YesNoCancel
                                         lrCustomMessageBox.ButtonText.Add("Yes")
                                         lrCustomMessageBox.ButtonText.Add("No")
@@ -645,7 +646,15 @@ Public Class tApplication
                         Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
 
                         If abThrowtoMSGBox Then
-                            aiMessageResponse = MsgBox(asErrorMessage, aiMessageBoxButtons)
+
+                            If abUseFlashCard Then
+                                Dim lfrmFlashCard As New frmFlashCard
+                                lfrmFlashCard.ziIntervalMilliseconds = 2500
+                                lfrmFlashCard.zsText = asErrorMessage
+                                lfrmFlashCard.Show(frmMain, "LightGray")
+                            Else
+                                aiMessageResponse = MsgBox(asErrorMessage, aiMessageBoxButtons)
+                            End If
 
                             Return aiMessageResponse
                         End If

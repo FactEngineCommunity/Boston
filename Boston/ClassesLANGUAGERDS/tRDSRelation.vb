@@ -554,8 +554,6 @@ Namespace RDS
                                    Optional ByVal aiOrdinalPosition As Integer = -1)
 
             Try
-                'If Me.OriginTable.Name = "EventActionDefinition" And Me.DestinationTable.Name = "Request" Then Debugger.Break()
-
                 'CodeSafe
                 If Me.OriginColumns.Contains(arColumn) Then Exit Sub
 
@@ -600,8 +598,6 @@ Namespace RDS
         Public Sub RemoveOriginColumn(ByRef arColumn As RDS.Column)
 
             Try
-                If Me.OriginTable.Name = "EventActionDefinition" And Me.DestinationTable.Name = "Request" Then Debugger.Break()
-
                 Me.OriginColumns.Remove(arColumn)
 
                 'CMML
@@ -618,8 +614,6 @@ Namespace RDS
         End Sub
 
         Public Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles DestinationTable.IndexModified
-
-            If Me.OriginTable.Name = "Request" Then Debugger.Break()
 
             Try
                 'CodeSafe
@@ -757,8 +751,6 @@ Namespace RDS
                 '                        Call Me.OriginTable.removeColumn(lrOriginalColumn)
                 '#End Region
                 '                    Else
-                '                        If Me.OriginTable.Name = "EventActionDefinition" And Me.DestinationTable.Name = "Request" Then Debugger.Break()
-
                 '                        lrOriginalColumn = Me.OriginColumns(0)
                 '                        lrActualTable = lrOriginalColumn.Table
 
@@ -860,8 +852,6 @@ Namespace RDS
         Private Sub DestinationTable_IndexAdded(ByRef arIndex As Index) Handles DestinationTable.IndexAdded
 
             Try
-                If Me.OriginTable.Name = "EventActionDefinition" And Me.DestinationTable.Name = "Request" Then Debugger.Break()
-
                 If arIndex.IsPrimaryKey Then
                     Dim lbColumnsArePartOfPrimaryKey As Boolean = False
                     Dim lrIndex As RDS.Index = arIndex
@@ -948,8 +938,6 @@ Namespace RDS
                         lrNewColumn.Role = Me.ResponsibleFactType.RoleGroup.Find(Function(x) x.InternalUniquenessConstraint.Count > 0)
                         lrNewColumn.FactType = lrNewColumn.Role.FactType
                     End If
-
-                    If Me.OriginTable.Name = "EventActionDefinition" Then Debugger.Break()
 
                     If Not Me.OriginTable.Column.Contains(lrNewColumn) Then
 

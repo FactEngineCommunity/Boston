@@ -397,8 +397,6 @@ Namespace RDS
                                   Optional abForceAdd As Boolean = False) As Boolean
 
             Try
-                If Me.Name = "Request" Then Debugger.Break()
-
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
                 arColumn.Table = Me 'CodeSafe
 

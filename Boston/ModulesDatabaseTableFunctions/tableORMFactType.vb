@@ -302,10 +302,8 @@ Namespace TableFactType
                             arFactType.Model.IsDirty = True
                             arFactType.ObjectifyingEntityType = lrEntityType
                             arFactType.isDirty = True
-                            lREcordset.Close()
-                            Throw New Exception(lsMessage)
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True,, True)
                         End If
-
                     End If
 
                 Else

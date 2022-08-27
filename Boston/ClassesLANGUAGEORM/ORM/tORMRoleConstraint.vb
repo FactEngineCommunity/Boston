@@ -2446,8 +2446,12 @@ RemoveAnyway:
                     '  reflect the new key, otherwise it will not be possible to Update an existing ValueType.
                     '------------------------------------------------------------------------------------------
                     Call TableRoleConstraint.ModifyKey(Me, asNewName)
+
                     Me.Id = asNewName
-                    Call TableRoleConstraint.UpdateRoleConstraint(Me) 'Sets the new Name
+                    Me.isDirty = True
+                    If Not Me.Model.StoreAsXML Then
+                        Call Me.Save() 'Sets the new Name
+                    End If
 
                     Call Me.RaiseEventNameChanged(lsOldName, asNewName)
 

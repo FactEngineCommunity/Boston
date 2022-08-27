@@ -136,7 +136,7 @@ Namespace Database
             Dim transaction As OleDb.OleDbTransaction = Nothing
             Dim locker As Object = New Object()
 
-            Call Boston.WriteToStatusBar("Perforing database upgrade from Version " & asFromVersionNr & " to Version " & asToVersionNr & ".", True)
+            Call Boston.WriteToStatusBar("Performing database upgrade from Version " & asFromVersionNr & " to Version " & asToVersionNr, True)
 
             Try
                 Dim lsSQLFilePath = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\TempFiles\"

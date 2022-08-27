@@ -1247,7 +1247,10 @@ Namespace FBM
 
                     Me.Id = asNewName
                     Me.Name = asNewName
-                    Call TableValueType.UpdateValueType(Me) 'Sets the new Name, because Id is the same as Name and the database's Name hasn't been updated yet.
+                    Me.isDirty = True
+                    If Not Me.Model.StoreAsXML Then
+                        Call Me.Save() 'Sets the new Name, because Id is the same as Name and the database's Name hasn't been updated yet.
+                    End If
 
                     '-------------------------------------------------------
                     'Update all of the respective ValueConstraint records
@@ -1268,45 +1271,45 @@ Namespace FBM
                     '  i.e. It's easier and safer to simply save the whole model.
                     '------------------------------------------------------------------------------------
                     If Me.Model.StoreAsXML Then
-                        Me.Model.Save()
-                    Else
-                        Dim larRole = From Role In Me.Model.Role
-                                      Where Role.JoinedORMObject Is Me
-                                      Select Role
-
-                        For Each lrRole In larRole
-                            lrRole.makeDirty()
-                            lrRole.FactType.makeDirty()
-                            Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lrRole.FactType.Id)
-                            Call lrModelDictionaryEntry.Save()
-                            If Not abSuppressModelSave Then lrRole.FactType.Save()
-                        Next
-                    End If
-
-                    '====================================================================================
-                    'RDS
-                    Dim lsColumnName As String = ""
-
-                    For Each lrColumn In Me.Model.RDS.getColumnsThatReferenceValueType(Me)
-
-                        If lrColumn.Role.FactType.Id = lrColumn.ActiveRole.FactType.Id Then
-                            Call lrColumn.setName(lrColumn.Role.GetAttributeName)
+                            Me.Model.Save()
                         Else
-                            lsColumnName = Me.Id
-                            lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                            Call lrColumn.setName(lsColumnName)
+                            Dim larRole = From Role In Me.Model.Role
+                                          Where Role.JoinedORMObject Is Me
+                                          Select Role
+
+                            For Each lrRole In larRole
+                                lrRole.makeDirty()
+                                lrRole.FactType.makeDirty()
+                                Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lrRole.FactType.Id)
+                                Call lrModelDictionaryEntry.Save()
+                                If Not abSuppressModelSave Then lrRole.FactType.Save()
+                            Next
                         End If
-                    Next
 
-                    '-------------------------------------------------------------
-                    'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
-                    If Not abSuppressModelSave Then Me.Model.Save()
+                        '====================================================================================
+                        'RDS
+                        Dim lsColumnName As String = ""
 
-                    Return True
-                End If 'Me.Id <> asNewName
+                        For Each lrColumn In Me.Model.RDS.getColumnsThatReferenceValueType(Me)
+
+                            If lrColumn.Role.FactType.Id = lrColumn.ActiveRole.FactType.Id Then
+                                Call lrColumn.setName(lrColumn.Role.GetAttributeName)
+                            Else
+                                lsColumnName = Me.Id
+                                lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                                Call lrColumn.setName(lsColumnName)
+                            End If
+                        Next
+
+                        '-------------------------------------------------------------
+                        'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
+                        If Not abSuppressModelSave Then Me.Model.Save()
+
+                        Return True
+                    End If 'Me.Id <> asNewName
 
 
-                Return False
+                    Return False
 
             Catch iex As tInformationException
                 prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)

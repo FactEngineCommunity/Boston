@@ -4608,7 +4608,10 @@ Namespace FBM
 
 
                     Me.Id = asNewName
-                    Call TableFactType.UpdateFactType(Me) 'Sets the new Name, TableFactType.ModifyKey (above) only modifies the key.
+                    Me.isDirty = True
+                    If Not Me.Model.StoreAsXML Then
+                        Call Me.Save() 'Sets the new Name, TableFactType.ModifyKey (above) only modifies the key.
+                    End If
 
 
                     Me.Model.MakeDirty()
@@ -4616,38 +4619,38 @@ Namespace FBM
                     RaiseEvent Updated()
 
                     If Not Me.Model.StoreAsXML Then
-                        Dim larRole = From Role In Me.Model.Role
-                                      Where Role.JoinedORMObject Is Me
-                                      Select Role
+                            Dim larRole = From Role In Me.Model.Role
+                                          Where Role.JoinedORMObject Is Me
+                                          Select Role
 
-                        For Each lrRole In larRole
-                            lrRole.makeDirty()
-                            lrRole.FactType.makeDirty()
-                            lrRole.FactType.Save()
-                        Next
-                    End If
+                            For Each lrRole In larRole
+                                lrRole.makeDirty()
+                                lrRole.FactType.makeDirty()
+                                lrRole.FactType.Save()
+                            Next
+                        End If
 
-                    Call Me.Model.TriggerEventModelElementModified(Me)
+                        Call Me.Model.TriggerEventModelElementModified(Me)
 
-                    If Not abSuppressModelSave Then Me.Model.Save()
+                        If Not abSuppressModelSave Then Me.Model.Save()
 
-                    Return True
-                End If 'Me.Id <> asNewName
+                        Return True
+                    End If 'Me.Id <> asNewName
 
-                'If abTriggerEvents Then
-                '    RaiseEvent Updated()
-                '    Call Me.RaiseEventNameChanged(asNewName)
-                '    Call Me.Model.MakeDirty(True)
-                'End If
+                    'If abTriggerEvents Then
+                    '    RaiseEvent Updated()
+                    '    Call Me.RaiseEventNameChanged(asNewName)
+                    '    Call Me.Model.MakeDirty(True)
+                    'End If
 
-                '------------------------------------------------------------------------------------
-                'Must save the Model because Roles that reference the EntityType must be saved.
-                '  NB If Roles are saved, the FactType must be saved. If the FactType is saved,
-                '  the RoleGroup's references (per Role) must be saved. A Role within the RoleGroup 
-                '  may reference another FactType, so that FactType must be saved...etc.
-                '  i.e. It's easier and safer to simply save the whole model.
-                '------------------------------------------------------------------------------------
-                If Not Me.Model.StoreAsXML Then
+                    '------------------------------------------------------------------------------------
+                    'Must save the Model because Roles that reference the EntityType must be saved.
+                    '  NB If Roles are saved, the FactType must be saved. If the FactType is saved,
+                    '  the RoleGroup's references (per Role) must be saved. A Role within the RoleGroup 
+                    '  may reference another FactType, so that FactType must be saved...etc.
+                    '  i.e. It's easier and safer to simply save the whole model.
+                    '------------------------------------------------------------------------------------
+                    If Not Me.Model.StoreAsXML Then
 
                     Dim larRole = From Role In Me.Model.Role
                                   Where Role.JoinedORMObject IsNot Nothing

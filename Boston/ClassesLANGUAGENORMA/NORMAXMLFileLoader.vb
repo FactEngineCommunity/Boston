@@ -1613,7 +1613,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                             lrRoleConstraint = arModel.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, larRoleList, loElement.Attribute("Name").Value)
                             lrRoleConstraint.NORMAReferenceId = loElement.Attribute("id")
 
-                            If lrRoleConstraint.NORMAReferenceId = "_B693BBB3-76B0-49A3-9F2E-31B80C46DD92" Then Debugger.Break()
+
                             arModel.AddRoleConstraint(lrRoleConstraint)
 
                             Try

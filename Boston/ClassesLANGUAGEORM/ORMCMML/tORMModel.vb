@@ -1401,7 +1401,7 @@ Namespace FBM
                             Call lrRDSRelation.changeResponsibleFactType(lrLinkFactType)
                         Catch ex As Exception
                             '20200726-VM-Unusual occurence, consider throwing an Exception.
-                            'Debugger.Break()
+                            Throw New Exception("Error trying to change the Responsible Fact Type for RDS Relation.")
                         End Try
 
                         Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
@@ -1454,7 +1454,7 @@ Namespace FBM
                             Call lrRDSRelation.changeResponsibleFactType(arFactType)
                         Catch ex As Exception
                             '20200726-VM-Unusual occurence, consider throwing an Exception.
-                            'Debugger.Break()
+                            Throw New Exception("Error trying to change Responsible Fact Type for RDSRelation.")
                         End Try
 
                         lrRecordset.MoveNext()

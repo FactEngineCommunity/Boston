@@ -179,7 +179,7 @@ Namespace FactEngine.TypeDB
                             larColumn.Add(lrColumn)
                             larUsedColumn.Add(lrColumn)
                         Else
-                            'Debugger.Break()
+                            Throw New Exception("Error finding Column. Getting Index by Table. TypeDBConnection.")
                         End If
                     Next
 
@@ -550,17 +550,18 @@ Namespace FactEngine.TypeDB
                                         End Select
                                     Case Is = Concept.ConceptOneofCase.Type
                                         loFieldValue = loValue.Type.Label
-                                        'Dim loObject As Object = GrpcServer.Transaction.
-                                        Try
-                                            Dim loEncoding As String = loValue.Type.Encoding.ToString
+                                    'Dim loObject As Object = GrpcServer.Transaction.
+                                    Try
+                                        Dim loEncoding As String = loValue.Type.Encoding.ToString
                                         Dim loValueType As String = loValue.Type.ValueType.ToString
 
                                     Catch ex As Exception
-                                            'Not a biggie at this stage.
-                                        End Try
-                                    Case Else
-                                        'Debugger.Break()
-                                End Select
+                                        'Not a biggie at this stage.
+                                    End Try
+
+                                Case Else
+                                    Throw New Exception("Unknown ConceptCase for Value. TypeDBConnection.GO.")
+                            End Select
 
                                 Try
                                     lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
