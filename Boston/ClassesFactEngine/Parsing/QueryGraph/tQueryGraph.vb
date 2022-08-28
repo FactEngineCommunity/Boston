@@ -1938,7 +1938,11 @@ ReturnClause:
                                                Where Column.FactType.Id = lrDerivationNode.QueryEdge.FBMFactType.Id
                                                Select Column).ToList
                     Else
-                        lrDerivationTable = lrDerivationNode.QueryEdge.FBMFactType.getCorrespondingRDSTable
+                        If lrDerivationNode.QueryEdge.FBMFactType.IsManyTo1BinaryFactType And Not lrDerivationNode.QueryEdge.FBMFactType.IsObjectified Then
+                            lrDerivationTable = lrDerivationNode.FBMModelObject.getCorrespondingRDSTable
+                        Else
+                            lrDerivationTable = lrDerivationNode.QueryEdge.FBMFactType.getCorrespondingRDSTable
+                        End If
 
                         larDerivationColumn = (From Column In lrDerivationTable.Column
                                                Where Column.Role.JoinedORMObject.Id = lrDerivationNode.Name
@@ -3115,7 +3119,10 @@ ReturnClause:
                                 Try
                                     Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
                                     lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
-                                    lrColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
+                                    If lrReturnColumn.ASCLAUSE IsNot Nothing Then
+                                        lrColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
+                                    End If
+
                                     larColumn.Add(lrColumn)
                                 Catch ex As Exception
                                     Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
@@ -3302,7 +3309,9 @@ MoveForward:
                                     lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrRole)
                                 Else
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                    If lrQueryEdge.BaseNode.FBMModelObject.IsDerived Then
+                                    If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType And lrQueryEdge.FBMFactType.IsDerived And Not lrQueryEdge.FBMFactType.IsObjectified Then
+                                        lrColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType), Nothing)
+                                    ElseIf lrQueryEdge.BaseNode.FBMModelObject.IsDerived Then
                                         lrColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.BaseNode.FBMModelObject.Id, lrQueryEdge.BaseNode.FBMModelObject), Nothing)
                                     End If
                                 End If

@@ -1897,8 +1897,50 @@ Namespace FBM
                                 Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
                                                                       Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.ShapeMidPoint.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.ShapeMidPoint.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
 
-                                lrRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
-                                lrRoleInstance.JoinedORMObject = larClosestModelElementInstance.First.ModelElementInstance
+                                Try
+                                    lrRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                                    lrRoleInstance.JoinedORMObject = larClosestModelElementInstance.First.ModelElementInstance
+                                Catch ex As Exception
+                                    'problem here. No shape.
+                                    'CodeSafe: Self heal if possible.
+                                    Dim lrClosestModeElementInstance = larClosestModelElementInstance.First.ModelElementInstance
+                                    Select Case lrClosestModeElementInstance.GetType
+                                        Case Is = GetType(FBM.FactTypeInstance)
+                                            Dim lrJoinedFactTypeInstance As FBM.FactTypeInstance = CType(lrClosestModeElementInstance, FBM.FactTypeInstance)
+                                            Call lrJoinedFactTypeInstance.DisplayAndAssociate()
+#Region "Link - Recover if needed"
+                                            If lrRoleInstance.Link Is Nothing Then
+                                                If lrClosestModeElementInstance.shape IsNot Nothing Then
+                                                    Dim lo_link As New DiagramLink(Me.Page.Diagram, lrRoleInstance.Shape, lrJoinedFactTypeInstance.Shape)
+                                                    lo_link.Locked = False ' was originally True
+                                                    lo_link.Tag = Me
+                                                    lrRoleInstance.Link = lo_link
+                                                    Me.Shape.OutgoingLinks.Add(lo_link)
+                                                    If Me.FactType.IsPreferredReferenceMode Then
+                                                        lrRoleInstance.Link.Visible = False
+                                                    Else
+                                                        lrRoleInstance.Link.Visible = True
+                                                    End If
+                                                    lrRoleInstance.Link.Pen.Width = 0.3
+
+                                                    '---------------------
+                                                    'Mark Mandatory Roles
+                                                    '---------------------
+                                                    If lrRoleInstance.Mandatory Then
+                                                        lo_link.BaseShape = ArrowHead.Circle
+                                                    Else
+                                                        lo_link.BaseShape = ArrowHead.None
+                                                    End If
+
+                                                    Me.Page.Diagram.Links.Add(lo_link)
+                                                End If
+                                            End If
+#End Region
+                                            lrRoleInstance.Link.Destination = lrClosestModeElementInstance.Shape
+                                            lrRoleInstance.JoinedORMObject = lrClosestModeElementInstance
+                                    End Select
+                                End Try
+
                                 Me.Page.Diagram.Invalidate()
                             End If
                         End If

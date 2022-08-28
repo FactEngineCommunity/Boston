@@ -990,7 +990,7 @@ Public Class frmFactEngine
                                                     lrBaseGraphNode.Edge.Add(lrEdge)
                                                 End If
                                             Else
-                                                Throw New Exception("Error duplicating edge. Graph View. FactEngine.GO.")
+                                                'Throw New Exception("Error duplicating edge. Graph View. FactEngine.GO.")
                                             End If
                                         End If
                                         liInd += 1

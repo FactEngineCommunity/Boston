@@ -704,6 +704,10 @@ RetryTypeOfJoin:
                 Select Case Me.TypeOfJoin
                     Case Is = pcenumRoleJoinType.EntityType
                         Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.JoinsEntityType.Id)
+                        If Me.JoinsEntityType.Shape Is Nothing And Me.JoinsEntityType.IsObjectifyingEntityType Then
+                            Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.JoinedORMObject.Id)
+                            Me.JoinsFactType.DisplayAndAssociate(False, False)
+                        End If
                     Case Is = pcenumRoleJoinType.ValueType
                         Me.JoinedORMObject = Me.Page.ValueTypeInstance.Find(Function(x) x.Id = Me.JoinsValueType.Id)
                     Case Is = pcenumRoleJoinType.FactType

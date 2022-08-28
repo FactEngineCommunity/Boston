@@ -196,6 +196,8 @@ Namespace FEQL
                     Dim lrFactType As FBM.FactType = CType(arModelElement, FBM.FactType)
                     If lrFactType.IsUnaryFactType Then
                         lsDerivationTableName = lrFactType.Id & vbCrLf
+                    ElseIf lrFactType.IsManyTo1BinaryFactType And Not lrFactType.IsObjectified Then
+                        lsDerivationTableName = lrFactType.Id
                     Else
                         lsDerivationTableName = arModelElement.getCorrespondingRDSTable.DatabaseName & vbCrLf
                     End If
