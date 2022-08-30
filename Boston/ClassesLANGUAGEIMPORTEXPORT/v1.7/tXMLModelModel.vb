@@ -1936,6 +1936,58 @@ SkipEntityType:
                 For Each lrFBMRoleConstraint In Me.ORMModel.RoleConstraints
 
                     Select Case lrFBMRoleConstraint.RoleConstraintType
+#Region "Ring Constraint"
+                        Case Is = pcenumRoleConstraintType.RingConstraint.ToString
+
+                            Dim lrNORMARoleConstraint As New NORMA.Model.RingConstraintType
+
+                            lrNORMARoleConstraint.id = "_" & lrFBMRoleConstraint.GUID
+                            lrNORMARoleConstraint.Name = lrFBMRoleConstraint.Name
+                            lrNORMARoleConstraint.Type = CType([Enum].Parse(GetType(NORMA.Model.RingConstraintTypeValues), lrFBMRoleConstraint.RingConstraintType), NORMA.Model.RingConstraintTypeValues)
+
+                            '================================================
+                            'Map the Ring Constraint
+                            '========================================
+
+
+                            Dim lrNORMARoleSequence = New NORMA.Model.ConstraintRoleSequenceWithJoinType
+                                lrNORMARoleConstraint.RoleSequence = lrNORMARoleSequence
+
+                            For Each lrFBMRoleConstraintRole In lrFBMRoleConstraint.RoleConstraintRoles
+
+                                'FactBasedModel: The FactType and Role that the RoleConstraintRole joins to.
+                                Dim lrFBMFactTypeAndRole = (From FactType In Me.ORMModel.FactTypes
+                                                            From Role In FactType.RoleGroup
+                                                            Where Role.Id = lrFBMRoleConstraintRole.RoleId
+                                                            Select New With {.FactType = FactType, .Role = Role}).First
+
+                                'NORMA Model:
+                                Dim lrRoleAndObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
+                                                       From FactType In lrModel.Facts.Items
+                                                       From Role In CType(FactType, NORMA.Model.Fact).FactRoles
+                                                       Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
+                                                       Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
+                                                       Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+
+                                If lrRoleAndObject Is Nothing Then
+                                    lrRoleAndObject = (From ModelElement In lrModel.Facts.Items
+                                                       From FactType In lrModel.Facts.Items
+                                                       From Role In CType(FactType, NORMA.Model.Fact).FactRoles
+                                                       Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
+                                                       Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
+                                                       Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+                                End If
+
+                                lrNORMARoleSequence.Role.Add(New NORMA.Model.RoleSequenceWithProjectionRoleRef() With {.id = "_" & System.Guid.NewGuid.ToString, .ref = lrRoleAndObject.Role.Id})
+                            Next
+
+                            If IsNothing(arNORMADocument.ORMModel.Constraints) Then
+                                arNORMADocument.ORMModel.Constraints = New NORMA.ORMModelConstraints()
+                                arNORMADocument.ORMModel.Constraints.Items = New List(Of Object)
+                            End If
+
+                            arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
+#End Region 'Ring Constraint
 #Region "Equality Constraint"
                         Case Is = pcenumRoleConstraintType.EqualityConstraint.ToString
 
@@ -2776,6 +2828,16 @@ SkipFactTypeInstance:
                         Dim lrFBMRoleConstraint = Me.ORMModel.RoleConstraints.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
                         Select Case lrFBMRoleConstraint.RoleConstraintType
+                            Case Is = "RingConstraint"
+                                Dim lrRoleConstraintInstance As New NORMA.ORMDiagram.RingConstraintShape
+                                lrRoleConstraintInstance.Subject = New NORMA.ORMDiagram.Subject
+                                lrRoleConstraintInstance.Subject.Ref = arORMDocument.ORMModel.Constraints.Items.First(Function(x) x.Name = lrConceptInstance.Symbol).Id
+                                lrRoleConstraintInstance.IsExpanded = True
+
+                                Dim liWidth = Math.Max(8, TextRenderer.MeasureText(lrConceptInstance.Symbol, New Font(lrPage.BaseFontName, lrPage.BaseFontSize)).Width - 5)
+                                lrRoleConstraintInstance.AbsoluteBounds = $"{lrConceptInstance.X / ldblScalar}, {lrConceptInstance.Y / ldblScalar}, {"0.16"}, {"0.16"}"
+
+                                lrPage.Shapes.Items.Add(lrRoleConstraintInstance)
                             Case Is = "ExternalUniquenessConstraint", "SubsetConstraint", "EqualityConstraint"
                                 Dim lrRoleConstraintInstance As New NORMA.ORMDiagram.ExternalConstraintShape
                                 lrRoleConstraintInstance.Subject = New NORMA.ORMDiagram.Subject

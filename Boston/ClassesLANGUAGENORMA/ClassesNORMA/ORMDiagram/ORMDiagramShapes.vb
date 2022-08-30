@@ -298,6 +298,13 @@ Namespace NORMA.ORMDiagram
         <XmlAttribute()>
         Public Property AbsoluteBounds() As String
 
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
+        Public Sub New()
+            Me.Id = "_" & System.Guid.NewGuid.ToString.ToUpper
+        End Sub
+
     End Class
 
 End Namespace

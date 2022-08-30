@@ -88,7 +88,7 @@ Namespace NORMA
             XmlElement("EqualityConstraint", GetType(Model.EqualityConstraintType)),
             XmlElement("FrequencyConstraint", GetType(Model.FrequencyConstraint)),
             XmlElement("MandatoryConstraint", GetType(Model.MandatoryConstraint)),
-            XmlElement("RingConstraint", GetType(Model.RingConstraint)),
+            XmlElement("RingConstraint", GetType(Model.RingConstraintType)),
             XmlElement("SubsetConstraint", GetType(Model.SubsetConstraint)),
             XmlElement("UniquenessConstraint", GetType(Model.UniquenessConstraint))>
         Public Property Items() As List(Of Object)
