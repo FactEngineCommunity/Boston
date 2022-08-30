@@ -41,6 +41,8 @@ Public Class frmToolboxEnterpriseExplorer
             Me.Visible = False
             Windows.Forms.Cursor.Current = Cursors.WaitCursor
 
+            Me.ToolStripMenuItemExportToNORMAormFile.Enabled = My.Settings.SuperuserMode
+
             Me.CircularProgressBar.Value = 0
 
             '==========================================================================================
@@ -3178,6 +3180,15 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
 
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the CoreDerivations into the metamodel
+
+                'UseCaseDiagrams
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(lrModel, False, True, False)
                 '==================================================
 
                 Call lrModel.createEntityRelationshipArtifacts()
@@ -5069,7 +5080,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
-    Private Sub ToNORMAormFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToNORMAormFileToolStripMenuItem.Click
+    Private Sub ToNORMAormFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemExportToNORMAormFile.Click
 
         Try
             Dim lrModel As FBM.Model
@@ -5123,7 +5134,7 @@ Public Class frmToolboxEnterpriseExplorer
                 Catch ex As XmlSchemaException
                     MessageBox.Show(ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Catch ex As Exception
-                    Throw New Exception(ex.Message)
+                    Throw New Exception(ex.InnerException.Message & vbCrLf & vbCrLf & ex.Message)
                 End Try
 
             End With

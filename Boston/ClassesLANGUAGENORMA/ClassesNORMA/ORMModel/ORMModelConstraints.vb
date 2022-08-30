@@ -189,7 +189,7 @@ Namespace NORMA.Model
 
         '''<remarks/>
         <XmlArrayItem("RoleSequence", IsNullable:=False)>
-        Public Property RoleSequences() As ConstraintRoleSequence()
+        Public Property RoleSequences As New List(Of ConstraintRoleSequence)
 
         '''<remarks/>
         <XmlAttribute(AttributeName:="id")>
@@ -204,7 +204,7 @@ Namespace NORMA.Model
 
             '''<remarks/>
             <XmlElement("Role")>
-            Public Property Role() As SequenceRole()
+            Public Property Role As New List(Of SequenceRole)
 
             '''<remarks/>
             <XmlAttribute(AttributeName:="id")>
@@ -222,6 +222,13 @@ Namespace NORMA.Model
             '''<remarks/>
             <XmlAttribute(AttributeName:="ref")>
             Public Property Ref() As String
+
+            ''' <summary>
+            ''' Parameterless Constructor
+            ''' </summary>
+            Public Sub New()
+                Me.Id = "_" & System.Guid.NewGuid.ToString
+            End Sub
 
         End Class
 

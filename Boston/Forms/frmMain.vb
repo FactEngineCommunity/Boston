@@ -86,7 +86,7 @@ Public Class frmMain
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
             psApplicationApplicationVersionNr = "6.4"
-            psApplicationDatabaseVersionNr = "1.34"
+            psApplicationDatabaseVersionNr = "1.35"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
             Dim loAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
@@ -492,7 +492,7 @@ SkipRegistrationChecking:
                 '-------------------------
                 If My.Settings.UseAutoUpdateChecker And lbCanCheckForUpdates Then
                     AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
-                    AutoUpdater.Start("https: //www.factengine.ai/products/Boston/update-info.xml")
+                    AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
                 End If
 
             Else
