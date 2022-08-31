@@ -3479,6 +3479,34 @@ FoundModelElement:
                     'lrMandatoryConstraint.ImpliedByObjectType.Ref = lrRoleAndObject.ORMObject.Id
 #End Region
 
+#Region "Role Value Constraint"
+                    Dim larRoleValueConstraint = From RoleConstraint In Me.ORMModel.RoleConstraints
+                                                 Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RoleValueConstraint.ToString
+                                                 Where RoleConstraint.RoleConstraintRoles.Count = 1
+                                                 Where RoleConstraint.RoleConstraintRoles(0).RoleId = lrFBMRole.Id
+                                                 Select RoleConstraint
+                    If larRoleValueConstraint.Count > 0 Then
+
+                        lrNORMARole.ValueRestriction = New NORMA.Model.Fact.FactRole.FactRoleValueRestriction
+
+                        Dim lrFBMRoleConstraint As XMLModel.RoleConstraint = larRoleValueConstraint(0)
+
+                        Dim lrNORMARoleValueConstraint As New NORMA.Model.Fact.FactRole.FactRoleValueRestriction.RestrictionRoleValueConstraint With {.Name = lrFBMRoleConstraint.Id}
+
+                        For Each lsValueRange In lrFBMRoleConstraint.ValueConstraint
+                            Dim lrNORMAValueRange As New NORMA.Model.Fact.FactRole.FactRoleValueRestriction.ConstraintValueRangesValueRange
+                            lrNORMAValueRange.MinValue = lsValueRange
+                            lrNORMAValueRange.MaxValue = lsValueRange
+                            lrNORMAValueRange.MinInclusion = "NotSet"
+                            lrNORMAValueRange.MaxInclusion = "NotSet"
+
+                            lrNORMARoleValueConstraint.ValueRanges.Add(lrNORMAValueRange)
+                        Next
+
+                        lrNORMARole.ValueRestriction.RoleValueConstraint = lrNORMARoleValueConstraint
+
+                    End If
+#End Region
                 Next
 
 #Region "Objectification"

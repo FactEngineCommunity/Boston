@@ -85,7 +85,8 @@ Namespace NORMA.Model
                 Partial Public Class RestrictionRoleValueConstraint
 
                     '''<remarks/>
-                    Public Property ValueRanges() As ConstraintValueRanges
+                    <XmlArrayItem("ValueRange", IsNullable:=False)>
+                    Public Property ValueRanges As New List(Of NORMA.Model.Fact.FactRole.FactRoleValueRestriction.ConstraintValueRangesValueRange)
 
                     '''<remarks/>
                     <XmlAttribute(AttributeName:="id")>
@@ -95,13 +96,20 @@ Namespace NORMA.Model
                     <XmlAttribute()>
                     Public Property Name() As String
 
+                    ''' <summary>
+                    ''' Parameterless Constructor
+                    ''' </summary>
+                    Public Sub New()
+                        Me.Id = "_" & System.Guid.NewGuid.ToString
+                    End Sub
+
                 End Class
 
                 <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
                 Partial Public Class ConstraintValueRanges
 
                     '''<remarks/>
-                    Public Property ValueRange() As ConstraintValueRangesValueRange
+                    Public Property ValueRange As New List(Of ConstraintValueRangesValueRange)
 
                 End Class
 
@@ -127,6 +135,13 @@ Namespace NORMA.Model
                     '''<remarks/>
                     <XmlAttribute()>
                     Public Property MaxInclusion() As String
+
+                    ''' <summary>
+                    ''' Parameterless Constructor
+                    ''' </summary>
+                    Public Sub New()
+                        Me.Id = "_" & System.Guid.NewGuid.ToString
+                    End Sub
 
                 End Class
 

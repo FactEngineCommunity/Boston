@@ -5188,11 +5188,11 @@ Namespace NORMA.Model
 
         Private notesField As NotesType
 
-        Private valueRangesField As ValueRangesType
+        Private valueRangesField As New ValueRangesType
 
         Private extensionsField As System.Xml.XmlElement
 
-        Private idField As String
+        Private idField As String = "_" & System.Guid.NewGuid.ToString
 
         '''<remarks/>
         Public Property Definitions() As DefinitionsType
@@ -5254,16 +5254,16 @@ Namespace NORMA.Model
  System.Xml.Serialization.XmlTypeAttribute([Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
     Partial Public Class ValueRangesType
 
-        Private valueRangeField() As ValueRangeType
+        Private valueRangeField As New List(Of ValueRangeType)
 
         '''<remarks/>
         <System.Xml.Serialization.XmlElementAttribute("ValueRange")>
-        Public Property ValueRange() As ValueRangeType()
+        Public Property ValueRange As List(Of ValueRangeType)
             Get
                 Return Me.valueRangeField
             End Get
             Set
-                Me.valueRangeField = value
+                Me.valueRangeField = Value
             End Set
         End Property
     End Class
@@ -5276,7 +5276,7 @@ Namespace NORMA.Model
  System.Xml.Serialization.XmlTypeAttribute([Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
     Partial Public Class ValueRangeType
 
-        Private idField As String
+        Private idField As String = "_" & System.Guid.NewGuid.ToString
 
         Private minValueField As String
 
