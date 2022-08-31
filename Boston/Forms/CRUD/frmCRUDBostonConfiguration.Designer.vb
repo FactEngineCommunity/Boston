@@ -96,6 +96,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -190,13 +191,15 @@ Partial Class frmCRUDBostonConfiguration
         Me.TableLayoutPanel1.ColumnCount = 1
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.Controls.Add(Me.ButtonCopyModelIdToClipboard, 0, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.LabelConfigurationFileLocation, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.LabelUserConfigurationFileLocation, 0, 1)
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(25, 45)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 2
+        Me.TableLayoutPanel1.RowCount = 3
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(525, 67)
         Me.TableLayoutPanel1.TabIndex = 3
         '
@@ -213,7 +216,7 @@ Partial Class frmCRUDBostonConfiguration
         'LabelUserConfigurationFileLocation
         '
         Me.LabelUserConfigurationFileLocation.AutoSize = True
-        Me.LabelUserConfigurationFileLocation.Location = New System.Drawing.Point(3, 33)
+        Me.LabelUserConfigurationFileLocation.Location = New System.Drawing.Point(3, 23)
         Me.LabelUserConfigurationFileLocation.Name = "LabelUserConfigurationFileLocation"
         Me.LabelUserConfigurationFileLocation.Size = New System.Drawing.Size(174, 13)
         Me.LabelUserConfigurationFileLocation.TabIndex = 2
@@ -872,6 +875,17 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
+        'ButtonCopyModelIdToClipboard
+        '
+        Me.ButtonCopyModelIdToClipboard.FlatAppearance.BorderSize = 0
+        Me.ButtonCopyModelIdToClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCopyModelIdToClipboard.Image = Global.Boston.My.Resources.Resources.CopyToClipboard16x16
+        Me.ButtonCopyModelIdToClipboard.Location = New System.Drawing.Point(3, 49)
+        Me.ButtonCopyModelIdToClipboard.Name = "ButtonCopyModelIdToClipboard"
+        Me.ButtonCopyModelIdToClipboard.Size = New System.Drawing.Size(20, 15)
+        Me.ButtonCopyModelIdToClipboard.TabIndex = 14
+        Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1000,4 +1014,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxExportSuppressMDAModelElements As CheckBox
     Friend WithEvents CheckBoxUseFlashCardErrorMessages As CheckBox
     Friend WithEvents CheckBoxFactEngineUseTransformations As CheckBox
+    Friend WithEvents ButtonCopyModelIdToClipboard As Button
 End Class

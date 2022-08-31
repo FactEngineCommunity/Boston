@@ -709,6 +709,29 @@ Namespace VAQL
                 Me._FOLLOWINGREADINGTEXT = value
             End Set
         End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDWRITTENAS As String = Nothing
+        Public Property KEYWDWRITTENAS As String
+            Get
+                Return Me._KEYWDWRITTENAS
+            End Get
+            Set(value As String)
+                Me._KEYWDWRITTENAS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _VALUETYPEWRITTENASCLAUSE As VAQL.ValueTypeWrittenAsClause = Nothing
+        Public Property VALUETYPEWRITTENASCLAUSE As VAQL.ValueTypeWrittenAsClause
+            Get
+                Return Me._VALUETYPEWRITTENASCLAUSE
+            End Get
+            Set(value As VAQL.ValueTypeWrittenAsClause)
+                Me._VALUETYPEWRITTENASCLAUSE = value
+            End Set
+        End Property
+
     End Class
 
     Public Class PredicatePartClause

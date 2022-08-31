@@ -5484,7 +5484,8 @@ Namespace FBM
 
         End Function
 
-        Public Function ExistsModelElement(ByVal asModelElementName As String, Optional abUseSafeMode As Boolean = False) As Boolean
+        Public Function ExistsModelElement(ByVal asModelElementName As String,
+                                           Optional abUseSafeMode As Boolean = False) As Boolean
 
             Try
                 ExistsModelElement = False
@@ -5495,7 +5496,7 @@ Namespace FBM
 
                 Dim lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Trim(asModelElementName)))
 
-                If IsSomething(lrDictionaryEntry) Then
+                If lrDictionaryEntry IsNot Nothing Then
                     If lrDictionaryEntry.isValueType Or
                        lrDictionaryEntry.isEntityType Or
                        lrDictionaryEntry.isFactType Or
@@ -5518,7 +5519,7 @@ Namespace FBM
                                                 ModelNote.Id = asModelElementName
                                           Select True
 
-                    ExistsModelElement = larModelElement.Count > 0
+                    Return larModelElement.Count > 0
 
                 End If
 

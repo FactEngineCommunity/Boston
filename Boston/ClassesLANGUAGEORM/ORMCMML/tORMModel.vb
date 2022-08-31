@@ -1338,6 +1338,30 @@ Namespace FBM
 
         End Function
 
+        Public Function ModelElementIsGeneralConceptOnly(ByVal asModelElementName As String) As Boolean
+
+            Try
+                Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(asModelElementName))
+
+                If lrModelDictionaryEntry Is Nothing Then
+                    Return False
+                Else
+                    Return lrModelDictionaryEntry.isGeneralConceptOnly
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Sets the ResponsibleFactType of existing Relations for the FactType to the relations respective LinkFactType.
         ''' This method called when a suitable FactType is objectified.

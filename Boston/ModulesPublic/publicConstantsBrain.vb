@@ -119,6 +119,7 @@
         ManyToMany
         ManyToOne
         MandatoryFirstRole
+        OneToMany
         UnaryFactType
     End Enum
 

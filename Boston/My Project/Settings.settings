@@ -21,7 +21,7 @@
       <Value Profile="(Default)">.\help\Boston.chm</Value>
     </Setting>
     <Setting Name="DatabaseConnectionString" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\Viev Pty Ltd\Boston\4.0.0.0\database\boston.vdb</Value>
+      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\FactEngine\Boston\4.0.0.0\database\boston.vdb</Value>
     </Setting>
     <Setting Name="ThrowCriticalDebugMessagesToScreen" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -93,7 +93,7 @@
       <Value Profile="(Default)">english.aiml</Value>
     </Setting>
     <Setting Name="FirstRun" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="AllowModelConfiguration" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -238,6 +238,9 @@
     </Setting>
     <Setting Name="BostonErrorMessagesShowFlashCard" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DefaultGeneralConceptToObjectTypeConversion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Value Type</Value>
     </Setting>
   </Settings>
 </SettingsFile>

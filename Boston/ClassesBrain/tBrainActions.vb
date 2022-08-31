@@ -629,12 +629,16 @@ Partial Public Class tBrain
                     lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
                     Me.OutputBuffer = "Okay"
                     Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+
+                    Me.Model.MakeDirty(False, False)
                 End If
             Else
-                Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False)
+                lrDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrDictionaryEntry, False, False,,,, True)
 
                 Me.OutputBuffer = "Okay"
                 Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+
+                Me.Model.MakeDirty(False, False)
             End If
 
             Return True
@@ -1022,7 +1026,26 @@ EndProcessing:
             larRole = New List(Of FBM.Role)
             Dim lrRoleConstraint As FBM.RoleConstraint
 
-            If arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.ManyToOne) Then
+            If arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.OneToMany) Then
+
+                Dim lsModelElementId As String = arQuestion.FocalSymbol(1)
+
+                lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementId)
+                larRole.Add(lrRole)
+
+                lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.InternalUniquenessConstraint,
+                                                                 larRole,
+                                                                 "InternalUniquenessConstraint",
+                                                                 1,
+                                                                 False,
+                                                                 False)
+
+                lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+
+                Me.Model.AddRoleConstraint(lrRoleConstraint, True, abBroadcastInterfaceEvent)
+
+
+            ElseIf arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.ManyToOne) Then
 
                 Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
 
@@ -1191,7 +1214,7 @@ EndProcessing:
             Dim lrValueType As FBM.ValueType
 
             If arQuestion.ObjectType IsNot Nothing Then
-                lrValueType = Me.CurrentQuestion.ObjectType
+                lrValueType = arQuestion.ObjectType '20220829-VM-Was Me.CurrentQuestion.ObjectType
             Else
 
                 Dim lrDummyValueType As FBM.ValueType = arQuestion.ValueType(0)
@@ -1221,7 +1244,7 @@ EndProcessing:
             'Add Error to ValueType because does not have a DataType
             Call lrValueType.CheckForErrors()
 
-            Me.Model.AddValueType(lrValueType, True, True, Nothing, True)
+            Me.Model.AddValueType(lrValueType, True, abBroadcastInterfaceEvent, Nothing, True)
 
             If Me.Page IsNot Nothing Then
 
@@ -1231,7 +1254,7 @@ EndProcessing:
 
                         If Me.Page.Diagram IsNot Nothing Then
                             Call lrValueTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, True)
+                            Call lrValueTypeInstance.Move(lrValueTypeInstance.X, lrValueTypeInstance.Y, abBroadcastInterfaceEvent)
 
                             If Me.AutoLayoutOn Then
                                 Me.Page.Form.AutoLayout()
@@ -1318,7 +1341,7 @@ EndProcessing:
                             Dim lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
 
                             Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, abBroadcastInterfaceEvent)
-                            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+                            Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, abBroadcastInterfaceEvent)
                         Case Is = pcenumLanguage.PropertyGraphSchema
 
                             Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)

@@ -180,6 +180,11 @@ Public Class frmToolboxModelDictionary
             loNode = Me.TreeView1.Nodes.Add("Constraints", "Constraints", 0, 0)
             loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
 
+            If prApplication.WorkingModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).Count > 0 Then
+                loNode = Me.TreeView1.Nodes.Add("General Concepts", "General Concepts", 28, 28)
+                loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
+            End If
+
             If Me.CheckBoxShowModelDictionary.Checked Then
                 loNode = Me.TreeView1.Nodes.Add("ModelDictionary", "Model Dictionary", 0, 0)
                 loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
@@ -325,6 +330,13 @@ Public Class frmToolboxModelDictionary
                 End Select
                 loNode = Me.TreeView1.Nodes("Constraints").Nodes.Add("RoleConstraint" & lrRoleConstraint.Name, lrRoleConstraint.Name, liImageIndex, liImageIndex)
                 loNode.Tag = lrRoleConstraint
+            Next
+
+            'General Concepts
+            For Each lrDictionaryEntry In prApplication.WorkingModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).OrderBy(Function(x) x.Symbol)
+
+                loNode = Me.TreeView1.Nodes("General Concepts").Nodes.Add(lrDictionaryEntry.Symbol, lrDictionaryEntry.Symbol, 29, 29)
+                loNode.Tag = lrDictionaryEntry
             Next
 
             If Me.CheckBoxShowModelDictionary.Checked Then
@@ -666,17 +678,19 @@ Public Class frmToolboxModelDictionary
                             'Establish the ContextMenu for the SelectedNode
                             '-----------------------------------------------
                             Select Case loModelObject.GetType
+                                Case Is = GetType(FBM.DictionaryEntry)
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripGeneralConcept
                                 Case Is = GetType(FBM.EntityType)
-                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
                                     Call Me.LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(FBM.ValueType)
-                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
                                     Call LoadPagesForValueType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(FBM.FactType)
-                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
                                     Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(FBM.RoleConstraint)
-                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
                                     Call LoadPagesForRoleConstraint(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(RDS.Table)
                                     Dim lrTable As RDS.Table = loModelObject
@@ -686,7 +700,7 @@ Public Class frmToolboxModelDictionary
                                         Case Is = GetType(FBM.FactType)
                                             Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
                                     End Select
-                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStrip1
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
                                 Case Else
                                     Me.TreeView1.ContextMenuStrip = Nothing
                             End Select
@@ -871,10 +885,10 @@ Public Class frmToolboxModelDictionary
                 lsWorkingPageId = prApplication.WorkingPage.PageId
             End If
 
-            Dim larPage = From Page In lrModel.Page _
-                          From FactTypeInstance In Page.FactTypeInstance _
-                          Where (FactTypeInstance.Id = asFactTypeId) _
-                          Select Page Distinct _
+            Dim larPage = From Page In lrModel.Page
+                          From FactTypeInstance In Page.FactTypeInstance
+                          Where (FactTypeInstance.Id = asFactTypeId)
+                          Select Page Distinct
                           Order By Page.Name
 
             If IsSomething(larPage) Then
@@ -883,10 +897,10 @@ Public Class frmToolboxModelDictionary
                     Dim loToolStripMenuItem As ToolStripMenuItem
                     Dim lr_enterprise_view As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                               lrPage, _
-                                                               lrPage.Model.ModelId, _
-                                                               pcenumLanguage.ORMModel, _
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
                                                                Nothing, lrPage.PageId)
 
                     lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
@@ -1040,7 +1054,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
+    Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripMain.Opening
 
         Try
             Select Case Me.TreeView1.SelectedNode.Tag.GetType
@@ -1508,6 +1522,62 @@ Public Class frmToolboxModelDictionary
 
         Try
             Call Me.LoadTree(asSearchString)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ConvertToEntityTypeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConvertToEntityTypeToolStripMenuItem.Click
+
+        Try
+            Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+
+            Try
+                lrModelDictionaryEntry = Me.TreeView1.SelectedNode.Tag
+
+                Call prApplication.WorkingModel.CreateEntityType(lrModelDictionaryEntry.Symbol, True, True, False, False)
+
+                Me.TreeView1.Nodes.Clear()
+                Call Me.LoadORMModelDictionary()
+
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ConvertToValueTypeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConvertToValueTypeToolStripMenuItem.Click
+
+        Try
+            Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+
+            Try
+                lrModelDictionaryEntry = Me.TreeView1.SelectedNode.Tag
+
+                Call prApplication.WorkingModel.CreateValueType(lrModelDictionaryEntry.Symbol, True,, True)
+
+                Me.TreeView1.Nodes.Clear()
+                Call Me.LoadORMModelDictionary()
+
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
 
         Catch ex As Exception
             Dim lsMessage As String

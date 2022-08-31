@@ -502,4 +502,14 @@ Public Class frmCRUDBostonConfiguration
 
     End Sub
 
+    Private Sub ButtonCopyModelIdToClipboard_Click(sender As Object, e As EventArgs) Handles ButtonCopyModelIdToClipboard.Click
+
+        System.Windows.Forms.Clipboard.SetText(Boston.GetConfigFileLocation)
+
+        Dim lfrmFlashCard As New frmFlashCard
+        lfrmFlashCard.ziIntervalMilliseconds = 1500
+        lfrmFlashCard.zsText = "Saved to clipboard."
+        lfrmFlashCard.Show(frmMain, "White")
+
+    End Sub
 End Class

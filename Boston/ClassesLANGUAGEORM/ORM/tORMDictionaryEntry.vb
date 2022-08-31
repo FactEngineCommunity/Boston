@@ -417,7 +417,13 @@ Namespace FBM
                     Me.isValue = True
             End Select
 
+            If aiConceptType <> pcenumConceptType.GeneralConcept Then Me.isGeneralConcept = False
+
             Me.Realisations.AddUnique(aiConceptType)
+
+            If Me.Model.Loaded Then
+                Me.isDirty = True
+            End If
             '20220215-VM-Was. Was too slow.
             'If Me.Model.Loaded Then
             '    If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = True

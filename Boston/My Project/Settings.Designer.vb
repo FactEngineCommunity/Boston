@@ -128,8 +128,8 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\Viev Pty Ltd\Boston\"& _ 
-            "4.0.0.0\database\boston.vdb")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\FactEngine\Boston\4."& _ 
+            "0.0.0\database\boston.vdb")>  _
         Public Property DatabaseConnectionString() As String
             Get
                 Return CType(Me("DatabaseConnectionString"),String)
@@ -416,7 +416,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
         Public Property FirstRun() As Boolean
             Get
                 Return CType(Me("FirstRun"),Boolean)
@@ -999,6 +999,18 @@ Namespace My
             End Get
             Set
                 Me("BostonErrorMessagesShowFlashCard") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Value Type")>  _
+        Public Property DefaultGeneralConceptToObjectTypeConversion() As String
+            Get
+                Return CType(Me("DefaultGeneralConceptToObjectTypeConversion"),String)
+            End Get
+            Set
+                Me("DefaultGeneralConceptToObjectTypeConversion") = value
             End Set
         End Property
     End Class

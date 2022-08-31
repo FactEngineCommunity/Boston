@@ -36,7 +36,7 @@ Partial Class frmToolboxModelDictionary
         Me.LabelPrompt = New System.Windows.Forms.Label()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
         Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ContextMenuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
         Me.ViewInGlossaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -49,9 +49,13 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ContextMenuStripGeneralConcept = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ConvertToEntityTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ConvertToValueTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_Main.SuspendLayout()
-        Me.ContextMenuStrip1.SuspendLayout()
+        Me.ContextMenuStripMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
+        Me.ContextMenuStripGeneralConcept.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_Main
@@ -200,12 +204,14 @@ Partial Class frmToolboxModelDictionary
         Me.ImageList.Images.SetKeyName(25, "Process16x16.png")
         Me.ImageList.Images.SetKeyName(26, "EntityTypeObjectifying.png")
         Me.ImageList.Images.SetKeyName(27, "Attribute-PrimaryKey.png")
+        Me.ImageList.Images.SetKeyName(28, "TaxonomyModel16x16.png")
+        Me.ImageList.Images.SetKeyName(29, "Entity-B&W16x16.png")
         '
-        'ContextMenuStrip1
+        'ContextMenuStripMain
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(281, 158)
+        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement})
+        Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 158)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -286,6 +292,24 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelModelElementTypeCount.Size = New System.Drawing.Size(13, 17)
         Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
         '
+        'ContextMenuStripGeneralConcept
+        '
+        Me.ContextMenuStripGeneralConcept.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConvertToEntityTypeToolStripMenuItem, Me.ConvertToValueTypeToolStripMenuItem})
+        Me.ContextMenuStripGeneralConcept.Name = "ContextMenuStripGeneralConcept"
+        Me.ContextMenuStripGeneralConcept.Size = New System.Drawing.Size(189, 70)
+        '
+        'ConvertToEntityTypeToolStripMenuItem
+        '
+        Me.ConvertToEntityTypeToolStripMenuItem.Name = "ConvertToEntityTypeToolStripMenuItem"
+        Me.ConvertToEntityTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+        Me.ConvertToEntityTypeToolStripMenuItem.Text = "convert to &Entity Type"
+        '
+        'ConvertToValueTypeToolStripMenuItem
+        '
+        Me.ConvertToValueTypeToolStripMenuItem.Name = "ConvertToValueTypeToolStripMenuItem"
+        Me.ConvertToValueTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+        Me.ConvertToValueTypeToolStripMenuItem.Text = "convert to &Value Type"
+        '
         'frmToolboxModelDictionary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -299,9 +323,10 @@ Partial Class frmToolboxModelDictionary
         Me.Text = "Model Dictionary"
         Me.GroupBox_Main.ResumeLayout(False)
         Me.GroupBox_Main.PerformLayout()
-        Me.ContextMenuStrip1.ResumeLayout(False)
+        Me.ContextMenuStripMain.ResumeLayout(False)
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
+        Me.ContextMenuStripGeneralConcept.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -309,7 +334,7 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents GroupBox_Main As System.Windows.Forms.GroupBox
     Friend WithEvents TreeView1 As System.Windows.Forms.TreeView
     Friend WithEvents ImageList As System.Windows.Forms.ImageList
-    Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents ContextMenuStripMain As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents ToolStripMenuItemViewOnPage As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemRemoveFromModel As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LabelModelName As System.Windows.Forms.Label
@@ -330,4 +355,7 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents ComboBox1 As ComboBox
     Friend WithEvents ToolStripMenuItemMakeMDAModelElement As ToolStripMenuItem
     Friend WithEvents SearchTextbox1 As SearchTextbox
+    Friend WithEvents ContextMenuStripGeneralConcept As ContextMenuStrip
+    Friend WithEvents ConvertToEntityTypeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ConvertToValueTypeToolStripMenuItem As ToolStripMenuItem
 End Class
