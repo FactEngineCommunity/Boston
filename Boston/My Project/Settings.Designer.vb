@@ -1004,7 +1004,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Value Type")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Entity Type")>  _
         Public Property DefaultGeneralConceptToObjectTypeConversion() As String
             Get
                 Return CType(Me("DefaultGeneralConceptToObjectTypeConversion"),String)

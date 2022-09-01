@@ -2184,6 +2184,7 @@ Namespace FBM
 
 
                 If arNewJoinedModelObject Is Me.JoinedORMObject Then
+                    RaiseEvent RoleJoinModified(Me.JoinedORMObject)
                     Exit Sub
                 Else
                     If Me.JoinedORMObject IsNot Nothing Then
@@ -2285,9 +2286,11 @@ Namespace FBM
                                     Next
 
                                     'Remove the Original Relation
-                                    If larOriginalColumn(0).Relation.Count > 0 Then
-                                        Dim lrRelation = larOriginalColumn(0).Relation(0)
-                                        Call Me.Model.RDS.removeRelation(lrRelation)
+                                    If larOriginalColumn.Count > 0 Then
+                                        If larOriginalColumn(0).Relation.Count > 0 Then
+                                            Dim lrRelation = larOriginalColumn(0).Relation(0)
+                                            Call Me.Model.RDS.removeRelation(lrRelation)
+                                        End If
                                     End If
 
                                     'Reassign the Role

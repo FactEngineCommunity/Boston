@@ -240,7 +240,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="DefaultGeneralConceptToObjectTypeConversion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Value Type</Value>
+      <Value Profile="(Default)">Entity Type</Value>
     </Setting>
   </Settings>
 </SettingsFile>

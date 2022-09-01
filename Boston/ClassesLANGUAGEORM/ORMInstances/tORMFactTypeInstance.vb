@@ -1608,7 +1608,9 @@ Namespace FBM
                 '  from the parent FactType, need to call remove_PredicateParts...here as well.
                 '----------------------------------------------------------------------------------------
                 'Me.FactTypeReading.RemovePredicatePartsForObjectType(arRoleInstance.JoinedORMObject)
-                Call Me.FactTypeReadingShape.RefreshShape()
+                If Me.FactTypeReadingShape IsNot Nothing Then
+                    Call Me.FactTypeReadingShape.RefreshShape()
+                End If
 
                 '-------------------
                 'Page is now Dirty
