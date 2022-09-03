@@ -65,6 +65,16 @@ Public Class frmMain
 
             Dim lsMessage As String = ""
 
+            If My.Settings.FirstRun Then
+                Try
+                    Dim lrCommonApplicationData As New CommonApplicationData("FactEngine", "Boston")
+                    Call lrCommonApplicationData.CreateFolders(True)
+                Catch ex As Exception
+                    'Not a biggie. This is only rarely a problem.
+                End Try
+
+            End If
+
             Me.MenuStrip_main.ImageScalingSize = New Drawing.Size(16, 16)
 
             Cursor.Current = Cursors.WaitCursor
@@ -156,9 +166,6 @@ ConfigurationOK:
 
             prApplication.MainForm = Me
 
-            If pbLogStartup Then
-                prApplication.ThrowErrorMessage("Successfully created the application object", pcenumErrorType.Information)
-            End If
             '==============================================================================================================================
 
             Me.StatusLabelGeneralStatus.Text = "Checking for Plugins"
@@ -194,7 +201,7 @@ ConfigurationOK:
                                                      FileSystemRights.FullControl,
                                                      AccessControlType.Allow)
             Catch
-                'Not a biggie. But Boston does need to be written to C:\ProgramData. If that fails, the customer will have to get in touch.
+                'Not a biggie. But Boston data does need to be written to C:\ProgramData. If that fails, the customer will have to get in touch.
             End Try
 
             Dim lsDatabaseLocation As String = ""
@@ -5541,7 +5548,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

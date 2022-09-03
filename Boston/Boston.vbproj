@@ -541,6 +541,7 @@
     <Compile Include="ClassesGeneral\SearchTextbox\SearchTextbox.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ClassesGeneral\tCommonApplicationData.vb" />
     <Compile Include="ClassesGeneral\tFlickerFreeListbox.vb">
       <SubType>Component</SubType>
     </Compile>

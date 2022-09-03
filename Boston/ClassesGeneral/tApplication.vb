@@ -458,6 +458,19 @@ Public Class tApplication
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="asErrorMessage">The error message</param>
+    ''' <param name="aiMessageType">Informatio, Warning, Critical</param>
+    ''' <param name="asStackTrace">The Stack Trace.</param>
+    ''' <param name="abShowStackTrace">True if you want to include the Stack Trace.</param>
+    ''' <param name="abAbortApplication">True if you want to abort the application. Default = False.</param>
+    ''' <param name="abThrowtoMSGBox">NB Set to True if you want to use the FlashCard.</param>
+    ''' <param name="aiMessageBoxButtons">MessageBoxButtons that you want to show for Warning messages.</param>
+    ''' <param name="abUseFlashCard">True if you just want to use the FlashCard.</param>
+    ''' <param name="arException">Used for RayGun. Include the actual exception so that it can be differentiated in the list of errors at RayGun.com</param>
+    ''' <returns></returns>
     Public Function ThrowErrorMessage(ByVal asErrorMessage As String,
                                       ByVal aiMessageType As pcenumErrorType,
                                       Optional ByVal asStackTrace As String = Nothing,
@@ -465,7 +478,8 @@ Public Class tApplication
                                       Optional ByVal abAbortApplication As Boolean = False,
                                       Optional ByVal abThrowtoMSGBox As Boolean = False,
                                       Optional ByRef aiMessageBoxButtons As MessageBoxButtons = MessageBoxButtons.OK,
-                                      Optional ByVal abUseFlashCard As Boolean = False) As DialogResult
+                                      Optional ByVal abUseFlashCard As Boolean = False,
+                                      Optional arException As Exception = Nothing) As DialogResult
 
         Dim lsStackTrace As String = ""
         Dim lsErrorMessage As String = Nothing
@@ -549,7 +563,12 @@ Public Class tApplication
 #Region "RayGun"
                         If My.Settings.UseAutomatedErrorReporting Then
                             Try
-                                Throw New Exception(asErrorMessage)
+                                If arException IsNot Nothing Then
+                                    prRaygunClient.Send(arException)
+                                Else
+                                    Throw New Exception(asErrorMessage)
+                                End If
+
                             Catch ex As Exception
                                 Try
                                     prRaygunClient.Send(ex)

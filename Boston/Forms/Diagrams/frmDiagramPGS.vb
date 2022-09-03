@@ -60,7 +60,7 @@ Public Class frmDiagramPGS
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -108,7 +108,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -286,7 +286,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return commonLinks
         End Try
@@ -822,7 +822,7 @@ Public Class frmDiagramPGS
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -845,7 +845,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1005,7 +1005,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1092,7 +1092,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1156,7 +1156,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1369,7 +1369,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1409,7 +1409,7 @@ Public Class frmDiagramPGS
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1511,13 +1511,13 @@ Public Class frmDiagramPGS
                 Next
 #End Region
 
-                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance _
-                                   From FactInstance In FactTypeInstance.Fact _
-                                   From FactDataInstance In FactInstance.Data _
-                                   Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                                    And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name _
-                                   Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name
+                                          Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
 
                 Dim lrFactDataInstance As New FBM.FactDataInstance
                 For Each lrFactDataInstance In larFactDataInstance
@@ -1576,7 +1576,7 @@ Public Class frmDiagramPGS
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.DiagramView.BringToFront()
         End Try
@@ -1631,10 +1631,10 @@ Public Class frmDiagramPGS
 
             Dim lrShapeNode As MindFusion.Diagramming.ShapeNode
             'lrShapeNode = lrPageObject.Shape.Clone(False)
-            lrShapeNode = New MindFusion.Diagramming.ShapeNode(lrNode.shape)
+            lrShapeNode = New MindFusion.Diagramming.ShapeNode(lrNode.Shape)
             lrShapeNode.Shape = loDiagrammingShape
             lrShapeNode.HandlesStyle = HandlesStyle.InvisibleMove
-            lrShapeNode.SetRect(lrNode.shape.Bounds, False)
+            lrShapeNode.SetRect(lrNode.Shape.Bounds, False)
             lrShapeNode.Font = New System.Drawing.Font("Arial", 10) 'lrShapeNode.Font = Me.zrPage.Diagram.Font
             lrShapeNode.TextFormat.Alignment = StringAlignment.Center
             lrShapeNode.Text = lrNode.Data
@@ -1792,7 +1792,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.CircularProgressBar.SendToBack()
             Me.HiddenDiagramView.SendToBack()
@@ -1851,7 +1851,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1913,24 +1913,24 @@ Public Class frmDiagramPGS
                     Me.MorphVector(0).TargetZoomFactor = lrPage.DiagramView.ZoomFactor
                 End If
 
-                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance _
-                                   From FactInstance In FactTypeInstance.Fact _
-                                   From FactDataInstance In FactInstance.Data _
-                                   Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          From FactInstance In FactTypeInstance.Fact
+                                          From FactDataInstance In FactInstance.Data
+                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
                                    And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name _
-                                   Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name
+                                          Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
 
                 Dim lrFactDataInstance As New FBM.FactDataInstance
                 For Each lrFactDataInstance In larFactDataInstance
                     Exit For
                 Next
 
-                If lrFactDataInstance.shape IsNot Nothing Then
+                If lrFactDataInstance.Shape IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrFactDataInstance.X,
                                                               lrFactDataInstance.Y,
-                                                              lrFactDataInstance.shape.Bounds.Width,
-                                                              lrFactDataInstance.shape.Bounds.Height)
+                                                              lrFactDataInstance.Shape.Bounds.Width,
+                                                              lrFactDataInstance.Shape.Bounds.Height)
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
@@ -1946,8 +1946,8 @@ Public Class frmDiagramPGS
                 If lrNode IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
                                                               lrNode.Y,
-                                                              lrNode.shape.Bounds.Width,
-                                                              lrNode.shape.Bounds.Height)
+                                                              lrNode.Shape.Bounds.Width,
+                                                              lrNode.Shape.Bounds.Height)
                     Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
                     Me.MorphVector(0).VectorSteps = Viev.Greater(25, (Math.Abs(lrNode.Shape.Bounds.X - lrNode.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrNode.Y) + 1))
                 Else
@@ -1972,7 +1972,7 @@ Public Class frmDiagramPGS
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2520,7 +2520,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error:  " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3001,7 +3001,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3331,7 +3331,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3379,104 +3379,104 @@ Public Class frmDiagramPGS
 
             Me.MorphVector.Add(New tMorphVector(liX, liY, 0, 0, 40))
 
-                '====================================================
-                '--------------------------------------------------------------
-                'Clear the list of ORMDiagrams that may relate to the EntityType
-                '--------------------------------------------------------------
-                Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
-                Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
-                Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
+            '====================================================
+            '--------------------------------------------------------------
+            'Clear the list of ORMDiagrams that may relate to the EntityType
+            '--------------------------------------------------------------
+            Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
+            Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
+            Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
 
-                Dim loMenuOption As ToolStripItem
-                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            Dim loMenuOption As ToolStripItem
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                '--------------------------------------------------------------------------------------------------------
-                'Get the ORM Diagrams for the selected Node.
-                If lrRelation.IsPGSRelationNode Then
-                    lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-                Else
-                    lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ORM Diagrams for the selected Node.
+            If lrRelation.IsPGSRelationNode Then
+                lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            Else
+                lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+            End If
+
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
                 End If
+            Next
 
-                For Each lrPage In lrPageList
-                    '---------------------------------------------------------------------------------------------------------
-                    'Try and find the Page within the EnterpriseView.TreeView
-                    '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-                    '  is not added for those hidden Pages.
-                    '----------------------------------------------------------
-                    lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ER Diagrams for the selected Node.
+            If lrRelation.IsPGSRelationNode Then
+                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            Else
+                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+            End If
 
-                    If IsSomething(lrEnterpriseView) Then
-                        '---------------------------------------------------
-                        'Add the Page(Name) to the MenuOption.DropDownItems
-                        '---------------------------------------------------
-                        loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
-                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                        AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
-                    End If
-                Next
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-                '--------------------------------------------------------------------------------------------------------
-                'Get the ER Diagrams for the selected Node.
-                If lrRelation.IsPGSRelationNode Then
-                    lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-                Else
-                    lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
                 End If
+            Next
 
-                For Each lrPage In lrPageList
-                    '---------------------------------------------------------------------------------------------------------
-                    'Try and find the Page within the EnterpriseView.TreeView
-                    '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-                    '  is not added for those hidden Pages.
-                    '----------------------------------------------------------
-                    lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+            '--------------------------------------------------------------------------------------------------------
+            'Get the PGS Diagrams for the selected Node.
+            If lrRelation.IsPGSRelationNode Then
+                lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            Else
+                lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+            End If
 
-                    If IsSomething(lrEnterpriseView) Then
-                        '---------------------------------------------------
-                        'Add the Page(Name) to the MenuOption.DropDownItems
-                        '---------------------------------------------------
-                        loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
-                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                        AddHandler loMenuOption.Click, AddressOf Me.morphToERDiagram
-                    End If
-                Next
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-                '--------------------------------------------------------------------------------------------------------
-                'Get the PGS Diagrams for the selected Node.
-                If lrRelation.IsPGSRelationNode Then
-                    lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
-                Else
-                    lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
                 End If
+            Next
 
-                For Each lrPage In lrPageList
-                    '---------------------------------------------------------------------------------------------------------
-                    'Try and find the Page within the EnterpriseView.TreeView
-                    '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-                    '  is not added for those hidden Pages.
-                    '----------------------------------------------------------
-                    lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
-
-                    If IsSomething(lrEnterpriseView) Then
-                        '---------------------------------------------------
-                        'Add the Page(Name) to the MenuOption.DropDownItems
-                        '---------------------------------------------------
-                        loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
-                        loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                        AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
-                    End If
-                Next
-
-            Catch ex As Exception
-                Dim lsMessage As String
+        Catch ex As Exception
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             Me.Cursor = Cursors.Default
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3511,7 +3511,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3630,7 +3630,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3711,7 +3711,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3742,7 +3742,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -3784,7 +3784,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3822,7 +3822,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3855,7 +3855,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3884,7 +3884,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3895,12 +3895,12 @@ Public Class frmDiagramPGS
             Dim lrPGSNodeType As PGS.Node
             Dim lrModelElement As FBM.ModelObject = Nothing
             Try
-                    lrPGSNodeType = Me.zrPage.SelectedObject(0)
-                Catch ex As Exception
-                    Exit Sub
-                End Try
+                lrPGSNodeType = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
 
-                lrModelElement = lrPGSNodeType.FBMModelElement
+            lrModelElement = lrPGSNodeType.FBMModelElement
 
             If lrModelElement.GetType = GetType(FBM.EntityType) Then
 
@@ -3920,7 +3920,7 @@ Public Class frmDiagramPGS
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4065,7 +4065,7 @@ Aborted:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -4079,7 +4079,7 @@ Aborted:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -4093,7 +4093,7 @@ Aborted:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4134,7 +4134,7 @@ Aborted:
 FinishedPretesting:
                 If lbGoForward Then
 
-                    Call lrFactType.MakeManyToManyRelationship
+                    Call lrFactType.MakeManyToManyRelationship()
 
                 End If
 
@@ -4149,7 +4149,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4194,7 +4194,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4227,7 +4227,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4288,7 +4288,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4350,7 +4350,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4453,7 +4453,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4522,7 +4522,7 @@ FinishedPretesting:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4646,7 +4646,7 @@ ErrorOut:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4677,7 +4677,7 @@ ErrorOut:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -4811,7 +4811,7 @@ SimplePredicate:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4828,7 +4828,7 @@ SimplePredicate:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -4846,7 +4846,7 @@ SimplePredicate:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4916,7 +4916,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4942,7 +4942,7 @@ EndProcessing:
                         lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
                     End If
                 Else
-                        lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
+                    lrFactType = lrERDRelation.RDSRelation.ResponsibleFactType
                 End If
 
                 Call lrfrmVerbalisationView.VerbaliseFactType(lrFactType)
@@ -4954,7 +4954,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4973,7 +4973,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4988,7 +4988,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5009,7 +5009,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5045,7 +5045,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5086,7 +5086,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

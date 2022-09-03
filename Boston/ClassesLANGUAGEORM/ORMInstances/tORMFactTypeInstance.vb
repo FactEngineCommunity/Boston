@@ -619,7 +619,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: FBM.tFactTypeInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrFactTypeInstance
             End Try
@@ -685,7 +685,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -902,7 +902,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -1073,7 +1073,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1304,7 +1304,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1438,7 +1438,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1564,7 +1564,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
@@ -1673,7 +1673,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -1771,7 +1771,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1799,7 +1799,7 @@ Namespace FBM
 
                         Next
 
-                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then                        
+                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then
                             Me.FactTypeReadingShape.Shape.Visible = True
                         End If
 
@@ -1817,7 +1817,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1963,7 +1963,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2034,7 +2034,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTypeInstance.DoAllRolesLinkToSameModelObject"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 DoAllRolesLinkToSameModelObject = False
             End Try
@@ -2074,7 +2074,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -2108,7 +2108,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2125,19 +2125,19 @@ Namespace FBM
             Try
                 For liInd = 1 To Me.Arity
                     If liInd = 1 Then
-                        apat1 = New AnchorPattern(New AnchorPoint() { _
-                                New AnchorPoint(50, 0, True, True), _
-                                New AnchorPoint(50, 100, True, True), _
+                        apat1 = New AnchorPattern(New AnchorPoint() {
+                                New AnchorPoint(50, 0, True, True),
+                                New AnchorPoint(50, 100, True, True),
                                 New AnchorPoint(0, 50, True, True)})
                     ElseIf (liInd > 1) And (liInd < Me.Arity) Then
-                        apat1 = New AnchorPattern(New AnchorPoint() { _
-                                New AnchorPoint(50, 0, True, True), _
+                        apat1 = New AnchorPattern(New AnchorPoint() {
+                                New AnchorPoint(50, 0, True, True),
                                 New AnchorPoint(50, 100, True, True)})
                     ElseIf liInd = Me.Arity Then
 
-                        apat1 = New AnchorPattern(New AnchorPoint() { _
-                                New AnchorPoint(50, 0, True, True), _
-                                New AnchorPoint(100, 50, True, True), _
+                        apat1 = New AnchorPattern(New AnchorPoint() {
+                                New AnchorPoint(50, 0, True, True),
+                                New AnchorPoint(100, 50, True, True),
                                 New AnchorPoint(50, 100, True, True)})
                     End If
 
@@ -2200,7 +2200,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -2230,14 +2230,14 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
         End Sub
 
-        Public Sub DisplayAndAssociate(Optional ByVal abDisplayFactTable As Boolean = False, _
-                                       Optional ByVal abDisplayFactTypeName As Boolean = False, _
+        Public Sub DisplayAndAssociate(Optional ByVal abDisplayFactTable As Boolean = False,
+                                       Optional ByVal abDisplayFactTypeName As Boolean = False,
                                        Optional ByVal abDisplaySubtypeFactType As Boolean = False)
 
             Dim loFactTypeNode As ShapeNode
@@ -2486,7 +2486,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTypeInstance.DisplayAndAssociate"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -2547,7 +2547,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2723,7 +2723,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2738,7 +2738,7 @@ Namespace FBM
                 Me.FactTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
 
                 If Me.Shape IsNot Nothing And Me.Page.Diagram IsNot Nothing Then
-                    Call Me.FactTypeDerivationText.DisplayAndAssociate()
+                    Call Me.FactTypeDerivationText.displayAndAssociate()
                 End If
             Else
                 Me.FactTypeDerivationText.Shape.Text = asDerivationText
@@ -2786,7 +2786,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2817,7 +2817,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2840,7 +2840,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2874,6 +2874,8 @@ Namespace FBM
         Private Sub _FactType_IUConstraintAdded(ByRef arFactType As FactType, ByRef arRoleConstraint As FBM.RoleConstraint) Handles _FactType.IUConstraintAdded
 
             Try
+                If Me.Page.Diagram Is Nothing Then Exit Sub
+
                 '----------------------------------------------------------
                 'Must add the new RoleConstraint to this FactTypeInstance
                 '----------------------------------------------------------
@@ -2908,7 +2910,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2958,7 +2960,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -3024,7 +3026,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -3053,7 +3055,7 @@ Namespace FBM
 
             If Me.Page IsNot Nothing Then
                 If Me.Page.Diagram IsNot Nothing Then
-                    Me.ObjectifyingEntityType.Hide
+                    Me.ObjectifyingEntityType.Hide()
                 End If
             End If
 
@@ -3145,7 +3147,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3172,7 +3174,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3249,7 +3251,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3398,8 +3400,8 @@ Namespace FBM
                             Dim lsEnumeratedIdentity As String
                             lsEnumeratedIdentity = lrJoinedEntityTypeInstance.EntityType.EnumerateInstance(lsEntityTypeInstance)
 
-                            Dim lo_combobox_item As tComboboxItem = New tComboboxItem(lsEntityTypeInstance, _
-                                                                                      lsEnumeratedIdentity, _
+                            Dim lo_combobox_item As tComboboxItem = New tComboboxItem(lsEntityTypeInstance,
+                                                                                      lsEnumeratedIdentity,
                                                                                       lsEntityTypeInstance)
 
                             If Not Me.Page.Form._comboBoxEntityTypeInstance.Items.Contains(lo_combobox_item) Then
@@ -3411,7 +3413,7 @@ Namespace FBM
                         loCombobox.DropDownStyle = ComboBoxStyle.DropDown
                         For Each lsEntityTypeInstance In lrJoinedEntityTypeInstance.EntityType.Instance
                             Dim lo_combobox_item As tComboboxItem = New tComboboxItem(lsEntityTypeInstance, lsEntityTypeInstance, lsEntityTypeInstance)
-                            If Not Me.Page.Form._comboBoxEntityTypeInstance.Items.Contains(lo_combobox_item) And _
+                            If Not Me.Page.Form._comboBoxEntityTypeInstance.Items.Contains(lo_combobox_item) And
                                Not lsEntityTypeInstance = e.Table(Me.Page.Form._col, Me.Page.Form._row).Text Then
                                 Me.Page.Form._comboBoxEntityTypeInstance.Items.Add(lo_combobox_item)
                             End If
@@ -3614,13 +3616,13 @@ Namespace FBM
                     If Me.FactTypeReadingShape Is Nothing Then
                         Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance
                     End If
-                    lrFactTypeReadingInstance.shape = Me.FactTypeReadingShape.shape
+                    lrFactTypeReadingInstance.Shape = Me.FactTypeReadingShape.Shape
                     Me.FactTypeReadingShape = lrFactTypeReadingInstance
                     Me.FactTypeReadingShape.RefreshShape()
                 Else
                     If IsSomething(Me.FactTypeReadingShape) Then
-                        If IsSomething(Me.FactTypeReadingShape.shape) Then
-                            Me.FactTypeReadingShape.shape.Text = ""
+                        If IsSomething(Me.FactTypeReadingShape.Shape) Then
+                            Me.FactTypeReadingShape.Shape.Text = ""
                         End If
                     End If
                 End If
@@ -3630,7 +3632,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3652,12 +3654,12 @@ Namespace FBM
                     Exit Sub
                 End If
 
-                Dim larPageObject = From PageObject In Me.Page.GetAllPageObjects _
-                                            Where PageObject.Id <> Me.Id _
+                Dim larPageObject = From PageObject In Me.Page.GetAllPageObjects
+                                    Where PageObject.Id <> Me.Id _
                                             And (Math.Abs(Me.X - PageObject.X) < liRepellDistance _
                                             And Math.Abs(Me.Y - PageObject.Y) < liRepellDistance) _
-                                            And PageObject.Shape IsNot Nothing _
-                                            Select PageObject
+                                            And PageObject.Shape IsNot Nothing
+                                    Select PageObject
 
                 For Each lrPageObject In larPageObject
 
@@ -3684,7 +3686,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3790,7 +3792,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3867,7 +3869,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3901,7 +3903,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -3933,7 +3935,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3952,7 +3954,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3980,7 +3982,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4013,7 +4015,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

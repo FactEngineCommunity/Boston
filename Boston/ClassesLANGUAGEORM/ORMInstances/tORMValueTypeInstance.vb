@@ -277,7 +277,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tValueTypeInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrValueTypeInstance
             End Try
@@ -424,7 +424,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -475,7 +475,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -515,7 +515,7 @@ Namespace FBM
                             liRangeY2 = Me.Y + 80
                     End Select
 
-                    Dim larObjectsInCell = From ModelElement In Me.Page.GetAllPageObjects _
+                    Dim larObjectsInCell = From ModelElement In Me.Page.GetAllPageObjects
                                            Where (ModelElement.X > liRangeX1) And (ModelElement.X < liRangeX2) _
                                            And (ModelElement.Y > liRangeY1) And (ModelElement.Y < liRangeY2) _
                                            And ModelElement.Id <> Me.Id
@@ -601,15 +601,15 @@ Namespace FBM
             IsReferenceModeForFactTypeOnPage = False
 
             Try
-                Dim larGoodFactTypeInstances = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                          Where FactTypeInstance.HasNULLRole = False _
-                                          Select FactTypeInstance
+                Dim larGoodFactTypeInstances = From FactTypeInstance In Me.Page.FactTypeInstance
+                                               Where FactTypeInstance.HasNULLRole = False
+                                               Select FactTypeInstance
 
-                Dim larFactTypeInstance = (From FactTypeInstance In larGoodFactTypeInstances _
-                                           From RoleInstance In FactTypeInstance.RoleGroup _
-                                          Where RoleInstance.JoinedORMObject.Id = Me.Id _
-                                          And FactTypeInstance.isPreferredReferenceMode = True _
-                                          Select FactTypeInstance).Count
+                Dim larFactTypeInstance = (From FactTypeInstance In larGoodFactTypeInstances
+                                           From RoleInstance In FactTypeInstance.RoleGroup
+                                           Where RoleInstance.JoinedORMObject.Id = Me.Id _
+                                          And FactTypeInstance.isPreferredReferenceMode = True
+                                           Select FactTypeInstance).Count
 
                 Return larFactTypeInstance > 0
 
@@ -623,7 +623,7 @@ Namespace FBM
             Catch ex As Exception
                 Dim lsMessage As String = ""
                 lsMessage = "Error: tValueTypeInstance.IsReferenceModeForFactTypeOnPage: " & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
@@ -667,7 +667,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -795,9 +795,9 @@ RemoveAnyway:
                     Dim G As Graphics
                     Dim liValueTypeNameStringSize As New SizeF
                     G = Me.Page.Form.CreateGraphics
-                    liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), _
-                                                                                Me.Page.Diagram.Font, _
-                                                                                1000, _
+                    liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name),
+                                                                                Me.Page.Diagram.Font,
+                                                                                1000,
                                                                                 System.Drawing.StringFormat.GenericDefault)
                     Dim loRectangle As New Rectangle(Me.X, Me.Y, liValueTypeNameStringSize.Width + 4, liValueTypeNameStringSize.Height + 4)
                     Me.Shape.SetRect(loRectangle, False)
@@ -811,7 +811,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -827,7 +827,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1050,7 +1050,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1081,10 +1081,10 @@ RemoveAnyway:
 
             abInClearSpace = True
 
-            Dim liClashCount = Aggregate ValueTypeInstance In Me.Page.ValueTypeInstance _
+            Dim liClashCount = Aggregate ValueTypeInstance In Me.Page.ValueTypeInstance
                                    Where ValueTypeInstance.Id <> Me.Id _
                                      And ValueTypeInstance.X = Me.X _
-                                     And ValueTypeInstance.Y = Me.Y _
+                                     And ValueTypeInstance.Y = Me.Y
                                     Into Count()
 
             If liClashCount > 0 Then
@@ -1155,11 +1155,11 @@ RemoveAnyway:
             End If
 
             Try
-                Dim larEntityTypeInstance = From PageObject In Me.Page.GetAllPageObjects _
+                Dim larEntityTypeInstance = From PageObject In Me.Page.GetAllPageObjects
                                             Where PageObject.Id <> Me.Id _
                                             And (Math.Abs(Me.X - PageObject.X) < liRepellDistance _
                                             And Math.Abs(Me.Y - PageObject.Y) < liRepellDistance) _
-                                            And PageObject.Shape IsNot Nothing _
+                                            And PageObject.Shape IsNot Nothing
                                             Select PageObject
 
                 For Each lrPageObject In larEntityTypeInstance
@@ -1187,7 +1187,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1205,10 +1205,10 @@ RemoveAnyway:
 
             liRepellDistance = 25
 
-            Dim larEntityTypeInstance = From EntityTypeInstance In Me.Page.EntityTypeInstance _
+            Dim larEntityTypeInstance = From EntityTypeInstance In Me.Page.EntityTypeInstance
                                         Where (Math.Abs(Me.X - EntityTypeInstance.X) < liRepellDistance _
                                         And Math.Abs(Me.Y - EntityTypeInstance.Y) < liRepellDistance) _
-                                        And EntityTypeInstance.Shape IsNot Nothing _
+                                        And EntityTypeInstance.Shape IsNot Nothing
                                         Select EntityTypeInstance
 
             For Each lrEntityTypeInstance In larEntityTypeInstance
@@ -1230,12 +1230,12 @@ RemoveAnyway:
 
             Next
 
-            Dim larValueTypeInstance = From ValueTypeInstance In Me.Page.ValueTypeInstance _
-                            Where ValueTypeInstance.Id <> Me.Id _
+            Dim larValueTypeInstance = From ValueTypeInstance In Me.Page.ValueTypeInstance
+                                       Where ValueTypeInstance.Id <> Me.Id _
                             And (Math.Abs(Me.X - ValueTypeInstance.X) < liRepellDistance _
                             And Math.Abs(Me.Y - ValueTypeInstance.Y) < liRepellDistance) _
-                            And ValueTypeInstance.Shape IsNot Nothing _
-                            Select ValueTypeInstance
+                            And ValueTypeInstance.Shape IsNot Nothing
+                                       Select ValueTypeInstance
 
             For Each lrValueTypeInstance In larValueTypeInstance
                 If (Me.X - lrValueTypeInstance.X > 0) And (Math.Abs(Me.X - lrValueTypeInstance.X) < liRepellDistance) Then
@@ -1305,7 +1305,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1323,7 +1323,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1341,7 +1341,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1363,8 +1363,8 @@ RemoveAnyway:
 
             Try
                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance = arEntityType.CloneInstance(Me.Page, True)
-                lrEntityTypeInstance.x = Me.X
-                lrEntityTypeInstance.y = Me.Y
+                lrEntityTypeInstance.X = Me.X
+                lrEntityTypeInstance.Y = Me.Y
 
                 Call lrEntityTypeInstance.DisplayAndAssociate()
 
@@ -1376,7 +1376,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

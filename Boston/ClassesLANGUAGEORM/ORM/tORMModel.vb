@@ -4891,12 +4891,12 @@ Namespace FBM
             If IsSomething(lrValueType) Then
                 asActualModelElementName = lrValueType.Id
                 Return pcenumConceptType.ValueType
-            ElseIf IsSomething(lrEntityType) Then
-                asActualModelElementName = lrEntityType.Id
-                Return pcenumConceptType.EntityType
             ElseIf IsSomething(lrFactType) Then
                 asActualModelElementName = lrFactType.Id
                 Return pcenumConceptType.FactType
+            ElseIf IsSomething(lrEntityType) Then
+                asActualModelElementName = lrEntityType.Id
+                Return pcenumConceptType.EntityType
             ElseIf IsSomething(lrRoleConstraint) Then
                 asActualModelElementName = lrRoleConstraint.Id
                 Return pcenumConceptType.RoleConstraint

@@ -159,12 +159,17 @@ Namespace FBM
 
                     If lrRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
                         Dim lrFactTypeReading = lrRelation.ResponsibleFactType.FactTypeReading(0)
-                        If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
-                            'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
-                            Dim lrTempNode = lrNode1
-                            lrNode1 = lrERDRelation.DestinationEntity
-                            lrNode2 = lrTempNode
-                        End If
+                        Try
+                            If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
+                                'Swap the Origin and Desination nodes, for directed Graphs. i.e. The single FactTypeReading determines the direction.
+                                Dim lrTempNode = lrNode1
+                                lrNode1 = lrERDRelation.DestinationEntity
+                                lrNode2 = lrTempNode
+                            End If
+                        Catch ex As Exception
+                            prApplication.ThrowErrorMessage("Error resolving edge direction", pcenumErrorType.Warning,, False,, True,, True, Nothing)
+                        End Try
+
                     End If
 
                     Dim lrLink As PGS.Link
@@ -188,7 +193,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -253,7 +258,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New PGS.Node
             End Try
@@ -363,7 +368,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -386,7 +391,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

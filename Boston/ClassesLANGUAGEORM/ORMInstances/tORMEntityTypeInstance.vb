@@ -602,7 +602,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tEntityTypeInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrEntityTypeInstance
             End Try
@@ -658,7 +658,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -762,7 +762,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -820,7 +820,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -853,7 +853,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1017,7 +1017,7 @@ Namespace FBM
                     '-----------------------------------------------------------------------------------
                     'Set the Rectangle for the whole EntityType and the ReferenceModeShape (if needed)
                     '-----------------------------------------------------------------------------------
-                    Call Me.SetShapeSizesAndPositions
+                    Call Me.SetShapeSizesAndPositions()
 
 #Region "Derivation Text"
                     '==========================================================================================================
@@ -1079,7 +1079,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1168,7 +1168,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1275,7 +1275,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1285,10 +1285,10 @@ MoveOn:
             Try
                 Dim loRectangle As Rectangle
 
-                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                          From Role In FactTypeInstance.FactType.RoleGroup _
+                Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                          From Role In FactTypeInstance.FactType.RoleGroup
                                           Where Role.JoinedORMObject.Id = Me.Id _
-                                          And FactTypeInstance.isPreferredReferenceMode = True _
+                                          And FactTypeInstance.isPreferredReferenceMode = True
                                           Select FactTypeInstance Distinct
 
                 Me.ReferenceModeShape.Visible = False
@@ -1410,7 +1410,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1442,7 +1442,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1470,7 +1470,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RoleInstance)
 
@@ -1522,7 +1522,7 @@ MoveOn:
                             liRangeY2 = Me.Y + 80
                     End Select
 
-                    Dim larObjectsInCell = From ModelElement In Me.Page.GetAllPageObjects _
+                    Dim larObjectsInCell = From ModelElement In Me.Page.GetAllPageObjects
                                            Where (ModelElement.X > liRangeX1) And (ModelElement.X < liRangeX2) _
                                            And (ModelElement.Y > liRangeY1) And (ModelElement.Y < liRangeY2) _
                                            And ModelElement.Id <> Me.Id
@@ -1638,7 +1638,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1701,7 +1701,7 @@ MoveOn:
                     End If
                 Catch
                 End Try
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1785,21 +1785,21 @@ MoveOn:
                         And Me.ReferenceModeFactType IsNot Nothing _
                         And abBroadcastInterfaceEvent Then
 
-                                Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
-                                Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
-                                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                                For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
-                                    TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
-                                    Me.Page.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
-                                Next
-                                Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
-                                Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
-                                Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
-                                Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
-                            End If
+                            Call TableFactTypeInstance.DeleteFactTypeInstance(Me.ReferenceModeFactType)
+                            Call TableValueTypeInstance.DeleteValueTypeInstance(Me.ReferenceModeValueType)
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            For Each lrRoleConstraintInstance In Me.ReferenceModeFactType.InternalUniquenessConstraint
+                                TableRoleConstraintInstance.DeleteRoleConstraintInstance(lrRoleConstraintInstance)
+                                Me.Page.RoleConstraintInstance.Remove(lrRoleConstraintInstance)
+                            Next
+                            Call TableFactTableInstance.DeleteFactTableInstance(Me.ReferenceModeFactType.FactTable)
+                            Call TableFactTypeName.DeleteFactTypeNameInstance(Me.ReferenceModeFactType.FactTypeName)
+                            Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                            Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
                         End If
+                    End If
 
-                    Else
+                Else
                     lsMessage = "You cannot remove the Entity Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Entity Type have been removed from the Page."
                     Dim lrApplicationException As New ApplicationException(lsMessage)
                     lrApplicationException.Data.Add("ErrorType", 100)
@@ -1828,7 +1828,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1872,7 +1872,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1909,7 +1909,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2236,7 +2236,7 @@ MoveOn:
                 lsMessage &= vbCrLf & vbCrLf & "EntityTypeName: " & Me.Name
                 lsMessage &= vbCrLf & ", PageId:" & Me.Page.PageId
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2403,7 +2403,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2496,7 +2496,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2518,9 +2518,9 @@ MoveOn:
 
                     '------------------------------------------------------------------------------------------------------------------
                     'Refresh the FactTables for FactTypes that join to the EntityTypeInstance, to reflect the CompoundReferenceScheme
-                    Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance _
-                                              From Role In FactTypeInstance.RoleGroup _
-                                              Where Role.JoinedORMObject.Id = Me.Id _
+                    Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                              From Role In FactTypeInstance.RoleGroup
+                                              Where Role.JoinedORMObject.Id = Me.Id
                                               Select FactTypeInstance
 
                     For Each lrFactTypeInstance In larFactTypeInstance.ToArray
@@ -2542,7 +2542,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2572,7 +2572,7 @@ MoveOn:
                     '--------------------------------------------------------------------------------------------------------------------------
                     'CodeSafe: Extra Checks
                     '------------------------
-                    If Me.ReferenceModeFactType Is Nothing And _
+                    If Me.ReferenceModeFactType Is Nothing And
                        Me.ReferenceModeValueType Is Nothing Then
                         lsMessage = "Tried to remove a Simple Reference Scheme from an EntityTypeInstance that doesn't have one."
                         lsMessage &= vbCrLf & "EntityType.Id: " & Me.Id
@@ -2624,7 +2624,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2668,7 +2668,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2695,7 +2695,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2727,7 +2727,7 @@ MoveOn:
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "EntityTypeName: " & Me.Name
                 lsMessage &= vbCrLf & ", PageId:" & Me.Page.PageId
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -2768,7 +2768,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2819,9 +2819,9 @@ MoveOn:
 
                             'If lrObject IsNot Me Then
                             liX = (Me.X + lrObject.X) / 2
-                                liY = (Me.Y + lrObject.Y) / 2
+                            liY = (Me.Y + lrObject.Y) / 2
 
-                                lrFactTypeInstance.Move(liX, liY, abBroadcastInterfaceEvent)
+                            lrFactTypeInstance.Move(liX, liY, abBroadcastInterfaceEvent)
                             'End If
                         End If
                     End If
@@ -2833,7 +2833,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2852,11 +2852,11 @@ MoveOn:
             End If
 
             Try
-                Dim larEntityTypeInstance = From PageObject In Me.Page.GetAllPageObjects _
+                Dim larEntityTypeInstance = From PageObject In Me.Page.GetAllPageObjects
                                             Where PageObject.Id <> Me.Id _
                                             And (Math.Abs(Me.X - PageObject.X) < liRepellDistance _
                                             And Math.Abs(Me.Y - PageObject.Y) < liRepellDistance) _
-                                            And PageObject.Shape IsNot Nothing _
+                                            And PageObject.Shape IsNot Nothing
                                             Select PageObject
 
                 For Each lrPageObject In larEntityTypeInstance
@@ -2884,7 +2884,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2995,7 +2995,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -3047,7 +3047,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3064,7 +3064,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3111,7 +3111,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -3141,7 +3141,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3157,7 +3157,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3192,7 +3192,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3208,7 +3208,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3255,7 +3255,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

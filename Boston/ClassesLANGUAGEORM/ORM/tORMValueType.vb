@@ -379,7 +379,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrValueType
             End Try
@@ -447,7 +447,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -580,7 +580,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -601,7 +601,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -749,7 +749,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -821,7 +821,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -879,7 +879,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -962,7 +962,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -983,7 +983,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1005,7 +1005,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1088,7 +1088,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -1271,45 +1271,45 @@ Namespace FBM
                     '  i.e. It's easier and safer to simply save the whole model.
                     '------------------------------------------------------------------------------------
                     If Me.Model.StoreAsXML Then
-                            Me.Model.Save()
-                        Else
-                            Dim larRole = From Role In Me.Model.Role
-                                          Where Role.JoinedORMObject Is Me
-                                          Select Role
+                        Me.Model.Save()
+                    Else
+                        Dim larRole = From Role In Me.Model.Role
+                                      Where Role.JoinedORMObject Is Me
+                                      Select Role
 
-                            For Each lrRole In larRole
-                                lrRole.makeDirty()
-                                lrRole.FactType.makeDirty()
-                                Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lrRole.FactType.Id)
-                                Call lrModelDictionaryEntry.Save()
-                                If Not abSuppressModelSave Then lrRole.FactType.Save()
-                            Next
-                        End If
-
-                        '====================================================================================
-                        'RDS
-                        Dim lsColumnName As String = ""
-
-                        For Each lrColumn In Me.Model.RDS.getColumnsThatReferenceValueType(Me)
-
-                            If lrColumn.Role.FactType.Id = lrColumn.ActiveRole.FactType.Id Then
-                                Call lrColumn.setName(lrColumn.Role.GetAttributeName)
-                            Else
-                                lsColumnName = Me.Id
-                                lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
-                                Call lrColumn.setName(lsColumnName)
-                            End If
+                        For Each lrRole In larRole
+                            lrRole.makeDirty()
+                            lrRole.FactType.makeDirty()
+                            Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lrRole.FactType.Id)
+                            Call lrModelDictionaryEntry.Save()
+                            If Not abSuppressModelSave Then lrRole.FactType.Save()
                         Next
+                    End If
 
-                        '-------------------------------------------------------------
-                        'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
-                        If Not abSuppressModelSave Then Me.Model.Save()
+                    '====================================================================================
+                    'RDS
+                    Dim lsColumnName As String = ""
 
-                        Return True
-                    End If 'Me.Id <> asNewName
+                    For Each lrColumn In Me.Model.RDS.getColumnsThatReferenceValueType(Me)
+
+                        If lrColumn.Role.FactType.Id = lrColumn.ActiveRole.FactType.Id Then
+                            Call lrColumn.setName(lrColumn.Role.GetAttributeName)
+                        Else
+                            lsColumnName = Me.Id
+                            lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                            Call lrColumn.setName(lsColumnName)
+                        End If
+                    Next
+
+                    '-------------------------------------------------------------
+                    'To make sure all the FactData and FactDataInstances/Pages are saved for RDS
+                    If Not abSuppressModelSave Then Me.Model.Save()
+
+                    Return True
+                End If 'Me.Id <> asNewName
 
 
-                    Return False
+                Return False
 
             Catch iex As tInformationException
                 prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
@@ -1318,7 +1318,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tValueType.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
@@ -1417,7 +1417,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1432,7 +1432,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
