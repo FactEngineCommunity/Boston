@@ -3651,14 +3651,6 @@ Public Class frmDiagramORM
                     End If
                 Case Is = (e.Control And Keys.L)
                     Call CreateValueType()
-                Case Is = Keys.ShiftKey
-                    If Me.zrPage.InternalUniquenessConstraintsExpanded Then
-                        Call contract_InternalUniquenessConstraints()
-                        Me.zrPage.InternalUniquenessConstraintsExpanded = False
-                    Else
-                        Call expand_InternalUniquenessConstraints()
-                        Me.zrPage.InternalUniquenessConstraintsExpanded = True
-                    End If
                 Case Is = Keys.N
                     If Me.zrPage.AreAllSelectedObjectsRoles Then
                         Dim lrRoleInstance As FBM.RoleInstance
@@ -7848,41 +7840,6 @@ SkipPopup:
 
     End Sub
 
-    Sub expand_InternalUniquenessConstraints()
-
-        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-
-        ''-------------------------------------------------------
-        ''Check to see if the user was clicking over a ShapeNode
-        ''-------------------------------------------------------
-        'lo_point = Diagram.PixelToUnit(e.Location)
-
-        'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
-        '----------------------------------------------
-        'Mouse is over a ShapeNode
-        '----------------------------------------------
-        '-----------------------------------------------------------------------------------
-        'Set/Reset the color of the ShapeNode under the mouse cursor
-        '-----------------------------------------------------------------------------------
-        'loNode = Diagram.GetNodeAt(lo_point)
-
-        '------------------------------------------------------------------------------------
-        'If the Node is a FactType or a Role make the InternalUniquenessConstraints
-        '  bigger so that they can be selected more easily.
-        '------------------------------------------------------------------------------------
-
-        For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-            Select Case lrRoleConstraintInstance.RoleConstraintType
-                Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                        lrRoleConstraintRoleInstance.shape.Resize(6, 3)
-                    Next
-            End Select
-        Next
-
-    End Sub
-
     ''' <summary>
     ''' Makes sure that no RoleConstraintInstance is in the process of having a RoleConstraintArgument created.
     '''   - See Me.Diagram.NodeDoubleClicked.
@@ -7903,25 +7860,6 @@ SkipPopup:
         Next
 
     End Sub
-
-    Sub contract_InternalUniquenessConstraints()
-
-        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-
-        For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-            Select Case lrRoleConstraintInstance.RoleConstraintType
-                Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                        lrRoleConstraintRoleInstance.shape.Resize(6, 0.05)
-                    Next
-            End Select
-        Next
-
-        Me.zrPage.InternalUniquenessConstraintsExpanded = False
-
-    End Sub
-
 
     Sub SetToolbox()
 

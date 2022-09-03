@@ -1970,7 +1970,17 @@ Namespace FBM
 
         Public Sub SortRoleGroupByRoleSequenceNr()
 
-            Call Me.RoleGroup.Sort(AddressOf CompareRoleSequenceNrs)
+            Try
+                Call Me.RoleGroup.Sort(AddressOf CompareRoleSequenceNrs)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
 
         End Sub
 
