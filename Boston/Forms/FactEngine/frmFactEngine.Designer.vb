@@ -69,6 +69,7 @@ Partial Class frmFactEngine
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
+        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -79,7 +80,6 @@ Partial Class frmFactEngine
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
         Me.Diagram5 = New MindFusion.Diagramming.Diagram()
-        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram6 = New MindFusion.Diagramming.Diagram()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -282,6 +282,7 @@ Partial Class frmFactEngine
         Me.ToolStripNaturalLanguage.Size = New System.Drawing.Size(1082, 35)
         Me.ToolStripNaturalLanguage.TabIndex = 0
         Me.ToolStripNaturalLanguage.Text = "ToolStrip4"
+        Me.ToolStripNaturalLanguage.Visible = False
         '
         'ToolStripLabelPromptNaturalLanguage
         '
@@ -500,6 +501,24 @@ Partial Class frmFactEngine
         Me.TabPageGraph.Text = "Graph"
         Me.TabPageGraph.UseVisualStyleBackColor = True
         '
+        'GraphView
+        '
+        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
+        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
+        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.GraphView.Diagram = Me.Diagram
+        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GraphView.Location = New System.Drawing.Point(0, 0)
+        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.GraphView.Name = "GraphView"
+        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
+        Me.GraphView.TabIndex = 0
+        Me.GraphView.Text = "DiagramView1"
+        '
         'ContextMenuStripGraph
         '
         Me.ContextMenuStripGraph.ImageScalingSize = New System.Drawing.Size(24, 24)
@@ -529,24 +548,6 @@ Partial Class frmFactEngine
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
-        '
-        'GraphView
-        '
-        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
-        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
-        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
-        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.GraphView.Diagram = Me.Diagram
-        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.GraphView.Location = New System.Drawing.Point(0, 0)
-        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.GraphView.Name = "GraphView"
-        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
-        Me.GraphView.TabIndex = 0
-        Me.GraphView.Text = "DiagramView1"
         '
         'frmFactEngine
         '

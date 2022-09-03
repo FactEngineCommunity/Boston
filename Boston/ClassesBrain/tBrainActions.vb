@@ -782,7 +782,7 @@ Partial Public Class tBrain
             '==========================================================================
             'Adding the FactType to the Model is done in the 'DropFactTypeAtPoint' stage, 
             '  which also broadcasts the event if in Client/Server mode. The below just creates the FactType ready for adding to the Model.
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True, )
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,,, abBroadcastInterfaceEvent)
 
             Dim larRole As New List(Of FBM.Role)
 
