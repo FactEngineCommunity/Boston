@@ -30,6 +30,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxAutoCompleteSingleClickSelects = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
         Me.LabelConfigurationFileLocation = New System.Windows.Forms.Label()
         Me.LabelUserConfigurationFileLocation = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -96,7 +97,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -202,6 +202,17 @@ Partial Class frmCRUDBostonConfiguration
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(525, 67)
         Me.TableLayoutPanel1.TabIndex = 3
+        '
+        'ButtonCopyModelIdToClipboard
+        '
+        Me.ButtonCopyModelIdToClipboard.FlatAppearance.BorderSize = 0
+        Me.ButtonCopyModelIdToClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCopyModelIdToClipboard.Image = Global.Boston.My.Resources.Resources.CopyToClipboard16x16
+        Me.ButtonCopyModelIdToClipboard.Location = New System.Drawing.Point(3, 49)
+        Me.ButtonCopyModelIdToClipboard.Name = "ButtonCopyModelIdToClipboard"
+        Me.ButtonCopyModelIdToClipboard.Size = New System.Drawing.Size(20, 15)
+        Me.ButtonCopyModelIdToClipboard.TabIndex = 14
+        Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
         '
         'LabelConfigurationFileLocation
         '
@@ -512,7 +523,6 @@ Partial Class frmCRUDBostonConfiguration
         'CheckBoxFactEngineUseTransformations
         '
         Me.CheckBoxFactEngineUseTransformations.AutoSize = True
-        Me.CheckBoxFactEngineUseTransformations.Enabled = False
         Me.CheckBoxFactEngineUseTransformations.Location = New System.Drawing.Point(19, 204)
         Me.CheckBoxFactEngineUseTransformations.Name = "CheckBoxFactEngineUseTransformations"
         Me.CheckBoxFactEngineUseTransformations.Size = New System.Drawing.Size(123, 17)
@@ -874,17 +884,6 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
-        '
-        'ButtonCopyModelIdToClipboard
-        '
-        Me.ButtonCopyModelIdToClipboard.FlatAppearance.BorderSize = 0
-        Me.ButtonCopyModelIdToClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonCopyModelIdToClipboard.Image = Global.Boston.My.Resources.Resources.CopyToClipboard16x16
-        Me.ButtonCopyModelIdToClipboard.Location = New System.Drawing.Point(3, 49)
-        Me.ButtonCopyModelIdToClipboard.Name = "ButtonCopyModelIdToClipboard"
-        Me.ButtonCopyModelIdToClipboard.Size = New System.Drawing.Size(20, 15)
-        Me.ButtonCopyModelIdToClipboard.TabIndex = 14
-        Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '

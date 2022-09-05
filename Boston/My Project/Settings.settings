@@ -242,5 +242,8 @@
     <Setting Name="DefaultGeneralConceptToObjectTypeConversion" Type="System.String" Scope="User">
       <Value Profile="(Default)">Entity Type</Value>
     </Setting>
+    <Setting Name="CoreVersionNumber" Type="System.String" Scope="User">
+      <Value Profile="(Default)">2.4</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

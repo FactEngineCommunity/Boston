@@ -87,6 +87,7 @@ Public Class frmCRUDBostonConfiguration
         Me.ComboBoxFactEngineUserDateFormat.Text = My.Settings.FactEngineUserDateFormat
         Me.ComboBoxFactEngineUserDateTimeFormat.Text = My.Settings.FactEngineUserDateTimeFormat
         Me.CheckBoxFactEngineShowStackTrace.Checked = My.Settings.ShowStackTraceFactEngineQuery
+        Me.CheckBoxFactEngineUseTransformations.Enabled = My.Settings.SuperuserMode
         Me.CheckBoxFactEngineUseTransformations.Checked = My.Settings.FactEngineUseTransformations
 
         'ER Diagrams

@@ -488,6 +488,8 @@ Namespace FBM
         Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
         <NonSerialized()>
         Public Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
+        <NonSerialized()>
+        Public Event SubtypeRelationshipRemoved(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
 
         ''' <summary>
         ''' Parameterless Constructor.
@@ -1524,6 +1526,7 @@ Namespace FBM
 
         Public Overridable Sub RemoveSubtypeRelationship(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
             Me.SubtypeRelationship.Remove(arSubtypeConstraint)
+            RaiseEvent SubtypeRelationshipRemoved(arSubtypeConstraint)
         End Sub
 
         Public Sub SetPropertyAttributes(ByRef arObject As Object, ByVal asProperty As String, ByVal abIsBrowsable As Boolean)

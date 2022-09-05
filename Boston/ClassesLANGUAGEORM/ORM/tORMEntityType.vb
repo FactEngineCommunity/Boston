@@ -2562,6 +2562,7 @@ FailsafeContinue:
             Call Me.Model.TriggerSubtypeRelationshipRemoved(arSubtypeRelationship)
 
             RaiseEvent SubtypeConstraintRemoved(arSubtypeRelationship)
+            MyBase.RemoveSubtypeRelationship(arSubtypeRelationship)
 
         End Sub
 

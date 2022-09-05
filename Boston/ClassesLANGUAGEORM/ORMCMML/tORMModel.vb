@@ -2402,6 +2402,11 @@ Namespace FBM
 
             Dim lsSQLQuery As String
 
+            If Me.CoreVersionNumber <> My.Settings.CoreVersionNumber Then
+                prApplication.ThrowErrorMessage("Upgrading the model to the new core version. This won't take long.", pcenumErrorType.Warning,, False, False, True,, True)
+                Boston.WriteToStatusBar("Updating the core for Model, " & Me.Name, True)
+            End If
+
             If Me.CoreVersionNumber = "" Then
 #Region " '' CoreVesionNumber"
                 'Entity Relationship Diagrams / Property Graph Schema

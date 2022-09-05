@@ -1054,6 +1054,12 @@ Namespace FBM
                                                 Return True
                                             Case Is = pcenumConceptType.EntityType
                                                 Dim lrEntityType As FBM.EntityType = lrModelElement
+                                                Dim lrTopmostEntityType = lrEntityType.GetTopmostNonAbsorbedSupertype(True)
+                                                If lrTopmostEntityType.IsObjectifyingEntityType Then
+                                                    If lrTopmostEntityType.ObjectifiedFactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing Then
+                                                        Return lrTopmostEntityType.ObjectifiedFactType.getCorrespondingRDSTable.getPrimaryKeyColumns.Count = 1
+                                                    End If
+                                                End If
                                                 If lrEntityType.ConceptType = pcenumConceptType.EntityType _
                                                     And lrEntityType.HasCompoundReferenceMode Then
                                                     Return False 'Because implies more than one Column

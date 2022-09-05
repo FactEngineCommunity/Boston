@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.ComponentModel
+Imports System.Reflection
 Imports System.Xml.Serialization
 Imports Boston.FBM
 
@@ -995,6 +996,109 @@ Namespace RDS
             Dispose(disposing:=True)
             GC.SuppressFinalize(Me)
         End Sub
+
+        ''' <summary>
+        ''' Not often used. Comes into effect when Entity Type is subtype of FactType.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        Private Sub DestinationTable_ColumnAdded(ByRef arColumn As Column) Handles DestinationTable.ColumnAdded
+
+            Try
+                Dim lrModelElement As FBM.ModelObject = arColumn.Table.FBMModelElement
+                If lrModelElement.GetType = GetType(FBM.EntityType) Then
+                    Dim lrEntityType As FBM.EntityType = lrModelElement
+                    Dim lrTopmostEntityType As FBM.EntityType = lrEntityType.GetTopmostNonAbsorbedSupertype(True)
+                    If lrTopmostEntityType.IsObjectifyingEntityType Then
+
+                        If arColumn.isPartOfPrimaryKey Then
+
+                            'Tidy up
+#Region "Tidy up OriginColumns that have an ActiveRole joined to an Entity Type."
+                            Dim larColumn = From Column In Me.OriginColumns
+                                            Where Column.ActiveRole.JoinsEntityType IsNot Nothing
+                                            Select Column
+
+                            For Each lrColumn In larColumn.ToList
+                                Call Me.OriginTable.removeColumn(lrColumn)
+                                Call Me.OriginColumns.Remove(lrColumn)
+                                lrColumn.Relation.Remove(Me)
+                                lrColumn.Dispose()
+                            Next
+                        End If
+                    End If
+#End Region
+
+                    Dim lrNewColumn = arColumn.Clone(Me.OriginTable, Me,, True)
+                    lrNewColumn.Relation.AddUnique(Me)
+
+                    Dim lbColumnsArePartOfPrimaryKey As Boolean = False
+                    Try
+                        lbColumnsArePartOfPrimaryKey = Me.OriginColumns(0).isPartOfPrimaryKey
+                    Catch ex As Exception
+                        'Not a biggie. lbColumnsArePartOfPrimaryKey set to false when declared.
+                    End Try
+                    Dim lrPrimaryKeyIndex As RDS.Index = Nothing
+                    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
+
+                    If Me.ResponsibleFactType.IsManyTo1BinaryFactType Then
+                        lrNewColumn.Role = Me.ResponsibleFactType.RoleGroup.Find(Function(x) x.InternalUniquenessConstraint.Count > 0)
+                        lrNewColumn.FactType = lrNewColumn.Role.FactType
+                    End If
+
+                    If Not Me.OriginTable.Column.Contains(lrNewColumn) Then
+
+                        If Me.OriginTable.addColumn(lrNewColumn) Then
+                            Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
+                            Me.AddDestinationColumn(arColumn, Me.DestinationColumns.Count)
+
+                            If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
+                                lrPrimaryKeyIndex.addColumn(lrNewColumn)
+                            End If
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub DestinationTable_ColumnRemoved(arColumn As Column) Handles DestinationTable.ColumnRemoved
+
+            Try
+                'CodeSafe
+                If Me.DestinationColumns.Contains(arColumn) Then
+                    Call Me.RemoveDestinationColumn(arColumn)
+                    If Me.ResponsibleFactType.IsManyTo1BinaryFactType Then
+                        Dim lrRole = Me.ResponsibleFactType.RoleGroup.Find(Function(x) x.InternalUniquenessConstraint.Count > 0)
+                        Dim larOriginTableColumn = From Column In Me.OriginTable.Column
+                                                   Where Column.Role.Id = lrRole.Id
+                                                   Where Column.ActiveRole.Id = arColumn.ActiveRole.Id
+                                                   Select Column
+
+                        For Each lrColumn In larOriginTableColumn.ToList
+                            Call Me.OriginTable.removeColumn(lrColumn)
+                        Next
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

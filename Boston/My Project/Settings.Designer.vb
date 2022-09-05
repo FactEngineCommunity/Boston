@@ -1013,6 +1013,18 @@ Namespace My
                 Me("DefaultGeneralConceptToObjectTypeConversion") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("2.4")>  _
+        Public Property CoreVersionNumber() As String
+            Get
+                Return CType(Me("CoreVersionNumber"),String)
+            End Get
+            Set
+                Me("CoreVersionNumber") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

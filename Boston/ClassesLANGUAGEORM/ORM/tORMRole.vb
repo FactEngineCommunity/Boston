@@ -1586,7 +1586,19 @@ Namespace FBM
                                 '20210824-VM-Was me.JoinsEntityType, which is wrong...want what is checked in Select above.
                                 larRolesToReturn.AddRange(lrOtherRoleInFactType.JoinsEntityType.getDownstreamActiveRoles(aarCoveredRoles))
                             Else
-                                larRolesToReturn.AddUnique(lrOtherRoleInFactType)
+                                Dim lrTopMostEntityType As FBM.EntityType = lrOtherRoleInFactType.JoinsEntityType.GetTopmostNonAbsorbedSupertype(True)
+                                If lrTopMostEntityType.IsObjectifyingEntityType Then
+                                    Dim lrTable As RDS.Table = lrTopMostEntityType.ObjectifiedFactType.getCorrespondingRDSTable(Nothing, True)
+                                    If lrTable IsNot Nothing Then
+                                        Dim larRole = From Column In lrTable.getPrimaryKeyColumns
+                                                      Select Column.ActiveRole
+
+                                        larRolesToReturn.AddRange(larRole.ToList)
+                                    End If
+                                Else
+                                    larRolesToReturn.AddUnique(lrOtherRoleInFactType)
+                                End If
+
                             End If
 
                     End Select
