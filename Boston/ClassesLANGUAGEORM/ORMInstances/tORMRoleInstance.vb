@@ -703,7 +703,7 @@ RetryTypeOfJoin:
                 '-------------------------------------------------------------
                 Select Case Me.TypeOfJoin
                     Case Is = pcenumRoleJoinType.EntityType
-                        Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.JoinsEntityType.Id)
+                        Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.JoinsEntityType.Id And x.Shape IsNot Nothing)
                         If Me.JoinsEntityType.Shape Is Nothing And Me.JoinsEntityType.IsObjectifyingEntityType Then
                             Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.JoinedORMObject.Id)
                             Me.JoinsFactType.DisplayAndAssociate(False, False)
@@ -1316,7 +1316,8 @@ RetryTypeOfJoin:
                         Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
 
                     Case Is = pcenumConceptType.EntityType
-                        Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(AddressOf arModelObject.Equals)
+                        Dim lrModelElement = arModelObject
+                        Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lrModelElement.Id And x.Shape IsNot Nothing)
 
                         '---------------------------------------------------------------------------------------------------------
                         'The EntityTypeInstance might not be on the Page, especially if a ValueType has just been converted to

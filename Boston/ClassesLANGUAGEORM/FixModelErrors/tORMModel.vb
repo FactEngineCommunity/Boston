@@ -395,6 +395,12 @@ Namespace FBM
                                     For Each lrActiveRole In larActiveRole
                                         lsColumnName = lrTable.createUniqueColumnName(lrActiveRole.JoinedORMObject.Id, Nothing, 0)
                                         Dim lrColumn As New RDS.Column(lrTable, lsColumnName, lrRole, lrActiveRole, True)
+
+                                        Dim lrTempColumn As RDS.Column = lrTable.Column.Find(AddressOf lrColumn.EqualsByRoleActiveRole)
+                                        If lrTempColumn IsNot Nothing Then
+                                            lrColumn = lrTempColumn
+                                        End If
+
                                         lrTable.addColumn(lrColumn)
                                         lrIndex = lrTable.getPrimaryKeyIndex
                                         If lrIndex IsNot Nothing Then

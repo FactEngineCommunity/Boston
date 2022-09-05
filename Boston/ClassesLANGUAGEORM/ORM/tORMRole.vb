@@ -2195,7 +2195,7 @@ Namespace FBM
                 End If
 
 
-                If arNewJoinedModelObject Is Me.JoinedORMObject Then
+                If arNewJoinedModelObject.Id Is Me.JoinedORMObject.Id Then
                     RaiseEvent RoleJoinModified(Me.JoinedORMObject)
                     Exit Sub
                 Else

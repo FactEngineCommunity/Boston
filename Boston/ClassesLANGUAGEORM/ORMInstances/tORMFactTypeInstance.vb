@@ -1753,10 +1753,15 @@ Namespace FBM
 
                 If Me.IsLinkFactType Then
                     If Me.LinkFactTypeRole IsNot Nothing Then
-                        Me.Page.RoleInstance.Find(Function(x) x.Id = Me.LinkFactTypeRole.Id).Shape.Brush =
-                        New MindFusion.Drawing.SolidBrush(Color.FromArgb(
+                        Try
+                            Me.Page.RoleInstance.Find(Function(x) x.Id = Me.LinkFactTypeRole.Id).Shape.Brush =
+                                                          New MindFusion.Drawing.SolidBrush(Color.FromArgb(
                                                           [Enum].Parse(GetType(pcenumColourWheel), [Enum].GetName(GetType(pcenumColourWheel), pcenumColourWheel.LightPurple))
                                                           ))
+                        Catch ex As Exception
+                            'FactType might not be ont the Page, only the ObjectifyingEntityType.
+                        End Try
+
                     End If
                 End If
 

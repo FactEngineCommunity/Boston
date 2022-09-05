@@ -2221,7 +2221,7 @@ Public Class frmDiagramORM
                         '------------------------------------------------------------------------------------------------------
                         Me.Diagram.Links.Remove(e.Link)
 
-                        If lrRoleInstance.FactType.IsLinkFactType Then
+                        If lrRoleInstance.FactType.IsLinkFactType And Not (lrTargetModelObject.Id = lrRoleInstance.Role.JoinedORMObject.Id) Then
                             MsgBox("You cannot directly reassign the Role of a Link Fact Type.")
                             Exit Sub
                         End If
