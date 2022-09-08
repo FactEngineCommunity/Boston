@@ -2221,7 +2221,13 @@ Public Class frmDiagramORM
                         '------------------------------------------------------------------------------------------------------
                         Me.Diagram.Links.Remove(e.Link)
 
-                        If lrRoleInstance.FactType.IsLinkFactType And Not (lrTargetModelObject.Id = lrRoleInstance.Role.JoinedORMObject.Id) Then
+                        Dim lbReassigningRole As Boolean = False
+                        Try
+                            lbReassigningRole = (lrTargetModelObject.Id <> lrRoleInstance.Role.JoinedORMObject.Id)
+                        Catch ex As Exception
+                            'JoinedORMObject may be Nothing. New Role.
+                        End Try
+                        If lrRoleInstance.FactType.IsLinkFactType And lbReassigningRole Then
                             MsgBox("You cannot directly reassign the Role of a Link Fact Type.")
                             Exit Sub
                         End If
@@ -6547,9 +6553,6 @@ SkipPopup:
                     '------------------------------------------------
                     'Find the best FactTypeReading for the FactType
                     '------------------------------------------------
-                    Dim lrFactTypeReading As New FBM.FactTypeReading
-                    Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance
-
                     Dim larRole As New List(Of FBM.Role)
                     Dim lrRole As FBM.RoleInstance
 

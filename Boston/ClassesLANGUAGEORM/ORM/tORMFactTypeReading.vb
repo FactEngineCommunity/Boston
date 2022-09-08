@@ -10,6 +10,9 @@ Namespace FBM
         Inherits FBM.ModelObject
         Implements IEquatable(Of FBM.FactTypeReading)
 
+        <XmlAttribute()>
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.FactTypeReading
+
         <XmlIgnore()> _
         Public _FactType As FBM.FactType
         <XmlIgnore()> _

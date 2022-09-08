@@ -1045,7 +1045,9 @@ Namespace FBM
             Next
 
             If Me.IsObjectified Then
-                Call Me.createLinkFactTypeForRole(arRole)
+                If arRole.JoinedORMObject IsNot Nothing Then
+                    Call Me.createLinkFactTypeForRole(arRole)
+                End If
             End If
 
             If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then

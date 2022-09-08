@@ -6131,9 +6131,6 @@ Public Class frmDiagramORMForOntologyBrowser
                     '------------------------------------------------
                     'Find the best FactTypeReading for the FactType
                     '------------------------------------------------
-                    Dim lrFactTypeReading As New FBM.FactTypeReading
-                    Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance
-
                     Dim larRole As New List(Of FBM.Role)
                     Dim lrRole As FBM.RoleInstance
 

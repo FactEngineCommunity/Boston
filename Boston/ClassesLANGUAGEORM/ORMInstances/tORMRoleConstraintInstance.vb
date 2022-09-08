@@ -1710,14 +1710,7 @@ Namespace FBM
                             Exit Sub
                         End If
 
-                        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-                        For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
-
-                            'lrRoleConstraintRoleInstance.Shape.Move(lrRoleConstraintRoleInstance.Shape.Bounds.X, _
-                            '                                        (lrRoleConstraintRoleInstance.Role.Shape.Bounds.Y - 3.5) - ((Me.LevelNr - 1) * 1.5))
-
-                        Next
-
+                        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance = Nothing
 
                         If Me.IsDeontic Then
                             Me.RoleConstraintRole(0).Shape.Shape = New Shape(
@@ -1786,6 +1779,14 @@ Namespace FBM
                                 lrRoleConstraintRole.Shape.Shape = lrShape
                             Next
                         End If
+
+                        For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
+
+                            lrRoleConstraintRoleInstance.Shape.Move(lrRoleConstraintRoleInstance.Role.Shape.Bounds.X,
+                                                                    (lrRoleConstraintRoleInstance.Role.Shape.Bounds.Y - 3.5) - ((Me.LevelNr - 1) * 2))
+
+                        Next
+
 
                 End Select
 

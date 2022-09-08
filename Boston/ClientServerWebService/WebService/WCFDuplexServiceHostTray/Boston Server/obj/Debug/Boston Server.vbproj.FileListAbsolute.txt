@@ -58,3 +58,4 @@ D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\Client
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFDuplexServiceHostTray\Boston Server\obj\Debug\Boston Server.exe
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFDuplexServiceHostTray\Boston Server\obj\Debug\Boston Server.xml
 D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFDuplexServiceHostTray\Boston Server\obj\Debug\Boston Server.pdb
+D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFDuplexServiceHostTray\Boston Server\obj\Debug\Boston Server.vbproj.AssemblyReference.cache

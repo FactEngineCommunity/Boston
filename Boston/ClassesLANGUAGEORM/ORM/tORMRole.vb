@@ -2194,8 +2194,14 @@ Namespace FBM
                     End If
                 End If
 
+                Dim lbJoiningToSameObject As Boolean = False
+                Try
+                    lbJoiningToSameObject = (arNewJoinedModelObject.Id = Me.JoinedORMObject.Id)
+                Catch ex As Exception
+                    'JoinedORMObject may be false.
+                End Try
 
-                If arNewJoinedModelObject.Id Is Me.JoinedORMObject.Id Then
+                If lbJoiningToSameObject Then
                     RaiseEvent RoleJoinModified(Me.JoinedORMObject)
                     Exit Sub
                 Else
@@ -2218,6 +2224,15 @@ Namespace FBM
                     End If
 
                     Me.JoinedORMObject = arNewJoinedModelObject
+
+                    Dim lrLinkFactType As FBM.FactType
+                    Try
+                        lrLinkFactType = Me.FactType.getLinkFactTypes.Find(Function(x) x.LinkFactTypeRole Is Me)
+                    Catch
+                        'CodeSafe: Create the missing LinkFactType.
+                        lrLinkFactType = Me.FactType.createLinkFactTypeForRole(Me)
+                    End Try
+                    If lrLinkFactType Is Nothing Then Me.FactType.createLinkFactTypeForRole(Me)
 
                     If abIgnoreRDSProcessing Then GoTo FinishedProcessing
 

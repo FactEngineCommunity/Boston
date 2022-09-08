@@ -9,6 +9,9 @@ Namespace FBM
         Inherits FBM.FactTypeReading
         Implements FBM.iPageObject
 
+        <XmlAttribute()>
+        Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.FactTypeReading
+
         'The FactTypeReading for which the FactTypeReadingInstance acts as View/Proxy.
         <XmlIgnore()> _
         Private WithEvents _FactTypeReading As New FBM.FactTypeReading

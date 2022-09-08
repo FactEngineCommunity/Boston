@@ -38,6 +38,8 @@ Partial Class frmMain
         Me.MaximiseToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.NormalToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox = New System.Windows.Forms.GroupBox()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutBostonServerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenu_main.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.GroupBox.SuspendLayout()
@@ -84,7 +86,7 @@ Partial Class frmMain
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SessionToolStripMenuItem, Me.ViewToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SessionToolStripMenuItem, Me.ViewToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(731, 24)
@@ -140,6 +142,19 @@ Partial Class frmMain
         Me.GroupBox.TabStop = False
         Me.GroupBox.Text = "Status/Events:"
         '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutBostonServerToolStripMenuItem})
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(52, 20)
+        Me.AboutToolStripMenuItem.Text = "&About"
+        '
+        'AboutBostonServerToolStripMenuItem
+        '
+        Me.AboutBostonServerToolStripMenuItem.Name = "AboutBostonServerToolStripMenuItem"
+        Me.AboutBostonServerToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.AboutBostonServerToolStripMenuItem.Text = "&About Boston Server"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -175,5 +190,6 @@ Partial Class frmMain
     Friend WithEvents MinimiseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MaximiseToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents NormalToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-
+    Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AboutBostonServerToolStripMenuItem As ToolStripMenuItem
 End Class

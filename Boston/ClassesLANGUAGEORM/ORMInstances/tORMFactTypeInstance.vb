@@ -1344,6 +1344,9 @@ Namespace FBM
             '  (e.g. 'A Part is in a Bin in a Warehouse'.
             '-----------------------------------------------------------------------------------
             Try
+                'CodeSafe
+                If Not Me.Model.Page.Contains(Me.Page) Then Return Nothing
+
                 Dim lrFactTypeReading As New FBM.FactTypeReading(Me.FactType, Me.Id)
                 Dim lar_ORM_object_type As New List(Of FBM.ModelObject)
 
@@ -2839,8 +2842,6 @@ Namespace FBM
 
         Private Sub _FactType_FactTypeReadingRemoved(ByRef arFactTypeReading As FactTypeReading) Handles _FactType.FactTypeReadingRemoved
 
-            Dim lrFactTypeReadingInstance As New FBM.FactTypeReadingInstance
-
             Try
                 'CodeSafe-Ignore stray FactTypeInstances.
                 If Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.Id) IsNot Me Then Exit Sub
@@ -3182,6 +3183,10 @@ Namespace FBM
                 Me.Page.RoleInstance.Remove(lrRoleInstance)
 
                 Call Me.SortRoleGroup()
+
+                For Each lrInternalUniquenessConstraintInstance In Me.InternalUniquenessConstraint
+                    Call lrInternalUniquenessConstraintInstance.RefreshShape()
+                Next
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -3629,7 +3634,7 @@ Namespace FBM
                 If IsSomething(lrFactTypeReading) Then
                     lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.Page)
                     If Me.FactTypeReadingShape Is Nothing Then
-                        Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance
+                        Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance(Me, lrFactTypeReading)
                     End If
                     lrFactTypeReadingInstance.Shape = Me.FactTypeReadingShape.Shape
                     Me.FactTypeReadingShape = lrFactTypeReadingInstance

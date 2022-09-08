@@ -100,7 +100,6 @@ Public Class frmMain
 
             ' Step 5 Start the service.
             selfHost.Open()
-            Me.ListBox.Items.Insert(0, "Press <ENTER> to terminate service.")
             Me.ListBox.Items.Insert(0, "Listening at: " & baseAddress.ToString)
             Me.ListBox.Items.Insert(0, "The service is ready.")
             Me.ListBox.Items.Add("")
@@ -121,7 +120,7 @@ Public Class frmMain
 
         lsMessage = "Are you absolutely sure you would like to terminate the Boston Server?"
         lsMessage &= vbCrLf & vbCrLf
-        lsMessage &= "First check to see that there are no instances of Boston open."
+        lsMessage &= "First check to see that there are no instances of Boston open and using the server."
 
         If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
 
@@ -185,4 +184,17 @@ Public Class frmMain
     Private Sub frmMain_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         e.Cancel = True
     End Sub
+
+    Private Sub AboutBostonServerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutBostonServerToolStripMenuItem.Click
+
+        Dim lsMessage As String
+
+        lsMessage = "Boston Server"
+        lsMessage &= vbCrLf & "Copyright FactEngine, 2022"
+        lsMessage &= vbCrLf & "Version: " & psVersionNumber
+
+        MsgBox(lsMessage)
+
+    End Sub
+
 End Class

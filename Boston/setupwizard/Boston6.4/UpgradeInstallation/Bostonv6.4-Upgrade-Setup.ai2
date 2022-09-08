@@ -405,6 +405,7 @@
             <file runtime-location="" name="ClassesNORMA\NORMAXSD\ORM2Diagram.xsd" destination-modified="0" destination="&lt;InstallDir&gt;\ClassesNORMA\NORMAXSD" reg-priority="1" overwrite-mode="0" attributes="97" />
             <file runtime-location="" name="ClassesNORMA\NORMAXSD\ORM2Root.xsd" destination-modified="0" destination="&lt;InstallDir&gt;\ClassesNORMA\NORMAXSD" reg-priority="1" overwrite-mode="0" attributes="97" />
             <file runtime-location="" name="database\databasedatatypes\bostondatabasedatattypes.csv" destination-modified="0" destination="&lt;InstallDir&gt;\database\databasedatatypes" reg-priority="1" overwrite-mode="0" attributes="97" />
+            <file runtime-location="" name="database\databaseupgrade\bostondatabaseupgrade.ldb" destination-modified="0" destination="&lt;InstallDir&gt;\database\databaseupgrade" reg-priority="1" overwrite-mode="0" attributes="97" />
             <file runtime-location="" name="database\databaseupgrade\bostondatabaseupgrade.vdb" destination-modified="0" destination="&lt;InstallDir&gt;\database\databaseupgrade" reg-priority="1" overwrite-mode="0" attributes="97" />
             <file runtime-location="" name="licenses\Images\VievLogoMedium.jpg" destination-modified="0" destination="&lt;InstallDir&gt;\licenses\Images" reg-priority="1" overwrite-mode="0" attributes="97" />
             <file runtime-location="" name="startup\images\academichat.png" destination-modified="0" destination="&lt;InstallDir&gt;\startup\images" reg-priority="1" overwrite-mode="0" attributes="97" />

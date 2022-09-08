@@ -700,6 +700,12 @@ ConnectionFailed:
 
     End Sub
 
+    ''' <summary>
+    ''' 20220907-VM-Possible that Page data was not being saved when changed from StoreAsXML to StoreInDatabase. Fix below.
+    ''' Call Me.zrModel.Save(True, True,True ) '20220907-VM-Was Save(True,False).
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub CheckBoxSaveToXML_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxSaveToXML.CheckedChanged
 
         Try
@@ -726,7 +732,7 @@ ConnectionFailed:
                         Try
                             Call Database.CompactAndRepairDatabase()
                             Call Me.zrModel.RapidEmpty(True)
-                            Call Me.zrModel.Save(True, False)
+                            Call Me.zrModel.Save(True, True, True) '20220907-VM-Was Save(True,False).
                         Catch ex As Exception
                             lsMessage = "Couldn't successfully save the Model to the Boston database. The Model will remain stored as XML."
                             Me.zrModel.StoreAsXML = True
