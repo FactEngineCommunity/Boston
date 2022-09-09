@@ -2951,11 +2951,25 @@ SkipRegistrationChecking:
     Private Sub ToolStripButton_Save_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButton_Save.Click
 
         Try
+            Dim lrModel As FBM.Model = Nothing
+
+            'CodeSafe
+            Try
+                Dim lrObject = zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
+            Catch ex As Exception
+                If prApplication.WorkingModel IsNot Nothing Then
+                    lrModel = prApplication.WorkingModel
+                    GoTo SaveModel
+                Else
+                    Exit Sub
+                End If
+            End Try
+
             If IsSomething(zfrmModelExplorer) Then
                 Select Case zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
                     Case Is = pcenumMenuType.modelORMModel
-                        Dim lrModel As FBM.Model
                         lrModel = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
+SaveModel:
                         If lrModel.IsDirty Or lrModel.hasADirtyPage Then
                             Me.Cursor = Cursors.WaitCursor
                             Boston.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
@@ -3020,7 +3034,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

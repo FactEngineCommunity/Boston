@@ -3785,6 +3785,7 @@ Namespace FBM
                 If (Me.Arity = 2) And (Me.InternalUniquenessConstraint.Count = 0) Then
 
                     Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                      Where Relation.ResponsibleFactType IsNot Nothing
                                       Where Relation.ResponsibleFactType.Id = Me.Id
                                       Select Relation
 

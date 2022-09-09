@@ -4009,6 +4009,7 @@ Public Class frmDiagramORM
                     If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
                         Me.zrPage.SelectedObject.Clear()
                         Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
+                        Call Me.SelectNode(loSelectedNode)
                         Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
                     End If
                     Call Me.SelectNode(loSelectedNode)
@@ -9287,12 +9288,19 @@ SkipPopup:
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
 
         Try
+            'CodeSafe
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+        Catch ex As Exception
+            Exit Sub
+        End Try
+
+        Try
             If Me.mrPopupToolSelector IsNot Nothing Then
                 Me.Diagram.Nodes.Remove(Me.mrPopupToolSelector.Node)
                 Me.mrPopupToolSelector = Nothing
             End If
 
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+
 
             Call lrEntityTypeInstance.RemoveFromPage(True)
 

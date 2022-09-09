@@ -312,7 +312,7 @@ Public Class frmToolboxTaxonomyTree
                     Case Is = pcenumConceptType.EntityType
 #Region "EntityType"
                         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                        lrEntityTypeInstance = lrModelObject.CloneInstance(lrPage, False)
+                        lrEntityTypeInstance = CType(lrModelObject, FBM.EntityType).CloneInstance(lrPage, False, True, True)
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                         lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
                         Call lrEntityTypeInstance.SetPropertyAttributes(Me, "DerivationText", True)
@@ -429,7 +429,7 @@ Public Class frmToolboxTaxonomyTree
 
 
                     Case Is = pcenumConceptType.FactType
-                        Dim lrFactTypeInstance As FBM.FactTypeInstance = lrModelObject.CloneInstance(lrPage, False)
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage, False)
 
                         Call lrFactTypeInstance.SetPropertyAttributes(Me, "ReferenceMode", lrFactTypeInstance.IsObjectified)
                         Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", lrFactTypeInstance.IsObjectified)
@@ -509,7 +509,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

@@ -1750,11 +1750,13 @@ Namespace FBM
                 Me.Shape.Pen.Color = Color.Blue
 
                 If IsSomething(Me.FactTable.TableShape) Then
-                    Me.FactTable.TableShape.Pen.Color = Color.Black
-                    Me.FactTable.TableShape.ZTop()
+                    If Me.FactTable.TableShape IsNot Nothing Then
+                        Me.FactTable.TableShape.Pen.Color = Color.Black
+                        Me.FactTable.TableShape.ZTop()
+                    End If
                 End If
 
-                If Me.IsLinkFactType Then
+                    If Me.IsLinkFactType Then
                     If Me.LinkFactTypeRole IsNot Nothing Then
                         Try
                             Me.Page.RoleInstance.Find(Function(x) x.Id = Me.LinkFactTypeRole.Id).Shape.Brush =
