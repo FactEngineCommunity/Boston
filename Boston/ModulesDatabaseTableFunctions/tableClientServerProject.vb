@@ -24,7 +24,7 @@ Public Module tableClientServerProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -55,7 +55,7 @@ Public Module tableClientServerProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -97,7 +97,7 @@ Public Module tableClientServerProject
 
             If Not lREcordset.EOF Then
                 arProject.Id = lREcordset("Id").Value
-                arProject.Name = lREcordset("Projectname").Value                
+                arProject.Name = lREcordset("Projectname").Value
                 arProject.CreatedByUser = New ClientServer.User
                 Dim lsCreatedByUserId As String = lREcordset("CreatedByUserId").Value
                 Call tableClientServerUser.getUserDetailsById(lsCreatedByUserId, arProject.CreatedByUser)
@@ -114,7 +114,7 @@ Public Module tableClientServerProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -159,7 +159,7 @@ Public Module tableClientServerProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -175,7 +175,7 @@ Public Module tableClientServerProject
 
             lsSQLQuery = " SELECT COUNT(*)"
             lsSQLQuery &= "  FROM ClientServerProjectUser"
-            lsSQLQuery &= " WHERE ProjectId = '" & arProject.Id & "'"        
+            lsSQLQuery &= " WHERE ProjectId = '" & arProject.Id & "'"
             lsSQLQuery &= "   AND UserId = '" & arUser.Id & "'"
 
             lREcordset.Open(lsSQLQuery)
@@ -190,7 +190,7 @@ Public Module tableClientServerProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -215,7 +215,7 @@ Public Module tableClientServerProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try

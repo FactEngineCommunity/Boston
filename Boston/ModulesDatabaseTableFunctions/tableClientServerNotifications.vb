@@ -22,14 +22,14 @@ Public Module tableClientServerNotifications
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
 
     End Sub
 
-    Public Function getOpenNotificationsByUserByType(ByRef arUser As ClientServer.User, _
+    Public Function getOpenNotificationsByUserByType(ByRef arUser As ClientServer.User,
                                                      ByRef aiNotificationType As pcenumNotificationType) _
                                                  As List(Of ClientServer.NotificationGeneral)
 
@@ -75,7 +75,7 @@ Public Module tableClientServerNotifications
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return larNotification
         End Try

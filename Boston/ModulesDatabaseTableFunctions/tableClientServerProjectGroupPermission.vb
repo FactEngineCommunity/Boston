@@ -24,7 +24,7 @@ Module tableClientServerProjectGroupPermission
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -51,7 +51,7 @@ Module tableClientServerProjectGroupPermission
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -87,7 +87,7 @@ Module tableClientServerProjectGroupPermission
                     lrProjectGroupPermission = New ClientServer.ProjectGroupPermission
                     lrProjectGroupPermission.Project = arProject
                     lrProjectGroupPermission.Group = arGroup
-                    lrProjectGroupPermission.Permission = _
+                    lrProjectGroupPermission.Permission =
                         CType([Enum].Parse(GetType(pcenumPermission), lREcordset("Permission").Value), pcenumPermission)
 
                     aarProjectGroupPermission.Add(lrProjectGroupPermission)
@@ -102,7 +102,7 @@ Module tableClientServerProjectGroupPermission
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

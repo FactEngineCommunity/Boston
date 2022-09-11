@@ -22,7 +22,7 @@ Public Module tableClientServerRoleFunction
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -51,7 +51,7 @@ Public Module tableClientServerRoleFunction
                 While Not lREcordset.EOF
                     lrFunction = New ClientServer.Function
                     lrFunction.Name = lREcordset("FunctionName").Value
-                    lrFunction.Function = _
+                    lrFunction.Function =
                         CType([Enum].Parse(GetType(pcenumFunction), lREcordset("FunctionName").Value), pcenumFunction)
                     lrFunction.FullText = lREcordset("FunctionFullText").Value
 
@@ -71,7 +71,7 @@ Public Module tableClientServerRoleFunction
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return larFunction
         End Try
@@ -96,7 +96,7 @@ Public Module tableClientServerRoleFunction
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

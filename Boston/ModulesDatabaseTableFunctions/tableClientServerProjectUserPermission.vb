@@ -24,7 +24,7 @@ Module tableClientServerProjectUserPermission
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -51,7 +51,7 @@ Module tableClientServerProjectUserPermission
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -87,7 +87,7 @@ Module tableClientServerProjectUserPermission
                     lrProjectUserPermission = New ClientServer.ProjectUserPermission
                     lrProjectUserPermission.Project = arProject
                     lrProjectUserPermission.User = arUser
-                    lrProjectUserPermission.Permission = _
+                    lrProjectUserPermission.Permission =
                         CType([Enum].Parse(GetType(pcenumPermission), lREcordset("Permission").Value), pcenumPermission)
 
                     aarProjectUserPermission.Add(lrProjectUserPermission)
@@ -102,7 +102,7 @@ Module tableClientServerProjectUserPermission
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -114,7 +114,7 @@ Module tableClientServerProjectUserPermission
         Try
             lsSQLQuery = "DELETE FROM ClientServerProjectUserPermission"
             lsSQLQuery &= " WHERE ProjectId = '" & arProject.Id & "'"
-            lsSQLQuery &= "   AND UserId = '" & arUser.Id & "'"            
+            lsSQLQuery &= "   AND UserId = '" & arUser.Id & "'"
 
             pdbConnection.BeginTrans()
             Call pdbConnection.Execute(lsSQLQuery)
@@ -126,7 +126,7 @@ Module tableClientServerProjectUserPermission
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
