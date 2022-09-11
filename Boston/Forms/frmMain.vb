@@ -2850,6 +2850,9 @@ SkipRegistrationChecking:
         Dim child As New frmToolboxBrainBox
 
         Try
+            'CodeSafe
+            If aoActivePane Is Nothing Then Return Nothing
+
             If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
                 '-------------------------------------------------------------
                 'Form is already loaded. Bring it to the front of the ZOrder

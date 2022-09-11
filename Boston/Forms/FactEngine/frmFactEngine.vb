@@ -680,11 +680,11 @@ Public Class frmFactEngine
 
 #Region "Transformations"
                 'TextBoxNaturalLanguage
-                If My.Settings.FactEngineUseTransformations Then
+                If My.Settings.FactEngineUseTransformations And abUseNaturalLanguage Then
 
-                    If abUseNaturalLanguage Then
-                        Me.TextBoxInput.Text = Trim(Me.TextBoxNaturalLanguage.Text)
-                    End If
+                    'If abUseNaturalLanguage Then
+                    Me.TextBoxInput.Text = Trim(Me.TextBoxNaturalLanguage.Text)
+                    'End If
 
                     Dim lrLanguageParser As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
 
@@ -701,6 +701,10 @@ Public Class frmFactEngine
 
                             If lrModelElement Is Nothing Then
                                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsLemma, True, True)
+                            End If
+
+                            If lrModelElement Is Nothing Then
+                                lrModelElement = prApplication.WorkingModel.ModelElements.Find(Function(x) Fastenshtein.Levenshtein.Distance(x.Id, lsTempWord) < 2)
                             End If
 
                             If lrModelElement IsNot Nothing Then
