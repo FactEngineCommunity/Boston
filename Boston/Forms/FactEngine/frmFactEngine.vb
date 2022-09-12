@@ -3093,4 +3093,21 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Sub TextBoxNaturalLanguage_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBoxNaturalLanguage.KeyDown
+
+        Try
+            If e.KeyCode = Keys.Enter Then
+                Call Me.GO(True)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

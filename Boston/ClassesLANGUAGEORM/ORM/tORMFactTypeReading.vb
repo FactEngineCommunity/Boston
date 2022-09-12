@@ -250,7 +250,7 @@ Namespace FBM
 
             For Each lrPredicatePart In Me.PredicatePart
                 If abUseFastenshtein Then
-                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) < 4) Or
+                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) > 4) Or
                      (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
                      (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
                         Return False
