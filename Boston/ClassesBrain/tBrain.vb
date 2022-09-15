@@ -3369,6 +3369,7 @@ SkipOutputChannel:
                 Me.AddQuestion(lrQuestion)
             End If
 
+            Me.Timeout.Enabled = True
             Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
 
 

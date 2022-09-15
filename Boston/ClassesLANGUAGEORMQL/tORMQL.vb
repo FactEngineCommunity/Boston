@@ -995,7 +995,7 @@ Namespace ORMQL
         End Function
 
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
-        Private Function ProcessSelectStatement(ByVal asORMQLStatement As String) As Object
+        Private Function ProcessSelectStatement(ByVal asORMQLStatement As String, Optional ByVal abIgnoreErrorMessage As Boolean = False) As Object
 
             Dim lrFact As New FBM.Fact
             Dim lrFactType As FBM.FactType
@@ -1381,7 +1381,10 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                If Not abIgnoreErrorMessage Then
+                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                End If
 
                 Return New ORMQL.Recordset
             End Try
@@ -2342,7 +2345,7 @@ Namespace ORMQL
 
         End Function
 
-        Public Function ProcessORMQLStatement(ByVal as_ORMQL_statement As String) As Object
+        Public Function ProcessORMQLStatement(ByVal as_ORMQL_statement As String, Optional abIgnoreErrorMessage As Boolean = False) As Object
 
             Dim lrFact As New FBM.Fact
 
@@ -2378,11 +2381,11 @@ Namespace ORMQL
                                     Dim lrRecordset = Me.ProcessSelectINSTANCESStatement(as_ORMQL_statement)
                                     Return lrRecordset
                                 Else
-                                    Dim lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement)
+                                    Dim lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement, abIgnoreErrorMessage)
                                     Return lrRecordset
                                 End If
                             Else
-                                Dim lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement)
+                                Dim lrRecordset = Me.ProcessSelectStatement(as_ORMQL_statement, abIgnoreErrorMessage)
                                 Return lrRecordset
                             End If
 

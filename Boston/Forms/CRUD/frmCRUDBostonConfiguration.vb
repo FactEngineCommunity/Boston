@@ -40,6 +40,25 @@ Public Class frmCRUDBostonConfiguration
 
     End Sub
 
+    Private Sub SetupUsingSuperUserMode()
+
+        Try
+            Me.CheckBoxFactEngineUseTransformations.Enabled = True
+            Me.CheckBoxClientServerInitialiseClient.Enabled = True
+            Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+
     Private Sub SetupForm()
 
         Call Me.LoadDebugModes()
@@ -72,8 +91,12 @@ Public Class frmCRUDBostonConfiguration
 
         Me.ComboBoxDatabaseType.Enabled = False
 
-        Me.CheckBoxEnableClientServer.Checked = My.Settings.UseClientServer
+        'Client/Server
         Me.CheckBoxUseRemoteUI.Checked = My.Settings.UseVirtualUI
+        Me.CheckBoxEnableClientServer.Checked = My.Settings.UseClientServer
+        Me.CheckBoxLoggingOutEndsSession.Checked = My.Settings.LoggingOutEndsSession
+        Me.CheckBoxClientServerRequireLoginAtStartup.Checked = My.Settings.RequireLoginAtStartup
+        Me.CheckBoxClientServerInitialiseClient.Checked = My.Settings.InitialiseClient
 
         If My.Settings.FactEngineDefaultQueryResultLimit = 0 Then
             Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite"
@@ -114,6 +137,10 @@ Public Class frmCRUDBostonConfiguration
 
         'Code Generation
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked = My.Settings.CodeGenerationUseSquareBracketsSQLTableNames
+
+        If My.Settings.SuperuserMode Then
+            Call Me.SetupUsingSuperUserMode()
+        End If
 
     End Sub
 
@@ -160,11 +187,16 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked
                 My.Settings.ThrowInformationDebugMessagesToScreen = Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked
                 My.Settings.BostonErrorMessagesShowStackTrace = Me.CheckBoxShowStackTrace.Checked
-                My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
-                My.Settings.RequireLoginAtStartup = Me.CheckBoxEnableClientServer.Checked
-                My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
-                My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
                 My.Settings.BostonErrorMessagesShowFlashCard = Me.CheckBoxUseFlashCardErrorMessages.Checked
+
+                'Client/Server
+                My.Settings.UseVirtualUI = Me.CheckBoxUseRemoteUI.Checked
+                My.Settings.UseClientServer = Me.CheckBoxEnableClientServer.Checked
+                My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
+                My.Settings.RequireLoginAtStartup = Me.CheckBoxClientServerRequireLoginAtStartup.Checked
+                My.Settings.InitialiseClient = Me.CheckBoxClientServerInitialiseClient.Checked
+
+
 
                 'FactEngine
                 My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
@@ -461,6 +493,9 @@ Public Class frmCRUDBostonConfiguration
             MsgBox(lsMessage, MsgBoxStyle.Exclamation)
 
             Call frmMain.ShowHideMenuOptions()
+
+            Call Me.SetupUsingSuperUserMode()
+
         End If
 
     End Sub

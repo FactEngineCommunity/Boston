@@ -5358,7 +5358,12 @@ SaveModel:
 
     Private Sub ToolStripMenuItemFactEngine_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemFactEngine.Click
 
-        Call Me.LoadFactEngine()
+        If prApplication.WorkingModel Is Nothing Then
+            MsgBox("Create and load a model before loading FactEngine.")
+        Else
+            Call Me.LoadFactEngine()
+        End If
+
 
     End Sub
 

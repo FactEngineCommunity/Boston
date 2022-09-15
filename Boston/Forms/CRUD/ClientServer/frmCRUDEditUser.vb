@@ -72,10 +72,18 @@ Public Class frmCRUDEditUser
 
         check_fields = True
 
-
         If Trim(textbox_operator_name.Text) = "" Then
             MsgBox("You must enter an 'Username' before saving.")
             check_fields = False
+        End If
+
+        Dim lrUser As ClientServer.User = Nothing
+        tableClientServerUser.getUserDetailsByUsername(Trim(textbox_operator_name.Text), lrUser, True)
+        If lrUser IsNot Nothing Then
+            If lrUser.Id <> Me.zrUser.Id Then
+                MsgBox("You must create a unique 'Username' before saving.")
+                check_fields = False
+            End If
         End If
 
         If textbox_password.Text <> textbox_confirmation_password.Text Then
@@ -91,6 +99,10 @@ Public Class frmCRUDEditUser
     Sub get_fields(ByRef arUser As ClientServer.User)
 
         arUser.Username = Trim(textbox_operator_name.Text)
+
+        arUser.FirstName = Trim(TextBoxFirstName.Text)
+        arUser.LastName = Trim(TextBoxLastName.Text)
+
         If Trim(textbox_password.Text) <> "" Then
             arUser.PasswordHash = ClientServer.getHash(textbox_password.Text)
         End If

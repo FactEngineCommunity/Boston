@@ -25,6 +25,12 @@ Public Class frmCRUDAddUser
             check_fields = False
         End If
 
+        Dim lrUser As ClientServer.User
+        If tableClientServerUser.getUserDetailsByUsername(Trim(textbox_operator_name.Text), lrUser, True) IsNot Nothing Then
+            MsgBox("You must create a unique 'Username' before saving.")
+            check_fields = False
+        End If
+
         If textbox_password.Text <> textbox_confirmation_password.Text Then
             MsgBox("The 'Confirmation Password' does not match the 'Password'. Please reenter the 'Password' and 'Confirm Password' field values.")
             textbox_password.Text = ""

@@ -3,6 +3,7 @@ Imports MindFusion.Diagramming.Layout
 Imports MindFusion.Diagramming
 Imports System.Runtime.InteropServices
 Imports System.ComponentModel
+Imports System.Text.RegularExpressions
 
 Public Class frmFactEngine
 
@@ -718,7 +719,12 @@ Public Class frmFactEngine
                     Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
 
                     For Each loTransformation In larTransformationTuples
-                        Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
+                        Dim regex As Regex = New Regex(loTransformation.FindRegEx)
+                        Dim match As Match = regex.Match(Me.TextBoxInput.Text)
+                        If match.Success Then
+                            Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
+                        End If
+
                     Next
 
                     'Tidy up

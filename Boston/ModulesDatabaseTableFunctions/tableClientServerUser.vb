@@ -155,7 +155,7 @@ Public Module tableClientServerUser
 
     End Sub
 
-    Public Sub getUserDetailsByUsername(ByVal asUsername As String, ByRef arUser As ClientServer.User)
+    Public Function getUserDetailsByUsername(ByVal asUsername As String, ByRef arUser As ClientServer.User, Optional ByVal abIgnoreErrorMessage As Boolean = False) As ClientServer.User
 
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New ADODB.Recordset
@@ -171,6 +171,10 @@ Public Module tableClientServerUser
             lREcordset.Open(lsSQLQuery)
 
             If Not lREcordset.EOF Then
+                If arUser Is Nothing Then
+                    arUser = New ClientServer.User
+                End If
+
                 arUser.Id = lREcordset("Id").Value
                 arUser.Username = Trim(lREcordset("Username").Value)
                 arUser.FirstName = Trim(lREcordset("FirstName").Value)
@@ -182,9 +186,14 @@ Public Module tableClientServerUser
 
                 arUser.Role = tableClientServerUserRole.getRolesForUser(arUser, True)
                 'arUser.Function is populated in publicClientServerModule.loginUser. No need to do anything here.
+
+                Return arUser
             Else
-                Dim lsMessage As String = "Error: getUserDetailsByUsername: No User returned for Username: " & asUsername
-                Throw New Exception(lsMessage)
+                If Not abIgnoreErrorMessage Then
+                    Dim lsMessage As String = "Error: getUserDetailsByUsername: No User returned for Username: " & asUsername
+                    Throw New Exception(lsMessage)
+                End If
+                Return Nothing
             End If
         Catch ex As Exception
             Dim lsMessage As String
@@ -193,10 +202,12 @@ Public Module tableClientServerUser
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
         End Try
 
 
-    End Sub
+    End Function
 
     Public Sub getUserDetailsById(ByVal asUserId As String,
                                   ByRef arUser As ClientServer.User,

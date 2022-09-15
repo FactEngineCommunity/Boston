@@ -97,6 +97,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxClientServerRequireLoginAtStartup = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxClientServerInitialiseClient = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -447,12 +449,14 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.CheckBoxClientServerInitialiseClient)
+        Me.GroupBox3.Controls.Add(Me.CheckBoxClientServerRequireLoginAtStartup)
         Me.GroupBox3.Controls.Add(Me.CheckBoxUseRemoteUI)
         Me.GroupBox3.Controls.Add(Me.CheckBoxLoggingOutEndsSession)
         Me.GroupBox3.Controls.Add(Me.CheckBoxEnableClientServer)
         Me.GroupBox3.Location = New System.Drawing.Point(6, 6)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(594, 129)
+        Me.GroupBox3.Size = New System.Drawing.Size(594, 162)
         Me.GroupBox3.TabIndex = 0
         Me.GroupBox3.TabStop = False
         '
@@ -885,6 +889,30 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
+        'CheckBoxClientServerRequireLoginAtStartup
+        '
+        Me.CheckBoxClientServerRequireLoginAtStartup.AutoSize = True
+        Me.CheckBoxClientServerRequireLoginAtStartup.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = False
+        Me.CheckBoxClientServerRequireLoginAtStartup.Location = New System.Drawing.Point(22, 88)
+        Me.CheckBoxClientServerRequireLoginAtStartup.Name = "CheckBoxClientServerRequireLoginAtStartup"
+        Me.CheckBoxClientServerRequireLoginAtStartup.Size = New System.Drawing.Size(138, 17)
+        Me.CheckBoxClientServerRequireLoginAtStartup.TabIndex = 3
+        Me.CheckBoxClientServerRequireLoginAtStartup.Text = "Require login at startup:"
+        Me.CheckBoxClientServerRequireLoginAtStartup.UseVisualStyleBackColor = True
+        '
+        'CheckBoxClientServerInitialiseClient
+        '
+        Me.CheckBoxClientServerInitialiseClient.AutoSize = True
+        Me.CheckBoxClientServerInitialiseClient.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBoxClientServerInitialiseClient.Enabled = False
+        Me.CheckBoxClientServerInitialiseClient.Location = New System.Drawing.Point(65, 111)
+        Me.CheckBoxClientServerInitialiseClient.Name = "CheckBoxClientServerInitialiseClient"
+        Me.CheckBoxClientServerInitialiseClient.Size = New System.Drawing.Size(95, 17)
+        Me.CheckBoxClientServerInitialiseClient.TabIndex = 4
+        Me.CheckBoxClientServerInitialiseClient.Text = "Initialise Client:"
+        Me.CheckBoxClientServerInitialiseClient.UseVisualStyleBackColor = True
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1014,4 +1042,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxUseFlashCardErrorMessages As CheckBox
     Friend WithEvents CheckBoxFactEngineUseTransformations As CheckBox
     Friend WithEvents ButtonCopyModelIdToClipboard As Button
+    Friend WithEvents CheckBoxClientServerInitialiseClient As CheckBox
+    Friend WithEvents CheckBoxClientServerRequireLoginAtStartup As CheckBox
 End Class

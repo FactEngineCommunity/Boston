@@ -89,7 +89,7 @@ Namespace Language
                     lsSQLQuery &= " FROM WordIsVerb"
                     lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                    lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                     If CInt(lrRecordset("Count").Data) > 0 Then
                         lbIsVerb = True
@@ -152,7 +152,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsArticle"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsArticle = True
@@ -176,7 +176,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsPreposition"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsPreposition = True
@@ -200,7 +200,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsConjunction"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsConjunction = True
@@ -224,7 +224,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsDelimeter"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsDelimeter = True
@@ -248,7 +248,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsAlternativeAdditiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsAlternativeAdditiveDeterminer = True
@@ -272,7 +272,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsCardinalNumber"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsCardinalNumber = True
@@ -296,7 +296,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsDegreeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsDegreeDeterminer = True
@@ -320,7 +320,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsDemonstrativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsDemonstrativeDeterminer = True
@@ -344,7 +344,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsDisjunctiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsDisjunctiveDeterminer = True
@@ -368,7 +368,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsDistributiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsDistributiveDeterminer = True
@@ -392,7 +392,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsElectiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsElectiveDeterminer = True
@@ -416,7 +416,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsEqualitiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsEqualitiveDeterminer = True
@@ -440,7 +440,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsEvaluativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsEvaluativeDeterminer = True
@@ -464,7 +464,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsExclamativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsExclamativeDeterminer = True
@@ -488,7 +488,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsExistentialDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsExistentialDeterminer = True
@@ -512,7 +512,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsInterrogativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsInterrogativeDeterminer = True
@@ -536,7 +536,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsNegativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsNegativeDeterminer = True
@@ -560,7 +560,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsPersonalDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsPersonalDeterminer = True
@@ -584,7 +584,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsPositiveMultalDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsPositiveMultalDeterminer = True
@@ -608,7 +608,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsPositivePaucal"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsPositivePaucal = True
@@ -632,7 +632,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsPossessiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsPossessiveDeterminer = True
@@ -656,7 +656,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsQualitativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsQualitativeDeterminer = True
@@ -680,7 +680,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsQuantifier"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsQuantifier = True
@@ -704,7 +704,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsRelativeDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsRelativeDeterminer = True
@@ -728,7 +728,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsSufficiencyDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsSufficiencyDeterminer = True
@@ -752,7 +752,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsSubordinateConjunction"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsSubordinateConjunction = True
@@ -776,7 +776,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsUniquitiveDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsUniquitiveDeterminer = True
@@ -800,7 +800,7 @@ Namespace Language
                 lsSQLQuery &= " FROM WordIsUniversalDeterminer"
                 lsSQLQuery &= " WHERE Word = '" & Trim(asWord) & "'"
 
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery, True)
 
                 If CInt(lrRecordset("Count").Data) > 0 Then
                     WordIsUniversalDeterminer = True
