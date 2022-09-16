@@ -131,8 +131,8 @@ Public Module tableClientServerProject
 
     End Function
 
-    Public Sub GetProjects(ByRef aarProject As List(Of ClientServer.Project),
-                           ByRef arUser As ClientServer.User)
+    Public Function GetProjects(ByRef aarProject As List(Of ClientServer.Project),
+                                ByRef arUser As ClientServer.User) As List(Of ClientServer.Project)
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
@@ -153,6 +153,11 @@ Public Module tableClientServerProject
             lREcordset.Open(lsSQLQuery)
 
             If Not lREcordset.EOF Then
+
+                If aarProject Is Nothing Then
+                    aarProject = New List(Of ClientServer.Project)
+                End If
+
                 While Not lREcordset.EOF
                     lrProject = New ClientServer.Project
                     lrProject.Id = lREcordset("Id").Value
@@ -166,15 +171,19 @@ Public Module tableClientServerProject
 
             lREcordset.Close()
 
+            Return aarProject
+
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return New List(Of ClientServer.Project)
         End Try
 
-    End Sub
+    End Function
 
     Public Function IsProjectAllocatedToUser(ByRef arProject As ClientServer.Project, ByRef arUser As ClientServer.User) As Boolean
 

@@ -101,6 +101,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
+        Me.ToolStripMenuItemMoveModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -315,9 +316,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 446)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 468)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -680,6 +681,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
         '
+        'ToolStripMenuItemMoveModel
+        '
+        Me.ToolStripMenuItemMoveModel.Name = "ToolStripMenuItemMoveModel"
+        Me.ToolStripMenuItemMoveModel.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemMoveModel.Text = "&Move Model"
+        '
         'frmToolboxEnterpriseExplorer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -776,4 +783,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents AddUseCaseDiagramToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AddProcessDiagramPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemExportToNORMAormFile As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemMoveModel As ToolStripMenuItem
 End Class

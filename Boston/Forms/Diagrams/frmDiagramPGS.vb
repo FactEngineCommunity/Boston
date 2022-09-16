@@ -15,7 +15,6 @@ Public Class frmDiagramPGS
     Private MorphVector As New List(Of tMorphVector)
 
     Private PropertyTableNode As TableNode
-
     Public Function areAllEntitiesAtPoint00() As Boolean
 
         For Each lrEntity As PGS.Node In Me.zrPage.ERDiagram.Entity

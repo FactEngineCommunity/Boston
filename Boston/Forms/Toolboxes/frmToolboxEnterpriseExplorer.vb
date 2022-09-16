@@ -98,6 +98,9 @@ Public Class frmToolboxEnterpriseExplorer
                                                        Nothing, _
                                                        loNode)
 
+#Region "Client/Server"
+            Me.ToolStripMenuItemMoveModel.Visible = My.Settings.UseClientServer
+
             If My.Settings.UseClientServer Then
                 Me.LabelPromptProject.Visible = True
                 Me.ComboBoxProject.Visible = True
@@ -113,6 +116,7 @@ Public Class frmToolboxEnterpriseExplorer
                 Me.LabelPromptProject.Visible = False
                 Me.ComboBoxProject.Visible = False
             End If
+#End Region
 
             Call LoadEnterpriseTreeSearchItems()
 
@@ -5159,6 +5163,40 @@ Public Class frmToolboxEnterpriseExplorer
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemMoveModel_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemMoveModel.Click
+
+        Try
+            Dim lfrmModelMove As New frmModelMove
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            lfrmModelMove.mrModel = lrModel
+
+            If lfrmModelMove.ShowDialog() = DialogResult.OK Then
+
+                If lfrmModelMove.mrProject.Id <> prApplication.WorkingProject.Id And
+                   lfrmModelMove.mrNamespace.Id <> prApplication.WorkingNamespace.Id Then
+
+                    lrModel.ProjectId = lfrmModelMove.mrProject.Id
+                    lrModel.Namespace = lfrmModelMove.mrNamespace
+                    lrModel.MakeDirty(False, False)
+                    Call lrModel.Save()
+
+                    Me.TreeView.Nodes.Remove(Me.TreeView.SelectedNode)
+
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

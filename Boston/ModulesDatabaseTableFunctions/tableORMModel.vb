@@ -306,6 +306,9 @@ Namespace TableModel
                 lsSQLQuery &= "       ,IsNamespace = " & ar_model.IsNamespace
                 lsSQLQuery &= "       ,TargetDatabaseType = '" & Trim(ar_model.TargetDatabaseType.ToString) & "'"
                 lsSQLQuery &= "       ,TargetDatabaseConnectionString = '" & Trim(ar_model.TargetDatabaseConnectionString) & "'"
+                If ar_model.Namespace IsNot Nothing Then
+                    lsSQLQuery &= "       ,NamespaceId = '" & Trim(ar_model.Namespace.Id) & "'"
+                End If
                 lsSQLQuery &= "       ,CreatedByUserId = '" & NullVal(ar_model.CreatedByUserId, "") & "'"
                 lsSQLQuery &= "       ,CoreVersionNumber = '" & Trim(ar_model.CoreVersionNumber) & "'"
                 lsSQLQuery &= "       ,Server = '" & Trim(ar_model.Server) & "'"
