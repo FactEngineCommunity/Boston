@@ -1343,9 +1343,12 @@ MoveOn:
 
                 lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
 
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
-                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
+                If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                    If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                        lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
+                    End If
                 End If
+
                 Dim lrRoleInstance As FBM.RoleInstance
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance

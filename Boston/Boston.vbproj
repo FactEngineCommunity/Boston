@@ -1434,6 +1434,12 @@
     <Compile Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\frmModelMove.Designer.vb">
+      <DependentUpon>frmModelMove.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmModelMove.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DialogBoxes\frmTextboxFind.Designer.vb">
       <DependentUpon>frmTextboxFind.vb</DependentUpon>
     </Compile>
@@ -2324,6 +2330,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.resx">
       <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmModelMove.resx">
+      <DependentUpon>frmModelMove.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmTextboxFind.resx">
       <DependentUpon>frmTextboxFind.vb</DependentUpon>

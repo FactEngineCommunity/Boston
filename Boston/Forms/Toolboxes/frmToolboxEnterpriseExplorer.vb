@@ -1050,16 +1050,18 @@ Public Class frmToolboxEnterpriseExplorer
                 lrInterfaceModel.Name = arModel.Name
                 If Not (arModel.ProjectId = "MyPersonalModels" Or arModel.ProjectId = "") Then
                     lrInterfaceModel.ProjectId = arModel.ProjectId
-                    lrInterfaceModel.Namespace = arModel.Namespace.Name
+                    If arModel.Namespace IsNot Nothing Then
+                        lrInterfaceModel.Namespace = arModel.Namespace.Name
+                    End If
 
                     If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
                         Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
                         lrBroadcast.Model = lrInterfaceModel
                         Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.SaveModel, lrBroadcast)
                     End If
-
                 End If
             End If
+
 
             '==============================================================================================
 
