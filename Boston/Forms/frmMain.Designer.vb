@@ -157,6 +157,7 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
+        Me.BroadcastMessageToUsersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -709,7 +710,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemTestClientServer
         '
-        Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBroadcastEventMonitorToolStripMenuItem, Me.ShowClientServerBroadcastTesterToolStripMenuItem})
+        Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BroadcastMessageToUsersToolStripMenuItem, Me.ShowBroadcastEventMonitorToolStripMenuItem, Me.ShowClientServerBroadcastTesterToolStripMenuItem})
         Me.ToolStripMenuItemTestClientServer.Name = "ToolStripMenuItemTestClientServer"
         Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 22)
         Me.ToolStripMenuItemTestClientServer.Text = "Clie&nt Server"
@@ -964,6 +965,12 @@ Partial Class frmMain
         '
         Me.TimerNotifications.Interval = 5000
         '
+        'BroadcastMessageToUsersToolStripMenuItem
+        '
+        Me.BroadcastMessageToUsersToolStripMenuItem.Name = "BroadcastMessageToUsersToolStripMenuItem"
+        Me.BroadcastMessageToUsersToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.BroadcastMessageToUsersToolStripMenuItem.Text = "&Broadcast Message to Users"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1110,4 +1117,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripMenuItemAddUnifiedOntology As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemEditUnifiedOntology As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemEditConfigurationData As ToolStripMenuItem
+    Friend WithEvents BroadcastMessageToUsersToolStripMenuItem As ToolStripMenuItem
 End Class

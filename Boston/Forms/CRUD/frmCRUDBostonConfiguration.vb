@@ -63,84 +63,99 @@ Public Class frmCRUDBostonConfiguration
 
         Call Me.LoadDebugModes()
 
-        'Error Management
-        Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked = My.Settings.ThrowInformationDebugMessagesToScreen
-        Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked = My.Settings.ThrowCriticalDebugMessagesToScreen
-        Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
-        Me.CheckBoxShowStackTrace.Checked = My.Settings.BostonErrorMessagesShowStackTrace
-        Me.CheckBoxUseFlashCardErrorMessages.Checked = My.Settings.BostonErrorMessagesShowFlashCard
+        Try
 
-        'Import/Export
-        Me.CheckBoxExportSuppressMDAModelElements.Checked = My.Settings.ExportFBMExcludeMDAModelElements
+            'Error Management
+            Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked = My.Settings.ThrowInformationDebugMessagesToScreen
+            Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked = My.Settings.ThrowCriticalDebugMessagesToScreen
+            Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
+            Me.CheckBoxShowStackTrace.Checked = My.Settings.BostonErrorMessagesShowStackTrace
+            Me.CheckBoxUseFlashCardErrorMessages.Checked = My.Settings.BostonErrorMessagesShowFlashCard
 
-        '---------------------------------------------------------
-        'Virtual Analyst
-        '-----------------
-        Me.CheckBoxVirtualAnalystDisplayBriana.Checked = My.Settings.DisplayBrianaVirtualAnalyst
-        Me.CheckBoxStartVirtualAnalystInQuietMode.Checked = My.Settings.StartVirtualAnalystInQuietMode
+            'Import/Export
+            Me.CheckBoxExportSuppressMDAModelElements.Checked = My.Settings.ExportFBMExcludeMDAModelElements
 
-        Call Me.LoadDatabaseTypes()
+            '---------------------------------------------------------
+            'Virtual Analyst
+            '-----------------
+            Me.CheckBoxVirtualAnalystDisplayBriana.Checked = My.Settings.DisplayBrianaVirtualAnalyst
+            Me.CheckBoxStartVirtualAnalystInQuietMode.Checked = My.Settings.StartVirtualAnalystInQuietMode
 
-        Me.TextBoxDatabaseConnectionString.Text = My.Settings.DatabaseConnectionString
+            Call Me.LoadDatabaseTypes()
 
-        Me.LabelConfigurationFileLocation.Text = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
-        Me.LabelUserConfigurationFileLocation.Text = Boston.GetConfigFileLocation
+            Me.TextBoxDatabaseConnectionString.Text = My.Settings.DatabaseConnectionString
 
-        'Boston Tab
-        Me.CheckBoxAutomaticallyCheckForUpdates.Checked = My.Settings.UseAutoUpdateChecker
+            Me.LabelConfigurationFileLocation.Text = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
+            Me.LabelUserConfigurationFileLocation.Text = Boston.GetConfigFileLocation
 
-        Me.ComboBoxDatabaseType.Enabled = False
+            'Boston Tab
+            Me.CheckBoxAutomaticallyCheckForUpdates.Checked = My.Settings.UseAutoUpdateChecker
 
-        'Client/Server
-        Me.CheckBoxUseRemoteUI.Checked = My.Settings.UseVirtualUI
-        Me.CheckBoxEnableClientServer.Checked = My.Settings.UseClientServer
-        Me.CheckBoxLoggingOutEndsSession.Checked = My.Settings.LoggingOutEndsSession
-        Me.CheckBoxClientServerRequireLoginAtStartup.Checked = My.Settings.RequireLoginAtStartup
-        Me.CheckBoxClientServerInitialiseClient.Checked = My.Settings.InitialiseClient
+            Me.ComboBoxDatabaseType.Enabled = False
 
-        If My.Settings.FactEngineDefaultQueryResultLimit = 0 Then
-            Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite"
-        Else
-            Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
-        End If
+            'Client/Server
+            Me.CheckBoxUseRemoteUI.Checked = My.Settings.UseVirtualUI
+            Me.CheckBoxEnableClientServer.Checked = My.Settings.UseClientServer
+            Me.CheckBoxLoggingOutEndsSession.Checked = My.Settings.LoggingOutEndsSession
+            Me.CheckBoxClientServerRequireLoginAtStartup.Checked = My.Settings.RequireLoginAtStartup
+            Me.CheckBoxClientServerInitialiseClient.Checked = My.Settings.InitialiseClient
 
-        'FactEngine
-        Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
-        Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked = My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
-        Me.ComboBoxFactEngineUserDateFormat.Text = My.Settings.FactEngineUserDateFormat
-        Me.ComboBoxFactEngineUserDateTimeFormat.Text = My.Settings.FactEngineUserDateTimeFormat
-        Me.CheckBoxFactEngineShowStackTrace.Checked = My.Settings.ShowStackTraceFactEngineQuery
-        Me.CheckBoxFactEngineUseTransformations.Enabled = My.Settings.SuperuserMode
-        Me.CheckBoxFactEngineUseTransformations.Checked = My.Settings.FactEngineUseTransformations
+            If My.Settings.FactEngineDefaultQueryResultLimit = 0 Then
+                Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite"
+            Else
+                Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = My.Settings.FactEngineDefaultQueryResultLimit
+            End If
 
-        'ER Diagrams
-        Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
+            'FactEngine
+            Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked = My.Settings.FactEngineShowDatabaseLogoInModelExplorer
+            Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked = My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes
+            Me.ComboBoxFactEngineUserDateFormat.Text = My.Settings.FactEngineUserDateFormat
+            Me.ComboBoxFactEngineUserDateTimeFormat.Text = My.Settings.FactEngineUserDateTimeFormat
+            Me.CheckBoxFactEngineShowStackTrace.Checked = My.Settings.ShowStackTraceFactEngineQuery
+            Me.CheckBoxFactEngineUseTransformations.Enabled = My.Settings.SuperuserMode
+            Me.CheckBoxFactEngineUseTransformations.Checked = My.Settings.FactEngineUseTransformations
 
-        'Diagrams General
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked = My.Settings.DiagramSpyShowLinkFactTypes
+            'ER Diagrams
+            Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
 
-        'Superuser Mode
-        Me.CheckBoxSuperuserMode.Enabled = My.Settings.SuperuserMode
-        RemoveHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
-        Me.CheckBoxSuperuserMode.Checked = My.Settings.SuperuserMode
-        AddHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
+            'Diagrams General
+            Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked = My.Settings.DiagramSpyShowLinkFactTypes
 
-        Me.CheckBoxAutoCompleteSingleClickSelects.Checked = My.Settings.AutoCompleteSingleClickSelects
+            'Superuser Mode
+            Me.CheckBoxSuperuserMode.Enabled = My.Settings.SuperuserMode
+            RemoveHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
+            Me.CheckBoxSuperuserMode.Checked = My.Settings.SuperuserMode
+            AddHandler CheckBoxSuperuserMode.CheckedChanged, AddressOf CheckBoxSuperuserMode_CheckedChanged
 
-        'Reverse Engineering
-        Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked = My.Settings.ReverseEngineeringKeepDatabaseColumnNames
-        Me.TextBoxReverseEngineeringDefaultReferenceMode.Text = Trim(My.Settings.ReverseEngineeringDefaultReferenceMode)
+            Me.CheckBoxAutoCompleteSingleClickSelects.Checked = My.Settings.AutoCompleteSingleClickSelects
 
-        'Modelling
-        Me.CheckBoxUseDefaultReferenceMode.Checked = My.Settings.UseDefaultReferenceModeNewEntityTypes
-        Me.TextBoxDefaultReferenceMode.Text = Trim(My.Settings.DefaultReferenceMode)
+            'Reverse Engineering
+            Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Checked = My.Settings.ReverseEngineeringKeepDatabaseColumnNames
+            Me.TextBoxReverseEngineeringDefaultReferenceMode.Text = Trim(My.Settings.ReverseEngineeringDefaultReferenceMode)
 
-        'Code Generation
-        Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked = My.Settings.CodeGenerationUseSquareBracketsSQLTableNames
+            'Modelling
+            Me.CheckBoxUseDefaultReferenceMode.Checked = My.Settings.UseDefaultReferenceModeNewEntityTypes
+            Me.TextBoxDefaultReferenceMode.Text = Trim(My.Settings.DefaultReferenceMode)
+            Me.ComboBoxDefaultGeneralConceptConversion.SelectedIndex = Me.ComboBoxDefaultGeneralConceptConversion.Items.IndexOf(My.Settings.DefaultGeneralConceptToObjectTypeConversion)
 
-        If My.Settings.SuperuserMode Then
-            Call Me.SetupUsingSuperUserMode()
-        End If
+            'Code Generation
+            Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked = My.Settings.CodeGenerationUseSquareBracketsSQLTableNames
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        Finally
+
+            If My.Settings.SuperuserMode Then
+                Call Me.SetupUsingSuperUserMode()
+            End If
+
+        End Try
 
     End Sub
 
@@ -212,9 +227,11 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
                 My.Settings.UseAutoUpdateChecker = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
                 My.Settings.UseAutomatedErrorReporting = Me.CheckBoxAutomaticallyReportErrorEvents.Checked
+
                 'Modelling
                 My.Settings.UseDefaultReferenceModeNewEntityTypes = Me.CheckBoxUseDefaultReferenceMode.Checked
                 My.Settings.DefaultReferenceMode = Trim(Me.TextBoxDefaultReferenceMode.Text)
+                My.Settings.DefaultGeneralConceptToObjectTypeConversion = Me.ComboBoxDefaultGeneralConceptConversion.SelectedItem.ToString
 
                 'CodeGeneration
                 'Code Generation

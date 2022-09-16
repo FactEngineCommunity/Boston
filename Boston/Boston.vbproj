@@ -1428,6 +1428,12 @@
     <Compile Include="Forms\Diagrams\frmDiagramUMLUseCase.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.Designer.vb">
+      <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DialogBoxes\frmTextboxFind.Designer.vb">
       <DependentUpon>frmTextboxFind.vb</DependentUpon>
     </Compile>
@@ -2315,6 +2321,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramUMLUseCase.resx">
       <DependentUpon>frmDiagramUMLUseCase.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.resx">
+      <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmTextboxFind.resx">
       <DependentUpon>frmTextboxFind.vb</DependentUpon>

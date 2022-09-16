@@ -155,6 +155,64 @@ Public Module tableClientServerUser
 
     End Sub
 
+    Public Function getAllUsers(Optional ByVal abIgnoreErrorMessage As Boolean = False) As List(Of ClientServer.User)
+
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New ADODB.Recordset
+        Dim lrUser As ClientServer.User = Nothing
+
+        Try
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
+
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM ClientServerUser"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If Not lREcordset.EOF Then
+
+                getAllUsers = New List(Of ClientServer.User)
+
+                While Not lREcordset.EOF
+                    lrUser = New ClientServer.User
+
+                    lrUser.Id = lREcordset("Id").Value
+                    lrUser.Username = Trim(lREcordset("Username").Value)
+                    lrUser.FirstName = Trim(lREcordset("FirstName").Value)
+                    lrUser.LastName = Trim(lREcordset("LastName").Value)
+                    lrUser.PasswordHash = lREcordset("PasswordHash").Value
+                    lrUser.IsActive = CBool(lREcordset("IsActive").Value)
+                    lrUser.ResetPassword = CBool(lREcordset("ResetPassword").Value)
+                    lrUser.IsSuperuser = CBool(lREcordset("IsSuperuser").Value)
+
+                    lrUser.Role = tableClientServerUserRole.getRolesForUser(lrUser, True)
+
+                    'arUser.Function is populated in publicClientServerModule.loginUser. No need to do anything here.
+                    getAllUsers.Add(lrUser)
+
+                    lREcordset.MoveNext()
+                End While
+            Else
+                If Not abIgnoreErrorMessage Then
+                    Dim lsMessage As String = "Error: Thre are no users in the database."
+                    Throw New Exception(lsMessage)
+                End If
+                Return New List(Of ClientServer.User)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return New List(Of ClientServer.User)
+        End Try
+
+    End Function
+
     Public Function getUserDetailsByUsername(ByVal asUsername As String, ByRef arUser As ClientServer.User, Optional ByVal abIgnoreErrorMessage As Boolean = False) As ClientServer.User
 
         Dim lsSQLQuery As String = ""

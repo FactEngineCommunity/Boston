@@ -2,6 +2,34 @@
 
 Public Module tableClientServerNotifications
 
+    Public Sub addNotification(ByRef arNotification As ClientServer.NotificationGeneral)
+
+        Dim lsSQLQuery As String = ""
+
+        Try
+            lsSQLQuery = "INSERT INTO ClientServerNotification VALUES ("
+            lsSQLQuery &= "#" & arNotification.DateTime.ToString & "#"
+            lsSQLQuery &= ",'" & arNotification.TargetUser.Id & "'"
+            lsSQLQuery &= ",'" & arNotification.NotificationType.ToString & "'"
+            lsSQLQuery &= ",'" & arNotification.Text & "'"
+            lsSQLQuery &= ", False"
+            lsSQLQuery &= ")"
+
+            pdbConnection.BeginTrans()
+            Call pdbConnection.Execute(lsSQLQuery)
+            pdbConnection.CommitTrans()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Public Sub closeNotification(ByRef arNotification As ClientServer.NotificationGeneral)
 
         Dim lsSQLQuery As String = ""

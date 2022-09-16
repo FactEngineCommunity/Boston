@@ -56,6 +56,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxClientServerInitialiseClient = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxClientServerRequireLoginAtStartup = New System.Windows.Forms.CheckBox()
         Me.CheckBoxUseRemoteUI = New System.Windows.Forms.CheckBox()
         Me.CheckBoxLoggingOutEndsSession = New System.Windows.Forms.CheckBox()
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
@@ -97,8 +99,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxClientServerRequireLoginAtStartup = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxClientServerInitialiseClient = New System.Windows.Forms.CheckBox()
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo = New System.Windows.Forms.Label()
+        Me.ComboBoxDefaultGeneralConceptConversion = New System.Windows.Forms.ComboBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -460,6 +462,30 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox3.TabIndex = 0
         Me.GroupBox3.TabStop = False
         '
+        'CheckBoxClientServerInitialiseClient
+        '
+        Me.CheckBoxClientServerInitialiseClient.AutoSize = True
+        Me.CheckBoxClientServerInitialiseClient.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBoxClientServerInitialiseClient.Enabled = False
+        Me.CheckBoxClientServerInitialiseClient.Location = New System.Drawing.Point(65, 111)
+        Me.CheckBoxClientServerInitialiseClient.Name = "CheckBoxClientServerInitialiseClient"
+        Me.CheckBoxClientServerInitialiseClient.Size = New System.Drawing.Size(95, 17)
+        Me.CheckBoxClientServerInitialiseClient.TabIndex = 4
+        Me.CheckBoxClientServerInitialiseClient.Text = "Initialise Client:"
+        Me.CheckBoxClientServerInitialiseClient.UseVisualStyleBackColor = True
+        '
+        'CheckBoxClientServerRequireLoginAtStartup
+        '
+        Me.CheckBoxClientServerRequireLoginAtStartup.AutoSize = True
+        Me.CheckBoxClientServerRequireLoginAtStartup.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = False
+        Me.CheckBoxClientServerRequireLoginAtStartup.Location = New System.Drawing.Point(22, 88)
+        Me.CheckBoxClientServerRequireLoginAtStartup.Name = "CheckBoxClientServerRequireLoginAtStartup"
+        Me.CheckBoxClientServerRequireLoginAtStartup.Size = New System.Drawing.Size(138, 17)
+        Me.CheckBoxClientServerRequireLoginAtStartup.TabIndex = 3
+        Me.CheckBoxClientServerRequireLoginAtStartup.Text = "Require login at startup:"
+        Me.CheckBoxClientServerRequireLoginAtStartup.UseVisualStyleBackColor = True
+        '
         'CheckBoxUseRemoteUI
         '
         Me.CheckBoxUseRemoteUI.AutoSize = True
@@ -820,6 +846,8 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxModelling
         '
+        Me.GroupBoxModelling.Controls.Add(Me.ComboBoxDefaultGeneralConceptConversion)
+        Me.GroupBoxModelling.Controls.Add(Me.LabelPromptNLAPIConvertsGeneralConceptsTo)
         Me.GroupBoxModelling.Controls.Add(Me.TextBoxDefaultReferenceMode)
         Me.GroupBoxModelling.Controls.Add(Me.LabelPromptDefaultReferenceMode)
         Me.GroupBoxModelling.Controls.Add(Me.CheckBoxUseDefaultReferenceMode)
@@ -889,29 +917,24 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxClientServerRequireLoginAtStartup
+        'LabelPromptNLAPIConvertsGeneralConceptsTo
         '
-        Me.CheckBoxClientServerRequireLoginAtStartup.AutoSize = True
-        Me.CheckBoxClientServerRequireLoginAtStartup.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = False
-        Me.CheckBoxClientServerRequireLoginAtStartup.Location = New System.Drawing.Point(22, 88)
-        Me.CheckBoxClientServerRequireLoginAtStartup.Name = "CheckBoxClientServerRequireLoginAtStartup"
-        Me.CheckBoxClientServerRequireLoginAtStartup.Size = New System.Drawing.Size(138, 17)
-        Me.CheckBoxClientServerRequireLoginAtStartup.TabIndex = 3
-        Me.CheckBoxClientServerRequireLoginAtStartup.Text = "Require login at startup:"
-        Me.CheckBoxClientServerRequireLoginAtStartup.UseVisualStyleBackColor = True
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.AutoSize = True
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Location = New System.Drawing.Point(18, 96)
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Name = "LabelPromptNLAPIConvertsGeneralConceptsTo"
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Size = New System.Drawing.Size(264, 13)
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.TabIndex = 3
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Text = "Natural Language API Converts General Concepts To:"
         '
-        'CheckBoxClientServerInitialiseClient
+        'ComboBoxDefaultGeneralConceptConversion
         '
-        Me.CheckBoxClientServerInitialiseClient.AutoSize = True
-        Me.CheckBoxClientServerInitialiseClient.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBoxClientServerInitialiseClient.Enabled = False
-        Me.CheckBoxClientServerInitialiseClient.Location = New System.Drawing.Point(65, 111)
-        Me.CheckBoxClientServerInitialiseClient.Name = "CheckBoxClientServerInitialiseClient"
-        Me.CheckBoxClientServerInitialiseClient.Size = New System.Drawing.Size(95, 17)
-        Me.CheckBoxClientServerInitialiseClient.TabIndex = 4
-        Me.CheckBoxClientServerInitialiseClient.Text = "Initialise Client:"
-        Me.CheckBoxClientServerInitialiseClient.UseVisualStyleBackColor = True
+        Me.ComboBoxDefaultGeneralConceptConversion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxDefaultGeneralConceptConversion.FormattingEnabled = True
+        Me.ComboBoxDefaultGeneralConceptConversion.Items.AddRange(New Object() {"Value Type", "Entity Type"})
+        Me.ComboBoxDefaultGeneralConceptConversion.Location = New System.Drawing.Point(288, 93)
+        Me.ComboBoxDefaultGeneralConceptConversion.Name = "ComboBoxDefaultGeneralConceptConversion"
+        Me.ComboBoxDefaultGeneralConceptConversion.Size = New System.Drawing.Size(82, 21)
+        Me.ComboBoxDefaultGeneralConceptConversion.TabIndex = 4
         '
         'frmCRUDBostonConfiguration
         '
@@ -1044,4 +1067,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents ButtonCopyModelIdToClipboard As Button
     Friend WithEvents CheckBoxClientServerInitialiseClient As CheckBox
     Friend WithEvents CheckBoxClientServerRequireLoginAtStartup As CheckBox
+    Friend WithEvents ComboBoxDefaultGeneralConceptConversion As ComboBox
+    Friend WithEvents LabelPromptNLAPIConvertsGeneralConceptsTo As Label
 End Class

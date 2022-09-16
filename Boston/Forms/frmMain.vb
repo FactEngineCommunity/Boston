@@ -5648,4 +5648,20 @@ SaveModel:
 
     End Sub
 
+    Private Sub BroadcastMessageToUsersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BroadcastMessageToUsersToolStripMenuItem.Click
+
+        Try
+            Dim lrClientServerMessageBroadcaster As New frmClientServerMessageBroadcast
+            Call lrClientServerMessageBroadcaster.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class
