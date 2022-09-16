@@ -1556,10 +1556,14 @@ Namespace RDS
                 End If
 
                 Dim lrRemovedColumn As RDS.Column = arColumn
-                For Each lrColumn In Me.Column.FindAll(Function(x) x.OrdinalPosition > lrRemovedColumn.OrdinalPosition)
-                    lrColumn.OrdinalPosition -= 1
-                    Call Me.Model.Model.setCMMLAttributeOrdinalPosition(lrColumn.Id, lrColumn.OrdinalPosition)
-                Next
+
+                'Need speed when loading a model.
+                If pbDoDatabaseProcessing Then
+                    For Each lrColumn In Me.Column.FindAll(Function(x) x.OrdinalPosition > lrRemovedColumn.OrdinalPosition)
+                        lrColumn.OrdinalPosition -= 1
+                        Call Me.Model.Model.setCMMLAttributeOrdinalPosition(lrColumn.Id, lrColumn.OrdinalPosition)
+                    Next
+                End If
 
                 '------------------------------------------------------------------------------------------------------
                 'Relations

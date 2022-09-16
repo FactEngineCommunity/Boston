@@ -3120,6 +3120,16 @@ Public Class frmToolboxEnterpriseExplorer
                 'MsgBox(lsMessage)
             End If
 
+            If prApplication.WorkingProject Is Nothing Then prApplication.WorkingProject = New ClientServer.Project("MyPersonalModels", "MyPersonalModels")
+            lrModel.ProjectId = prApplication.WorkingProject.Id
+
+            'Namespace
+            If prApplication.WorkingProject.Id = "MyPersonalModels" Then
+                lrModel.Namespace = Nothing
+            Else
+                lrModel.Namespace = Me.ComboBoxNamespace.SelectedItem.Tag
+            End If
+
             If My.Settings.UseClientServer And (prApplication.User IsNot Nothing) Then
                 lrModel.CreatedByUserId = prApplication.User.Id
             End If
@@ -4788,13 +4798,15 @@ Public Class frmToolboxEnterpriseExplorer
                     'TreeNode
                     Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
 
-                    '========================================================================================
-                    'Load the NORMA file
-                    Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
+                '========================================================================================
+                'Load the NORMA file
+                pbDoDatabaseProcessing = False
+                Call Me.LoadNORMAXMLFile(lrModel, loXDocument, lrNewTreeNode)
+                pbDoDatabaseProcessing = True
 
-                    '========================================================================================
-                    'Save the Model?
-                    Dim lrCustomMessageBox As New frmCustomMessageBox
+                '========================================================================================
+                'Save the Model?
+                Dim lrCustomMessageBox As New frmCustomMessageBox
 
                     lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
                     lsMessage &= "Save the model now? (Recommended)"

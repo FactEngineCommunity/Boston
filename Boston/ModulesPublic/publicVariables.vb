@@ -29,6 +29,11 @@ Public Module publicVariables
     'Crash Reporting - Automated/Online using www.raygun.com
     Public prRaygunClient As New RaygunClient("7M0bwJKUwe7HEJZen4wOpg")
 
+    ''' <summary>
+    ''' Used for when loading models, don't want to do database processing
+    ''' </summary>
+    Public pbDoDatabaseProcessing As Boolean = True
+
     '------------------------------------------------------
     'Reference Suite of Tables
     '------------------------------------------------------    

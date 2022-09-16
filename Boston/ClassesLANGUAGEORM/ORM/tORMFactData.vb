@@ -146,8 +146,8 @@ Namespace FBM
                         '  the Data/Value must be a new Data/Value altogether, so create a new
                         '  DictionaryEntry in the ModelDictionary.
                         '-------------------------------------------------------------------------
-                        lrOriginalDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lsOriginalSymbol, pcenumConceptType.Value)
-                        lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
+                        'lrOriginalDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lsOriginalSymbol, pcenumConceptType.Value)
+                        lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsOriginalSymbol And x.isValue) ' lrOriginalDictionaryEntry.Equals)
                         If lrOriginalDictionaryEntry IsNot Nothing Then ' IsSomething(Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)) Then
                             'lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
                             Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, pcenumConceptType.Value, True)

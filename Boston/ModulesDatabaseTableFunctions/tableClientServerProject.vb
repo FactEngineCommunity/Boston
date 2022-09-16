@@ -80,7 +80,9 @@ Public Module tableClientServerProject
 
     End Function
 
-    Public Sub getProjectDetailsById(ByVal asProjectId As String, ByRef arProject As ClientServer.Project)
+    Public Function getProjectDetailsById(ByVal asProjectId As String,
+                                          ByRef arProject As ClientServer.Project,
+                                          Optional abIgnoreErrors As Boolean = False) As ClientServer.Project
 
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New ADODB.Recordset
@@ -96,17 +98,25 @@ Public Module tableClientServerProject
             lREcordset.Open(lsSQLQuery)
 
             If Not lREcordset.EOF Then
+                If arProject Is Nothing Then
+                    arProject = New ClientServer.Project
+                End If
+
                 arProject.Id = lREcordset("Id").Value
                 arProject.Name = lREcordset("Projectname").Value
                 arProject.CreatedByUser = New ClientServer.User
                 Dim lsCreatedByUserId As String = lREcordset("CreatedByUserId").Value
                 Call tableClientServerUser.getUserDetailsById(lsCreatedByUserId, arProject.CreatedByUser)
             Else
-                Dim lsMessage As String = "Error: getProjectDetailsById: No Project returned for Id: " & asProjectId
-                Throw New Exception(lsMessage)
+                If Not abIgnoreErrors Then
+                    Dim lsMessage As String = "Error: getProjectDetailsById: No Project returned for Id: " & asProjectId
+                    Throw New Exception(lsMessage)
+                End If
             End If
 
             lREcordset.Close()
+
+            Return arProject
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -115,9 +125,11 @@ Public Module tableClientServerProject
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+			Return Nothing
         End Try
 
-    End Sub
+    End Function
 
     Public Sub GetProjects(ByRef aarProject As List(Of ClientServer.Project),
                            ByRef arUser As ClientServer.User)

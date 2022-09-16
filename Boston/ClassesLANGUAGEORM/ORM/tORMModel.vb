@@ -3436,7 +3436,7 @@ Namespace FBM
                     '  DictionaryEntry from the ModelDiction and the database.
                     '-----------------------------------------------------------------------------------------
                     If (lrDictionarEntry.Realisations.Count <= 0) And Not lrDictionarEntry.isGeneralConcept Then
-                        Me.RemoveDictionaryEntry(lrDictionarEntry, True)
+                        Me.RemoveDictionaryEntry(lrDictionarEntry, pbDoDatabaseProcessing)
                     End If
 
                 End If
@@ -3737,12 +3737,26 @@ Namespace FBM
                                          ByVal abDoDatabaseProcessing As Boolean)
 
             Dim lsMessage As String
-
+            Dim liInd As Integer
             Try
                 If arDictionaryEntry.Realisations.Count <= 1 Then
 
-                    Me.ModelDictionary.Remove(arDictionaryEntry)
+                    If Me.Dictionary.TryGetValue(arDictionaryEntry.Symbol, liInd) Then
+                        Try
+                            If Me.ModelDictionary(liInd).Symbol = arDictionaryEntry.Symbol Then
+                                Me.ModelDictionary.RemoveAt(liInd)
+                            Else
+                                Me.ModelDictionary.Remove(arDictionaryEntry)
+                            End If
+                        Catch ex As Exception
+                            Me.ModelDictionary.Remove(arDictionaryEntry)
+                        End Try
+                    Else
+                        Me.ModelDictionary.Remove(arDictionaryEntry)
+                    End If
+
                     Me.Dictionary.Remove(arDictionaryEntry.Symbol)
+
 
                     If abDoDatabaseProcessing Then
                         TableModelDictionary.DeleteModelDictionaryEntry(arDictionaryEntry)

@@ -2048,7 +2048,7 @@ Namespace ORMQL
                     End If
                 End If
             Else
-                lrFactType.RemoveFactByData(lrFact, True)
+                lrFactType.RemoveFactByData(lrFact, True, pbDoDatabaseProcessing)
             End If
 
             Return True

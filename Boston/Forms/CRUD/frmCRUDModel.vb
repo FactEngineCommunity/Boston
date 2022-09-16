@@ -52,6 +52,24 @@ Public Class frmCRUDModel
 
         Me.LabelModelId.Text = "Model Id: " & Me.zrModel.ModelId
 
+        'Project
+        If Me.zrModel.ProjectId IsNot Nothing Then
+            Dim lrProject As ClientServer.Project = Nothing
+            lrProject = tableClientServerProject.getProjectDetailsById(Me.zrModel.ProjectId, lrProject, True)
+            If lrProject IsNot Nothing Then
+                Me.LabelProject.Text = lrProject.Name
+            End If
+        End If
+
+        'Namespace
+        If Me.zrModel.Namespace IsNot Nothing Then
+            Dim lrNamespace As ClientServer.Namespace = Nothing
+            lrNamespace = tableClientServerNamespace.getNamespaceDetailsById(Me.zrModel.Namespace.Id, lrNamespace, True)
+            If lrNamespace IsNot Nothing Then
+                Me.LabelNamespace.Text = lrNamespace.Name
+            End If
+        End If
+
     End Sub
 
     Private Sub frmCRUDModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load

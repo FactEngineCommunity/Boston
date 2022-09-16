@@ -1004,6 +1004,8 @@ Namespace RDS
         Private Sub DestinationTable_ColumnAdded(ByRef arColumn As Column) Handles DestinationTable.ColumnAdded
 
             Try
+                If Not arColumn.isPartOfPrimaryKey Then Exit Sub
+
                 Dim lrModelElement As FBM.ModelObject = arColumn.Table.FBMModelElement
                 If lrModelElement.GetType = GetType(FBM.EntityType) Then
                     Dim lrEntityType As FBM.EntityType = lrModelElement
@@ -1047,6 +1049,8 @@ Namespace RDS
 
                     If Not Me.OriginTable.Column.Contains(lrNewColumn) Then
 
+                        'MsgBox(Me.OriginTable.Name)
+
                         If Me.OriginTable.addColumn(lrNewColumn) Then
                             Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
                             Me.AddDestinationColumn(arColumn, Me.DestinationColumns.Count)
@@ -1083,7 +1087,7 @@ Namespace RDS
                                                    Select Column
 
                         For Each lrColumn In larOriginTableColumn.ToList
-                            Call Me.OriginTable.removeColumn(lrColumn)
+                            Call Me.OriginTable.removeColumn(lrColumn,, Me.OriginTable.FBMModelElement.HasSubTypes)
                         Next
                     End If
                 End If

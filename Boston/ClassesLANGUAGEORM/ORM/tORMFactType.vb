@@ -1156,7 +1156,9 @@ Namespace FBM
                     '----------------------------------------------------------------------------
                     'Make sure the FactData.Data Value is in the ModelDictionary for the Model.
                     '----------------------------------------------------------------------------
-                    Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model, lrFactData.Data, pcenumConceptType.Value), False)
+                    If Not Me.Model.Dictionary.ContainsKey(lrFactData.Data) Then
+                        Call Me.Model.AddModelDictionaryEntry(New FBM.DictionaryEntry(Me.Model, lrFactData.Data, pcenumConceptType.Value), False)
+                    End If
                 Next
 
                 Dim lrRole As FBM.Role
@@ -1614,7 +1616,7 @@ Namespace FBM
                     Me.ObjectifyingEntityType.Instance.Remove(lrFact.Id)
                 End If
 
-                Call lrFact.RemoveFromModel() 'Permanently deletes the Fact from the database.
+                Call lrFact.RemoveFromModel(,, pbDoDatabaseProcessing) 'Permanently deletes the Fact from the database.
 
                 For Each lrFactData In lrFact.Data
                     lrDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lrFactData.Data, pcenumConceptType.Value)

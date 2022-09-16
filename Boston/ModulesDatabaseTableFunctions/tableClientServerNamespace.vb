@@ -60,7 +60,9 @@ Public Module tableClientServerNamespace
 
     End Function
 
-    Public Sub getNamespaceDetailsById(ByVal asNamespaceId As String, ByRef arNamespace As ClientServer.Namespace)
+    Public Function getNamespaceDetailsById(ByVal asNamespaceId As String,
+                                            ByRef arNamespace As ClientServer.Namespace,
+                                            Optional abIgnoreErrors As Boolean = False) As ClientServer.Namespace
 
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New ADODB.Recordset
@@ -76,6 +78,9 @@ Public Module tableClientServerNamespace
             lREcordset.Open(lsSQLQuery)
 
             If Not lREcordset.EOF Then
+                If arNamespace Is Nothing Then
+                    arNamespace = New ClientServer.Namespace
+                End If
                 arNamespace.Id = lREcordset("Id").Value
                 arNamespace.Name = lREcordset("Namespace").Value
                 arNamespace.Number = lREcordset("Number").Value
@@ -83,9 +88,16 @@ Public Module tableClientServerNamespace
                 Call tableClientServerProject.getProjectDetailsById(lREcordset("ProjectId").Value, lrProject)
                 arNamespace.Project = lrProject
             Else
-                Dim lsMessage As String = "Error: getNamespaceDetailsById: No Namespace returned for Id: " & asNamespaceId
-                Throw New Exception(lsMessage)
+                If Not abIgnoreErrors Then
+                    Dim lsMessage As String = "Error: getNamespaceDetailsById: No Namespace returned for Id: " & asNamespaceId
+                    Throw New Exception(lsMessage)
+                End If
             End If
+
+            lREcordset.Close()
+
+            Return arNamespace
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -93,9 +105,11 @@ Public Module tableClientServerNamespace
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
         End Try
 
-    End Sub
+    End Function
 
     Public Function getNamespacesForProject(ByRef arProject As ClientServer.Project) As List(Of ClientServer.Namespace)
 
