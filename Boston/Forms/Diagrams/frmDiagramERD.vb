@@ -1178,37 +1178,47 @@ SkipORMReadingEditor:
 
         frmMain.ToolStripButton_Save.Enabled = True
 
-        '-------------------------------------------------------------------------------------------
-        'The user has clicked/moved a ShapeNode, so update the X and Y coordinates of the ShapeNode
-        '-------------------------------------------------------------------------------------------            
-        Dim lrTableNode As TableNode
+        Try
+            '-------------------------------------------------------------------------------------------
+            'The user has clicked/moved a ShapeNode, so update the X and Y coordinates of the ShapeNode
+            '-------------------------------------------------------------------------------------------            
+            Dim lrTableNode As TableNode
 
-        Dim lrFactInstance As New FBM.FactInstance
+            Dim lrFactInstance As New FBM.FactInstance
 
-        Select Case e.Node.Tag.ConceptType
-            Case Is = pcenumConceptType.Entity
+            Select Case e.Node.Tag.ConceptType
+                Case Is = pcenumConceptType.Entity
 
-                lrTableNode = e.Node
+                    lrTableNode = e.Node
 
-                Dim lrEntity As ERD.Entity
-                lrEntity = e.Node.Tag
-                lrEntity.Move(e.Node.Bounds.X, e.Node.Bounds.Y, False)
+                    Dim lrEntity As ERD.Entity
+                    lrEntity = e.Node.Tag
+                    lrEntity.Move(e.Node.Bounds.X, e.Node.Bounds.Y, False)
 
-                'lrFactDataInstance = lrTableNode.Tag.FactDataInstance
-                'lrFactDataInstance.X = e.Node.Bounds.X
-                'lrFactDataInstance.Y = e.Node.Bounds.Y
-                Me.zrPage.MakeDirty()
+                    'lrFactDataInstance = lrTableNode.Tag.FactDataInstance
+                    'lrFactDataInstance.X = e.Node.Bounds.X
+                    'lrFactDataInstance.Y = e.Node.Bounds.Y
+                    Me.zrPage.MakeDirty()
 
-                'lrTableNode.Tag.X = lrFactDataInstance.X
-                'lrTableNode.Tag.Y = lrFactDataInstance.Y
-            Case Else
+                    'lrTableNode.Tag.X = lrFactDataInstance.X
+                    'lrTableNode.Tag.Y = lrFactDataInstance.Y
+                Case Else
 
-        End Select
+            End Select
 
-        Me.Diagram.RouteAllLinks()
+            Me.Diagram.RouteAllLinks()
 
-        Dim layout As New MindFusion.Diagramming.Layout.OrthogonalLayout
-        layout.Arrange(Me.Diagram)
+            Dim layout As New MindFusion.Diagramming.Layout.OrthogonalLayout
+            layout.Arrange(Me.Diagram)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, False,, True,, True, ex)
+        End Try
 
     End Sub
 

@@ -1706,6 +1706,8 @@ Namespace FBM
 
                         Me.Concept = lrNewDictionaryEntry.Concept
 
+                        lrNewDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry, True, True, False, False, False, True, False, False)
+
                         lrNewDictionaryEntry.AddConceptType(Me.ConceptType)
 
                         Return lrNewDictionaryEntry

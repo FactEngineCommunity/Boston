@@ -682,6 +682,7 @@ SkipRegistrationChecking:
                 Me.ToolStripMenuItemUser.Visible = True
                 Me.ToolStripMenuItemProject.Visible = True
             End If
+            Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
 
             '-------------------------------------------------------------------------------------------------------
             'Main Client/Server menu items
@@ -5336,7 +5337,7 @@ SaveModel:
 
     End Sub
 
-    Private Sub CodeGeneratorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGeneratorToolStripMenuItem.Click
+    Private Sub CodeGeneratorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCodeGenerator.Click
 
         If prApplication.SoftwareCategory = pcenumSoftwareCategory.Student Then
             Dim lsMessage = "Please upgrade to Boston Professional for code generation."

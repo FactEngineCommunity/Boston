@@ -1,3 +1,5 @@
+Imports System.Reflection
+
 Public Class frmCRUDAddUser
 
     Private zrUser As New ClientServer.User
@@ -13,6 +15,8 @@ Public Class frmCRUDAddUser
         'Call load_roles()
         'Call load_employees()
         Me.textbox_operator_name.Focus()
+
+        Me.ErrorProvider.BlinkStyle = ErrorBlinkStyle.AlwaysBlink
 
     End Sub
 
@@ -35,6 +39,16 @@ Public Class frmCRUDAddUser
             MsgBox("The 'Confirmation Password' does not match the 'Password'. Please reenter the 'Password' and 'Confirm Password' field values.")
             textbox_password.Text = ""
             textbox_confirmation_password.Text = ""
+            check_fields = False
+        End If
+
+        If Trim(Me.TextBoxFirstName.Text) = "" Then
+            Me.ErrorProvider.SetError(Me.TextBoxFirstName, "First Name is mandatory.")
+            check_fields = False
+        End If
+
+        If Trim(Me.TextBoxLastName.Text) = "" Then
+            Me.ErrorProvider.SetError(Me.TextBoxLastName, "Last Name is mandatory.")
             check_fields = False
         End If
 
@@ -135,4 +149,41 @@ Public Class frmCRUDAddUser
 
     End Sub
 
+    Private Sub TextBoxFirstName_TextChanged(sender As Object, e As EventArgs) Handles TextBoxFirstName.TextChanged
+
+        Try
+            If (Me.TextBoxFirstName.Text) = "" Then
+                Me.ErrorProvider.SetError(Me.TextBoxFirstName, "First Name is mandatory.")
+            Else
+                Me.ErrorProvider.Clear()
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxLastName_TextChanged(sender As Object, e As EventArgs) Handles TextBoxLastName.TextChanged
+
+        Try
+            If (Me.TextBoxLastName.Text) = "" Then
+                Me.ErrorProvider.SetError(Me.TextBoxLastName, "Last Name is mandatory.")
+            Else
+                Me.ErrorProvider.Clear()
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

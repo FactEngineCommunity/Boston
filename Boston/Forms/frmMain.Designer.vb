@@ -65,7 +65,7 @@ Partial Class frmMain
         Me.CopyAsImageToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemView = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuItem_ShowEnterpriseTreeView = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CodeGeneratorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemCodeGenerator = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemFactEngine = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator8 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItem11 = New System.Windows.Forms.ToolStripMenuItem()
@@ -123,6 +123,7 @@ Partial Class frmMain
         Me.ToolStripMenuItemOpenLogFile = New System.Windows.Forms.ToolStripMenuItem()
         Me.EmailSupportvievcomToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemTestClientServer = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BroadcastMessageToUsersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowBroadcastEventMonitorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TestNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -157,7 +158,6 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
-        Me.BroadcastMessageToUsersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -331,7 +331,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemView
         '
-        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.CodeGeneratorToolStripMenuItem, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy, Me.ToolStripMenuItemUnifiedOntologyBrowser})
+        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.ToolStripMenuItemCodeGenerator, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy, Me.ToolStripMenuItemUnifiedOntologyBrowser})
         Me.ToolStripMenuItemView.Name = "ToolStripMenuItemView"
         Me.ToolStripMenuItemView.Size = New System.Drawing.Size(44, 22)
         Me.ToolStripMenuItemView.Text = "&View"
@@ -342,14 +342,14 @@ Partial Class frmMain
         Me.MenuItem_ShowEnterpriseTreeView.Size = New System.Drawing.Size(210, 22)
         Me.MenuItem_ShowEnterpriseTreeView.Text = "&Model Explorer"
         '
-        'CodeGeneratorToolStripMenuItem
+        'ToolStripMenuItemCodeGenerator
         '
-        Me.CodeGeneratorToolStripMenuItem.AutoSize = False
-        Me.CodeGeneratorToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
-        Me.CodeGeneratorToolStripMenuItem.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-        Me.CodeGeneratorToolStripMenuItem.Name = "CodeGeneratorToolStripMenuItem"
-        Me.CodeGeneratorToolStripMenuItem.Size = New System.Drawing.Size(188, 30)
-        Me.CodeGeneratorToolStripMenuItem.Text = "&Code Generator"
+        Me.ToolStripMenuItemCodeGenerator.AutoSize = False
+        Me.ToolStripMenuItemCodeGenerator.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
+        Me.ToolStripMenuItemCodeGenerator.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+        Me.ToolStripMenuItemCodeGenerator.Name = "ToolStripMenuItemCodeGenerator"
+        Me.ToolStripMenuItemCodeGenerator.Size = New System.Drawing.Size(188, 30)
+        Me.ToolStripMenuItemCodeGenerator.Text = "&Code Generator"
         '
         'ToolStripMenuItemFactEngine
         '
@@ -715,6 +715,12 @@ Partial Class frmMain
         Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 22)
         Me.ToolStripMenuItemTestClientServer.Text = "Clie&nt Server"
         '
+        'BroadcastMessageToUsersToolStripMenuItem
+        '
+        Me.BroadcastMessageToUsersToolStripMenuItem.Name = "BroadcastMessageToUsersToolStripMenuItem"
+        Me.BroadcastMessageToUsersToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
+        Me.BroadcastMessageToUsersToolStripMenuItem.Text = "&Broadcast Message to Users"
+        '
         'ShowBroadcastEventMonitorToolStripMenuItem
         '
         Me.ShowBroadcastEventMonitorToolStripMenuItem.Name = "ShowBroadcastEventMonitorToolStripMenuItem"
@@ -965,12 +971,6 @@ Partial Class frmMain
         '
         Me.TimerNotifications.Interval = 5000
         '
-        'BroadcastMessageToUsersToolStripMenuItem
-        '
-        Me.BroadcastMessageToUsersToolStripMenuItem.Name = "BroadcastMessageToUsersToolStripMenuItem"
-        Me.BroadcastMessageToUsersToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
-        Me.BroadcastMessageToUsersToolStripMenuItem.Text = "&Broadcast Message to Users"
-        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1104,7 +1104,7 @@ Partial Class frmMain
     Friend WithEvents ToolStripSeparator5 As ToolStripSeparator
     Friend WithEvents ToolStripButtonNewModel As ToolStripButton
     Friend WithEvents ToolStripButton1 As ToolStripButton
-    Friend WithEvents CodeGeneratorToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemCodeGenerator As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemFactEngine As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem2 As ToolStripMenuItem
     Friend WithEvents CompactAndRepairToolStripMenuItem As ToolStripMenuItem

@@ -49,7 +49,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ViewModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ViewGlossaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GenerateDocumentationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CodeGenerationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemCodeGenerator = New System.Windows.Forms.ToolStripMenuItem()
         Me.FactEngineToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemKeywordExtractionTool = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemTaxonomyTree = New System.Windows.Forms.ToolStripMenuItem()
@@ -75,6 +75,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.HideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideAllotherModelsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemMoveModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemModelConfiguration = New System.Windows.Forms.ToolStripMenuItem()
@@ -101,7 +102,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
-        Me.ToolStripMenuItemMoveModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -316,9 +316,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.CodeGenerationToolStripMenuItem, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 468)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 446)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -341,12 +341,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GenerateDocumentationToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.GenerateDocumentationToolStripMenuItem.Text = "Generate D&ocumentation"
         '
-        'CodeGenerationToolStripMenuItem
+        'ToolStripMenuItemCodeGenerator
         '
-        Me.CodeGenerationToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
-        Me.CodeGenerationToolStripMenuItem.Name = "CodeGenerationToolStripMenuItem"
-        Me.CodeGenerationToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.CodeGenerationToolStripMenuItem.Text = "Code &Generation"
+        Me.ToolStripMenuItemCodeGenerator.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
+        Me.ToolStripMenuItemCodeGenerator.Name = "ToolStripMenuItemCodeGenerator"
+        Me.ToolStripMenuItemCodeGenerator.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemCodeGenerator.Text = "Code &Generator"
         '
         'FactEngineToolStripMenuItem
         '
@@ -522,6 +522,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.RenameToolStripMenuItem.Text = "&Rename"
         '
+        'ToolStripMenuItemMoveModel
+        '
+        Me.ToolStripMenuItemMoveModel.Name = "ToolStripMenuItemMoveModel"
+        Me.ToolStripMenuItemMoveModel.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemMoveModel.Text = "&Move Model"
+        '
         'DeleteModelToolStripMenuItem
         '
         Me.DeleteModelToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.deleteround16x16
@@ -681,12 +687,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
         '
-        'ToolStripMenuItemMoveModel
-        '
-        Me.ToolStripMenuItemMoveModel.Name = "ToolStripMenuItemMoveModel"
-        Me.ToolStripMenuItemMoveModel.Size = New System.Drawing.Size(207, 22)
-        Me.ToolStripMenuItemMoveModel.Text = "&Move Model"
-        '
         'frmToolboxEnterpriseExplorer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -761,7 +761,7 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ButtonNewModel As Button
     Friend WithEvents ToolTip As ToolTip
     Friend WithEvents Panel1 As Panel
-    Friend WithEvents CodeGenerationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemCodeGenerator As ToolStripMenuItem
     Friend WithEvents TreeView As BostonTreeView
     Friend WithEvents FactEngineToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents HideToolStripMenuItem As ToolStripMenuItem

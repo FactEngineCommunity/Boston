@@ -100,6 +100,7 @@ Public Class frmToolboxEnterpriseExplorer
 
 #Region "Client/Server"
             Me.ToolStripMenuItemMoveModel.Visible = My.Settings.UseClientServer
+            Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
 
             If My.Settings.UseClientServer Then
                 Me.LabelPromptProject.Visible = True
@@ -4620,7 +4621,7 @@ Public Class frmToolboxEnterpriseExplorer
         Me.TreeView.Left = 3
     End Sub
 
-    Private Sub CodeGenerationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CodeGenerationToolStripMenuItem.Click
+    Private Sub CodeGenerationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCodeGenerator.Click
 
         If prApplication.SoftwareCategory = pcenumSoftwareCategory.Student Then
             Dim lsMessage = "Please upgrade to Boston Professional for code generation."

@@ -938,7 +938,7 @@ Namespace FBM
                                     Dim lrModelObject As FBM.ModelObject = Nothing
 
                                     Try
-                                        lrModelObject = Me.GetModelObjectByName(lsTableName).GetTopmostNonAbsorbedSupertype
+                                        lrModelObject = Me.GetModelObjectByName(lsTableName,,, True).GetTopmostNonAbsorbedSupertype
                                         lrTable = Me.RDS.getTableByName(lrModelObject.Id)
                                     Catch
                                         lsMessage = "No Model Element found for (possibly new) Table Name:" & lsTableName
@@ -950,7 +950,7 @@ Namespace FBM
                                     If lrTable Is Nothing Then
                                         'Table not created yet
                                         If lsTableName = lrModelObject.Id Then
-                                            Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName)
+                                            Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName,,, True)
                                             lrTable = New RDS.Table(Me.RDS, lsTableName, lrModelElement)
                                             Me.RDS.Table.AddUnique(lrTable)
 
@@ -1485,7 +1485,7 @@ Namespace FBM
 
                                     If lrTable Is Nothing Then
                                         'Table not created yet
-                                        Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName)
+                                        Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName,,, True)
                                         lrTable = New RDS.Table(Me.RDS, lsTableName, lrModelElement)
                                         Me.RDS.Table.AddUnique(lrTable)
                                     End If
@@ -1510,7 +1510,7 @@ Namespace FBM
 
                                         If lrTable Is Nothing Then
                                             'Table not created yet
-                                            Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName)
+                                            Dim lrModelElement As FBM.ModelObject = Me.GetModelObjectByName(lsTableName,,, True)
                                             lrTable = New RDS.Table(Me.RDS, lsTableName, lrModelElement)
                                             Me.RDS.Table.AddUnique(lrTable)
                                         End If
@@ -5130,7 +5130,8 @@ Namespace FBM
 
         Public Function GetModelObjectByName(ByVal asModelObjectName As String,
                                              Optional abIgnoreErrorIfNotInModel As Boolean = False,
-                                             Optional abSwitchLowerCaseToDictionaryEntry As Boolean = False) As FBM.ModelObject
+                                             Optional abSwitchLowerCaseToDictionaryEntry As Boolean = False,
+                                             Optional abUseSafeMode As Boolean = False) As FBM.ModelObject
 
             Dim lrValueType As FBM.ValueType
             Dim lrEntityType As FBM.EntityType
@@ -5140,7 +5141,7 @@ Namespace FBM
             Dim lsModelObjectName = Trim(asModelObjectName)
 
             Try
-                If Me.ExistsModelElement(lsModelObjectName) Then
+                If Me.ExistsModelElement(lsModelObjectName, abUseSafeMode) Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
                     lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsModelObjectName))
@@ -5519,7 +5520,9 @@ Namespace FBM
 
                         ExistsModelElement = True
                     End If
-                ElseIf abUseSafeMode Then
+                End If
+
+                If abUseSafeMode And Not ExistsModelElement Then
                     'CodeSafe
                     Dim larModelElement = From ValueType In Me.ValueType
                                           From EntityType In Me.EntityType

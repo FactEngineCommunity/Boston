@@ -19,6 +19,7 @@ Partial Class frmCRUDAddUser
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.button_cancel = New System.Windows.Forms.Button()
         Me.button_okay = New System.Windows.Forms.Button()
         Me.groupbox_main = New System.Windows.Forms.GroupBox()
@@ -34,9 +35,11 @@ Partial Class frmCRUDAddUser
         Me.textbox_password = New System.Windows.Forms.TextBox()
         Me.labelprompt_operator_name = New System.Windows.Forms.Label()
         Me.textbox_operator_name = New System.Windows.Forms.TextBox()
+        Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
         Me.groupbox_main.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox_line2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'button_cancel
@@ -181,6 +184,10 @@ Partial Class frmCRUDAddUser
         Me.textbox_operator_name.Size = New System.Drawing.Size(196, 20)
         Me.textbox_operator_name.TabIndex = 0
         '
+        'ErrorProvider
+        '
+        Me.ErrorProvider.ContainerControl = Me
+        '
         'frmCRUDAddUser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -200,6 +207,7 @@ Partial Class frmCRUDAddUser
         Me.groupbox_main.PerformLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PictureBox_line2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -218,4 +226,5 @@ Partial Class frmCRUDAddUser
     Friend WithEvents TextBoxFirstName As System.Windows.Forms.TextBox
     Friend WithEvents LabelPromptLastName As System.Windows.Forms.Label
     Friend WithEvents LabelPromptFirstName As System.Windows.Forms.Label
+    Friend WithEvents ErrorProvider As ErrorProvider
 End Class
