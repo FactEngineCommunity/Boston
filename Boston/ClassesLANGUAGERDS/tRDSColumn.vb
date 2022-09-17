@@ -541,7 +541,17 @@ Namespace RDS
 
             Try
                 If Me.Relation.Count = 0 Then Return Nothing
-                Return Me.Relation.Find(Function(x) x.OriginTable Is Me.Table).DestinationColumns.Find(Function(x) x.ActiveRole Is Me.ActiveRole)
+
+                Dim larRelation = From Relation In Me.Relation
+                                  Where Relation.OriginTable Is Me.Table
+                                  Select Relation
+
+                If larRelation.Count > 0 Then
+                    Return larRelation(0).DestinationColumns.Find(Function(x) x.ActiveRole Is Me.ActiveRole)
+                Else
+                    Return Nothing
+                End If
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

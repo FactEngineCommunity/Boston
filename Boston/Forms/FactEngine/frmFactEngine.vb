@@ -696,7 +696,7 @@ Public Class frmFactEngine
                     For Each lsWord In lasWords
                         Dim lsTempWord = lsWord.Replace(",", "")
                         Dim lsLemma As String = Nothing
-                        If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Then
+                        If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Or (prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True) IsNot Nothing) Then
 
                             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
 
