@@ -46,7 +46,7 @@ Public Class frmAbout
             lsMessage = "Error: You might not have a default email application setup in Windows."
             lsMessage &= vbCrLf & vbCrLf
             lsMessage &= "Email support@factengine.ai for support on Boston"
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 

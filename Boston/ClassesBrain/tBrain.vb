@@ -414,7 +414,13 @@ Public Class tBrain
 
                     AddHandler Button1.Click, AddressOf Me.ResponseButton_Click
 
-                    Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position
+                    Me.OutputChannel.Text = Trim(Me.OutputChannel.Text)
+                    Me.OutputChannel.Select(Me.OutputChannel.Text.Length - 1, 0)
+                    Me.OutputChannel.AppendText(vbCrLf)
+                    Me.OutputChannel.Select(Me.OutputChannel.Text.Length - 1, 0)
+                    Me.OutputChannel.ScrollToCaret()
+
+                    Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position                    
                     Me.OutputChannel.Controls.Add(Button1) ' get it inside the rich text box
                     Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
 
