@@ -55,7 +55,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return pcenumORMDataType.TextVariableLength
             End Try
@@ -77,7 +77,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -96,7 +96,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return 0
             End Try
 
@@ -169,7 +169,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -256,7 +256,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -282,7 +282,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -325,7 +325,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return pcenumConceptType.Unknown
             End Try
@@ -383,7 +383,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -546,7 +546,7 @@ SkippedSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -681,7 +681,7 @@ SkippedSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -971,7 +971,7 @@ SkippedSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1329,7 +1329,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1381,7 +1381,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1464,7 +1464,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1541,7 +1541,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                                 arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing)
                             End If
                         End If
-                        End If
+                    End If
                 End If
             Next
 
@@ -2135,9 +2135,9 @@ SkipRoleConstraint:
                 lrRoleConstraint.MinimumFrequencyCount = loElement.Attribute("MinFrequency").Value
 
                 If (lrRoleConstraint.MinimumFrequencyCount = 0) And (lrRoleConstraint.MaximumFrequencyCount > 0) Then
-                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
+                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
                 ElseIf (lrRoleConstraint.MinimumFrequencyCount > 0) And (lrRoleConstraint.MaximumFrequencyCount = 0) Then
-                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOREqual
+                    lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
                 ElseIf lrRoleConstraint.MinimumFrequencyCount = lrRoleConstraint.MaximumFrequencyCount Then
                     lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
                 End If
@@ -2274,7 +2274,7 @@ SkippedRole:
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                         lsMessage &= vbCrLf & vbCrLf & "Error trying to set RoleId for Link Fact Type for Fact Type: " & loElement.Attribute("_Name").Value
                         lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                     End Try
                 Next
 
@@ -2284,7 +2284,7 @@ SkippedRole:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2519,7 +2519,7 @@ SkippedRole:
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
             Next 'Ring Constraint
 
@@ -2752,11 +2752,11 @@ SkippedRole:
 
                             Try
                                 If My.Settings.NORMAImportingAlwaysCollapseReferenceMode Then
-                                    lbExpandReferenceScheme = false
+                                    lbExpandReferenceScheme = False
                                 Else
                                     lbExpandReferenceScheme = CBool(lrObjectTypeShapeXElement.Attribute("ExpandRefMode").Value)
                                 End If
-                                
+
                             Catch ex As Exception
                                 'Not a Biggie
                             End Try
@@ -2815,22 +2815,22 @@ SkippedRole:
 
                             lrEntityTypeInstance.ExpandReferenceMode = lbExpandReferenceScheme
 #End Region
-                            ElseIf IsSomething(lrValueType) Then
+                        ElseIf IsSomething(lrValueType) Then
 #Region "ValueTypes"
-                                Dim lrValueTypeInstance As New FBM.ValueTypeInstance
-                                lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
-                                lrValueTypeInstance.InstanceNumber = lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueType.Id).Count + 1
-                                'If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
-                                '    lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
-                                'Else
-                                Boston.WriteToStatusBar("Loading Value Type Instance")
-                                lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                                'End If
-                                lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
-                                lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
-                                lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                            Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                            lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
+                            lrValueTypeInstance.InstanceNumber = lrPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueType.Id).Count + 1
+                            'If lrPage.ValueTypeInstance.Exists(AddressOf lrValueTypeInstance.Equals) Then
+                            '    lrValueTypeInstance = lrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
+                            'Else
+                            Boston.WriteToStatusBar("Loading Value Type Instance")
+                            lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                            'End If
+                            lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
+                            lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                            lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 #End Region
-                            ElseIf IsSomething(lrFactType) Then
+                        ElseIf IsSomething(lrFactType) Then
 #Region "FactTypes"
                             lrFactTypeInstance = New FBM.FactTypeInstance
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage, False)
@@ -3349,7 +3349,7 @@ SkipRoleValueConstraint2:
 
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                         lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                     End Try
 
                     '------------------
@@ -3592,7 +3592,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3718,7 +3718,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3884,7 +3884,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4041,7 +4041,7 @@ SkippedModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try

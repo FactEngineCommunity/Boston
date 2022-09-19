@@ -70,7 +70,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -101,7 +101,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -121,7 +121,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -179,7 +179,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Column)
             End Try
@@ -196,8 +196,8 @@ Namespace RDS
 
             Try
 
-                Dim larRelation = From Relation In Me.Relation _
-                                  Where Relation.ResponsibleFactType Is arFactType _
+                Dim larRelation = From Relation In Me.Relation
+                                  Where Relation.ResponsibleFactType Is arFactType
                                   Select Relation
 
                 If larRelation.Count > 1 Then
@@ -214,21 +214,21 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New RDS.Relation
 
             End Try
         End Function
 
-        Public Function getRelationsByOriginTableOriginColumns(ByVal arOriginTable As RDS.Table, _
+        Public Function getRelationsByOriginTableOriginColumns(ByVal arOriginTable As RDS.Table,
                                                                ByVal aarOriginColumn As List(Of RDS.Column)
                                                                ) As List(Of RDS.Relation)
 
             Try
-                Dim larRelation = From Relation In Me.Relation _
+                Dim larRelation = From Relation In Me.Relation
                                   Where Relation.OriginTable.Name = arOriginTable.Name _
-                                  And Relation.OriginColumns.CompareWith(aarOriginColumn) = 0 _
+                                  And Relation.OriginColumns.CompareWith(aarOriginColumn) = 0
                                   Select Relation Distinct
 
 
@@ -240,7 +240,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Relation)
             End Try
@@ -280,7 +280,7 @@ Namespace RDS
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 If abThrowErrorMessage Then
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
 
                 Return Nothing
@@ -312,7 +312,7 @@ Namespace RDS
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 If abThrowErrorMessage Then
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
 
                 Return Nothing
@@ -373,7 +373,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -386,9 +386,9 @@ Namespace RDS
             '-------------------------------------------------------------------
             'Columns
             'Remove the Index from all Columns that are involved with the Index
-            Dim larColumn = From Table In Me.Table _
-                            From Column In Table.Column _
-                            Where Column.Index.Contains(lrIndex) _
+            Dim larColumn = From Table In Me.Table
+                            From Column In Table.Column
+                            Where Column.Index.Contains(lrIndex)
                             Select Column
 
             For Each lrColumn In larColumn
@@ -439,7 +439,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -502,7 +502,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -524,7 +524,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

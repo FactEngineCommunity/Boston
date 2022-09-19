@@ -3381,6 +3381,8 @@ Public Class frmDiagramORM
                                 End Select
                             Next
 
+                            lsFactTypeName = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+
                             '-------------------------------------------------------------------------
                             'Create a list of the selected objects so that a FactType can be created
                             '  with as many Roles (linked to the selected objects) as there are

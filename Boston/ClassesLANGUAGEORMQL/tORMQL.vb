@@ -612,7 +612,7 @@ Namespace ORMQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -688,7 +688,7 @@ Namespace ORMQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -779,7 +779,7 @@ Namespace ORMQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -835,7 +835,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -871,7 +871,7 @@ Namespace ORMQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -922,7 +922,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -987,7 +987,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New ORMQL.Recordset
             End Try
@@ -1383,7 +1383,7 @@ Namespace ORMQL
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
 
                 If Not abIgnoreErrorMessage Then
-                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
 
                 Return New ORMQL.Recordset
@@ -1442,13 +1442,13 @@ Namespace ORMQL
                     lrCustomClass = lrComparison
 
                     lrSerializer = New System.Xml.Serialization.XmlSerializer(lrCustomClass.GetType())
-                    Xml = New XDocument
+                    xml = New XDocument
 
-                    lrWriter = Xml.CreateWriter
+                    lrWriter = xml.CreateWriter
                     lrSerializer.Serialize(lrWriter, lrCustomClass)
                     lrWriter.Close()
 
-                    Dim lasColumnName As XElement = <Comparison><%= From p In Xml.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                    Dim lasColumnName As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Token>
                                                                     Where p.@Type = "WHERECLAUSECOLUMNNAMESTR"
                                                                     Select p.<Text>.Value
                                                                 %>
@@ -1456,7 +1456,7 @@ Namespace ORMQL
 
                     lsColumnName = lasColumnName.Value
 
-                    Dim lrDataValue As XElement = <Comparison><%= From p In Xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                    Dim lrDataValue As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
                                                                   Where p.@Type = "VALUE"
                                                                   Select p.<Text>.Value
                                                               %>
@@ -1513,7 +1513,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1593,7 +1593,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1779,7 +1779,7 @@ Namespace ORMQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try

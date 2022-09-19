@@ -77,7 +77,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -92,10 +92,10 @@ Public Class frmToolboxEnterpriseExplorer
         Try
             loNode = Me.TreeView.Nodes.Add("Models", "Models", 0, 0)
 
-            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.menuBoston, _
-                                                       Nothing, _
-                                                       Nothing, _
-                                                       Nothing, _
+            loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.menuBoston,
+                                                       Nothing,
+                                                       Nothing,
+                                                       Nothing,
                                                        loNode)
 
 #Region "Client/Server"
@@ -154,7 +154,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -219,7 +219,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -413,7 +413,7 @@ Public Class frmToolboxEnterpriseExplorer
                 Call frmMain.ShowHideMenuOptions()
 
                 Call frmMain.SetGlobalsToNothing()
-               
+
                 Me.TreeView.Nodes.Clear()
 
             Catch ex As Exception
@@ -422,7 +422,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
             Me.zrToolTip.Dispose()
@@ -649,7 +649,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -736,7 +736,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             Dim loObject As Object
 
-            If e.Label = "" Then                
+            If e.Label = "" Then
                 Exit Sub
             End If
 
@@ -875,7 +875,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -999,7 +999,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1016,7 +1016,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1036,7 +1036,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1085,7 +1085,7 @@ Public Class frmToolboxEnterpriseExplorer
                     Boston.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                 End If
                 Call arModel.Load(True, False, Me.BackgroundWorkerModelLoader)
-                Call Me.HideCircularProgressBar
+                Call Me.HideCircularProgressBar()
                 Me.Cursor = Cursors.Default
                 Boston.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
             End If
@@ -1095,7 +1095,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1349,7 +1349,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1431,7 +1431,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1453,7 +1453,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1514,7 +1514,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1697,7 +1697,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -1900,7 +1900,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -2027,7 +2027,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -2258,7 +2258,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Application.UseWaitCursor = False
             Me.Cursor = Cursors.Default
@@ -2294,10 +2294,10 @@ Public Class frmToolboxEnterpriseExplorer
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             Dim loTreeNode As TreeNode
 
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                       lrPage, _
-                                                       lrPage.Model.ModelId, _
-                                                       pcenumLanguage.ORMModel, _
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                       lrPage,
+                                                       lrPage.Model.ModelId,
+                                                       pcenumLanguage.ORMModel,
                                                        Nothing, lrPage.PageId)
 
             If IsSomething(prPageNodes.Find(AddressOf lr_enterprise_view.Equals)) Then
@@ -2659,7 +2659,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2710,10 +2710,10 @@ Public Class frmToolboxEnterpriseExplorer
 
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             loTreeNode = New TreeNode
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel, _
-                                                       lrPage, _
-                                                       lrPage.Model.ModelId, _
-                                                       pcenumLanguage.ORMModel, _
+            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                       lrPage,
+                                                       lrPage.Model.ModelId,
+                                                       pcenumLanguage.ORMModel,
                                                        Nothing, lrPage.PageId)
 
             loTreeNode = prPageNodes.Find(AddressOf lr_enterprise_view.Equals).TreeNode
@@ -2887,7 +2887,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2975,7 +2975,7 @@ Public Class frmToolboxEnterpriseExplorer
         Catch ex As Exception
             Dim lsMessage As String = ""
             lsMessage = "Error: frnToolboxEnterpriseTree.ExportToORMCMMLToolStripMenuItem: " & vbCrLf & vbCrLf & ex.Message
-            Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -2983,7 +2983,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem1.Click
 
-        Call Me.ImportFBMXMLFile
+        Call Me.ImportFBMXMLFile()
 
     End Sub
 
@@ -3010,7 +3010,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End If
@@ -3266,7 +3266,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3343,7 +3343,7 @@ Public Class frmToolboxEnterpriseExplorer
 
     '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
     '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-    '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+    '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
     '    End Try
 
     'End Sub
@@ -3380,7 +3380,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3581,7 +3581,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3698,7 +3698,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3756,7 +3756,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3812,7 +3812,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3881,7 +3881,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3934,7 +3934,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4028,7 +4028,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4059,7 +4059,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4372,7 +4372,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4479,7 +4479,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -4572,7 +4572,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4657,7 +4657,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End With
     End Sub
@@ -4700,7 +4700,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4753,7 +4753,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4794,16 +4794,16 @@ Public Class frmToolboxEnterpriseExplorer
                 Call lrModel.AddCoreERDPGSSTMUMLModelElements(Nothing)
 
                 If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
-                        lrModel.ModelId = System.Guid.NewGuid.ToString
-                    End If
+                    lrModel.ModelId = System.Guid.NewGuid.ToString
+                End If
 
-                    If TableModel.ExistsModelByName(lrModel.Name) Then
-                        lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
-                    End If
+                If TableModel.ExistsModelByName(lrModel.Name) Then
+                    lrModel.Name = lrModel.CreateUniqueModelName(lrModel.Name, 0)
+                End If
 
-                    '========================================================================================
-                    'TreeNode
-                    Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
+                '========================================================================================
+                'TreeNode
+                Dim lrNewTreeNode = Me.AddModelToModelExplorer(lrModel, False)
 
                 '========================================================================================
                 'Load the NORMA file
@@ -4815,43 +4815,43 @@ Public Class frmToolboxEnterpriseExplorer
                 'Save the Model?
                 Dim lrCustomMessageBox As New frmCustomMessageBox
 
-                    lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
-                    lsMessage &= "Save the model now? (Recommended)"
+                lsMessage = "Your NORMA Model has been successfully loaded into Boston." & vbCrLf & vbCrLf
+                lsMessage &= "Save the model now? (Recommended)"
 
-                    lrCustomMessageBox.Message = lsMessage
-                    lrCustomMessageBox.ButtonText.Add("No")
-                    lrCustomMessageBox.ButtonText.Add("Save to database")
-                    lrCustomMessageBox.ButtonText.Add("Store as XML")
+                lrCustomMessageBox.Message = lsMessage
+                lrCustomMessageBox.ButtonText.Add("No")
+                lrCustomMessageBox.ButtonText.Add("Save to database")
+                lrCustomMessageBox.ButtonText.Add("Store as XML")
 
-                    Select Case lrCustomMessageBox.ShowDialog
-                        Case Is = "Store as XML"
-                            lrModel.StoreAsXML = True
+                Select Case lrCustomMessageBox.ShowDialog
+                    Case Is = "Store as XML"
+                        lrModel.StoreAsXML = True
                         Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
                         Call lrModel.Save(True, False)
                         Boston.WriteToStatusBar("Model Saved")
                     Case Is = "Save to database"
-                            With New WaitCursor
+                        With New WaitCursor
                             Boston.WriteToStatusBar("Saving Model: " & lrModel.Name)
                             Call lrModel.Save(True, False)
                             Boston.WriteToStatusBar("Model Saved")
                         End With
-                    End Select
+                End Select
 
-                    Call lrNewTreeNode.EnsureVisible()
+                Call lrNewTreeNode.EnsureVisible()
 
-                    'Me.zrToolTip.IsBalloon = True
-                    lsMessage = "New Model added: " & lrModel.Name
-                    Me.zrToolTip.IsBalloon = True
-                    Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
-                    Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
-                End If
+                'Me.zrToolTip.IsBalloon = True
+                lsMessage = "New Model added: " & lrModel.Name
+                Me.zrToolTip.IsBalloon = True
+                Me.zrToolTip.ToolTipIcon = ToolTipIcon.None
+                Me.zrToolTip.Show(lsMessage, Me, lrNewTreeNode.Bounds.X, lrNewTreeNode.Bounds.Y + lrNewTreeNode.Bounds.Height, 4000)
+            End If
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4882,7 +4882,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4939,7 +4939,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -4971,7 +4971,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5027,7 +5027,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5090,7 +5090,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -5163,7 +5163,7 @@ Public Class frmToolboxEnterpriseExplorer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

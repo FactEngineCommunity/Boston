@@ -202,7 +202,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -276,7 +276,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub 'CreateEntityRelationshipArtifacts
@@ -298,7 +298,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -532,7 +532,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -634,7 +634,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -659,9 +659,9 @@ Namespace FBM
             Try
                 '=====================================================================
                 'Generate the Indexes for EntityTypes with CompoundReferenceSchemes
-                Dim larEntityType = From EntityType In Me.EntityType _
+                Dim larEntityType = From EntityType In Me.EntityType
                                     Where EntityType.IsMDAModelElement = False _
-                                    And EntityType.HasCompoundReferenceMode _
+                                    And EntityType.HasCompoundReferenceMode
                                     Select EntityType
 
                 For Each lrEntityType In larEntityType
@@ -673,10 +673,10 @@ Namespace FBM
 
                         Dim lrNearestRole As FBM.Role = lrRoleConstraintRole.Role.FactType.GetOtherRoleOfBinaryFactType(lrRoleConstraintRole.Role.Id)
 
-                        Dim larColumns = From Table In Me.RDS.Table _
-                                        From Column In Table.Column
-                                        Where Column.Role.Id = lrNearestRole.Id
-                                        Select Column Distinct ' 'ActiveRole.Id = lrRoleConstraintRole.Role.Id _
+                        Dim larColumns = From Table In Me.RDS.Table
+                                         From Column In Table.Column
+                                         Where Column.Role.Id = lrNearestRole.Id
+                                         Select Column Distinct ' 'ActiveRole.Id = lrRoleConstraintRole.Role.Id _
 
                         For Each lrColumn In larColumns
                             '20210505-VM-Not needed because IsPartOfPrimaryKey is a function of Table Indexes
@@ -714,7 +714,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -728,19 +728,19 @@ Namespace FBM
             'Generate the Indexes for SimpleReferenceSchemes
             '=================================================
             Try
-                Dim larRole = From RoleConstraint In Me.RoleConstraint _
+                Dim larRole = From RoleConstraint In Me.RoleConstraint
                               Where RoleConstraint.IsMDAModelElement = False _
                               And RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
                               And RoleConstraint.RoleConstraintRole.Count = 1 _
-                              And RoleConstraint.IsPreferredIdentifier = True _
+                              And RoleConstraint.IsPreferredIdentifier = True
                               Select RoleConstraint.RoleConstraintRole(0).Role.FactType.GetOtherRoleOfBinaryFactType(RoleConstraint.RoleConstraintRole(0).Role.Id)
 
                 For Each lrRole In larRole
 
-                    Dim larColumns = From Table In Me.RDS.Table _
-                                    From Column In Table.Column
-                                    Where Column.Role.Id = lrRole.Id _
-                                    Select Column Distinct
+                    Dim larColumns = From Table In Me.RDS.Table
+                                     From Column In Table.Column
+                                     Where Column.Role.Id = lrRole.Id
+                                     Select Column Distinct
 
                     lrColumn = larColumns(0)
 
@@ -779,7 +779,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -884,7 +884,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -944,7 +944,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -954,8 +954,8 @@ Namespace FBM
             Try
                 Dim lrRole As FBM.Role = arRole
 
-                Dim larRelation = From Relation In Me.RDS.Relation _
-                                  Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id _
+                Dim larRelation = From Relation In Me.RDS.Relation
+                                  Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
                                   Select Relation
 
                 Dim lrResponsibleRole As FBM.Role
@@ -965,9 +965,9 @@ Namespace FBM
                     lrResponsibleRole = lrRole
 
                     If lrRole.FactType.IsObjectified Then
-                        Dim larLinkFactTypeRole = From FactType In lrRole.Model.FactType _
+                        Dim larLinkFactTypeRole = From FactType In lrRole.Model.FactType
                                                   Where FactType.IsLinkFactType = True _
-                                                  And FactType.LinkFactTypeRole Is lrResponsibleRole _
+                                                  And FactType.LinkFactTypeRole Is lrResponsibleRole
                                                   Select FactType.RoleGroup(0)
 
                         For Each lrLinkFactTypeRole In larLinkFactTypeRole
@@ -996,7 +996,7 @@ Namespace FBM
 
                     If lrResponsibleRole IsNot Nothing Then
                         Select Case lrResponsibleRole.JoinedORMObject.ConceptType
-                            Case Is = pcenumConceptType.EntityType, _
+                            Case Is = pcenumConceptType.EntityType,
                                       pcenumConceptType.FactType
 
                                 Call lrRole.Model.generateRelationForManyTo1BinaryFactType(lrResponsibleRole)
@@ -1012,7 +1012,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -1177,7 +1177,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1356,7 +1356,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1588,7 +1588,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1628,7 +1628,7 @@ Namespace FBM
 
                 If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
 
-                Dim larRelation = From Relation In Me.RDS.Relation _
+                Dim larRelation = From Relation In Me.RDS.Relation
                                   Where Relation.ResponsibleFactType.Id = arResponsibleRole.FactType.Id _
                                   And Relation.OriginTable Is lrOriginTable _
                                   And Relation.DestinationTable Is lrDestinationTable _
@@ -1645,15 +1645,15 @@ Namespace FBM
                 'Create the Relation
                 '--------------------------------------------------------------------                        
                 Dim lrRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
-                                                   lrOriginTable, _
-                                                   pcenumCMMLMultiplicity.Many, _
-                                                   True, _
-                                                   lbContributesToPrimaryKey, _
-                                                   "Is involved in", _
-                                                   lrDestinationTable, _
-                                                    pcenumCMMLMultiplicity.One, _
-                                                   arResponsibleRole.Mandatory, _
-                                                   "Involves", _
+                                                   lrOriginTable,
+                                                   pcenumCMMLMultiplicity.Many,
+                                                   True,
+                                                   lbContributesToPrimaryKey,
+                                                   "Is involved in",
+                                                   lrDestinationTable,
+                                                    pcenumCMMLMultiplicity.One,
+                                                   arResponsibleRole.Mandatory,
+                                                   "Involves",
                                                    arResponsibleRole.FactType)
 
                 '--------------------------------------------------------------------------
@@ -1692,7 +1692,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1721,7 +1721,7 @@ Namespace FBM
 
         Public Function HasCoreModel() As Boolean
 
-            If Me.FactType.FindAll(Function(x) x.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString).Count > 0 And _
+            If Me.FactType.FindAll(Function(x) x.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString).Count > 0 And
                 Not Me.Name = "Core" Then
                 Return True
             Else
@@ -1840,7 +1840,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2107,7 +2107,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Me.RDSLoading = False
             End Try
@@ -2211,7 +2211,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2230,7 +2230,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2247,9 +2247,9 @@ Namespace FBM
 
                 Dim lrTable As RDS.Table
 
-                Dim larFactType = From FactType In Me.FactType _
-                                  From Role In FactType.RoleGroup _
-                                  Where Role.JoinedORMObject.Id = arRole.FactType.Id _
+                Dim larFactType = From FactType In Me.FactType
+                                  From Role In FactType.RoleGroup
+                                  Where Role.JoinedORMObject.Id = arRole.FactType.Id
                                   Select FactType
 
                 For Each lrFactType In larFactType
@@ -2276,16 +2276,16 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
         Public Function getTableForResponsibleRole(ByVal arRole As FBM.Role) As RDS.Table
 
-            Dim larTable = From Table In Me.RDS.Table _
-                           From Column In Table.Column _
-                           Where Column.Role.Id = arRole.Id _
+            Dim larTable = From Table In Me.RDS.Table
+                           From Column In Table.Column
+                           Where Column.Role.Id = arRole.Id
                            Select Table
 
             If larTable.Count > 0 Then
@@ -2309,19 +2309,19 @@ Namespace FBM
                         'Recursive, down the nested ObjectifiedFactTypes
                         Call Me.removeColumnsForObjectifiedFactType(arTargetTable, lrOFTRole.FactType)
                     Else
-                        Dim larColumn = From Table In Me.RDS.Table _
-                                        From Column In Table.Column _
+                        Dim larColumn = From Table In Me.RDS.Table
+                                        From Column In Table.Column
                                         Where Table.Name = arTargetTable.Name _
                                         And Column.ActiveRole.Id = lrOFTRole.Id _
-                                        And Column.ActiveRole.Id <> Column.Role.Id _
+                                        And Column.ActiveRole.Id <> Column.Role.Id
                                         Select Column
 
                         For Each lrColumn In larColumn.ToArray
 
-                            Dim larIndex = From Index In Me.RDS.Index _
-                                           From Column In Index.Column _
+                            Dim larIndex = From Index In Me.RDS.Index
+                                           From Column In Index.Column
                                            Where Column.Id = lrColumn.Id _
-                                           And Column.ActiveRole.Id <> Column.Role.Id _
+                                           And Column.ActiveRole.Id <> Column.Role.Id
                                            Select Index
 
                             For Each lrIndex In larIndex.ToList
@@ -2339,7 +2339,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2395,7 +2395,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2691,7 +2691,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

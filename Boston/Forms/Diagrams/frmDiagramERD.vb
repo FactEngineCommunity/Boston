@@ -2712,24 +2712,6 @@ SkipORMReadingEditor:
                 End If
             Next
 
-            For Each lrDestinationColumn In lrERDLink.Relation.RDSRelation.DestinationColumns
-                lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrDestinationColumn.Id And x.Column.Table Is lrERDLink.Relation.RDSRelation.DestinationTable)
-                Try
-                    lrAttribute.Cell.TextColor = Color.White
-                    lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-                Catch ex As Exception
-                    'Not a biggie.
-                End Try
-
-                If lrERDLink.Relation.RelationFactType.Is1To1BinaryFactType Then
-                    'Highlight the reverse Attributes
-                    For Each lrDestinationAttribute In lrAttribute.Entity.Attribute.FindAll(Function(x) x.Column.Relation.Contains(lrERDLink.Relation.RDSRelation))
-                        lrDestinationAttribute.Cell.TextColor = Color.White
-                        lrDestinationAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightSteelBlue)
-                    Next
-                End If
-            Next
-
             '---------------------------------------------------------------------------
             'If the ORM(FactType)ReadingEditor is loaded, then
             '  do the appropriate processing so that the data in the ReadingEditor grid
@@ -2757,6 +2739,28 @@ SkipORMReadingEditor:
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Call lrToolboxForm.VerbaliseRelation(lrERDLink.Relation.RDSRelation.ResponsibleFactType, lrERDLink.Relation.RDSRelation, ModifierKeys.HasFlag(Keys.Control))
             End If
+
+            '-------------------------------------------------------
+            'Highlighting
+            '-------------------------------------------------------
+            For Each lrDestinationColumn In lrERDLink.Relation.RDSRelation.DestinationColumns
+                lrAttribute = Me.zrPage.ERDiagram.Attribute.Find(Function(x) x.Column.Id = lrDestinationColumn.Id And x.Column.Table Is lrERDLink.Relation.RDSRelation.DestinationTable)
+                Try
+                    lrAttribute.Cell.TextColor = Color.White
+                    lrAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+
+                    If lrERDLink.Relation.RelationFactType.Is1To1BinaryFactType Then
+                        'Highlight the reverse Attributes
+                        For Each lrDestinationAttribute In lrAttribute.Entity.Attribute.FindAll(Function(x) x.Column.Relation.Contains(lrERDLink.Relation.RDSRelation))
+                            lrDestinationAttribute.Cell.TextColor = Color.White
+                            lrDestinationAttribute.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightSteelBlue)
+                        Next
+                    End If
+
+                Catch ex As Exception
+                    'Not a biggie.
+                End Try
+            Next
 
         Catch ex As Exception
             Dim lsMessage1 As String
