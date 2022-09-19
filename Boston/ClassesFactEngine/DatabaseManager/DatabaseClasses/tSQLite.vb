@@ -91,6 +91,50 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
+
+#Region "Special Indexes"
+                            'When an Index in SQLite has a Column that may be NULL, need to add another special index.                            
+                            Dim larIndexWithNullableColumn = From Index In lrIndex.Table.Index
+                                                             From Column In Index.Column
+                                                             Where Not Column.IsMandatory
+                                                             Select Index
+
+                            Dim liInd = 1
+                            For Each lrIndex In larIndexWithNullableColumn
+                                Dim lsSQLCommand As String = ""
+
+                                cmd.CommandText = "DROP INDEX uc_" & arIndex.Table.Name & "special" & liInd.ToString
+                                Try
+                                    cmd.ExecuteNonQuery()
+                                Catch ex As Exception
+                                    'Tried
+                                End Try
+
+                                lsSQLCommand = "CREATE UNIQUE INDEX uc_" & lrIndex.Table.Name & "special" & liInd.ToString & " ON " & lrIndex.Table.Name & "_temp" & "("
+                                Dim liInd2 = 0
+                                For Each lrColumn In lrIndex.Column.FindAll(Function(x) x.IsMandatory)
+                                    If liInd2 > 0 Then lsSQLCommand &= ","
+                                    lsSQLCommand &= "[" & lrColumn.Name & "]"
+                                    liInd2 += 1
+                                Next
+                                lsSQLCommand &= ")"
+                                liInd2 = 0
+                                lsSQLCommand &= " WHERE "
+                                For Each lrColumn In lrIndex.Column.FindAll(Function(x) Not x.IsMandatory)
+                                    If liInd2 > 0 Then
+                                        lsSQLCommand &= ", "
+                                    End If
+                                    lsSQLCommand &= lrColumn.Name
+                                    liInd2 += 1
+                                Next
+                                lsSQLCommand &= " IS NULL"
+                                cmd.CommandText = lsSQLCommand
+                                cmd.ExecuteNonQuery()
+                                liInd += 1
+                            Next
+#End Region
+
+
                             cmd.CommandText = "INSERT INTO [" & arIndex.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arIndex.Table.Name & "]"
@@ -1135,6 +1179,49 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
+
+#Region "Special Indexes"
+                            'When an Index in SQLite has a Column that may be NULL, need to add another special index.                            
+                            Dim larIndexWithNullableColumn = From Index In lrIndex.Table.Index
+                                                             From Column In Index.Column
+                                                             Where Not Column.IsMandatory
+                                                             Select Index
+
+                            Dim liInd = 1
+                            For Each lrIndex In larIndexWithNullableColumn
+                                Dim lsSQLCommand As String = ""
+
+                                cmd.CommandText = "DROP INDEX uc_" & arIndex.Table.Name & "special" & liInd.ToString
+                                Try
+                                    cmd.ExecuteNonQuery()
+                                Catch ex As Exception
+                                    'Tried
+                                End Try
+
+                                lsSQLCommand = "CREATE UNIQUE INDEX uc_" & lrIndex.Table.Name & "special" & liInd.ToString & " ON " & lrIndex.Table.Name & "_temp" & "("
+                                Dim liInd2 = 0
+                                For Each lrColumn In lrIndex.Column.FindAll(Function(x) x.IsMandatory)
+                                    If liInd2 > 0 Then lsSQLCommand &= ","
+                                    lsSQLCommand &= "[" & lrColumn.Name & "]"
+                                    liInd2 += 1
+                                Next
+                                lsSQLCommand &= ")" & vbCrLf
+                                liInd2 = 0
+                                lsSQLCommand &= " WHERE "
+                                For Each lrColumn In lrIndex.Column.FindAll(Function(x) Not x.IsMandatory)
+                                    If liInd2 > 0 Then
+                                        lsSQLCommand &= ", "
+                                    End If
+                                    lsSQLCommand &= lrColumn.Name
+                                    liInd2 += 1
+                                Next
+                                lsSQLCommand &= " IS NULL"
+                                cmd.CommandText = lsSQLCommand
+                                cmd.ExecuteNonQuery()
+                                liInd += 1
+                            Next
+#End Region
+
                             cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arIndex.Table.Name & "]"
@@ -1230,6 +1317,10 @@ Namespace FactEngine
 
                 Dim lsSQL As String
 
+                Dim lasColumnNames = From Column In arTable.Column
+                                     Select Column.Name
+                Dim lsColumnList = String.Join(",", lasColumnNames)
+
                 lsSQL = "PRAGMA foreign_keys=OFF"
                 Me.GONonQuery(lsSQL)
 
@@ -1239,9 +1330,21 @@ Namespace FactEngine
 
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arTable, arTable.Name)
-                            cmd.ExecuteNonQuery()
+                            Try
+                                cmd.Transaction = tr
+                                cmd.CommandText = Me.generateSQLCREATETABLEStatement(arTable, arTable.Name & "_temp")
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "INSERT INTO [" & arTable.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arTable.Name & "]"
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "DROP TABLE [" & arTable.Name & "]"
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "ALTER TABLE [" & arTable.Name & "_temp] RENAME TO [" & arTable.Name & "]"
+                                cmd.ExecuteNonQuery()
+                            Catch ex As Exception
+                                cmd.CommandText = Me.generateSQLCREATETABLEStatement(arTable, arTable.Name)
+                                cmd.ExecuteNonQuery()
+                            End Try
+
                         End Using
 
                         tr.Commit()
@@ -1249,6 +1352,7 @@ Namespace FactEngine
                         MsgBox(ex.Message)
                         tr.Rollback()
                     End Try
+
                 End Using
 
                 lsSQL = "PRAGMA foreign_keys=ON"

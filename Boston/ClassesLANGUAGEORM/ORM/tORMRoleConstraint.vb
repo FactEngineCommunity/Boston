@@ -663,7 +663,7 @@ Namespace FBM
                             Dim lrEntityType As FBM.EntityType
                             lrEntityType = lrOtherRoleOfFactType.JoinedORMObject
 
-                            Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrEntityType.Name)
+                            Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrEntityType.GetTopmostNonAbsorbedSupertype.Name)
 
                             Dim larIndexColumn As New List(Of RDS.Column)
 
