@@ -28,7 +28,7 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
         Me.SearchTextbox1 = New SearchTextbox()
         Me.LabelPromptViewAs = New System.Windows.Forms.Label()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.ComboBoxView = New System.Windows.Forms.ComboBox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.CheckBoxShowModelDictionary = New System.Windows.Forms.CheckBox()
         Me.CheckBoxShowCoreModelElements = New System.Windows.Forms.CheckBox()
@@ -66,7 +66,7 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.GroupBox_Main.Controls.Add(Me.SearchTextbox1)
         Me.GroupBox_Main.Controls.Add(Me.LabelPromptViewAs)
-        Me.GroupBox_Main.Controls.Add(Me.ComboBox1)
+        Me.GroupBox_Main.Controls.Add(Me.ComboBoxView)
         Me.GroupBox_Main.Controls.Add(Me.ButtonRefresh)
         Me.GroupBox_Main.Controls.Add(Me.CheckBoxShowModelDictionary)
         Me.GroupBox_Main.Controls.Add(Me.CheckBoxShowCoreModelElements)
@@ -99,15 +99,15 @@ Partial Class frmToolboxModelDictionary
         Me.LabelPromptViewAs.TabIndex = 8
         Me.LabelPromptViewAs.Text = "View as:"
         '
-        'ComboBox1
+        'ComboBoxView
         '
-        Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Items.AddRange(New Object() {"Object-Role Model - Model Elements", "Entity-Relation - Entities", "Property Graph - Node Types", "CMML - Common MetaModel Language"})
-        Me.ComboBox1.Location = New System.Drawing.Point(70, 49)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(269, 21)
-        Me.ComboBox1.TabIndex = 7
+        Me.ComboBoxView.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxView.FormattingEnabled = True
+        Me.ComboBoxView.Items.AddRange(New Object() {"Object-Role Model - Model Elements", "Entity-Relation - Entities", "Property Graph - Node Types", "CMML - Common MetaModel Language"})
+        Me.ComboBoxView.Location = New System.Drawing.Point(70, 49)
+        Me.ComboBoxView.Name = "ComboBoxView"
+        Me.ComboBoxView.Size = New System.Drawing.Size(269, 21)
+        Me.ComboBoxView.TabIndex = 7
         '
         'ButtonRefresh
         '
@@ -296,7 +296,7 @@ Partial Class frmToolboxModelDictionary
         '
         Me.ContextMenuStripGeneralConcept.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConvertToEntityTypeToolStripMenuItem, Me.ConvertToValueTypeToolStripMenuItem})
         Me.ContextMenuStripGeneralConcept.Name = "ContextMenuStripGeneralConcept"
-        Me.ContextMenuStripGeneralConcept.Size = New System.Drawing.Size(189, 70)
+        Me.ContextMenuStripGeneralConcept.Size = New System.Drawing.Size(189, 48)
         '
         'ConvertToEntityTypeToolStripMenuItem
         '
@@ -352,7 +352,7 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents PropertiesToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ViewInGlossaryToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LabelPromptViewAs As Label
-    Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents ComboBoxView As ComboBox
     Friend WithEvents ToolStripMenuItemMakeMDAModelElement As ToolStripMenuItem
     Friend WithEvents SearchTextbox1 As SearchTextbox
     Friend WithEvents ContextMenuStripGeneralConcept As ContextMenuStrip

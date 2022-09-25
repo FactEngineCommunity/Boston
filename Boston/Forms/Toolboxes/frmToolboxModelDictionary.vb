@@ -29,6 +29,12 @@ Public Class frmToolboxModelDictionary
 
     Public Sub SetupForm()
 
+        'Setup ComboboxView
+        'Object-Role Model - Model Elements
+        'Entity-Relation - Entities
+        'Property Graph - Node Types
+        'CMML - Common MetaModel Language
+
         If IsSomething(prApplication.WorkingPage) Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language)
         Else
@@ -81,7 +87,7 @@ Public Class frmToolboxModelDictionary
 
             Dim liLanguage As pcenumLanguage = pcenumLanguage.ORMModel
 
-            Select Case Me.ComboBox1.SelectedIndex
+            Select Case Me.ComboBoxView.SelectedIndex
                 Case Is = 0
                     liLanguage = pcenumLanguage.ORMModel
                 Case Is = 1
@@ -94,22 +100,22 @@ Public Class frmToolboxModelDictionary
                 liLanguage = ailanguage
             End If
 
-            RemoveHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
+            RemoveHandler Me.ComboBoxView.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
             Select Case liLanguage
                 Case Is = pcenumLanguage.ORMModel
                     Call Me.LoadORMModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 0
+                    Me.ComboBoxView.SelectedIndex = 0
                 Case Is = pcenumLanguage.EntityRelationshipDiagram
                     Call Me.LoadERDModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 1
+                    Me.ComboBoxView.SelectedIndex = 1
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 2
+                    Me.ComboBoxView.SelectedIndex = 2
                 Case Is = pcenumLanguage.UMLUseCaseDiagram
                     Call Me.LoadCMMLModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 3
+                    Me.ComboBoxView.SelectedIndex = 3
             End Select
-            AddHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
+            AddHandler Me.ComboBoxView.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
 
             Me.ziLoadedLanguage = ailanguage
 
@@ -1182,6 +1188,8 @@ Public Class frmToolboxModelDictionary
 
     Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
 
+        Dim liCurrentLanguage As pcenumLanguage = Me.ComboBoxView.SelectedItem.ItemData
+
         If IsSomething(prApplication.WorkingPage) Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
         Else
@@ -1384,22 +1392,22 @@ Public Class frmToolboxModelDictionary
 
         Try
             Me.TreeView1.Nodes.Clear()
-            RemoveHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
+            RemoveHandler Me.ComboBoxView.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
             Select Case aiLanguage
                 Case Is = pcenumLanguage.ORMModel
                     Call Me.LoadORMModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 0
+                    Me.ComboBoxView.SelectedIndex = 0
                 Case Is = pcenumLanguage.EntityRelationshipDiagram
                     Call Me.LoadERDModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 1
+                    Me.ComboBoxView.SelectedIndex = 1
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 2
+                    Me.ComboBoxView.SelectedIndex = 2
                 Case Is = pcenumLanguage.UMLUseCaseDiagram
                     Call Me.LoadCMMLModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 3
+                    Me.ComboBoxView.SelectedIndex = 3
             End Select
-            AddHandler Me.ComboBox1.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
+            AddHandler Me.ComboBoxView.SelectedIndexChanged, AddressOf Me.ComboBox1_SelectedIndexChanged
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1444,7 +1452,7 @@ Public Class frmToolboxModelDictionary
         End Try
     End Sub
 
-    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
+    Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxView.SelectedIndexChanged
 
         Try
             Call Me.LoadTree
@@ -1464,7 +1472,7 @@ Public Class frmToolboxModelDictionary
 
         Try
             Call Me.TreeView1.Nodes.Clear()
-            Select Case Me.ComboBox1.SelectedIndex
+            Select Case Me.ComboBoxView.SelectedIndex
                 Case Is = 0
                     Call Me.LoadORMModelDictionary(asSearchString)
                 Case Is = 1
@@ -1473,7 +1481,7 @@ Public Class frmToolboxModelDictionary
                     Call Me.LoadPGSModelDictionary()
                 Case Is = pcenumLanguage.UMLUseCaseDiagram
                     Call Me.LoadCMMLModelDictionary()
-                    Me.ComboBox1.SelectedIndex = 3
+                    Me.ComboBoxView.SelectedIndex = 3
             End Select
 
         Catch ex As Exception

@@ -682,7 +682,9 @@ SkipRegistrationChecking:
                 Me.ToolStripMenuItemUser.Visible = True
                 Me.ToolStripMenuItemProject.Visible = True
             End If
-            Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
+            If My.Settings.UseClientServer Then
+                Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
+            End If
 
             '-------------------------------------------------------------------------------------------------------
             'Main Client/Server menu items

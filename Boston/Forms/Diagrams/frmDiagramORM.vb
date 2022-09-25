@@ -4014,7 +4014,13 @@ Public Class frmDiagramORM
                         Call Me.SelectNode(loSelectedNode)
                         Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
                     End If
-                    Call Me.SelectNode(loSelectedNode)
+                    Select Case loSelectedNode.GetType
+                        Case Is = GetType(ShapeNode)
+                            Call Me.SelectNode(loSelectedNode)
+                        Case Is = GetType(TableNode)
+                            'N/A
+                    End Select
+
                     loSelectedNode.Selected = True
                 End If
 
@@ -7714,9 +7720,10 @@ SkipPopup:
                     Call Me.zrPage.MakeDirty()
 
                     If IsSomething(lrFact) Then
-                        '---------------------------------
-                        'Ad the new Fact to the FactType
-                        '---------------------------------
+                        '-------------------------------------------------------------
+                        'Add the new Fact to the FactType                        
+                        'Adds the new FactInstance to the FactTypeInstance by event.
+                        '-----------------------------------------------------------
                         lrFactType.AddFact(lrFact)
 
                         lrFactTypeInstance.Id = lrFactType.Id
@@ -7726,11 +7733,6 @@ SkipPopup:
 
                         lrFactInstance = Me.zrPage.CreateFactInstance(lrFactTypeInstance, lrFact)
 
-                        '--------------------------------------------------
-                        'Add the new FactInstance to the FactTypeInstance
-                        '--------------------------------------------------
-                        lrFactTypeInstance.Fact.Add(lrFactInstance)
-                        Me.zrPage.FactInstance.Add(lrFactInstance)
 
                         lrFactTypeInstance.FactTable.ResortFactTable()
 
@@ -9273,6 +9275,8 @@ SkipPopup:
             lrFactTypeInstance.FactTable.TableShape.Visible = ToolStripMenuItemViewFactTable.Checked
 
             lrFactTypeInstance.FactTable.TableShape.Move(lrFactTypeInstance.Shape.Bounds.X + 3, lrFactTypeInstance.Shape.Bounds.Bottom + 5)
+
+            lrFactTypeInstance.FactTable.ResortFactTable()
 
         Catch ex As Exception
             Dim lsMessage As String

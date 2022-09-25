@@ -960,9 +960,9 @@ Namespace FBM
             lrFactInstance.isDirty = True
             Me.isDirty = True
             Me.Page.IsDirty = True
-            Me.Fact.Add(lrFactInstance)
+            Me.Fact.AddUnique(lrFactInstance)
 
-            Me.Page.FactInstance.Add(lrFactInstance)
+            Me.Page.FactInstance.AddUnique(lrFactInstance)
 
             If IsSomething(Me.FactTable) And abResortFactTable And Me.Page.Diagram IsNot Nothing Then
                 If Me.FactTable.TableShape.Visible And Me.Page.Diagram.Nodes.Contains(Me.FactTable.TableShape) Then

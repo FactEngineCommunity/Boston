@@ -362,6 +362,10 @@ Public Class tBrain
             MsgBox(ex.Message & vbCrLf & vbCrLf & "Possible Cross thread concern.")
         End Try
 
+        If Not abSuppressLineLimit Then
+            Call Me.LimitOutputChannelLines()
+        End If
+
         'Buttons
         Try
             For Each lrButton In Me.ResponseButtons.ToArray
@@ -414,11 +418,9 @@ Public Class tBrain
 
                     AddHandler Button1.Click, AddressOf Me.ResponseButton_Click
 
-                    Me.OutputChannel.Text = Trim(Me.OutputChannel.Text)
-                    Me.OutputChannel.Select(Me.OutputChannel.Text.Length - 1, 0)
-                    Me.OutputChannel.AppendText(vbCrLf)
-                    Me.OutputChannel.Select(Me.OutputChannel.Text.Length - 1, 0)
-                    Me.OutputChannel.ScrollToCaret()
+                    'Me.OutputChannel.Text = Trim(Me.OutputChannel.Text)
+                    'Me.OutputChannel.Select(Me.OutputChannel.Text.Length - 1, 0)
+                    'Me.OutputChannel.ScrollToCaret()
 
                     Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position                    
                     Me.OutputChannel.Controls.Add(Button1) ' get it inside the rich text box
@@ -469,6 +471,8 @@ Public Class tBrain
                     lrRichTextBox.AutoScrollOffset = New Point(Button1.Left, Button1.Top + Button1.Height)
 #End Region
             End Select
+
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -478,20 +482,6 @@ Public Class tBrain
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
-        '======================================================================
-        '20200725-VM Test to see if can limit the number of lines in the textbox
-        Try
-            Dim numOfLines As Integer = 8
-            Dim loTextBox As RichTextBox = Me.OutputChannel
-            Dim lines As List(Of String) = loTextBox.Lines.ToList
-            If (lines.Count > numOfLines) And Not abSuppressLineLimit Then
-                Me.OutputChannel.Select(0, Me.OutputChannel.GetFirstCharIndexFromLine(Viev.Greater(1, (loTextBox.Lines.Count - numOfLines) - 1))) 'Select the first line
-                Me.OutputChannel.SelectedText = ""
-            End If
-        Catch ex As Exception
-        End Try
-        '-------------------------------------------------------
-
         Try
             Me.OutputChannel.SelectionStart = Me.OutputChannel.Text.Length
             Me.OutputChannel.ScrollToCaret()
@@ -499,6 +489,37 @@ Public Class tBrain
         End Try
 
 SkipOutputChannel:
+
+    End Sub
+
+    Private Sub LimitOutputChannelLines()
+
+        Try
+            '======================================================================
+            '20200725-VM Test to see if can limit the number of lines in the textbox
+            Try
+                Dim numOfLines As Integer = 8
+                Dim loTextBox As RichTextBox = Me.OutputChannel
+                Dim lines As List(Of String) = loTextBox.Lines.ToList
+                If (lines.Count > numOfLines) Then ' And Not abSuppressLineLimit Then
+                    Me.OutputChannel.Select(0, Me.OutputChannel.GetFirstCharIndexFromLine(Viev.Greater(1, (loTextBox.Lines.Count - numOfLines) - 1))) 'Select the first line
+                    Me.OutputChannel.SelectedText = ""
+                End If
+
+                Me.OutputChannel.SelectionStart = Me.OutputChannel.Text.Length
+                Me.OutputChannel.ScrollToCaret()
+            Catch ex As Exception
+            End Try
+            '-------------------------------------------------------
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

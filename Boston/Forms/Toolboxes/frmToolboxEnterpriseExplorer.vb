@@ -100,9 +100,8 @@ Public Class frmToolboxEnterpriseExplorer
 
 #Region "Client/Server"
             Me.ToolStripMenuItemMoveModel.Visible = My.Settings.UseClientServer
-            Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
-
             If My.Settings.UseClientServer Then
+                Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
                 Me.LabelPromptProject.Visible = True
                 Me.ComboBoxProject.Visible = True
                 Me.LabelPromptNamespace.Visible = True
