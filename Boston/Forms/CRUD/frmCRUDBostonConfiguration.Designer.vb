@@ -92,6 +92,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.GroupBoxModelling = New System.Windows.Forms.GroupBox()
+        Me.ComboBoxDefaultGeneralConceptConversion = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo = New System.Windows.Forms.Label()
         Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
         Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.CheckBoxUseDefaultReferenceMode = New System.Windows.Forms.CheckBox()
@@ -99,8 +101,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo = New System.Windows.Forms.Label()
-        Me.ComboBoxDefaultGeneralConceptConversion = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptBostonServerPortNumber = New System.Windows.Forms.Label()
+        Me.TextBoxBostonServerPortNumber = New System.Windows.Forms.TextBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -451,6 +453,8 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.TextBoxBostonServerPortNumber)
+        Me.GroupBox3.Controls.Add(Me.LabelPromptBostonServerPortNumber)
         Me.GroupBox3.Controls.Add(Me.CheckBoxClientServerInitialiseClient)
         Me.GroupBox3.Controls.Add(Me.CheckBoxClientServerRequireLoginAtStartup)
         Me.GroupBox3.Controls.Add(Me.CheckBoxUseRemoteUI)
@@ -458,7 +462,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox3.Controls.Add(Me.CheckBoxEnableClientServer)
         Me.GroupBox3.Location = New System.Drawing.Point(6, 6)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(594, 162)
+        Me.GroupBox3.Size = New System.Drawing.Size(594, 193)
         Me.GroupBox3.TabIndex = 0
         Me.GroupBox3.TabStop = False
         '
@@ -858,6 +862,25 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxModelling.TabIndex = 0
         Me.GroupBoxModelling.TabStop = False
         '
+        'ComboBoxDefaultGeneralConceptConversion
+        '
+        Me.ComboBoxDefaultGeneralConceptConversion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxDefaultGeneralConceptConversion.FormattingEnabled = True
+        Me.ComboBoxDefaultGeneralConceptConversion.Items.AddRange(New Object() {"Value Type", "Entity Type"})
+        Me.ComboBoxDefaultGeneralConceptConversion.Location = New System.Drawing.Point(288, 93)
+        Me.ComboBoxDefaultGeneralConceptConversion.Name = "ComboBoxDefaultGeneralConceptConversion"
+        Me.ComboBoxDefaultGeneralConceptConversion.Size = New System.Drawing.Size(82, 21)
+        Me.ComboBoxDefaultGeneralConceptConversion.TabIndex = 4
+        '
+        'LabelPromptNLAPIConvertsGeneralConceptsTo
+        '
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.AutoSize = True
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Location = New System.Drawing.Point(18, 96)
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Name = "LabelPromptNLAPIConvertsGeneralConceptsTo"
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Size = New System.Drawing.Size(264, 13)
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.TabIndex = 3
+        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Text = "Natural Language API Converts General Concepts To:"
+        '
         'TextBoxDefaultReferenceMode
         '
         Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(247, 62)
@@ -917,24 +940,21 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'LabelPromptNLAPIConvertsGeneralConceptsTo
+        'LabelPromptBostonServerPortNumber
         '
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.AutoSize = True
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Location = New System.Drawing.Point(18, 96)
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Name = "LabelPromptNLAPIConvertsGeneralConceptsTo"
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Size = New System.Drawing.Size(264, 13)
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.TabIndex = 3
-        Me.LabelPromptNLAPIConvertsGeneralConceptsTo.Text = "Natural Language API Converts General Concepts To:"
+        Me.LabelPromptBostonServerPortNumber.AutoSize = True
+        Me.LabelPromptBostonServerPortNumber.Location = New System.Drawing.Point(7, 145)
+        Me.LabelPromptBostonServerPortNumber.Name = "LabelPromptBostonServerPortNumber"
+        Me.LabelPromptBostonServerPortNumber.Size = New System.Drawing.Size(139, 13)
+        Me.LabelPromptBostonServerPortNumber.TabIndex = 5
+        Me.LabelPromptBostonServerPortNumber.Text = "Boston Server Port Number:"
         '
-        'ComboBoxDefaultGeneralConceptConversion
+        'TextBoxBostonServerPortNumber
         '
-        Me.ComboBoxDefaultGeneralConceptConversion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBoxDefaultGeneralConceptConversion.FormattingEnabled = True
-        Me.ComboBoxDefaultGeneralConceptConversion.Items.AddRange(New Object() {"Value Type", "Entity Type"})
-        Me.ComboBoxDefaultGeneralConceptConversion.Location = New System.Drawing.Point(288, 93)
-        Me.ComboBoxDefaultGeneralConceptConversion.Name = "ComboBoxDefaultGeneralConceptConversion"
-        Me.ComboBoxDefaultGeneralConceptConversion.Size = New System.Drawing.Size(82, 21)
-        Me.ComboBoxDefaultGeneralConceptConversion.TabIndex = 4
+        Me.TextBoxBostonServerPortNumber.Location = New System.Drawing.Point(152, 142)
+        Me.TextBoxBostonServerPortNumber.Name = "TextBoxBostonServerPortNumber"
+        Me.TextBoxBostonServerPortNumber.Size = New System.Drawing.Size(60, 20)
+        Me.TextBoxBostonServerPortNumber.TabIndex = 6
         '
         'frmCRUDBostonConfiguration
         '
@@ -1069,4 +1089,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxClientServerRequireLoginAtStartup As CheckBox
     Friend WithEvents ComboBoxDefaultGeneralConceptConversion As ComboBox
     Friend WithEvents LabelPromptNLAPIConvertsGeneralConceptsTo As Label
+    Friend WithEvents TextBoxBostonServerPortNumber As TextBox
+    Friend WithEvents LabelPromptBostonServerPortNumber As Label
 End Class

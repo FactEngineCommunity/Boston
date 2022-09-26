@@ -81,10 +81,16 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="frmMain.vb">
+    <Compile Include="Forms\CRUD\frmCRUDBostonServerConfiguration.Designer.vb">
+      <DependentUpon>frmCRUDBostonServerConfiguration.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\frmCRUDBostonServerConfiguration.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.vb">
+    <Compile Include="Forms\frmMain.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmMain.Designer.vb">
       <DependentUpon>frmMain.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
@@ -106,7 +112,10 @@
     <Compile Include="publicConstants.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmMain.resx">
+    <EmbeddedResource Include="Forms\CRUD\frmCRUDBostonServerConfiguration.resx">
+      <DependentUpon>frmCRUDBostonServerConfiguration.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">

@@ -36,28 +36,7 @@ Public Class frmCRUDBostonConfiguration
 
         End If
 
-
-
     End Sub
-
-    Private Sub SetupUsingSuperUserMode()
-
-        Try
-            Me.CheckBoxFactEngineUseTransformations.Enabled = True
-            Me.CheckBoxClientServerInitialiseClient.Enabled = True
-            Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = True
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-        End Try
-
-    End Sub
-
 
     Private Sub SetupForm()
 
@@ -99,6 +78,7 @@ Public Class frmCRUDBostonConfiguration
             Me.CheckBoxLoggingOutEndsSession.Checked = My.Settings.LoggingOutEndsSession
             Me.CheckBoxClientServerRequireLoginAtStartup.Checked = My.Settings.RequireLoginAtStartup
             Me.CheckBoxClientServerInitialiseClient.Checked = My.Settings.InitialiseClient
+            Me.TextBoxBostonServerPortNumber.Text = Trim(My.Settings.BostonServerPortNumber)
 
             If My.Settings.FactEngineDefaultQueryResultLimit = 0 Then
                 Me.DomainUpDownFactEngineDefaultQueryResultLimit.Text = "Infinite"
@@ -159,6 +139,24 @@ Public Class frmCRUDBostonConfiguration
 
     End Sub
 
+    Private Sub SetupUsingSuperUserMode()
+
+        Try
+            Me.CheckBoxFactEngineUseTransformations.Enabled = True
+            Me.CheckBoxClientServerInitialiseClient.Enabled = True
+            Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Private Sub frmCRUDRichmondConfiguration_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Call Me.SetupForm()
@@ -210,8 +208,7 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.LoggingOutEndsSession = Me.CheckBoxLoggingOutEndsSession.Checked
                 My.Settings.RequireLoginAtStartup = Me.CheckBoxClientServerRequireLoginAtStartup.Checked
                 My.Settings.InitialiseClient = Me.CheckBoxClientServerInitialiseClient.Checked
-
-
+                My.Settings.BostonServerPortNumber = Trim(Me.TextBoxBostonServerPortNumber.Text)
 
                 'FactEngine
                 My.Settings.FactEngineShowDatabaseLogoInModelExplorer = Me.CheckBoxFactEngineShowDatabaseLogoModelExplorer.Checked
@@ -565,4 +562,15 @@ Public Class frmCRUDBostonConfiguration
         lfrmFlashCard.Show(frmMain, "White")
 
     End Sub
+
+    Private Sub TextBoxBostonServerPortNumber_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextBoxBostonServerPortNumber.KeyPress
+
+        If Asc(e.KeyChar) <> 8 Then
+            If Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57 Then
+                e.Handled = True
+            End If
+        End If
+
+    End Sub
+
 End Class

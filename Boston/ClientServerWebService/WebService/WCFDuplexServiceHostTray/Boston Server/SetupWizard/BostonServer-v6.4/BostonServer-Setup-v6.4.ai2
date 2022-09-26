@@ -1,0 +1,231 @@
+<aiw2project project-file-version="6">
+  <cs-general>
+    <application-name value="Boston Server" />
+    <application-version value="6.4" />
+    <company-name value="FactEngine" />
+    <install-path value="&lt;ProgramFiles&gt;\&lt;CompanyName&gt;\&lt;AppName&gt;" reg-root-key="2" reg-path="Software\&lt;CompanyName&gt;\&lt;AppName&gt;" read-from-registry="0" reg-value="Directory" />
+    <shortcut-path value="Boston\&lt;AppName&gt;" all-users-start-menu="0" />
+    <update-installation value="0" />
+    <allow-clean-install value="0" />
+    <prompt-before-running value="0" />
+    <silent-installation value="0" />
+  </cs-general>
+  <cs-dialogs>
+    <dialog selected="0" title="Language" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Language.adt" />
+    <dialog selected="1" title="Welcome" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Welcome.adt" />
+    <dialog selected="0" title="License agreement" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\License.adt" />
+    <dialog selected="0" title="Readme" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Readme.adt" />
+    <dialog selected="0" title="System information" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Sysinfo.adt" />
+    <dialog selected="0" title="User information" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Userinfo.adt" />
+    <dialog selected="1" title="Select destination directory" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Destdir.adt" />
+    <dialog selected="1" title="Select shortcut folder" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Shortcutdir.adt" />
+    <dialog selected="0" title="Installation type" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Installtype.adt" />
+    <dialog selected="0" title="Options" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Options.adt" />
+    <dialog selected="1" title="Summary" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Summary.adt" />
+    <dialog selected="1" title="Installing" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Installing.adt" />
+    <dialog selected="1" title="Finished" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Finished.adt" />
+    <dialog selected="1" title="Uninstall" project-relative-path="0" display-once="0" template="Themes\Windows XP theme\Uninstall.adt" />
+    <scale value="1" />
+  </cs-dialogs>
+  <cs-dialogs-language>
+    <language project-relative-path="0" filename="LanguageSets\lang_eng.als" />
+    <default-language value="0" />
+    <dialog-title value="Select language" />
+    <dialog-text value="Please select the language that you would like to use during the installation." />
+    <use-dialog-strings value="0" />
+  </cs-dialogs-language>
+  <cs-dialogs-readme>
+    <text value="" language="0" />
+    <text value="" language="1" />
+  </cs-dialogs-readme>
+  <cs-dialogs-license>
+    <text value="" language="0" />
+    <text value="" language="1" />
+    <direct-approval value="0" />
+    <prohibit-silent-installation value="0" />
+  </cs-dialogs-license>
+  <cs-dialogs-sysinfo>
+    <item selected="1" index="0" />
+    <item selected="1" index="1" />
+    <item selected="1" index="2" />
+    <item selected="1" index="3" />
+    <item selected="1" index="4" />
+    <item selected="1" index="5" />
+    <item selected="1" index="6" />
+    <item selected="1" index="7" />
+    <item selected="1" index="8" />
+    <item selected="1" index="9" />
+    <item selected="1" index="10" />
+    <item selected="1" index="11" />
+    <item selected="1" index="12" />
+    <item selected="1" index="13" />
+    <tentative value="0" />
+  </cs-dialogs-sysinfo>
+  <cs-dialogs-userinfo>
+    <user-name selected="0" required="0" />
+    <company-name selected="0" required="0" />
+    <serial selected="0" required="0" />
+    <show-confirmation selected="0" />
+    <delimited-style selected="0" field1="4" field2="4" field3="4" />
+    <serial-codes value="" />
+  </cs-dialogs-userinfo>
+  <cs-dialogs-options>
+    <show-lines-at-tree-root selected="1" />
+    <show-sub-process-progress selected="0" />
+    <show-restart-computer selected="0" force="0" />
+    <show-launch-program selected="0" file="" default="0" />
+    <show-open-readme selected="0" file="" default="0" />
+  </cs-dialogs-options>
+  <cs-dialogs-uninstall>
+    <add-remove-dialog comments="" selected="1" publisher="&lt;CompanyName&gt;" title="&lt;AppName&gt;" publisher-url="" support-url="" version="&lt;AppVersion&gt;" update-url="" icon="" />
+    <custom-uninstaller command-line="" file="" />
+    <uninstaller-name value="&lt;WindowsDir&gt;\&lt;AppNameInFileNameFormat&gt; Uninstaller.exe" />
+    <no-uninstallation selected="0" />
+  </cs-dialogs-uninstall>
+  <cs-files>
+    <installation-item name="Application files" description="Minimum files required for the application to run." flags="1">
+      <files>
+        <folder value="D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFDuplexServiceHostTray\Boston Server\bin\Debug\" relative="0" expanded="1">
+          <file runtime-location="" name="Boston Server.exe" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="Boston Server.exe.config" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="Boston Server.pdb" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="Boston Server.vshost.exe" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="Boston Server.vshost.exe.config" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="Boston Server.vshost.exe.manifest" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="Boston Server.xml" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="BostonWCFServiceLibrary.dll" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="BostonWCFServiceLibrary.dll.config" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="BostonWCFServiceLibrary.pdb" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="BostonWCFServiceLibrary.xml" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="VievFBMInterface.dll" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="VievFBMInterface.pdb" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="VievFBMInterface.xml" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="VievPluginFramework.dll" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="WeifenLuo.WinFormsUI.Docking.dll" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="WeifenLuo.WinFormsUI.Docking.pdb" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="WindowsApplication1.exe.config" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="WindowsApplication1.vshost.exe" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="WindowsApplication1.vshost.exe.config" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+          <file runtime-location="" name="WindowsApplication1.vshost.exe.manifest" destination-modified="0" destination="&lt;InstallDir&gt;" reg-priority="1" overwrite-mode="0" attributes="97" />
+        </folder>
+      </files>
+    </installation-item>
+  </cs-files>
+  <cs-syschanges>
+    <require-admin selected="0" />
+    <as-invoker selected="0" />
+  </cs-syschanges>
+  <cs-syschanges-registry>
+    <root key="0" />
+    <root key="1" />
+    <root key="2">
+      <key name="Software" uninstall-type="0">
+        <key name="&lt;CompanyName&gt;" uninstall-type="0">
+          <key name="&lt;AppName&gt;" uninstall-type="0">
+            <value value="&lt;InstallDir&gt;" name="Directory" type="2" uninstall-type="0" />
+            <value value="&lt;AppVersion&gt;" name="Version" type="2" uninstall-type="0" />
+            <value value="&lt;UninstallerName&gt;" name="Uninstaller" type="2" uninstall-type="0" />
+          </key>
+        </key>
+      </key>
+    </root>
+    <root key="3" />
+    <apply-conditions-access selected="0" />
+  </cs-syschanges-registry>
+  <cs-syschanges-shortcuts>
+    <shortcut link-name="&lt;ShortcutDir&gt;\&lt;AppName&gt; Uninstaller.lnk" command-line="" target-file="&lt;UninstallerName&gt;" working-dir="&lt;WindowsDir&gt;" icon="" />
+    <shortcut link-name="&lt;ShortcutDir&gt;\&lt;AppName&gt;.lnk" command-line="" target-file="&lt;InstallDir&gt;\&lt;AppName&gt;.exe" working-dir="&lt;InstallDir&gt;" icon="" />
+    <open-shortcut-folder selected="0" />
+  </cs-syschanges-shortcuts>
+  <cs-syschanges-ini />
+  <cs-syschanges-text />
+  <cs-syschanges-associations />
+  <cs-sys-requirements>
+    <cpu amd="0" manufacturer="0" flags="0" speed="0" intel="0" />
+    <win-9x build="0" index="2" />
+    <win-nt index="6" service-pack="0" />
+    <ram value="0" />
+    <directx minor-version="0" major-version="0" />
+    <resolution yres="0" xres="0" bpp="0" />
+    <wave-playback selected="0" />
+    <midi-playback selected="0" />
+    <joystick selected="0" />
+    <java-version index="0" />
+    <net-version index="5" />
+  </cs-sys-requirements>
+  <cs-background>
+    <show-window selected="0" />
+    <occupy-task-bar selected="0" />
+    <title-bar show="1" text="&lt;AppName&gt; Installation" />
+    <background-color color1="8421376" color2="8421376" color3="8421376" mid-color-pos="50" />
+    <main-text color="16777215" shadow-color="0" text="&lt;AppName&gt; Installation" />
+    <sub-text color="16777215" shadow-color="0" text="Version &lt;AppVersion&gt;" />
+    <bottom-text color="16777215" text="Copyright Â&#169; 2004 &lt;CompanyName&gt;" />
+    <image y-offset="60" transparent="0" file="" tiled="0" position="0" full-screen="0" x-offset="20" />
+  </cs-background>
+  <cs-background-slideshow>
+    <settings y-offset="0" showtime="0" relative-position="0" image-position="0" dialog-position="0" x-offset="0" />
+  </cs-background-slideshow>
+  <cs-advanced>
+    <convert-jpgs selected="0" />
+    <convert-mp3s selected="0" />
+    <default-overwrite-mode index="4" />
+    <backup-system-files selected="1" />
+    <replace-in-use-files selected="0" />
+    <no-append-appname selected="0" />
+    <disable-xp-visuals selected="0" />
+    <suppress-privilege-warning value="0" />
+    <check-previous-installations value="" selected="1" value-name="" any-above="0" path="Software\&lt;CompanyName&gt;\&lt;AppName&gt;" root-key="2" smart-comparison="0" />
+    <start-sound file="" />
+    <own-dll command-line="" file="" />
+    <installation-icon file="" />
+    <min-compression-ratio value="0" />
+    <autorun-mode selected="0" />
+    <x64-compliance-mode selected="0" />
+    <version-information file-version-major-low="0" file-version-minor-low="0" file-version-major-high="1" create-version-information="0" file-version-minor-high="0">
+      <string-properties>
+        <property property-key="Comments" property-value="" />
+        <property property-key="CompanyName" property-value="&lt;CompanyName&gt;" />
+        <property property-key="FileDescription" property-value="" />
+        <property property-key="FileVersion" property-value="&lt;AppVersion&gt;" />
+        <property property-key="InternalName" property-value="" />
+        <property property-key="LegalCopyright" property-value="" />
+        <property property-key="LegalTrademarks" property-value="" />
+        <property property-key="OriginalFilename" property-value="" />
+        <property property-key="ProductName" property-value="&lt;AppName&gt;" />
+        <property property-key="ProductVersion" property-value="&lt;AppVersion&gt;" />
+      </string-properties>
+    </version-information>
+  </cs-advanced>
+  <cs-advanced-variables />
+  <cs-advanced-shell-interactive />
+  <cs-advanced-shell-file />
+  <cs-advanced-resource />
+  <cs-autoupdate>
+    <mode index="0" />
+    <installation-item index="0" />
+    <install-to value="&lt;CommonFiles&gt;\Thraex Software\AutoUpdator" />
+    <update-xml-url value="" />
+    <download-urls>
+      <url value="" />
+    </download-urls>
+    <program-description value="" />
+    <save-xml-as value="(Use project name)" />
+    <create-shortcut selected="0" />
+    <auto-execute selected="0" />
+  </cs-autoupdate>
+  <cs-create-setup>
+    <setup-filename value="(Use project name)" />
+    <multiple-disk-spanning selected="0" disk-size="1,38" />
+  </cs-create-setup>
+  <constants />
+  <internal>
+    <use-main-window-caption value="1" />
+    <last-bc-image-path value="" />
+    <last-dll-path value="" />
+    <last-text-file-path value="" />
+    <last-files-path value="D:\Viev\02-Marketing\01-Product\01-Products\Boston\Versions\Boston\Boston\ClientServerWebService\WebService\WCFDuplexServiceHostTray\Boston Server\bin\Debug\" />
+    <last-slide-image-path value="" />
+    <active-theme value="Windows XP Theme" />
+  </internal>
+</aiw2project>

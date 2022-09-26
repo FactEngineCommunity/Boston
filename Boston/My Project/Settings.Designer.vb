@@ -956,7 +956,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property ExportFBMExcludeMDAModelElements() As Boolean
             Get
                 Return CType(Me("ExportFBMExcludeMDAModelElements"),Boolean)
@@ -1035,6 +1035,18 @@ Namespace My
             End Get
             Set
                 Me("ClientServerViewCodeGenerator") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("8080")>  _
+        Public Property BostonServerPortNumber() As String
+            Get
+                Return CType(Me("BostonServerPortNumber"),String)
+            End Get
+            Set
+                Me("BostonServerPortNumber") = value
             End Set
         End Property
     End Class

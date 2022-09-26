@@ -228,7 +228,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="ExportFBMExcludeMDAModelElements" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="FactEngineUseTransformations" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -247,6 +247,9 @@
     </Setting>
     <Setting Name="ClientServerViewCodeGenerator" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="BostonServerPortNumber" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8080</Value>
     </Setting>
   </Settings>
 </SettingsFile>

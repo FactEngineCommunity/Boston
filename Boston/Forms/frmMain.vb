@@ -48,7 +48,7 @@ Public Class frmMain
     'NB See method InitialiseClient
     'NB See method Private prDubplexServiceClient 
     'NB See Main.Designer  Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-    Private Const ServiceEndpointUri As String = "http://localhost:9001/WCFServices/DuplexService"
+    Private ServiceEndpointUri As String = "http://localhost:" & My.Settings.BostonServerPortNumber & "/WCFServices/DuplexService"
 
     Private Sub frm_main_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -124,7 +124,7 @@ Public Class frmMain
                             System.IO.Directory.CreateDirectory(Path.GetDirectoryName(Boston.GetConfigFileLocation))
                             File.Copy(lsPath, Boston.GetConfigFileLocation)
 
-                            MsgBox("As part of this upgrade Boston needs to restart. Press [Ok] to close Boston and then restart Boston.")
+                            MsgBox("As part Of this upgrade Boston needs To restart. Press [Ok] To close Boston And Then restart Boston.")
                             Me.Close()
                             Me.Dispose()
 
@@ -168,7 +168,7 @@ ConfigurationOK:
 
             '==============================================================================================================================
 
-            Me.StatusLabelGeneralStatus.Text = "Checking for Plugins"
+            Me.StatusLabelGeneralStatus.Text = "Checking For Plugins"
             '===============================================================================
             'Get the Plugins for the Application.
             '  NB Plugins are not critical, so if the \plugins\ directory doesn't exist, then skip this step.
@@ -251,7 +251,7 @@ ConfigurationOK:
                     My.Settings.Save()
 
                     If pbLogStartup Then
-                        lsMessage = "FirstRun-Moved database to " & lsCommonDatabaseFileLocation
+                        lsMessage = "FirstRun-Moved database To " & lsCommonDatabaseFileLocation
                         prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
                     End If
                 End If
@@ -269,7 +269,7 @@ ConfigurationOK:
             '  NB May be different from My.Settings.DatabaseVersionNumber, which is the actual version of the database installed.
             prApplication.DatabaseVersionNr = psApplicationDatabaseVersionNr
 
-#Region "Open the database & Upgrade if necessary"
+#Region "Open the database & Upgrade If necessary"
             Me.StatusLabelGeneralStatus.Text = "Opening Database"
             If Boston.OpenDatabase() Then
 
@@ -310,13 +310,13 @@ ConfigurationOK:
                         '--------------------------------------------------------------------------------------------------------------
                         'Real problems exist. The application requires a DatabaseVersionNumber 'less' than the one installed
                         '--------------------------------------------------------------------------------------------------------------
-                        lsMessage = "Contact FactEngine support. This installation of Boston requires a Database Version Number less than the one installed"
+                        lsMessage = "Contact FactEngine support. This installation Of Boston requires a Database Version Number less than the one installed"
                         lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Database version required by software:  " & prApplication.DatabaseVersionNr & vbCrLf
-                        lsMessage &= "Required database version (Configuration): " & My.Settings.DatabaseVersionNumber & vbCrLf
-                        lsMessage &= "Database version (actual database): " & lsDatabaseVersionNumber & vbCrLf
+                        lsMessage &= "Database version required by software  " & prApplication.DatabaseVersionNr & vbCrLf
+                        lsMessage &= "Required database version (Configuration) " & My.Settings.DatabaseVersionNumber & vbCrLf
+                        lsMessage &= "Database version (actual database) " & lsDatabaseVersionNumber & vbCrLf
                         lsMessage &= vbCrLf & vbCrLf
-                        lsMessage &= "Installed database location: " & vbCrLf
+                        lsMessage &= "Installed database location " & vbCrLf
                         lsMessage &= lsCommonDatabaseFileLocation
                         prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
                         Me.Close()
@@ -471,10 +471,10 @@ ConfigurationOK:
                     Else
                         'The Trial must be up, or new install of Boston.
                         lsMessage = "Please contact FactEngine to obtain a registration key for Boston."
-                        lsMessage.AppendDoubleLineBreak("Either:")
-                        lsMessage.AppendLine("1. You have installed a new copy of Boston Professional;")
-                        lsMessage.AppendLine("2. Your trial of Boston has expired; or")
-                        lsMessage.AppendLine("3. Your registration key is invalid.")
+                        lsMessage.AppendDoubleLineBreak("Either")
+                        lsMessage.AppendLine("1. You have installed a New copy of Boston Professional;")
+                        lsMessage.AppendLine("2. Your trial of Boston has expired; Or")
+                        lsMessage.AppendLine("3. Your registration key Is invalid.")
                         MsgBox(lsMessage)
 
                         Dim lrRegistrationForm As New frmRegistration
