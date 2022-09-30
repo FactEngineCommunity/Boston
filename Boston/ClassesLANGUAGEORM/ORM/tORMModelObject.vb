@@ -1577,21 +1577,31 @@ Namespace FBM
 
         Public Sub SetLongDescription(ByVal asLongDescription As String)
 
-            Me.LongDescription = asLongDescription
+            Try
+                Me.LongDescription = asLongDescription
 
-            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
 
-            If lrDictionaryEntry IsNot Nothing Then
-                lrDictionaryEntry.LongDescription = asLongDescription
-                lrDictionaryEntry.isDirty = True
-                Call lrDictionaryEntry.Save()
-            End If
+                If lrDictionaryEntry IsNot Nothing Then
+                    lrDictionaryEntry.LongDescription = asLongDescription
+                    lrDictionaryEntry.isDirty = True
+                    Call lrDictionaryEntry.Save()
+                End If
 
 
-            RaiseEvent LongDescriptionChanged(asLongDescription)
+                RaiseEvent LongDescriptionChanged(asLongDescription)
 
-            Me.isDirty = True
-            Me.Model.MakeDirty(False, False)
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
         End Sub
 
         ''' <summary>
@@ -1641,20 +1651,31 @@ Namespace FBM
         End Sub
 
         Public Sub SetShortDescription(ByVal asShortDescription As String)
-            Me.ShortDescription = asShortDescription
 
-            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+            Try
+                Me.ShortDescription = asShortDescription
 
-            If lrDictionaryEntry IsNot Nothing Then
-                lrDictionaryEntry.ShortDescription = asShortDescription
-                lrDictionaryEntry.isDirty = True
-                Call lrDictionaryEntry.Save()
-            End If
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
 
-            RaiseEvent ShortDescriptionChanged(asShortDescription)
+                If lrDictionaryEntry IsNot Nothing Then
+                    lrDictionaryEntry.ShortDescription = asShortDescription
+                    lrDictionaryEntry.isDirty = True
+                    Call lrDictionaryEntry.Save()
+                End If
 
-            Me.isDirty = True
-            Me.Model.MakeDirty(False, False)
+                RaiseEvent ShortDescriptionChanged(asShortDescription)
+
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
         End Sub
 
         Public Function SwitchConcept(ByVal arNewConcept As Concept, ByVal aiConceptType As pcenumConceptType) As FBM.DictionaryEntry

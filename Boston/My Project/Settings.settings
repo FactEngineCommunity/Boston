@@ -251,5 +251,8 @@
     <Setting Name="BostonServerPortNumber" Type="System.String" Scope="User">
       <Value Profile="(Default)">8080</Value>
     </Setting>
+    <Setting Name="BostonServerIPAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

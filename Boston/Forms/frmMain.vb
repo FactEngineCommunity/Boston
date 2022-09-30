@@ -48,7 +48,8 @@ Public Class frmMain
     'NB See method InitialiseClient
     'NB See method Private prDubplexServiceClient 
     'NB See Main.Designer  Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-    Private ServiceEndpointUri As String = "http://localhost:" & My.Settings.BostonServerPortNumber & "/WCFServices/DuplexService"
+    'http://localhost
+    Private ServiceEndpointUri As String = My.Settings.BostonServerIPAddress & ":" & My.Settings.BostonServerPortNumber & "/WCFServices/DuplexService"
 
     Private Sub frm_main_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -5062,6 +5063,8 @@ SaveModel:
             Me.TimerNotifications.Stop()
             Exit Sub
         End If
+
+        If prApplication.User Is Nothing Then Exit Sub
 
         If Me.zfrmNotifications Is Nothing Then
 

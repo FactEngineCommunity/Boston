@@ -53,6 +53,7 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemSelectionAddEntity = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemSelectionAddValueType = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AsGeneralConceptToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.ContextMenuStripTextboxSelection.SuspendLayout()
@@ -223,13 +224,13 @@ Partial Class frmKeywordExtraction
         'ToolStripMenuItemAddAsEntityType
         '
         Me.ToolStripMenuItemAddAsEntityType.Name = "ToolStripMenuItemAddAsEntityType"
-        Me.ToolStripMenuItemAddAsEntityType.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemAddAsEntityType.Size = New System.Drawing.Size(154, 22)
         Me.ToolStripMenuItemAddAsEntityType.Text = "...as Entity Type"
         '
         'ToolStripMenuItemAddAsValueType
         '
         Me.ToolStripMenuItemAddAsValueType.Name = "ToolStripMenuItemAddAsValueType"
-        Me.ToolStripMenuItemAddAsValueType.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemAddAsValueType.Size = New System.Drawing.Size(154, 22)
         Me.ToolStripMenuItemAddAsValueType.Text = "...as Value Type"
         '
         'ToolStripMenuItemViewInORMVerbaliser
@@ -277,7 +278,7 @@ Partial Class frmKeywordExtraction
         '
         'ToolStripMenuItem1
         '
-        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemSelectionAddEntity, Me.ToolStripMenuItemSelectionAddValueType})
+        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemSelectionAddEntity, Me.ToolStripMenuItemSelectionAddValueType, Me.AsGeneralConceptToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItem1.Text = "&Add to Model"
@@ -285,14 +286,20 @@ Partial Class frmKeywordExtraction
         'ToolStripMenuItemSelectionAddEntity
         '
         Me.ToolStripMenuItemSelectionAddEntity.Name = "ToolStripMenuItemSelectionAddEntity"
-        Me.ToolStripMenuItemSelectionAddEntity.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItemSelectionAddEntity.Text = "...as Entity Type"
+        Me.ToolStripMenuItemSelectionAddEntity.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemSelectionAddEntity.Text = "...as &Entity Type"
         '
         'ToolStripMenuItemSelectionAddValueType
         '
         Me.ToolStripMenuItemSelectionAddValueType.Name = "ToolStripMenuItemSelectionAddValueType"
-        Me.ToolStripMenuItemSelectionAddValueType.Size = New System.Drawing.Size(180, 22)
-        Me.ToolStripMenuItemSelectionAddValueType.Text = "...as Value Type"
+        Me.ToolStripMenuItemSelectionAddValueType.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemSelectionAddValueType.Text = "...as &Value Type"
+        '
+        'AsGeneralConceptToolStripMenuItem
+        '
+        Me.AsGeneralConceptToolStripMenuItem.Name = "AsGeneralConceptToolStripMenuItem"
+        Me.AsGeneralConceptToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
+        Me.AsGeneralConceptToolStripMenuItem.Text = "...as &General Concept"
         '
         'frmKeywordExtraction
         '
@@ -324,7 +331,7 @@ Partial Class frmKeywordExtraction
 
     End Sub
 
-    Private WithEvents HelpButton As Button
+    Private Shadows WithEvents HelpButton As Button
     Private WithEvents KeywordExtractionNormalButton As Button
     Private WithEvents SaveButton As Button
     Private WithEvents progressBar1 As ProgressBar
@@ -354,4 +361,5 @@ Partial Class frmKeywordExtraction
     Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemSelectionAddEntity As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemSelectionAddValueType As ToolStripMenuItem
+    Friend WithEvents AsGeneralConceptToolStripMenuItem As ToolStripMenuItem
 End Class

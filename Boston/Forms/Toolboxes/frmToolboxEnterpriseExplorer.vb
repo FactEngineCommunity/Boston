@@ -1359,7 +1359,7 @@ Public Class frmToolboxEnterpriseExplorer
             Me.zbDraggingOver = True
 
             'Check that there is a TreeNode being dragged 
-            If e.Data.GetDataPresent("System.Windows.Forms.TreeNode", True) Then
+            If e.Data.GetDataPresent("Boston.cTreeNode", True) Then
             Else
                 Exit Sub
             End If
@@ -3989,31 +3989,34 @@ Public Class frmToolboxEnterpriseExplorer
 
                 '----------------------------------------------------------------------------
                 'Get the User Permissions for the Project
-                If Me.ComboBoxProject.SelectedItem.Tag.Id = "MyPersonalModels" Then
-                    prApplication.User.ProjectPermission.Clear()
-                    Dim lrPermission As New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.FullRights)
-                    prApplication.User.ProjectPermission.Add(lrPermission)
+                If prApplication.User IsNot Nothing Then
+                    If Me.ComboBoxProject.SelectedItem.Tag.Id = "MyPersonalModels" Then
+                        prApplication.User.ProjectPermission.Clear()
+                        Dim lrPermission As New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.FullRights)
+                        prApplication.User.ProjectPermission.Add(lrPermission)
 
-                    lrPermission = New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.Create)
-                    prApplication.User.ProjectPermission.Add(lrPermission)
+                        lrPermission = New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.Create)
+                        prApplication.User.ProjectPermission.Add(lrPermission)
 
-                    lrPermission = New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.Read)
-                    prApplication.User.ProjectPermission.Add(lrPermission)
+                        lrPermission = New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.Read)
+                        prApplication.User.ProjectPermission.Add(lrPermission)
 
-                    lrPermission = New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.Alter)
-                    prApplication.User.ProjectPermission.Add(lrPermission)
-                Else
-                    Call prApplication.User.getProjectPermissions(lrProject)
+                        lrPermission = New ClientServer.Permission(lrProject, pcenumPermissionClass.User, pcenumPermission.Alter)
+                        prApplication.User.ProjectPermission.Add(lrPermission)
+                    Else
+                        Call prApplication.User.getProjectPermissions(lrProject)
+                    End If
                 End If
 
                 '---------------------------------------------------------------------------
                 'Load the Models for the Project
-                If Me.ComboBoxProject.SelectedItem.Tag.Id = "MyPersonalModels" Then
+                If Me.ComboBoxProject.SelectedItem.Tag.Id = "MyPersonalModels" And prApplication.User IsNot Nothing Then
                     Call Me.LoadModels(prApplication.User.Id, Nothing)
                 Else
                     Me.zsNamespaceId = Me.ComboBoxNamespace.SelectedItem.ItemData
                     Call Me.LoadModels(Nothing, Me.zsNamespaceId)
                 End If
+
 
                 If Me.TreeView.Nodes(0).Nodes.Count = 1 Then
                     Me.TreeView.Nodes(0).Expand()
@@ -4390,48 +4393,125 @@ Public Class frmToolboxEnterpriseExplorer
 
         If e.Effect = DragDropEffects.Copy Then
 
-            If e.Data.GetDataPresent("System.Windows.Forms.TreeNode", True) Then
+            If e.Data.GetDataPresent("Boston.cTreeNode", True) Then
 
-                Dim dropNode As TreeNode = CType(e.Data.GetData("System.Windows.Forms.TreeNode"), TreeNode)
+                Dim dropNode As TreeNode = CType(e.Data.GetData("Boston.cTreeNode"), TreeNode)
 
-                If dropNode.Tag.Tag.GetType Is GetType(FBM.Page) Then
+                Select Case dropNode.Tag.Tag.GetType
+                    Case Is = GetType(FBM.Model)
 
-                    Dim lrPage, lrNewPage As FBM.Page
-                    lrPage = dropNode.Tag.Tag
+                        Dim pt As Point = sender.PointToClient(New Point(e.X, e.Y))
+                        Dim DestinationNode As TreeNode = sender.GetNodeAt(pt)
 
-                    Select Case lrPage.Language
-                        Case Is = pcenumLanguage.EntityRelationshipDiagram,
-                                  pcenumLanguage.PropertyGraphSchema
-                            lsMessage = "You can only copy ORM Diagram Pages from one Model to another Model."
-                            MsgBox(lsMessage)
-                            Exit Sub
-                    End Select
+                        If DestinationNode.Tag.Tag.GetType Is GetType(FBM.Model) Then
 
-                    Dim pt As Point = sender.PointToClient(New Point(e.X, e.Y))
-                    Dim DestinationNode As TreeNode = sender.GetNodeAt(pt)
+                            Dim lrDragModel As FBM.Model = dropNode.Tag.Tag
+                            Dim lrDestinationModel As FBM.Model = DestinationNode.Tag.Tag
 
-                    If DestinationNode.Tag.Tag.GetType Is GetType(FBM.Model) Then
+                            If lrDragModel.ModelId <> lrDestinationModel.ModelId Then
 
-                        Dim lrModel As FBM.Model = DestinationNode.Tag.Tag
+                                If Not MsgBox("Are you sure you want to merge the Model with the selected Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                                    Exit Sub
+                                End If
 
-                        If lrPage.Model.ModelId <> lrModel.ModelId Then
+                                If Not lrDestinationModel.Loaded Then
+                                    Call lrDestinationModel.Load()
+                                End If
 
-                            If Not lrModel.Loaded Then
-                                Call lrModel.Load()
+#Region "Merge Models"
+                                Dim lrMergeValueType As FBM.ValueType
+                                For Each lrValueType In lrDragModel.ValueType.FindAll(Function(x) Not x.IsMDAModelElement)
+                                    If lrDestinationModel.GetModelObjectByName(lrValueType.Id, True,, False) Is Nothing Then
+                                        lrMergeValueType = lrValueType.Clone(lrDestinationModel, False, False)
+                                        lrDestinationModel.AddValueType(lrMergeValueType, True, True, Nothing, True)
+                                    End If
+                                Next
+
+                                Dim lrMergeEntityType As FBM.EntityType
+                                For Each lrEntityType In lrDragModel.EntityType.FindAll(Function(x) Not x.IsMDAModelElement)
+                                    If lrDestinationModel.GetModelObjectByName(lrEntityType.Id, True,, False) Is Nothing Then
+                                        lrMergeEntityType = lrEntityType.Clone(lrDestinationModel, False, False)
+                                        lrDestinationModel.AddEntityType(lrMergeEntityType, True, True, Nothing, True)
+                                    End If
+                                Next
+
+                                Dim lrMergeFactType As FBM.FactType
+                                For Each lrFactType In lrDragModel.FactType.FindAll(Function(x) Not x.IsMDAModelElement)
+                                    If lrDestinationModel.GetModelObjectByName(lrFactType.Id, True,, False) Is Nothing Then
+                                        lrMergeFactType = lrFactType.Clone(lrDestinationModel, False, False)
+                                        lrDestinationModel.AddFactType(lrMergeFactType, True, True, Nothing)
+                                    End If
+                                Next
+
+                                Dim lrMergeRoleConstraint As FBM.RoleConstraint
+                                For Each lrRoleConstraint In lrDragModel.RoleConstraint.FindAll(Function(x) Not x.IsMDAModelElement)
+                                    If lrDestinationModel.GetModelObjectByName(lrRoleConstraint.Id, True,, False) Is Nothing Then
+                                        lrMergeRoleConstraint = lrRoleConstraint.Clone(lrDestinationModel, False, False)
+                                        lrDestinationModel.AddRoleConstraint(lrMergeRoleConstraint, True, True, Nothing, False, Nothing, False)
+                                    End If
+                                Next
+
+                                For Each lrGeneralConceptDictionaryEntry In lrDragModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+
+                                    Dim lrNewGeneralConceptDictionaryEntry = lrGeneralConceptDictionaryEntry.Clone(lrDestinationModel)
+                                    Call lrDragModel.AddModelDictionaryEntry(lrNewGeneralConceptDictionaryEntry, True, True, False, False, False, True, False, False)
+
+                                Next
+#End Region
+
+                            Else
+                                MsgBox("You can't merge a Model with itself.")
+                                Exit Sub
                             End If
 
-                            lrPage.Name = lrModel.CreateUniquePageName(lrPage.Name, 0)
-
-                            lrNewPage = lrPage.Clone(lrModel, True, False, , True)
-                            lrModel.Page.Add(lrNewPage)
-                            Call lrModel.Save()
-
-                            Call Me.AddExistingPageToModel(lrNewPage, lrNewPage.Model, DestinationNode, True)
                         Else
-                            MsgBox("You cannot copy a Page to the Model that it belongs to.")
+                            MsgBox("You can only merge a Model with a Model. Drop on a Model.")
+                            Exit Sub
                         End If
-                    End If
-                End If
+
+                    Case Is = GetType(FBM.Page)
+
+                        If Not MsgBox("Are you sure you want to merge the Page with the selected Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                            Exit Sub
+                        End If
+
+                        Dim lrPage, lrNewPage As FBM.Page
+
+                        lrPage = dropNode.Tag.Tag
+
+                        Select Case lrPage.Language
+                            Case Is = pcenumLanguage.EntityRelationshipDiagram,
+                                      pcenumLanguage.PropertyGraphSchema
+                                lsMessage = "You can only copy ORM Diagram Pages from one Model to another Model."
+                                MsgBox(lsMessage)
+                                Exit Sub
+                        End Select
+
+                        Dim pt As Point = sender.PointToClient(New Point(e.X, e.Y))
+                        Dim DestinationNode As TreeNode = sender.GetNodeAt(pt)
+
+                        If DestinationNode.Tag.Tag.GetType Is GetType(FBM.Model) Then
+
+                            Dim lrModel As FBM.Model = DestinationNode.Tag.Tag
+
+                            If lrPage.Model.ModelId <> lrModel.ModelId Then
+
+                                If Not lrModel.Loaded Then
+                                    Call lrModel.Load()
+                                End If
+
+                                lrPage.Name = lrModel.CreateUniquePageName(lrPage.Name, 0)
+
+                                lrNewPage = lrPage.Clone(lrModel, True, False, , True)
+                                lrModel.Page.Add(lrNewPage)
+                                Call lrModel.Save()
+
+                                Call Me.AddExistingPageToModel(lrNewPage, lrNewPage.Model, DestinationNode, True)
+                            Else
+                                MsgBox("You cannot copy a Page to the Model that it belongs to.")
+                            End If
+                        End If
+                End Select
 
             End If
         ElseIf e.Effect = DragDropEffects.Move Then

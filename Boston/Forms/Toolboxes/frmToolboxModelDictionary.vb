@@ -493,13 +493,31 @@ Public Class frmToolboxModelDictionary
             Dim lrORMToolboxVerbalisation As frmToolboxORMVerbalisation
             lrORMToolboxVerbalisation = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
 
+            Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
+            lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
+
             Me.ToolStripStatusLabelRealisationsCount.Text = "0"
             Me.ToolStripStatusLabelModelElementTypeCount.Text = "0"
 
             If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
 
             Select Case e.Node.Tag.GetType.ToString
+                Case Is = GetType(FBM.DictionaryEntry).ToString
+
+                    Dim lrModelElement As New FBM.ModelObject(e.Node.Tag.Symbol, pcenumConceptType.GeneralConcept)
+                    lrModelElement.Model = Me.zrLoadedModel
+                    Dim lrModelDictionaryEntry As FBM.DictionaryEntry = e.Node.Tag
+                    lrModelElement.ShortDescription = lrModelDictionaryEntry.ShortDescription
+                    lrModelElement.LongDescription = lrModelDictionaryEntry.LongDescription
+
+                    '--------------------------------------------
+                    'Show the Descriptions for the ModelElement
+                    '--------------------------------------------
+                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                        Call lrModelElementDescriptionsEditor.setDescriptions(lrModelElement)
+                    End If
                 Case Is = GetType(FBM.ValueType).ToString
+#Region "ValueType"
                     lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, e.Node.Tag.Id, pcenumConceptType.ValueType)
                     lrDictionaryEntry = Me.zrLoadedModel.AddModelDictionaryEntry(lrDictionaryEntry)
 
@@ -513,7 +531,15 @@ Public Class frmToolboxModelDictionary
                         lrORMToolboxVerbalisation.VerbaliseValueType(e.Node.Tag)
                     End If
 
+                    '--------------------------------------------
+                    'Show the Descriptions for the ModelElement
+                    '--------------------------------------------
+                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                        Call lrModelElementDescriptionsEditor.setDescriptions(e.Node.Tag)
+                    End If
+#End Region
                 Case Is = GetType(FBM.EntityType).ToString
+#Region "EntityType"
                     lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, e.Node.Tag.Id, pcenumConceptType.EntityType)
                     lrDictionaryEntry = Me.zrLoadedModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
 
@@ -526,7 +552,16 @@ Public Class frmToolboxModelDictionary
                     If IsSomething(lrORMToolboxVerbalisation) Then
                         lrORMToolboxVerbalisation.VerbaliseEntityType(e.Node.Tag)
                     End If
+
+                    '--------------------------------------------
+                    'Show the Descriptions for the ModelElement
+                    '--------------------------------------------
+                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                        Call lrModelElementDescriptionsEditor.setDescriptions(e.Node.Tag)
+                    End If
+#End Region
                 Case Is = GetType(FBM.FactType).ToString
+#Region "FactType"
                     '--------------------------------------------------------------
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
@@ -575,6 +610,14 @@ Public Class frmToolboxModelDictionary
                         End If
                     End If
 
+                    '--------------------------------------------
+                    'Show the Descriptions for the ModelElement
+                    '--------------------------------------------
+                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                        Call lrModelElementDescriptionsEditor.setDescriptions(e.Node.Tag)
+                    End If
+
+#End Region
                 Case Is = GetType(RDS.Column).ToString
                     If IsSomething(lrORMToolboxVerbalisation) Then
                         lrORMToolboxVerbalisation.VerbaliseColumn(e.Node.Tag)

@@ -109,6 +109,11 @@ Public Module tableClientServerInvitation
         Dim larInvitation As New List(Of ClientServer.Invitation)
 
         Try
+            'CodeSafe
+            If arUser Is Nothing Then
+                Return larInvitation
+            End If
+
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
 

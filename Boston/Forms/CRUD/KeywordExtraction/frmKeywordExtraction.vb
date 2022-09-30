@@ -486,6 +486,7 @@ Public Class frmKeywordExtraction
 			KeywordExtractionNormalButton.Enabled = True
 			StatusLabel.Text = ofd.FileName & " file open finish."
 
+#Region "Highlight existing ModelElements"
 			For Each lrModelElement In Me.zrModel.getModelObjects
 				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.RoyalBlue)
 			Next
@@ -501,6 +502,11 @@ Public Class frmKeywordExtraction
 				Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
 			Next
 
+			For Each lrModelDictionaryEntry In Me.zrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+				Call Me.HighlightText(Me.TextRichTextBox, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
+			Next
+#End Region
+
 		End If
 
 	End Sub
@@ -511,10 +517,10 @@ Public Class frmKeywordExtraction
 		Dim index As Integer = 0
 		Dim s_start As Integer = myRtb.SelectionStart
 		Dim startIndex As Integer = 0
-
+		Dim lsAllText As String = LCase(myRtb.Text)
 
 		While index < myRtb.TextLength
-			index = myRtb.Text.IndexOf(word, startIndex)
+			index = lsAllText.IndexOf(LCase(word), startIndex)
 			If index > 0 And index < myRtb.TextLength - word.Length Then
 				myRtb.[Select](index, word.Length)
 				myRtb.SelectionColor = color
@@ -735,8 +741,18 @@ Public Class frmKeywordExtraction
 
 	Private Sub ToolStripMenuItemSelectionAddEntity_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemSelectionAddEntity.Click
 
+		Dim lsMessage As String
+
 		Try
 			If Me.TextRichTextBox.SelectionLength > 0 Then
+
+				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
+
+				If Me.zrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
+					lsMessage = lsModelElementName & " is already in the model."
+					MsgBox(lsMessage)
+					Exit Sub
+				End If
 
 				Dim lsEntityTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
 				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
@@ -778,7 +794,6 @@ Public Class frmKeywordExtraction
 			End If
 
 		Catch ex As Exception
-			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -790,32 +805,87 @@ Public Class frmKeywordExtraction
 
 	Private Sub ToolStripMenuItemSelectionAddValueType_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemSelectionAddValueType.Click
 
+		Dim lsMessage As String
+
 		Try
-			Dim lsValueTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
-			lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+			If Me.TextRichTextBox.SelectionLength > 0 Then
 
-			Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
-			Dim liDataTypeLength As Integer = 50
-			Dim liDataTypePrecision As Integer = 0
+				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
 
-			Dim lrValueType As FBM.ValueType
-			lrValueType = Me.zrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
+				If Me.zrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
+					lsMessage = lsModelElementName & " is already in the model."
+					MsgBox(lsMessage)
+					Exit Sub
+				End If
 
-			Me.TextRichTextBox.SelectionColor = Color.DarkSeaGreen
 
-			'-------------------------------------------------------
-			'ORM Verbalisation
-			'-------------------------------------------------------
-			Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
-			lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
 
-			If IsSomething(lrToolboxForm) Then
-				lrToolboxForm.zrModel = Me.zrModel
-				Call lrToolboxForm.verbaliseModelElement(lrValueType)
+				Dim lsValueTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
+				lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+
+				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+				Dim liDataTypeLength As Integer = 50
+				Dim liDataTypePrecision As Integer = 0
+
+				Dim lrValueType As FBM.ValueType
+				lrValueType = Me.zrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+				Me.TextRichTextBox.SelectionColor = Color.DarkSeaGreen
+
+				'-------------------------------------------------------
+				'ORM Verbalisation
+				'-------------------------------------------------------
+				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+
+				If IsSomething(lrToolboxForm) Then
+					lrToolboxForm.zrModel = Me.zrModel
+					Call lrToolboxForm.verbaliseModelElement(lrValueType)
+				End If
+
 			End If
 
 		Catch ex As Exception
-			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub AsGeneralConceptToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AsGeneralConceptToolStripMenuItem.Click
+
+		Dim lsMessage As String
+		Try
+
+			If Me.TextRichTextBox.SelectionLength > 0 Then
+
+				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
+
+				Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.zrModel, lsModelElementName, pcenumConceptType.GeneralConcept)
+
+				If Me.zrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+
+					lrDictionaryEntry = Me.zrModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+
+					If lrDictionaryEntry.isGeneralConcept Then
+						MsgBox(lsModelElementName & " is already a General Concept within the Model.")
+						Exit Sub
+					Else
+						lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
+						Me.zrModel.MakeDirty(False, False)
+					End If
+				Else
+					lrDictionaryEntry = Me.zrModel.AddModelDictionaryEntry(lrDictionaryEntry, False, False,,,, True)
+				End If
+
+				Me.TextRichTextBox.SelectionColor = Color.DarkOrange
+
+			End If
+
+		Catch ex As Exception
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
