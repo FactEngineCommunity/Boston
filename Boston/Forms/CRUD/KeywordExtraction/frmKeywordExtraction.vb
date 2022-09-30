@@ -244,6 +244,7 @@ Public Class frmKeywordExtraction
 	End Sub
 
 	Private Sub SaveButton_Click(sender As Object, e As EventArgs) Handles SaveButton.Click
+
 		Dim save As String()
 		Dim WordsNum As Integer = 0
 		For i As Integer = 0 To MyData.WordsFre.Length - 1
@@ -263,6 +264,7 @@ Public Class frmKeywordExtraction
 			Dim encode As Encoding = Encoding.GetEncoding("GB2312")
 			File.WriteAllLines(sfd.FileName, save)
 		End If
+
 	End Sub
 
 	Private Sub OpenButton()
@@ -437,7 +439,7 @@ Public Class frmKeywordExtraction
 	End Sub
 
 	Private Sub TextRichTextBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextRichTextBox.KeyPress
-		e.Handled = True
+		'e.Handled = True
 	End Sub
 
 	Private Sub ResultListView_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles ResultListView.ColumnClick
@@ -483,9 +485,50 @@ Public Class frmKeywordExtraction
 			KeywordExtractionMaxButton.Enabled = True
 			KeywordExtractionNormalButton.Enabled = True
 			StatusLabel.Text = ofd.FileName & " file open finish."
+
+			For Each lrModelElement In Me.zrModel.getModelObjects
+				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.RoyalBlue)
+			Next
+			For Each lrModelElement In Me.zrModel.ValueType
+				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.DarkGreen)
+			Next
+
+			Dim lasValueConstraint = From ValueType In Me.zrModel.ValueType
+									 From ValueConstraint In ValueType.ValueConstraint
+									 Select ValueConstraint
+
+			For Each lsValueConstraint In lasValueConstraint
+				Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
+			Next
+
 		End If
 
 	End Sub
+
+	Public  Sub HighlightText(ByVal myRtb As RichTextBox, ByVal word As String, ByVal color As Color)
+
+		If word = String.Empty Then Return
+		Dim index As Integer = 0
+		Dim s_start As Integer = myRtb.SelectionStart
+		Dim startIndex As Integer = 0
+
+
+		While index < myRtb.TextLength
+			index = myRtb.Text.IndexOf(word, startIndex)
+			If index > 0 And index < myRtb.TextLength - word.Length Then
+				myRtb.[Select](index, word.Length)
+				myRtb.SelectionColor = color
+				startIndex = index + word.Length
+			Else
+				Exit While
+			End If
+		End While
+
+		myRtb.SelectionStart = s_start
+		myRtb.SelectionLength = 0
+		myRtb.SelectionColor = Color.Black
+	End Sub
+
 
 	Private Sub ResultListView_MouseDown(sender As Object, e As MouseEventArgs) Handles ResultListView.MouseDown
 
@@ -591,7 +634,12 @@ Public Class frmKeywordExtraction
 	Private Sub TextRichTextBox_MouseDown(sender As Object, e As MouseEventArgs) Handles TextRichTextBox.MouseDown
 
 		Try
-			Me.TextRichTextBox.ContextMenuStrip = Me.ContextMenuStripTextbox
+			If Me.TextRichTextBox.SelectionLength > 0 Then
+				Me.TextRichTextBox.ContextMenuStrip = Me.ContextMenuStripTextboxSelection
+			Else
+				Me.TextRichTextBox.ContextMenuStrip = Me.ContextMenuStripTextbox
+			End If
+
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -681,6 +729,98 @@ Public Class frmKeywordExtraction
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
 			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItemSelectionAddEntity_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemSelectionAddEntity.Click
+
+		Try
+			If Me.TextRichTextBox.SelectionLength > 0 Then
+
+				Dim lsEntityTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
+				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
+
+				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+				Dim liDataTypeLength As Integer = 50
+				Dim liDataTypePrecision As Integer = 0
+
+				Dim lrEntityType As FBM.EntityType
+				lrEntityType = Me.zrModel.CreateEntityType(lsEntityTypeName, True, True)
+
+				If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+
+					Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode, False, Nothing, True, liDataType, False, False)
+
+					If lrEntityType.getDataType = pcenumORMDataType.DataTypeNotSet Then
+						Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType)
+					End If
+
+					Call lrEntityType.ReferenceModeValueType.SetDataTypeLength(liDataTypeLength)
+					Call lrEntityType.ReferenceModeValueType.SetDataTypePrecision(liDataTypePrecision)
+
+				End If
+
+				Me.TextRichTextBox.SelectionColor = Color.RoyalBlue
+
+				'-------------------------------------------------------
+				'ORM Verbalisation
+				'-------------------------------------------------------
+				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+
+				If IsSomething(lrToolboxForm) Then
+					lrToolboxForm.zrModel = Me.zrModel
+					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
+				End If
+
+
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItemSelectionAddValueType_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemSelectionAddValueType.Click
+
+		Try
+			Dim lsValueTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
+			lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+
+			Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+			Dim liDataTypeLength As Integer = 50
+			Dim liDataTypePrecision As Integer = 0
+
+			Dim lrValueType As FBM.ValueType
+			lrValueType = Me.zrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+			Me.TextRichTextBox.SelectionColor = Color.DarkSeaGreen
+
+			'-------------------------------------------------------
+			'ORM Verbalisation
+			'-------------------------------------------------------
+			Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
+			lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+
+			If IsSomething(lrToolboxForm) Then
+				lrToolboxForm.zrModel = Me.zrModel
+				Call lrToolboxForm.verbaliseModelElement(lrValueType)
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub

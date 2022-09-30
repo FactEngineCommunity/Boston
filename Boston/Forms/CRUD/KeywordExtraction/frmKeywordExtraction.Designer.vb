@@ -49,8 +49,13 @@ Partial Class frmKeywordExtraction
         Me.FindToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.LabelModelName = New System.Windows.Forms.Label()
+        Me.ContextMenuStripTextboxSelection = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemSelectionAddEntity = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemSelectionAddValueType = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
+        Me.ContextMenuStripTextboxSelection.SuspendLayout()
         Me.SuspendLayout()
         '
         'HelpButton
@@ -218,13 +223,13 @@ Partial Class frmKeywordExtraction
         'ToolStripMenuItemAddAsEntityType
         '
         Me.ToolStripMenuItemAddAsEntityType.Name = "ToolStripMenuItemAddAsEntityType"
-        Me.ToolStripMenuItemAddAsEntityType.Size = New System.Drawing.Size(154, 22)
+        Me.ToolStripMenuItemAddAsEntityType.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemAddAsEntityType.Text = "...as Entity Type"
         '
         'ToolStripMenuItemAddAsValueType
         '
         Me.ToolStripMenuItemAddAsValueType.Name = "ToolStripMenuItemAddAsValueType"
-        Me.ToolStripMenuItemAddAsValueType.Size = New System.Drawing.Size(154, 22)
+        Me.ToolStripMenuItemAddAsValueType.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemAddAsValueType.Text = "...as Value Type"
         '
         'ToolStripMenuItemViewInORMVerbaliser
@@ -264,6 +269,31 @@ Partial Class frmKeywordExtraction
         Me.LabelModelName.TabIndex = 54
         Me.LabelModelName.Text = "LabelModelName"
         '
+        'ContextMenuStripTextboxSelection
+        '
+        Me.ContextMenuStripTextboxSelection.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1})
+        Me.ContextMenuStripTextboxSelection.Name = "ContextMenuStripTextboxSelection"
+        Me.ContextMenuStripTextboxSelection.Size = New System.Drawing.Size(181, 48)
+        '
+        'ToolStripMenuItem1
+        '
+        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemSelectionAddEntity, Me.ToolStripMenuItemSelectionAddValueType})
+        Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem1.Text = "&Add to Model"
+        '
+        'ToolStripMenuItemSelectionAddEntity
+        '
+        Me.ToolStripMenuItemSelectionAddEntity.Name = "ToolStripMenuItemSelectionAddEntity"
+        Me.ToolStripMenuItemSelectionAddEntity.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemSelectionAddEntity.Text = "...as Entity Type"
+        '
+        'ToolStripMenuItemSelectionAddValueType
+        '
+        Me.ToolStripMenuItemSelectionAddValueType.Name = "ToolStripMenuItemSelectionAddValueType"
+        Me.ToolStripMenuItemSelectionAddValueType.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItemSelectionAddValueType.Text = "...as Value Type"
+        '
         'frmKeywordExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -288,6 +318,7 @@ Partial Class frmKeywordExtraction
         Me.Text = "Keyword Extraction (beta)"
         Me.ContextMenuStripKeyword.ResumeLayout(False)
         Me.ContextMenuStripTextbox.ResumeLayout(False)
+        Me.ContextMenuStripTextboxSelection.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -319,4 +350,8 @@ Partial Class frmKeywordExtraction
     Friend WithEvents FindToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LabelPromptModel As Label
     Friend WithEvents LabelModelName As Label
+    Friend WithEvents ContextMenuStripTextboxSelection As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemSelectionAddEntity As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemSelectionAddValueType As ToolStripMenuItem
 End Class

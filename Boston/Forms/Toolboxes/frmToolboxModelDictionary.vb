@@ -1188,13 +1188,28 @@ Public Class frmToolboxModelDictionary
 
     Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
 
-        Dim liCurrentLanguage As pcenumLanguage = Me.ComboBoxView.SelectedItem.ItemData
+        Dim liCurrentLanguage As pcenumLanguage = pcenumLanguage.ORMModel
 
-        If IsSomething(prApplication.WorkingPage) Then
-            Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
-        Else
-            Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
-        End If
+        Try
+            liCurrentLanguage = Me.ComboBoxView.SelectedItem.ItemData
+        Catch ex As Exception
+            liCurrentLanguage = pcenumLanguage.ORMModel
+        End Try
+
+        Try
+            If IsSomething(prApplication.WorkingPage) Then
+                Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
+            Else
+                Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
