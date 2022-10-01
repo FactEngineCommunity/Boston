@@ -54,6 +54,7 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemSelectionAddEntity = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemSelectionAddValueType = New System.Windows.Forms.ToolStripMenuItem()
         Me.AsGeneralConceptToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.ContextMenuStripTextboxSelection.SuspendLayout()
@@ -241,15 +242,15 @@ Partial Class frmKeywordExtraction
         '
         'ContextMenuStripTextbox
         '
-        Me.ContextMenuStripTextbox.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FindToolStripMenuItem})
+        Me.ContextMenuStripTextbox.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FindToolStripMenuItem, Me.SaveAsToolStripMenuItem})
         Me.ContextMenuStripTextbox.Name = "ContextMenuStripTextbox"
-        Me.ContextMenuStripTextbox.Size = New System.Drawing.Size(138, 26)
+        Me.ContextMenuStripTextbox.Size = New System.Drawing.Size(181, 70)
         '
         'FindToolStripMenuItem
         '
         Me.FindToolStripMenuItem.Name = "FindToolStripMenuItem"
         Me.FindToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(137, 22)
+        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.FindToolStripMenuItem.Text = "&Find"
         '
         'LabelPromptModel
@@ -274,13 +275,13 @@ Partial Class frmKeywordExtraction
         '
         Me.ContextMenuStripTextboxSelection.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem1})
         Me.ContextMenuStripTextboxSelection.Name = "ContextMenuStripTextboxSelection"
-        Me.ContextMenuStripTextboxSelection.Size = New System.Drawing.Size(181, 48)
+        Me.ContextMenuStripTextboxSelection.Size = New System.Drawing.Size(148, 26)
         '
         'ToolStripMenuItem1
         '
         Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemSelectionAddEntity, Me.ToolStripMenuItemSelectionAddValueType, Me.AsGeneralConceptToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem1.Size = New System.Drawing.Size(147, 22)
         Me.ToolStripMenuItem1.Text = "&Add to Model"
         '
         'ToolStripMenuItemSelectionAddEntity
@@ -300,6 +301,12 @@ Partial Class frmKeywordExtraction
         Me.AsGeneralConceptToolStripMenuItem.Name = "AsGeneralConceptToolStripMenuItem"
         Me.AsGeneralConceptToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
         Me.AsGeneralConceptToolStripMenuItem.Text = "...as &General Concept"
+        '
+        'SaveAsToolStripMenuItem
+        '
+        Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
+        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.SaveAsToolStripMenuItem.Text = "Save as..."
         '
         'frmKeywordExtraction
         '
@@ -362,4 +369,5 @@ Partial Class frmKeywordExtraction
     Friend WithEvents ToolStripMenuItemSelectionAddEntity As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemSelectionAddValueType As ToolStripMenuItem
     Friend WithEvents AsGeneralConceptToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SaveAsToolStripMenuItem As ToolStripMenuItem
 End Class

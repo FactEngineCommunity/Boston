@@ -144,7 +144,7 @@ Namespace FBM
             End Get
             Set(ByVal value As List(Of FBM.DictionaryEntry))
                 Me._ModelDictionary = value
-                RaiseEvent ModelUpdated()
+                RaiseEvent ModelUpdated(Nothing)
             End Set
         End Property
 
@@ -442,7 +442,7 @@ Namespace FBM
         <NonSerialized()>
         Public Event StructureModified() 'Used, for example, to refresh the ModelDictionary toolbox. Used in leiu of making the model dirty and saving the entire model.
         <NonSerialized()>
-        Public Event ModelUpdated()
+        Public Event ModelUpdated(ByRef arModelElement As FBM.ModelObject)
         <NonSerialized()>
         Public Event ModelErrorsUpdated()
         <NonSerialized()>
@@ -4780,19 +4780,16 @@ Namespace FBM
 
         End Sub
 
-        Public Sub MakeDirty(Optional ByVal abGlobalBroadcast As Boolean = False, Optional abCheckForErrors As Boolean = True)
+        Public Sub MakeDirty(Optional ByVal abGlobalBroadcast As Boolean = False,
+                             Optional abCheckForErrors As Boolean = True,
+                             Optional abModelElement As FBM.ModelObject = Nothing)
 
             Try
 
                 Me.IsDirty = True
 
                 If abGlobalBroadcast Then
-                    RaiseEvent ModelUpdated()
-                Else
-                    '----------------------------
-                    'Default is GlobalBroadcast
-                    '----------------------------
-                    'RaiseEvent ModelUpdated()
+                    RaiseEvent ModelUpdated(abModelElement)
                 End If
 
                 If abCheckForErrors And Me.AllowCheckForErrors Then

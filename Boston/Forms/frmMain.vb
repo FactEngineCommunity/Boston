@@ -1606,7 +1606,7 @@ SkipRegistrationChecking:
 
         child.MdiParent = Me
 
-        child.zrModel = arModel
+        child.mrModel = arModel
 
         child.Show(Me.DockPanel)
 

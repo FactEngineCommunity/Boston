@@ -14,7 +14,7 @@ Imports System.Collections
 Public Class frmKeywordExtraction
 
 	Private lvwColumnSorter As ListViewColumnSorter
-	Public zrModel As FBM.Model
+	Public WithEvents mrModel As FBM.Model
 	Dim mfrmFindDialog As New frmTextboxFind()
 
 	''' <summary>
@@ -143,7 +143,7 @@ Public Class frmKeywordExtraction
 	Private Sub SetupForm()
 
 		Try
-			Me.LabelModelName.Text = Me.zrModel.Name
+			Me.LabelModelName.Text = Me.mrModel.Name
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -220,7 +220,7 @@ Public Class frmKeywordExtraction
 				lvi(i).SubItems(0).Text = (i + 1).ToString()
 				lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
 
-				If Me.zrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+				If Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
 					MyData.WordsFre(i).IsInModel = True
 					Dim loFont = New Font("Arial", 10, FontStyle.Bold)
 					lvi(i).SubItems(1).Font = loFont
@@ -329,7 +329,7 @@ Public Class frmKeywordExtraction
 				End If
 			Next
 
-			Dim lrModelElement = Me.zrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(word), True)
+			Dim lrModelElement = Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(word), True)
 			If lrModelElement IsNot Nothing Then
 				'-------------------------------------------------------
 				'ORM Verbalisation
@@ -337,7 +337,7 @@ Public Class frmKeywordExtraction
 				Dim lrToolboxForm As frmToolboxORMVerbalisation
 				lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
 				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.zrModel
+					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrModelElement)
 				End If
 
@@ -369,7 +369,7 @@ Public Class frmKeywordExtraction
 				g.DrawLine(p, x, Me.Size.Height - 80, x, Me.Size.Height - 20)
 			Next
 		End If
-    End Sub
+	End Sub
 
 
 	Private Sub DoWork_Normal()
@@ -407,7 +407,7 @@ Public Class frmKeywordExtraction
 					lvi(i).SubItems(0).Text = (i + 1).ToString()
 					lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
 
-					If Me.zrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+					If Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
 						MyData.WordsFre(i).IsInModel = True
 						Dim loFont = New Font("Arial", 10, FontStyle.Bold)
 						lvi(i).SubItems(1).Font = loFont
@@ -487,14 +487,15 @@ Public Class frmKeywordExtraction
 			StatusLabel.Text = ofd.FileName & " file open finish."
 
 #Region "Highlight existing ModelElements"
-			For Each lrModelElement In Me.zrModel.getModelObjects
+			For Each lrModelElement In Me.mrModel.getModelObjects
 				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.RoyalBlue)
 			Next
-			For Each lrModelElement In Me.zrModel.ValueType
+
+			For Each lrModelElement In Me.mrModel.ValueType
 				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.DarkGreen)
 			Next
 
-			Dim lasValueConstraint = From ValueType In Me.zrModel.ValueType
+			Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType
 									 From ValueConstraint In ValueType.ValueConstraint
 									 Select ValueConstraint
 
@@ -502,7 +503,7 @@ Public Class frmKeywordExtraction
 				Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
 			Next
 
-			For Each lrModelDictionaryEntry In Me.zrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+			For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
 				Call Me.HighlightText(Me.TextRichTextBox, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
 			Next
 #End Region
@@ -511,7 +512,7 @@ Public Class frmKeywordExtraction
 
 	End Sub
 
-	Public  Sub HighlightText(ByVal myRtb As RichTextBox, ByVal word As String, ByVal color As Color)
+	Public Sub HighlightText(ByVal myRtb As RichTextBox, ByVal word As String, ByVal color As Color)
 
 		If word = String.Empty Then Return
 		Dim index As Integer = 0
@@ -571,7 +572,7 @@ Public Class frmKeywordExtraction
 				Dim liDataTypePrecision As Integer = 0
 
 				Dim lrValueType As FBM.ValueType
-				lrValueType = Me.zrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
+				lrValueType = Me.mrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
 
 				MyData.WordsFre(liIndex).IsInModel = True
 				Dim loFont = New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
@@ -582,10 +583,10 @@ Public Class frmKeywordExtraction
 				'ORM Verbalisation
 				'-------------------------------------------------------
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
-				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
 				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.zrModel
+					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrValueType)
 				End If
 			End With
@@ -617,10 +618,10 @@ Public Class frmKeywordExtraction
 				'ORM Verbalisation
 				'-------------------------------------------------------
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
-				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
 				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.zrModel
+					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrModelElement)
 				End If
 			End With
@@ -695,7 +696,7 @@ Public Class frmKeywordExtraction
 				Dim liDataTypePrecision As Integer = 0
 
 				Dim lrEntityType As FBM.EntityType
-				lrEntityType = Me.zrModel.CreateEntityType(lsEntityTypeName, True, True)
+				lrEntityType = Me.mrModel.CreateEntityType(lsEntityTypeName, True, True)
 
 				If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
 
@@ -719,10 +720,10 @@ Public Class frmKeywordExtraction
 				'ORM Verbalisation
 				'-------------------------------------------------------
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
-				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
 				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.zrModel
+					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
 				End If
 			End With
@@ -748,7 +749,7 @@ Public Class frmKeywordExtraction
 
 				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
 
-				If Me.zrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
+				If Me.mrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
 					lsMessage = lsModelElementName & " is already in the model."
 					MsgBox(lsMessage)
 					Exit Sub
@@ -762,7 +763,7 @@ Public Class frmKeywordExtraction
 				Dim liDataTypePrecision As Integer = 0
 
 				Dim lrEntityType As FBM.EntityType
-				lrEntityType = Me.zrModel.CreateEntityType(lsEntityTypeName, True, True)
+				lrEntityType = Me.mrModel.CreateEntityType(lsEntityTypeName, True, True)
 
 				If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
 
@@ -783,10 +784,10 @@ Public Class frmKeywordExtraction
 				'ORM Verbalisation
 				'-------------------------------------------------------
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
-				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
 				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.zrModel
+					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
 				End If
 
@@ -812,7 +813,7 @@ Public Class frmKeywordExtraction
 
 				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
 
-				If Me.zrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
+				If Me.mrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
 					lsMessage = lsModelElementName & " is already in the model."
 					MsgBox(lsMessage)
 					Exit Sub
@@ -828,7 +829,7 @@ Public Class frmKeywordExtraction
 				Dim liDataTypePrecision As Integer = 0
 
 				Dim lrValueType As FBM.ValueType
-				lrValueType = Me.zrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
+				lrValueType = Me.mrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
 
 				Me.TextRichTextBox.SelectionColor = Color.DarkSeaGreen
 
@@ -836,10 +837,10 @@ Public Class frmKeywordExtraction
 				'ORM Verbalisation
 				'-------------------------------------------------------
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
-				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.zrModel, Me.DockPanel.ActivePane)
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
 				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.zrModel
+					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrValueType)
 				End If
 
@@ -864,21 +865,21 @@ Public Class frmKeywordExtraction
 
 				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
 
-				Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.zrModel, lsModelElementName, pcenumConceptType.GeneralConcept)
+				Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.mrModel, lsModelElementName, pcenumConceptType.GeneralConcept)
 
-				If Me.zrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+				If Me.mrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
 
-					lrDictionaryEntry = Me.zrModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+					lrDictionaryEntry = Me.mrModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
 
 					If lrDictionaryEntry.isGeneralConcept Then
 						MsgBox(lsModelElementName & " is already a General Concept within the Model.")
 						Exit Sub
 					Else
 						lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
-						Me.zrModel.MakeDirty(False, False)
+						Me.mrModel.MakeDirty(False, False)
 					End If
 				Else
-					lrDictionaryEntry = Me.zrModel.AddModelDictionaryEntry(lrDictionaryEntry, False, False,,,, True)
+					lrDictionaryEntry = Me.mrModel.AddModelDictionaryEntry(lrDictionaryEntry, False, False,,,, True)
 				End If
 
 				Me.TextRichTextBox.SelectionColor = Color.DarkOrange
@@ -886,6 +887,61 @@ Public Class frmKeywordExtraction
 			End If
 
 		Catch ex As Exception
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub SaveAsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SaveAsToolStripMenuItem.Click
+
+		Try
+			Dim sfd As New SaveFileDialog()
+			sfd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
+			If sfd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+
+				System.IO.File.WriteAllText(sfd.FileName, Me.TextRichTextBox.Text)
+
+			End If
+
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub mrModel_ModelUpdated(ByRef arModelElement As FBM.ModelObject) Handles mrModel.ModelUpdated
+
+		Try
+			If arModelElement IsNot Nothing Then
+				Select Case arModelElement.GetType
+					Case Is = GetType(FBM.ValueType)
+
+						Dim lrValueType As FBM.ValueType = arModelElement
+
+						Call Me.HighlightText(Me.TextRichTextBox, lrValueType.Id, Color.DarkGreen)
+
+						Dim lasValueConstraint = From ValueConstraint In lrValueType.ValueConstraint
+												 Select ValueConstraint
+
+						For Each lsValueConstraint In lasValueConstraint
+							Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
+						Next
+
+				End Select
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

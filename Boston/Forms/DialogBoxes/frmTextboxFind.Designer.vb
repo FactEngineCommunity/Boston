@@ -120,11 +120,10 @@ Partial Class frmTextboxFind
         Me.optUp.Text = "&Up"
         Me.optUp.UseVisualStyleBackColor = True
         '
-        'DlgFind
+        'frmTextboxFind
         '
         Me.AcceptButton = Me.btnFind
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(343, 86)
         Me.Controls.Add(Me.GroupBox1)
@@ -138,8 +137,9 @@ Partial Class frmTextboxFind
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "DlgFind"
+        Me.Name = "frmTextboxFind"
         Me.ShowInTaskbar = False
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Find"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()

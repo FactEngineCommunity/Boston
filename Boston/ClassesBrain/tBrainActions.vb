@@ -1433,8 +1433,9 @@ EndProcessing:
                     Else
                         Call lrValueType.AddValueConstraint(lsValueConstraintValue)
                     End If
-
                 Next
+
+                Call Me.Model.MakeDirty(True, False, lrValueType)
 
                 Me.send_data("Ok")
 
