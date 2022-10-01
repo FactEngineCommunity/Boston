@@ -30,10 +30,13 @@ Public Class frmToolboxModelDictionary
     Public Sub SetupForm()
 
         'Setup ComboboxView
-        'Object-Role Model - Model Elements
-        'Entity-Relation - Entities
-        'Property Graph - Node Types
-        'CMML - Common MetaModel Language
+        If Me.ComboBoxView.Items.Count = 0 Then
+            Me.ComboBoxView.Items.Add(New tComboboxItem(pcenumLanguage.ORMModel, "Object-Role Model - Model Elements"))
+            Me.ComboBoxView.Items.Add(New tComboboxItem(pcenumLanguage.EntityRelationshipDiagram, "Entity-Relation - Entities"))
+            Me.ComboBoxView.Items.Add(New tComboboxItem(pcenumLanguage.PropertyGraphSchema, "Property Graph - Node Types"))
+            Me.ComboBoxView.Items.Add(New tComboboxItem(pcenumLanguage.CMML, "CMML - Common MetaModel Language"))
+            Me.ComboBoxView.SelectedIndex = 0
+        End If
 
         If IsSomething(prApplication.WorkingPage) Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language)
@@ -85,16 +88,7 @@ Public Class frmToolboxModelDictionary
                 Me.LabelModelName.Text = Me.zrORMModel.Name
             End If
 
-            Dim liLanguage As pcenumLanguage = pcenumLanguage.ORMModel
-
-            Select Case Me.ComboBoxView.SelectedIndex
-                Case Is = 0
-                    liLanguage = pcenumLanguage.ORMModel
-                Case Is = 1
-                    liLanguage = pcenumLanguage.EntityRelationshipDiagram
-                Case Is = 2
-                    liLanguage = pcenumLanguage.PropertyGraphSchema
-            End Select
+            Dim liLanguage As pcenumLanguage = Me.ComboBoxView.SelectedItem.ItemData
 
             If ailanguage <> liLanguage Then
                 liLanguage = ailanguage
@@ -111,7 +105,7 @@ Public Class frmToolboxModelDictionary
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
                     Me.ComboBoxView.SelectedIndex = 2
-                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                Case Is = pcenumLanguage.CMML
                     Call Me.LoadCMMLModelDictionary()
                     Me.ComboBoxView.SelectedIndex = 3
             End Select
@@ -1240,11 +1234,8 @@ Public Class frmToolboxModelDictionary
         End Try
 
         Try
-            If IsSomething(prApplication.WorkingPage) Then
-                Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
-            Else
-                Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
-            End If
+            Call Me.LoadToolboxModelDictionary(liCurrentLanguage, True)
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1461,7 +1452,7 @@ Public Class frmToolboxModelDictionary
                 Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
                     Me.ComboBoxView.SelectedIndex = 2
-                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                Case Is = pcenumLanguage.CMML
                     Call Me.LoadCMMLModelDictionary()
                     Me.ComboBoxView.SelectedIndex = 3
             End Select
@@ -1530,16 +1521,15 @@ Public Class frmToolboxModelDictionary
 
         Try
             Call Me.TreeView1.Nodes.Clear()
-            Select Case Me.ComboBoxView.SelectedIndex
-                Case Is = 0
+            Select Case Me.ComboBoxView.SelectedItem.ItemData
+                Case Is = pcenumLanguage.ORMModel
                     Call Me.LoadORMModelDictionary(asSearchString)
-                Case Is = 1
+                Case Is = pcenumLanguage.EntityRelationshipDiagram
                     Call Me.LoadERDModelDictionary()
-                Case Is = 2
+                Case Is = pcenumLanguage.PropertyGraphSchema
                     Call Me.LoadPGSModelDictionary()
-                Case Is = pcenumLanguage.UMLUseCaseDiagram
+                Case Is = pcenumLanguage.CMML
                     Call Me.LoadCMMLModelDictionary()
-                    Me.ComboBoxView.SelectedIndex = 3
             End Select
 
         Catch ex As Exception
