@@ -1078,6 +1078,77 @@ Namespace FBM
 
         End Sub
 
+        Private Sub CreateDerivationTextShape()
+
+            Try
+                Dim loFactTypeDerivationTextShape As ShapeNode
+                Dim lsDerivationText As String = ""
+
+
+                If Me.FactType.IsManyTo1BinaryFactType Then
+                    '-----------------------------------------------------------------------------------------------
+                    'That's good, because needs to be at least that for Derived Fact Type.
+                    Dim lrRole As FBM.Role
+                    lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                    lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                    lsDerivationText &= vbCrLf & Me.DerivationText
+                Else
+                    lsDerivationText = "* " & Me.DerivationText
+                End If
+
+                Dim StringSize As New SizeF
+
+                StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize.Height += 2
+
+                If StringSize.Width > 70 Then
+                    StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
+                End If
+
+                loFactTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y + Me.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
+                loFactTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                loFactTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
+                loFactTypeDerivationTextShape.EnableStyledText = True
+                loFactTypeDerivationTextShape.Locked = False
+                loFactTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
+                loFactTypeDerivationTextShape.Text = lsDerivationText
+                Call loFactTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
+                loFactTypeDerivationTextShape.TextColor = Color.Black
+                loFactTypeDerivationTextShape.Transparent = True
+                loFactTypeDerivationTextShape.AllowIncomingLinks = False
+                loFactTypeDerivationTextShape.AllowOutgoingLinks = False
+                loFactTypeDerivationTextShape.ZTop()
+
+                If Me.FactTypeDerivationText Is Nothing Then
+                    Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
+                    Me.FactTypeDerivationText.InstanceNumber = Me.InstanceNumber
+                End If
+
+                Me.FactTypeDerivationText.Shape = loFactTypeDerivationTextShape
+                loFactTypeDerivationTextShape.Tag = Me.FactTypeDerivationText
+
+                If Me.FactTypeDerivationText.X = 0 Then Me.FactTypeDerivationText.X = Me.X
+                If Me.FactTypeDerivationText.Y = 0 Then Me.FactTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+
+                Me.FactTypeDerivationText.Shape.Move(Me.FactTypeDerivationText.X,
+                                                     Me.FactTypeDerivationText.Y)
+
+                Me.Page.Diagram.Nodes.Add(Me.FactTypeDerivationText.Shape)
+
+                Me.FactTypeDerivationText.Shape.Visible = Me.IsDerived
+                Call Me.FactTypeDerivationText.Shape.ZBottom()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Sub Delete()
             '--------------------------------------------------------------------------------
             'Deletes the FactTypeInstance from the database.
@@ -2750,19 +2821,35 @@ Namespace FBM
 
         Private Sub _FactType_DerivationTextChanged(asDerivationText As String) Handles _FactType.DerivationTextChanged
 
-            Me.DerivationText = asDerivationText
+            Try
 
-            If Me.FactTypeDerivationText Is Nothing Then
-                Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
-                Me.FactTypeDerivationText.X = Me.X
-                Me.FactTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+                Me.DerivationText = asDerivationText
 
-                If Me.Shape IsNot Nothing And Me.Page.Diagram IsNot Nothing Then
-                    Call Me.FactTypeDerivationText.displayAndAssociate()
+                If Me.FactTypeDerivationText Is Nothing Then
+
+                    Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
+                    Me.FactTypeDerivationText.X = Me.X
+                    Me.FactTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+
+                    If Me.Shape IsNot Nothing And Me.Page.Diagram IsNot Nothing Then
+                        Call Me.FactTypeDerivationText.displayAndAssociate()
+                    End If
+                Else
+                    If Me.FactTypeDerivationText.Shape Is Nothing Then
+                        Call Me.CreateDerivationTextShape()
+                    Else
+                        Me.FactTypeDerivationText.Shape.Text = asDerivationText
+                    End If
                 End If
-            Else
-                Me.FactTypeDerivationText.Shape.Text = asDerivationText
-            End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

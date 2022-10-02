@@ -63,52 +63,61 @@ Namespace FBM
             Dim lsDerivationText As String
             Dim loFactTypeDerivationTextShape As ShapeNode
 
-            If Me.FactType.IsManyTo1BinaryFactType Then
-                '-----------------------------------------------------------------------------------------------
-                'That's good, because needs to be at least that for Derived Fact Type.
-                Dim lrRole As FBM.Role
-                lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
-                lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
-                lsDerivationText &= vbCrLf & Me.FactType.DerivationText
-            Else
-                lsDerivationText = "* " & Me.FactType.DerivationText
-            End If
+            Try
+                If Me.FactType.IsManyTo1BinaryFactType Then
+                    '-----------------------------------------------------------------------------------------------
+                    'That's good, because needs to be at least that for Derived Fact Type.
+                    Dim lrRole As FBM.Role
+                    lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                    lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                    lsDerivationText &= vbCrLf & Me.FactType.DerivationText
+                Else
+                    lsDerivationText = "* " & Me.FactType.DerivationText
+                End If
 
-            StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-            StringSize.Height += 2
+                StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize.Height += 2
 
-            If StringSize.Width > 70 Then
-                StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
-            End If
+                If StringSize.Width > 70 Then
+                    StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
+                End If
 
-            loFactTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y + Me.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
-            loFactTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
-            loFactTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
-            loFactTypeDerivationTextShape.EnableStyledText = True
-            loFactTypeDerivationTextShape.Locked = False
-            loFactTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
-            loFactTypeDerivationTextShape.Text = lsDerivationText
-            Call loFactTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
-            loFactTypeDerivationTextShape.TextColor = Color.Black
-            loFactTypeDerivationTextShape.Transparent = True
-            loFactTypeDerivationTextShape.AllowIncomingLinks = False
-            loFactTypeDerivationTextShape.AllowOutgoingLinks = False
-            loFactTypeDerivationTextShape.ZTop()
+                loFactTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.FactTypeInstance.X, Me.FactTypeInstance.Y + Me.FactTypeInstance.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
+                loFactTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                loFactTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
+                loFactTypeDerivationTextShape.EnableStyledText = True
+                loFactTypeDerivationTextShape.Locked = False
+                loFactTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
+                loFactTypeDerivationTextShape.Text = lsDerivationText
+                Call loFactTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
+                loFactTypeDerivationTextShape.TextColor = Color.Black
+                loFactTypeDerivationTextShape.Transparent = True
+                loFactTypeDerivationTextShape.AllowIncomingLinks = False
+                loFactTypeDerivationTextShape.AllowOutgoingLinks = False
+                loFactTypeDerivationTextShape.ZTop()
 
-            'Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
-            Me.Shape = loFactTypeDerivationTextShape
-            loFactTypeDerivationTextShape.Tag = Me
+                'Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
+                Me.Shape = loFactTypeDerivationTextShape
+                loFactTypeDerivationTextShape.Tag = Me
 
-            If Me.X = 0 Then Me.X = Me.X
-            If Me.Y = 0 Then Me.Y = Me.Y + Me.Shape.Bounds.Height + 5
+                If Me.X = 0 Then Me.X = Me.X
+                If Me.Y = 0 Then Me.Y = Me.Y + Me.Shape.Bounds.Height + 5
 
-            Me.Shape.Move(Me.X, Me.Y)
+                Me.Shape.Move(Me.X, Me.Y)
 
-            Me.Page.Diagram.Nodes.Add(Me.Shape)
+                Me.Page.Diagram.Nodes.Add(Me.Shape)
 
-            Me.Shape.Visible = Me.FactType.IsDerived
-            Call Me.Shape.ZBottom()
+                Me.Shape.Visible = Me.FactType.IsDerived
+                Call Me.Shape.ZBottom()
 
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

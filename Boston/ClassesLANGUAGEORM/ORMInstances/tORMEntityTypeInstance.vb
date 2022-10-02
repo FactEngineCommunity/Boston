@@ -2332,12 +2332,14 @@ MoveOn:
                             'The ValueTypeInstance is already on the Page.
                             '-----------------------------------------------------------------------------------------------
                             Me.ReferenceModeValueType = Me.Page.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
-                            Me.ReferenceModeValueType.Shape.Visible = False
+                            If Me.ReferenceModeValueType.Shape IsNot Nothing Then
+                                Me.ReferenceModeValueType.Shape.Visible = False
+                            End If
                         Else
-                            '----------------------------------------
-                            'Need to add the ValueType to the Page.
-                            '----------------------------------------
-                            Me.ReferenceModeValueType = Me.EntityType.ReferenceModeValueType.CloneInstance(Me.Page, True)
+                                '----------------------------------------
+                                'Need to add the ValueType to the Page.
+                                '----------------------------------------
+                                Me.ReferenceModeValueType = Me.EntityType.ReferenceModeValueType.CloneInstance(Me.Page, True)
                             '------------------------------------------------------------------------------------------
                             '20170322-If all seems fine without this code commented out (just below)...remove it.
                             'Call Me.ReferenceModeValueType.SetName(Me.MakeReferenceModeName)

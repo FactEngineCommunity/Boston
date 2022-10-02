@@ -1366,7 +1366,9 @@ RemoveAnyway:
                 lrEntityTypeInstance.X = Me.X
                 lrEntityTypeInstance.Y = Me.Y
 
-                Call lrEntityTypeInstance.DisplayAndAssociate()
+                If Me.Page.Diagram IsNot Nothing Then
+                    Call lrEntityTypeInstance.DisplayAndAssociate()
+                End If
 
                 Call Me.RemoveFromPage(True, True)
 

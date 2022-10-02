@@ -4359,16 +4359,27 @@ Namespace FBM
 
         Public Sub SetDerivationText(ByVal asDerivationText As String, ByVal abBroadcastInterfaceEvent As Boolean)
 
-            Me.DerivationText = asDerivationText
+            Try
 
-            Call Me.makeDirty()
-            Call Me.Model.MakeDirty(False, False)
+                Me.DerivationText = asDerivationText
 
-            RaiseEvent DerivationTextChanged(asDerivationText)
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(False, False)
 
-            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
-                Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
-            End If
+                RaiseEvent DerivationTextChanged(asDerivationText)
+
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                    Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

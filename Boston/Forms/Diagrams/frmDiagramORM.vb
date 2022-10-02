@@ -7214,11 +7214,13 @@ SkipPopup:
                 'Moved as a SubType
                 '--------------------
             Else
-                CType(lrCentralModelElementInstance, Object).Shape.Move(liX, liY)
-                CType(lrCentralModelElementInstance, Object).HasBeenMoved = True
+                If CType(lrCentralModelElementInstance, Object).Shape IsNot Nothing Then
+                    CType(lrCentralModelElementInstance, Object).Shape.Move(liX, liY)
+                    CType(lrCentralModelElementInstance, Object).HasBeenMoved = True
+                End If
             End If
 
-            Dim liDegrees As Integer
+                Dim liDegrees As Integer
             If lrCentralModelElementInstance.HasSubTypes Then
                 liDegrees = 270
             Else
