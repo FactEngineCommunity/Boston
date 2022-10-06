@@ -3512,7 +3512,6 @@ Public Class frmDiagramORMForGlossary
                         If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.FactType Then
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
                             mnuOption_IsObjectified.Checked = lrFactTypeInstance.IsObjectified
-                            Me.ToolStripMenuItemFactTypeInstanceRemoveFromPage.Enabled = Not lrFactTypeInstance.isPreferredReferenceMode
                         End If
                     End If
                     Call lrFactTypeInstance.Selected()
@@ -4671,13 +4670,15 @@ Public Class frmDiagramORMForGlossary
 
                     If IsSomething(lrFactTypeReading) Then
                         lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(lo_link.Origin.Tag.factType.Page)
-                        lrFactTypeReadingInstance.shape = lo_link.Origin.Tag.factType.FactTypeReadingShape.shape
-                        lo_link.Origin.Tag.FactType.FactTypeReadingShape = lrFactTypeReadingInstance
-                        lo_link.Origin.Tag.FactType.FactTypeReadingShape.RefreshShape()
+                        If lo_link.Origin.Tag.factType.FactTypeReadingShape IsNot Nothing Then
+                            lrFactTypeReadingInstance.Shape = lo_link.Origin.Tag.factType.FactTypeReadingShape.shape
+                            lo_link.Origin.Tag.FactType.FactTypeReadingShape = lrFactTypeReadingInstance
+                            lo_link.Origin.Tag.FactType.FactTypeReadingShape.RefreshShape()
+                        End If
                     Else
                         If IsSomething(lrFactTypeInstance.FactTypeReadingShape) Then
-                            If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
-                                lrFactTypeInstance.FactTypeReadingShape.shape.Text = ""
+                            If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                                lrFactTypeInstance.FactTypeReadingShape.Shape.Text = ""
                             End If
                         End If
                     End If
@@ -6452,22 +6453,6 @@ Public Class frmDiagramORMForGlossary
 
     End Sub
 
-    Private Sub LockToThisPositionOnPageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LockToThisPositionOnPageToolStripMenuItem.Click
-
-        Dim lrShapeNode As New MindFusion.Diagramming.ShapeNode
-
-        lrShapeNode = Me.zrPage.SelectedObject(0).Shape
-
-        Me.LockToThisPositionOnPageToolStripMenuItem.Checked = Not Me.LockToThisPositionOnPageToolStripMenuItem.Checked
-
-        If Me.LockToThisPositionOnPageToolStripMenuItem.Checked Then
-            lrShapeNode.IgnoreLayout = True
-        Else
-            lrShapeNode.IgnoreLayout = False
-        End If
-
-    End Sub
-
     Private Sub ToolStripMenuItem9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemViewFactTable.Click
 
         Dim lrFactTypeInstance As FBM.FactTypeInstance
@@ -6488,37 +6473,6 @@ Public Class frmDiagramORMForGlossary
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
-
-    End Sub
-
-    Private Sub RemoveFromPageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RemoveFromPageToolStripMenuItem.Click
-
-        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-
-        Try
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Call lrEntityTypeInstance.RemoveFromPage(True)
-
-            '-----------------------------------
-            'Setup the Undo for the UserAction
-            '-----------------------------------
-            Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.RemovedPageObjectFromPage, Me.zrPage)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-            Me.zrPage.MakeDirty()
-            Call Me.EnableSaveButton()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
 
     End Sub
 
@@ -6544,34 +6498,6 @@ Public Class frmDiagramORMForGlossary
 
     End Sub
 
-    Private Sub ToolStripMenuItem11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem11.Click
-
-        Dim lrValueTypeInstance As FBM.ValueTypeInstance
-
-        Try
-            lrValueTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Call lrValueTypeInstance.RemoveFromPage(True)
-
-            Dim lrUserAction As New tUserAction(lrValueTypeInstance, pcenumUserAction.RemovedPageObjectFromPage, Me.zrPage)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-            Me.zrPage.MakeDirty()
-            Call Me.EnableSaveButton()
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-
-    End Sub
-
     Private Sub ToolStripMenuItem12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItem12.Click
 
         Try
@@ -6583,33 +6509,6 @@ Public Class frmDiagramORMForGlossary
             'Call lrValueTypeInstance.RemoveFromPage()
 
             Call lrValueTypeInstance.ValueType.RemoveFromModel(False, True, True)
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub ToolStripMenuItem13_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemFactTypeInstanceRemoveFromPage.Click
-
-        Try
-            Dim lrFactTypeInstance As FBM.FactTypeInstance
-
-            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-
-            Call lrFactTypeInstance.RemoveFromPage(False)
-
-            Dim lrUserAction As New tUserAction(lrFactTypeInstance, pcenumUserAction.RemovedPageObjectFromPage, Me.zrPage)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-
-            Me.zrPage.MakeDirty()
-            Call Me.EnableSaveButton()
 
         Catch ex As Exception
             Dim lsMessage As String

@@ -49,6 +49,8 @@ Namespace FBM
                                 Call Me.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa()
                             Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
                                 Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount(arModelElementToFix)
+                            Case Is = pcenumModelFixType.SubtypeRelationshipWithNoFactType
+                                Call Me.SubtypeRelationshipWithNoFactType
                         End Select
 
                     Next
@@ -802,6 +804,30 @@ SkipColumn2:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub SubtypeRelationshipWithNoFactType()
+
+            Try
+                Dim larSubtypeRelationship = From EntityType In Me.EntityType
+                                             From SubtypeRelationship In EntityType.SubtypeRelationship
+                                             Where SubtypeRelationship.FactType Is Nothing
+                                             Select SubtypeRelationship
+
+                For Each lrSubtypeRelationship In larSubtypeRelationship.ToArray
+                    Call lrSubtypeRelationship.RemoveFromModel()
+                    Call lrSubtypeRelationship.ModelElement.CreateSubtypeRelationship(lrSubtypeRelationship.parentModelElement, False, Nothing, Nothing, True, Nothing)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

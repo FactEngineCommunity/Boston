@@ -1028,7 +1028,7 @@ Namespace FBM
                 End With
 
                 If Not abIgnoreSubtypeRelationships Then
-                    For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    For Each lrSubtypeRelationship In Me.SubtypeRelationship.FindAll(Function(x) x IsNot Nothing)
                         Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(arPage, False)
                         lrSubtypeRelationshipInstance.ModelElement = lrEntityTypeInstance
                         lrEntityTypeInstance.SubtypeRelationship.Add(lrSubtypeRelationshipInstance)
@@ -1339,7 +1339,7 @@ Namespace FBM
 
                         Dim lrRole As FBM.Role
 
-                        For Each lrRole In laoRole
+                        For Each lrRole In laoRole.ToArray
                             lrRole.ReassignJoinedModelObject(Me, abBroadcastInterfaceEvent)
                         Next
                     End If

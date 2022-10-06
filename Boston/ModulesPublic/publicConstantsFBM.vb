@@ -47,6 +47,7 @@
         RDSRelationsThatHaveNoOriginColumnsRemoveRelation
         RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
         RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
+        SubtypeRelationshipWithNoFactType
     End Enum
 
 End Module

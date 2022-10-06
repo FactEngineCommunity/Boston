@@ -29,7 +29,9 @@ Namespace FBM
             End Get
             Set(ByVal value As FBM.FactType)
                 Me._FactType = value
-                Me.Concept = value.Concept
+                If value IsNot Nothing Then
+                    Me.Concept = value.Concept
+                End If
             End Set
         End Property
 
@@ -734,32 +736,40 @@ Namespace FBM
 
         Public Sub BringStrandedJoinedObjectsCloser()
 
-
-
             Dim liNewX, liNewY As Integer
 
             If Me.isPreferredReferenceMode Then Exit Sub
 
-            Dim laiConceptType = {pcenumConceptType.ValueType, pcenumConceptType.EntityType}
+            Try
+                Dim laiConceptType = {pcenumConceptType.ValueType, pcenumConceptType.EntityType}
 
-            If Me.Arity = 2 Then Exit Sub
+                If Me.Arity = 2 Then Exit Sub
 
-            For Each lrRoleInstance In Me.RoleGroup.FindAll(Function(x) laiConceptType.Contains(x.JoinedORMObject.ConceptType))
+                For Each lrRoleInstance In Me.RoleGroup.FindAll(Function(x) laiConceptType.Contains(x.JoinedORMObject.ConceptType))
 
-                Call Me.getBlankCellCloseBy(liNewX, liNewY)
+                    Call Me.getBlankCellCloseBy(liNewX, liNewY)
 
-                If lrRoleInstance.JoinedORMObject.GetAdjoinedRoles(True).Count = 1 Then
-                    'That ModelElement is only linked to this FactTypeInstance
-                    Select Case lrRoleInstance.JoinedORMObject.ConceptType
-                        Case Is = pcenumConceptType.ValueType
-                            Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
-                            lrValueTypeInstance.Move(liNewX, liNewY, True)
-                        Case Is = pcenumConceptType.EntityType
-                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrRoleInstance.JoinedORMObject
-                            lrEntityTypeInstance.Move(liNewX, liNewY, True)
-                    End Select
-                End If
-            Next
+                    If lrRoleInstance.JoinedORMObject.GetAdjoinedRoles(True).Count = 1 Then
+                        'That ModelElement is only linked to this FactTypeInstance
+                        Select Case lrRoleInstance.JoinedORMObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType
+                                Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
+                                lrValueTypeInstance.Move(liNewX, liNewY, True)
+                            Case Is = pcenumConceptType.EntityType
+                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrRoleInstance.JoinedORMObject
+                                lrEntityTypeInstance.Move(liNewX, liNewY, True)
+                        End Select
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -2605,7 +2615,9 @@ Namespace FBM
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     For Each lrRoleInstance In Me.RoleGroup
                         lrRoleInstance.Shape.Visible = True
-                        lrRoleInstance.Link.Visible = True
+                        If lrRoleInstance.Link IsNot Nothing Then
+                            lrRoleInstance.Link.Visible = True
+                        End If
                         For Each lrRoleConstraintInstance In lrRoleInstance.RoleConstraint
                             For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
                                 If lrRoleConstraintInstance.Shape IsNot Nothing Then

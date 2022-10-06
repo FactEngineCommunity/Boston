@@ -2814,8 +2814,9 @@ FinishedProcessing:
                 Next
 
                 If Not Me.HasInternalUniquenessConstraint And Me.FactType.IsManyTo1BinaryFactType Then
-                    Dim larRelation = From Relation In Me.Model.RDS.Relation _
-                                      Where Relation.ResponsibleFactType.Id = Me.FactType.Id _
+                    Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                      Where Relation.ResponsibleFactType IsNot Nothing
+                                      Where Relation.ResponsibleFactType.Id = Me.FactType.Id
                                       Select Relation
 
                     For Each lrRelation In larRelation

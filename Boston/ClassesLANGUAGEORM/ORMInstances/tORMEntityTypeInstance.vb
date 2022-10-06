@@ -1233,8 +1233,10 @@ Namespace FBM
                     lrFactTypeInstance.Shape.Visible = False
                     lrFactTypeInstance.FactTable.TableShape.Visible = False
                     lrFactTypeInstance.FactTypeNameShape.Visible = False
-                    If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
-                        lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
+                    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                            lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
+                        End If
                     End If
                     Dim lrRoleInstance As FBM.RoleInstance
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance

@@ -145,8 +145,14 @@ Namespace FBM
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                If Me.ModelElement IsNot Nothing Then
+                    lsMessage.AppendLine("Model Element: " & Me.ModelElement.Id)
+                End If
+                If Me.parentModelElement IsNot Nothing Then
+                    lsMessage.AppendLine("Supertype: " & Me.parentModelElement.Id)
+                End If
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -167,7 +173,6 @@ Namespace FBM
 
             Try
                 Call Me.ModelElement.RemoveSubtypeRelationship(Me)
-                Call Me.FactType.RemoveFromModel(True, False, True, True)
                 Call Me.Delete()
 
                 '-----------------------------------------------------------------------------------------------------
@@ -190,13 +195,15 @@ Namespace FBM
                     Call lrTable.removeSupertypeColumns(Me)
                 End If
 
+                Call Me.FactType.RemoveFromModel(True, False, True, True)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -269,7 +276,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

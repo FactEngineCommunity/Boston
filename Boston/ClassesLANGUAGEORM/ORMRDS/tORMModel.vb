@@ -1629,6 +1629,7 @@ Namespace FBM
                 If (lrOriginTable Is Nothing) Or (lrDestinationTable Is Nothing) Then Exit Sub
 
                 Dim larRelation = From Relation In Me.RDS.Relation
+                                  Where Relation.ResponsibleFactType IsNot Nothing
                                   Where Relation.ResponsibleFactType.Id = arResponsibleRole.FactType.Id _
                                   And Relation.OriginTable Is lrOriginTable _
                                   And Relation.DestinationTable Is lrDestinationTable _

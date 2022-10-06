@@ -26,6 +26,7 @@ Partial Class frmToolboxModelDictionary
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxModelDictionary))
         Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
+        Me.SearchTextbox1 = New SearchTextbox()
         Me.LabelPromptViewAs = New System.Windows.Forms.Label()
         Me.ComboBoxView = New System.Windows.Forms.ComboBox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
@@ -51,7 +52,6 @@ Partial Class frmToolboxModelDictionary
         Me.ContextMenuStripGeneralConcept = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ConvertToEntityTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConvertToValueTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SearchTextbox1 = New SearchTextbox()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStripMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -80,6 +80,15 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.TabIndex = 0
         Me.GroupBox_Main.TabStop = False
         Me.GroupBox_Main.Text = "Model Dictionary:"
+        '
+        'SearchTextbox1
+        '
+        Me.SearchTextbox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.SearchTextbox1.Location = New System.Drawing.Point(6, 71)
+        Me.SearchTextbox1.Name = "SearchTextbox1"
+        Me.SearchTextbox1.Size = New System.Drawing.Size(333, 26)
+        Me.SearchTextbox1.TabIndex = 9
         '
         'LabelPromptViewAs
         '
@@ -201,7 +210,7 @@ Partial Class frmToolboxModelDictionary
         '
         Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 158)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 180)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -299,15 +308,6 @@ Partial Class frmToolboxModelDictionary
         Me.ConvertToValueTypeToolStripMenuItem.Name = "ConvertToValueTypeToolStripMenuItem"
         Me.ConvertToValueTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
         Me.ConvertToValueTypeToolStripMenuItem.Text = "convert to &Value Type"
-        '
-        'SearchTextbox1
-        '
-        Me.SearchTextbox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SearchTextbox1.Location = New System.Drawing.Point(6, 71)
-        Me.SearchTextbox1.Name = "SearchTextbox1"
-        Me.SearchTextbox1.Size = New System.Drawing.Size(333, 26)
-        Me.SearchTextbox1.TabIndex = 9
         '
         'frmToolboxModelDictionary
         '

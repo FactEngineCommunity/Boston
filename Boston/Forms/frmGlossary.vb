@@ -3,15 +3,15 @@ Imports System.IO
 Imports System.Web.UI
 Public Class frmGlossary
 
-    Public WithEvents zrModel As FBM.Model
+    Public WithEvents mrModel As FBM.Model
     Private zrFrmORMDiagramViewer As frmDiagramORMForGlossary
 
     Private Sub frmGlossary_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
 
         If prApplication.WorkingModel IsNot Nothing Then
-            Me.zrModel = prApplication.WorkingModel
-            Me.LabelModelName.Text = Me.zrModel.Name
-            Call Me.ShowGlossary(zrModel)
+            Me.mrModel = prApplication.WorkingModel
+            Me.LabelModelName.Text = Me.mrModel.Name
+            Call Me.ShowGlossary(Me.mrModel)
         End If
 
     End Sub
@@ -20,8 +20,8 @@ Public Class frmGlossary
 
         Try
             If prApplication.WorkingModel IsNot Nothing Then
-                Me.zrModel = prApplication.WorkingModel
-                Me.LabelModelName.Text = Me.zrModel.Name
+                Me.mrModel = prApplication.WorkingModel
+                Me.LabelModelName.Text = Me.mrModel.Name
                 Call Me.ShowGlossary(prApplication.WorkingModel)
             Else
                 Throw New Exception("There is no current Model selected. Try selecting a Model in the Model Explorer and trying again.")
@@ -34,7 +34,7 @@ Public Class frmGlossary
             formToShow.WindowState = FormWindowState.Maximized
             formToShow.FormBorderStyle = Windows.Forms.FormBorderStyle.None
             formToShow.Visible = True
-            Dim lrPage As New FBM.Page(zrModel, "GlossaryPage", "GlossaryPage", pcenumLanguage.ORMModel)
+            Dim lrPage As New FBM.Page(Me.mrModel, "GlossaryPage", "GlossaryPage", pcenumLanguage.ORMModel)
             formToShow.zrPage = lrPage
             Me.SplitContainer2.Panel2.Controls.Add(formToShow)
 
@@ -65,28 +65,32 @@ Public Class frmGlossary
 
     Private Sub LoadGlossaryListbox()
 
-        Dim items As New List(Of FBM.Concept)
+        Dim items As New List(Of FBM.ModelObject)
 
         For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
-            items.Add(lrValueType.Concept)
+            items.Add(lrValueType)
         Next
 
         For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
-            items.Add(lrEntityType.Concept)
+            items.Add(lrEntityType)
+        Next
+
+        ListBoxGlossary.BeginUpdate()
+        ListBoxGlossary.Items.Clear()
+
+        For Each item In items 'matchingItemList
+            ListBoxGlossary.Items.Add(New tComboboxItem(item, item.Id, item))
         Next
 
         If Me.CheckBoxShowGeneralConcepts.Checked Then
             For Each lrDictionaryEntry In prApplication.WorkingModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
-                items.Add(lrDictionaryEntry.Concept)
+                ListBoxGlossary.Items.Add(New tComboboxItem(lrDictionaryEntry, lrDictionaryEntry.Symbol, lrDictionaryEntry))
             Next
         End If
 
-        ListBox1.BeginUpdate()
-        ListBox1.Items.Clear()
-        For Each item In items 'matchingItemList
-            ListBox1.Items.Add(item.Symbol)
-        Next
-        ListBox1.EndUpdate()
+        ListBoxGlossary.EndUpdate()
+
+
 
     End Sub
 
@@ -94,24 +98,25 @@ Public Class frmGlossary
 
         Dim lrEntityType As FBM.EntityType
 
-        Me.ListBox1.Items.Clear()
+        Me.ListBoxGlossary.Items.Clear()
 
         For Each lrEntityType In arModel.EntityType.FindAll(Function(x) x.IsObjectifyingEntityType = False _
                                                                 And x.IsMDAModelElement = False)
-            Me.ListBox1.Items.Add(lrEntityType.Name)
+
+            Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrEntityType, lrEntityType.Id, lrEntityType))
         Next
 
         For Each lrValueType In arModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
-            Me.ListBox1.Items.Add(lrValueType.Name)
+            Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrValueType, lrValueType.Id, lrValueType))
         Next
 
         For Each lrFactType In arModel.FactType.FindAll(Function(x) (x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable)
-            Me.ListBox1.Items.Add(lrFactType.Name)
+            Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrFactType, lrFactType.Id, lrFactType))
         Next
 
         If Me.CheckBoxShowGeneralConcepts.Checked Then
             For Each lrDictionaryEntry In arModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept = True)
-                Me.ListBox1.Items.Add(lrDictionaryEntry.Symbol)
+                Me.ListBoxGlossary.Items.Add(lrDictionaryEntry.Symbol)
             Next
         End If
 
@@ -120,7 +125,7 @@ Public Class frmGlossary
     Public Sub FocusModelElement(ByRef arModelElement As FBM.ModelObject)
 
         Try
-            Me.ListBox1.SelectedIndex = Me.ListBox1.Items.IndexOf(arModelElement.Id)
+            Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.Items.IndexOf(arModelElement.Id)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -138,7 +143,7 @@ Public Class frmGlossary
         'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
         '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
 
-        Dim items = From it In prApplication.WorkingModel.ModelDictionary _
+        Dim items = From it In Me.mrModel.ModelDictionary
                     Where it.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
                     And ((it.isEntityType Or it.isValueType) _
                     Or (Me.CheckBoxShowGeneralConcepts.Checked And it.isGeneralConcept))
@@ -146,12 +151,13 @@ Public Class frmGlossary
 
         'Dim matchingItemList As List(Of Object) = items.ToList()
 
-        ListBox1.BeginUpdate()
-        ListBox1.Items.Clear()
+        ListBoxGlossary.BeginUpdate()
+        ListBoxGlossary.Items.Clear()
         For Each item In items 'matchingItemList
-            ListBox1.Items.Add(item.Symbol)
+            Dim lrModelObject As FBM.ModelObject = Me.mrModel.GetModelObjectByName(item.Symbol, True)
+            ListBoxGlossary.Items.Add(New tComboboxItem(lrModelObject, lrModelObject.Id, lrModelObject))
         Next
-        ListBox1.EndUpdate()
+        ListBoxGlossary.EndUpdate()
 
     End Sub
 
@@ -264,7 +270,7 @@ Public Class frmGlossary
             lrVerbaliser.HTW.WriteBreak()
 
             'LINQ
-            Dim FactType = From ft In zrModel.FactType,
+            Dim FactType = From ft In Me.mrModel.FactType,
                                 rl In ft.RoleGroup
                            Where rl.JoinedORMObject.Id = arEntityType.Id
                            Select ft Distinct
@@ -400,19 +406,19 @@ Public Class frmGlossary
     End Sub
 
 
-    Private Sub ListBox1_Click(sender As Object, e As EventArgs) Handles ListBox1.Click
+    Private Sub ListBox1_Click(sender As Object, e As EventArgs) Handles ListBoxGlossary.Click
 
         Dim lsSelectedString As String = ""
 
         With New WaitCursor
-            If Me.ListBox1.SelectedIndex >= 0 Then
-                lsSelectedString = ListBox1.GetItemText(ListBox1.SelectedItem)
+            If Me.ListBoxGlossary.SelectedIndex >= 0 Then
+                lsSelectedString = ListBoxGlossary.GetItemText(ListBoxGlossary.SelectedItem)
             End If
 
             Dim lrModelObject As FBM.ModelObject
 
             If lsSelectedString <> "" Then
-                lrModelObject = Me.zrModel.GetModelObjectByName(lsSelectedString)
+                lrModelObject = Me.mrModel.GetModelObjectByName(lsSelectedString)
 
                 Call Me.DescribeModelElement(lrModelObject)
             End If
@@ -423,23 +429,23 @@ Public Class frmGlossary
     Public Sub DescribeModelElement(ByVal arModelElement As FBM.ModelObject)
 
         Try
-            Select Case zrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
+            Select Case Me.mrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
                 Case Is = pcenumConceptType.EntityType
                     Dim lrEntityType As FBM.EntityType
-                    lrEntityType = Me.zrModel.GetModelObjectByName(arModelElement.Id)
+                    lrEntityType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
                     Call Me.VerbaliseEntityType(lrEntityType)
 
                 Case Is = pcenumConceptType.ValueType
                     Dim lrValueType As FBM.ValueType
-                    lrValueType = Me.zrModel.GetModelObjectByName(arModelElement.Id)
+                    lrValueType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
                     Call Me.VerbaliseValueType(lrValueType)
 
                 Case Is = pcenumConceptType.FactType
                     Dim lrFactType As FBM.FactType
-                    lrFactType = Me.zrModel.GetModelObjectByName(arModelElement.Id)
+                    lrFactType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
                     Call Me.VerbaliseFactType(lrFactType)
                 Case Is = pcenumConceptType.GeneralConcept
-                    Call Me.VerbaliseGeneralConcept(Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
+                    Call Me.VerbaliseGeneralConcept(Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
             End Select
 
             '-----------------------------------------------
@@ -454,7 +460,7 @@ Public Class frmGlossary
                 If IsSomething(lrPropertyGridForm) Then
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id))
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id))
                 End If
             Else
                 Call Me.DisplayORMDiagramViewForModelObject(arModelElement)
@@ -487,7 +493,7 @@ Public Class frmGlossary
             Case Is = pcenumConceptType.EntityType
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = arModelObject
-                Dim larSuptypeRelationship = From EntityType In Me.zrModel.EntityType
+                Dim larSuptypeRelationship = From EntityType In Me.mrModel.EntityType
                                              From SubtypeRelationship In EntityType.SubtypeRelationship
                                              Where EntityType.Id = lrEntityType.Id
                                              Select SubtypeRelationship
@@ -680,13 +686,13 @@ Public Class frmGlossary
         lrVerbaliser.HTW.WriteBreak()
 
         'LINQ
-        Dim RoleData = From ft In zrModel.FactType, _
-                            rl In ft.RoleGroup, _
-                            fct In ft.Fact, _
-                            data In fct.Data _
-                            Where rl.JoinedORMObject.Id = arValueType.Id _
-                            And data.Role.JoinedORMObject.Id = arValueType.Id _
-                            Select data Distinct
+        Dim RoleData = From ft In Me.mrModel.FactType,
+                            rl In ft.RoleGroup,
+                            fct In ft.Fact,
+                            data In fct.Data
+                       Where rl.JoinedORMObject.Id = arValueType.Id _
+                            And data.Role.JoinedORMObject.Id = arValueType.Id
+                       Select data Distinct
 
         Dim lrRoleData As FBM.FactData
 
@@ -707,10 +713,10 @@ Public Class frmGlossary
 
 
         'LINQ
-        Dim FactType = From ft In zrModel.FactType, _
-                            rl In ft.RoleGroup _
-                            Where rl.JoinedORMObject.Id = arValueType.Id _
-                            Select ft Distinct
+        Dim FactType = From ft In Me.mrModel.FactType,
+                            rl In ft.RoleGroup
+                       Where rl.JoinedORMObject.Id = arValueType.Id
+                       Select ft Distinct
 
         Dim lrFactType As FBM.FactType
 
@@ -1050,7 +1056,7 @@ Public Class frmGlossary
 
             Dim lrModelObject As FBM.ModelObject
 
-            lrModelObject = Me.zrModel.GetModelObjectByName(lsModelObjectName)
+            lrModelObject = Me.mrModel.GetModelObjectByName(lsModelObjectName)
 
             Select Case lrModelObject.ConceptType
                 Case Is = pcenumConceptType.ValueType
@@ -1067,8 +1073,8 @@ Public Class frmGlossary
 
             Me.TextBox1.Text = ""
             Call Me.LoadGlossaryListbox()
-            If Me.ListBox1.Items.Contains(lrModelObject.Id) Then
-                Me.ListBox1.SelectedIndex = Me.ListBox1.FindString(lrModelObject.Id)
+            If Me.ListBoxGlossary.Items.Contains(lrModelObject.Id) Then
+                Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.FindString(lrModelObject.Id)
             End If
 
             '------------------------------------------------------------------------------------------
@@ -1102,11 +1108,11 @@ Public Class frmGlossary
 
     Private Sub CheckBoxShowGeneralConcepts_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxShowGeneralConcepts.CheckedChanged
 
-        Call Me.ShowGlossary(Me.zrModel)
+        Call Me.ShowGlossary(Me.mrModel)
 
     End Sub
 
-    Private Sub zrModel_ModelUpdated() Handles zrModel.ModelUpdated
+    Private Sub zrModel_ModelUpdated() Handles mrModel.ModelUpdated
 
         frmMain.ToolStripButton_Save.Enabled = True
 
@@ -1119,6 +1125,7 @@ Public Class frmGlossary
 
         loSaveFileDialog.OverwritePrompt = True
         loSaveFileDialog.Filter = "HTML File (*.html)|*.html"
+        loSaveFileDialog.FileName = "index.html"
 
         If loSaveFileDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
 
@@ -1147,6 +1154,405 @@ Public Class frmGlossary
         End If
 
 
+
+    End Sub
+
+    Private Sub ContextMenuStripMain_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripMain.Opening
+
+        Try
+            'CodeSafe
+            If Me.ListBoxGlossary.SelectedIndex < 0 Then
+                Me.ContextMenuStripMain.Hide()
+                Exit Sub
+            End If
+
+            Dim loModelObject As FBM.ModelObject = Me.ListBoxGlossary.SelectedItem.Tag
+
+            Me.ToolStripMenuItemViewOnPage.DropDownItems.Clear()
+
+            If IsSomething(loModelObject) Then
+                '-----------------------------------------------
+                'Establish the ContextMenu for the SelectedNode
+                '-----------------------------------------------
+                Select Case loModelObject.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Call Me.LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                    Case Is = GetType(FBM.ValueType)
+                        Call LoadPagesForValueType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                    Case Is = GetType(FBM.FactType)
+                        Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
+                End Select
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Sub OpenORMDiagram(ByVal sender As Object, ByVal e As EventArgs)
+
+        Try
+            Dim lr_enterprise_view As tEnterpriseEnterpriseView
+            Dim item As ToolStripItem = CType(sender, ToolStripItem)
+
+            '---------------------------------------------------------------------------
+            'Find and select the TreeViewNode in the EnterpriseTreeViewer for the Page
+            '---------------------------------------------------------------------------
+            lr_enterprise_view = item.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+            prApplication.WorkingPage = New FBM.Page
+            prApplication.WorkingPage = lr_enterprise_view.Tag
+            Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+
+    Sub LoadPagesForEntityType(ByRef aoMenuStripItem As ToolStripMenuItem, ByVal asEntityTypeId As String)
+
+        Dim lrModel As FBM.Model
+        Dim lrPage As FBM.Page
+
+        Try
+            lrModel = prApplication.WorkingModel
+
+            aoMenuStripItem.DropDownItems.Clear()
+
+            Dim lsWorkingPageId As String = Nothing
+            If prApplication.WorkingPage IsNot Nothing Then
+                lsWorkingPageId = prApplication.WorkingPage.PageId
+            End If
+
+            Dim larPage = From Page In lrModel.Page
+                          From EntityTypeInstance In Page.EntityTypeInstance
+                          Where (EntityTypeInstance.Id = asEntityTypeId)
+                          Select Page Distinct
+                          Order By Page.Name
+
+            If IsSomething(larPage) Then
+                For Each lrPage In larPage
+
+                    Dim loToolStripMenuItem As ToolStripMenuItem
+                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
+                                                               Nothing, lrPage.PageId)
+
+
+                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+
+                    If IsSomething(lr_enterprise_view) Then
+                        '---------------------------------------------------
+                        'Add the Page(Name) to the MenuOption.DropDownItems
+                        '---------------------------------------------------
+                        lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asEntityTypeId)
+
+                        loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
+                        loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                        AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                        aoMenuStripItem.Enabled = True
+                    End If
+
+                Next
+            Else
+                Dim loToolStripMenuItem As ToolStripMenuItem
+                loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add("Not yet added to a page")
+                loToolStripMenuItem.Enabled = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+        End Try
+
+    End Sub
+
+    Sub LoadPagesForFactType(ByVal aoMenuStripItem As ToolStripMenuItem, ByVal asFactTypeId As String)
+
+        Dim lrModel As FBM.Model
+        Dim lrPage As FBM.Page
+
+        Try
+            lrModel = prApplication.WorkingModel
+
+            aoMenuStripItem.DropDownItems.Clear()
+
+            Dim lsWorkingPageId As String = Nothing
+            If prApplication.WorkingPage IsNot Nothing Then
+                lsWorkingPageId = prApplication.WorkingPage.PageId
+            End If
+
+            Dim larPage = From Page In lrModel.Page
+                          From FactTypeInstance In Page.FactTypeInstance
+                          Where (FactTypeInstance.Id = asFactTypeId)
+                          Select Page Distinct
+                          Order By Page.Name
+
+            If IsSomething(larPage) Then
+                For Each lrPage In larPage
+
+                    Dim loToolStripMenuItem As ToolStripMenuItem
+                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
+                                                               Nothing, lrPage.PageId)
+
+                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asFactTypeId)
+                    loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
+                    loToolStripMenuItem.Tag = lr_enterprise_view
+
+                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                Next
+            Else
+                Dim loToolStripMenuItem As ToolStripMenuItem
+                loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add("Not yet added to a page")
+                loToolStripMenuItem.Enabled = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Sub LoadPagesForValueType(ByVal aoMenuStripItem As ToolStripMenuItem, ByVal asValueTypeId As String)
+
+        Dim lrModel As FBM.Model
+        Dim lrPage As FBM.Page
+
+        Try
+
+            lrModel = prApplication.WorkingModel
+
+            aoMenuStripItem.DropDownItems.Clear()
+
+            Dim lsWorkingPageId As String = Nothing
+            If prApplication.WorkingPage IsNot Nothing Then
+                lsWorkingPageId = prApplication.WorkingPage.PageId
+            End If
+
+            Dim larPage = From Page In lrModel.Page
+                          From ValueTypeInstance In Page.ValueTypeInstance
+                          Where (ValueTypeInstance.Id = asValueTypeId)
+                          Select Page Distinct
+                          Order By Page.Name
+
+            If IsSomething(larPage) Then
+                For Each lrPage In larPage
+
+                    Dim loToolStripMenuItem As ToolStripMenuItem
+                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+
+                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                               lrPage,
+                                                               lrPage.Model.ModelId,
+                                                               pcenumLanguage.ORMModel,
+                                                               Nothing, lrPage.PageId)
+
+                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asValueTypeId)
+                    loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
+                    loToolStripMenuItem.Tag = lr_enterprise_view
+
+                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                Next
+            Else
+                Dim loToolStripMenuItem As ToolStripMenuItem
+                loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add("Not yet added to a page")
+                loToolStripMenuItem.Enabled = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemViewInDiagramSpy_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemViewInDiagramSpy.Click
+
+        Try
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.mrModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            Dim lrModelObject As FBM.ModelObject
+
+            Try
+                lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id)
+
+                If frmMain.IsDiagramSpyFormLoaded Then
+                    prApplication.ActivePages.Find(Function(x) x.Tag.GetType Is GetType(FBM.DiagramSpyPage)).Close()
+                End If
+
+                Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+            Catch ex As Exception
+
+            End Try
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemRemoveFromModel_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemRemoveFromModel.Click
+
+        Dim lsMessage As String = ""
+        Dim lrModelObject As FBM.ModelObject
+
+        Try
+            Select Case Me.ListBoxGlossary.SelectedItem.Tag.GetType
+                Case Is = GetType(RDS.Table)
+                    Dim lrTable As RDS.Table = Me.ListBoxGlossary.SelectedItem.Tag
+                    lrModelObject = lrTable.FBMModelElement
+                Case Else
+                    lrModelObject = Me.ListBoxGlossary.SelectedItem.Tag
+            End Select
+
+
+            lsMessage = "The " & lrModelObject.ConceptType.ToString & ", '" & lrModelObject.Name & "', will be removed from the Model and all Pages."
+            lsMessage &= vbCrLf & vbCrLf
+            lsMessage &= "This action cannot be undone. Click [OK] to proceed, or [Cancel]."
+
+            If MsgBox(lsMessage, MsgBoxStyle.OkCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Ok Then
+
+                If lrModelObject.RemoveFromModel(False, True, True) Then
+
+                    '----------------------------------------------------------------------------------------------------
+                    'NB If Model.StructureChanged event is triggered by the removal of the ModelObject from the Model,
+                    '  the whole tree will be refreshed in this form, so no TreeNode will be selected.
+                    '  i.e. The node that would otherwise need to be removed, is likely already removed by the refresh.
+                    '----------------------------------------------------------------------------------------------------
+                    If Me.ListBoxGlossary.SelectedItem IsNot Nothing Then
+                        Me.ListBoxGlossary.Items.RemoveAt(Me.ListBoxGlossary.SelectedIndex)
+                    End If
+
+                    Dim lrModel As FBM.Model = lrModelObject.Model
+                    Dim larPage As New List(Of FBM.Page)
+
+
+                    larPage = lrModel.GetPagesContainingModelObject(lrModelObject)
+
+                    'Vm-20180329-The below probably not required.
+                    'Dim lrPage As FBM.Page
+                    'For Each lrPage In larPage
+                    '    lrPage.RemoveModelObject(lrModelObject)
+                    'Next
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub PropertiesToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem1.Click
+
+        Try
+            Dim lrModelObject As FBM.ModelObject
+
+            Select Case Me.ListBoxGlossary.SelectedItem.Tag.GetType
+                Case Is = GetType(RDS.Table)
+                    lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Name, True)
+                Case Is = GetType(FBM.ValueType),
+                              GetType(FBM.EntityType),
+                              GetType(FBM.FactType)
+                    lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id, True)
+                Case Else
+                    Exit Sub
+            End Select
+
+            'CodeSafe 
+            If lrModelObject Is Nothing Then Exit Sub
+
+            Dim lrModelElementInstance As Object = Nothing
+
+            Select Case lrModelObject.GetType
+                Case Is = GetType(FBM.EntityType)
+                    lrModelElementInstance = CType(lrModelObject, FBM.EntityType).CloneInstance(New FBM.Page(Me.mrModel), False, False, Nothing)
+                Case Is = GetType(FBM.ValueType)
+                    Dim lrValueType As FBM.ValueType = lrModelObject
+                    lrModelElementInstance = lrValueType.CloneInstance(New FBM.Page(Me.mrModel), False, False)
+                Case Is = GetType(FBM.FactType)
+                    Dim lrFactType As FBM.FactType = lrModelObject
+                    lrModelElementInstance = lrFactType.CloneInstance(New FBM.Page(Me.mrModel), False, False, 1)
+                Case Else
+                    Exit Sub
+            End Select
+
+            Call frmMain.LoadToolboxPropertyWindow(frmMain.DockPanel.ActivePane, lrModelElementInstance)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ListBoxGlossary_MouseDown(sender As Object, e As MouseEventArgs) Handles ListBoxGlossary.MouseDown
+
+        Try
+            Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.IndexFromPoint(e.X, e.Y)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

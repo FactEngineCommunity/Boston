@@ -54,7 +54,7 @@ Namespace XMLModel
         ''' </summary>
         ''' <param name="arFBMModel">The model being mapped.</param>
         ''' <remarks></remarks>
-        Public Sub MapFromFBMModel(ByVal arFBMModel As FBM.Model, Optional ByVal abExcludedMDAModelElements As Boolean = False)
+        Public Function MapFromFBMModel(ByVal arFBMModel As FBM.Model, Optional ByVal abExcludedMDAModelElements As Boolean = False) As Boolean
 
             Try
                 Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
@@ -146,12 +146,17 @@ SkipModelLevelValueType:
 
                     For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
 
-                        lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
-                        lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
-                        lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
-                        lrXMLSubtypeRelationship.IsPrimarySubtypeRelationship = lrSubtypeRelationship.IsPrimarySubtypeRelationship
+                        Try
+                            lrXMLSubtypeRelationship = New XMLModel.SubtypeRelationship
+                            lrXMLSubtypeRelationship.ParentEntityTypeId = lrSubtypeRelationship.parentModelElement.Id
+                            lrXMLSubtypeRelationship.SubtypingFactTypeId = lrSubtypeRelationship.FactType.Id
+                            lrXMLSubtypeRelationship.IsPrimarySubtypeRelationship = lrSubtypeRelationship.IsPrimarySubtypeRelationship
 
-                        lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
+                            lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
+                        Catch ex As Exception
+                            prApplication.ThrowErrorMessage("Error exporting Subtype Relationship for Entity Type: " & lrXMLEntityType.Id, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.OK, False, Nothing)
+                            Throw New Exception("Error exporting Model to FBM format.")
+                        End Try
                     Next
 
                     Me.ORMModel.EntityTypes.Add(lrXMLEntityType)
@@ -595,16 +600,20 @@ SkipModelLevelRoleConstraint:
                     Me.ORMDiagram.Add(lrExportPage)
                 Next
 
+                Return True
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         ''' <summary>
         ''' Maps an instance of this class to an instance of FBM.Model
@@ -3599,7 +3608,7 @@ FoundModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

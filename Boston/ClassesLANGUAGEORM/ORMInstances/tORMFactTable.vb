@@ -187,7 +187,7 @@ Namespace FBM
             Catch ex As Exception
                 lsMessage = "Error: tFactTable.DisplayAndAssociate"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -261,7 +261,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -302,7 +302,7 @@ SkipThat:
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTable.ResetBlackCellText"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -448,7 +448,7 @@ SkipThat:
                 lsMessage1 &= vbCrLf & vbCrLf & "FactTypeName: " & Me.FactTypeInstance.Name
                 lsMessage1 &= vbCrLf & vbCrLf & "PageId: " & Me.FactTypeInstance.Page.PageId
                 lsMessage1 &= vbCrLf & vbCrLf & "PageId: " & Me.FactTypeInstance.Page.Name
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, loErr.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, loErr.StackTrace,,,,,, loErr)
             End Try
 
         End Sub
@@ -483,7 +483,7 @@ SkipThat:
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTable.Save"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

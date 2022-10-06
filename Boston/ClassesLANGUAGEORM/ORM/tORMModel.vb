@@ -1056,6 +1056,7 @@ Namespace FBM
                                      And Not lrRole.FactType.IsPreferredReferenceMode Then
 
                                     Dim larRelation = From Relation In Me.RDS.Relation
+                                                      Where Relation.ResponsibleFactType IsNot Nothing
                                                       Where Relation.ResponsibleFactType.Id = lrRole.FactType.Id
                                                       Select Relation
 
@@ -4571,7 +4572,9 @@ Namespace FBM
 
                 If Me.Loaded = False Then Exit Sub
 
-                Call lrExportModel.MapFromFBMModel(Me, False)
+                If Not lrExportModel.MapFromFBMModel(Me, False) Then
+                    Exit Sub
+                End If
 
                 Dim lsFileLocationName As String = ""
                 If Boston.IsSerializable(lrExportModel) Then

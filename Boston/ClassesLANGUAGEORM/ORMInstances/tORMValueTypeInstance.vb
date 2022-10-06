@@ -791,7 +791,7 @@ RemoveAnyway:
                 Me.Symbol = Me.ValueType.Id
                 Me.Name = Me.ValueType.Id
 
-                If IsSomething(Me.Shape) Then
+                If IsSomething(Me.Shape) And IsSomething(Me.Page.Form) Then
                     Dim G As Graphics
                     Dim liValueTypeNameStringSize As New SizeF
                     G = Me.Page.Form.CreateGraphics
@@ -1018,6 +1018,7 @@ RemoveAnyway:
                 Dim G As Graphics
                 Dim liValueTypeNameStringSize As New SizeF
 
+                'If Shape/Form exist
                 If IsSomething(Me.Shape) And Me.Page.Form IsNot Nothing Then
                     G = Me.Page.Form.CreateGraphics
                     liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
@@ -1030,11 +1031,11 @@ RemoveAnyway:
                     Else
                         Me.Shape.Pen.Color = Color.Navy
                     End If
+
+                    'IsIndependent
+                    Me.Shape.Text = Me.Id & Boston.returnIfTrue(Me.IsIndependent, " !", "")
                 End If
 
-                If Me.IsIndependent Then
-                    Me.Shape.Text = Me.Id & " !"
-                End If
 
                 If Me.Model IsNot Nothing Then
                     Call Me.Model.MakeDirty(True, False)

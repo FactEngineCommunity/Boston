@@ -706,6 +706,7 @@ RetryTypeOfJoin:
                         Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.JoinsEntityType.Id And x.Shape IsNot Nothing)
                         If Me.JoinsEntityType Is Nothing Then
                             Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.Role.JoinedORMObject.Id)
+                            If Me.JoinedORMObject Is Nothing Then GoTo PostJoinedORMObject
                             Me.JoinsFactType.DisplayAndAssociate(False, False)
                         End If
                     Case Is = pcenumRoleJoinType.ValueType
@@ -725,6 +726,7 @@ RetryTypeOfJoin:
                         Me.JoinedORMObject = Nothing
                 End Select
 
+PostJoinedORMObject:
                 '-------------------------------------------------------------
                 'Create the link between the Role and the ORMObject that it 
                 '  joins to.

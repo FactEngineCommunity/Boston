@@ -57,7 +57,7 @@ Namespace FBM
                     Dim lsMessage As String = "FactData item does not have a Concept."
                     lsMessage &= vbCrLf & vbCrLf & "Fact.Id: " & Me.Fact.Id
                     lsMessage &= vbCrLf & "FactType.Id: " & Me.Fact.FactType.Id
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                     Return "DummyValue"
                 End Try
             End Get
@@ -163,13 +163,13 @@ Namespace FBM
 
                         Me.makeDirty()
 
-                            RaiseEvent ConceptSymbolUpdated()
+                        RaiseEvent ConceptSymbolUpdated()
 
-                            lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
-                            'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
-                        End If
+                        lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
+                        'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                    End If
 
-                        Call Me.Model.MakeDirty(False, False)
+                    Call Me.Model.MakeDirty(False, False)
 
                 Catch ex As Exception
                     Dim lsMessage1 As String
@@ -177,7 +177,7 @@ Namespace FBM
 
                     lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
             End Set
         End Property
@@ -231,7 +231,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -371,7 +371,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tRoleData.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrFactData
             End Try
@@ -415,6 +415,20 @@ Namespace FBM
                     'Find the RoleInstance for the FactData
                     '----------------------------------------
                     lrFactDataInstance.Role = arPage.RoleInstance.Find(Function(x) x.Id = Me.Role.Id)
+
+                    If lrFactDataInstance.Role Is Nothing Then
+                        Dim lrRoleInstance As FBM.RoleInstance = Nothing
+                        Try
+                            lrRoleInstance = (From FactTypeInstance In arPage.FactTypeInstance
+                                              From Role In FactTypeInstance.RoleGroup
+                                              Where Role.Id = Me.Role.Id
+                                              Select Role).First
+                        Catch ex As Exception
+                            'Nothing found
+                        End Try
+                        If lrRoleInstance IsNot Nothing Then lrFactDataInstance.Role = lrRoleInstance
+                    End If
+
                     'CodeSafe: Add the Clone and add the RoleInstance to the Page if it does not exist
                     If lrFactDataInstance.Role.Data.FindAll(Function(x) x.Role Is Nothing).Count > 0 Then
                         lrFactDataInstance.Role = Me.Role.CloneInstance(arPage, True)
@@ -444,7 +458,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -490,7 +504,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -515,7 +529,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -584,7 +598,7 @@ Namespace FBM
                 lsMessage &= vbCrLf & "RoleId: " & Me.Role.Id
                 lsMessage &= vbCrLf & ". FactSymbol(Id): " & Me.Fact.Symbol
                 lsMessage &= vbCrLf & ". Value: " & Me.Data
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -669,7 +683,7 @@ Namespace FBM
         '        Dim lsMessage As String
         '        lsMessage = "Error: FBM.tFactData.SwitchConcept"
         '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,,ex)
         '    End Try
 
         'End Sub
@@ -684,7 +698,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

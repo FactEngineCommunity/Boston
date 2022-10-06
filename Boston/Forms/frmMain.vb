@@ -3089,7 +3089,6 @@ SaveModel:
         Dim lrForm As Object
 
         Try
-
             Dim lrPage As FBM.Page = prApplication.WorkingPage
 
             If lrPage Is Nothing Then
@@ -4062,16 +4061,29 @@ SaveModel:
             Dim larConnectionString() As String
             Dim lsNewDatabaseAndPath As String
 
+            If My.Settings.DatabaseType <> pcenumDatabaseType.MSJet.ToString Then
+                MsgBox("Can only backup the MSJet version of the Boston database. Exiting.")
+                Exit Sub
+            End If
+
+            Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+
+
+            lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+
             larConnectionString = Split(My.Settings.DatabaseConnectionString, ";")
 
-            For liInd = 0 To larConnectionString.Length - 1
-                ls_db_location = larConnectionString(liInd)
-                ls_db_location = Trim(ls_db_location)
-                If ls_db_location.StartsWith("Data Source=") Then
-                    ls_db_location = ls_db_location.Replace("Data Source=", "")
-                    Exit For
-                End If
-            Next
+            '20221006-VM-Removed
+            'For liInd = 0 To larConnectionString.Length - 1
+            '    ls_db_location = larConnectionString(liInd)
+            '    ls_db_location = Trim(ls_db_location)
+            '    If ls_db_location.StartsWith("Data Source=") Then
+            '        ls_db_location = ls_db_location.Replace("Data Source=", "")
+            '        Exit For
+            '    End If
+            'Next
+
+            ls_db_location = lrSQLConnectionStringBuilder("Data Source")
 
             '------------------------------------------------
             'Define the location of database

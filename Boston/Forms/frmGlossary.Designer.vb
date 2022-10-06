@@ -22,19 +22,26 @@ Partial Class frmGlossary
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         Me.CheckBoxShowGeneralConcepts = New System.Windows.Forms.CheckBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.ListBox1 = New System.Windows.Forms.ListBox()
+        Me.ListBoxGlossary = New System.Windows.Forms.ListBox()
+        Me.ContextMenuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
-        Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.ContextMenuStripMain.SuspendLayout()
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer2.Panel1.SuspendLayout()
         Me.SplitContainer2.SuspendLayout()
@@ -54,7 +61,7 @@ Partial Class frmGlossary
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelModelName)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelPromptModel)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextBox1)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.ListBox1)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ListBoxGlossary)
         '
         'SplitContainer1.Panel2
         '
@@ -62,6 +69,16 @@ Partial Class frmGlossary
         Me.SplitContainer1.Size = New System.Drawing.Size(884, 574)
         Me.SplitContainer1.SplitterDistance = 289
         Me.SplitContainer1.TabIndex = 0
+        '
+        'ButtonGenerateHTMLGlossary
+        '
+        Me.ButtonGenerateHTMLGlossary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonGenerateHTMLGlossary.Location = New System.Drawing.Point(12, 534)
+        Me.ButtonGenerateHTMLGlossary.Name = "ButtonGenerateHTMLGlossary"
+        Me.ButtonGenerateHTMLGlossary.Size = New System.Drawing.Size(141, 23)
+        Me.ButtonGenerateHTMLGlossary.TabIndex = 5
+        Me.ButtonGenerateHTMLGlossary.Text = "Generate &HTML Glossary"
+        Me.ButtonGenerateHTMLGlossary.UseVisualStyleBackColor = True
         '
         'CheckBoxShowGeneralConcepts
         '
@@ -99,17 +116,51 @@ Partial Class frmGlossary
         Me.TextBox1.Size = New System.Drawing.Size(195, 20)
         Me.TextBox1.TabIndex = 1
         '
-        'ListBox1
+        'ListBoxGlossary
         '
-        Me.ListBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.ListBoxGlossary.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ListBox1.FormattingEnabled = True
-        Me.ListBox1.Location = New System.Drawing.Point(12, 95)
-        Me.ListBox1.Name = "ListBox1"
-        Me.ListBox1.Size = New System.Drawing.Size(262, 433)
-        Me.ListBox1.Sorted = True
-        Me.ListBox1.TabIndex = 0
+        Me.ListBoxGlossary.ContextMenuStrip = Me.ContextMenuStripMain
+        Me.ListBoxGlossary.FormattingEnabled = True
+        Me.ListBoxGlossary.Location = New System.Drawing.Point(12, 95)
+        Me.ListBoxGlossary.Name = "ListBoxGlossary"
+        Me.ListBoxGlossary.Size = New System.Drawing.Size(262, 433)
+        Me.ListBoxGlossary.Sorted = True
+        Me.ListBoxGlossary.TabIndex = 0
+        '
+        'ContextMenuStripMain
+        '
+        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ToolStripMenuItemRemoveFromModel, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(186, 92)
+        '
+        'ToolStripMenuItemViewOnPage
+        '
+        Me.ToolStripMenuItemViewOnPage.Name = "ToolStripMenuItemViewOnPage"
+        Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemViewOnPage.Text = "&View on Page..."
+        '
+        'ToolStripMenuItemViewInDiagramSpy
+        '
+        Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.MenuImages.Spyglass16x16
+        Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
+        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
+        '
+        'ToolStripMenuItemRemoveFromModel
+        '
+        Me.ToolStripMenuItemRemoveFromModel.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
+        Me.ToolStripMenuItemRemoveFromModel.Name = "ToolStripMenuItemRemoveFromModel"
+        Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(185, 22)
+        Me.ToolStripMenuItemRemoveFromModel.Text = "&Remove From Model"
+        '
+        'PropertiesToolStripMenuItem1
+        '
+        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(185, 22)
+        Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'SplitContainer2
         '
@@ -134,16 +185,6 @@ Partial Class frmGlossary
         Me.WebBrowser.Size = New System.Drawing.Size(591, 358)
         Me.WebBrowser.TabIndex = 2
         '
-        'ButtonGenerateHTMLGlossary
-        '
-        Me.ButtonGenerateHTMLGlossary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.ButtonGenerateHTMLGlossary.Location = New System.Drawing.Point(12, 534)
-        Me.ButtonGenerateHTMLGlossary.Name = "ButtonGenerateHTMLGlossary"
-        Me.ButtonGenerateHTMLGlossary.Size = New System.Drawing.Size(141, 23)
-        Me.ButtonGenerateHTMLGlossary.TabIndex = 5
-        Me.ButtonGenerateHTMLGlossary.Text = "Generate &HTML Glossary"
-        Me.ButtonGenerateHTMLGlossary.UseVisualStyleBackColor = True
-        '
         'frmGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -158,6 +199,7 @@ Partial Class frmGlossary
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.ContextMenuStripMain.ResumeLayout(False)
         Me.SplitContainer2.Panel1.ResumeLayout(False)
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer2.ResumeLayout(False)
@@ -166,11 +208,16 @@ Partial Class frmGlossary
     End Sub
     Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
-    Friend WithEvents ListBox1 As System.Windows.Forms.ListBox
+    Friend WithEvents ListBoxGlossary As System.Windows.Forms.ListBox
     Friend WithEvents SplitContainer2 As System.Windows.Forms.SplitContainer
     Friend WithEvents WebBrowser As System.Windows.Forms.WebBrowser
     Friend WithEvents LabelModelName As System.Windows.Forms.Label
     Friend WithEvents LabelPromptModel As System.Windows.Forms.Label
     Friend WithEvents CheckBoxShowGeneralConcepts As System.Windows.Forms.CheckBox
     Friend WithEvents ButtonGenerateHTMLGlossary As Button
+    Friend WithEvents ContextMenuStripMain As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItemViewOnPage As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemViewInDiagramSpy As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemRemoveFromModel As ToolStripMenuItem
+    Friend WithEvents PropertiesToolStripMenuItem1 As ToolStripMenuItem
 End Class

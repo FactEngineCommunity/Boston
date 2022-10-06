@@ -1700,14 +1700,11 @@ SkipRelation:
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lrRecordset As ORMQL.Recordset
-                Dim lrFactInstance As FBM.FactInstance
                 Dim lrRDSTable As RDS.Table
 
                 lrRDSTable = arEntityInstance.RDSTable
                 '==================================================================================================================
 
-                Dim lrFactDataInstance As FBM.FactDataInstance
                 arEntityInstance.X = aoPointF.X
                 arEntityInstance.Y = aoPointF.Y
 

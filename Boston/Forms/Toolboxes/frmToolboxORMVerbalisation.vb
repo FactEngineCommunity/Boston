@@ -3251,120 +3251,135 @@ Public Class frmToolboxORMVerbalisation
         Dim lrVerbaliser As New FBM.ORMVerbailser
         Call lrVerbaliser.Reset()
 
-        '------------------------------------------------------
-        'Declare that the EntityType(Name) is an EntityType
-        '------------------------------------------------------
-        lrVerbaliser.VerbaliseModelObject(arValueType)
-        lrVerbaliser.VerbaliseQuantifier(" is a Value Type.")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-
-        '-------------------------------------------------
-        'FOR EACH IncomingLink (from a Role)
-        '  Verbalise the FactType for the associated Role
-        'LOOP 
-        '-------------------------------------------------
-        lrVerbaliser.VerbaliseQuantifier("Data Type: ")
-        lrVerbaliser.HTW.Write(arValueType.DataType.ToString)
-        lrVerbaliser.HTW.WriteBreak()
-
-
-        If arValueType.DataTypeLength <> 0 Then
-            lrVerbaliser.VerbaliseQuantifier("Data Type Length: ")
-            lrVerbaliser.HTW.Write(arValueType.DataTypeLength.ToString)
-            lrVerbaliser.HTW.WriteBreak()
-        End If
-
-        If arValueType.DataTypePrecision <> 0 Then
-            lrVerbaliser.VerbaliseQuantifier("Data Type Precition: ")
-            lrVerbaliser.HTW.Write(arValueType.DataTypePrecision.ToString)
-            lrVerbaliser.HTW.WriteBreak()
-        End If
-
-        '-------------------------------------------------
-        'FOR EACH IncomingLink (from a Role)
-        '  Verbalise the FactType for the associated Role
-        'LOOP 
-        '-------------------------------------------------
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseQuantifier("Value Constraints:")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-
-
-        Dim liCounter As Integer = 0
-        Dim lrValueTypeConstraintString As String = ""
-
-        If arValueType.ValueConstraint.Count > 0 Then
-            lrVerbaliser.VerbaliseQuantifier("Possible Values for ")
+        Try
+            '------------------------------------------------------
+            'Declare that the EntityType(Name) is an EntityType
+            '------------------------------------------------------
             lrVerbaliser.VerbaliseModelObject(arValueType)
-            lrVerbaliser.VerbaliseQuantifier(" are {")
-            For Each lrValueTypeConstraintString In arValueType.ValueConstraint
-                liCounter += 1
-                If liCounter = 1 Then
-                    lrVerbaliser.HTW.Write("'" & lrValueTypeConstraintString & "'")
-                Else
-                    lrVerbaliser.HTW.Write(", '" & lrValueTypeConstraintString & "'")
-                End If
-            Next
-            lrVerbaliser.VerbaliseQuantifier("}")
-        Else
-            lrVerbaliser.VerbaliseQuantifier("There are no Value Constraints for this Value Type.")
-        End If
-
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseQuantifier("Sample Values:")
-        lrVerbaliser.HTW.WriteBreak()
-
-        'LINQ
-        Dim RoleData = From ft In zrModel.FactType,
-                            rl In ft.RoleGroup,
-                            fct In ft.Fact,
-                            data In fct.Data
-                       Where rl.JoinedORMObject.Id = arValueType.Id _
-                            And data.Role.JoinedORMObject.Id = arValueType.Id
-                       Select data Distinct
-
-        Dim lrRoleData As FBM.FactData
-
-        For Each lrRoleData In RoleData
-            lrVerbaliser.HTW.Write("'" & lrRoleData.Data & "'")
-        Next
-
-        '-------------------------------------------------
-        'FOR EACH IncomingLink (from a Role)
-        '  Verbalise the FactType for the associated Role
-        'LOOP 
-        '-------------------------------------------------
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.VerbaliseQuantifier("Fact Types:")
-        lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-
-
-        'LINQ
-        Dim FactType = From ft In zrModel.FactType,
-                            rl In ft.RoleGroup
-                       Where rl.JoinedORMObject.Id = arValueType.Id
-                       Select ft Distinct
-
-        Dim lrFactType As FBM.FactType
-
-
-        For Each lrFactType In FactType
-            lrVerbaliser.VerbaliseModelObject(lrFactType)
-            lrVerbaliser.VerbalisePredicateText(" (")
-            If lrFactType.FactTypeReading.Count > 0 Then
-                Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser)
-            End If
-            lrVerbaliser.VerbalisePredicateText(")")
+            lrVerbaliser.VerbaliseQuantifier(" is a Value Type.")
             lrVerbaliser.HTW.WriteBreak()
-        Next
+            lrVerbaliser.HTW.WriteBreak()
 
-        Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+            '-------------------------------------------------
+            'FOR EACH IncomingLink (from a Role)
+            '  Verbalise the FactType for the associated Role
+            'LOOP 
+            '-------------------------------------------------
+            lrVerbaliser.VerbaliseQuantifier("Data Type: ")
+            lrVerbaliser.HTW.Write(arValueType.DataType.ToString)
+            lrVerbaliser.HTW.WriteBreak()
+
+
+            If arValueType.DataTypeLength <> 0 Then
+                lrVerbaliser.VerbaliseQuantifier("Data Type Length: ")
+                lrVerbaliser.HTW.Write(arValueType.DataTypeLength.ToString)
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
+            If arValueType.DataTypePrecision <> 0 Then
+                lrVerbaliser.VerbaliseQuantifier("Data Type Precition: ")
+                lrVerbaliser.HTW.Write(arValueType.DataTypePrecision.ToString)
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
+            '-------------------------------------------------
+            'FOR EACH IncomingLink (from a Role)
+            '  Verbalise the FactType for the associated Role
+            'LOOP 
+            '-------------------------------------------------
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Value Constraints:")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+
+            Dim liCounter As Integer = 0
+            Dim lrValueTypeConstraintString As String = ""
+
+            If arValueType.ValueConstraint.Count > 0 Then
+                lrVerbaliser.VerbaliseQuantifier("Possible Values for ")
+                lrVerbaliser.VerbaliseModelObject(arValueType)
+                lrVerbaliser.VerbaliseQuantifier(" are {")
+                For Each lrValueTypeConstraintString In arValueType.ValueConstraint
+                    liCounter += 1
+                    If liCounter = 1 Then
+                        lrVerbaliser.HTW.Write("'" & lrValueTypeConstraintString & "'")
+                    Else
+                        lrVerbaliser.HTW.Write(", '" & lrValueTypeConstraintString & "'")
+                    End If
+                Next
+                lrVerbaliser.VerbaliseQuantifier("}")
+            Else
+                lrVerbaliser.VerbaliseQuantifier("There are no Value Constraints for this Value Type.")
+            End If
+
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Sample Values:")
+            lrVerbaliser.HTW.WriteBreak()
+
+            'LINQ
+            Dim RoleData = From ft In zrModel.FactType,
+                                rl In ft.RoleGroup,
+                                fct In ft.Fact,
+                                data In fct.Data
+                           Where rl.JoinedORMObject.Id = arValueType.Id _
+                                And data.Role.JoinedORMObject.Id = arValueType.Id
+                           Select data Distinct
+
+            Dim lrRoleData As FBM.FactData
+
+            For Each lrRoleData In RoleData
+                lrVerbaliser.HTW.Write("'" & lrRoleData.Data & "'")
+            Next
+
+            '-------------------------------------------------
+            'FOR EACH IncomingLink (from a Role)
+            '  Verbalise the FactType for the associated Role
+            'LOOP 
+            '-------------------------------------------------
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Fact Types:")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+
+            'LINQ
+            Dim FactType = From ft In zrModel.FactType,
+                                rl In ft.RoleGroup
+                           Where rl.JoinedORMObject.Id = arValueType.Id
+                           Select ft Distinct
+
+            Dim lrFactType As FBM.FactType
+
+            For Each lrFactType In FactType
+                lrVerbaliser.VerbaliseModelObject(lrFactType)
+                lrVerbaliser.VerbalisePredicateText(" (")
+                If lrFactType.FactTypeReading.Count > 0 Then
+                    Try
+                        Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser)
+                    Catch ex As Exception
+                        lrVerbaliser.VerbaliseError("Error verbalising Fact Type Reading.")
+                    End Try
+
+                End If
+                lrVerbaliser.VerbalisePredicateText(")")
+                lrVerbaliser.HTW.WriteBreak()
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        Finally
+            Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
+        End Try
 
     End Sub
 

@@ -107,7 +107,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tModelNoteInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrModelNoteInstance
             End Try
@@ -224,20 +224,22 @@ Namespace FBM
                         End If
 
                         Dim loNode As MindFusion.Diagramming.ShapeNode = lrJoinedORMObject.Shape
-                        Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
-                        lo_link.Locked = True
-                        ReDim lo_link.Pen.DashPattern(3)
-                        lo_link.Pen.DashPattern(0) = 3
-                        lo_link.Pen.DashPattern(1) = 2
-                        lo_link.Pen.DashPattern(2) = 3
-                        lo_link.Pen.DashPattern(3) = 2
-                        lo_link.Pen.Color = Color.LightGray
-                        Me.Page.Diagram.Links.Add(lo_link)
-                        Me.Link = New DiagramLink(Me.Page.Diagram)
-                        Me.Link = lo_link
+
+                        If loNode IsNot Nothing Then
+                            Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, loNode)
+                            lo_link.Locked = True
+                            ReDim lo_link.Pen.DashPattern(3)
+                            lo_link.Pen.DashPattern(0) = 3
+                            lo_link.Pen.DashPattern(1) = 2
+                            lo_link.Pen.DashPattern(2) = 3
+                            lo_link.Pen.DashPattern(3) = 2
+                            lo_link.Pen.Color = Color.LightGray
+                            Me.Page.Diagram.Links.Add(lo_link)
+                            Me.Link = New DiagramLink(Me.Page.Diagram)
+                            Me.Link = lo_link
+                        End If
                     End If
                 End If
-
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -245,7 +247,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -281,7 +283,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -307,7 +309,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -388,7 +390,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -407,7 +409,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

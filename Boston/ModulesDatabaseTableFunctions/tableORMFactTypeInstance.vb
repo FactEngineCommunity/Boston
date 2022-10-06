@@ -50,7 +50,7 @@ Namespace TableFactTypeInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -191,6 +191,13 @@ Namespace TableFactTypeInstance
                         'Else
                         lrFactTypeInstance.FactType = arPage.Model.FactType.Find(Function(x) x.Id = lrFactTypeInstance.Id)
 
+                        If lrFactTypeInstance.FactType Is Nothing Then
+                            'CodeSafe
+                            Dim lrFactType As New FBM.FactType(arPage.Model, lrFactTypeInstance.Id, True)
+                            lrFactType.isDirty = False
+                            lrFactTypeInstance.FactType = TableFactType.GetFactTypeDetailsByModel(lrFactType, True, False, False)
+                        End If
+
                         lrFactTypeInstance.ShortDescription = lrFactTypeInstance.FactType.ShortDescription
                         lrFactTypeInstance.LongDescription = lrFactTypeInstance.FactType.LongDescription
                         lrFactTypeInstance.DBName = lrFactTypeInstance.FactType.DBName
@@ -203,10 +210,6 @@ Namespace TableFactTypeInstance
                         lrFactTypeInstance.IsLinkFactType = lrFactTypeInstance.FactType.IsLinkFactType
                         If lrFactTypeInstance.IsLinkFactType Then
                             lrFactTypeInstance.LinkFactTypeRole = arPage.RoleInstance.Find(Function(x) x.Id = NullVal(lREcordset("LinkFactTypeRoleId").Value, ""))
-                        End If
-
-                        If lrFactTypeInstance.FactType Is Nothing Then
-                            Throw New Exception("Cannot find FactType for FactTypeInstance with FactTypeId: " & lrFactTypeInstance.Id)
                         End If
 
                         lrFactTypeInstance.IsObjectified = lrFactTypeInstance.FactType.IsObjectified
@@ -387,7 +390,7 @@ Namespace TableFactTypeInstance
             Catch ex As Exception
                 lsMessage = "Error: TableFactTypeInstance.lrFactTypeInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -482,7 +485,7 @@ Namespace TableFactTypeInstance
                 Dim lsMessage As String
                 lsMessage = "Error: GetFactTypeInstancesByPage:"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -507,7 +510,7 @@ Namespace TableFactTypeInstance
                 lsMessage = "Error: TableFactTypeInstance.ModifyKey"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -536,7 +539,7 @@ Namespace TableFactTypeInstance
                 lsMessage = "Error: TableFactTypeInstance.UpdateFactTypeInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

@@ -4652,7 +4652,7 @@ Public Class frmDiagramORM
 
             Dim lrRoleInstance As FBM.RoleInstance
             Dim lrOtherRoleInstance As FBM.RoleInstance
-
+            lo_point = Me.DiagramView.ClientToDoc(e.Location)
             If IsSomething(Diagram.GetNodeAt(lo_point)) Then
                 '----------------------------------------------
                 'Mouse is over a ShapeNode
@@ -4662,11 +4662,14 @@ Public Class frmDiagramORM
 
                 Dim lrRoleName As FBM.RoleName
                 Select Case loNode.Tag.ConceptType
+
                     Case Is = pcenumConceptType.Role
                         'loNode.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
 
                         lrRoleInstance = loNode.Tag
                         lrRoleInstance.RoleName.Shape.TextColor = Color.BlueViolet
+                        lrRoleInstance.FactType.Shape.Pen.Color = Color.LightGray
+                        lrRoleInstance.FactType.Shape.Visible = True
                         For Each lrOtherRoleInstance In Me.zrPage.RoleInstance
                             If Not (lrOtherRoleInstance Is lrRoleInstance) Then
                                 'lrOtherRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
@@ -4689,6 +4692,9 @@ Public Class frmDiagramORM
                     Case Is = pcenumConceptType.ValueType
                         Me.DiagramView.AllowLinkCursor = Cursors.Hand
                     Case Else
+                        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                            lrFactTypeInstance.SetAppropriateColour()
+                        Next
                         For Each lrRoleInstance In Me.zrPage.RoleInstance
                             'lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
                             lrRoleInstance.RoleName.SetAppropriateColour()
@@ -5795,15 +5801,19 @@ SkipPopup:
 
     End Sub
 
-
     Private Sub mnuOption_Mandatory_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOption_Mandatory.Click
 
         Try
             Dim lrRoleInstance As FBM.RoleInstance
 
+            Try
+                lrRoleInstance = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
             mnuOption_Mandatory.Checked = Not mnuOption_Mandatory.Checked
 
-            lrRoleInstance = Me.zrPage.SelectedObject(0)
             lrRoleInstance.SetMandatory(mnuOption_Mandatory.Checked)
 
             '--------------------------------------------
@@ -9343,6 +9353,7 @@ SkipPopup:
             Try
                 lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
             Catch ex As Exception
+                Me.zrPage.SelectedObject.Clear()
                 Exit Sub
             End Try
 
@@ -9353,7 +9364,7 @@ SkipPopup:
 
                 Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
 
-                For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship.ToArray
+                For Each lrSubtypeRelationship In lrEntityTypeInstance.EntityType.SubtypeRelationship.FindAll(Function(x) x IsNot Nothing).ToArray
                     Call lrSubtypeRelationship.RemoveFromModel()
                 Next
 
@@ -9377,7 +9388,12 @@ SkipPopup:
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
         Try
-            lrValueTypeInstance = Me.zrPage.SelectedObject(0)
+            Try
+                lrValueTypeInstance = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Me.zrPage.SelectedObject.Clear()
+                Exit Sub
+            End Try
 
             Call lrValueTypeInstance.RemoveFromPage(True)
 

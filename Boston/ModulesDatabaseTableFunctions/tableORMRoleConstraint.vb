@@ -43,7 +43,7 @@ Namespace TableRoleConstraint
                 Dim lsMessage As String
                 lsMessage = "Error: TableRoleConstraint.AddRoleConstraint: "
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -234,7 +234,7 @@ LastResortObjectifyingEntityType:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return larFactType
             End Try
@@ -358,7 +358,7 @@ LastResortObjectifyingEntityType:
 
                                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                             End Try
 
                         End If
@@ -376,7 +376,7 @@ LastResortObjectifyingEntityType:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return arRoleConstraint
             End Try
@@ -448,12 +448,12 @@ LastResortObjectifyingEntityType:
                         lrRoleConstraint.MaximumFrequencyCount = lREcordset("MaximumFrequencyCount").Value
                         lrRoleConstraint.MinimumFrequencyCount = lREcordset("MinimumFrequencyCount").Value
                         Select Case lREcordset("CardinalityRangeType").Value
-                            Case Is = pcenumCardinalityRangeType.LessThanOREqual.ToString
-                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOREqual
+                            Case Is = pcenumCardinalityRangeType.LessThanOrEqual.ToString
+                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
                             Case Is = pcenumCardinalityRangeType.Equal.ToString
                                 lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
-                            Case Is = pcenumCardinalityRangeType.GreaterThanOREqual.ToString
-                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOREqual
+                            Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual.ToString
+                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
                             Case Is = pcenumCardinalityRangeType.Between.ToString
                                 lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
                         End Select
@@ -524,7 +524,7 @@ LastResortObjectifyingEntityType:
 
                                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                             End Try
 
                         End If
@@ -540,7 +540,7 @@ LastResortObjectifyingEntityType:
             Catch ex As Exception
                 lsMessage = "Error: TableRoleConstraint.GetRoleConstraintsByModel: "
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -598,7 +598,7 @@ LastResortObjectifyingEntityType:
                 Dim lsMessage1 As String
                 lsMessage1 = "Error: TableRoleConstraint.getRolesForRoleConstraint: "
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -657,7 +657,7 @@ LastResortObjectifyingEntityType:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 

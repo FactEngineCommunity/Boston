@@ -2913,7 +2913,10 @@ Public Class frmToolboxEnterpriseExplorer
             lrExportModel.ORMModel.ModelId = lrModel.ModelId
             lrExportModel.ORMModel.Name = lrModel.Name
 
-            Call lrExportModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements)
+            If Not lrExportModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements) Then
+                MsgBox("Fix the model errors, then try again.")
+                Exit Sub
+            End If
 
             Dim lsFileLocationName As String = ""
             If Boston.IsSerializable(lrExportModel) Then
@@ -3831,14 +3834,16 @@ Public Class frmToolboxEnterpriseExplorer
         With New WaitCursor
 
             Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+
             If Not lrModel.Loaded Then
                 Call Me.DoModelLoading(lrModel)
-                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
             End If
 
             While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
                 Boston.WriteToStatusBar("Still loading the Model's Pages")
             End While
+
+            Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
 
             Call frmMain.LoadGlossaryForm()
         End With
@@ -5146,11 +5151,11 @@ Public Class frmToolboxEnterpriseExplorer
                 lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
 
                 If lrCorePage Is Nothing Then
-                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CorePropertyGraphSchema.ToString & "', in the Core Model.")
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreBPMNDiagram.ToString & "', in the Core Model.")
                 End If
 
                 '----------------------------------------------------
-                'Create the Page for the EntityRelationshipDiagram.
+                'Create the Page for the BPMNDiagram.
                 '----------------------------------------------------
                 Boston.WriteToStatusBar("Creating the Page.")
                 lrPage = lrCorePage.Clone(prApplication.WorkingModel)
@@ -5199,7 +5204,10 @@ Public Class frmToolboxEnterpriseExplorer
                 lrFBMModel.ORMModel.Name = lrModel.Name
 
                 Boston.WriteToStatusBar("Converting the Model to the .fbm Fact-Based Model format")
-                Call lrFBMModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements)
+                If Not lrFBMModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements) Then
+                    MsgBox("Fix the model errors, then try again")
+                    Exit Sub
+                End If
 
                 lrModel = Me.TreeView.SelectedNode.Tag.Tag
                 If Not lrModel.Loaded Then

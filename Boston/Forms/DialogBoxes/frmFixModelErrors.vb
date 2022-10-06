@@ -90,6 +90,10 @@ Public Class frmFixModelErrors
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType,
                                                                               "Objectifying Entity Type Ids Not the same As Objectified Fact Type Id.",
                                                                               pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.SubtypeRelationshipWithNoFactType,
+                                                                              "Subtype Relationships with no Fact Type, fix.",
+                                                                              pcenumModelFixType.SubtypeRelationshipWithNoFactType))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

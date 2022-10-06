@@ -1215,6 +1215,7 @@ Namespace FBM
                     Dim lrRole As FBM.Role = larRole(0)
 
                     Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                      Where Relation.ResponsibleFactType IsNot Nothing
                                       Where Relation.ResponsibleFactType.Id = Me.Id
                                       Select Relation
 
@@ -4438,6 +4439,7 @@ Namespace FBM
                             Dim lrRole As FBM.Role = larRole(0)
 
                             Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                              Where Relation.ResponsibleFactType IsNot Nothing
                                               Where Relation.ResponsibleFactType.Id = Me.Id
                                               Select Relation
 
@@ -4455,7 +4457,6 @@ Namespace FBM
                         End If
 
                     End If
-
 
                     RaiseEvent FactTypeReadingModified(arFactTypeReading)
 
