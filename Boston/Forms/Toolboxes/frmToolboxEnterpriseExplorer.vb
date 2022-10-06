@@ -5184,6 +5184,8 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ToNORMAormFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemExportToNORMAormFile.Click
 
+        Dim lsMessage As String
+
         Try
             Dim lrModel As FBM.Model
             Dim lrFBMModel As New XMLModel.Model
@@ -5203,8 +5205,18 @@ Public Class frmToolboxEnterpriseExplorer
                 lrFBMModel.ORMModel.ModelId = lrModel.ModelId
                 lrFBMModel.ORMModel.Name = lrModel.Name
 
+                Dim lbExcludeMDAModelElements As Boolean = My.Settings.ExportFBMExcludeMDAModelElements
+
+                If Not My.Settings.ExportFBMExcludeMDAModelElements Then
+                    lsMessage = "Double you want exclude Boston Core MDA (Model Driven Architecture) elements? (recommended)"
+                    If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                        lbExcludeMDAModelElements = True
+                    End If
+                End If
+
                 Boston.WriteToStatusBar("Converting the Model to the .fbm Fact-Based Model format")
-                If Not lrFBMModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements) Then
+
+                If Not lrFBMModel.MapFromFBMModel(lrModel, lbExcludeMDAModelElements) Then
                     MsgBox("Fix the model errors, then try again")
                     Exit Sub
                 End If
@@ -5245,7 +5257,6 @@ Public Class frmToolboxEnterpriseExplorer
             End With
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

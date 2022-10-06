@@ -268,7 +268,7 @@
         <Instance />
         <SubtypeRelationships />
       </EntityType>
-      <EntityType Id="CoreAttributeIsPartOfRelationDestination1" GUID="77515e5d-f14b-4fbc-a3cb-b9f97f903124" Name="CoreAttributeIsPartOfRelationDestination1" DBName="" ReferenceSchemeRoleConstraintId="" IsObjectifyingEntityType="false" ReferenceMode="" IsIndependent="false" IsPersonal="false" IsAbsorbed="false" IsMDAModelElement="false" IsDerived="false" DerivationText="" LongDescription="" ShortDescription="">
+      <EntityType Id="CoreAttributeIsPartOfRelationDestination1" GUID="77515e5d-f14b-4fbc-a3cb-b9f97f903124" Name="CoreAttributeIsPartOfRelationDestination1" DBName="" ReferenceSchemeRoleConstraintId="" IsObjectifyingEntityType="false" ReferenceMode="" IsIndependent="false" IsPersonal="false" IsAbsorbed="false" IsMDAModelElement="true" IsDerived="false" DerivationText="" LongDescription="" ShortDescription="">
         <Instance />
         <SubtypeRelationships />
       </EntityType>
@@ -276,7 +276,7 @@
         <Instance />
         <SubtypeRelationships />
       </EntityType>
-      <EntityType Id="CoreAttributeIsPartOfRelationOrigin1" GUID="35b4f077-960a-4843-a749-90fcd4931b02" Name="CoreAttributeIsPartOfRelationOrigin1" DBName="" ReferenceSchemeRoleConstraintId="" IsObjectifyingEntityType="false" ReferenceMode="" IsIndependent="false" IsPersonal="false" IsAbsorbed="false" IsMDAModelElement="false" IsDerived="false" DerivationText="" LongDescription="" ShortDescription="">
+      <EntityType Id="CoreAttributeIsPartOfRelationOrigin1" GUID="35b4f077-960a-4843-a749-90fcd4931b02" Name="CoreAttributeIsPartOfRelationOrigin1" DBName="" ReferenceSchemeRoleConstraintId="" IsObjectifyingEntityType="false" ReferenceMode="" IsIndependent="false" IsPersonal="false" IsAbsorbed="false" IsMDAModelElement="true" IsDerived="false" DerivationText="" LongDescription="" ShortDescription="">
         <Instance />
         <SubtypeRelationships />
       </EntityType>
@@ -373,7 +373,7 @@
       </EntityType>
     </EntityTypes>
     <FactTypes>
-      <FactType Id="CoreOriginMultiplicity" GUID="bec558ee-58c9-494c-b6ba-9d1ed40d51ed" Name="CoreOriginMultiplicity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreOriginMultiplicity" GUID="0c982407-67ba-43f0-abd4-f7aee002136d" Name="CoreOriginMultiplicity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="95de2de2-0368-4f11-9ad2-e40a28ad208f" Name="ERDRelation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -396,7 +396,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsSubtypeOfCoreElement" GUID="8989125d-be42-42f8-837a-4f3cc220c97f" Name="CoreProcessIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsSubtypeOfCoreElement" GUID="76cbf3af-b517-4dd9-b391-2c2a73c27304" Name="CoreProcessIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="d33c7f9b-53b3-437d-8ddb-8f94de1c270d" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -429,7 +429,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNProcessType" GUID="9d4ea470-a8e6-4ab8-b5cd-8fa81e63ec44" Name="CoreProcessIsOfCoreBPMNProcessType" DBName="" ObjectifyingEntityTypeId="CoreProcessIsOfCoreBPMNProcessType" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNProcessType" GUID="df3e9131-51ae-463f-a573-158c4729b872" Name="CoreProcessIsOfCoreBPMNProcessType" DBName="" ObjectifyingEntityTypeId="CoreProcessIsOfCoreBPMNProcessType" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="410ff65d-82a0-4ffa-a44a-23cedf6d7a0c" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -452,7 +452,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNGatewayType" GUID="8a5964de-8cd3-4bc9-8514-ccaa777f7a7c" Name="CoreProcessIsOfCoreBPMNGatewayType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNGatewayType" GUID="51f8a6b5-9138-4d06-b378-6d7cda4c2354" Name="CoreProcessIsOfCoreBPMNGatewayType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="07b4491e-7243-49a1-8d20-e3af97aaf7aa" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -475,7 +475,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNEventType" GUID="78f0bfc8-a65b-46e5-81b4-2059d1d93b8b" Name="CoreProcessIsOfCoreBPMNEventType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNEventType" GUID="5e355429-6ab5-4e46-885c-10dd0a91e5d7" Name="CoreProcessIsOfCoreBPMNEventType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="1ceb5cd5-305d-4c1a-aa6b-fe4a1425b7b0" Name="Process" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -498,7 +498,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNEventSubtype" GUID="367bf6f1-f556-43e8-b3c6-dbaa018ef17a" Name="CoreProcessIsOfCoreBPMNEventSubtype" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNEventSubtype" GUID="120dfd2e-713a-40f6-8dc7-69e924092b4c" Name="CoreProcessIsOfCoreBPMNEventSubtype" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="819bfc2d-8b05-491f-a486-0a4d2be4a6a6" Name="Process" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -521,7 +521,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNEventPosition" GUID="5d972042-d64b-4d5d-93ef-c01e4116dfde" Name="CoreProcessIsOfCoreBPMNEventPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNEventPosition" GUID="084b06c7-30dd-40d0-bd52-2bdea1729a33" Name="CoreProcessIsOfCoreBPMNEventPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="2d9b66ad-8860-4720-8c68-885dffc97fb5" Name="Process" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -544,7 +544,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNConversationType" GUID="b766c255-ead0-4521-a1c7-bfd413c48de2" Name="CoreProcessIsOfCoreBPMNConversationType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNConversationType" GUID="419162c4-dfd5-442a-989c-95cc363bcf02" Name="CoreProcessIsOfCoreBPMNConversationType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f74b794b-f6bd-461e-8fa0-414631ef3758" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -567,7 +567,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNActivityType" GUID="ddf6f8ce-e7c4-4ee2-839b-652f2f18c2aa" Name="CoreProcessIsOfCoreBPMNActivityType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNActivityType" GUID="dab125a6-6a5f-4210-99ff-7a7d52268e28" Name="CoreProcessIsOfCoreBPMNActivityType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="498c10b3-bd17-4a01-a3aa-7933cb31aeb1" Name="Process" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -590,7 +590,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessIsOfCoreBPMNActivityTaskType" GUID="407e4a45-a6b3-46c8-8f07-b916d2e20b9d" Name="CoreProcessIsOfCoreBPMNActivityTaskType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessIsOfCoreBPMNActivityTaskType" GUID="3a63978c-777b-4b4f-8319-c976e22e2ee7" Name="CoreProcessIsOfCoreBPMNActivityTaskType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="bcf94eac-9020-4c81-8dbf-2138226a90c1" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -613,7 +613,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessHasProcessText" GUID="d647408a-0f5a-4f8e-8cc1-5811f207077d" Name="CoreProcessHasProcessText" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessHasProcessText" GUID="876cadf9-d5c8-4eb6-afbe-05a09b354df0" Name="CoreProcessHasProcessText" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="ba43b515-ff26-458b-adea-403b46cd91c7" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -636,7 +636,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessHasCoreBPMNActivityMarker" GUID="9fc2a9e5-893a-46aa-b75e-da60e3ccaf31" Name="CoreProcessHasCoreBPMNActivityMarker" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessHasCoreBPMNActivityMarker" GUID="d1d9e41d-f01c-4292-9701-3dedb2834a51" Name="CoreProcessHasCoreBPMNActivityMarker" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="d8b98b99-522b-468c-8c3d-fa81d82e24d5" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -659,7 +659,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessGroupIsSubtypeOfCoreProcess" GUID="4cab37a3-2720-49f2-90d5-312f060fa29e" Name="CoreProcessGroupIsSubtypeOfCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessGroupIsSubtypeOfCoreProcess" GUID="e62ee1f6-2718-4ed4-99c9-4efec88df512" Name="CoreProcessGroupIsSubtypeOfCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="6c37a3cd-b965-4c8e-b2b6-27a809c22fa2" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcessGroup">
             <ValueConstraint />
@@ -692,7 +692,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessGroupHasCoreProcessGroup_Id" GUID="1c36777f-2683-4f6c-a3e9-870c90446a75" Name="CoreProcessGroupHasCoreProcessGroup_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessGroupHasCoreProcessGroup_Id" GUID="967e0b47-70ac-4c3d-bd1b-013965817f13" Name="CoreProcessGroupHasCoreProcessGroup_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="1fc4221e-0e3e-4e79-b461-05d1f257571c" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcessGroup">
             <ValueConstraint />
@@ -725,7 +725,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessGroupContainsCoreProcess" GUID="23f44e22-9604-467a-bdbe-a6a4c95931f6" Name="CoreProcessGroupContainsCoreProcess" DBName="" ObjectifyingEntityTypeId="CoreProcessGroupContainsCoreProcess" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessGroupContainsCoreProcess" GUID="17a797e4-3b50-44f8-a7b3-9f0b646dbe80" Name="CoreProcessGroupContainsCoreProcess" DBName="" ObjectifyingEntityTypeId="CoreProcessGroupContainsCoreProcess" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="38770480-7c86-4b37-a114-2a4edb1d6b42" Name="ProcessGroup" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessGroup">
             <ValueConstraint />
@@ -748,7 +748,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessContainsSubCoreProcessInCoreProcessSubGroup" GUID="912bc4b2-aa33-4c10-94cd-a04d75828350" Name="CoreProcessContainsSubCoreProcessInCoreProcessSubGroup" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessContainsSubCoreProcessInCoreProcessSubGroup" GUID="4f50d14f-97ff-460d-b237-7f81b04628b4" Name="CoreProcessContainsSubCoreProcessInCoreProcessSubGroup" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="d042fd26-221b-4e6f-b432-efe8a462f391" Name="Process" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -790,7 +790,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreP2PIsIncludes" GUID="66eea6b4-bc02-4071-8634-5bf94ed8441a" Name="CoreP2PIsIncludes" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreP2PIsIncludes" GUID="306bbb18-ec50-4ab8-aa00-cb9fce0fb119" Name="CoreP2PIsIncludes" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="afe0d7d2-e79c-4e58-8812-bf2b85271eab" Name="CoreP2PIsIncludes" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -807,7 +807,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreP2PIsExtends" GUID="f292ef8c-297c-4f71-93dc-2facace08cb7" Name="CoreP2PIsExtends" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreP2PIsExtends" GUID="16af60ad-e6e3-4e64-afc8-eee98b2d0e07" Name="CoreP2PIsExtends" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c579fb0f-a4aa-4b0f-8bd7-9411adf16f69" Name="CoreP2PIsExtends" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -824,7 +824,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreOriginPredicate" GUID="889e3cfc-a5c5-4a8b-902f-b279cd6a721c" Name="CoreOriginPredicate" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreOriginPredicate" GUID="db5d1f74-0c15-47b6-ac00-02314578bcdb" Name="CoreOriginPredicate" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="74d540df-c6e1-471d-b472-0841517e5c34" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -847,7 +847,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreValueTypeHasState" GUID="4dc104c6-34b2-4f53-bbeb-e41d479139bc" Name="CoreValueTypeHasState" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreValueTypeHasState" GUID="67999775-1518-4a0a-add7-7a83a7485a28" Name="CoreValueTypeHasState" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="5b7da0ff-c01a-4ce1-8ab2-46bc5c9ebdbe" Name="ValueType" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreValueType">
             <ValueConstraint />
@@ -880,7 +880,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreOriginIsMandatory" GUID="40741cdf-da03-44b2-958e-097bf8985861" Name="CoreOriginIsMandatory" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreOriginIsMandatory" GUID="af194637-b228-46da-996f-fe8c06691cc3" Name="CoreOriginIsMandatory" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="da99d8a6-d4b2-426c-8886-1cff0a3e6571" Name="OriginIsMandatory" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -897,7 +897,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIsPGSRelation" GUID="b068b16e-09c4-4034-a69b-cbaf79b62ff3" Name="CoreIsPGSRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIsPGSRelation" GUID="5fcc066a-d3f4-4112-878a-ae1999db4e10" Name="CoreIsPGSRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="050a402a-5dad-49ca-bf66-b8ea7dc49666" Name="IsPGSRelation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreEntity">
             <ValueConstraint />
@@ -914,7 +914,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessSubGroupIsSubtypeOfCoreElement" GUID="ba35923b-e04d-4904-9beb-7a6724c6d029" Name="CoreProcessSubGroupIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessSubGroupIsSubtypeOfCoreElement" GUID="bc97d26f-3c1a-42c0-b7a1-e4eb62ca3345" Name="CoreProcessSubGroupIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="cb4ccad5-bb89-478b-872f-e3e7907c5c5b" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProcessGroup">
             <ValueConstraint />
@@ -947,7 +947,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessToProcessParticipationRelation" GUID="df764bcc-efb2-4aa1-a5fa-7b809d51cb9e" Name="CoreProcessToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="CoreProcessToProcessParticipationRelation" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessToProcessParticipationRelation" GUID="f83a7de3-8503-498c-a255-9ef0dcb9c5ca" Name="CoreProcessToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="CoreProcessToProcessParticipationRelation" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="74aab087-8b52-4f25-871f-7d9db19567ed" Name="Process1" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcess">
             <ValueConstraint />
@@ -976,7 +976,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessToProcessParticipationRelationIsConditionalFlow" GUID="783d1195-40a7-4a5d-8d9c-ef6973c7500d" Name="CoreProcessToProcessParticipationRelationIsConditionalFlow" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessToProcessParticipationRelationIsConditionalFlow" GUID="89733021-23eb-4c67-8bf1-69d898db8938" Name="CoreProcessToProcessParticipationRelationIsConditionalFlow" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="096070b3-2a2a-4a27-87e1-ec0b598cb36e" Name="RelationIsConditionalFlow" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -993,7 +993,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessToProcessParticipationRelationIsDefaultFlow" GUID="a4408df0-cc8a-429e-b800-0be952babf57" Name="CoreProcessToProcessParticipationRelationIsDefaultFlow" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessToProcessParticipationRelationIsDefaultFlow" GUID="4c30117d-22a0-4d79-82b8-04a0c987fd02" Name="CoreProcessToProcessParticipationRelationIsDefaultFlow" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c1052ef5-a77c-4802-909e-8cd4ca262ab3" Name="RelationIsDefaultFlow" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -1010,7 +1010,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreValueTypeHasStartCoreElementState" GUID="c0a16cfe-25f9-42d7-97ae-5d3b7f7eb773" Name="CoreValueTypeHasStartCoreElementState" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="true">
+      <FactType Id="CoreValueTypeHasStartCoreElementState" GUID="c80c9e7d-b6ba-49a9-bc73-2e3ba26182f9" Name="CoreValueTypeHasStartCoreElementState" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="true">
         <RoleGroup>
           <Role Id="fb1a3265-9b44-4345-9b82-0729c06db1be" Name="ValueType" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreValueType">
             <ValueConstraint />
@@ -1039,7 +1039,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreValueTypeHasEndCoreElementState" GUID="18a259ea-76e5-4a39-907c-a0f6f9eb7090" Name="CoreValueTypeHasEndCoreElementState" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="true">
+      <FactType Id="CoreValueTypeHasEndCoreElementState" GUID="2aa65dd0-81c2-43a8-9ffe-80e4853687dc" Name="CoreValueTypeHasEndCoreElementState" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="true">
         <RoleGroup>
           <Role Id="9d1e7451-ef93-4cc1-9cb4-8b1875a163da" Name="ValueType" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreValueType">
             <ValueConstraint />
@@ -1074,7 +1074,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreValueTypeHasCoreValueType_Id" GUID="bb1ee5ff-ea5f-4d5f-bcbe-cd2c3dc39080" Name="CoreValueTypeHasCoreValueType_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreValueTypeHasCoreValueType_Id" GUID="23db8c92-8a92-4e83-bd43-62b3a35b044b" Name="CoreValueTypeHasCoreValueType_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="febe32ab-f604-4481-8d5e-d9fef468b13b" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreValueType">
             <ValueConstraint />
@@ -1107,7 +1107,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreTypeIsSubtypeOfCoreElement" GUID="e3d571a8-309f-4f04-bf09-8cc2b40ade93" Name="CoreTypeIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreTypeIsSubtypeOfCoreElement" GUID="a5516a19-2faf-4d11-8e8e-144277e56a3e" Name="CoreTypeIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c70a94e1-7f46-44f8-aed6-3352b869f01d" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreType">
             <ValueConstraint />
@@ -1140,7 +1140,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreStateTransition" GUID="52bb9563-e8b7-4cbf-b3cd-1844ceb1be7b" Name="CoreStateTransition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreStateTransition" GUID="6722315b-c2c3-47df-9839-3027ba7635e6" Name="CoreStateTransition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="7453c6e6-21e5-447e-831d-73d43f6d19fa" Name="Concept1" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -1175,7 +1175,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreStateIsSubtypeOfCoreElement" GUID="e6864dac-bd68-41b7-92cb-6cae1373ecc7" Name="CoreStateIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreStateIsSubtypeOfCoreElement" GUID="dda33217-f814-4b98-bf68-14f86ca77742" Name="CoreStateIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="5635b1ec-49bd-4ca7-a583-292648178d70" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreState">
             <ValueConstraint />
@@ -1208,7 +1208,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreStateHasName" GUID="afde3b72-7f56-4feb-924c-6254a63536f4" Name="CoreStateHasName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreStateHasName" GUID="01c41192-c0d4-47ba-976c-882dc774cd7e" Name="CoreStateHasName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="4e82dedb-d455-4237-864e-cd15b6fff3f0" Name="State" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreState">
             <ValueConstraint />
@@ -1231,7 +1231,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRoleHasCoreRole_Id" GUID="b3564fe0-8f8e-4d14-bb8b-6bfdb8c5aa43" Name="CoreRoleHasCoreRole_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRoleHasCoreRole_Id" GUID="fa287f57-059e-46b9-a12e-b5c42a343380" Name="CoreRoleHasCoreRole_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="ce0f0054-ad16-4122-8194-45df09300d90" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreRole">
             <ValueConstraint />
@@ -1264,7 +1264,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationTriggersACascadeUpdate" GUID="0baf09ed-1cc1-44f5-8cbb-d586a45cdb3a" Name="CoreRelationTriggersACascadeUpdate" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationTriggersACascadeUpdate" GUID="a6fa9624-f350-4c0e-abb9-ad72b1a39233" Name="CoreRelationTriggersACascadeUpdate" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="6514df0c-0f89-4a81-9408-35b9620d69de" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -1281,7 +1281,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationTriggersACascadeDelete" GUID="f6ebd81b-e806-4689-933a-1d4e40ad7628" Name="CoreRelationTriggersACascadeDelete" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationTriggersACascadeDelete" GUID="8142d375-0c55-4f1e-a43d-5fd45c39b897" Name="CoreRelationTriggersACascadeDelete" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="2c8e34c4-ea9d-409e-af96-8efcb22452fb" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -1298,7 +1298,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIsMandatory" GUID="46f6e740-2424-4421-a0d7-1f819126f9fb" Name="CoreIsMandatory" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIsMandatory" GUID="9f8ac27f-39ff-44b9-98d8-28f1416f93f7" Name="CoreIsMandatory" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="bcb70097-2167-4087-8c5d-2de9398c38fb" Name="IsMandatory" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttribute">
             <ValueConstraint />
@@ -1315,7 +1315,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationMustEnforceReferentialIntegrity" GUID="87f06981-df79-4357-aacd-e88a84b0dcdf" Name="CoreRelationMustEnforceReferentialIntegrity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationMustEnforceReferentialIntegrity" GUID="385848d1-0367-4261-9654-f9d2b6950fda" Name="CoreRelationMustEnforceReferentialIntegrity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f84419be-df0d-48d5-be84-7ca650052790" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -1332,7 +1332,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationIsForFactType" GUID="8cf61dab-f804-480c-8314-a4a7a7310a40" Name="CoreRelationIsForFactType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationIsForFactType" GUID="e4f128be-c4e7-4e50-a1e6-c1efbd48bdf8" Name="CoreRelationIsForFactType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f1e9e66d-2bf2-4988-a70e-f0913d59140a" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -1355,7 +1355,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationIsForEntity" GUID="6b7526ea-c578-4671-be17-ec5dad0fe4e6" Name="CoreRelationIsForEntity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationIsForEntity" GUID="270895e7-30e9-4dca-9135-79bb6e5c6a9e" Name="CoreRelationIsForEntity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="b0b0c444-fa95-4a26-8434-b2fcd534897b" Name="Entity" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreEntity">
             <ValueConstraint />
@@ -1378,7 +1378,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationHasDestinationEntity" GUID="27767d7d-1d8a-4697-b6d7-ded3c50a580b" Name="CoreRelationHasDestinationEntity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationHasDestinationEntity" GUID="b572c149-178d-4fbd-a83c-036c5faef79c" Name="CoreRelationHasDestinationEntity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c4ba9f24-05ac-4ae1-9d17-9d66c83a0791" Name="Entity" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreEntity">
             <ValueConstraint />
@@ -1401,7 +1401,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CorePropertyIsSubtypeOfCoreElement" GUID="097e0477-1eea-4378-bf84-a7427740b017" Name="CorePropertyIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CorePropertyIsSubtypeOfCoreElement" GUID="4addabb0-68da-4c5c-8021-f14ab78eaa7d" Name="CorePropertyIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f7503e2d-fb34-4931-8482-ea751ba05b23" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProperty">
             <ValueConstraint />
@@ -1434,7 +1434,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CorePropertyIsForRole" GUID="766ebce5-63b0-4a74-ae15-7656bfaed730" Name="CorePropertyIsForRole" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CorePropertyIsForRole" GUID="31956de2-a0c9-4bf2-aeea-94e4e9a3edce" Name="CorePropertyIsForRole" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="0639d55f-ebce-4e61-bbd9-00934e164b1b" Name="Property" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProperty">
             <ValueConstraint />
@@ -1457,7 +1457,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CorePropertyIsForFactType" GUID="227d6f28-f49f-411d-a9d9-532956d44405" Name="CorePropertyIsForFactType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CorePropertyIsForFactType" GUID="999738cd-f922-4292-8ae0-33485f393530" Name="CorePropertyIsForFactType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f9015e90-ce43-4f71-9681-f9ab7b72913f" Name="Property" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProperty">
             <ValueConstraint />
@@ -1480,7 +1480,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CorePropertyHasPropertyName" GUID="b8afd7cd-48b5-4fc4-901c-3ef768eaa321" Name="CorePropertyHasPropertyName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CorePropertyHasPropertyName" GUID="6fd24309-088b-417f-94fd-830a52fd94b6" Name="CorePropertyHasPropertyName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="b11c6775-88da-4556-9e6c-c454c1af9da6" Name="PropertyName" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CorePropertyName">
             <ValueConstraint />
@@ -1513,7 +1513,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CorePropertyHasOrdinalPosition" GUID="479ea371-9afb-444b-ba0a-55823fee4a95" Name="CorePropertyHasOrdinalPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CorePropertyHasOrdinalPosition" GUID="cd35dee2-7d81-45b6-b1e2-c8d0d10413d3" Name="CorePropertyHasOrdinalPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="88d8a1d0-20ba-4a65-ae6c-8dab12eb98d0" Name="Property" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProperty">
             <ValueConstraint />
@@ -1536,7 +1536,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CorePropertyHasActiveRole" GUID="98ba69b1-dc51-43bb-a147-0b0e1a3b588a" Name="CorePropertyHasActiveRole" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CorePropertyHasActiveRole" GUID="858741e3-b09b-48bf-8243-6f776f0c5f9c" Name="CorePropertyHasActiveRole" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c57ec18e-5b9b-45bd-94ad-be150d0524b7" Name="Property" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreProperty">
             <ValueConstraint />
@@ -1559,7 +1559,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessToProcessRelationHasConditionExpression" GUID="489175c5-60cc-4e78-908b-f3efa3a0197c" Name="CoreProcessToProcessRelationHasConditionExpression" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessToProcessRelationHasConditionExpression" GUID="c29c156b-7c10-45c6-9984-b253e71c3f42" Name="CoreProcessToProcessRelationHasConditionExpression" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="da3f85c7-f21f-4dbf-931b-596da7b80b95" Name="ProcessProcessRelation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -1582,7 +1582,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationIsSubtypeOfCoreElement" GUID="63b0db81-e1de-465c-927d-40698b54a54f" Name="CoreRelationIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationIsSubtypeOfCoreElement" GUID="aa1d6e7e-d630-44a5-ba15-e1cfeb31d34c" Name="CoreRelationIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="cd39508f-c278-4dee-8504-ff3c5ab7216d" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -1615,7 +1615,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexRestrainsToUniqueValues" GUID="7c0b7c9a-791f-4068-b843-94680638764e" Name="CoreIndexRestrainsToUniqueValues" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexRestrainsToUniqueValues" GUID="a6db899b-bb08-415e-9617-ccc9c25eb884" Name="CoreIndexRestrainsToUniqueValues" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="b37468dc-8bee-4e41-98e3-8f93e0f3f7b5" Name="Index" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -1632,7 +1632,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreValueTypeIsStateTransitionBased" GUID="caddde57-8e86-4556-995a-8451c68e4614" Name="CoreValueTypeIsStateTransitionBased" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreValueTypeIsStateTransitionBased" GUID="0c2fdfec-85ee-4d93-a9e3-4410f4b7c80d" Name="CoreValueTypeIsStateTransitionBased" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="9665f3e0-8083-4a49-ad61-c8e4330ab451" Name="IsStateTransitionBased" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreValueType">
             <ValueConstraint />
@@ -1649,7 +1649,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexIsPrimaryKey" GUID="c605b1d0-5794-4767-a60c-b9c22b5f696c" Name="CoreIndexIsPrimaryKey" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexIsPrimaryKey" GUID="0ba69237-cc80-46ed-a2ac-f0168b5ac3d8" Name="CoreIndexIsPrimaryKey" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="2419e36f-eee5-4b2a-9a69-13195349f978" Name="Index" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -1666,7 +1666,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataIsDataStore" GUID="9ea51c75-5bb8-4631-a8e3-d35de6e0e365" Name="CoreDataIsDataStore" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataIsDataStore" GUID="da2eb88b-b95d-4494-aac5-2d18e75eed75" Name="CoreDataIsDataStore" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="2391a74b-2b71-417a-9696-6a57fdcc6698" Name="DataIsDataStore" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreData">
             <ValueConstraint />
@@ -1683,7 +1683,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexMakesUseOfProperty" GUID="20208a6e-0cf3-41ab-8689-ececb79648c6" Name="CoreIndexMakesUseOfProperty" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexMakesUseOfProperty" GUID="6ada5917-4084-4b80-bfd8-bd6bb34ed2dd" Name="CoreIndexMakesUseOfProperty" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="bdce4460-4801-4cfb-b5b8-78773aa90c70" Name="Index" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -1706,7 +1706,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataIsAttachedToCoreProcess" GUID="b30d3dd9-9371-4a1e-8d9f-c3004cf63ee4" Name="CoreDataIsAttachedToCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataIsAttachedToCoreProcess" GUID="5070539e-5617-4448-b182-ffde142bd7c3" Name="CoreDataIsAttachedToCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="06f48803-3f99-445a-b7e7-7c5bdd50ce6a" Name="Data" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreData">
             <ValueConstraint />
@@ -1729,7 +1729,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataHasCoreAnnotation" GUID="6402d922-f4bd-4153-94c7-e2c431a0b72f" Name="CoreDataHasCoreAnnotation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataHasCoreAnnotation" GUID="cb30754d-1b3c-4b83-9a91-783521a693fb" Name="CoreDataHasCoreAnnotation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="1bc7bbd7-0d85-4c92-9c39-b1551a12e4c8" Name="Data" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -1752,7 +1752,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreContributesToPrimaryKey" GUID="f8673679-b8d0-4c9f-ad5c-8c8ca1a13346" Name="CoreContributesToPrimaryKey" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreContributesToPrimaryKey" GUID="4aa31bca-e6bc-4362-b16c-22bf50cf8690" Name="CoreContributesToPrimaryKey" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f4196ecd-7ecf-4adb-ae60-019d8ae636da" Name="ContributesToPrimaryKey" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -1769,7 +1769,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreClassGetsIdentificationFromSupertypeClass" GUID="4b356edf-5e1e-4c34-9019-ea441fe24281" Name="CoreClassGetsIdentificationFromSupertypeClass" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreClassGetsIdentificationFromSupertypeClass" GUID="ddb397a4-fcfe-4042-9f0e-dc8b5af4dc5c" Name="CoreClassGetsIdentificationFromSupertypeClass" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="76982b79-6400-43f9-9307-45c282a1152c" Name="Subtype" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreEntity">
             <ValueConstraint />
@@ -1792,7 +1792,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNPoolLaneIsForCoreActor" GUID="81e5364f-1d87-4830-9b9e-895879cbce5a" Name="CoreBPMNPoolLaneIsForCoreActor" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNPoolLaneIsForCoreActor" GUID="50025610-97b1-48ef-9fcb-b0fb7888cdc4" Name="CoreBPMNPoolLaneIsForCoreActor" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="b97da9da-977f-4b92-a7e3-82ba5a1955c2" Name="PoolLane" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreBPMNPoolLane">
             <ValueConstraint />
@@ -1815,7 +1815,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNPoolLaneHousesPoolLaneAtSequenceNr" GUID="98a9bfd4-0c1b-471c-9c9b-fb6502c6f702" Name="CoreBPMNPoolLaneHousesPoolLaneAtSequenceNr" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNPoolLaneHousesPoolLaneAtSequenceNr" GUID="4880c704-1c35-407a-87ff-bd8acb1ee49d" Name="CoreBPMNPoolLaneHousesPoolLaneAtSequenceNr" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="79910698-6822-4d46-862c-c4ff0768fa24" Name="PoolLane" SequenceNr="2" Mandatory="false" JoinedObjectTypeId="CoreBPMNPoolLane">
             <ValueConstraint />
@@ -1844,7 +1844,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNCollaborationHasCoreBPMNCollaborationName" GUID="03c8411c-4dc2-4001-98cf-fa0c9bcde2b8" Name="CoreBPMNCollaborationHasCoreBPMNCollaborationName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNCollaborationHasCoreBPMNCollaborationName" GUID="690fbd6d-398c-4053-ac31-9c298d433e40" Name="CoreBPMNCollaborationHasCoreBPMNCollaborationName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="80ae7596-f9f0-4744-b3f2-a115d333c918" Name="Collaboration" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreBPMNPoolLane">
             <ValueConstraint />
@@ -1867,7 +1867,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNCollaborationHasCoreBPMNCollaboration_Id1" GUID="0d4b0834-8e39-4bb5-8278-cf1ba3d0e361" Name="CoreBPMNCollaborationHasCoreBPMNCollaboration_Id1" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNCollaborationHasCoreBPMNCollaboration_Id1" GUID="b9ec3973-d5e3-48cd-bed9-7b0cdd189af5" Name="CoreBPMNCollaborationHasCoreBPMNCollaboration_Id1" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="808b336d-a4d1-496e-8dd6-80d1f6d68598" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreBPMNPoolLane">
             <ValueConstraint />
@@ -1900,7 +1900,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataIsInput" GUID="fed5149e-96d2-4bf4-a82b-71b0cfbcdeb2" Name="CoreDataIsInput" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataIsInput" GUID="78cce612-5a07-4163-94d1-8896fe0e9ffc" Name="CoreDataIsInput" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="30b43009-2aab-484b-8890-be3bae2103dd" Name="DataIsInput" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreData">
             <ValueConstraint />
@@ -1917,7 +1917,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNCollaborationContainsCoreElement" GUID="18235d7c-7d88-4530-84e8-8aec7ef385a0" Name="CoreBPMNCollaborationContainsCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNCollaborationContainsCoreElement" GUID="25e3d869-c78a-4e73-8bb6-ee719cceed61" Name="CoreBPMNCollaborationContainsCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="214a2430-afa2-4403-adf2-80f592640757" Name="BPMNDocument" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreBPMNPoolLane">
             <ValueConstraint />
@@ -1940,7 +1940,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeIsSubtypeOfCoreProperty" GUID="7ff159a5-5811-4253-9776-a65a4d741b3f" Name="CoreAttributeIsSubtypeOfCoreProperty" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeIsSubtypeOfCoreProperty" GUID="97eb120f-a425-4bd4-b6d8-8150b5c4375f" Name="CoreAttributeIsSubtypeOfCoreProperty" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="fa59df62-a06a-4b10-b13a-1f27126d733d" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreAttribute">
             <ValueConstraint />
@@ -1973,7 +1973,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeIsPartOfRelationOriginHasOrdinalPosition" GUID="c485ae4c-1b10-4ca9-95b9-b71c2d462660" Name="CoreAttributeIsPartOfRelationOriginHasOrdinalPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeIsPartOfRelationOriginHasOrdinalPosition" GUID="ada25618-517d-49c3-b8f6-c1177612db77" Name="CoreAttributeIsPartOfRelationOriginHasOrdinalPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="45742519-8dce-4f52-ac3e-51c631e3c745" Name="RelationAttribute" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreAttributeIsPartOfRelationOrigin">
             <ValueConstraint />
@@ -1996,7 +1996,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeIsPartOfRelationOrigin" GUID="77e96a22-afb5-462a-9d99-2f2ec7fda57a" Name="CoreAttributeIsPartOfRelationOrigin" DBName="" ObjectifyingEntityTypeId="CoreAttributeIsPartOfRelationOrigin" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeIsPartOfRelationOrigin" GUID="750d7288-cb60-4c6c-9e9c-cd578a1f3782" Name="CoreAttributeIsPartOfRelationOrigin" DBName="" ObjectifyingEntityTypeId="CoreAttributeIsPartOfRelationOrigin" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c505e513-a7d1-4dc5-84cd-c4d31d319e38" Name="Attribute" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttribute">
             <ValueConstraint />
@@ -2019,7 +2019,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition" GUID="38af507e-ae65-46a0-92bb-7bfffc79d38b" Name="CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition" GUID="453c82e1-736c-4c84-b68c-35e8c53b8664" Name="CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="59093bb6-64b5-445c-b3fb-532746fba525" Name="RelationAttribute" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreAttributeIsPartOfRelationDestination">
             <ValueConstraint />
@@ -2042,7 +2042,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeIsPartOfRelationDestination" GUID="d9b3f292-a68b-45cd-8b6b-07065098874a" Name="CoreAttributeIsPartOfRelationDestination" DBName="" ObjectifyingEntityTypeId="CoreAttributeIsPartOfRelationDestination" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeIsPartOfRelationDestination" GUID="cd395b68-86f7-49ee-a4d9-230dc9954507" Name="CoreAttributeIsPartOfRelationDestination" DBName="" ObjectifyingEntityTypeId="CoreAttributeIsPartOfRelationDestination" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="7a9a9d61-dbd7-42c2-8035-0923c2c9bff0" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -2065,7 +2065,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeIsDerivedFactTypeParameter" GUID="e0205a3d-0aaa-42d6-8d71-4a365d2f045d" Name="CoreAttributeIsDerivedFactTypeParameter" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeIsDerivedFactTypeParameter" GUID="983a9de6-ff31-437f-b838-028344f4253f" Name="CoreAttributeIsDerivedFactTypeParameter" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="dada4797-653c-4083-be08-07ebafcf362f" Name="IsDerivedFactTypeParameter" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttribute">
             <ValueConstraint />
@@ -2082,7 +2082,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreActorToProcessRelationHasMultipleParticipants" GUID="ed506f3f-f02b-4136-801f-bad3020c5790" Name="CoreActorToProcessRelationHasMultipleParticipants" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreActorToProcessRelationHasMultipleParticipants" GUID="b2adf3bb-7424-4a0b-9aab-4b5503b50c27" Name="CoreActorToProcessRelationHasMultipleParticipants" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="62fd34c8-cb8e-411b-b39a-8d3b2f48224e" Name="HasMultipleParticipants" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreActorToProcessParticipationRelation">
             <ValueConstraint />
@@ -2099,7 +2099,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreActorToProcessParticipationRelation" GUID="006e7820-d99b-404e-a304-af6862fc646e" Name="CoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="CoreActorToProcessParticipationRelation" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreActorToProcessParticipationRelation" GUID="f14a7242-9b36-4bc6-a038-46795043b297" Name="CoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="CoreActorToProcessParticipationRelation" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="true" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="5839176d-1df4-47f6-b43d-521eeb148749" Name="Actor" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreActor">
             <ValueConstraint />
@@ -2128,7 +2128,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreActorProcessRelationIsAtSequenceNr" GUID="ccaa846b-d453-4ff8-804f-b79a8bd66307" Name="CoreActorProcessRelationIsAtSequenceNr" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreActorProcessRelationIsAtSequenceNr" GUID="22e396a4-b49d-4f11-89a6-c024b70acc8d" Name="CoreActorProcessRelationIsAtSequenceNr" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="bd097da6-ea75-4056-9354-55f9aee28912" Name="ActorProcessRelation" SequenceNr="2" Mandatory="false" JoinedObjectTypeId="CoreActorToProcessParticipationRelation">
             <ValueConstraint />
@@ -2151,7 +2151,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreActorIsSubtypeOfCoreElement" GUID="d0bcafa4-59c5-447c-8015-a5df1c36ffd0" Name="CoreActorIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreActorIsSubtypeOfCoreElement" GUID="bebc3ca8-cb46-48e7-a468-df567f9404f0" Name="CoreActorIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="06058f1a-7c64-4ae1-be14-12b406e6fdd6" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreActor">
             <ValueConstraint />
@@ -2184,7 +2184,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNActorInDocumentOwnsP2PRelation" GUID="bd80c4bd-5a39-41f1-9440-f30bc97a9058" Name="CoreBPMNActorInDocumentOwnsP2PRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNActorInDocumentOwnsP2PRelation" GUID="b8ca1a3f-8a09-4cb0-a1f2-df49e7d9c77b" Name="CoreBPMNActorInDocumentOwnsP2PRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="4aaac66f-5247-4a97-8583-62f6e2d867db" Name="P2PRelation" SequenceNr="2" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -2207,7 +2207,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataIsMessage" GUID="f4bf3479-1450-4c84-847f-76cebb040ae9" Name="CoreDataIsMessage" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataIsMessage" GUID="24441659-d207-4502-b353-05bd0bfd8933" Name="CoreDataIsMessage" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="4925e6e9-5b9b-4f1b-bf9e-540a4b6ce0c2" Name="DataIsMessage" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreData">
             <ValueConstraint />
@@ -2224,7 +2224,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataIsCollection" GUID="a5693abe-1ede-4e33-915a-09e5a95eaacf" Name="CoreDataIsCollection" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataIsCollection" GUID="918fe407-ba9c-43d8-bb23-1292feb36a69" Name="CoreDataIsCollection" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="e67634f2-3978-440f-80ee-808e5a87fd11" Name="DataIsCollection" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreData">
             <ValueConstraint />
@@ -2241,7 +2241,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDestinationIsMandatory" GUID="a9a625d3-9ef0-488b-8316-eb2691f54fe2" Name="CoreDestinationIsMandatory" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDestinationIsMandatory" GUID="68124516-180a-4c7a-a84e-072b7e1b9780" Name="CoreDestinationIsMandatory" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="bc9df784-ac44-43aa-8cbf-1cc378eff1ca" Name="DestinationIsMandatory" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -2258,7 +2258,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexIsForEntity" GUID="5b6fc4e8-3142-42ea-a957-308e34aab9ce" Name="CoreIndexIsForEntity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexIsForEntity" GUID="ff90a382-e8f4-43fb-803b-089ebc68ed29" Name="CoreIndexIsForEntity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="b105afb2-0240-4e9e-b1cc-ad0545bf4411" Name="Index" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -2281,7 +2281,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexIgnoresNulls" GUID="8ba5d7a2-efd8-43c2-ae40-c43c81561a7b" Name="CoreIndexIgnoresNulls" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexIgnoresNulls" GUID="c38defd3-50d7-4355-a2a3-0457601d67c3" Name="CoreIndexIgnoresNulls" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="12e6156f-f977-4519-beaa-3b517b5665af" Name="Index" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -2298,7 +2298,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexHasQualifier" GUID="1a31a416-4038-47f0-baaa-07a4e8204414" Name="CoreIndexHasQualifier" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexHasQualifier" GUID="bd48b13e-7dd9-4042-be82-f4f6b1f6ee7f" Name="CoreIndexHasQualifier" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="7b5eeae2-6211-4a84-b5ae-f397acdc2098" Name="Index" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -2321,7 +2321,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexHasIndexName" GUID="3e90f36c-f13c-46d0-b56e-1415edef0835" Name="CoreIndexHasIndexName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexHasIndexName" GUID="fe874236-e618-454a-8564-7d92019e6f25" Name="CoreIndexHasIndexName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c4aa56f4-5448-4295-802b-7004a0028dc6" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -2354,7 +2354,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreIndexHasDirection" GUID="8303dc87-a183-485c-b273-5e88e23b65f9" Name="CoreIndexHasDirection" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreIndexHasDirection" GUID="f25a571d-5276-4c28-b411-95eafbe39535" Name="CoreIndexHasDirection" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="19338c59-3a56-4b7e-a785-a8654f05bcd2" Name="Index" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreIndex">
             <ValueConstraint />
@@ -2377,7 +2377,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreFactTypeHasCoreFactType_Id" GUID="ee408927-41a4-4e6c-aace-89ab294b16c9" Name="CoreFactTypeHasCoreFactType_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreFactTypeHasCoreFactType_Id" GUID="69ea1f44-7852-47ed-bced-010a47c95df9" Name="CoreFactTypeHasCoreFactType_Id" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="00ea3e8d-2e22-4450-bad6-becfcfb5ff0e" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreFactType">
             <ValueConstraint />
@@ -2410,7 +2410,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreERDAttribute" GUID="03925f77-a847-4503-9d36-b1ceaa51de2f" Name="CoreERDAttribute" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreERDAttribute" GUID="86ea279a-d85e-4ac0-85ce-a5e148a90b55" Name="CoreERDAttribute" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="602f235a-21cf-4309-9405-0174693775be" Name="ModelObject" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreEntity">
             <ValueConstraint />
@@ -2433,7 +2433,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataIsSubtypeOfCoreElement" GUID="f7fe2ce2-481b-47eb-8492-32c97c0f99b4" Name="CoreDataIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataIsSubtypeOfCoreElement" GUID="2aa62a8d-69e8-4667-9567-167afc30951d" Name="CoreDataIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c7f03945-71be-47a3-adce-7fc5d7cdd667" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreData">
             <ValueConstraint />
@@ -2466,7 +2466,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreEndStateIsSubtypeOfCoreElement" GUID="4effbd09-64e0-4718-ac9c-bc9e8fba0a80" Name="CoreEndStateIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreEndStateIsSubtypeOfCoreElement" GUID="4dc3fc9a-63bf-434c-92d6-eb0ca97ff0ab" Name="CoreEndStateIsSubtypeOfCoreElement" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="cba79866-bd5f-4a8a-9cb8-1f18d13909ee" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreEndState">
             <ValueConstraint />
@@ -2499,7 +2499,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreEntityIsSubtypeOfCoreType" GUID="9365e57a-1c5d-44de-8b03-a5866834ad1b" Name="CoreEntityIsSubtypeOfCoreType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreEntityIsSubtypeOfCoreType" GUID="705965a3-867a-4ce3-9bb8-130e44bf708a" Name="CoreEntityIsSubtypeOfCoreType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="true" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="05110ec3-0091-4813-8e1a-2441bb6d3268" Name="Subtype" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreEntity">
             <ValueConstraint />
@@ -2532,7 +2532,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreElementHasElementName" GUID="4937678d-77db-4fd3-8a60-6386fb979eee" Name="CoreElementHasElementName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreElementHasElementName" GUID="9d1ca039-71c4-4b56-b843-f000d11793b4" Name="CoreElementHasElementName" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="60c8cc48-aba9-4931-9b3c-b782ded035f8" Name="Element" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -2555,7 +2555,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDestinationMultiplicity" GUID="c2e24f52-7bff-4c90-8e60-9f9654072f3a" Name="CoreDestinationMultiplicity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDestinationMultiplicity" GUID="3a8833f0-4185-40f4-bb71-b2596a9ba5a8" Name="CoreDestinationMultiplicity" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="f8404367-3414-40be-aacd-e42385c4e517" Name="ERDRelation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -2578,7 +2578,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDestinationPredicate" GUID="d2521ec7-5783-4f0d-91e3-14e959373dc1" Name="CoreDestinationPredicate" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDestinationPredicate" GUID="9019bcbf-4a11-43fc-bf65-f0e55e2df4c8" Name="CoreDestinationPredicate" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="ff83131f-3447-4eba-b41d-ad3a4eb06474" Name="Relation" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreRelation">
             <ValueConstraint />
@@ -2601,7 +2601,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreElementHasCoreElement_Name" GUID="e8a6bc91-b603-459b-9352-a59bf87afccf" Name="CoreElementHasCoreElement_Name" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreElementHasCoreElement_Name" GUID="0c690bdb-525a-4187-9390-e077118d10a1" Name="CoreElementHasCoreElement_Name" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="true" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="299b7143-be3e-413a-b723-9ef781ab6d45" Name="" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -2634,7 +2634,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreElementHasElementType" GUID="13a113b9-6c3d-4bfb-b7de-8fab40d3f5e4" Name="CoreElementHasElementType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreElementHasElementType" GUID="e8f32cad-fcc8-4cfe-a96b-67f6c6b9937a" Name="CoreElementHasElementType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="e6ca6889-db16-470f-9106-d20387a59c3b" Name="Element" SequenceNr="1" Mandatory="true" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -2657,7 +2657,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreElementHasCoreModelNote" GUID="70f36f33-13a5-479c-b886-3d0e8c620daf" Name="CoreElementHasCoreModelNote" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreElementHasCoreModelNote" GUID="d78301b1-8178-435f-88ee-808006228356" Name="CoreElementHasCoreModelNote" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="4e1f9008-22a3-47aa-a3c3-c12ee8f50913" Name="Element" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -2680,7 +2680,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreElementIsAtSequenceNr" GUID="83771a0e-4994-469a-a926-a8f66227ba3c" Name="CoreElementIsAtSequenceNr" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreElementIsAtSequenceNr" GUID="019a72f0-f133-4552-b565-f2087ece27b8" Name="CoreElementIsAtSequenceNr" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="false" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="6dcee10a-bf3d-48f9-9176-46eec0e96e64" Name="Element" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreElement">
             <ValueConstraint />
@@ -2703,7 +2703,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeCoreAttributeIsPartOfRelationDesination" GUID="5e26c2b9-9a83-428d-a0f5-4d44863bbab4" Name="CoreAttributeCoreAttributeIsPartOfRelationDesination" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="c0a211a0-91da-4882-8be2-ff3492a1c359" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeCoreAttributeIsPartOfRelationDesination" GUID="e1d059b1-99e3-4da7-9316-4f878c61ad16" Name="CoreAttributeCoreAttributeIsPartOfRelationDesination" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="c0a211a0-91da-4882-8be2-ff3492a1c359" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="08a4a14a-71f6-4f17-a061-c0ebb1d8a408" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttributeIsPartOfRelationDestination">
             <ValueConstraint />
@@ -2736,7 +2736,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreAttributeCoreAttributeIsPartOfRelationOrigin" GUID="b7828822-08fc-404f-9914-2d15818c2a9c" Name="CoreAttributeCoreAttributeIsPartOfRelationOrigin" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="c505e513-a7d1-4dc5-84cd-c4d31d319e38" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreAttributeCoreAttributeIsPartOfRelationOrigin" GUID="d16cb283-28eb-4a11-b3ad-ea49db332a4e" Name="CoreAttributeCoreAttributeIsPartOfRelationOrigin" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="c505e513-a7d1-4dc5-84cd-c4d31d319e38" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="43aebcfc-b691-4110-9b1c-bb2dcc0b1c95" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttributeIsPartOfRelationOrigin">
             <ValueConstraint />
@@ -2769,7 +2769,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataCoreProcessToProcessParticipationRelation" GUID="979385fb-0fc6-42b7-b489-bc9feb5de125" Name="CoreDataCoreProcessToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="3f7c208c-aeed-4205-a2f2-dca0f1b629df" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataCoreProcessToProcessParticipationRelation" GUID="2d0abc5a-e45f-49f4-9611-0c45d9cd7a4b" Name="CoreDataCoreProcessToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="3f7c208c-aeed-4205-a2f2-dca0f1b629df" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="dc997c91-a840-4916-888e-b16a9e2b772a" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -2802,7 +2802,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreDataCoreActorToProcessParticipationRelation" GUID="97a0114f-934f-4b13-b0a8-92b1564134c0" Name="CoreDataCoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="3057354a-03ed-4445-9baf-a0e69612753a" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreDataCoreActorToProcessParticipationRelation" GUID="2518f5b3-b57f-48fa-a571-1bd9c3276587" Name="CoreDataCoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="3057354a-03ed-4445-9baf-a0e69612753a" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="7afeea79-729b-434d-be04-6e72723108f1" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreActorToProcessParticipationRelation">
             <ValueConstraint />
@@ -2835,7 +2835,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreBPMNProcessTypeCoreProcessIsOfCoreBPMNProcessType" GUID="5140366e-abb1-4444-92c0-5a2870095fca" Name="CoreBPMNProcessTypeCoreProcessIsOfCoreBPMNProcessType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="deb5f2d5-8a75-459b-9b94-afd512d1ee68" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreBPMNProcessTypeCoreProcessIsOfCoreBPMNProcessType" GUID="0af19a22-17c5-4753-a98d-c6ebf19ad05d" Name="CoreBPMNProcessTypeCoreProcessIsOfCoreBPMNProcessType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="deb5f2d5-8a75-459b-9b94-afd512d1ee68" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="564d8f4e-899e-41d8-9c31-3e236424cb61" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessIsOfCoreBPMNProcessType">
             <ValueConstraint />
@@ -2868,7 +2868,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessCoreProcessGroupContainsCoreProcess" GUID="6d1be870-35ec-4107-b11c-45c8b07c77f5" Name="CoreProcessCoreProcessGroupContainsCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="ad34ac7c-5c6e-4fc2-af4c-501a2bdcfdda" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessCoreProcessGroupContainsCoreProcess" GUID="6c8c2b0c-ccfd-4699-85ce-5c1912c5e782" Name="CoreProcessCoreProcessGroupContainsCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="ad34ac7c-5c6e-4fc2-af4c-501a2bdcfdda" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="0ad86512-4aa9-4f31-9f75-64f91b91a364" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessGroupContainsCoreProcess">
             <ValueConstraint />
@@ -2901,7 +2901,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessCoreProcessIsOfCoreBPMNProcessType" GUID="d0a2fec7-875a-4702-af3b-ddfad04e4401" Name="CoreProcessCoreProcessIsOfCoreBPMNProcessType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="410ff65d-82a0-4ffa-a44a-23cedf6d7a0c" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessCoreProcessIsOfCoreBPMNProcessType" GUID="a54b8892-0e09-49fe-97de-4c1599f548f2" Name="CoreProcessCoreProcessIsOfCoreBPMNProcessType" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="410ff65d-82a0-4ffa-a44a-23cedf6d7a0c" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="348df97f-1459-418b-8fdf-d1a4b7a58579" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessIsOfCoreBPMNProcessType">
             <ValueConstraint />
@@ -2934,7 +2934,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessCoreProcessToProcessParticipationRelation" GUID="4859a9c4-a93f-4750-8ce8-2b956f8643e9" Name="CoreProcessCoreProcessToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="74aab087-8b52-4f25-871f-7d9db19567ed" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessCoreProcessToProcessParticipationRelation" GUID="7a93a358-3a68-4667-b01e-deb0272bee13" Name="CoreProcessCoreProcessToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="74aab087-8b52-4f25-871f-7d9db19567ed" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="c22c8a67-f1db-48da-bd59-403f85a3fb85" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -2967,7 +2967,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessCoreProcessToProcessParticipationRelation1" GUID="8f8d2f2e-6280-4413-b5a0-d0e5ef5162e5" Name="CoreProcessCoreProcessToProcessParticipationRelation1" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="c225e144-261b-4365-9009-de1b84f33032" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessCoreProcessToProcessParticipationRelation1" GUID="56f19d6b-6ed3-4809-b221-1c13f719fb87" Name="CoreProcessCoreProcessToProcessParticipationRelation1" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="c225e144-261b-4365-9009-de1b84f33032" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="84dc79cf-15ba-45f8-a5bb-ad53be0ad11e" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessToProcessParticipationRelation">
             <ValueConstraint />
@@ -3000,7 +3000,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationCoreAttributeIsPartOfRelationOrigin" GUID="3217fb07-b39e-4d9d-a8ce-93871df11d1d" Name="CoreRelationCoreAttributeIsPartOfRelationOrigin" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="1efc27c9-f1ee-47d3-aba4-720a58bff9f4" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationCoreAttributeIsPartOfRelationOrigin" GUID="b0b6b99f-2de9-481e-8e62-c2656fb84682" Name="CoreRelationCoreAttributeIsPartOfRelationOrigin" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="1efc27c9-f1ee-47d3-aba4-720a58bff9f4" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="d1653908-4557-43b4-9f10-7e0f6d8d234a" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttributeIsPartOfRelationOrigin">
             <ValueConstraint />
@@ -3033,7 +3033,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreRelationCoreAttributeIsPartOfRelationDesination" GUID="d054a7f3-2ced-4e20-9e78-6bbc24ca6c45" Name="CoreRelationCoreAttributeIsPartOfRelationDesination" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="7a9a9d61-dbd7-42c2-8035-0923c2c9bff0" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreRelationCoreAttributeIsPartOfRelationDesination" GUID="c9e3ff1b-c226-46bd-8805-670cbe02f42c" Name="CoreRelationCoreAttributeIsPartOfRelationDesination" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="7a9a9d61-dbd7-42c2-8035-0923c2c9bff0" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="ff154950-867c-4d50-9168-53a579313b46" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreAttributeIsPartOfRelationDestination">
             <ValueConstraint />
@@ -3066,7 +3066,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessGroupCoreProcessGroupContainsCoreProcess" GUID="9a7cced3-ea3c-448b-b1c8-41d8ea34ef70" Name="CoreProcessGroupCoreProcessGroupContainsCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="38770480-7c86-4b37-a114-2a4edb1d6b42" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessGroupCoreProcessGroupContainsCoreProcess" GUID="d6cd9881-8d22-4726-9aba-b51c8b613e19" Name="CoreProcessGroupCoreProcessGroupContainsCoreProcess" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="38770480-7c86-4b37-a114-2a4edb1d6b42" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="930e31d9-5494-4e9c-8a46-9e37aaeceacb" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreProcessGroupContainsCoreProcess">
             <ValueConstraint />
@@ -3099,7 +3099,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreProcessCoreActorToProcessParticipationRelation" GUID="ce44d57e-c1b1-447c-ab3b-af93c3358b60" Name="CoreProcessCoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="d8675825-3d4b-414a-8e0c-b76878e57328" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreProcessCoreActorToProcessParticipationRelation" GUID="477fb72d-7bd2-4c15-afe1-200ee45babce" Name="CoreProcessCoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="d8675825-3d4b-414a-8e0c-b76878e57328" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="9227ac3b-3835-496c-b33a-7e3982a9f354" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreActorToProcessParticipationRelation">
             <ValueConstraint />
@@ -3132,7 +3132,7 @@
           </FactTypeReading>
         </FactTypeReadings>
       </FactType>
-      <FactType Id="CoreActorCoreActorToProcessParticipationRelation" GUID="7452eb65-03a9-41b3-ad0a-c9e0ca0714fa" Name="CoreActorCoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="5839176d-1df4-47f6-b43d-521eeb148749" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
+      <FactType Id="CoreActorCoreActorToProcessParticipationRelation" GUID="04e3f634-6c9b-4f1a-89ff-f15d54045e5f" Name="CoreActorCoreActorToProcessParticipationRelation" DBName="" ObjectifyingEntityTypeId="" IsLinkFactType="true" LinkFactTypeRoleId="5839176d-1df4-47f6-b43d-521eeb148749" IsMDAModelElement="true" IsSubtypeRelationshipFactType="false" IsObjectified="false" IsPreferredReferenceSchemeFT="false" IsDerived="false" IsStored="false" DerivationText="" LongDescription="" ShortDescription="" IsIndependent="false" IsSubtypeStateControlling="false" StoreFactCoordinates="false">
         <RoleGroup>
           <Role Id="bd036adf-d0c5-4291-9a6a-27ba3a24bddd" Name="" SequenceNr="1" Mandatory="false" JoinedObjectTypeId="CoreActorToProcessParticipationRelation">
             <ValueConstraint />
@@ -3173,16 +3173,6 @@
           <RoleConstraintRole RoleId="6db36a18-8238-4f3f-a17a-8c1cfe2021dd" SequenceNr="2" IsEntry="false" IsExit="false" ArgumentId="" ArgumentSequenceNr="0" />
         </RoleConstraintRoles>
         <Argument>
-          <RoleConstraintArgument SequenceNr="1">
-            <Role>
-              <RoleReference RoleId="c6b85420-b5d1-4eae-8b8a-401dc258d88e" />
-            </Role>
-            <JoinPath JoinPathError="None">
-              <RolePath>
-                <RoleReference RoleId="c6b85420-b5d1-4eae-8b8a-401dc258d88e" />
-              </RolePath>
-            </JoinPath>
-          </RoleConstraintArgument>
           <RoleConstraintArgument SequenceNr="2">
             <Role>
               <RoleReference RoleId="6db36a18-8238-4f3f-a17a-8c1cfe2021dd" />
@@ -3190,6 +3180,16 @@
             <JoinPath JoinPathError="None">
               <RolePath>
                 <RoleReference RoleId="6db36a18-8238-4f3f-a17a-8c1cfe2021dd" />
+              </RolePath>
+            </JoinPath>
+          </RoleConstraintArgument>
+          <RoleConstraintArgument SequenceNr="1">
+            <Role>
+              <RoleReference RoleId="c6b85420-b5d1-4eae-8b8a-401dc258d88e" />
+            </Role>
+            <JoinPath JoinPathError="None">
+              <RolePath>
+                <RoleReference RoleId="c6b85420-b5d1-4eae-8b8a-401dc258d88e" />
               </RolePath>
             </JoinPath>
           </RoleConstraintArgument>
@@ -7020,7 +7020,7 @@
         <ConceptInstance Symbol="CoreProcessHasProcessText" ConceptType="FactType" RoleId="NotUsed" X="206" Y="89" Orientation="0" Visible="true" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
-        <ConceptInstance Symbol="CoreProcessHasProcessText" ConceptType="FactTypeReading" RoleId="NotUsed" X="206" Y="99" Orientation="0" Visible="false" InstanceNumber="1">
+        <ConceptInstance Symbol="CoreProcessHasProcessText" ConceptType="FactTypeReading" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
         <ConceptInstance Symbol="CoreProcessHasProcessText" ConceptType="FactTypeName" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
@@ -7029,7 +7029,7 @@
         <ConceptInstance Symbol="CoreP2PIsIncludes" ConceptType="FactType" RoleId="NotUsed" X="190" Y="130" Orientation="0" Visible="true" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
-        <ConceptInstance Symbol="CoreP2PIsIncludes" ConceptType="FactTypeReading" RoleId="NotUsed" X="190" Y="140" Orientation="0" Visible="false" InstanceNumber="1">
+        <ConceptInstance Symbol="CoreP2PIsIncludes" ConceptType="FactTypeReading" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
         <ConceptInstance Symbol="CoreP2PIsIncludes" ConceptType="FactTypeName" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
@@ -7038,7 +7038,7 @@
         <ConceptInstance Symbol="CoreP2PIsExtends" ConceptType="FactType" RoleId="NotUsed" X="190" Y="147" Orientation="0" Visible="true" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
-        <ConceptInstance Symbol="CoreP2PIsExtends" ConceptType="FactTypeReading" RoleId="NotUsed" X="190" Y="157" Orientation="0" Visible="false" InstanceNumber="1">
+        <ConceptInstance Symbol="CoreP2PIsExtends" ConceptType="FactTypeReading" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
         <ConceptInstance Symbol="CoreP2PIsExtends" ConceptType="FactTypeName" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
@@ -7047,7 +7047,7 @@
         <ConceptInstance Symbol="CoreElementHasElementType" ConceptType="FactType" RoleId="NotUsed" X="164" Y="63" Orientation="0" Visible="true" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
-        <ConceptInstance Symbol="CoreElementHasElementType" ConceptType="FactTypeReading" RoleId="NotUsed" X="164" Y="73" Orientation="0" Visible="false" InstanceNumber="1">
+        <ConceptInstance Symbol="CoreElementHasElementType" ConceptType="FactTypeReading" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
         <ConceptInstance Symbol="CoreElementHasElementType" ConceptType="FactTypeName" RoleId="NotUsed" X="159" Y="49" Orientation="0" Visible="true" InstanceNumber="1">
@@ -7056,7 +7056,7 @@
         <ConceptInstance Symbol="CoreElementHasElementName" ConceptType="FactType" RoleId="NotUsed" X="165" Y="29" Orientation="0" Visible="true" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
-        <ConceptInstance Symbol="CoreElementHasElementName" ConceptType="FactTypeReading" RoleId="NotUsed" X="165" Y="39" Orientation="0" Visible="false" InstanceNumber="1">
+        <ConceptInstance Symbol="CoreElementHasElementName" ConceptType="FactTypeReading" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
         <ConceptInstance Symbol="CoreElementHasElementName" ConceptType="FactTypeName" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="true" InstanceNumber="1">
@@ -7065,7 +7065,7 @@
         <ConceptInstance Symbol="CoreElementHasCoreElement_Name" ConceptType="FactType" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="true" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
-        <ConceptInstance Symbol="CoreElementHasCoreElement_Name" ConceptType="FactTypeReading" RoleId="NotUsed" X="-1" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
+        <ConceptInstance Symbol="CoreElementHasCoreElement_Name" ConceptType="FactTypeReading" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">
           <isDirty>true</isDirty>
         </ConceptInstance>
         <ConceptInstance Symbol="CoreElementHasCoreElement_Name" ConceptType="FactTypeName" RoleId="NotUsed" X="0" Y="0" Orientation="0" Visible="false" InstanceNumber="1">

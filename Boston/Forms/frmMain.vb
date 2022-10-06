@@ -3052,8 +3052,6 @@ SaveModel:
 
     End Sub
 
-
-
     Private Sub ToolStripMenuItem12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem_ShowEnterpriseTreeView.Click
 
         Me.MenuItem_ShowEnterpriseTreeView.Checked = Not Me.MenuItem_ShowEnterpriseTreeView.Checked
