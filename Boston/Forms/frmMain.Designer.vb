@@ -158,6 +158,7 @@ Partial Class frmMain
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
+        Me.BackgroundWorkerStatusBar = New System.ComponentModel.BackgroundWorker()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -183,14 +184,14 @@ Partial Class frmMain
         '
         'SaveToolStripMenuItem
         '
-        Me.SaveToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Save16x16
+        Me.SaveToolStripMenuItem.Image = CType(resources.GetObject("SaveToolStripMenuItem.Image"), System.Drawing.Image)
         Me.SaveToolStripMenuItem.Name = "SaveToolStripMenuItem"
         Me.SaveToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
         Me.SaveToolStripMenuItem.Text = "&Save"
         '
         'SaveAllToolStripMenuItem
         '
-        Me.SaveAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SaveAll16x16
+        Me.SaveAllToolStripMenuItem.Image = CType(resources.GetObject("SaveAllToolStripMenuItem.Image"), System.Drawing.Image)
         Me.SaveAllToolStripMenuItem.Name = "SaveAllToolStripMenuItem"
         Me.SaveAllToolStripMenuItem.Size = New System.Drawing.Size(194, 22)
         Me.SaveAllToolStripMenuItem.Text = "Save &All"
@@ -202,14 +203,14 @@ Partial Class frmMain
         '
         'ToolStripMenuItemNewModel
         '
-        Me.ToolStripMenuItemNewModel.Image = Global.Boston.My.Resources.Resources.ModelAdd16x16
+        Me.ToolStripMenuItemNewModel.Image = CType(resources.GetObject("ToolStripMenuItemNewModel.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemNewModel.Name = "ToolStripMenuItemNewModel"
         Me.ToolStripMenuItemNewModel.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemNewModel.Text = "&New Model"
         '
         'ToolStripMenuItem2
         '
-        Me.ToolStripMenuItem2.Image = Global.Boston.My.Resources.Resources.XML16x16
+        Me.ToolStripMenuItem2.Image = CType(resources.GetObject("ToolStripMenuItem2.Image"), System.Drawing.Image)
         Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
         Me.ToolStripMenuItem2.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItem2.Text = "&Import .fbm File"
@@ -263,14 +264,14 @@ Partial Class frmMain
         '
         'PrintPreviewToolStripMenuItem
         '
-        Me.PrintPreviewToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.PrintPreview16x16
+        Me.PrintPreviewToolStripMenuItem.Image = CType(resources.GetObject("PrintPreviewToolStripMenuItem.Image"), System.Drawing.Image)
         Me.PrintPreviewToolStripMenuItem.Name = "PrintPreviewToolStripMenuItem"
         Me.PrintPreviewToolStripMenuItem.Size = New System.Drawing.Size(143, 22)
         Me.PrintPreviewToolStripMenuItem.Text = "Print Pre&view"
         '
         'PrintToolStripMenuItem
         '
-        Me.PrintToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Print16x16
+        Me.PrintToolStripMenuItem.Image = CType(resources.GetObject("PrintToolStripMenuItem.Image"), System.Drawing.Image)
         Me.PrintToolStripMenuItem.Name = "PrintToolStripMenuItem"
         Me.PrintToolStripMenuItem.Size = New System.Drawing.Size(143, 22)
         Me.PrintToolStripMenuItem.Text = "&Print"
@@ -284,7 +285,7 @@ Partial Class frmMain
         '
         'CopyToolStripMenuItem
         '
-        Me.CopyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Copy16x16
+        Me.CopyToolStripMenuItem.Image = CType(resources.GetObject("CopyToolStripMenuItem.Image"), System.Drawing.Image)
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
         Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy"
@@ -292,7 +293,7 @@ Partial Class frmMain
         'PasteToolStripMenuItem
         '
         Me.PasteToolStripMenuItem.Enabled = False
-        Me.PasteToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Paste16x16
+        Me.PasteToolStripMenuItem.Image = CType(resources.GetObject("PasteToolStripMenuItem.Image"), System.Drawing.Image)
         Me.PasteToolStripMenuItem.Name = "PasteToolStripMenuItem"
         Me.PasteToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.PasteToolStripMenuItem.Text = "&Paste"
@@ -300,7 +301,7 @@ Partial Class frmMain
         'ToolStripMenuItemUndo
         '
         Me.ToolStripMenuItemUndo.Enabled = False
-        Me.ToolStripMenuItemUndo.Image = Global.Boston.My.Resources.Resources.Undo16x16
+        Me.ToolStripMenuItemUndo.Image = CType(resources.GetObject("ToolStripMenuItemUndo.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemUndo.Name = "ToolStripMenuItemUndo"
         Me.ToolStripMenuItemUndo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Z), System.Windows.Forms.Keys)
         Me.ToolStripMenuItemUndo.Size = New System.Drawing.Size(221, 22)
@@ -309,7 +310,7 @@ Partial Class frmMain
         'ToolStripMenuItemRedo
         '
         Me.ToolStripMenuItemRedo.Enabled = False
-        Me.ToolStripMenuItemRedo.Image = Global.Boston.My.Resources.Resources.Redo16x16
+        Me.ToolStripMenuItemRedo.Image = CType(resources.GetObject("ToolStripMenuItemRedo.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemRedo.Name = "ToolStripMenuItemRedo"
         Me.ToolStripMenuItemRedo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Y), System.Windows.Forms.Keys)
         Me.ToolStripMenuItemRedo.Size = New System.Drawing.Size(221, 22)
@@ -317,14 +318,14 @@ Partial Class frmMain
         '
         'SelectAllToolStripMenuItem
         '
-        Me.SelectAllToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.SelectAll
+        Me.SelectAllToolStripMenuItem.Image = CType(resources.GetObject("SelectAllToolStripMenuItem.Image"), System.Drawing.Image)
         Me.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem"
         Me.SelectAllToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.SelectAllToolStripMenuItem.Text = "Select &All"
         '
         'CopyAsImageToClipboardToolStripMenuItem
         '
-        Me.CopyAsImageToClipboardToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Camera16x16
+        Me.CopyAsImageToClipboardToolStripMenuItem.Image = CType(resources.GetObject("CopyAsImageToClipboardToolStripMenuItem.Image"), System.Drawing.Image)
         Me.CopyAsImageToClipboardToolStripMenuItem.Name = "CopyAsImageToClipboardToolStripMenuItem"
         Me.CopyAsImageToClipboardToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
         Me.CopyAsImageToClipboardToolStripMenuItem.Text = "Copy as &Image to Clipboard"
@@ -345,7 +346,7 @@ Partial Class frmMain
         'ToolStripMenuItemCodeGenerator
         '
         Me.ToolStripMenuItemCodeGenerator.AutoSize = False
-        Me.ToolStripMenuItemCodeGenerator.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
+        Me.ToolStripMenuItemCodeGenerator.Image = CType(resources.GetObject("ToolStripMenuItemCodeGenerator.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemCodeGenerator.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripMenuItemCodeGenerator.Name = "ToolStripMenuItemCodeGenerator"
         Me.ToolStripMenuItemCodeGenerator.Size = New System.Drawing.Size(188, 30)
@@ -353,7 +354,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemFactEngine
         '
-        Me.ToolStripMenuItemFactEngine.Image = Global.Boston.My.Resources.MenuImagesMain.FactEngine16x16
+        Me.ToolStripMenuItemFactEngine.Image = CType(resources.GetObject("ToolStripMenuItemFactEngine.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemFactEngine.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
         Me.ToolStripMenuItemFactEngine.Name = "ToolStripMenuItemFactEngine"
         Me.ToolStripMenuItemFactEngine.Size = New System.Drawing.Size(210, 22)
@@ -386,7 +387,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemToolbox
         '
-        Me.ToolStripMenuItemToolbox.Image = Global.Boston.My.Resources.Resources.Toolbox16x16B_W
+        Me.ToolStripMenuItemToolbox.Image = CType(resources.GetObject("ToolStripMenuItemToolbox.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemToolbox.Name = "ToolStripMenuItemToolbox"
         Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(172, 22)
         Me.ToolStripMenuItemToolbox.Text = "&Toolbox"
@@ -405,7 +406,7 @@ Partial Class frmMain
         '
         'TestToolStripMenuItem
         '
-        Me.TestToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
+        Me.TestToolStripMenuItem.Image = CType(resources.GetObject("TestToolStripMenuItem.Image"), System.Drawing.Image)
         Me.TestToolStripMenuItem.Name = "TestToolStripMenuItem"
         Me.TestToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.P), System.Windows.Forms.Keys)
         Me.TestToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
@@ -424,7 +425,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemDiagramSpy
         '
-        Me.ToolStripMenuItemDiagramSpy.Image = Global.Boston.My.Resources.Resources.spyglass_icon
+        Me.ToolStripMenuItemDiagramSpy.Image = CType(resources.GetObject("ToolStripMenuItemDiagramSpy.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemDiagramSpy.Name = "ToolStripMenuItemDiagramSpy"
         Me.ToolStripMenuItemDiagramSpy.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemDiagramSpy.Text = "&Diagram Spy"
@@ -445,7 +446,7 @@ Partial Class frmMain
         '
         'ConfigurationToolStripMenuItem
         '
-        Me.ConfigurationToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Properties216x16
+        Me.ConfigurationToolStripMenuItem.Image = CType(resources.GetObject("ConfigurationToolStripMenuItem.Image"), System.Drawing.Image)
         Me.ConfigurationToolStripMenuItem.Name = "ConfigurationToolStripMenuItem"
         Me.ConfigurationToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
         Me.ConfigurationToolStripMenuItem.Text = "&Configuration"
@@ -469,14 +470,14 @@ Partial Class frmMain
         'DatabaseToolStripMenuItem
         '
         Me.DatabaseToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BackupDatabaseToolStripMenuItem, Me.CompactAndRepairToolStripMenuItem, Me.RemoveUnneededConceptsToolStripMenuItem})
-        Me.DatabaseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Database16x16
+        Me.DatabaseToolStripMenuItem.Image = CType(resources.GetObject("DatabaseToolStripMenuItem.Image"), System.Drawing.Image)
         Me.DatabaseToolStripMenuItem.Name = "DatabaseToolStripMenuItem"
         Me.DatabaseToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
         Me.DatabaseToolStripMenuItem.Text = "&Database"
         '
         'BackupDatabaseToolStripMenuItem
         '
-        Me.BackupDatabaseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.backup16x16
+        Me.BackupDatabaseToolStripMenuItem.Image = CType(resources.GetObject("BackupDatabaseToolStripMenuItem.Image"), System.Drawing.Image)
         Me.BackupDatabaseToolStripMenuItem.Name = "BackupDatabaseToolStripMenuItem"
         Me.BackupDatabaseToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.BackupDatabaseToolStripMenuItem.Text = "&Backup Database"
@@ -655,14 +656,14 @@ Partial Class frmMain
         '
         'ToolStripMenuItemAddUnifiedOntology
         '
-        Me.ToolStripMenuItemAddUnifiedOntology.Image = Global.Boston.My.Resources.Resources.Add16x16
+        Me.ToolStripMenuItemAddUnifiedOntology.Image = CType(resources.GetObject("ToolStripMenuItemAddUnifiedOntology.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemAddUnifiedOntology.Name = "ToolStripMenuItemAddUnifiedOntology"
         Me.ToolStripMenuItemAddUnifiedOntology.Size = New System.Drawing.Size(190, 22)
         Me.ToolStripMenuItemAddUnifiedOntology.Text = "&Add Unified Ontology"
         '
         'ToolStripMenuItemEditUnifiedOntology
         '
-        Me.ToolStripMenuItemEditUnifiedOntology.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.ToolStripMenuItemEditUnifiedOntology.Image = CType(resources.GetObject("ToolStripMenuItemEditUnifiedOntology.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemEditUnifiedOntology.Name = "ToolStripMenuItemEditUnifiedOntology"
         Me.ToolStripMenuItemEditUnifiedOntology.Size = New System.Drawing.Size(190, 22)
         Me.ToolStripMenuItemEditUnifiedOntology.Text = "&Edit Unified Ontology"
@@ -676,7 +677,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemHelp
         '
-        Me.ToolStripMenuItemHelp.Image = Global.Boston.My.Resources.Resources.Help16x16
+        Me.ToolStripMenuItemHelp.Image = CType(resources.GetObject("ToolStripMenuItemHelp.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemHelp.Name = "ToolStripMenuItemHelp"
         Me.ToolStripMenuItemHelp.ShortcutKeys = System.Windows.Forms.Keys.F1
         Me.ToolStripMenuItemHelp.Size = New System.Drawing.Size(226, 22)
@@ -684,7 +685,7 @@ Partial Class frmMain
         '
         'AboutRichmondToolStripMenuItem
         '
-        Me.AboutRichmondToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.About16x16
+        Me.AboutRichmondToolStripMenuItem.Image = CType(resources.GetObject("AboutRichmondToolStripMenuItem.Image"), System.Drawing.Image)
         Me.AboutRichmondToolStripMenuItem.Name = "AboutRichmondToolStripMenuItem"
         Me.AboutRichmondToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.AboutRichmondToolStripMenuItem.Text = "&About Boston"
@@ -696,14 +697,14 @@ Partial Class frmMain
         '
         'ToolStripMenuItemOpenLogFile
         '
-        Me.ToolStripMenuItemOpenLogFile.Image = Global.Boston.My.Resources.Resources.LogFile16x16
+        Me.ToolStripMenuItemOpenLogFile.Image = CType(resources.GetObject("ToolStripMenuItemOpenLogFile.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemOpenLogFile.Name = "ToolStripMenuItemOpenLogFile"
         Me.ToolStripMenuItemOpenLogFile.Size = New System.Drawing.Size(226, 22)
         Me.ToolStripMenuItemOpenLogFile.Text = "&Open Log File"
         '
         'EmailSupportvievcomToolStripMenuItem
         '
-        Me.EmailSupportvievcomToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.email16x16
+        Me.EmailSupportvievcomToolStripMenuItem.Image = CType(resources.GetObject("EmailSupportvievcomToolStripMenuItem.Image"), System.Drawing.Image)
         Me.EmailSupportvievcomToolStripMenuItem.Name = "EmailSupportvievcomToolStripMenuItem"
         Me.EmailSupportvievcomToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.EmailSupportvievcomToolStripMenuItem.Text = "&Email support@factengine.ai"
@@ -775,7 +776,7 @@ Partial Class frmMain
         '
         Me.ToolStripButton1.AutoSize = False
         Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = Global.Boston.My.Resources.MenuImagesMain.Home16x16
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
         Me.ToolStripButton1.Size = New System.Drawing.Size(28, 29)
@@ -799,7 +800,7 @@ Partial Class frmMain
         'ToolStripButtonNewModel
         '
         Me.ToolStripButtonNewModel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButtonNewModel.Image = Global.Boston.My.Resources.MenuImagesMain.ModelAdd16x16
+        Me.ToolStripButtonNewModel.Image = CType(resources.GetObject("ToolStripButtonNewModel.Image"), System.Drawing.Image)
         Me.ToolStripButtonNewModel.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonNewModel.Name = "ToolStripButtonNewModel"
         Me.ToolStripButtonNewModel.Size = New System.Drawing.Size(23, 29)
@@ -895,7 +896,7 @@ Partial Class frmMain
         '
         'ToolStripButtonNotifications
         '
-        Me.ToolStripButtonNotifications.Image = Global.Boston.My.Resources.Resources.Notification16x16
+        Me.ToolStripButtonNotifications.Image = CType(resources.GetObject("ToolStripButtonNotifications.Image"), System.Drawing.Image)
         Me.ToolStripButtonNotifications.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonNotifications.Name = "ToolStripButtonNotifications"
         Me.ToolStripButtonNotifications.Size = New System.Drawing.Size(144, 29)
@@ -970,6 +971,10 @@ Partial Class frmMain
         'TimerNotifications
         '
         Me.TimerNotifications.Interval = 5000
+        '
+        'BackgroundWorkerStatusBar
+        '
+        Me.BackgroundWorkerStatusBar.WorkerReportsProgress = True
         '
         'frmMain
         '
@@ -1118,4 +1123,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripMenuItemEditUnifiedOntology As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemEditConfigurationData As ToolStripMenuItem
     Friend WithEvents BroadcastMessageToUsersToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BackgroundWorkerStatusBar As System.ComponentModel.BackgroundWorker
 End Class

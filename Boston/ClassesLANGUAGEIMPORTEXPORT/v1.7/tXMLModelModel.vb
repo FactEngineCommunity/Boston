@@ -1821,7 +1821,7 @@ SkipValueType:
                 Next
 #End Region
 
-                '                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(62)
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(20)
 
                 '==============================
                 'Map the EntityTypes
@@ -1867,7 +1867,7 @@ SkipEntityType:
                 Next
 #End Region
 
-                '                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(64)
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(30)
 
                 '==============================
                 'Map the FactTypes
@@ -1962,6 +1962,7 @@ SkipEntityType:
 #End Region 'Subtype Relationships
 
 #End Region
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(50)
 
                 '==============================
                 'Map the RoleConstraints
@@ -1985,7 +1986,7 @@ SkipEntityType:
 
 
                             Dim lrNORMARoleSequence = New NORMA.Model.ConstraintRoleSequenceWithJoinType
-                                lrNORMARoleConstraint.RoleSequence = lrNORMARoleSequence
+                            lrNORMARoleConstraint.RoleSequence = lrNORMARoleSequence
 
                             For Each lrFBMRoleConstraintRole In lrFBMRoleConstraint.RoleConstraintRoles
 
@@ -2433,7 +2434,7 @@ SkipEntityType:
 SkipRoleConstraint:
                 Next
 
-                'If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(68)
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(60)
 
 #End Region
 
@@ -2490,7 +2491,8 @@ SkipRoleConstraint:
                 'Map the Pages
                 '=====================
                 Call Me.MapToORMDiagrams(lrORMDocument, aoBackgroundWorker)
-                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
+
+                Call Boston.WriteToStatusBar("NORMA model populated", True, 0)
 
                 Return lrORMDocument
 
@@ -2689,57 +2691,59 @@ SkipValueTypeInstance:
                     Try
                         Dim lrFBMFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
-                        lrFactTypeInstance = New NORMA.ORMDiagram.FactTypeShape
-                        lrFactTypeInstance.Subject = New NORMA.ORMDiagram.Subject
-                        Dim lrFactType As NORMA.Model.Fact = arORMDocument.ORMModel.Facts.Items.First(Function(x) x._Name = lrConceptInstance.Symbol)
-                        lrFactTypeInstance.Subject.Ref = lrFactType.Id
-                        lrFactTypeInstance.IsExpanded = True
-                        lrFactTypeInstance.AbsoluteBounds = $"{CDbl(lrConceptInstance.X / ldblScalar - (lrConceptInstance.Symbol.Length / ldblWidthScale) / 4)}, {lrConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
+                        If Not lrFBMFactType.IsSubtypeRelationshipFactType Then
+                            lrFactTypeInstance = New NORMA.ORMDiagram.FactTypeShape
+                            lrFactTypeInstance.Subject = New NORMA.ORMDiagram.Subject
+                            Dim lrFactType As NORMA.Model.Fact = arORMDocument.ORMModel.Facts.Items.First(Function(x) x._Name = lrConceptInstance.Symbol)
+                            lrFactTypeInstance.Subject.Ref = lrFactType.Id
+                            lrFactTypeInstance.IsExpanded = True
+                            lrFactTypeInstance.AbsoluteBounds = $"{CDbl(lrConceptInstance.X / ldblScalar - (lrConceptInstance.Symbol.Length / ldblWidthScale) / 4)}, {lrConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
 
 #Region "Relative Shapes"
-                        lrFactTypeInstance.RelativeShapes = New NORMA.ORMDiagram.FactTypeShape.RelativeShape
+                            lrFactTypeInstance.RelativeShapes = New NORMA.ORMDiagram.FactTypeShape.RelativeShape
 
 #Region "Fact Type Reading"
-                        'FactTypeReading
-                        lrFactTypeReadingConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
-                        If lrFactTypeReadingConceptInstance IsNot Nothing Then
-                            Dim lrFactTypeReadingInstance As New NORMA.ORMDiagram.FactTypeShape.RelativeShape.FactTypeReadingShape
-                            lrFactTypeReadingInstance.AbsoluteBounds = $"{lrFactTypeReadingConceptInstance.X / ldblScalar}, {lrFactTypeReadingConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
-                            lrFactTypeReadingInstance.Subject.Ref = lrFactType.ReadingOrders.Find(Function(x) x.Id = lrConceptInstance.Symbol).Id
-                            lrFactTypeInstance.RelativeShapes.ReadingShape = lrFactTypeReadingInstance
-                        End If
+                            'FactTypeReading
+                            lrFactTypeReadingConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeReading And x.Symbol = lrFactType.Id)
+                            If lrFactTypeReadingConceptInstance IsNot Nothing Then
+                                Dim lrFactTypeReadingInstance As New NORMA.ORMDiagram.FactTypeShape.RelativeShape.FactTypeReadingShape
+                                lrFactTypeReadingInstance.AbsoluteBounds = $"{lrFactTypeReadingConceptInstance.X / ldblScalar}, {lrFactTypeReadingConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
+                                lrFactTypeReadingInstance.Subject.Ref = lrFactType.ReadingOrders.Find(Function(x) x.Id = lrConceptInstance.Symbol).Id
+                                lrFactTypeInstance.RelativeShapes.ReadingShape = lrFactTypeReadingInstance
+                            End If
 #End Region
 
 #Region "Fact Type Name"
-                        'FactTypeName
-                        lrFactTypeNameConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeName And x.Symbol = lrFactType.Id)
-                        If lrFactTypeNameConceptInstance IsNot Nothing Then
-                            Dim lrFactTypeNameInstance As New NORMA.ORMDiagram.FactTypeShape.RelativeShape.FactTypeNameShape
-                            If lrFBMFactType.IsObjectified Then
-                                lrFactTypeInstance.RelativeShapes.ObjectifiedFactTypeNameShape = lrFactTypeNameInstance
-                                lrFactTypeNameInstance.AbsoluteBounds = $"{lrFactTypeNameConceptInstance.X / ldblScalar}, {lrFactTypeNameConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
-                            Else
-                                '20220728-VM-Unknown at this stage.
+                            'FactTypeName
+                            lrFactTypeNameConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.FactTypeName And x.Symbol = lrFactType.Id)
+                            If lrFactTypeNameConceptInstance IsNot Nothing Then
+                                Dim lrFactTypeNameInstance As New NORMA.ORMDiagram.FactTypeShape.RelativeShape.FactTypeNameShape
+                                If lrFBMFactType.IsObjectified Then
+                                    lrFactTypeInstance.RelativeShapes.ObjectifiedFactTypeNameShape = lrFactTypeNameInstance
+                                    lrFactTypeNameInstance.AbsoluteBounds = $"{lrFactTypeNameConceptInstance.X / ldblScalar}, {lrFactTypeNameConceptInstance.Y / ldblScalar}, {lrConceptInstance.Symbol.Length / ldblWidthScale}, {ldblFixedHeight}"
+                                Else
+                                    '20220728-VM-Unknown at this stage.
+                                End If
                             End If
-                        End If
 #End Region
 
 #Region "Derivation Rules"
-                        '20220728-VM-Ignore at this stage. Leave out of transformation to NORMA .orm model at this stage.
-                        '                    If lrFactType.IsDerived Then
-                        '                        lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
-                        '                        If lrDerivationTextConceptInstance IsNot Nothing Then
-                        '                            lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(lrPage.Model,
-                        '                                                                                                           lrPage,
-                        '                                                                                                           lrFactTypeInstance)
-                        '                            lrFactTypeInstance.FactTypeDerivationText.X = lrDerivationTextConceptInstance.X
-                        '                            lrFactTypeInstance.FactTypeDerivationText.Y = lrDerivationTextConceptInstance.Y
-                        '                        End If
-                        '                    End If
+                            '20220728-VM-Ignore at this stage. Leave out of transformation to NORMA .orm model at this stage.
+                            '                    If lrFactType.IsDerived Then
+                            '                        lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
+                            '                        If lrDerivationTextConceptInstance IsNot Nothing Then
+                            '                            lrFactTypeInstance.FactTypeDerivationText = New FBM.FactTypeDerivationText(lrPage.Model,
+                            '                                                                                                           lrPage,
+                            '                                                                                                           lrFactTypeInstance)
+                            '                            lrFactTypeInstance.FactTypeDerivationText.X = lrDerivationTextConceptInstance.X
+                            '                            lrFactTypeInstance.FactTypeDerivationText.Y = lrDerivationTextConceptInstance.Y
+                            '                        End If
+                            '                    End If
 #End Region
 
 #End Region
-                        lrPage.Shapes.Items.Add(lrFactTypeInstance)
+                            lrPage.Shapes.Items.Add(lrFactTypeInstance)
+                        End If
                     Catch ex As Exception
                         'Call Me.ReportModelLoadingError(arModel, ex.Message)
                         Continue For
@@ -3008,7 +3012,7 @@ SkipRoleConstraintInstance:
                 'Next
 #End Region
 
-                'If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70 + CInt(9 * (arModel.Page.FindAll(Function(x) x.Loaded = True).Count / arModel.Page.Count)))
+                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70 + CInt(29 * (arORMDocument.ORMDiagram.Count / Me.ORMDiagram.Count)))
 
                 Return lrPage
 

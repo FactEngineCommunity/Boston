@@ -9,6 +9,7 @@ Imports Boston.DuplexServiceClient  'Client/Server
 Imports System.ServiceModel
 Imports AutoUpdaterDotNET
 Imports System.Configuration
+Imports System.ComponentModel
 
 Public Class frmMain
 
@@ -3824,7 +3825,7 @@ SaveModel:
 
                     End If
 
-                        lrfrmSignatueResolution.Dispose()
+                    lrfrmSignatueResolution.Dispose()
 
                 End If 'Pasting to a different Model.
 
@@ -4599,7 +4600,7 @@ SaveModel:
 
             '------------------------------------------------------------------
             'LogIn from populates prApplication.User
-            Call Me.loginUser(prApplication.User)
+            Call Me.logInUser(prApplication.User)
 
         End If
 
@@ -4771,7 +4772,7 @@ SaveModel:
             ElseIf tableClientServerNamespace.getNamespaceCount = 0 Then
                 MsgBox("There are no Namespaces to edit.", MsgBoxStyle.Information)
 
-            ElseIf (tableClientServerProjectUser.getProjectCountByAllocatedUser(prApplication.User) = 0) And _
+            ElseIf (tableClientServerProjectUser.getProjectCountByAllocatedUser(prApplication.User) = 0) And
                    Not prApplication.User.IsSuperuser Then
 
                 lsMessage = "You are not allocated to any Project."
@@ -4857,7 +4858,7 @@ SaveModel:
 
     Private Sub AddRoleToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddRoleToolStripMenuItem.Click
 
-        Call Me.loadCRUDAddRole()
+        Call Me.LoadCRUDAddRole()
 
     End Sub
 
@@ -5680,4 +5681,21 @@ SaveModel:
         End Try
 
     End Sub
+
+    Private Sub BackgroundWorkerStatusBar_ProgressChanged(sender As Object, e As ProgressChangedEventArgs) Handles BackgroundWorkerStatusBar.ProgressChanged
+
+        Try
+            Call Boston.WriteToProgressBar(e.ProgressPercentage)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

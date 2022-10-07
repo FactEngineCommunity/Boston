@@ -5228,7 +5228,7 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
 
                 Boston.WriteToStatusBar("Converting the Model to the .orm NORMA format")
-                lrNORMADocument = lrFBMModel.MapToNORMAORMModel(New NORMA.ORMDocument, Nothing)
+                lrNORMADocument = lrFBMModel.MapToNORMAORMModel(New NORMA.ORMDocument, frmMain.BackgroundWorkerStatusBar)
 
                 Dim lrSaveFileDialog As New SaveFileDialog()
 

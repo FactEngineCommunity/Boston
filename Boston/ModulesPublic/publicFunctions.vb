@@ -554,6 +554,9 @@ OpenConnection:
             Try
                 'frmMain.zfrmModelExplorer.CircularProgressBar.Value = aiProgressPercent
                 'frmMain.zfrmModelExplorer.Invalidate()
+                frmMain.ToolStripProgressBar.Visible = True
+                frmMain.ToolStripProgressBar.Value = aiProgressPercent
+                frmMain.Refresh()
 
             Catch ex As Exception
                 Dim lsMessage As String
