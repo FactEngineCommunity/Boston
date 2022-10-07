@@ -155,7 +155,7 @@ Namespace FBM
                 If abRapidSave Then
                     Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
                 Else
-                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance) Then
+                    If TableConceptInstance.ExistsConceptInstance(lrConceptInstance, False) Then
                         Call TableConceptInstance.UpdateConceptInstance(lrConceptInstance)
                     Else
                         Call TableConceptInstance.AddConceptInstance(lrConceptInstance)
@@ -186,7 +186,57 @@ Namespace FBM
 
         End Sub
 
-        Public Sub Move(aiNewX As Integer, aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Shadows Sub Move(aiNewX As Integer, aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+
+            Try
+                If aiNewX < 0 Then aiNewX = 0
+                If aiNewY < 0 Then aiNewY = 0
+
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Move(aiNewX, aiNewY)
+                End If
+
+                Me.X = aiNewX
+                Me.Y = aiNewY
+
+                '==============================================================================
+                'Client/Server: Broadcast the moving of the Object
+                '  20221007-VM-Not sure if implemented for Derivation Text.
+                'If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+
+                '    Dim lrModel As New Viev.FBM.Interface.Model
+                '    Dim lrPage As New Viev.FBM.Interface.Page()
+
+                '    lrModel.ModelId = Me.Page.Model.ModelId
+                '    lrPage.Id = Me.Page.PageId
+                '    lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
+                '    lrPage.ConceptInstance.X = Me.Shape.Bounds.X
+                '    lrPage.ConceptInstance.Y = Me.Shape.Bounds.Y
+                '    lrPage.ConceptInstance.ModelElementId = Me.Id
+                '    lrModel.Page = lrPage
+
+                '    Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                '    lrBroadcast.Model = lrModel
+                '    Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
+
+                'End If
+                '==============================================================================
+
+                Me.isDirty = True
+                Me.FactTypeInstance.isDirty = True
+                If Me.Page IsNot Nothing Then
+                    Me.Page.IsDirty = True
+                End If
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

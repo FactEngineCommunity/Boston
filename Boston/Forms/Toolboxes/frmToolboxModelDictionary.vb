@@ -165,12 +165,14 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub LoadORMModelDictionary(Optional ByVal asSearchString As String = Nothing)
+    Private Sub LoadORMModelDictionary(Optional ByRef asSearchString As String = Nothing)
 
         Dim loNode As TreeNode
         Dim loSubNode As TreeNode
 
         Try
+            Dim lsSearchString = LCase(asSearchString)
+
             loNode = Me.TreeView1.Nodes.Add("ObjectType", "Object Type", 0, 0)
             loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
 
@@ -199,7 +201,7 @@ Public Class frmToolboxModelDictionary
             Call prApplication.WorkingModel.EntityType.Sort(AddressOf FBM.EntityType.CompareEntityTypeNames)
 
             If asSearchString IsNot Nothing Then
-                larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+                larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) Not x.IsObjectifyingEntityType)
             Else
@@ -219,7 +221,7 @@ Public Class frmToolboxModelDictionary
             Dim larValueType As New List(Of FBM.ValueType)
             Call prApplication.WorkingModel.ValueType.Sort(AddressOf FBM.ValueType.CompareValueTypeNames)
             If asSearchString IsNot Nothing Then
-                larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+                larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larValueType = prApplication.WorkingModel.ValueType
             Else
@@ -235,7 +237,7 @@ Public Class frmToolboxModelDictionary
             Dim lrFactType As New FBM.FactType
             Call prApplication.WorkingModel.FactType.Sort(AddressOf FBM.FactType.CompareFactTypeNames)
             If asSearchString IsNot Nothing Then
-                larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+                larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsLinkFactType = False)
             Else
@@ -292,7 +294,7 @@ Public Class frmToolboxModelDictionary
             Dim larRoleConstraint As New List(Of FBM.RoleConstraint)
             Dim liImageIndex As Integer = 0
             If asSearchString IsNot Nothing Then
-                larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(asSearchString))
+                larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larRoleConstraint = prApplication.WorkingModel.RoleConstraint
             Else

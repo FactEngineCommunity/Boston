@@ -248,7 +248,7 @@ Namespace TableFactTypeInstance
                         Call TableFactTypeName.GetFactTypeNameDetails(lrFactTypeInstance.FactTypeName)
 
                         'FactTypeReadingPoint
-                        Dim lrFTRConceptInstance As New FBM.ConceptInstance(lrFactTypeInstance.Model, lrFactTypeInstance.Page, lrFactTypeInstance.Id, pcenumConceptType.FactTypeReading)
+                        Dim lrFTRConceptInstance As New FBM.ConceptInstance(lrFactTypeInstance.Model, lrFactTypeInstance.Page, lrFactTypeInstance.Id, pcenumConceptType.FactTypeReading, lrFactTypeInstance.InstanceNumber)
                         Call TableConceptInstance.ExistsConceptInstance(lrFTRConceptInstance)
                         lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFTRConceptInstance.X, lrFTRConceptInstance.Y)
 

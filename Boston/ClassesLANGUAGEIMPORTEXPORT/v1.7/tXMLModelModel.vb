@@ -111,6 +111,7 @@ SkipModelLevelValueType:
                 '========================
                 'Process the EntityTypes
                 '========================
+#Region "EntityTypes"
                 Dim lrEntityType As FBM.EntityType
                 Dim lrXMLEntityType As XMLModel.EntityType
 
@@ -162,10 +163,12 @@ SkipModelLevelValueType:
                     Me.ORMModel.EntityTypes.Add(lrXMLEntityType)
 SkipModelLevelEntityType:
                 Next
+#End Region
 
                 '=======================
                 'Process the FactTypes
                 '=======================
+#Region "FactTypes"
                 Dim lrFactType As FBM.FactType
                 Dim lrXMLFactType As XMLModel.FactType
 
@@ -286,6 +289,7 @@ SkipModelLevelEntityType:
                     Me.ORMModel.FactTypes.Add(lrXMLFactType)
 SkipModelLevelFactType:
                 Next
+#End Region
 
                 '------------------------------------------------------------------------------------
                 'IMPORTANT: Make sure the LinkFactTypes are at the end of the list
@@ -294,6 +298,7 @@ SkipModelLevelFactType:
                 '=========================
                 'Map the RoleConstraints
                 '=========================
+#Region "RoleConstraints"
                 Dim lrRoleConstraint As FBM.RoleConstraint
                 Dim lrXMLRoleConstraint As XMLModel.RoleConstraint
                 Dim lrRoleConstraintRole As FBM.RoleConstraintRole
@@ -369,10 +374,12 @@ SkipModelLevelFactType:
                     Me.ORMModel.RoleConstraints.Add(lrXMLRoleConstraint)
 SkipModelLevelRoleConstraint:
                 Next
+#End Region
 
                 '================
                 'Map ModelNotes
                 '================
+#Region "ModelNotes"
                 Dim lrModelNote As FBM.ModelNote
                 Dim lrXMLModelNote As XMLModel.ModelNote
 
@@ -389,10 +396,12 @@ SkipModelLevelRoleConstraint:
 
                     Me.ORMModel.ModelNotes.Add(lrXMLModelNote)
                 Next
+#End Region
 
                 '================================
                 'Map the Pages
                 '================================
+#Region "Pages"
                 Dim lrPage As FBM.Page
 
                 For Each lrPage In arFBMModel.Page
@@ -519,6 +528,19 @@ SkipModelLevelRoleConstraint:
                         lrConceptInstance.X = lrFactTypeInstance.FactTypeName.X
                         lrConceptInstance.Y = lrFactTypeInstance.FactTypeName.Y
                         lrExportPage.ConceptInstance.Add(lrConceptInstance)
+
+                        'DerivationText
+                        If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                            lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                     lrFactTypeInstance.Page,
+                                                                     lrFactTypeInstance.Id,
+                                                                     pcenumConceptType.DerivationText,
+                                                                     lrFactTypeInstance.InstanceNumber)
+                            lrConceptInstance.Visible = True
+                            lrConceptInstance.X = lrFactTypeInstance.FactTypeDerivationText.X
+                            lrConceptInstance.Y = lrFactTypeInstance.FactTypeDerivationText.Y
+                            lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                        End If
                     Next
 
                     '--------------------------------------------------------------
@@ -601,6 +623,7 @@ SkipModelLevelRoleConstraint:
 
                     Me.ORMDiagram.Add(lrExportPage)
                 Next
+#End Region
 
                 Return True
 
@@ -2129,12 +2152,18 @@ SkipEntityType:
                                                                 Select New With {.FactType = FactType, .Role = Role}).First
 
                                     'NORMA Model:
-                                    Dim lrRoleAndObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
+                                    Dim lrRoleAndObject As Object
+                                    Try
+                                        lrRoleAndObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
                                                            From FactType In lrModel.Facts.Items
+                                                           Where CType(FactType, NORMA.Model.Fact).FactRoles IsNot Nothing
                                                            From Role In CType(FactType, NORMA.Model.Fact).FactRoles
                                                            Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
                                                            Where ModelElement.Name = lrFBMFactTypeAndRole.Role.JoinedObjectType.Id 'ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
                                                            Select New With {.FactType = FactType, .Role = Role, .NORMAObject = ModelElement}).FirstOrDefault()
+                                    Catch ex As Exception
+                                        lrRoleAndObject = Nothing
+                                    End Try
 
                                     If lrRoleAndObject Is Nothing Then
                                         lrRoleAndObject = (From ModelElement In lrModel.Facts.Items
@@ -2225,6 +2254,7 @@ SkipEntityType:
                                     'NORMA Model:
                                     Dim lrRoleAndObject = (From ModelElement In arNORMADocument.ORMModel.Objects.Items
                                                            From FactType In lrModel.Facts.Items
+                                                           Where CType(FactType, NORMA.Model.Fact).FactRoles IsNot Nothing
                                                            From Role In CType(FactType, NORMA.Model.Fact).FactRoles
                                                            Where Role.Id = "_" & lrFBMRoleConstraintRole.RoleId
                                                            Where ModelElement.Id = "_" & lrFBMFactTypeAndRole.Role.JoinedObjectType.GUID
@@ -3415,21 +3445,23 @@ FoundModelElement:
                     If lrJoinedORMObject Is Nothing Then
 
                         Dim lrFBMFactType As XMLModel.FactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lrFBMRole.JoinedObjectTypeId)
-                        Dim lrNORMAFactType As New NORMA.Model.Fact("_" & lrFBMFactType.GUID, lrFBMFactType.Name)
-                        Call Me.GetNORMAFactTypeDetails(arNORMADocument, lrNORMAFactType, lrFBMFactType)
 
-                        If IsNothing(arNORMADocument.ORMModel.Facts) Then
-                            arNORMADocument.ORMModel.Facts = New NORMA.ORMModelFacts()
-                            arNORMADocument.ORMModel.Facts.Items = Array.CreateInstance(GetType(Object), 0)
+                        If lrFBMFactType IsNot Nothing Then
+                            Dim lrNORMAFactType As New NORMA.Model.Fact("_" & lrFBMFactType.GUID, lrFBMFactType.Name)
+                            Call Me.GetNORMAFactTypeDetails(arNORMADocument, lrNORMAFactType, lrFBMFactType)
+
+                            If IsNothing(arNORMADocument.ORMModel.Facts) Then
+                                arNORMADocument.ORMModel.Facts = New NORMA.ORMModelFacts()
+                                arNORMADocument.ORMModel.Facts.Items = Array.CreateInstance(GetType(Object), 0)
+                            End If
+                            arNORMADocument.ORMModel.Facts.Items.Add(lrNORMAFactType)
+
+                            larJoinedObject = (From lrObject In arNORMADocument.ORMModel.Objects.Items
+                                               Where latType.Contains(lrObject.GetType) AndAlso lrObject.Name = lrFBMRole.JoinedObjectTypeId
+                                               Select lrObject).ToList
+
+                            lrJoinedORMObject = larJoinedObject.FirstOrDefault()
                         End If
-                        arNORMADocument.ORMModel.Facts.Items.Add(lrNORMAFactType)
-
-                        larJoinedObject = (From lrObject In arNORMADocument.ORMModel.Objects.Items
-                                           Where latType.Contains(lrObject.GetType) AndAlso lrObject.Name = lrFBMRole.JoinedObjectTypeId
-                                           Select lrObject).ToList
-
-                        lrJoinedORMObject = larJoinedObject.FirstOrDefault()
-
 
                     End If
 
@@ -3459,7 +3491,8 @@ FoundModelElement:
                                 CType(lrJoinedORMObject.PlayedRoles, List(Of NORMA.Model.ObjectifiedType.ObjectifiedTypeRole)).
                                     Add(New NORMA.Model.ObjectifiedType.ObjectifiedTypeRole() With {.Ref = lrNORMARole.Id})
                         End Select
-
+                    Else
+                        prApplication.ThrowErrorMessage("Trouble finding Joined ORM Object, " & lrFBMRole.JoinedObjectTypeId & ", for Fact Type: " & arFBMFactType.Id, pcenumErrorType.Warning,, False,, True)
                     End If
 
                     If IsNothing(arNORMAFactType.FactRoles) Then

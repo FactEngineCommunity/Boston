@@ -2227,7 +2227,7 @@ Public Class frmDiagramORM
                         Catch ex As Exception
                             'JoinedORMObject may be Nothing. New Role.
                         End Try
-                        If lrRoleInstance.FactType.IsLinkFactType And lbReassigningRole Then
+                        If (lrRoleInstance.FactType.IsLinkFactType And lbReassigningRole) And Not My.Computer.Keyboard.ShiftKeyDown Then
                             MsgBox("You cannot directly reassign the Role of a Link Fact Type.")
                             Exit Sub
                         End If
@@ -2243,16 +2243,16 @@ Public Class frmDiagramORM
                             Select Case lrTargetModelObject.ConceptType
                                 Case Is = pcenumConceptType.ValueType
                                     Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrTargetModelObject
-                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrValueTypeInstance.ValueType, True)
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrValueTypeInstance.ValueType, True,, My.Computer.Keyboard.ShiftKeyDown)
                                 Case Is = pcenumConceptType.EntityType
                                     Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrTargetModelObject
-                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeInstance.EntityType, True)
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeInstance.EntityType, True,, My.Computer.Keyboard.ShiftKeyDown)
                                 Case Is = pcenumConceptType.EntityTypeName
                                     Dim lrEntityTypeNameInstance As FBM.EntityTypeName = lrTargetModelObject
-                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeNameInstance.EntityTypeInstance.EntityType, True)
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrEntityTypeNameInstance.EntityTypeInstance.EntityType, True,, My.Computer.Keyboard.ShiftKeyDown)
                                 Case Is = pcenumConceptType.FactType
                                     Dim lrFactTypeInstance As FBM.FactTypeInstance = lrTargetModelObject
-                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrFactTypeInstance.FactType, True)
+                                    lrRoleInstance.Role.ReassignJoinedModelObject(lrFactTypeInstance.FactType, True,, My.Computer.Keyboard.ShiftKeyDown)
                             End Select
                         End If
 
@@ -9068,7 +9068,7 @@ SkipPopup:
         '==============================================================================================
         'Special menu options for SubtypeRelationship FactTypes.        
         Me.ToolStripMenuItemFactTypeInstanceRemoveFromPage.Enabled = Not lrFactType.IsSubtypeRelationshipFactType
-        Me.ToolStripMenuItemFactTypeRemoveFromPageModel.Enabled = Not (lrFactType.IsSubtypeRelationshipFactType Or lrFactType.IsLinkFactType)
+        Me.ToolStripMenuItemFactTypeRemoveFromPageModel.Enabled = Not (lrFactType.IsSubtypeRelationshipFactType Or lrFactType.IsLinkFactType) Or My.Computer.Keyboard.ShiftKeyDown
         '===================---------------------------------------------------------------------------
 
         '--------------------------------------------------------------------

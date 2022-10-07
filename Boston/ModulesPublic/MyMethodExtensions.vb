@@ -31,6 +31,12 @@ Module MyMethodExtensions
         Return If(value.Length <= maxLength, value, value.Substring(0, maxLength))
     End Function
 
+    <Extension()>
+    Public Function LCase(ByVal value As String) As String
+        If String.IsNullOrEmpty(value) Then Return value
+        Return Strings.LCase(value)
+    End Function
+
     ''' <summary>
     ''' For the ErrorProvider. Determines if there is an invalid control...a control with a validation error
     ''' </summary>
