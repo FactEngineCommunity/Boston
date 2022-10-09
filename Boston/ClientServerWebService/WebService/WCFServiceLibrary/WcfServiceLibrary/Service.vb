@@ -24,36 +24,45 @@ Public Class DuplexService
 
 
     Public Sub SendBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                             ByRef arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
+                                  ByRef arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
 
         SyncLock _sycnRoot
 
             Console.WriteLine("Broadcasting Message: " & aiBroadcastType.ToString)
 
-            For i As Integer = _callbackChannels.Count - 1 To 0 Step -1
-                If (CType(_callbackChannels(i), ICommunicationObject)).State <> CommunicationState.Opened Then
-                    Console.WriteLine("Detected Non-Open Callback Channel: {0}. Closing", _callbackChannels(i).GetHashCode())
-                    _callbackChannels.RemoveAt(i)
-                    Continue For
-                End If
-
-                Try
-
-                    Console.WriteLine("Attempting Broadcasts")
-
-                    Dim callbackChannel As IDuplexCallback = OperationContext.Current.GetCallbackChannel(Of IDuplexCallback)()
-                    If Not (callbackChannel Is _callbackChannels(i)) Then
-                        _callbackChannels(i).ReceiveBroadcast(aiBroadcastType, arObject)
-                        Console.WriteLine("Pushed Broadcast on Callback Channel: {0}", _callbackChannels(i).GetHashCode())
+            Try
+                For i As Integer = _callbackChannels.Count - 1 To 0 Step -1
+                    If (CType(_callbackChannels(i), ICommunicationObject)).State <> CommunicationState.Opened Then
+                        Console.WriteLine("Detected Non-Open Callback Channel: {0}. Closing", _callbackChannels(i).GetHashCode())
+                        _callbackChannels.RemoveAt(i)
+                        Continue For
                     End If
 
-                Catch ex As Exception
-                    Console.WriteLine("Service threw exception while communicating on Callback Channel: {0}", _callbackChannels(i).GetHashCode())
-                    Console.WriteLine("Exception Type: {0} on Callback Chanel {1}. Description: {2}", ex.[GetType](), _callbackChannels(i).GetHashCode, ex.Message)
-                    Console.WriteLine("Removing Callback Channel: {0}", _callbackChannels(i).GetHashCode)
-                    _callbackChannels.RemoveAt(i)
-                End Try
-            Next
+                    Try
+
+                        Console.WriteLine("Attempting Broadcasts")
+
+                        Dim callbackChannel As IDuplexCallback = OperationContext.Current.GetCallbackChannel(Of IDuplexCallback)()
+                        If Not (callbackChannel Is _callbackChannels(i)) Then
+                            _callbackChannels(i).ReceiveBroadcast(aiBroadcastType, arObject)
+                            Console.WriteLine("Pushed Broadcast on Callback Channel: {0}", _callbackChannels(i).GetHashCode())
+                        End If
+
+                    Catch ex As Exception
+                        Console.WriteLine("Service threw exception while communicating on Callback Channel: {0}", _callbackChannels(i).GetHashCode())
+                        Console.WriteLine("Exception Type: {0} on Callback Chanel {1}. Description: {2}", ex.[GetType](), _callbackChannels(i).GetHashCode, ex.Message)
+                        Console.WriteLine("Removing Callback Channel: {0}", _callbackChannels(i).GetHashCode)
+                        _callbackChannels.RemoveAt(i)
+                    End Try
+                Next
+
+
+            Catch ex As Exception
+                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast()
+                lrBroadcast.ErrorCode = Viev.FBM.Interface.publicConstants.pcenumErrorType.UndocumentedError
+                lrBroadcast.ErrorMessage = "Error processing the Broadcast"
+                arObject = lrBroadcast
+            End Try
 
         End SyncLock
 

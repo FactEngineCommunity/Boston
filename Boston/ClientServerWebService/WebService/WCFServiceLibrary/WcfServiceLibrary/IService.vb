@@ -26,7 +26,7 @@ Public Module Module1
 
         <OperationContract(IsOneWay:=False)>  '20220327-VM-Was False
         Sub ReceiveBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                             ByRef arObject As Viev.FBM.Interface.Broadcast) '20220327-VM-Was ByVal
+                                   ByRef arObject As Viev.FBM.Interface.Broadcast) '20220327-VM-Was ByVal
 
     End Interface
 

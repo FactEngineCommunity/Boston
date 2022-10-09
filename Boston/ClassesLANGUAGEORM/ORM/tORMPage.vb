@@ -2962,6 +2962,10 @@ NextY:
             Try
                 If Me.Diagram IsNot Nothing Then
                     Me.Diagram.Nodes.Remove(arValueTypeInstance.Shape)
+
+                    If arValueTypeInstance._ValueConstraint IsNot Nothing Then
+                        Me.Diagram.Nodes.Remove(arValueTypeInstance._ValueConstraint.Shape)
+                    End If
                 End If
 
                 Me.ValueTypeInstance.Remove(arValueTypeInstance)

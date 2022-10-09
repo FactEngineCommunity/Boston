@@ -35,7 +35,7 @@ Namespace DuplexServiceClient
         Public Event BroadcastEventReceived As EventHandler(Of Broadcast)
 
         Public Sub ReceiveBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                                    ByRef arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexCallback.ReceiveBroadcast
+                                         ByRef arObject As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexCallback.ReceiveBroadcast
 
             Dim lrBroadcast = New Broadcast(aiBroadcastType, arObject)
             '20220327-VM-Was _syncContext.Post(New SendOrPostCallback(AddressOf OnBroadcastEvent), lrBroadcast)

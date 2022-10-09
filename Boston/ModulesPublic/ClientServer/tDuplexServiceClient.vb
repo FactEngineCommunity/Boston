@@ -47,7 +47,7 @@ Namespace DuplexServiceClient
         End Sub
 
         Public Sub SendBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
-                                 ByRef arBroadcast As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
+                                      ByRef arBroadcast As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
             Try
 
                 Channel.SendBroadcast(aiBroadcastType, arBroadcast)

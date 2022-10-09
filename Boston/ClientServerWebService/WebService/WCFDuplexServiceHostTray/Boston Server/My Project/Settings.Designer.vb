@@ -65,6 +65,18 @@ Namespace My
                 Me("BostonServerPortNumber") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("http://localhost:")>  _
+        Public Property BostonServerURL() As String
+            Get
+                Return CType(Me("BostonServerURL"),String)
+            End Get
+            Set
+                Me("BostonServerURL") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

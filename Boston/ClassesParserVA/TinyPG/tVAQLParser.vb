@@ -9395,26 +9395,26 @@ lbProblemSolved =                         ParseNATURALLANGUAGEPROMPT(node) ' Non
                         End Select ' Choice Rule
                             If Not lbProblemSolved Then
                                m_tree.Errors.Clear
-                            If Not lbProblemSolved Then
-                              m_tree.Errors.Clear
-                              If liMaxRange > Me.MaxDistance Then
+                        If Not lbProblemSolved Then
+                            m_tree.Errors.Clear
+                            If liMaxRange > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
-                              End If
-                        lbProblemSolved =                             ParseMODELELEMENTLEADINGSTMT(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: MODELELEMENTLEADINGSTMT
+                            End If
+                            lbProblemSolved = ParseMODELELEMENTLEADINGSTMT(parent.Nodes(parent.Nodes.Count - 1)) ' NonTerminal Rule: MODELELEMENTLEADINGSTMT
                             If m_tree.Errors.Count > 0 Then
-                              If m_scanner.EndPos > Me.MaxDistance Then
-                                Me.MaxDistance = m_scanner.StartPos
-                                max_tree = m_tree.clone
-                              End If
-                              lbProblemSolved = False
-                            Else If m_scanner.EndPos = Me.MaxDistance Then
+                                If m_scanner.EndPos > Me.MaxDistance Then
+                                    Me.MaxDistance = m_scanner.StartPos
+                                    max_tree = m_tree.clone
+                                End If
+                                lbProblemSolved = False
+                            ElseIf m_scanner.EndPos = Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.EndPos
                                 max_tree = m_tree.clone
                             End If
 
-                            End If
-                            End If
+                        End If
+                    End If
                          If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
                              parent.Nodes.Remove(node)
                              Return False
