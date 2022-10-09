@@ -209,7 +209,6 @@ Namespace VAQL
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -459,7 +458,6 @@ Namespace VAQL
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -2021,7 +2019,6 @@ Namespace VAQL
                    m_tree.Errors.Clear
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2054,7 +2051,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2087,7 +2083,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2120,7 +2115,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2153,7 +2147,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2186,7 +2179,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2219,7 +2211,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2252,7 +2243,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2285,7 +2275,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2318,7 +2307,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2351,7 +2339,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2384,7 +2371,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2417,7 +2403,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2450,7 +2435,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2483,7 +2467,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2516,7 +2499,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2549,7 +2531,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2582,7 +2563,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2615,7 +2595,6 @@ Namespace VAQL
                 End If
                 If Not lbProblemSolved Then
                   m_tree.Errors.Clear
-                  m_scanner.StartPos = liMaxRange
                   If liMaxRange > Me.MaxDistance Then
                     Me.MaxDistance = m_scanner.StartPos
                     max_tree = m_tree.clone
@@ -2868,7 +2847,6 @@ Namespace VAQL
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -2901,7 +2879,6 @@ Namespace VAQL
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -2934,7 +2911,6 @@ Namespace VAQL
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -2967,7 +2943,6 @@ Namespace VAQL
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -3000,7 +2975,6 @@ Namespace VAQL
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -3310,7 +3284,6 @@ Namespace VAQL
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -3343,7 +3316,6 @@ Namespace VAQL
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -3934,7 +3906,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                                m_tree.Errors.Clear
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
-                              m_scanner.StartPos = liMaxRange
                               If liMaxRange > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
@@ -3954,7 +3925,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                             End If
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
-                              m_scanner.StartPos = liMaxRange
                               If liMaxRange > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
@@ -4148,7 +4118,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                                m_tree.Errors.Clear
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
-                              m_scanner.StartPos = liMaxRange
                               If liMaxRange > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
@@ -4621,7 +4590,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -4641,7 +4609,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -4661,7 +4628,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -4681,7 +4647,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -5123,7 +5088,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -5143,7 +5107,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -5921,7 +5884,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -5941,7 +5903,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -5961,7 +5922,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -5981,7 +5941,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -6066,7 +6025,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                                m_tree.Errors.Clear
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
-                              m_scanner.StartPos = liMaxRange
                               If liMaxRange > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone
@@ -6663,7 +6621,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -7351,7 +7308,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -7371,7 +7327,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -7850,7 +7805,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -7870,7 +7824,6 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9008,7 +8961,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                            m_tree.Errors.Clear
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9028,7 +8980,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9048,7 +8999,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9068,7 +9018,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9088,7 +9037,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9108,7 +9056,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9128,7 +9075,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9148,7 +9094,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9168,7 +9113,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9188,7 +9132,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9208,7 +9151,6 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         End If
                         If Not lbProblemSolved Then
                           m_tree.Errors.Clear
-                          m_scanner.StartPos = liMaxRange
                           If liMaxRange > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
@@ -9406,8 +9348,8 @@ lbProblemSolved =                         ParseNATURALLANGUAGEPROMPT(node) ' Non
                                     Me.MaxDistance = m_scanner.StartPos
                                     max_tree = m_tree.clone
                                   End If
-                                lbProblemSolved = False
-                            End If
+                                  lbProblemSolved = False
+                                End If
 
                             Case TokenType.FRONTREADINGTEXT
                         lbProblemSolved =                                 ParseMODELELEMENTLEADINGSTMT(node) ' NonTerminal Rule: MODELELEMENTLEADINGSTMT
@@ -9455,7 +9397,6 @@ lbProblemSolved =                         ParseNATURALLANGUAGEPROMPT(node) ' Non
                                m_tree.Errors.Clear
                             If Not lbProblemSolved Then
                               m_tree.Errors.Clear
-                              m_scanner.StartPos = liMaxRange
                               If liMaxRange > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
                                 max_tree = m_tree.clone

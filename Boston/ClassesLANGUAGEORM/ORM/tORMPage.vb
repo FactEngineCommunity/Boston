@@ -451,7 +451,7 @@ Namespace FBM
                     'Clone the FactTypes
                     '----------------------
                     Call Boston.WriteToStatusBar("Cloning FactTypes", True, 48)
-                    For Each lrFactTypeInstance In .FactTypeInstance
+                    For Each lrFactTypeInstance In .FactTypeInstance.ToArray
                         If lrPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
                             '--------------------------------------------------------------------------------------------------
                             'The FactTypeInstance was most likely added to the Page as part of recursive Cloning.

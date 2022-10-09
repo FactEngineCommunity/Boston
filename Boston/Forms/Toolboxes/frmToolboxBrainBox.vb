@@ -1250,8 +1250,6 @@ ProcessToken:
                         'Don't add anything
                     Case Is = VAQL.TokenType.PREDICATEPART
                         'Don't add anything
-                    Case Is = VAQL.TokenType.UNARYPREDICATEPART
-                        'Don't add anything
                     Case Is = VAQL.TokenType.NUMBER
                         'Don't add anything
                     Case Is = VAQL.TokenType.EOF
@@ -1260,7 +1258,7 @@ ProcessToken:
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
                     Case Is = VAQL.TokenType.SPACE
                         Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                    Case Is = VAQL.TokenType.MODELELEMENTNAME
+                    Case Is = VAQL.TokenType.MODELELEMENTNAME, VAQL.TokenType.UNARYPREDICATEPART
                         Me.AutoComplete.Enabled = True
                         Call Me.PopulateEnterpriseAwareWithObjectTypes(Me.zsIntellisenseBuffer)
                     Case Is = VAQL.TokenType.VALUE

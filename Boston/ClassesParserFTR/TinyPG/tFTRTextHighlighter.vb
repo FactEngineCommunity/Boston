@@ -220,7 +220,7 @@ Namespace FTR
         ClearUndo()
 
         AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
+        AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
         AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
         AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
@@ -259,8 +259,8 @@ Namespace FTR
             End If
             '=============================
 
-        ' undo/redo
-        If e.KeyValue = 89 AndAlso e.Control Then
+            ' undo/redo
+            If e.KeyValue = 89 AndAlso e.Control Then
             Redo()
             ' CTRL-Y
         End If
@@ -310,50 +310,53 @@ Namespace FTR
         Return node
     End Function
 
-    Private Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
+        Public Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
 
-        If node Is Nothing Then
-            Return Nothing
-        End If
-
-        If node.Nodes.Count > 0 Then
-            If node.Nodes.Count > 1 And _
-                   node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
-                Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
-            ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
-                Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
-            Else
-                Return node.Nodes(node.Nodes.Count - 1)
+            If node Is Nothing Then
+                Return Nothing
             End If
-        Else
-            Return node
-        End If
 
-    End Function
+            If node.Nodes.Count > 0 Then
+                If node.Nodes.Count > 1 And
+                   node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
+                    Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
+                ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
+                    Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
+                Else
+                    Return node.Nodes(node.Nodes.Count - 1)
+                End If
+            Else
+                Return node
+            End If
 
-    ''' <summary>
-    ''' use HighlighText to start the text highlight process from the caller's thread.
-    ''' this method is not used internally. 
-    ''' </summary>
-    Public Sub HighlightText()
-        SyncLock treelock
-            textChanged = True
-            currentText = Trim(Textbox.Text)
-        End SyncLock
-    End Sub
+        End Function
 
-    Private Sub HighlightTextInternal()
+        ''' <summary>
+        ''' use HighlighText to start the text highlight process from the caller's thread.
+        ''' this method is not used internally. 
+        ''' </summary>
+        Public Sub HighlightText()
+
+            SyncLock treelock
+                textChanged = True
+                currentText = Textbox.Text
+            End SyncLock
+
+        End Sub
+
+        Private Sub HighlightTextInternal()
         ' highlight the text (used internally only)
         Lock()
 
         Dim hscroll As Integer = HScrollPos
         Dim vscroll As Integer = VScrollPos
 
-        Dim selstart As Integer = Textbox.SelectionStart
+            Dim selstart As Integer = Textbox.SelectionStart
 
-        HighlighTextCore()
+            HighlighTextCore()
 
-        Textbox.[Select](selstart, 0)
+
+                Textbox.[Select](selstart, 0)
 
         HScrollPos = hscroll
         VScrollPos = vscroll
@@ -437,20 +440,22 @@ Namespace FTR
                 Continue While
             End If
 
-            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
 
-            SyncLock treelock
-                If textChanged Then
-                    Continue While
-                Else
-                    ' assign new tree
-                    Tree = _tree
+                SyncLock treelock
+                    If textChanged Then
+                        Continue While
+                    Else
+                        ' assign new tree
+                        Tree = _tree
+                    End If
+                End SyncLock
+
+
+                If _tree.Errors.Count = 0 Then
+                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
                 End If
-            End SyncLock
-
-
-            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-        End While
+            End While
     End Sub
 
 
