@@ -1889,9 +1889,6 @@ MoveOn:
                 If Me.ReferenceModeFactType.FactTable IsNot Nothing Then Me.ReferenceModeFactType.FactTable.RemoveFromPage(abBroadcastInterfaceEvent)
                 Me.ReferenceModeFactType.FactTypeName.RemoveFromPage(abBroadcastInterfaceEvent)
 
-                Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
-                Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
-
                 Me.PreferredIdentifierRCId = ""
                 Me.ReferenceModeValueType = Nothing
                 Me.ReferenceModeFactType = Nothing
@@ -1902,6 +1899,13 @@ MoveOn:
                 End If
 
                 Me.ExpandReferenceMode = False
+
+                Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                Try
+                    Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
+                Catch ex As Exception
+                    'Not a biggie
+                End Try
 
                 If Me.Page.Diagram Is Nothing Then Exit Sub
                 Me.Page.Diagram.Invalidate()

@@ -1613,6 +1613,30 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadFEKLUploaderTool(ByRef arModel As FBM.Model)
+
+        Dim child As New frmFEKLUploader
+
+        Try
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        End Try
+
+    End Sub
+
     Public Sub LoadToolboxTaxonomyTree(ByRef arModel As FBM.Model)
 
         Try

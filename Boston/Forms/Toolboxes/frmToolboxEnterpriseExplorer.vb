@@ -40,7 +40,7 @@ Public Class frmToolboxEnterpriseExplorer
             Me.Visible = False
             Windows.Forms.Cursor.Current = Cursors.WaitCursor
 
-            Me.ToolStripMenuItemExportToNORMAormFile.Enabled = My.Settings.SuperuserMode
+            'Me.ToolStripMenuItemExportToNORMAormFile.Enabled = My.Settings.SuperuserMode
 
             Me.CircularProgressBar.Value = 0
 
@@ -5247,12 +5247,15 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Try
                     Call lrNORMADocument.SerializeObject(lrNORMADocument, lsFileLocationName)
-
                 Catch ex As XmlSchemaException
                     MessageBox.Show(ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Catch ex As Exception
                     Throw New Exception(ex.InnerException.Message & vbCrLf & vbCrLf & ex.Message)
                 End Try
+
+                If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
+                    prThinfinity.DownloadFile(lsFileLocationName)
+                End If
 
             End With
 
@@ -5288,6 +5291,37 @@ Public Class frmToolboxEnterpriseExplorer
                 End If
 
             End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub FEKLUploaderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FEKLUploaderToolStripMenuItem.Click
+
+        Dim lrModel As FBM.Model
+
+        Try
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = New FBM.Model
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            'CodesSafe-Load the model
+            If Not lrModel.Loaded Then
+                With New WaitCursor
+                    Call lrModel.Load(False, False, Nothing, False)
+                End With
+            End If
+
+            Call frmMain.LoadFEKLUploaderTool(lrModel)
 
         Catch ex As Exception
             Dim lsMessage As String

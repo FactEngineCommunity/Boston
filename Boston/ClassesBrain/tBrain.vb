@@ -359,7 +359,7 @@ Public Class tBrain
             Me.OutputChannel.AppendText(lsString & vbCrLf)
 
         Catch ex As Exception
-            MsgBox(ex.Message & vbCrLf & vbCrLf & "Possible Cross thread concern.")
+            Boston.WriteToStatusBar("Possible Cross thread concern.")
         End Try
 
         If Not abSuppressLineLimit Then

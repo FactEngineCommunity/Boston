@@ -6493,7 +6493,10 @@ SkipPopup:
             lrUserAction.PostActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
             prApplication.AddUndoAction(lrUserAction)
             frmMain.ToolStripMenuItemUndo.Enabled = True
+        Next
 
+        '20221009-Need to be here otherwise FactTypeReadings get moved back to where they came from (if called above).
+        For Each loORMObject In Me.zrPage.SelectedObject.ToArray
             Select Case loORMObject.ConceptType
                 Case pcenumConceptType.EntityType, pcenumConceptType.ValueType
 

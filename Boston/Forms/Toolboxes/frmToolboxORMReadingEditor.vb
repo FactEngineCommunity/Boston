@@ -203,7 +203,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -331,7 +331,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -485,7 +485,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -609,7 +609,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -838,7 +838,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -851,9 +851,9 @@ Public Class frmToolboxORMReadingEditor
                 Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
             End If
         ElseIf e.ColumnIndex = 1 Then
-                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
-            ElseIf e.ColumnIndex = 2 Then
-                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
+            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
+        ElseIf e.ColumnIndex = 2 Then
+            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
         End If
 
     End Sub
@@ -885,7 +885,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1035,7 +1035,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1256,10 +1256,13 @@ ProcessToken:
             'FactType.CountReferencesToModelObject
 
             For Each lrModelObject In larModelObject
-                If Me.TextboxReading.Text.CountSubstring(lrModelObject.Id) < Me.zrFactTypeInstance.FactType.CountReferencesToModelObject(lrModelObject) Then
-                    Call Me.AddEnterpriseAwareItem(lrModelObject.Id, FTR.TokenType.MODELELEMENTNAME)
-                End If
-
+                Try
+                    If Me.TextboxReading.Text.CountSubstring(lrModelObject.Id) < Me.zrFactTypeInstance.FactType.CountReferencesToModelObject(lrModelObject) Then
+                        Call Me.AddEnterpriseAwareItem(lrModelObject.Id, FTR.TokenType.MODELELEMENTNAME)
+                    End If
+                Catch ex As Exception
+                    'Not a biggie
+                End Try
             Next
 
         Catch ex As Exception
@@ -1268,7 +1271,7 @@ ProcessToken:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1300,10 +1303,10 @@ ProcessToken:
                     'End If
                 Case Is = FTR.TokenType.MODELELEMENTNAME
                     Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                Case Is = FTR.TokenType.PREBOUNDREADINGTEXT, _
+                Case Is = FTR.TokenType.PREBOUNDREADINGTEXT,
                           FTR.TokenType.POSTBOUNDREADINGTEXT
                     'Don't add anything 
-                Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT, _
+                Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT,
                           FTR.TokenType.FRONTREADINGTEXT
                     'Don't add anything 
                 Case Is = FTR.TokenType.UNARYPREDICATEPART
@@ -1336,7 +1339,7 @@ ProcessToken:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1552,7 +1555,7 @@ ProcessToken:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 

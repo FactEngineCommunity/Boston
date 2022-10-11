@@ -19,6 +19,35 @@ Module MyMethodExtensions
     End Sub
 
     ''' <summary>
+    ''' Richtextbox GotoLine
+    ''' </summary>
+    ''' <param name="wantedLine_zero_based"></param>
+    <Extension()>
+    Public Sub GotoLine(ByVal richTextBox As RichTextBox, ByVal wantedLine_zero_based As Integer)
+        Dim index As Integer = richTextBox.GetFirstCharIndexFromLine(wantedLine_zero_based)
+        richTextBox.[Select](index, 0)
+        richTextBox.ScrollToCaret()
+    End Sub
+
+    ''' <summary>
+    ''' Richtextbox Highlight Line
+    ''' </summary>
+    ''' <param name="richTextBox"></param>
+    ''' <param name="index"></param>
+    ''' <param name="color"></param>
+    <Extension()>
+    Public Sub HighlightLine(ByVal richTextBox As RichTextBox, ByVal index As Integer, ByVal color As Color)
+        richTextBox.SelectAll()
+        richTextBox.SelectionBackColor = richTextBox.BackColor
+        Dim lines = richTextBox.Lines
+        If index < 0 OrElse index >= lines.Length Then Return
+        Dim start = richTextBox.GetFirstCharIndexFromLine(index)
+        Dim length = lines(index).Length
+        richTextBox.[Select](start, length)
+        richTextBox.SelectionBackColor = color
+    End Sub
+
+    ''' <summary>
     ''' Truncates a string to a max number of characters.
     ''' NB Can also use Strings.Left(str,int)
     ''' </summary>

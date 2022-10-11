@@ -53,6 +53,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.FactEngineToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemKeywordExtractionTool = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemTaxonomyTree = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FEKLUploaderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.AddPageToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPastePage = New System.Windows.Forms.ToolStripMenuItem()
@@ -316,9 +317,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 446)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 468)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -368,6 +369,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItemTaxonomyTree.Name = "ToolStripMenuItemTaxonomyTree"
         Me.ToolStripMenuItemTaxonomyTree.Size = New System.Drawing.Size(207, 22)
         Me.ToolStripMenuItemTaxonomyTree.Text = "Taxonomy Tree"
+        '
+        'FEKLUploaderToolStripMenuItem
+        '
+        Me.FEKLUploaderToolStripMenuItem.Name = "FEKLUploaderToolStripMenuItem"
+        Me.FEKLUploaderToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.FEKLUploaderToolStripMenuItem.Text = "FEKL Uploader"
         '
         'ToolStripSeparator7
         '
@@ -565,7 +572,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItem12.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FromORMCMMLFileToolStripMenuItem})
         Me.ToolStripMenuItem12.Image = Global.Boston.My.Resources.MenuImages.Import16x16
         Me.ToolStripMenuItem12.Name = "ToolStripMenuItem12"
-        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(182, 22)
+        Me.ToolStripMenuItem12.Size = New System.Drawing.Size(216, 22)
         Me.ToolStripMenuItem12.Text = "&Import"
         Me.ToolStripMenuItem12.Visible = False
         '
@@ -580,14 +587,14 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ExportTestingToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.XML16x16
         Me.ExportTestingToolStripMenuItem.Name = "ExportTestingToolStripMenuItem"
-        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.ExportTestingToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.ExportTestingToolStripMenuItem.Text = "To .&fbm File"
         '
         'TocqlFileToolStripMenuItem
         '
         Me.TocqlFileToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.CQL16x16
         Me.TocqlFileToolStripMenuItem.Name = "TocqlFileToolStripMenuItem"
-        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(182, 22)
+        Me.TocqlFileToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.TocqlFileToolStripMenuItem.Text = "To .&cql File"
         Me.TocqlFileToolStripMenuItem.Visible = False
         '
@@ -595,8 +602,8 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ToolStripMenuItemExportToNORMAormFile.Image = Global.Boston.My.Resources.Resources.NORMA16x16
         Me.ToolStripMenuItemExportToNORMAormFile.Name = "ToolStripMenuItemExportToNORMAormFile"
-        Me.ToolStripMenuItemExportToNORMAormFile.Size = New System.Drawing.Size(182, 22)
-        Me.ToolStripMenuItemExportToNORMAormFile.Text = "To NORMA .orm File"
+        Me.ToolStripMenuItemExportToNORMAormFile.Size = New System.Drawing.Size(216, 22)
+        Me.ToolStripMenuItemExportToNORMAormFile.Text = "To NORMA .orm File (beta)"
         '
         'ToolStripMenuItemFixModelErrors
         '
@@ -784,4 +791,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents AddProcessDiagramPageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemExportToNORMAormFile As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemMoveModel As ToolStripMenuItem
+    Friend WithEvents FEKLUploaderToolStripMenuItem As ToolStripMenuItem
 End Class

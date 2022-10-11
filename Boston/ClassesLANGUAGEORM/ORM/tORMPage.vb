@@ -2719,7 +2719,7 @@ NextY:
         Public Sub RemoveFactTypeInstance(ByRef arFactTypeInstance As FBM.FactTypeInstance, ByVal abBroadcastInterfaceEvent As Boolean)
 
             Try
-                If Me.Diagram IsNot Nothing Then
+                If Me.Diagram IsNot Nothing And arFactTypeInstance.Shape IsNot Nothing Then
 
                     Me.Diagram.Nodes.Remove(arFactTypeInstance.Shape)
                     If arFactTypeInstance.FactTypeReadingShape IsNot Nothing Then Me.Diagram.Nodes.Remove(arFactTypeInstance.FactTypeReadingShape.Shape)

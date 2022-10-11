@@ -1588,7 +1588,6 @@ Namespace FBM
                     Call lrDictionaryEntry.Save()
                 End If
 
-
                 RaiseEvent LongDescriptionChanged(asLongDescription)
 
                 Me.isDirty = True

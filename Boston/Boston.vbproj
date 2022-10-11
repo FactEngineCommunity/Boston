@@ -1300,6 +1300,12 @@
     <Compile Include="Forms\CRUD\ClientServer\frmLogin.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\CRUD\FEKLUploader\frmFEKLUploader.Designer.vb">
+      <DependentUpon>frmFEKLUploader.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CRUD\FEKLUploader\frmFEKLUploader.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\CRUD\frmCRUDEditReferenceTable.Designer.vb">
       <DependentUpon>frmCRUDEditReferenceTable.vb</DependentUpon>
     </Compile>
@@ -2239,6 +2245,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\ClientServer\frmLogin.resx">
       <DependentUpon>frmLogin.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CRUD\FEKLUploader\frmFEKLUploader.resx">
+      <DependentUpon>frmFEKLUploader.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\frmCRUDEditReferenceTable.resx">
       <DependentUpon>frmCRUDEditReferenceTable.vb</DependentUpon>
