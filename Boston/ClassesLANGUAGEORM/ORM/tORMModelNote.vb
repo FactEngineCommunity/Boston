@@ -68,29 +68,39 @@ Namespace FBM
 
             Dim lrModelNoteInstance As New FBM.ModelNoteInstance
 
-            With Me
-                lrModelNoteInstance.Id = .Id
-                lrModelNoteInstance.Model = arPage.Model
-                lrModelNoteInstance.Page = arPage
-                lrModelNoteInstance.NoteText = .Text
-                lrModelNoteInstance.ModelNote = Me
-                If IsSomething(.JoinedObjectType) Then
-                    Select Case Me.JoinedObjectType.ConceptType
-                        Case Is = pcenumConceptType.EntityType
-                            lrModelNoteInstance.JoinedObjectType = arPage.EntityTypeInstance.Find(AddressOf Me.JoinedObjectType.Equals)
-                        Case Is = pcenumConceptType.ValueType
-                            lrModelNoteInstance.JoinedObjectType = arPage.ValueTypeInstance.Find(AddressOf Me.JoinedObjectType.Equals)
-                        Case Is = pcenumConceptType.FactType
-                            lrModelNoteInstance.JoinedObjectType = arPage.FactTypeInstance.Find(AddressOf Me.JoinedObjectType.Equals)
-                    End Select
-                Else
-                    lrModelNoteInstance.JoinedObjectType = Nothing
-                End If
-            End With
+            Try
+                With Me
+                    lrModelNoteInstance.Id = .Id
+                    lrModelNoteInstance.Model = arPage.Model
+                    lrModelNoteInstance.Page = arPage
+                    lrModelNoteInstance.NoteText = .Text
+                    lrModelNoteInstance.ModelNote = Me
+                    If IsSomething(.JoinedObjectType) Then
+                        Select Case Me.JoinedObjectType.ConceptType
+                            Case Is = pcenumConceptType.EntityType
+                                lrModelNoteInstance.JoinedObjectType = arPage.EntityTypeInstance.Find(AddressOf Me.JoinedObjectType.Equals)
+                            Case Is = pcenumConceptType.ValueType
+                                lrModelNoteInstance.JoinedObjectType = arPage.ValueTypeInstance.Find(AddressOf Me.JoinedObjectType.Equals)
+                            Case Is = pcenumConceptType.FactType
+                                lrModelNoteInstance.JoinedObjectType = arPage.FactTypeInstance.Find(AddressOf Me.JoinedObjectType.Equals)
+                        End Select
+                    Else
+                        lrModelNoteInstance.JoinedObjectType = Nothing
+                    End If
+                End With
 
-            If abAddToPage Then
-                arPage.ModelNoteInstance.Add(lrModelNoteInstance)
-            End If
+                If abAddToPage Then
+                    arPage.ModelNoteInstance.Add(lrModelNoteInstance)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
             Return lrModelNoteInstance
 
@@ -111,13 +121,17 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Overrides Function GetSignature() As String
 
-            Dim lsSignature As String
+            Try
+                Dim lsSignature As String
 
-            lsSignature = Me.Id
-            lsSignature &= Me.JoinedObjectType.Id
-            lsSignature &= Me.Text
+                lsSignature = Me.Id
+                lsSignature &= Me.JoinedObjectType.Id
+                lsSignature &= Me.Text
 
-            Return lsSignature
+                Return lsSignature
+            Catch ex As Exception
+                Return "error"
+            End Try
 
         End Function
 
@@ -154,7 +168,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -200,7 +214,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -220,19 +234,29 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
         Public Sub SetJoinedModelObject(ByRef arModelObject As FBM.ModelObject)
 
-            Me.JoinedObjectType = arModelObject
+            Try
+                Me.JoinedObjectType = arModelObject
 
-            Call Me.makeDirty()
-            Call Me.Model.MakeDirty(False, False)
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(False, False)
 
-            RaiseEvent JoinedObjectTypeChanged(arModelObject)
+                RaiseEvent JoinedObjectTypeChanged(arModelObject)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

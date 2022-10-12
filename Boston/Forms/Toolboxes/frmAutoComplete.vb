@@ -194,6 +194,9 @@ Public Class frmAutoComplete
                     '-------------------
                     'Nothing to remove
                     '-------------------
+                    If Me.ListBox.SelectedIndex >= 0 Then
+                        lsSelectedItem = Me.ListBox.SelectedItem.ToString
+                    End If
                 Else
                     Select Case aiActionType
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.None

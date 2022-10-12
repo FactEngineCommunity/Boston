@@ -227,26 +227,36 @@ Public Class frmToolboxORMReadingEditor
         Dim ls_joined_object_name As String = ""
         Dim liInd As Integer = 0
 
-        If TextboxReading.SelectionLength > 0 Then
-            lsSelection = TextboxReading.SelectedText
+        Try
+            If TextboxReading.SelectionLength > 0 Then
+                lsSelection = TextboxReading.SelectedText
 
-            TextboxReading.SelectAll()
-            TextboxReading.SelectionProtected = False
-            TextboxReading.SelectionColor = Color.Black
-            TextboxReading.Text = lsSelection & lsReading
+                TextboxReading.SelectAll()
+                TextboxReading.SelectionProtected = False
+                TextboxReading.SelectionColor = Color.Black
+                TextboxReading.Text = lsSelection & lsReading
 
-            For liInd = 1 To Me.zrFactTypeInstance.Arity
-                Dim lrJoinedORMObject As Object = Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject
-                ls_joined_object_name = " " & Trim(lrJoinedORMObject.shape.tag.name)
-                TextboxReading.Find(ls_joined_object_name, RichTextBoxFinds.Reverse)
-                TextboxReading.SelectionColor = Color.Blue
-                TextboxReading.SelectionProtected = True
-                TextboxReading.DeselectAll()
-            Next
-        End If
+                For liInd = 1 To Me.zrFactTypeInstance.Arity
+                    Dim lrJoinedORMObject As Object = Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject
+                    ls_joined_object_name = " " & Trim(lrJoinedORMObject.shape.tag.name)
+                    TextboxReading.Find(ls_joined_object_name, RichTextBoxFinds.Reverse)
+                    TextboxReading.SelectionColor = Color.Blue
+                    TextboxReading.SelectionProtected = True
+                    TextboxReading.DeselectAll()
+                Next
+            End If
 
-        TextboxReading.ForeColor = Color.Black
-        Call Me.ProtectFactTypeTerms(Me.TextboxReading)
+            TextboxReading.ForeColor = Color.Black
+            Call Me.ProtectFactTypeTerms(Me.TextboxReading)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -261,18 +271,32 @@ Public Class frmToolboxORMReadingEditor
         Dim lo_sentence As Language.Sentence
         Dim lsWord As String = ""
 
-        lo_sentence = New Language.Sentence(Me.TextboxReading.Text)
+        Try
+            lo_sentence = New Language.Sentence(Me.TextboxReading.Text)
 
-        For Each lsWord In lo_sentence.WordList
-            'MsgBox("'" & lsWord & "'")
-        Next
+            For Each lsWord In lo_sentence.WordList
+                'MsgBox("'" & lsWord & "'")
+            Next
 
-        TextboxReading.SelectAll()
-        TextboxReading.SelectionProtected = False
-        TextboxReading.Text = ""
+            TextboxReading.SelectAll()
+            TextboxReading.SelectionProtected = False
+            TextboxReading.Text = ""
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
+
+    ''' <summary>
+    ''' 20221012-VM-Schedule for removal. Not called from anywhere.
+    ''' </summary>
     Sub PopulateTermList()
 
         Dim liInd As Integer
@@ -280,21 +304,31 @@ Public Class frmToolboxORMReadingEditor
 
         Me.zrTermList.Clear()
 
-        For liInd = 1 To Me.zrFactTypeInstance.Arity
-            Select Case Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    lsJoinedObjectName = Trim(Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.Name)
-                Case Is = pcenumConceptType.FactType
-                    lsJoinedObjectName = Trim(Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.Name)
-                Case Is = pcenumConceptType.ValueType
-                    lsJoinedObjectName = Trim(Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.Name)
-            End Select
+        Try
+            For liInd = 1 To Me.zrFactTypeInstance.Arity
+                Select Case Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        lsJoinedObjectName = Trim(Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.Name)
+                    Case Is = pcenumConceptType.FactType
+                        lsJoinedObjectName = Trim(Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.Name)
+                    Case Is = pcenumConceptType.ValueType
+                        lsJoinedObjectName = Trim(Me.zrFactTypeInstance.RoleGroup(liInd - 1).JoinedORMObject.Name)
+                End Select
 
-            '----------------------------------------------------------------
-            'Add to the list of ORMObjectTypes within the selected FactType
-            '----------------------------------------------------------------
-            Me.zrTermList.Add(lsJoinedObjectName)
-        Next
+                '----------------------------------------------------------------
+                'Add to the list of ORMObjectTypes within the selected FactType
+                '----------------------------------------------------------------
+                Me.zrTermList.Add(lsJoinedObjectName)
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -630,67 +664,83 @@ Public Class frmToolboxORMReadingEditor
 
         Dim lasSortedModelNameObjectList As New List(Of String)
 
-        For Each lsDictionaryItem In Me.zrHashList
-            lasSortedModelNameObjectList.Add(lsDictionaryItem.Key)
-        Next
+        Try
+            For Each lsDictionaryItem In Me.zrHashList
+                lasSortedModelNameObjectList.Add(lsDictionaryItem.Key)
+            Next
 
-        Dim lrStringLengthComparerDescending As New Viev.Strings.StringLengthComparerDescending
-        lasSortedModelNameObjectList.Sort(lrStringLengthComparerDescending)
+            Dim lrStringLengthComparerDescending As New Viev.Strings.StringLengthComparerDescending
+            lasSortedModelNameObjectList.Sort(lrStringLengthComparerDescending)
 
 
-        aoRichTextBox.SelectAll()
-        aoRichTextBox.SelectionProtected = False
-        aoRichTextBox.SelectionColor = Color.Black
-        aoRichTextBox.DeselectAll()
-        aoRichTextBox.SelectionStart = aoRichTextBox.TextLength
+            aoRichTextBox.SelectAll()
+            aoRichTextBox.SelectionProtected = False
+            aoRichTextBox.SelectionColor = Color.Black
+            aoRichTextBox.DeselectAll()
+            aoRichTextBox.SelectionStart = aoRichTextBox.TextLength
 
-        For liInd = 1 To lasSortedModelNameObjectList.Count 'Me.zrFactTypeInstance.Arity
-            '------------------------------------------------------
-            'Get the Name of the ModelObject within the FactType
-            '------------------------------------------------------
-            ls_joined_object_name = lasSortedModelNameObjectList(liInd - 1)
+            For liInd = 1 To lasSortedModelNameObjectList.Count 'Me.zrFactTypeInstance.Arity
+                '------------------------------------------------------
+                'Get the Name of the ModelObject within the FactType
+                '------------------------------------------------------
+                ls_joined_object_name = lasSortedModelNameObjectList(liInd - 1)
 
-            While liInd2 < aoRichTextBox.TextLength
-                If liInd2 <= 0 Then liInd2 = 1
+                While liInd2 < aoRichTextBox.TextLength
+                    If liInd2 <= 0 Then liInd2 = 1
 
-                liInd2 = aoRichTextBox.Find(ls_joined_object_name, (liInd2 - 1), RichTextBoxFinds.WholeWord)
-                If liInd2 < 0 Then
-                    liInd2 = 1
-                    Exit While
-                End If
+                    liInd2 = aoRichTextBox.Find(ls_joined_object_name, (liInd2 - 1), RichTextBoxFinds.WholeWord)
+                    If liInd2 < 0 Then
+                        liInd2 = 1
+                        Exit While
+                    End If
 
-                aoRichTextBox.SelectionColor = Color.Blue
-                aoRichTextBox.SelectionProtected = True
+                    aoRichTextBox.SelectionColor = Color.Blue
+                    aoRichTextBox.SelectionProtected = True
 
-                If (aoRichTextBox.SelectionStart + Len(ls_joined_object_name)) >= aoRichTextBox.TextLength Then
-                    Exit While
-                ElseIf (aoRichTextBox.SelectionStart = 0) Then
-                    Exit While
-                Else
-                    liInd2 = aoRichTextBox.SelectionStart + Len(ls_joined_object_name)
-                End If
-            End While
-        Next
+                    If (aoRichTextBox.SelectionStart + Len(ls_joined_object_name)) >= aoRichTextBox.TextLength Then
+                        Exit While
+                    ElseIf (aoRichTextBox.SelectionStart = 0) Then
+                        Exit While
+                    Else
+                        liInd2 = aoRichTextBox.SelectionStart + Len(ls_joined_object_name)
+                    End If
+                End While
+            Next
 
-        aoRichTextBox.SelectionStart = aoRichTextBox.TextLength
+            aoRichTextBox.SelectionStart = aoRichTextBox.TextLength
 
-    End Sub
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-    Private Sub DataGrid_Readings_CellBeginEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellCancelEventArgs) Handles DataGrid_Readings.CellBeginEdit
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub DataGrid_Readings_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGrid_Readings.CellClick
 
-        If e.ColumnIndex = 0 Then
-            'Me.DataGrid_Readings.ContextMenuStrip = Nothing
-        ElseIf e.ColumnIndex = 1 Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
-            Me.DataGrid_Readings.Rows(e.RowIndex).Selected = True
-        ElseIf e.ColumnIndex = 2 Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
-            Me.DataGrid_Readings.Rows(e.RowIndex).Selected = True
-        End If
+        Try
+            If e.ColumnIndex = 0 Then
+                'Me.DataGrid_Readings.ContextMenuStrip = Nothing
+            ElseIf e.ColumnIndex = 1 Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
+                Me.DataGrid_Readings.Rows(e.RowIndex).Selected = True
+            ElseIf e.ColumnIndex = 2 Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
+                Me.DataGrid_Readings.Rows(e.RowIndex).Selected = True
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -845,16 +895,25 @@ Public Class frmToolboxORMReadingEditor
 
     Private Sub DataGrid_Readings_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGrid_Readings.CellMouseDown
 
-
-        If e.ColumnIndex = 0 Then
-            If Me.DataGrid_Readings.SelectedRows.Count > 0 Then
-                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
+        Try
+            If e.ColumnIndex = 0 Then
+                If Me.DataGrid_Readings.SelectedRows.Count > 0 Then
+                    Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
+                End If
+            ElseIf e.ColumnIndex = 1 Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
+            ElseIf e.ColumnIndex = 2 Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
             End If
-        ElseIf e.ColumnIndex = 1 Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferred
-        ElseIf e.ColumnIndex = 2 Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuStripIsPreferredForPredicate
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -906,10 +965,21 @@ Public Class frmToolboxORMReadingEditor
         '  The IntellisenseBuffer is used to limit the number of options provided in the AutoComplete (Intellisense) form.
         '-------------------------------------------------------------------------------------------------------------------
         Dim loRegularExpression As Regex
-        loRegularExpression = New Regex("[a-zA-Z0-9]")
-        If loRegularExpression.IsMatch(e.KeyChar) Then
-            zsIntellisenseBuffer &= LCase(e.KeyChar)
-        End If
+
+        Try
+            loRegularExpression = New Regex("[a-zA-Z0-9]")
+            If loRegularExpression.IsMatch(e.KeyChar) Then
+                zsIntellisenseBuffer &= LCase(e.KeyChar)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -917,19 +987,29 @@ Public Class frmToolboxORMReadingEditor
 
         'For [Enter] see KeyDown. Calls Me.processFactTypeReading()
 
-        If e.KeyCode = Keys.Down Or Trim(Me.TextboxReading.Text) <> "NL:" Then
-            Call Me.ProcessAutoComplete(e)
-        End If
+        Try
+            If e.KeyCode = Keys.Down Or Trim(Me.TextboxReading.Text) <> "NL:" Then
+                Call Me.ProcessAutoComplete(e)
+            End If
 
-        If e.KeyCode = Keys.Escape Then
-            Me.AutoComplete.Hide()
-        End If
+            If e.KeyCode = Keys.Escape Then
+                Me.AutoComplete.Hide()
+            End If
 
-        If (e.KeyCode = Keys.Enter) And Me.TextboxReading.Text = "" Then
-            Call Me.AutoComplete.Hide()
-        End If
+            If (e.KeyCode = Keys.Enter) And Me.TextboxReading.Text = "" Then
+                Call Me.AutoComplete.Hide()
+            End If
 
-        e.Handled = True
+            e.Handled = True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -939,57 +1019,26 @@ Public Class frmToolboxORMReadingEditor
 
     End Sub
 
-    ''' <summary>
-    ''' 20161118-VM-May be able to delete this function. Was implemented before the new FTR regime was implemented.
-    ''' Is largely supplemented/replaced by the form/functions ability to make sure that all possible Role combinations
-    '''  for a FTR are covered on "creation" of a FTR, and as only really required for those FactTypes that have more than
-    '''  one Role joining the same Object Type.
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks></remarks>
-    Private Sub textbox_reading_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-        '----------------------------------------------------------------------------
-        'Establish the ContextMenu to move ORM Object Type names within the Reading.
-        '  * But only if the User has first selected the name of an ORM Object Type.
-        '----------------------------------------------------------------------------
-
-        Dim lsSelected_text As String = Me.TextboxReading.SelectedText
-        Dim ls_message As String = ""
-        Dim Pattern As String = "^[A-Z]" ' Pattern = Starting char is a capital letter 
-        Dim Match As System.Text.RegularExpressions.Match
-
-
-        If e.Button = Windows.Forms.MouseButtons.Right Then
-            If Me.TextboxReading.SelectionLength = 0 Then
-                ls_message = "Please select a Term (DoubleClick on the Term) to move it."
-                MsgBox(ls_message)
-                Me.ContextMenuStrip_MoveTerms.Enabled = False
-            Else
-                Match = Regex.Match(lsSelected_text(0), Pattern) 'See if the Word/Term starts with a Capital/Uppercase Letter
-                If Match.Success = False Then
-                    ls_message = "You can only move the names of ORM Object Types (Entity Types, Value Types, Fact Types) within a Reading."
-                    MsgBox(ls_message)
-                    Me.ContextMenuStrip_MoveTerms.Enabled = False
-                Else
-                    Me.ContextMenuStrip_MoveTerms.Enabled = True
-                End If
-            End If
-
-        End If
-
-    End Sub
-
     Private Sub TextboxReading_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextboxReading.GotFocus
 
-        Me.LabelHelpTips.Text = "[V] Down arrow button on your keyboard shows a list of the Object Types linked to the Roles of the selected Fact Type."
-        Me.LabelHelpTips.Text &= vbCrLf & "[Enter] button adds the Fact Type Reading to the list of Fact Type Readings for the selected Fact Type."
+        Try
+            Me.LabelHelpTips.Text = "[V] Down arrow button on your keyboard shows a list of the Object Types linked to the Roles of the selected Fact Type."
+            Me.LabelHelpTips.Text &= vbCrLf & "[Enter] button adds the Fact Type Reading to the list of Fact Type Readings for the selected Fact Type."
 
-        If Me.TextboxReading.Text = "Enter a Fact Type Reading for the selected Fact Type here." Then
-            Me.TextboxReading.Text = ""
-            Me.TextboxReading.ForeColor = Color.Black
-        End If
-        Me.Refresh()
+            If Me.TextboxReading.Text = "Enter a Fact Type Reading for the selected Fact Type here." Then
+                Me.TextboxReading.Text = ""
+                Me.TextboxReading.ForeColor = Color.Black
+            End If
+            Me.Refresh()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1042,16 +1091,26 @@ Public Class frmToolboxORMReadingEditor
 
     Private Sub ShowAutoCompleteTool()
 
-        Me.AutoComplete.Owner = Me
-        Me.AutoComplete.Show()
+        Try
+            Me.AutoComplete.Owner = Me
+            Me.AutoComplete.Show()
 
-        Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
-        lo_point.X += Me.TextboxReading.Bounds.X
-        lo_point.Y += Me.TextboxReading.Bounds.Y
-        lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
-        Me.AutoComplete.Location = PointToScreen(lo_point)
+            Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
+            lo_point.X += Me.TextboxReading.Bounds.X
+            lo_point.Y += Me.TextboxReading.Bounds.Y
+            lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
+            Me.AutoComplete.Location = PointToScreen(lo_point)
 
-        Me.AutoComplete.ListBox.ItemHeight = Me.AutoComplete.Font.GetHeight + 3
+            Me.AutoComplete.ListBox.ItemHeight = Me.AutoComplete.Font.GetHeight + 3
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1061,182 +1120,191 @@ Public Class frmToolboxORMReadingEditor
         Dim liTokenType As FTR.TokenType
         Dim lsCurrentTokenType As Object
 
-        '-------------------
-        'Get the ParseTree
-        '-------------------
-        Me.zrTextHighlighter.Tree = Me.FTRParser.Parse(Me.TextboxReading.Text)
+        Try
+            '-------------------
+            'Get the ParseTree
+            '-------------------
+            Me.zrTextHighlighter.Tree = Me.FTRParser.Parse(Me.TextboxReading.Text)
 
-        If Me.AutoComplete.ListBox.Items.Count = 0 Then
-            Me.AutoComplete.Hide()
-        End If
-        Me.AutoComplete.ListBox.Items.Clear()
-
-        Dim lrLastToken As FTR.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
-
-        If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Or (lrLastToken = FTR.TokenType.EOF) Then
-
-            If lrLastToken = FTR.TokenType.EOF Then
-                liTokenType = FTR.TokenType.EOF
-                GoTo ProcessToken
-            ElseIf Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
-                lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
-            Else
-                lsExpectedToken = Me.zrTextHighlighter.Tree.Optionals(0).ExpectedToken
+            If Me.AutoComplete.ListBox.Items.Count = 0 Then
+                Me.AutoComplete.Hide()
             End If
+            Me.AutoComplete.ListBox.Items.Clear()
 
-            If lsExpectedToken <> "" Then
-                liTokenType = DirectCast([Enum].Parse(GetType(FTR.TokenType), lsExpectedToken), FTR.TokenType)
-                'MsgBox("Expecting: " & Me.zrScanner.Patterns(liTokenType).ToString)
-            End If
+            Dim lrLastToken As FTR.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
 
-            If Me.zrTextHighlighter.Tree.Optionals.Count > 0 Then
-                Call Me.PopulateEnterpriseAwareFromOptionals(Me.zrTextHighlighter.Tree.Optionals)
-            End If
+            If (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Or (lrLastToken = FTR.TokenType.EOF) Then
+
+                If lrLastToken = FTR.TokenType.EOF Then
+                    liTokenType = FTR.TokenType.EOF
+                    GoTo ProcessToken
+                ElseIf Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+                    lsExpectedToken = Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken
+                Else
+                    lsExpectedToken = Me.zrTextHighlighter.Tree.Optionals(0).ExpectedToken
+                End If
+
+                If lsExpectedToken <> "" Then
+                    liTokenType = DirectCast([Enum].Parse(GetType(FTR.TokenType), lsExpectedToken), FTR.TokenType)
+                    'MsgBox("Expecting: " & Me.zrScanner.Patterns(liTokenType).ToString)
+                End If
+
+                If Me.zrTextHighlighter.Tree.Optionals.Count > 0 Then
+                    Call Me.PopulateEnterpriseAwareFromOptionals(Me.zrTextHighlighter.Tree.Optionals)
+                End If
 
 ProcessToken:
-            Select Case liTokenType
-                Case Is = FTR.TokenType._NONE_
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT,
-                          FTR.TokenType.FRONTREADINGTEXT
+                Select Case liTokenType
+                    Case Is = FTR.TokenType._NONE_
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT,
+                              FTR.TokenType.FRONTREADINGTEXT
                     'Don't add anything 
-                Case Is = FTR.TokenType.UNARYPREDICATEPART
+                    Case Is = FTR.TokenType.SUBSCRIPT
                     'Don't add anything 
-                Case Is = FTR.TokenType.SUBSCRIPT
+                    Case Is = FTR.TokenType.PREBOUNDREADINGTEXT,
+                              FTR.TokenType.POSTBOUNDREADINGTEXT
                     'Don't add anything 
-                Case Is = FTR.TokenType.PREBOUNDREADINGTEXT,
-                          FTR.TokenType.POSTBOUNDREADINGTEXT
-                    'Don't add anything 
-                Case Is = FTR.TokenType.PREDICATEPART
+                    Case Is = FTR.TokenType.PREDICATEPART
                     'Don't add anything
-                Case Is = FTR.TokenType.EOF
-                    Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                Case Is = FTR.TokenType.PREDICATESPACE
-                    Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
-                Case Is = FTR.TokenType.MODELELEMENTNAME
-                    Me.AutoComplete.Enabled = True
-                    Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                Case Else
-                    Me.AutoComplete.Enabled = True
-                    Me.AddEnterpriseAwareItem(Me.FTRScanner.Patterns(liTokenType).ToString, liTokenType)
-            End Select
-
-            lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-            If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
-                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
-
-                Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                    Case Is = FTR.TokenType.MODELELEMENTNAME
+                    Case Is = FTR.TokenType.EOF
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                    Case Is = FTR.TokenType.PREDICATESPACE
+                        Me.AutoComplete.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox
+                    Case Is = FTR.TokenType.MODELELEMENTNAME,
+                              FTR.TokenType.UNARYPREDICATEPART
                         Me.AutoComplete.Enabled = True
                         Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                    Case Is = FTR.TokenType.PREDICATEPART,
-                              FTR.TokenType.PREDICATESPACE
-                        Me.AutoComplete.Enabled = True
-                        'Call Me.AddFactTypePredicatePartsToEnterpriseAware()
-                End Select
-            End If
-
-            '======================================================================================
-            'Last effort.
-            Call Me.PopulateEnterpriseAwareBasedOnOutstandingModelObjects()
-
-
-            If e.KeyCode = Keys.Down Then
-                If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                    Me.AutoComplete.ListBox.Focus()
-                    Me.AutoComplete.ListBox.SelectedIndex = 0
-                    e.Handled = True
-                End If
-            End If
-
-            If e.Control Then
-                If e.KeyValue = Keys.J Then
-                    'Call Me.AddFactTypeReadingsToEnterpriseAware()
-                    Exit Sub
-                End If
-            End If
-
-            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
-
-                Me.AutoComplete.Owner = Me
-                Me.AutoComplete.Show()
-
-                Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
-                lo_point.X += Me.TextboxReading.Bounds.X
-                lo_point.Y += Me.TextboxReading.Bounds.Y
-                lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
-                Me.AutoComplete.Location = PointToScreen(lo_point)
-            End If
-
-            If e.KeyCode <> Keys.Down Then
-                Me.TextboxReading.Focus()
-            End If
-        Else
-            '=========================================================================================================================
-            'Load all the MododelObjects of the FactType anyway, because Intellisense for FactTypeReadings doesn't always come up with
-            '  MODELELEMENTNAME TokenType in the Optionals of the ParseTree.
-            Me.AutoComplete.Enabled = True
-            Call Me.PopulateEnterpriseAwareWithObjectTypes()
-
-            Me.FTRProcessor.ProcessFTR(Trim(Me.TextboxReading.Text), Me.FTRParseTree)
-            Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = New List(Of String)
-            Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT = New List(Of Object)
-            Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE = New List(Of Object)
-            Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
-            Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
-            Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree.Nodes(0))
-
-            Dim lsModelElementName As String = ""
-            Dim liModelElementCount As Integer = Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count
-
-            Dim lrModelElementNode As FTR.ParseNode
-            lrModelElementNode = Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT(Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count - 1)
-            Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
-            Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
-            Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
-            Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
-            lsModelElementName = Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME
-            If liModelElementCount = Me.zrFactTypeInstance.RoleGroup.Count _
-                And Me.zrFactTypeInstance.Model.ExistsModelElement(lsModelElementName) Then
-                Me.AutoComplete.Enabled = False
-            End If
-            '=========================================================================================================================
-
-            lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-            If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
-                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
-                Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                    Case Is = FTR.TokenType.PREDICATEPART,
-                              FTR.TokenType.PREDICATESPACE
-                        Me.AutoComplete.Enabled = True
-                        'Call Me.AddFactTypeReadingsToEnterpriseAware()
                     Case Else
-                        'Me.AutoComplete.Enabled = False
+                        Me.AutoComplete.Enabled = True
+                        Me.AddEnterpriseAwareItem(Me.FTRScanner.Patterns(liTokenType).ToString, liTokenType)
                 End Select
+
+                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
+                If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
+                    lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
+
+                    Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                        Case Is = FTR.TokenType.MODELELEMENTNAME
+                            Me.AutoComplete.Enabled = True
+                            Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                        Case Is = FTR.TokenType.PREDICATEPART,
+                                  FTR.TokenType.PREDICATESPACE
+                            Me.AutoComplete.Enabled = True
+                            'Call Me.AddFactTypePredicatePartsToEnterpriseAware()
+                    End Select
+                End If
+
+                '======================================================================================
+                'Last effort.
+                Call Me.PopulateEnterpriseAwareBasedOnOutstandingModelObjects()
+
+
+                If e.KeyCode = Keys.Down Then
+                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                        Me.AutoComplete.ListBox.Focus()
+                        Me.AutoComplete.ListBox.SelectedIndex = 0
+                        e.Handled = True
+                    End If
+                End If
+
+                If e.Control Then
+                    If e.KeyValue = Keys.J Then
+                        'Call Me.AddFactTypeReadingsToEnterpriseAware()
+                        Exit Sub
+                    End If
+                End If
+
+                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+
+                    Me.AutoComplete.Owner = Me
+                    Me.AutoComplete.Show()
+
+                    Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
+                    lo_point.X += Me.TextboxReading.Bounds.X
+                    lo_point.Y += Me.TextboxReading.Bounds.Y
+                    lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
+                    Me.AutoComplete.Location = PointToScreen(lo_point)
+                End If
+
+                If e.KeyCode <> Keys.Down Then
+                    Me.TextboxReading.Focus()
+                End If
+            Else
+                '=========================================================================================================================
+                'Load all the MododelObjects of the FactType anyway, because Intellisense for FactTypeReadings doesn't always come up with
+                '  MODELELEMENTNAME TokenType in the Optionals of the ParseTree.
+                Me.AutoComplete.Enabled = True
+                Call Me.PopulateEnterpriseAwareWithObjectTypes()
+
+                Me.FTRProcessor.ProcessFTR(Trim(Me.TextboxReading.Text), Me.FTRParseTree)
+                Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = New List(Of String)
+                Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT = New List(Of Object)
+                Me.FTRProcessor.FACTTYPEREADINGStatement.PREDICATECLAUSE = New List(Of Object)
+                Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
+                Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
+                Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree.Nodes(0))
+
+                Dim lsModelElementName As String = ""
+                Dim liModelElementCount As Integer = Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count
+
+                Dim lrModelElementNode As FTR.ParseNode
+                lrModelElementNode = Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT(Me.FTRProcessor.FACTTYPEREADINGStatement.MODELELEMENT.Count - 1)
+                Me.FTRProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
+                Me.FTRProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
+                Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
+                Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.MODELELEMENTClause, lrModelElementNode)
+                lsModelElementName = Me.FTRProcessor.MODELELEMENTClause.MODELELEMENTNAME
+                If liModelElementCount = Me.zrFactTypeInstance.RoleGroup.Count _
+                    And Me.zrFactTypeInstance.Model.ExistsModelElement(lsModelElementName) Then
+                    Me.AutoComplete.Enabled = False
+                End If
+                '=========================================================================================================================
+
+                lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
+                If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
+                    lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
+                    Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
+                        Case Is = FTR.TokenType.PREDICATEPART,
+                                  FTR.TokenType.PREDICATESPACE
+                            Me.AutoComplete.Enabled = True
+                            'Call Me.AddFactTypeReadingsToEnterpriseAware()
+                        Case Else
+                            'Me.AutoComplete.Enabled = False
+                    End Select
+                End If
+
+                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+
+                    Me.AutoComplete.Owner = Me
+                    Me.AutoComplete.Show()
+
+                    Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
+                    lo_point.X += Me.TextboxReading.Bounds.X
+                    lo_point.Y += Me.TextboxReading.Bounds.Y
+                    lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 6
+                    Me.AutoComplete.Location = PointToScreen(lo_point)
+                End If
+
+                If e.KeyCode <> Keys.Down Then
+                    Me.TextboxReading.Focus()
+                End If
+
             End If
 
-            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
-
-                Me.AutoComplete.Owner = Me
-                Me.AutoComplete.Show()
-
-                Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
-                lo_point.X += Me.TextboxReading.Bounds.X
-                lo_point.Y += Me.TextboxReading.Bounds.Y
-                lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 6
-                Me.AutoComplete.Location = PointToScreen(lo_point)
+            If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                Me.LabelHelpTips.Text = ""
+                Me.LabelHelpTips.Text.Append("Press the [V] down arrow key on your keyboard to goto the AutoComplete box.")
             End If
 
-            If e.KeyCode <> Keys.Down Then
-                Me.TextboxReading.Focus()
-            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End If
-
-        If Me.AutoComplete.ListBox.Items.Count > 0 Then
-            Me.LabelHelpTips.Text = ""
-            Me.LabelHelpTips.Text.Append("Press the [V] down arrow key on your keyboard to goto the AutoComplete box.")
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1282,13 +1350,14 @@ ProcessToken:
         Dim lsToken As String = ""
         Dim liTokenType As FTR.TokenType
 
-        For Each lrParseError In aarParseErrors
-            liTokenType = DirectCast([Enum].Parse(GetType(FTR.TokenType), lrParseError.ExpectedToken), FTR.TokenType)
-            Select Case liTokenType
-                Case Is = FTR.TokenType.PREDICATEPART
-                    'Dim lrModelElement As FBM.ModelObject
-                    Dim lsModelElementName As String
-                    lsModelElementName = Me.TextboxReading.Text.Trim.Split(" ").Last
+        Try
+            For Each lrParseError In aarParseErrors
+                liTokenType = DirectCast([Enum].Parse(GetType(FTR.TokenType), lrParseError.ExpectedToken), FTR.TokenType)
+                Select Case liTokenType
+                    Case Is = FTR.TokenType.PREDICATEPART
+                        'Dim lrModelElement As FBM.ModelObject
+                        Dim lsModelElementName As String
+                        lsModelElementName = Me.TextboxReading.Text.Trim.Split(" ").Last
                     ''lrModelElement = prApplication.WorkingModel.GetModelElementByName(lsModelElementName)
                     'If IsSomething(lrModelElement) Then
                     '    Call Me.AddPredicatePartsToEnterpriseAware(prBradfordApplication.Database.MetaDataManager.GetPredicatePartsForModelObject(lrModelElement))
@@ -1301,24 +1370,33 @@ ProcessToken:
                     '        Call Me.AddPredicatePartsToEnterpriseAware(prBradfordApplication.Database.MetaDataManager.GetPredicatePartsForModelObject(lrModelElement))
                     '    End If
                     'End If
-                Case Is = FTR.TokenType.MODELELEMENTNAME
-                    Call Me.PopulateEnterpriseAwareWithObjectTypes()
-                Case Is = FTR.TokenType.PREBOUNDREADINGTEXT,
-                          FTR.TokenType.POSTBOUNDREADINGTEXT
+                    Case Is = FTR.TokenType.MODELELEMENTNAME
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes()
+                    Case Is = FTR.TokenType.PREBOUNDREADINGTEXT,
+                              FTR.TokenType.POSTBOUNDREADINGTEXT
                     'Don't add anything 
-                Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT,
-                          FTR.TokenType.FRONTREADINGTEXT
+                    Case Is = FTR.TokenType.FOLLOWINGREADINGTEXT,
+                              FTR.TokenType.FRONTREADINGTEXT
                     'Don't add anything 
-                Case Is = FTR.TokenType.UNARYPREDICATEPART
+                    Case Is = FTR.TokenType.UNARYPREDICATEPART
                     'Don't add anything 
-                Case Is = FTR.TokenType.SUBSCRIPT
+                    Case Is = FTR.TokenType.SUBSCRIPT
                     'Don't add anything 
-                Case Is = FTR.TokenType.EOF
-                    'Don't add anything 
-                Case Else
-                    Call Me.AddEnterpriseAwareItem(Me.FTRScanner.Patterns(liTokenType).ToString, liTokenType)
-            End Select
-        Next
+                    Case Is = FTR.TokenType.EOF
+                        'Don't add anything 
+                    Case Else
+                        Call Me.AddEnterpriseAwareItem(Me.FTRScanner.Patterns(liTokenType).ToString, liTokenType)
+                End Select
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1354,48 +1432,62 @@ ProcessToken:
         'CodeSafe
         If Me.zrFactTypeInstance Is Nothing Then Exit Sub
 
-        Dim lbStartsWith As Boolean = False
-        lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
+        Try
+            Dim lbStartsWith As Boolean = False
+            lbStartsWith = "asdf".StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture)
 
-        Dim larModelObject As New List(Of FBM.ModelObject)
-        Dim lrRoleInstance As FBM.RoleInstance
-        For Each lrRoleInstance In Me.zrFactTypeInstance.RoleGroup
-            larModelObject.Add(lrRoleInstance.Role.JoinedORMObject)
-        Next
+            Dim larModelObject As New List(Of FBM.ModelObject)
+            Dim lrRoleInstance As FBM.RoleInstance
+            For Each lrRoleInstance In Me.zrFactTypeInstance.RoleGroup
+                larModelObject.Add(lrRoleInstance.Role.JoinedORMObject)
+            Next
 
-        For Each lrValueType In larModelObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrValueType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+            For Each lrValueType In larModelObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lrValueType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                        Call Me.AddEnterpriseAwareItem(lrValueType.Name, FTR.TokenType.MODELELEMENTNAME)
+                    End If
+                Else
                     Call Me.AddEnterpriseAwareItem(lrValueType.Name, FTR.TokenType.MODELELEMENTNAME)
                 End If
-            Else
-                Call Me.AddEnterpriseAwareItem(lrValueType.Name, FTR.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
 
-        For Each lrEntityType In larModelObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrEntityType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+            For Each lrEntityType In larModelObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lrEntityType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                        Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FTR.TokenType.MODELELEMENTNAME)
+                    End If
+                Else
                     Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FTR.TokenType.MODELELEMENTNAME)
                 End If
-            Else
-                Call Me.AddEnterpriseAwareItem(lrEntityType.Name, FTR.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
 
-        For Each lrFactType In larModelObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
-            If zsIntellisenseBuffer.Length > 0 Then
-                If lrFactType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+            For Each lrFactType In larModelObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
+                If zsIntellisenseBuffer.Length > 0 Then
+                    If lrFactType.Name.StartsWith(zsIntellisenseBuffer, True, System.Globalization.CultureInfo.CurrentUICulture) Then
+                        Call Me.AddEnterpriseAwareItem(lrFactType.Name, FTR.TokenType.MODELELEMENTNAME)
+                    End If
+                Else
                     Call Me.AddEnterpriseAwareItem(lrFactType.Name, FTR.TokenType.MODELELEMENTNAME)
                 End If
-            Else
-                Call Me.AddEnterpriseAwareItem(lrFactType.Name, FTR.TokenType.MODELELEMENTNAME)
-            End If
-        Next
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Function CheckIfCanDisplayEnterpriseAwareBox()
+
+        If Me.AutoComplete Is Nothing Then
+            Return False
+        End If
 
         If Me.AutoComplete.ListBox.Items.Count > 0 Then
             Return True
@@ -1438,9 +1530,13 @@ ProcessToken:
 
             Call Me.PopulateDataGridWithFactTypeReadings()
 
-
         Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1449,13 +1545,23 @@ ProcessToken:
 
         Dim lrFactTypeReading As FBM.FactTypeReading
 
-        If Me.DataGrid_Readings.SelectedRows.Count = 0 Then
-            Exit Sub
-        End If
+        Try
+            If Me.DataGrid_Readings.SelectedRows.Count = 0 Then
+                Exit Sub
+            End If
 
-        lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
+            lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
 
-        ToolStripMenuItemIsPreferred.Checked = lrFactTypeReading.IsPreferred
+            ToolStripMenuItemIsPreferred.Checked = lrFactTypeReading.IsPreferred
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1494,7 +1600,12 @@ ProcessToken:
 
 
         Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1503,32 +1614,53 @@ ProcessToken:
 
         Dim lrFactTypeReading As FBM.FactTypeReading
 
-        If Me.DataGrid_Readings.SelectedRows.Count = 0 Then
-            Exit Sub
-        End If
+        Try
+            If Me.DataGrid_Readings.SelectedRows.Count = 0 Then
+                Exit Sub
+            End If
 
-        lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
+            lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
 
-        ToolStripMenuItemIsPreferredForPredicate.Checked = lrFactTypeReading.IsPreferredForPredicate
+            ToolStripMenuItemIsPreferredForPredicate.Checked = lrFactTypeReading.IsPreferredForPredicate
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub zrFactType_FactTypeReadingAdded(ByRef arFactTypeReading As FBM.FactTypeReading) Handles zrFactType.FactTypeReadingAdded
 
         Dim lbFound As Boolean = False
-        For Each Row In Me.DataGrid_Readings.Rows
-            If Row.Tag.Id = arFactTypeReading.Id Then
-                lbFound = True
-            End If
-        Next
 
-        If Not lbFound Then
-            Me.DataGrid_Readings.Rows.Add()
-            Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Cells(0).Value = arFactTypeReading.GetReadingText
-            Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Cells(1).Value = arFactTypeReading.IsPreferred
-            Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Cells(2).Value = arFactTypeReading.IsPreferredForPredicate
-            Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Tag = arFactTypeReading
-        End If
+        Try
+            For Each Row In Me.DataGrid_Readings.Rows
+                If Row.Tag.Id = arFactTypeReading.Id Then
+                    lbFound = True
+                End If
+            Next
+
+            If Not lbFound Then
+                Me.DataGrid_Readings.Rows.Add()
+                Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Cells(0).Value = arFactTypeReading.GetReadingText
+                Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Cells(1).Value = arFactTypeReading.IsPreferred
+                Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Cells(2).Value = arFactTypeReading.IsPreferredForPredicate
+                Me.DataGrid_Readings.Rows(Me.DataGrid_Readings.Rows.Count - 1).Tag = arFactTypeReading
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1581,68 +1713,103 @@ ProcessToken:
 
 
         Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
     Private Sub TextboxReading_MouseClick(sender As Object, e As MouseEventArgs) Handles TextboxReading.MouseClick
 
-        Me.LabelHelpTips.Text = "Double Click over a Fact Type Reading to edit the Fact Type Reading."
-        Me.LabelHelpTips.Text &= vbCrLf & "Select (Left Click leftmost column to highlight) a Fact Type Reading to Delete the selected Fact Type Reading."
-        Me.LabelHelpTips.Text &= vbCrLf & "Select then press the [Delete] button to delete a selected Fact Type Reading"
-        Me.Refresh()
+        Try
 
+            Me.LabelHelpTips.Text = "Double Click over a Fact Type Reading to edit the Fact Type Reading."
+            Me.LabelHelpTips.Text &= vbCrLf & "Select (Left Click leftmost column to highlight) a Fact Type Reading to Delete the selected Fact Type Reading."
+            Me.LabelHelpTips.Text &= vbCrLf & "Select then press the [Delete] button to delete a selected Fact Type Reading"
+            Me.Refresh()
 
-        Dim rowIndex As Integer = DataGrid_Readings.HitTest(e.Location.X, e.Location.Y).RowIndex
+            Dim rowIndex As Integer = DataGrid_Readings.HitTest(e.Location.X, e.Location.Y).RowIndex
 
-        'If there was no DataGridViewRow under the cursor, return
-        If (rowIndex >= 0) Then
+            'If there was no DataGridViewRow under the cursor, return
+            If (rowIndex >= 0) Then
 
-            'Clear all other selections before making a New selection
-            DataGrid_Readings.ClearSelection()
+                'Clear all other selections before making a New selection
+                DataGrid_Readings.ClearSelection()
 
-            'Select the found DataGridViewRow
-            DataGrid_Readings.Rows(rowIndex).Selected = True
-        End If
+                'Select the found DataGridViewRow
+                DataGrid_Readings.Rows(rowIndex).Selected = True
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub DataGrid_Readings_MouseClick(sender As Object, e As MouseEventArgs) Handles DataGrid_Readings.MouseClick
 
-        Dim rowIndex As Integer = DataGrid_Readings.HitTest(e.Location.X, e.Location.Y).RowIndex
+        Try
+            Dim rowIndex As Integer = DataGrid_Readings.HitTest(e.Location.X, e.Location.Y).RowIndex
 
-        'If there was no DataGridViewRow under the cursor, return
-        If (rowIndex >= 0) Then
+            'If there was no DataGridViewRow under the cursor, return
+            If (rowIndex >= 0) Then
 
-            'Clear all other selections before making a New selection
-            DataGrid_Readings.ClearSelection()
+                'Clear all other selections before making a New selection
+                DataGrid_Readings.ClearSelection()
 
-            'Select the found DataGridViewRow
-            DataGrid_Readings.Rows(rowIndex).Selected = True
-        End If
+                'Select the found DataGridViewRow
+                DataGrid_Readings.Rows(rowIndex).Selected = True
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub DataGrid_Readings_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles DataGrid_Readings.CellMouseClick
 
-        Dim loPoint As Point = New Point(e.X, e.Y)
+        Try
+            Dim loPoint As Point = New Point(e.X, e.Y)
 
-        Dim rowIndex As Integer = DataGrid_Readings.HitTest(loPoint.X, loPoint.Y).RowIndex
+            Dim rowIndex As Integer = DataGrid_Readings.HitTest(loPoint.X, loPoint.Y).RowIndex
 
-        'If there was no DataGridViewRow under the cursor, return
-        If (rowIndex >= 0) Then
+            'If there was no DataGridViewRow under the cursor, return
+            If (rowIndex >= 0) Then
 
-            'Clear all other selections before making a New selection
-            DataGrid_Readings.ClearSelection()
+                'Clear all other selections before making a New selection
+                DataGrid_Readings.ClearSelection()
 
-            'Select the found DataGridViewRow
-            DataGrid_Readings.Rows(rowIndex).Selected = True
+                'Select the found DataGridViewRow
+                DataGrid_Readings.Rows(rowIndex).Selected = True
 
-        End If
-        If e.Button = MouseButtons.Right Then
-            Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
-        End If
+            End If
+            If e.Button = MouseButtons.Right Then
+                Me.DataGrid_Readings.ContextMenuStrip = ContextMenuFactTypeReading
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

@@ -3872,6 +3872,10 @@ Public Class frmDiagramORM
         Try
             Dim loNode = arShapeNode
 
+            'CodeSafe
+            If loNode Is Nothing Then Exit Sub
+            If loNode.Tag Is Nothing Then Exit Sub
+
             Select Case loNode.Tag.ConceptType
                 Case Is = pcenumConceptType.EntityType
                     loNode.Pen.Color = Color.Blue
@@ -4328,6 +4332,9 @@ Public Class frmDiagramORM
     Private Sub DoPropertiesGridProcessing(ByRef arModelElement As FBM.ModelObject)
 
         Try
+            'CodeSafe
+            If arModelElement Is Nothing Then Exit Sub
+
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
@@ -10472,7 +10479,12 @@ SkipRemovalFromModel:
 
         Try
             lrRoleConstraintRoleInstance = Me.zrPage.SelectedObject(0)
+        Catch ex As Exception
+            Me.zrPage.SelectedObject.Clear()
+            Exit Sub
+        End Try
 
+        Try
             Using loWaitCursor As New WaitCursor
                 If lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
 

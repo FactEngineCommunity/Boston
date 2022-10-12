@@ -363,7 +363,7 @@ RetryTypeOfJoin:
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tRoleInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleInstance
             End Try
@@ -510,7 +510,7 @@ RetryTypeOfJoin:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "Error getting Attribute"
             End Try
@@ -584,7 +584,7 @@ RetryTypeOfJoin:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 BelongsToTable = "Mystery"
             End Try
@@ -639,6 +639,11 @@ RetryTypeOfJoin:
             Dim loDroppedNode As New ShapeNode
 
             Try
+                'CodeSafe
+                If Me.Page.Diagram Is Nothing Then
+                    Exit Sub
+                End If
+
                 '-----------------------------------------------------------------------------
                 'Establish the position of the RoleInstance relative to the FactTypeInstance
                 '-----------------------------------------------------------------------------
@@ -788,7 +793,7 @@ PostJoinedORMObject:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -995,60 +1000,60 @@ PostJoinedORMObject:
                 End Try
 
                 If IsSomething(Me.RoleName) Then
-                        '------------------------------------------------------
-                        'RoleName is already displayed for the RoleInstance
-                        '------------------------------------------------------
-                        If Me.Role.Name <> "" Then
-                            Me.RoleName.Shape.Text = "[" & Me.Role.Name & "]"
-                            Me.RoleName.Shape.Resize(StringSize.Width, StringSize.Height)
-                        End If
+                    '------------------------------------------------------
+                    'RoleName is already displayed for the RoleInstance
+                    '------------------------------------------------------
+                    If Me.Role.Name <> "" Then
+                        Me.RoleName.Shape.Text = "[" & Me.Role.Name & "]"
+                        Me.RoleName.Shape.Resize(StringSize.Width, StringSize.Height)
+                    End If
+                Else
+                    '-----------------------------------------
+                    'Setup the RoleName for the RoleInstance
+                    '-----------------------------------------
+                    Dim loRoleName As ShapeNode
+
+                    G = Me.Page.Form.CreateGraphics
+
+                    StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Role.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+
+                    loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(Me.Shape.Bounds.X, Me.Shape.Bounds.Y - StringSize.Height, StringSize.Width, StringSize.Height)
+                    loRoleName.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                    loRoleName.HandlesStyle = HandlesStyle.InvisibleMove
+                    If Trim(Me.Role.Name) <> "" Then
+                        loRoleName.Text = "[" & Trim(Me.Role.Name) & "]"
                     Else
-                        '-----------------------------------------
-                        'Setup the RoleName for the RoleInstance
-                        '-----------------------------------------
-                        Dim loRoleName As ShapeNode
-
-                        G = Me.Page.Form.CreateGraphics
-
-                        StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Role.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-
-                        loRoleName = Me.Page.Diagram.Factory.CreateShapeNode(Me.Shape.Bounds.X, Me.Shape.Bounds.Y - StringSize.Height, StringSize.Width, StringSize.Height)
-                        loRoleName.Shape = MindFusion.Diagramming.Shapes.Rectangle
-                        loRoleName.HandlesStyle = HandlesStyle.InvisibleMove
-                        If Trim(Me.Role.Name) <> "" Then
-                            loRoleName.Text = "[" & Trim(Me.Role.Name) & "]"
-                        Else
-                            loRoleName.Text = ""
-                        End If
-                        loRoleName.TextColor = Color.Blue
-                        loRoleName.Transparent = True
-
-                        loRoleName.Visible = True
-                        loRoleName.ZTop()
-                        Dim lrRoleName As FBM.RoleName = New FBM.RoleName(Me, Me.Role.Name)
-                        lrRoleName.RoleInstance = Me
-                        loRoleName.Tag = lrRoleName
-                        '---------------------------------------------------------------------------
-                        'Attach the Role.RoleName ShapeNode to the Role ShapeGroup,                                    
-                        '---------------------------------------------------------------------------
-                        loRoleName.AttachTo(Me.Shape, AttachToNode.TopLeft)
-                        lrRoleName.Shape = loRoleName
-                        Me.RoleName = lrRoleName
+                        loRoleName.Text = ""
                     End If
+                    loRoleName.TextColor = Color.Blue
+                    loRoleName.Transparent = True
 
-                    If Me.FactType.IsLinkFactType Then
-                        Me.Shape.Pen.DashPattern = New Single() {4, 3, 4, 3}
-                    End If
+                    loRoleName.Visible = True
+                    loRoleName.ZTop()
+                    Dim lrRoleName As FBM.RoleName = New FBM.RoleName(Me, Me.Role.Name)
+                    lrRoleName.RoleInstance = Me
+                    loRoleName.Tag = lrRoleName
+                    '---------------------------------------------------------------------------
+                    'Attach the Role.RoleName ShapeNode to the Role ShapeGroup,                                    
+                    '---------------------------------------------------------------------------
+                    loRoleName.AttachTo(Me.Shape, AttachToNode.TopLeft)
+                    lrRoleName.Shape = loRoleName
+                    Me.RoleName = lrRoleName
+                End If
 
-                    Me.Page.Diagram.Invalidate()
+                If Me.FactType.IsLinkFactType Then
+                    Me.Shape.Pen.DashPattern = New Single() {4, 3, 4, 3}
+                End If
 
-                Catch ex As Exception
-                    Dim lsMessage As String
+                Me.Page.Diagram.Invalidate()
+
+            Catch ex As Exception
+                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1113,7 +1118,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1128,19 +1133,19 @@ PostJoinedORMObject:
             Dim liPositionInRoleGroup As Integer
 
             If liPositionInRoleGroup = 1 Then
-                apat1 = New AnchorPattern(New AnchorPoint() { _
-                        New AnchorPoint(50, 0, True, True), _
-                        New AnchorPoint(50, 100, True, True), _
+                apat1 = New AnchorPattern(New AnchorPoint() {
+                        New AnchorPoint(50, 0, True, True),
+                        New AnchorPoint(50, 100, True, True),
                         New AnchorPoint(0, 50, True, True)})
 
             ElseIf (liPositionInRoleGroup > 1) And (liPositionInRoleGroup < Me.FactType.Arity) Then
-                apat1 = New AnchorPattern(New AnchorPoint() { _
-                        New AnchorPoint(50, 0, True, True), _
+                apat1 = New AnchorPattern(New AnchorPoint() {
+                        New AnchorPoint(50, 0, True, True),
                         New AnchorPoint(50, 100, True, True)})
             ElseIf liPositionInRoleGroup = Me.FactType.Arity Then
-                apat1 = New AnchorPattern(New AnchorPoint() { _
-                        New AnchorPoint(50, 0, True, True), _
-                        New AnchorPoint(100, 50, True, True), _
+                apat1 = New AnchorPattern(New AnchorPoint() {
+                        New AnchorPoint(50, 0, True, True),
+                        New AnchorPoint(100, 50, True, True),
                         New AnchorPoint(50, 100, True, True)})
             End If
 
@@ -1232,7 +1237,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1249,7 +1254,7 @@ PostJoinedORMObject:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1413,7 +1418,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1459,7 +1464,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1502,7 +1507,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1554,7 +1559,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1569,7 +1574,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -1584,7 +1589,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1598,7 +1603,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

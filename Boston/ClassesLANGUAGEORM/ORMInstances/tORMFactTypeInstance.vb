@@ -1051,7 +1051,12 @@ Namespace FBM
                 Call Me.Shape.ZBottom()
 
                 'FactTypeName
-                Dim G As Graphics = Me.Page.Form.CreateGraphics
+                Try
+                    Dim G As Graphics = Me.Page.Form.CreateGraphics
+                Catch ex As Exception
+                    GoTo ReattachRoles
+                End Try
+
                 Dim StringSize As SizeF = Me.Page.Diagram.MeasureString(Trim(Me.FactType.Id), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                 If Me.FactTypeName.Shape IsNot Nothing Then
                     Me.FactTypeName.Shape.Resize(StringSize.Width + 4, StringSize.Height)
@@ -1064,6 +1069,7 @@ Namespace FBM
                     End If
                 End If
 
+ReattachRoles:
                 For Each lrRoleInstance In Me.RoleGroup
                     lrRoleInstance.Shape.Detach()
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)

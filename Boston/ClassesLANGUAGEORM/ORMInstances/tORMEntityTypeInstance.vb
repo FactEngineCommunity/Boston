@@ -1900,7 +1900,10 @@ MoveOn:
 
                 Me.ExpandReferenceMode = False
 
-                Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                If Me.ReferenceModeFactType IsNot Nothing Then
+                    Me.ReferenceModeFactType.RemoveFromPage(abBroadcastInterfaceEvent)
+                End If
+
                 Try
                     Me.ReferenceModeValueType.RemoveFromPage(abBroadcastInterfaceEvent)
                 Catch ex As Exception

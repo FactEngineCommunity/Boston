@@ -47,10 +47,12 @@ Namespace TableFactType
 
                 Call pdbConnection.Execute(lsSQLQuery)
             Catch ex As Exception
-                Dim lsMessage As String = ""
-                lsMessage = "TableFactType.AddFactType: "
-                lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -137,26 +139,38 @@ Namespace TableFactType
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
 
-            lREcordset.ActiveConnection = pdbConnection
-            lREcordset.CursorType = pcOpenStatic
+            Try
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
 
-            lsSQLQuery = "SELECT COUNT(*)"
-            lsSQLQuery &= "  FROM MetaModelFactType FT,"
-            lsSQLQuery &= "       MetaModelModelDictionary MD"
-            lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arFactType.Model.ModelId) & "'"
-            lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
-            lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
-            lsSQLQuery &= "   AND FT.FactTypeId = '" & Trim(Replace(arFactType.Id, "'", "`")) & "'"
+                lsSQLQuery = "SELECT COUNT(*)"
+                lsSQLQuery &= "  FROM MetaModelFactType FT,"
+                lsSQLQuery &= "       MetaModelModelDictionary MD"
+                lsSQLQuery &= " WHERE MD.ModelId = '" & Trim(arFactType.Model.ModelId) & "'"
+                lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
+                lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
+                lsSQLQuery &= "   AND FT.FactTypeId = '" & Trim(Replace(arFactType.Id, "'", "`")) & "'"
 
-            lREcordset.Open(lsSQLQuery)
+                lREcordset.Open(lsSQLQuery)
 
-            If lREcordset(0).Value > 0 Then
-                ExistsFactTypeByModel = True
-            Else
-                ExistsFactTypeByModel = False
-            End If
+                If lREcordset(0).Value > 0 Then
+                    ExistsFactTypeByModel = True
+                Else
+                    ExistsFactTypeByModel = False
+                End If
 
-            lREcordset.Close()
+                lREcordset.Close()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
 
         End Function
 
@@ -165,25 +179,37 @@ Namespace TableFactType
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
 
-            lREcordset.ActiveConnection = pdbConnection
-            lREcordset.CursorType = pcOpenStatic
+            Try
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = pcOpenStatic
 
-            lsSQLQuery = "SELECT COUNT(*)"
-            lsSQLQuery &= "  FROM MetaModelFactType FT,"
-            lsSQLQuery &= "       MetaModelModelDictionary MD"
-            lsSQLQuery &= " WHERE MD.Symbol = FT.FactTypeId"
-            lsSQLQuery &= " WHERE MD.ModelId = FT.ModelId"
-            lsSQLQuery &= "   AND FT.FactTypeId = '" & Trim(Replace(arFactType.Id, "'", "`")) & "'"
+                lsSQLQuery = "SELECT COUNT(*)"
+                lsSQLQuery &= "  FROM MetaModelFactType FT,"
+                lsSQLQuery &= "       MetaModelModelDictionary MD"
+                lsSQLQuery &= " WHERE MD.Symbol = FT.FactTypeId"
+                lsSQLQuery &= " WHERE MD.ModelId = FT.ModelId"
+                lsSQLQuery &= "   AND FT.FactTypeId = '" & Trim(Replace(arFactType.Id, "'", "`")) & "'"
 
-            lREcordset.Open(lsSQLQuery)
+                lREcordset.Open(lsSQLQuery)
 
-            If lREcordset(0).Value > 0 Then
-                ExistsFactTypeByAnyModel = True
-            Else
-                ExistsFactTypeByAnyModel = False
-            End If
+                If lREcordset(0).Value > 0 Then
+                    ExistsFactTypeByAnyModel = True
+                Else
+                    ExistsFactTypeByAnyModel = False
+                End If
 
-            lREcordset.Close()
+                lREcordset.Close()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
 
         End Function
 

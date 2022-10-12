@@ -41,7 +41,7 @@ Namespace XMLModel
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1115,7 +1115,7 @@ SkipModelNote:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1171,7 +1171,7 @@ SkipModelNote:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1575,7 +1575,7 @@ SkipFactTypeInstance:
                                                            Nothing)
                     arModel._ModelError.Add(lrModelError)
                 Else
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
                 Return Nothing
 
@@ -2502,7 +2502,7 @@ SkipRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2557,7 +2557,7 @@ SkipRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3025,7 +3025,7 @@ SkipRoleConstraintInstance:
                 If abCalledAsThread Then
                     '20220721-VM-Add code here for throwing error messages in a thread.
                 Else
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
 
                 Return Nothing
@@ -3052,7 +3052,7 @@ SkipRoleConstraintInstance:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3144,7 +3144,7 @@ SkipRoleConstraintInstance:
                 lsMessage2 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage2 &= vbCrLf & vbCrLf & ex.Message
                 lsMessage2 &= vbCrLf & vbCrLf & "Loading Facts for FactType: '" & arFactType.Id & "'"
-                prApplication.ThrowErrorMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3214,22 +3214,22 @@ SkipRoleConstraintInstance:
                     End If
 
                     If IsSomething(arFactType.ObjectifyingEntityType) Then
-                            '---------------------------------------------
-                            'Okay, have found the ObjectifyingEntityType
-                            '---------------------------------------------
-                        Else
-                            lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
-                            lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
-                            lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
-                            lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
-                            Throw New Exception(lsMessage)
-                        End If
+                        '---------------------------------------------
+                        'Okay, have found the ObjectifyingEntityType
+                        '---------------------------------------------
+                    Else
+                        lsMessage = "No EntityType found in the Model for Objectifying Entity Type of the FactType"
+                        lsMessage &= vbCrLf & "ModelId: " & arFactType.Model.ModelId
+                        lsMessage &= vbCrLf & "FactTypeId: " & arFactType.Id
+                        lsMessage &= vbCrLf & "Looking for EntityTypeId: " & lsEntityTypeId
+                        Throw New Exception(lsMessage)
                     End If
+                End If
 
-                    '-----------------------------------------------------
-                    'Get the Roles within the RoleGroup for the FactType
-                    '-----------------------------------------------------                
-                    Dim lrModelElement As FBM.ModelObject
+                '-----------------------------------------------------
+                'Get the Roles within the RoleGroup for the FactType
+                '-----------------------------------------------------                
+                Dim lrModelElement As FBM.ModelObject
                 For Each lrXMLRole In lrXMLFactType.RoleGroup
 
                     lrRole = New FBM.Role
@@ -3313,7 +3313,7 @@ FoundModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3385,7 +3385,7 @@ FoundModelElement:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -3684,7 +3684,7 @@ FoundModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
