@@ -25,7 +25,7 @@ Namespace UML
 
         Public Link As MindFusion.Diagramming.DiagramLink
 
-        Public Event RemovedFromModel()
+        Public Shadows Event RemovedFromModel()
 
         ''' <summary>
         ''' Parameterless Constructor

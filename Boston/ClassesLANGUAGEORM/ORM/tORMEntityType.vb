@@ -284,7 +284,7 @@ Namespace FBM
         Public Event ReferenceModeChanged(ByVal asNewReferenceMode As String, ByVal abSimpleAssignment As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event ReferenceModeFactTypeChanged(ByRef arNewReferenceModeFactType As FBM.FactType)
         Public Event ReferenceModeValueTypeChanged(ByRef arNewReferenceModeValueType As FBM.ValueType)
-        Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event PreferredIdentifierRCIdChanged(ByVal asNewPreferredIndentifierRCId As String)
         Public Event ReferenceModeRoleConstraintChanged(ByRef arNewReferenceModeRoleConstraint As FBM.RoleConstraint)
         Public Event IsObjectifyingEntityTypeChanged(ByVal abNewIsObjectifyingEntityType As Boolean)
@@ -2428,6 +2428,7 @@ FailsafeContinue:
                 Me.Model.RemoveEntityType(Me, abDoDatabaseProcessing)
 
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
+                MyBase.TriggerRemovedFromModel()
 
                 Return True
 

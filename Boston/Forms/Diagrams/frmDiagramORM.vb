@@ -4664,7 +4664,12 @@ Public Class frmDiagramORM
                 '----------------------------------------------
                 'Mouse is over a ShapeNode
                 '----------------------------------------------
-                loNode = Diagram.GetNodeAt(lo_point)
+                Try
+                    loNode = Diagram.GetNodeAt(lo_point)
+                Catch ex As Exception
+                    Exit Sub
+                End Try
+
                 If loNode.Tag Is Nothing Then Exit Sub 'Sometimes this happens.
 
                 Dim lrRoleName As FBM.RoleName

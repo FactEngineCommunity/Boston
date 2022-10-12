@@ -352,7 +352,7 @@ Namespace FBM
         Public Event Objectified() 'When the FactType is changed to an ObjectifiedFactType
         Public Event ObjectifyingEntityTypeChanged(ByRef arNewObjectifyingEntityType As FBM.EntityType)
         Public Event ObjectificationRemoved() 'When the objectification of the FactType is removed.
-        Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page)
         Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 

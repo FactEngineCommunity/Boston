@@ -1,7 +1,8 @@
-﻿Public Class frmToolboxDescriptions
+﻿Imports System.Reflection
 
-    Public mrModelElement As FBM.ModelObject
+Public Class frmToolboxDescriptions
 
+    Public WithEvents mrModelElement As FBM.ModelObject
     Public Function EqualsByName(ByVal other As Form) As Boolean
         If Me.Name = other.Name Then
             Return True
@@ -31,10 +32,10 @@
     Private Sub frmToolboxDescriptions_Leave(sender As Object, e As EventArgs) Handles Me.Leave
 
         If Me.mrModelElement IsNot Nothing Then
-
-            Call Me.mrModelElement.SetShortDescription(Trim(Me.TextBoxShortDescription.Text))
-            Call Me.mrModelElement.SetLongDescription(Trim(Me.TextBoxLongDescription.Text))
-
+            If Me.mrModelElement.Model IsNot Nothing Then
+                Call Me.mrModelElement.SetShortDescription(Trim(Me.TextBoxShortDescription.Text))
+                Call Me.mrModelElement.SetLongDescription(Trim(Me.TextBoxLongDescription.Text))
+            End If
         End If
 
     End Sub
@@ -42,6 +43,22 @@
     Private Sub frmToolboxDescriptions_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
         prApplication.ToolboxForms.RemoveAll(AddressOf Me.EqualsByName)
+
+    End Sub
+
+    Private Sub mrModelElement_RemovedFromModel() Handles mrModelElement.RemovedFromModel
+
+        Try
+            Me.mrModelElement = Nothing
+            Me.LabelModelElementName.Text = "<No Model Element Selected>"
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

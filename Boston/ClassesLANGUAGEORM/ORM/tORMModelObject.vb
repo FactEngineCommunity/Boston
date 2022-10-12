@@ -142,8 +142,6 @@ Namespace FBM
         <XmlIgnore()>
         Public ObjectifiedFactType As FBM.FactType = Nothing
 
-
-
         Public ReadOnly Property ReferenceSchemeRoleConstraint As FBM.RoleConstraint
             Get
                 Select Case Me.GetType
@@ -484,6 +482,8 @@ Namespace FBM
         Public Event LongDescriptionChanged(ByVal asLongDescription As String)
         <NonSerialized()>
         Public Event NameChanged(ByVal asOldName As String, ByVal asNewName As String)
+        <NonSerialized()>
+        Public Event RemovedFromModel()
         <NonSerialized()>
         Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
         <NonSerialized()>
@@ -1789,6 +1789,10 @@ Namespace FBM
 
         Public Sub TriggerChangedToFactType(ByRef arFactType As FBM.FactType)
             RaiseEvent ChangedToFactType(arFactType)
+        End Sub
+
+        Public Sub TriggerRemovedFromModel()
+            RaiseEvent RemovedFromModel()
         End Sub
 
     End Class

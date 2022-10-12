@@ -199,7 +199,7 @@ Namespace FBM
         <NonSerialized()>
         Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
         <NonSerialized()>
-        Public Event RemovedFromModel(ByVal abDeleteAll As Boolean)
+        Public Shadows Event RemovedFromModel(ByVal abDeleteAll As Boolean)
 
         Public Sub New()
             '------------------------------------

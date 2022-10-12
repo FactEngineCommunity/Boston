@@ -238,7 +238,7 @@ Namespace FBM
         <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         <NonSerialized()>
-        Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
         <NonSerialized()>
         Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
 

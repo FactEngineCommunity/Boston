@@ -27,7 +27,7 @@ Namespace FBM
 
         Public Event TextChanged(ByVal asNewText As String)
         Public Event JoinedObjectTypeChanged(ByVal arJoinedModelObject As FBM.ModelObject)
-        Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
 
         ''' <summary>
         ''' Parameterless constructor

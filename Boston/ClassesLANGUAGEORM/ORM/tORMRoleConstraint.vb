@@ -313,7 +313,7 @@ Namespace FBM
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
 
         Public Event CardinalityChanged(ByVal aiNewCardinality As Integer)
-        Public Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean) Implements iModelObject.RemovedFromModel
+        Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean) Implements iModelObject.RemovedFromModel
         Public Event RemoveIndex(ByVal abBroadcastInterfaceEvent As Boolean)
         Public Event RoleConstraintTypeChanged(ByVal aiNewRoleConstraintType As pcenumRoleConstraintType)
         Public Event RingConstraintTypeChanged(ByVal aiNewRingConstraintType As pcenumRingConstraintType)
