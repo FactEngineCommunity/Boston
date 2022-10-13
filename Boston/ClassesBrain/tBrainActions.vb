@@ -3,7 +3,7 @@
 Partial Public Class tBrain
 
     Private Function ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                                 Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
         Dim lsReferenceMode As String
@@ -40,10 +40,10 @@ Partial Public Class tBrain
                     Dim lrModelObject = Me.Model.GetModelObjectByName(lsEntityTypeName)
                     If lrModelObject.GetType IsNot GetType(FBM.EntityType) Then
                         lsMessage = lsEntityTypeName & " is not an Entity Type"
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
                         Return False
@@ -108,10 +108,10 @@ Partial Public Class tBrain
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                     If lsDataTypeName Is Nothing Then
                         lsMessage = "That's not a valid Data Type."
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
                         Return False
@@ -121,10 +121,10 @@ Partial Public Class tBrain
                         liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                     Catch ex As Exception
                         lsMessage = "That's not a valid Data Type."
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
                         Return False
@@ -184,7 +184,7 @@ Partial Public Class tBrain
     End Function
 
     Private Function ProcessOBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
         Dim lrPGSNodeType As PGS.Node = Nothing
@@ -214,20 +214,20 @@ Partial Public Class tBrain
 
             ElseIf lrModelObject Is Nothing Then
                 lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
                 Return False
 
             ElseIf lrModelObject.GetType IsNot GetType(FBM.FactType) Then
                 lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
                 Return False
@@ -249,19 +249,19 @@ Partial Public Class tBrain
 
                 If lrModelObject Is Nothing Then
                     lsMessage = lsModelElementName & " is not a Object Type in the Model."
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
                 ElseIf lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName) Is Nothing Then
                     lsMessage = lsModelElementName & " is not a Object Type that plays any Role in the Fact Type, " & lrFactType.Id & "."
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -277,10 +277,10 @@ Partial Public Class tBrain
             If larRole.Count < lrFactType.RoleGroup.Count - 1 Then
 
                 lsMessage = "The number of Object Types played by Roles in the Internal Uniqueness Constraint need to be at least the number of Roles in the Fact Type minus one."
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
                 Return False
@@ -302,10 +302,10 @@ Partial Public Class tBrain
                     If larRole.Count = lrFactType.Arity Then
                         If lrFactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactType.Arity Then
                             lsMessage = "The Fact Type, '" & lrFactType.Id & "', already has a total internal uniqueness constraint."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -335,10 +335,10 @@ Partial Public Class tBrain
                     'InternalUniquenessConstraint already exists for Roles selected
                     '----------------------------------------------------------------
                     lsMessage = "The Fact Type, " & lrFactType.Id & " already has an Internal Uniqueness Constraint plays by the Roles that link the nominated Object Types."
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -416,7 +416,7 @@ Partial Public Class tBrain
     End Sub
 
     Private Function ProcessFactStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
         Dim lrPGSNodeType As PGS.Node = Nothing
@@ -459,10 +459,10 @@ Partial Public Class tBrain
 
             If lrFactType Is Nothing Then
                 lsMessage = lsReturnErrorMessage
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
                 Return False
@@ -500,10 +500,10 @@ Partial Public Class tBrain
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
 
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
 
@@ -532,20 +532,20 @@ Partial Public Class tBrain
 
             'ElseIf lrModelObject Is Nothing Then
             '    lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
-            '    If arDCSError IsNot Nothing Then
-            '        arDCSError.Success = False
-            '        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-            '        arDCSError.ErrorString = lsMessage
+            '    If arDSCError IsNot Nothing Then
+            '        arDSCError.Success = False
+            '        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+            '        arDSCError.ErrorString = lsMessage
             '    End If
             '    Me.send_data(lsMessage)
             '    Return False
 
             'ElseIf lrModelObject.GetType IsNot GetType(FBM.FactType) Then
             '    lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
-            '    If arDCSError IsNot Nothing Then
-            '        arDCSError.Success = False
-            '        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-            '        arDCSError.ErrorString = lsMessage
+            '    If arDSCError IsNot Nothing Then
+            '        arDSCError.Success = False
+            '        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+            '        arDSCError.ErrorString = lsMessage
             '    End If
             '    Me.send_data(lsMessage)
             '    Return False
@@ -567,19 +567,19 @@ Partial Public Class tBrain
 
             '    If lrModelObject Is Nothing Then
             '        lsMessage = lsModelElementName & " is not a Object Type in the Model."
-            '        If arDCSError IsNot Nothing Then
-            '            arDCSError.Success = False
-            '            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-            '            arDCSError.ErrorString = lsMessage
+            '        If arDSCError IsNot Nothing Then
+            '            arDSCError.Success = False
+            '            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+            '            arDSCError.ErrorString = lsMessage
             '        End If
             '        Me.send_data(lsMessage)
             '        Return False
             '    ElseIf lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName) Is Nothing Then
             '        lsMessage = lsModelElementName & " is not a Object Type that plays any Role in the Fact Type, " & lrFactType.Id & "."
-            '        If arDCSError IsNot Nothing Then
-            '            arDCSError.Success = False
-            '            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-            '            arDCSError.ErrorString = lsMessage
+            '        If arDSCError IsNot Nothing Then
+            '            arDSCError.Success = False
+            '            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+            '            arDSCError.ErrorString = lsMessage
             '        End If
             '        Me.send_data(lsMessage)
             '        Return False
@@ -1284,7 +1284,7 @@ EndProcessing:
     End Sub
 
     Private Function ProcessISANENTITYTYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                 Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1303,10 +1303,10 @@ EndProcessing:
 
                 If Me.Model.ExistsModelElement(lsEntityTypeName) Then
                     lsMessage = "There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name"
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -1380,7 +1380,7 @@ EndProcessing:
     End Function
 
     Private Function ProcessVALUECONSTRAINTCLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                  Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                  Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1399,10 +1399,10 @@ EndProcessing:
 
                 If Not Me.Model.ExistsModelElement(lsValueTypeName) Then
                     lsMessage = "There is no Model Element with the name, '" & lsValueTypeName & "'. Try another name"
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -1412,10 +1412,10 @@ EndProcessing:
 
                 If Not lrModelElement.GetType = GetType(FBM.ValueType) Then
                     lsMessage = "There is no Value Type called, '" & lsValueTypeName & "'."
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -1428,10 +1428,10 @@ EndProcessing:
 
                     If lrValueType.ValueConstraint.Contains(lsValueConstraintValue) Then
                         lsMessage = "The value, " & lsValueConstraintValue & ", already exists in the Value Constraint for Value Type, " & lsValueTypeName & "."
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
                         Return False
@@ -1462,9 +1462,237 @@ EndProcessing:
 
     End Function
 
+    Private Function ProcessADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                                             Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.KEYWDADDOBJECTTYPESRELATEDTO = ""
+                Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.MODELELEMENTNAME = ""
+                Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.PAGENAME = ""
+
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsModelElementName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.MODELELEMENTNAME))
+
+                Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lsModelElementName, True)
+
+                If lrModelObject Is Nothing Then
+                    lsMessage = "That's not a valid Object Type Name."
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
+                Else
+                    Dim lsPageName As String = Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.PAGENAME
+
+                    Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lsPageName)
+
+                    If lrPage Is Nothing Then
+                        lsMessage = "That's not a valid Page Name in the Model."
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
+                    Else
+                        If lrPage.getModelElementById(lrModelObject.Id) Is Nothing Then
+                            Call lrPage.DropModelElementAtPoint(lrModelObject, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), abBroadcastInterfaceEvent, False)
+                        End If
+
+                        Dim larFactType = lrModelObject.getOutgoingFactTypes.FindAll(Function(x) x.IsLinkFactType = False)
+
+                        For Each lrFactType In larFactType
+                            Call lrPage.DropFactTypeAtPoint(lrFactType, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), False,, abBroadcastInterfaceEvent, False, True, False, False)
+                        Next
+                    End If
+                End If
+
+            End With
+
+            Try
+                Me.OutputBuffer = "Okay"
+                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
+            Return True
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
+    Private Function ProcessCREATEPAGEStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQLProcessor.CREATEPAGEStatement.KEYWDCREATE = ""
+                Me.VAQLProcessor.CREATEPAGEStatement.KEYWDPAGE = ""
+                Me.VAQLProcessor.CREATEPAGEStatement.PAGENAME = ""
+
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.CREATEPAGEStatement, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsPageName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.CREATEPAGEStatement.PAGENAME))
+
+                Dim lrPage As New FBM.Page(Me.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
+
+                If lrPage Is Nothing Then
+                    lsMessage = "Error creating the new Page."
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
+                Else
+                    Try
+                        Me.Model.Page.AddUnique(lrPage)
+                        lrPage.Loaded = True
+                        If frmMain.zfrmModelExplorer IsNot Nothing Then
+                            frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, Me.Model, Nothing, True)
+                        End If
+                    Catch ex As Exception
+                        'Not a biggie
+                    End Try
+                End If
+
+                Try
+                    Me.OutputBuffer = "Okay"
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                Catch ex As Exception
+                    'Not a biggie.
+                End Try
+
+                Return True
+
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
+
+    Private Function ProcessADDOBJECTTYPETOPAGEStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                         Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.KEYWDADDOBJECTTYPE = ""
+                Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.KEYWDTOPAGE = ""
+                Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.MODELELEMENTNAME = ""
+                Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.PAGENAME = ""
+
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsModelElementName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.MODELELEMENTNAME))
+
+                Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lsModelElementName, True)
+
+                If lrModelObject Is Nothing Then
+                    lsMessage = "That's not a valid Object Type Name."
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
+                Else
+                    Dim lsPageName As String = Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.PAGENAME
+
+                    Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lsPageName)
+
+                    If lrPage Is Nothing Then
+                        lsMessage = "That's not a valid Page Name in the Model."
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
+                    Else
+                        Call lrPage.DropModelElementAtPoint(lrModelObject, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), abBroadcastInterfaceEvent, False)
+
+                        Dim larFactType = lrModelObject.getOutgoingFactTypes()
+
+                        For Each lrFactType In larFactType
+                            Call lrPage.DropFactTypeAtPoint(lrFactType, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), False,, abBroadcastInterfaceEvent, False, True, False, False)
+                        Next
+
+                        lrPage.Loaded = True
+                    End If
+                End If
+
+                Try
+                    Me.OutputBuffer = "Okay"
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                Catch ex As Exception
+                    'Not a biggie.
+                End Try
+
+                Return True
+
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
 
     Private Function ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                               Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                               Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1485,10 +1713,10 @@ EndProcessing:
 
                 If Me.Model.ExistsModelElement(lsValueTypeName) Then
                     lsMessage = "There is already a Model Element with the name, '" & lsValueTypeName & "'. Try another name"
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -1527,10 +1755,10 @@ EndProcessing:
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                     If lsDataTypeName Is Nothing Then
                         lsMessage = "That's not a valid Data Type."
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
                         Return False
@@ -1540,10 +1768,10 @@ EndProcessing:
                         liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                     Catch ex As Exception
                         lsMessage = "That's not a valid Data Type."
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
                         Return False
@@ -1749,7 +1977,7 @@ EndProcessing:
     End Sub
 
     Private Function ProcessVALUETYPEISWRITTENASStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1787,10 +2015,10 @@ EndProcessing:
             lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
             If lsDataTypeName Is Nothing Then
                 lsMessage = "That's not a valid Data Type."
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
                 Return False
@@ -1800,10 +2028,10 @@ EndProcessing:
                 liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
             Catch ex As Exception
                 lsMessage = "That's not a valid Data Type."
-                If arDCSError IsNot Nothing Then
-                    arDCSError.Success = False
-                    arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                    arDCSError.ErrorString = lsMessage
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDSCError.ErrorString = lsMessage
                 End If
                 Me.send_data(lsMessage)
                 Return False

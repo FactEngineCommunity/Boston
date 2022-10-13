@@ -109,10 +109,6 @@ Namespace VAQL
             Patterns.Add(TokenType.NUMBER, regex)
             Tokens.Add(TokenType.NUMBER)
 
-            regex = new Regex("[aA-zZ0-9\s\-]+", RegexOptions.Compiled)
-            Patterns.Add(TokenType.PAGENAME, regex)
-            Tokens.Add(TokenType.PAGENAME)
-
             regex = new Regex("\.", RegexOptions.Compiled)
             Patterns.Add(TokenType.PERIOD, regex)
             Tokens.Add(TokenType.PERIOD)
@@ -120,6 +116,10 @@ Namespace VAQL
             regex = new Regex("(\+|-)", RegexOptions.Compiled)
             Patterns.Add(TokenType.PLUSMINUS, regex)
             Tokens.Add(TokenType.PLUSMINUS)
+
+            regex = new Regex("[aA-zZ0-9\s\-]+", RegexOptions.Compiled)
+            Patterns.Add(TokenType.PAGENAME, regex)
+            Tokens.Add(TokenType.PAGENAME)
 
             regex = new Regex("\-[a-z]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.POSTBOUNDREADINGTEXT, regex)
@@ -177,6 +177,14 @@ Namespace VAQL
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 
+            regex = new Regex("ADD OBJECT TYPE", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDADDOBJECTTYPE, regex)
+            Tokens.Add(TokenType.KEYWDADDOBJECTTYPE)
+
+            regex = new Regex("ADD OBJECT TYPES RELATED TO", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDADDOBJECTTYPESRELATEDTO, regex)
+            Tokens.Add(TokenType.KEYWDADDOBJECTTYPESRELATEDTO)
+
             regex = new Regex("ANY NUMBER OF", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDANYNUMBEROF, regex)
             Tokens.Add(TokenType.KEYWDANYNUMBEROF)
@@ -188,6 +196,10 @@ Namespace VAQL
             regex = new Regex("AT MOST ONE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDATMOSTONE, regex)
             Tokens.Add(TokenType.KEYWDATMOSTONE)
+
+            regex = new Regex("CREATE", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDCREATE, regex)
+            Tokens.Add(TokenType.KEYWDCREATE)
 
             regex = new Regex("INCLUDES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDINCLUDES, regex)
@@ -353,9 +365,17 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDONE, regex)
             Tokens.Add(TokenType.KEYWDONE)
 
+            regex = new Regex("PAGE", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDPAGE, regex)
+            Tokens.Add(TokenType.KEYWDPAGE)
+
             regex = new Regex("READING", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDREADING, regex)
             Tokens.Add(TokenType.KEYWDREADING)
+
+            regex = new Regex("TO PAGE", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDTOPAGE, regex)
+            Tokens.Add(TokenType.KEYWDTOPAGE)
 
             regex = new Regex("WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWRITTENAS, regex)
@@ -519,98 +539,107 @@ Namespace VAQL
         VALUECONSTRAINTVALUELIST= 31
         VALUETYPEISWRITTENASCLAUSE= 32
         VALUETYPEWRITTENASCLAUSE= 33
-        FACTSTMT    = 34
-        FACTTYPEIDENTIFICATION= 35
-        FACTTYPESTMT= 36
-        FACTREADINGSTMT= 37
-        MODELELEMENTLEADINGSTMT= 38
-        BASEPRODUCTION= 39
-        Start       = 40
+        ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT= 34
+        ADDOBJECTTYPETOPAGESTMT= 35
+        CREATEPAGESTMT= 36
+        CREATESTMT  = 37
+        FACTSTMT    = 38
+        FACTTYPEIDENTIFICATION= 39
+        FACTTYPESTMT= 40
+        FACTREADINGSTMT= 41
+        MODELELEMENTLEADINGSTMT= 42
+        BASEPRODUCTION= 43
+        Start       = 44
 
         'Terminal tokens:
-        BROPEN      = 41
-        BRCLOSE     = 42
-        COLON       = 43
-        COLUMNNAMESTR= 44
-        COMMA       = 45
-        CURLYBRACKETCLOSE= 46
-        CURLYBRACKETOPEN= 47
-        DOUBLEQUOTE = 48
-        EOF         = 49
-        EQUALS      = 50
-        FACTTYPENAME= 51
-        FOLLOWINGREADINGTEXT= 52
-        FRONTREADINGTEXT= 53
-        ID          = 54
-        MULTDIV     = 55
-        MODELNAME   = 56
-        MODELELEMENTNAME= 57
-        MODELID     = 58
-        NUMBER      = 59
-        PAGENAME    = 60
-        PERIOD      = 61
-        PLUSMINUS   = 62
-        POSTBOUNDREADINGTEXT= 63
-        PREBOUNDREADINGTEXT= 64
-        PREDICATEPART= 65
-        PREDICATESPACE= 66
-        REFERENCEMODE= 67
-        ROLENAME    = 68
-        SINGLEQUOTE = 69
-        STAR        = 70
-        SPACE       = 71
-        UNARYPREDICATEPART= 72
-        USERTABLENAME= 73
-        VALUECONSTRAINTVALUE= 74
-        WHERECLAUSECOLUMNNAMESTR= 75
-        VALUE       = 76
-        KEYWDANYNUMBEROF= 77
-        KEYWDATLEASTONE= 78
-        KEYWDATMOSTONE= 79
-        KEYWDINCLUDES= 80
-        KEYWDISA    = 81
-        KEYWDISWHERE= 82
-        KEYWDDATATYPELOGICALTRUEFALSE= 83
-        KEYWDDATATYPELOGICALYESNO= 84
-        KEYWDDATATYPEAUTOCOUNTER= 85
-        KEYWDDATATYPEDECIMAL= 86
-        KEYWDDATATYPEFLOATCUSTOMPRECISION= 87
-        KEYWDDATATYPEFLOATDOUBLEPRECISION= 88
-        KEYWDDATATYPEFLOATSINGLEPRECISION= 89
-        KEYWDDATATYPEMONEY= 90
-        KEYWDDATATYPESIGNEDBIGINTEGER= 91
-        KEYWDDATATYPESIGNEDINTEGER= 92
-        KEYWDDATATYPESIGNEDSMALLINTEGER= 93
-        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 94
-        KEYWDDATATYPEUNSIGNEDINTEGER= 95
-        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 96
-        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 97
-        KEYWDDATATYPEOBJECTID= 98
-        KEYWDDATATYPEROWID= 99
-        KEYWDDATATYPERAWDATAFIXEDLENGTH= 100
-        KEYWDDATATYPERAWDATALARGELENGTH= 101
-        KEYWDDATATYPERAWDATAOLEOBJECT= 102
-        KEYWDDATATYPERAWDATA= 103
-        KEYWDDATATYPERAWDATAVARIABLELENGTH= 104
-        KEYWDDATATYPEAUTOTIMESTAMP= 105
-        KEYWDDATATYPEDATE= 106
-        KEYWDDATATYPEDATETIME= 107
-        KEYWDDATATYPETIME= 108
-        KEYWDDATATYPESTRINGFIXEDLENGTH= 109
-        KEYWDDATATYPESTRINGLARGELENGTH= 110
-        KEYWDDATATYPESTRINGVARIABLELENGTH= 111
-        KEYWDIDENTIFIEDBYITS= 112
-        KEYWDISACONCEPT= 113
-        KEYWDISAKINDOF= 114
-        KEYWDISANENTITYTYPE= 115
-        KEYWDISAVALUETYPE= 116
-        KEYWDISIDENTIFIEDBYITS= 117
-        KEYWDISWRITTENAS= 118
-        KEYWDNL     = 119
-        KEYWDONE    = 120
-        KEYWDREADING= 121
-        KEYWDWRITTENAS= 122
-        WHITESPACE  = 123
+        BROPEN      = 45
+        BRCLOSE     = 46
+        COLON       = 47
+        COLUMNNAMESTR= 48
+        COMMA       = 49
+        CURLYBRACKETCLOSE= 50
+        CURLYBRACKETOPEN= 51
+        DOUBLEQUOTE = 52
+        EOF         = 53
+        EQUALS      = 54
+        FACTTYPENAME= 55
+        FOLLOWINGREADINGTEXT= 56
+        FRONTREADINGTEXT= 57
+        ID          = 58
+        MULTDIV     = 59
+        MODELNAME   = 60
+        MODELELEMENTNAME= 61
+        MODELID     = 62
+        NUMBER      = 63
+        PERIOD      = 64
+        PLUSMINUS   = 65
+        PAGENAME    = 66
+        POSTBOUNDREADINGTEXT= 67
+        PREBOUNDREADINGTEXT= 68
+        PREDICATEPART= 69
+        PREDICATESPACE= 70
+        REFERENCEMODE= 71
+        ROLENAME    = 72
+        SINGLEQUOTE = 73
+        STAR        = 74
+        SPACE       = 75
+        UNARYPREDICATEPART= 76
+        USERTABLENAME= 77
+        VALUECONSTRAINTVALUE= 78
+        WHERECLAUSECOLUMNNAMESTR= 79
+        VALUE       = 80
+        KEYWDADDOBJECTTYPE= 81
+        KEYWDADDOBJECTTYPESRELATEDTO= 82
+        KEYWDANYNUMBEROF= 83
+        KEYWDATLEASTONE= 84
+        KEYWDATMOSTONE= 85
+        KEYWDCREATE = 86
+        KEYWDINCLUDES= 87
+        KEYWDISA    = 88
+        KEYWDISWHERE= 89
+        KEYWDDATATYPELOGICALTRUEFALSE= 90
+        KEYWDDATATYPELOGICALYESNO= 91
+        KEYWDDATATYPEAUTOCOUNTER= 92
+        KEYWDDATATYPEDECIMAL= 93
+        KEYWDDATATYPEFLOATCUSTOMPRECISION= 94
+        KEYWDDATATYPEFLOATDOUBLEPRECISION= 95
+        KEYWDDATATYPEFLOATSINGLEPRECISION= 96
+        KEYWDDATATYPEMONEY= 97
+        KEYWDDATATYPESIGNEDBIGINTEGER= 98
+        KEYWDDATATYPESIGNEDINTEGER= 99
+        KEYWDDATATYPESIGNEDSMALLINTEGER= 100
+        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 101
+        KEYWDDATATYPEUNSIGNEDINTEGER= 102
+        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 103
+        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 104
+        KEYWDDATATYPEOBJECTID= 105
+        KEYWDDATATYPEROWID= 106
+        KEYWDDATATYPERAWDATAFIXEDLENGTH= 107
+        KEYWDDATATYPERAWDATALARGELENGTH= 108
+        KEYWDDATATYPERAWDATAOLEOBJECT= 109
+        KEYWDDATATYPERAWDATA= 110
+        KEYWDDATATYPERAWDATAVARIABLELENGTH= 111
+        KEYWDDATATYPEAUTOTIMESTAMP= 112
+        KEYWDDATATYPEDATE= 113
+        KEYWDDATATYPEDATETIME= 114
+        KEYWDDATATYPETIME= 115
+        KEYWDDATATYPESTRINGFIXEDLENGTH= 116
+        KEYWDDATATYPESTRINGLARGELENGTH= 117
+        KEYWDDATATYPESTRINGVARIABLELENGTH= 118
+        KEYWDIDENTIFIEDBYITS= 119
+        KEYWDISACONCEPT= 120
+        KEYWDISAKINDOF= 121
+        KEYWDISANENTITYTYPE= 122
+        KEYWDISAVALUETYPE= 123
+        KEYWDISIDENTIFIEDBYITS= 124
+        KEYWDISWRITTENAS= 125
+        KEYWDNL     = 126
+        KEYWDONE    = 127
+        KEYWDPAGE   = 128
+        KEYWDREADING= 129
+        KEYWDTOPAGE = 130
+        KEYWDWRITTENAS= 131
+        WHITESPACE  = 132
     End Enum
 
     <Serializable()>

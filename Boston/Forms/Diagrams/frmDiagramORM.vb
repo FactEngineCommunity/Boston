@@ -12632,7 +12632,7 @@ SkipRemovalFromModel:
 
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings
+            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings.FindAll(Function(x) x.FactType.IsLinkFactType = False)
 
                 If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
 

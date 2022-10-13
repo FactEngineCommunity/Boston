@@ -438,6 +438,18 @@ Namespace VAQL
                 Case TokenType.VALUETYPEWRITTENASCLAUSE
                     Value = EvalVALUETYPEWRITTENASCLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT
+                    Value = EvalADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.ADDOBJECTTYPETOPAGESTMT
+                    Value = EvalADDOBJECTTYPETOPAGESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATEPAGESTMT
+                    Value = EvalCREATEPAGESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATESTMT
+                    Value = EvalCREATESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.FACTSTMT
                     Value = EvalFACTSTMT(tree, paramlist)
                     Exit Select
@@ -612,6 +624,22 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalVALUETYPEWRITTENASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalADDOBJECTTYPETOPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATEPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

@@ -2299,8 +2299,7 @@ NextY:
                             '  is loaded onto the Page as an EntityTypeInstance
                             '--------------------------------------------
                         Else
-                            AreObjectTypesLoadedForFactType = False
-                            Exit Function
+                            Return False
                         End If
                     Case Is = pcenumConceptType.ValueType
                         If IsSomething(Me.ValueTypeInstance.Find(Function(x) x.Id = lrRole.JoinedORMObject.Id)) Then
@@ -2309,8 +2308,7 @@ NextY:
                             '  is loaded onto the Page as an ValueTypeInstance
                             '--------------------------------------------
                         Else
-                            AreObjectTypesLoadedForFactType = False
-                            Exit Function
+                            Return False
                         End If
                     Case Is = pcenumConceptType.FactType
                         If IsSomething(Me.FactTypeInstance.Find(Function(x) x.Id = lrRole.JoinedORMObject.Id)) Then
@@ -2319,11 +2317,12 @@ NextY:
                             '  is loaded onto the Page as an FactTypeInstance
                             '--------------------------------------------
                         Else
-                            AreObjectTypesLoadedForFactType = False
-                            Exit Function
+                            Return False
                         End If
                 End Select
             Next
+
+            Return True
 
         End Function
 

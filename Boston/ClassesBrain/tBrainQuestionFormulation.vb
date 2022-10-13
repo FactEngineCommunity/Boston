@@ -8,11 +8,11 @@ Partial Public Class tBrain
     ''' <param name="asOriginalSentence"></param>
     ''' <param name="abBroadcastInterfaceEvent"></param>
     ''' <param name="abStraightToActionProcessing"></param>
-    ''' <param name="arDCSError"></param>
+    ''' <param name="arDSCError"></param>
     Private Function FormulateQuestionsANYNUMBEROFStatement(ByVal asOriginalSentence As String,
                                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                             Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                            Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                            Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -160,10 +160,10 @@ Partial Public Class tBrain
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                         If lsDataTypeName Is Nothing Then
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -173,10 +173,10 @@ Partial Public Class tBrain
                             liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                         Catch ex As Exception
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -278,7 +278,7 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsATLEASTONEStatement(ByVal asOriginalSentence As String,
                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                            Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                           Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                           Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -426,10 +426,10 @@ Partial Public Class tBrain
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                         If lsDataTypeName Is Nothing Then
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -439,10 +439,10 @@ Partial Public Class tBrain
                             liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                         Catch ex As Exception
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -538,7 +538,7 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsATMOSTONEStatement(ByVal asOriginalSentence As String,
                                                      Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                      Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                     Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                     Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -686,10 +686,10 @@ Partial Public Class tBrain
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                         If lsDataTypeName Is Nothing Then
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -699,10 +699,10 @@ Partial Public Class tBrain
                             liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                         Catch ex As Exception
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -834,7 +834,7 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsFACTTYPEStatement(ByVal asOriginalSentence As String,
                                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                          Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                         Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                         Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Try
             Dim lrFactTypeReading As New FBM.FactTypeReading
@@ -1053,7 +1053,7 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsONEStatement(ByVal asOriginalSentence As String,
                                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                     Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                    Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                    Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1188,10 +1188,10 @@ Partial Public Class tBrain
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
                         If lsDataTypeName Is Nothing Then
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -1201,10 +1201,10 @@ Partial Public Class tBrain
                             liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
                         Catch ex As Exception
                             lsMessage = "That's not a valid Data Type."
-                            If arDCSError IsNot Nothing Then
-                                arDCSError.Success = False
-                                arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                                arDCSError.ErrorString = lsMessage
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
                             End If
                             Me.send_data(lsMessage)
                             Return False
@@ -1463,7 +1463,7 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsISWHEREStatement(ByVal asOriginalSentence As String,
                                                         Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                         Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                        Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                        Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Try
             Dim lsMessage As String = ""
@@ -1486,10 +1486,10 @@ Partial Public Class tBrain
                     If Me.VAQLProcessor.ISWHEREStatement.FACTTYPESTMT(liInd).MODELELEMENT.Count <> Me.VAQLProcessor.ISWHEREStatement.FACTTYPESTMT(0).MODELELEMENT.Count Then
 
                         lsMessage = "That is an incorrect IS WHERE statement. Each Fact Type Reading must have the same number of Model Elements."
-                        If arDCSError IsNot Nothing Then
-                            arDCSError.Success = False
-                            arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                            arDCSError.ErrorString = lsMessage
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                            arDSCError.ErrorString = lsMessage
                         End If
                         Me.send_data(lsMessage)
 
@@ -1515,10 +1515,10 @@ Partial Public Class tBrain
                     'A ObjectType already exists within the Model for the name lsModelObjectName
                     '-----------------------------------------------------------------------------
                     lsMessage = "A Model Element already exists in the Model with the name, '" & lsFactTypeName & "'."
-                    If arDCSError IsNot Nothing Then
-                        arDCSError.Success = False
-                        arDCSError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                        arDCSError.ErrorString = lsMessage
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDSCError.ErrorString = lsMessage
                     End If
                     Me.send_data(lsMessage)
                     Return False
@@ -1639,7 +1639,7 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsISAKINDOFStatement(ByVal asOriginalSentence As String,
                                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                           Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                          Optional ByRef arDCSError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Try
             Dim lsMessage As String = ""

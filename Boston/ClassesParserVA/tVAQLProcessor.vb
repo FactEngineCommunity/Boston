@@ -2,6 +2,119 @@
 
 Namespace VAQL
 
+    Public Class AddObjectTypesRelatedToObjectTypeOnPage
+
+        Private _KEYWDADDOBJECTTYPESRELATEDTO As String
+        Public Property KEYWDADDOBJECTTYPESRELATEDTO As String
+            Get
+                Return Me._KEYWDADDOBJECTTYPESRELATEDTO
+            End Get
+            Set(value As String)
+                Me._KEYWDADDOBJECTTYPESRELATEDTO = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class AddObjectTypeToPageStatement
+
+        Private _KEYWDADDOBJECTTYPE As String
+        Public Property KEYWDADDOBJECTTYPE As String
+            Get
+                Return Me._KEYWDADDOBJECTTYPE
+            End Get
+            Set(value As String)
+                Me._KEYWDADDOBJECTTYPE = value
+            End Set
+        End Property
+
+        Private _KEYWDTOPAGE As String
+        Public Property KEYWDTOPAGE As String
+            Get
+                Return Me._KEYWDTOPAGE
+            End Get
+            Set(value As String)
+                Me._KEYWDTOPAGE = value
+            End Set
+        End Property
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class CreatePageStatement
+
+        Private _KEYWDCREATE As String
+        Public Property KEYWDCREATE As String
+            Get
+                Return Me._KEYWDCREATE
+            End Get
+            Set(value As String)
+                Me._KEYWDCREATE = value
+            End Set
+        End Property
+
+        Private _KEYWDPAGE As String
+        Public Property KEYWDPAGE As String
+            Get
+                Return Me._KEYWDPAGE
+            End Get
+            Set(value As String)
+                Me._KEYWDPAGE = value
+            End Set
+        End Property
+
+        Private _PAGENAME As String
+        Public Property PAGENAME As String
+            Get
+                Return Me._PAGENAME
+            End Get
+            Set(value As String)
+                Me._PAGENAME = value
+            End Set
+        End Property
+
+    End Class
+
+
     Public Class IsAConceptStatement
 
         Private _FRONTREADINGTEXT As String
@@ -754,6 +867,9 @@ Namespace VAQL
         Private Parser As New VAQL.Parser(New VAQL.Scanner) 'Used to parse Text input into the Brain; especially for ORMQL.
         Private Parsetree As New VAQL.ParseTree 'Used with the Parser, is populated during the parsing of text input into the Brain; especially ORMQL
 
+        Public ADDOBJECTTYPETOPAGEStatement As New VAQL.AddObjectTypeToPageStatement
+        Public ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement As New VAQL.AddObjectTypesRelatedToObjectTypeOnPage
+        Public CREATEPAGEStatement As New VAQL.CreatePageStatement
         Public FACTStatement As New VAQL.FactStatement
         Public ISACONCEPTStatement As New VAQL.IsAConceptStatement
         Public ISANENTITYTYPEStatement As New VAQL.IsAnEntityTypeStatement
@@ -1175,7 +1291,21 @@ Namespace VAQL
                 If Me.Parsetree.Errors.Count > 0 Then
                     Return False
                 Else
-                    If Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then
+                    If Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDADDOBJECTTYPE) And
+                        Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDTOPAGE) Then
+                        aoTokenType = TokenType.ADDOBJECTTYPETOPAGESTMT
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT) Then
+                        aoTokenType = TokenType.ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDCREATE) And
+                           Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDPAGE) Then
+                        aoTokenType = TokenType.CREATEPAGESTMT
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then
                         aoTokenType = TokenType.VALUETYPEISWRITTENASCLAUSE
                         aoParseTree = Me.Parsetree
 

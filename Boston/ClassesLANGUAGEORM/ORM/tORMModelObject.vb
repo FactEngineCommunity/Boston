@@ -1012,6 +1012,30 @@ Namespace FBM
 
         End Function
 
+        Public Function getOutgoingFactTypes() As List(Of FBM.FactType)
+
+            Dim larFactType As New List(Of FBM.FactType)
+
+            Try
+                larFactType = (From FactType In Me.Model.FactType
+                               From Role In FactType.RoleGroup
+                               Where Role.JoinedORMObject.Id = Me.Id
+                               Where Role.InternalUniquenessConstraint.Count > 0
+                               Select FactType).ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+            Return larFactType
+
+        End Function
+
         Public Function getIncomingFactTypeReadings(Optional ByVal aiMaximumFactTypeArity As Integer = 10) As List(Of FBM.FactTypeReading)
 
             Dim larFactTypeReading As New List(Of FBM.FactTypeReading)

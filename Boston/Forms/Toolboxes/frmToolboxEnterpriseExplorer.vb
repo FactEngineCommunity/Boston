@@ -572,15 +572,70 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Function TreeViewRecursiveSearch(ByRef arTreeViewNode As TreeNode, ByRef arObject As Object) As TreeNode
+
+        Try
+            For Each lrTreeNode In arTreeViewNode.Nodes
+                Select Case arObject.GetType
+                    Case Is = GetType(String)
+                        If lrTreeNode.Tag.ModelId = arObject Then
+                            Return lrTreeNode
+                        Else
+                            Call Me.TreeViewRecursiveSearch(lrTreeNode, arObject)
+                        End If
+                    Case Else
+                        If lrTreeNode.Tag.ModelId Is arObject Then
+                            Return lrTreeNode
+                        Else
+                            Call Me.TreeViewRecursiveSearch(lrTreeNode, arObject)
+                        End If
+                End Select
+
+            Next
+
+            Return Nothing
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="arPage">The Page to be added to the Model.</param>
+    ''' <param name="arModel">The Model that the Page is to be added to.</param>
+    ''' <param name="arTreeNode">If Nothing, finds the TreeNode</param>
+    ''' <param name="abToolTipNewPage">True if to show a tooltip when the Page is added to the Model in the TreeView.</param>
+    ''' <returns></returns>
     Public Function AddExistingPageToModel(ByRef arPage As FBM.Page,
                                       ByRef arModel As FBM.Model,
-                                      ByVal arTreeNode As cTreeNode,
+                                      ByRef arTreeNode As cTreeNode,
                                       Optional ByVal abToolTipNewPage As Boolean = False) As tEnterpriseEnterpriseView
 
         Try
             Dim loNode As TreeNode
             Dim liPageMenuType As pcenumMenuType = Nothing
             Dim liImageIndex As Integer = pcenumNavigationIcons.iconPage
+
+            If arTreeNode Is Nothing Then
+
+                For Each lrTreeNode In Me.TreeView.Nodes
+                    arTreeNode = Me.TreeViewRecursiveSearch(lrTreeNode, arModel.ModelId)
+                    If arTreeNode IsNot Nothing Then Exit For
+                Next
+
+            End If
+
+            If arTreeNode Is Nothing Then Return Nothing
 
             'If arTreeNode.Tag.LanguageId = arPage.Language Then
             Select Case arPage.Language 'TreeNode.Tag.LanguageId
