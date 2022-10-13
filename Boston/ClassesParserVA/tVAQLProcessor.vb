@@ -58,6 +58,16 @@ Namespace VAQL
             End Set
         End Property
 
+        Private _KEYWDSTANDALONE As String
+        Public Property KEYWDSTANDALONE As String
+            Get
+                Return Me._KEYWDSTANDALONE
+            End Get
+            Set(value As String)
+                Me._KEYWDSTANDALONE = value
+            End Set
+        End Property
+
         Private _MODELELEMENTNAME As String
         Public Property MODELELEMENTNAME As String
             Get

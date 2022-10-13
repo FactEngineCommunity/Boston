@@ -1242,18 +1242,22 @@ Namespace FBM
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                        lrRoleInstance.Shape.Visible = False
-                        lrRoleInstance.Link.Visible = False
-                        For Each lrRoleConstraintInstance In lrRoleInstance.RoleConstraint
-                            For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                                lrRoleConstraintRoleInstance.Shape.Visible = False
+                        Try
+                            lrRoleInstance.Shape.Visible = False
+                            lrRoleInstance.Link.Visible = False
+                            For Each lrRoleConstraintInstance In lrRoleInstance.RoleConstraint
+                                For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
+                                    lrRoleConstraintRoleInstance.Shape.Visible = False
+                                Next
                             Next
-                        Next
-                        If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
-                            Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
-                            lrValueTypeInstance.Shape.Visible = False
-                            lrValueTypeInstance._ValueConstraint.Shape.Visible = False
-                        End If
+                            If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
+                                Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
+                                lrValueTypeInstance.Shape.Visible = False
+                                lrValueTypeInstance._ValueConstraint.Shape.Visible = False
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie. Migh not be on the Page.
+                        End Try
                     Next
                     For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
                         For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole

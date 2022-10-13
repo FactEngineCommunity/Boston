@@ -377,6 +377,10 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDTOPAGE, regex)
             Tokens.Add(TokenType.KEYWDTOPAGE)
 
+            regex = new Regex("STAND ALONE", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDSTANDALONE, regex)
+            Tokens.Add(TokenType.KEYWDSTANDALONE)
+
             regex = new Regex("WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWRITTENAS, regex)
             Tokens.Add(TokenType.KEYWDWRITTENAS)
@@ -638,8 +642,9 @@ Namespace VAQL
         KEYWDPAGE   = 128
         KEYWDREADING= 129
         KEYWDTOPAGE = 130
-        KEYWDWRITTENAS= 131
-        WHITESPACE  = 132
+        KEYWDSTANDALONE= 131
+        KEYWDWRITTENAS= 132
+        WHITESPACE  = 133
     End Enum
 
     <Serializable()>

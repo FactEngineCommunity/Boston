@@ -375,6 +375,9 @@ Namespace FEQL
                 Case TokenType.ADDITIONALVALUE
                     Value = EvalADDITIONALVALUE(tree, paramlist)
                     Exit Select
+                Case TokenType.ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT
+                    Value = EvalADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.ASCLAUSE
                     Value = EvalASCLAUSE(tree, paramlist)
                     Exit Select
@@ -522,6 +525,9 @@ Namespace FEQL
                 Case TokenType.ADDMODELELEMENTSTMT
                     Value = EvalADDMODELELEMENTSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.ADDOBJECTTYPETOPAGESTMT
+                    Value = EvalADDOBJECTTYPETOPAGESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.ADDVALUETYPESTMT
                     Value = EvalADDVALUETYPESTMT(tree, paramlist)
                     Exit Select
@@ -572,6 +578,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.CREATEMODELELEMENTSTMT
                     Value = EvalCREATEMODELELEMENTSTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATEPAGESTMT
+                    Value = EvalCREATEPAGESTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.CREATESTMT
                     Value = EvalCREATESTMT(tree, paramlist)
@@ -846,6 +855,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -1042,6 +1055,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalADDOBJECTTYPETOPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalADDVALUETYPESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -1107,6 +1124,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalCREATEMODELELEMENTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATEPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

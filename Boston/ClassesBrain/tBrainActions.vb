@@ -1226,7 +1226,7 @@ EndProcessing:
                 lsOldValueTypeName = arQuestion.ValueType(0).Id
                 lsValueTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ValueType(0).Id)
 
-                If arQuestion.sentence IsNot Nothing Then
+                If arQuestion.sentence IsNot Nothing And Me.CurrentQuestion IsNot Nothing Then
                     arQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
                     arQuestion.sentence.ResetSentence()
 
@@ -1620,6 +1620,7 @@ EndProcessing:
 
                 Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.KEYWDADDOBJECTTYPE = ""
                 Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.KEYWDTOPAGE = ""
+                Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.KEYWDSTANDALONE = Nothing
                 Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.MODELELEMENTNAME = ""
                 Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.PAGENAME = ""
 
@@ -1657,11 +1658,13 @@ EndProcessing:
                     Else
                         Call lrPage.DropModelElementAtPoint(lrModelObject, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), abBroadcastInterfaceEvent, False)
 
-                        Dim larFactType = lrModelObject.getOutgoingFactTypes()
+                        If Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.KEYWDSTANDALONE Is Nothing Then
+                            Dim larFactType = lrModelObject.getOutgoingFactTypes()
 
-                        For Each lrFactType In larFactType
-                            Call lrPage.DropFactTypeAtPoint(lrFactType, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), False,, abBroadcastInterfaceEvent, False, True, False, False)
-                        Next
+                            For Each lrFactType In larFactType
+                                Call lrPage.DropFactTypeAtPoint(lrFactType, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), False,, abBroadcastInterfaceEvent, False, True, False, False)
+                            Next
+                        End If
 
                         lrPage.Loaded = True
                     End If

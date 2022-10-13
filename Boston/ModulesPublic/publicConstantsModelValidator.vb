@@ -34,6 +34,7 @@
         TooManyReadingRolesError = 128
         RoleConstraintConflictError = 129
         ModelLoadingError = 300
+        ModelElementAppearsOnNoPage = 130
     End Enum
 
 End Module
