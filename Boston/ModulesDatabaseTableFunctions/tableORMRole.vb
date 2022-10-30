@@ -9,7 +9,6 @@ Namespace TableRole
             Dim lsSQLQuery As String = ""
 
             Try
-
                 lsSQLQuery = "INSERT INTO MetaModelRole"
                 lsSQLQuery &= " VALUES ("
                 lsSQLQuery &= " #" & Now & "#"
@@ -46,10 +45,11 @@ Namespace TableRole
 
             Catch ex As Exception
                 Dim lsMessage As String
-                lsMessage = "Error: TableFactType.AddRole"
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -72,7 +72,7 @@ Namespace TableRole
                 lsMessage &= vbCrLf & "ModelId: " & arRole.Model.ModelId
                 lsMessage &= vbCrLf & "RoleId: " & arRole.Id
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -276,7 +276,7 @@ SkipJoiningRole:
                 lsMessage1 &= vbCrLf & vbCrLf & "Loading Roles for "
                 lsMessage1 &= vbCrLf & "  FactTypeId: '" & arFactType.Id & "' for"
                 lsMessage1 &= vbCrLf & "  ModelId: '" & arFactType.Model.ModelId & "'"
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 GetRolesForModelFactType = New List(Of FBM.Role)
             End Try
@@ -326,7 +326,7 @@ SkipJoiningRole:
                 lsMessage = "Error: TableFactType.UpdateRole"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

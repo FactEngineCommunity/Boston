@@ -2849,7 +2849,7 @@ SkipOutputChannel:
                 Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), Me.OutputBuffer, False, False, Me.CurrentQuestion.ExpectedResponseType)
 
                 Exit Sub
-            ElseIf Not IsSomething(Me.CurrentQuestion) And Me.Question.Count > 0 Then
+            ElseIf Not IsSomething(Me.CurrentQuestion) And Me.Question.Count > 0 And Me.OutputChannel IsNot Nothing Then
                 '-------------------------------------
                 'Ask the next Question in the queue.
                 '-------------------------------------
@@ -2858,7 +2858,6 @@ SkipOutputChannel:
                 Me.CurrentQuestion = Me.Question(0)
                 Me.CurrentPlan = Me.CurrentQuestion.Plan
                 Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), Me.OutputBuffer, False, False, Me.CurrentQuestion.ExpectedResponseType)
-
 
             Else
                 'Me.OutputBuffer = "I don't have any questions at this time"

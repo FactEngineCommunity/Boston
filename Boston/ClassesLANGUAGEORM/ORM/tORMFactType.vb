@@ -4252,14 +4252,24 @@ Namespace FBM
 
 
             Try
-                '20220129-VM-Haven't seen this error for a long time. If after a time, not missed, then remove.
-                'Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
-                'lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
-                'lrDictionaryEntry.isFactType = True
-
                 If abRapidSave Then
                     pdbConnection.BeginTrans()
-                    Call TableFactType.AddFactType(Me)
+                    If Not TableFactType.AddFactType(Me) Then
+#Region "CodeSafe"
+                        Try
+                            Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
+                            Call lrDictionaryEntry.Save()
+                            If Not TableFactType.AddFactType(Me) Then
+                                pdbConnection.RollbackTrans()
+                                Throw New Exception("Failed to save the Fact Type, " & Me.Id & ".")
+                            End If
+                        Catch ex As Exception
+                            pdbConnection.RollbackTrans()
+                            Throw New Exception("Failed to save the Fact Type, " & Me.Id & ".")
+                        End Try
+#End Region
+                    End If
+CommitTransaction:
                     pdbConnection.CommitTrans()
                     Me.isDirty = False
                 ElseIf Me.isDirty Then

@@ -723,7 +723,7 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion, Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+    Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion, Optional ByVal abBroadcastInterfaceEvent As Boolean = True, Optional abStraightToActionProcessing As Boolean = False) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lrResolvedWord As Language.WordResolved
@@ -873,7 +873,7 @@ Partial Public Class tBrain
                 Call Me.Model.createColumnForUnaryFactType(lrFactType)
             End If
 
-            If lrFactType.Arity = 2 Then
+            If lrFactType.Arity = 2 And Not abStraightToActionProcessing Then
                 Call Me.FormulateQuestionCreateInternalUniquenessConstraint(lrFactType, lrFactTypeReading)
             End If
 
@@ -1475,6 +1475,7 @@ EndProcessing:
                 Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.KEYWDADDOBJECTTYPESRELATEDTO = ""
                 Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.MODELELEMENTNAME = ""
                 Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.PAGENAME = ""
+                Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.KEYWDANYFACTTYPE = Nothing
 
                 Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement, Me.VAQLParsetree.Nodes(0))
 
@@ -1512,7 +1513,14 @@ EndProcessing:
                             Call lrPage.DropModelElementAtPoint(lrModelObject, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), abBroadcastInterfaceEvent, False)
                         End If
 
-                        Dim larFactType = lrModelObject.getOutgoingFactTypes.FindAll(Function(x) x.IsLinkFactType = False)
+                        Dim larFactType As List(Of FBM.FactType) = Nothing
+
+                        If Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.KEYWDANYFACTTYPE IsNot Nothing Then
+                            larFactType = lrModelObject.getOutgoingFactTypes(True).FindAll(Function(x) x.IsLinkFactType = False)
+                        Else
+                            larFactType = lrModelObject.getOutgoingFactTypes.FindAll(Function(x) x.IsLinkFactType = False)
+                        End If
+
 
                         For Each lrFactType In larFactType
                             Call lrPage.DropFactTypeAtPoint(lrFactType, New PointF(Boston.RandomInteger(10, 100), Boston.RandomInteger(10, 100)), False,, abBroadcastInterfaceEvent, False, True, False, False)

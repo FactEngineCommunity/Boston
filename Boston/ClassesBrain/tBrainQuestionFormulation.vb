@@ -1070,7 +1070,7 @@ Partial Public Class tBrain
                                             lrStep)
 
             If abStraightToActionProcessing Then
-                Call Me.executeStatementAddFactType(lrQuestion, abBroadcastInterfaceEvent)
+                Call Me.executeStatementAddFactType(lrQuestion, abBroadcastInterfaceEvent, abStraightToActionProcessing)
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                 Me.AddQuestion(lrQuestion)
             End If
@@ -1658,7 +1658,7 @@ Partial Public Class tBrain
                                             larAdditionalSentence)
 
                 If abStraightToActionProcessing Then
-                    Call Me.executeStatementAddFactType(lrQuestion, abBroadcastInterfaceEvent)
+                    Call Me.executeStatementAddFactType(lrQuestion, abBroadcastInterfaceEvent, abStraightToActionProcessing)
                 ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                     Me.AddQuestion(lrQuestion)
                 End If

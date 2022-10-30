@@ -1033,6 +1033,7 @@ Namespace FBM
                 'CodeSafe: Sometimes gets called when removing a FactType.
                 If Me.RoleGroup.Count = 0 Then Exit Sub
                 If Me.Shape Is Nothing Then Exit Sub
+                If Me.Page.Diagram Is Nothing Then Exit Sub
 
                 'VM-20180330-ToDo: This next line might never allow anything through. Test and remove if necessary
                 If Me.Shape.Parent Is Nothing Then Exit Sub
@@ -1979,11 +1980,13 @@ ReattachRoles:
 
                     For Each lrRoleInstance In Me.RoleGroup
                         liCounter += 1
-                        lbIsVisible = lrRoleInstance.Shape.Visible
-                        lrRoleInstance.Shape.Detach()
-                        lrRoleInstance.Shape.Move((Me.Shape.Bounds.X + 3) + ((liCounter - 1) * 6), Me.Shape.Bounds.Y + 4 + ((Me.FactType.GetHighestConstraintLevel - 1) * 1.6))
-                        lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.BottomCenter)
-                        lrRoleInstance.Shape.Visible = lbIsVisible
+                        If lrRoleInstance.Shape IsNot Nothing Then
+                            lbIsVisible = lrRoleInstance.Shape.Visible
+                            lrRoleInstance.Shape.Detach()
+                            lrRoleInstance.Shape.Move((Me.Shape.Bounds.X + 3) + ((liCounter - 1) * 6), Me.Shape.Bounds.Y + 4 + ((Me.FactType.GetHighestConstraintLevel - 1) * 1.6))
+                            lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.BottomCenter)
+                            lrRoleInstance.Shape.Visible = lbIsVisible
+                        End If
                         lrRoleInstance.SequenceNr = liCounter
 
                         'Redraw Link to nearest ConceptInstance

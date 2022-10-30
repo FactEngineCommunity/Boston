@@ -8,7 +8,7 @@ Namespace TableFactType
         ''' 
         ''' </summary>
         ''' <param name="arFactType"></param>
-        Sub AddFactType(ByRef arFactType As FBM.FactType)
+        Function AddFactType(ByRef arFactType As FBM.FactType) As Boolean
 
             Dim lsSQLQuery As String = ""
 
@@ -46,6 +46,9 @@ Namespace TableFactType
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
+
+                Return True
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -53,9 +56,11 @@ Namespace TableFactType
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         Sub DeleteFactType(ByVal arFactType As FBM.FactType)
 

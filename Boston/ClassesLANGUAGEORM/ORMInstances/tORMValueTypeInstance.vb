@@ -780,6 +780,9 @@ RemoveAnyway:
             'Set the size of the ValueTypeInstance
             '---------------------------------------
             Try
+                'CodeSafe
+                If Me.Page Is Nothing Or Me.Model Is Nothing Or Me.ValueType Is Nothing Then Exit Sub
+
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.ValueType.Id, pcenumConceptType.ValueType)
                 lrConceptInstance.X = Me.X
                 lrConceptInstance.Y = Me.Y

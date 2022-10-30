@@ -1012,16 +1012,23 @@ Namespace FBM
 
         End Function
 
-        Public Function getOutgoingFactTypes() As List(Of FBM.FactType)
+        Public Function getOutgoingFactTypes(Optional ByVal abAnyFactType As Boolean = False) As List(Of FBM.FactType)
 
             Dim larFactType As New List(Of FBM.FactType)
 
             Try
-                larFactType = (From FactType In Me.Model.FactType
-                               From Role In FactType.RoleGroup
-                               Where Role.JoinedORMObject.Id = Me.Id
-                               Where Role.InternalUniquenessConstraint.Count > 0
-                               Select FactType).ToList
+                If abAnyFactType Then
+                    larFactType = (From FactType In Me.Model.FactType
+                                   From Role In FactType.RoleGroup
+                                   Where Role.JoinedORMObject.Id = Me.Id
+                                   Select FactType).ToList
+                Else
+                    larFactType = (From FactType In Me.Model.FactType
+                                   From Role In FactType.RoleGroup
+                                   Where Role.JoinedORMObject.Id = Me.Id
+                                   Where Role.InternalUniquenessConstraint.Count > 0
+                                   Select FactType).ToList
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

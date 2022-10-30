@@ -34,6 +34,16 @@ Namespace VAQL
             End Set
         End Property
 
+        Private _KEYWDANYFACTTYPE As String
+        Public Property KEYWDANYFACTTYPE As String
+            Get
+                Return Me._KEYWDANYFACTTYPE
+            End Get
+            Set(value As String)
+                Me._KEYWDANYFACTTYPE = value
+            End Set
+        End Property
+
     End Class
 
     Public Class AddObjectTypeToPageStatement

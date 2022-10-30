@@ -10901,13 +10901,13 @@ SkipRemovalFromModel:
             Me.BackgroundWorker.ReportProgress(0)
 
             lrPage = Me.zrPage.CreatePropertyGraphSchema(Me.BackgroundWorker)
+
+            If lrPage Is Nothing Then
+                prApplication.ThrowErrorMessage("The Page was not created successfully. Why not share your model with FactEngine and we'll investigate why.", pcenumErrorType.Warning, Nothing, False, False, True,, False, Nothing)
+                Exit Sub
+            End If
             lrPage.Loaded = True
             lrPage.Save(False, True)
-
-            Me.CircularProgressBar.Value = 0
-            Me.CircularProgressBar.Text = "0%"
-            Me.CircularProgressBar.Invalidate()
-            Me.CircularProgressBar.SendToBack()
 
 
             Me.zrPage.Model.AllowCheckForErrors = True
@@ -10935,6 +10935,11 @@ SkipRemovalFromModel:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        Finally
+            Me.CircularProgressBar.Value = 0
+            Me.CircularProgressBar.Text = "0%"
+            Me.CircularProgressBar.Invalidate()
+            Me.CircularProgressBar.SendToBack()
         End Try
 
 
@@ -11550,7 +11555,11 @@ SkipRemovalFromModel:
             lsMessage = "Are you sure you want to remove all the arguments and role links for this Role Constraint?"
 
             If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
-                lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
+                Try
+                    lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
+                Catch ex As Exception
+                    Exit Sub
+                End Try
 
                 For Each lrArgument In lrRoleConstraintInstance.RoleConstraint.Argument.ToArray
                     lrRoleConstraintInstance.RoleConstraint.RemoveArgument(lrArgument)

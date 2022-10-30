@@ -53,12 +53,16 @@ Namespace DuplexServiceClient
                 Channel.SendBroadcast(aiBroadcastType, arBroadcast)
 
             Catch ex As Exception
-                Dim lsMessage1 As String
+                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-                lsMessage1 = "Error sending Client/Server Broadcast. The session may have timed out."
-                lsMessage1 &= "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                lsMessage = "Error sending Client/Server Broadcast. The session may have timed out."
+                lsMessage.AppendDoubleLineBreak("Try restarting Boston.")
+                lsMessage.AppendDoubleLineBreak("If this message repeats, the Boston Server may be down.")
+
+
+                lsMessage.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, False, False, True, MessageBoxButtons.OK, False, ex)
             End Try
 
         End Sub
@@ -359,7 +363,7 @@ Namespace DuplexServiceClient
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -463,7 +467,7 @@ Namespace DuplexServiceClient
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -554,7 +558,7 @@ Namespace DuplexServiceClient
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
