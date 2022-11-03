@@ -39,7 +39,7 @@ Namespace TableModelDictionary
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
             End Try
 
@@ -73,7 +73,7 @@ Namespace TableModelDictionary
                 Dim lsMessage As String
                 lsMessage = "Error: TableModelDictionary.DeleteModelDictionaryEntry"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -96,7 +96,7 @@ Namespace TableModelDictionary
                 Dim lsMessage As String
                 lsMessage = "Error: TableModelDictionary.DeleteModelDictionaryEntry"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -130,7 +130,7 @@ Namespace TableModelDictionary
                 Dim lsMessage As String
                 lsMessage = "Error: TableModelDictionary.DoesModelObjectExistInAntotherModel"
                 lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -166,7 +166,7 @@ Namespace TableModelDictionary
                 Dim lsMessage As String
                 lsMessage = "Error: TableModelDictionary.ExistsModelDictionaryEntry"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -311,7 +311,7 @@ Namespace TableModelDictionary
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.DictionaryEntry)
             End Try
@@ -410,7 +410,7 @@ Namespace TableModelDictionary
                 lsMessage &= vbCrLf & vbCrLf
                 lsMessage &= "Original Symbol: '" & arDictionaryEntry.Symbol & "'"
                 lsMessage &= vbCrLf & "New Symbol: '" & asNewSymbol & "'"
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 pdbConnection.RollbackTrans()
             End Try
@@ -449,7 +449,7 @@ Namespace TableModelDictionary
                 Dim lsMessage As String
                 lsMessage = "Error: TableModelDictionary.UpdateModelDictionaryEntry"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
