@@ -41,8 +41,9 @@ Namespace Database
 
             Dim lsReturnString As String = ""
 
-            lsReturnString = asString.Replace("'", "''")
             lsReturnString = asString.Replace("""", "''")
+            lsReturnString = asString.Replace("'", "''")
+
 
             Return lsReturnString
 

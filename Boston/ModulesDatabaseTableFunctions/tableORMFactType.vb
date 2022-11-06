@@ -32,7 +32,7 @@ Namespace TableFactType
                 lsSQLQuery &= " ," & arFactType.IsMDAModelElement
                 lsSQLQuery &= " ," & arFactType.IsDerived
                 lsSQLQuery &= " ," & arFactType.IsStored
-                lsSQLQuery &= " ,'" & Trim(Replace(arFactType.DerivationText, "'", "`")) & "'"
+                lsSQLQuery &= " ,'" & Database.MakeStringSafe(Trim(Replace(arFactType.DerivationText, "'", "`"))) & "'"
                 lsSQLQuery &= " ," & arFactType.IsLinkFactType
                 lsSQLQuery &= " ,'" & arFactType.GUID & "'"
                 If arFactType.LinkFactTypeRole IsNot Nothing Then

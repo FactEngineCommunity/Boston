@@ -248,6 +248,21 @@ Public Class frmCRUDIndexManager
                 Dim lsNewIndexName = Me.DataGridViewIndexes.Rows(liRowNr).Cells(0).Value
                 Dim lrActualIndex = Me.mrTable.Index.Find(Function(x) x.Name = lsNewIndexName)
 
+                Dim lrNewIndex As RDS.Index = Nothing
+
+                If lrActualIndex Is Nothing Then
+                    lrNewIndex = lrIndex.Clone(Me.mrTable)
+
+                    Dim larIndex = From Index In Me.mrTable.Index
+                                   Where Index.EqualsByColumns(lrNewIndex)
+                                   Where Not Index Is lrNewIndex
+                                   Select Index
+
+                    If larIndex.Count > 0 Then
+                        lrActualIndex = larIndex(0)
+                    End If
+                End If
+
 #Region "Prechecks"
                 If lrIndex.Column.Count = 0 Then
                     MsgBox("The Index must contain at least one Column/Property.")
@@ -268,6 +283,8 @@ Public Class frmCRUDIndexManager
 
 ProcessExistingIndex:
 #Region "Process Existing Index"
+
+                Call lrActualIndex.setName(lsNewIndexName)
 
                 Select Case Me.mrTable.FBMModelElement.GetType
                     Case Is = GetType(FBM.EntityType)
@@ -314,7 +331,7 @@ ProcessExistingIndex:
                                 Call Me.RevertToActualIndex(lrActualIndex)
                                 Exit Sub
                             Else
-                                Dim lrNewIndex = lrIndex.Clone(Me.mrTable)
+                                lrNewIndex = lrIndex.Clone(Me.mrTable)
 
                                 If larRole.Count = 0 Then
                                     '==========================================================================
@@ -449,7 +466,7 @@ ProcessExistingIndex:
 ProcessNewIndex:
 #Region "Process New Index"
                 If lrIndex IsNot Nothing Then
-                    Dim lrNewIndex = lrIndex.Clone(Me.mrTable)
+                    lrNewIndex = lrIndex.Clone(Me.mrTable)
 
                     larRole = New List(Of FBM.Role)
 
@@ -902,6 +919,7 @@ EnableRevert:
 
                 lrCandidateIndex.Name = lsNewIndexName
 
+                Me.ButtonApply.Enabled = True
             End If
 
         Catch ex As Exception
@@ -914,4 +932,5 @@ EnableRevert:
         End Try
 
     End Sub
+
 End Class
