@@ -689,57 +689,65 @@ Public Class frmFactEngine
 
                     Dim lrLanguageParser As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
 
+                    Try
+
 #Region "Substitute for ModelElement names"
-                    Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
+                        Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
 
-                    Dim lrModelElement As FBM.ModelObject
-                    For Each lsWord In lasWords
-                        Dim lsTempWord = lsWord.Replace(",", "")
-                        Dim lsLemma As String = Nothing
-                        If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Or (prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True) IsNot Nothing) Then
+                        Dim lrModelElement As FBM.ModelObject
+                        For Each lsWord In lasWords
+                            Dim lsTempWord = lsWord.Replace(",", "")
+                            Dim lsLemma As String = Nothing
+                            If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Or (prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True) IsNot Nothing) Then
 
-                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
+                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
 
-                            If lrModelElement Is Nothing Then
-                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsLemma, True, True)
+                                If lrModelElement Is Nothing Then
+                                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsLemma, True, True)
+                                End If
+
+                                If lrModelElement Is Nothing Then
+                                    lrModelElement = prApplication.WorkingModel.ModelElements.Find(Function(x) Fastenshtein.Levenshtein.Distance(x.Id, lsTempWord) < 2)
+                                End If
+
+                                If lrModelElement IsNot Nothing Then
+                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
+                                End If
                             End If
-
-                            If lrModelElement Is Nothing Then
-                                lrModelElement = prApplication.WorkingModel.ModelElements.Find(Function(x) Fastenshtein.Levenshtein.Distance(x.Id, lsTempWord) < 2)
-                            End If
-
-                            If lrModelElement IsNot Nothing Then
-                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
-                            End If
-                        End If
-                    Next
+                        Next
 #End Region
 
-                    Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                    Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
+                        Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                        Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
 
-                    For Each loTransformation In larTransformationTuples
-                        Dim regex As Regex = New Regex(loTransformation.FindRegEx)
-                        Dim match As Match = regex.Match(Me.TextBoxInput.Text)
-                        If match.Success Then
-                            Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
-                        End If
+                        For Each loTransformation In larTransformationTuples
+                            Dim regex As Regex = New Regex(loTransformation.FindRegEx)
+                            Dim match As Match = regex.Match(Me.TextBoxInput.Text)
+                            If match.Success Then
+                                Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
+                            End If
+                        Next
 
-                    Next
+                        'Tidy up
+                        lasWords = Me.TextBoxInput.Text.Split(" ")
 
-                    'Tidy up
-                    lasWords = Me.TextBoxInput.Text.Split(" ")
+                        For Each lsWord In lasWords
 
-                    For Each lsWord In lasWords
+                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsWord, True, True)
 
-                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsWord, True, True)
+                            If lrModelElement IsNot Nothing Then
+                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsWord, lrModelElement.Id)
+                            End If
 
-                        If lrModelElement IsNot Nothing Then
-                            Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsWord, lrModelElement.Id)
-                        End If
+                        Next
 
-                    Next
-
+                    Catch ex As Exception
+                        Me.LabelError.BringToFront()
+                        Me.LabelError.Text = "Woops. Error executing Transformations. Contact FactEngine support."
+                        Me.TabControl1.SelectedTab = Me.TabPageResults
+                        Me.LabelError.ForeColor = Color.Orange
+                        Exit Sub
+                    End Try
                 End If
 #End Region
 

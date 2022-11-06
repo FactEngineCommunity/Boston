@@ -1036,7 +1036,7 @@ Namespace FactEngine
                                     '                    'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
                                     '                    loFieldValue = lrSQLiteDataReader.GetString(liInd)
                                     '                End Try
-
+                                    loFieldValue = lrResult.Values(loResult(0).Keys(liInd))
                             End Select
 
                             Try
