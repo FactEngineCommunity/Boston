@@ -741,6 +741,28 @@ Public Class frmFactEngine
 
                         Next
 
+#Region "Check for Double_Word with underscore model element names"
+                        Dim Words() As String = Me.TextBoxInput.Text.Split(" ")
+                        Dim lsConcatWords As String = Nothing
+                        Dim lsConcatWordsUnderscore As String = Nothing
+                        Dim lsCamelConcatWords As String = Nothing
+
+                        For liInd = 0 To Words.Count - 2
+
+                            lsConcatWords = Words(liInd) & " " & Words(liInd + 1)
+                            lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
+                            If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
+                                Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
+                            End If
+
+                            lsConcatWordsUnderscore = Words(liInd) & "_" & Words(liInd + 1)
+                            lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
+                            If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
+                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
+                            End If
+                        Next
+#End Region
+
                     Catch ex As Exception
                         Me.LabelError.BringToFront()
                         Me.LabelError.Text = "Woops. Error executing Transformations. Contact FactEngine support."

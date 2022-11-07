@@ -236,7 +236,7 @@ Namespace TableReferenceFieldValue
                                 Case Else
                                     Dim pro As System.Reflection.PropertyInfo
                                     pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
-                                    pro.SetValue(loTupleObject, CStr(loField.value), Nothing)
+                                    pro.SetValue(loTupleObject, CStr(Viev.NullVal(loField.value, " ")), Nothing)
                             End Select
                             liInd += 1
                         Next
