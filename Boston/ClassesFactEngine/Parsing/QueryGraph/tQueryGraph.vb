@@ -385,7 +385,6 @@ StartMatch:
 
 
 #End Region
-
                 'WHERE
                 larEdgesWithTargetNode = From QueryEdge In Me.QueryEdges
                                          Where QueryEdge.TargetNode IsNot Nothing
@@ -437,6 +436,11 @@ StartMatch:
                 larWhereEdges.RemoveAll(Function(x) (Not x.IsRDSTable And x.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType)) And (x.IdentifierList.Count = 0) And (x.TargetNode.IdentifierList.Count = 0))
 
                 If larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then 'HeadNode.HasIdentifier is where "(Person:'Peter') went to WHICH School"
+
+                    If Me.QueryEdges.Count = 0 And Me.HeadNode IsNot Nothing Then
+                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase.First & ":" & Me.HeadNode.Name & ")"
+                    End If
+
                     GoTo ReturnClause 'There is no WHERE Conditionals.
                 Else
                     lsCypherQuery &= vbCrLf & "WHERE "
@@ -744,7 +748,6 @@ StartMatch:
 #End Region
 #End Region
 
-
 #Region "Subqueries"
                 '=====================================================================================
                 'SubQueries
@@ -790,11 +793,10 @@ StartMatch:
                 '=====================================================================================
 #End Region
 
-
 #Region "RETURN/GET Clause"
 ReturnClause:
                 If Not abIsSubQuery Then
-                    If Me.ProjectionColumn.Count > 0 Then
+                    If Me.ProjectionColumn.Count > 0 Or arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
                         lsCypherQuery &= vbCrLf & "RETURN "
                     End If
 
@@ -844,7 +846,10 @@ ReturnClause:
                                                  Select ReturnColumn
 
                         If larCountStarColumn.Count > 0 Then
-                            lsCypherQuery &= ", COUNT(*)"
+                            If arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN.Count > 1 Then
+                                lsCypherQuery &= ","
+                            End If
+                            lsCypherQuery &= " COUNT(*)"
                             If larCountStarColumn(0).ASCLAUSE IsNot Nothing Then
                                 lsCypherQuery &= " AS " & larCountStarColumn(0).ASCLAUSE.COLUMNNAMESTR
                             End If
