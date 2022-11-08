@@ -425,42 +425,38 @@ Namespace FEQL
 
     Private Sub AutoHighlightStart()
         Dim _tree As ParseTree
-            Dim _currenttext As String = ""
-            Try
-                While Not isDisposing
-                    Dim _textchanged As Boolean
-                    SyncLock treelock
-                        _textchanged = textChanged
-                        If textChanged Then
-                            textChanged = False
-                            _currenttext = currentText
-                        End If
-                    End SyncLock
-                    If Not _textchanged Then
-                        Thread.Sleep(200)
+        Dim _currenttext As String = ""
+        While Not isDisposing
+            Dim _textchanged As Boolean
+            SyncLock treelock
+                _textchanged = textChanged
+                If textChanged Then
+                    textChanged = False
+                    _currenttext = currentText
+                End If
+            End SyncLock
+            If Not _textchanged Then
+                Thread.Sleep(200)
+                Continue While
+            End If
+
+                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+
+                SyncLock treelock
+                    If textChanged Then
                         Continue While
+                    Else
+                        ' assign new tree
+                        Tree = _tree
                     End If
-
-                    _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
-
-                    SyncLock treelock
-                        If textChanged Then
-                            Continue While
-                        Else
-                            ' assign new tree
-                            Tree = _tree
-                        End If
-                    End SyncLock
+                End SyncLock
 
 
-                    If _tree.Errors.Count = 0 Then
-                        Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-                    End If
-                End While
-            Catch ex As Exception
-                'Woops
-            End Try
-        End Sub
+                If _tree.Errors.Count = 0 Then
+                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
+                End If
+            End While
+    End Sub
 
 
     ''' <summary>

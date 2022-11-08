@@ -1011,6 +1011,11 @@ Namespace FactEngine
                         Dim loFieldValue As Object = Nothing
                         Dim liInd As Integer
                         For liInd = 0 To loResult(0).Keys.Count - 1
+
+                            If lrResult.Values(loResult(0).Keys(liInd)) Is Nothing Then
+                                loFieldValue = "NULL"
+                                GoTo AddFactData
+                            End If
                             Select Case lrResult.Values(loResult(0).Keys(liInd)).GetType '.GetFieldType(liInd)
                                 Case Is = GetType(String)
                                     If Not Viev.NullVal(lrResult.Values(loResult(0).Keys(liInd)), "") = "" Then
@@ -1039,6 +1044,7 @@ Namespace FactEngine
                                     loFieldValue = lrResult.Values(loResult(0).Keys(liInd))
                             End Select
 
+AddFactData:
                             Try
                                 lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
                                 '=====================================================

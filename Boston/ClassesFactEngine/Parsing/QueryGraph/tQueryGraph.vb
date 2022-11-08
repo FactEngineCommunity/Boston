@@ -438,10 +438,23 @@ StartMatch:
                 If larConditionalQueryEdges.Count = 0 And (Not Me.HeadNode.HasIdentifier) Then 'HeadNode.HasIdentifier is where "(Person:'Peter') went to WHICH School"
 
                     If Me.QueryEdges.Count = 0 And Me.HeadNode IsNot Nothing Then
-                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase.First & ":" & Me.HeadNode.Name & ")"
+                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")"
                     End If
 
                     GoTo ReturnClause 'There is no WHERE Conditionals.
+                ElseIf larConditionalQueryEdges.Count = 1 And (Not Me.HeadNode.HasIdentifier) Then 'HeadNode.HasIdentifier is where "(Person:'Peter') went to WHICH School"
+
+                    If Me.QueryEdges.Count = 1 And Me.HeadNode IsNot Nothing And Trim(lsCypherQuery = "MATCH") Then
+                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")"
+                    Else
+                        lsCypherQuery &= vbCrLf & "WHERE "
+                    End If
+
+                    'GoTo ReturnClause
+                ElseIf larConditionalQueryEdges.Count = 0 And Me.HeadNode.HasIdentifier Then
+                    If Me.QueryEdges.Count = 1 And Me.HeadNode IsNot Nothing Then
+                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")" & vbCrLf & "WHERE "
+                    End If
                 Else
                     lsCypherQuery &= vbCrLf & "WHERE "
                 End If

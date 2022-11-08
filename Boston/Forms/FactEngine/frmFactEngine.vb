@@ -720,6 +720,43 @@ Public Class frmFactEngine
                         Dim loTransformation As Object = New System.Dynamic.ExpandoObject
                         Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
 
+#Region "Check for Double_Word with underscore model element names"
+                        Dim Words() As String = Me.TextBoxInput.Text.Split(" ")
+                        Dim lsConcatWords As String = Nothing
+                        Dim lsConcatWordsUnderscore As String = Nothing
+                        Dim lsCamelConcatWords As String = Nothing
+
+                        For liWordCount = 3 To 2 Step -1
+
+                            For liInd = 0 To Words.Count - liWordCount
+                                lsConcatWords = ""
+                                For liInd2 = 0 To liWordCount - 1
+                                    lsConcatWords &= Words(liInd + liInd2) & " "
+                                Next
+                                lsConcatWords = Trim(lsConcatWords)
+                                lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
+                                If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
+                                    Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
+                                End If
+
+                                lsConcatWordsUnderscore = ""
+                                For liInd2 = 0 To liWordCount - 1
+                                    lsConcatWordsUnderscore &= Words(liInd + liInd2)
+                                    If liInd2 < liWordCount - 1 Then
+                                        lsConcatWordsUnderscore &= "_"
+                                    End If
+                                Next
+                                'Words(liInd) & "_" & Words(liInd + 1)
+                                lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
+                                If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
+                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
+                                End If
+                            Next
+                        Next
+#End Region
+
+
+
                         For Each loTransformation In larTransformationTuples
                             Dim regex As Regex = New Regex(loTransformation.FindRegEx)
                             Dim match As Match = regex.Match(Me.TextBoxInput.Text)
@@ -740,28 +777,6 @@ Public Class frmFactEngine
                             End If
 
                         Next
-
-#Region "Check for Double_Word with underscore model element names"
-                        Dim Words() As String = Me.TextBoxInput.Text.Split(" ")
-                        Dim lsConcatWords As String = Nothing
-                        Dim lsConcatWordsUnderscore As String = Nothing
-                        Dim lsCamelConcatWords As String = Nothing
-
-                        For liInd = 0 To Words.Count - 2
-
-                            lsConcatWords = Words(liInd) & " " & Words(liInd + 1)
-                            lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
-                            If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
-                                Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
-                            End If
-
-                            lsConcatWordsUnderscore = Words(liInd) & "_" & Words(liInd + 1)
-                            lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
-                            If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
-                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
-                            End If
-                        Next
-#End Region
 
                     Catch ex As Exception
                         Me.LabelError.BringToFront()
@@ -1336,7 +1351,9 @@ Public Class frmFactEngine
 
             Select Case e.KeyCode
                 Case Is = Keys.Escape, Keys.F5, Keys.Home, Keys.End, Keys.ShiftKey
-                Case Is = Keys.Down, Keys.Up, Keys.Space
+                Case Is = Keys.Down, Keys.Up
+                Case Is = Keys.Space '20221108-VM-Was not calling ProcessAutoComplete which was probably fine.
+                    Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
                 Case Is = Keys.A
                 Case Else
                     Select Case e.KeyData
@@ -2092,7 +2109,24 @@ Public Class frmFactEngine
 
                 Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
-                        Call Me.PopulateEnterpriseAwareWithObjectTypes(True)
+
+#Region "Predicates"
+                        Dim lsModelElementName = zsIntellisenseBuffer
+                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
+                        If lrModelElement IsNot Nothing Then
+                            Select Case lrModelElement.GetType
+                                Case Is = GetType(FBM.FactType)
+                                    Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement, True))
+                                Case Is = GetType(FBM.EntityType)
+                                    For Each lrFactType In lrModelElement.getConnectedFactTypes
+                                        Call Me.AddPredicatePartsToEnterpriseAware(lrFactType.getPredicatePartsForModelObject(lrModelElement))
+
+                                    Next
+                            End Select
+                        End If
+#End Region
+
+                        Call Me.PopulateEnterpriseAwareWithObjectTypes(False)
                 End Select
 
             ElseIf (Me.zrTextHighlighter.Tree.Errors.Count > 0) Or (Me.zrTextHighlighter.Tree.Optionals.Count > 0) Then
@@ -3139,6 +3173,8 @@ Public Class frmFactEngine
         Try
             If e.KeyCode = Keys.Enter Then
                 Call Me.GO(True)
+                e.Handled = True
+                e.SuppressKeyPress = True
             End If
         Catch ex As Exception
             Dim lsMessage As String
