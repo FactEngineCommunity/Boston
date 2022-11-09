@@ -423,6 +423,9 @@ Namespace VAQL
                 Case TokenType.PREDICATECLAUSE
                     Value = EvalPREDICATECLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.QUOTEDMODELELEMENTNAME
+                    Value = EvalQUOTEDMODELELEMENTNAME(tree, paramlist)
+                    Exit Select
                 Case TokenType.UNARYPREDICATECLAUSE
                     Value = EvalUNARYPREDICATECLAUSE(tree, paramlist)
                     Exit Select
@@ -604,6 +607,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalPREDICATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalQUOTEDMODELELEMENTNAME(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

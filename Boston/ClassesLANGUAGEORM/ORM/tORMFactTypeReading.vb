@@ -269,6 +269,41 @@ Namespace FBM
 
         End Function
 
+        Public Function EqualsByPredicatePartTextModelElements(ByVal other As FBM.FactTypeReading,
+                                                               Optional abUseFastenshtein As Boolean = False) As Boolean
+
+            Dim liInd As Integer = 0
+
+            If Me.PredicatePart.Count <> other.PredicatePart.Count Then
+                Return False
+            End If
+
+            For Each lrPredicatePart In Me.PredicatePart
+
+                If lrPredicatePart.Role.JoinedORMObject.Id <> other.PredicatePart(liInd).Role.JoinedORMObject.Id Then
+                    Return False
+                End If
+
+                If abUseFastenshtein Then
+                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) > 4) Or
+                     (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
+                     (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
+                        Return False
+                    End If
+                Else
+                    If (lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText) Or
+                     (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
+                     (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
+                        Return False
+                    End If
+                End If
+                liInd += 1
+            Next
+
+            Return True
+
+        End Function
+
         ''' <summary>
         ''' Used in FactEngine queries, to find FTRs for partial matches within a larger FT.Arity and FTR.
         ''' E.g. "Person visited (Country:'China')" within a larger ternary FT

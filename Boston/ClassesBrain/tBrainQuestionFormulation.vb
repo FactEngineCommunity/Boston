@@ -247,7 +247,9 @@ Partial Public Class tBrain
                                 lrThirdStep)
 
             If abStraightToActionProcessing Then
-                Call Me.executeStatementAddFactTypePredetermined(lrQuestion)
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                    Return False
+                End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                 Me.AddQuestion(lrQuestion)
             End If
@@ -513,7 +515,9 @@ Partial Public Class tBrain
                                     lrThirdStep)
 
             If abStraightToActionProcessing Then
-                Call Me.executeStatementAddFactTypePredetermined(lrQuestion)
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                    Return False
+                End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                 Me.AddQuestion(lrQuestion)
             End If
@@ -815,7 +819,9 @@ Partial Public Class tBrain
                                     lrThirdStep)
 
             If abStraightToActionProcessing Then
-                Call Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent)
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                    Return False
+                End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                 Me.AddQuestion(lrQuestion)
             End If
@@ -1364,7 +1370,9 @@ Partial Public Class tBrain
                                     lrStep)
 
             If abStraightToActionProcessing Then
-                Call Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent)
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                    Return False
+                End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                 Me.AddQuestion(lrQuestion)
             End If

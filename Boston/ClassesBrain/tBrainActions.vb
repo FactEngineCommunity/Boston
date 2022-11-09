@@ -723,7 +723,10 @@ Partial Public Class tBrain
 
     End Sub
 
-    Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion, Optional ByVal abBroadcastInterfaceEvent As Boolean = True, Optional abStraightToActionProcessing As Boolean = False) As Boolean
+    Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion,
+                                                 Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                 Optional abStraightToActionProcessing As Boolean = False,
+                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lrResolvedWord As Language.WordResolved
@@ -787,7 +790,7 @@ Partial Public Class tBrain
             '==========================================================================
             'Adding the FactType to the Model is done in the 'DropFactTypeAtPoint' stage, 
             '  which also broadcasts the event if in Client/Server mode. The below just creates the FactType ready for adding to the Model.
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,,, abBroadcastInterfaceEvent)
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , False,,, abBroadcastInterfaceEvent)
 
             Dim larRole As New List(Of FBM.Role)
 
@@ -798,8 +801,24 @@ Partial Public Class tBrain
             Dim lrFactTypeInstance As FBM.FactTypeInstance
             Dim loPointF As PointF
 
+#Region "FactTypeReading"
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, arQuestion.sentence)
             lrFactTypeReading.IsPreferred = True
+
+            Dim larFactTypeReading = From FactType In Me.Model.FactType
+                                     From FactTypeReading In FactType.FactTypeReading
+                                     Where FactTypeReading.EqualsByPredicatePartTextModelElements(lrFactTypeReading)
+                                     Select FactTypeReading
+
+            If larFactTypeReading.Count > 0 Then
+                arDSCError.Success = False
+                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                arDSCError.ErrorString = "A Fact Type with this predicate already exists."
+                Return False
+            End If
+#End Region
+
+            Call Me.Model.AddFactType(lrFactType)
 
             '====================================================================
             'Check to see that the FactType doesn't clash with another FactType
@@ -964,7 +983,8 @@ EndProcessing:
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function executeStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion,
-                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True) As Boolean
+                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                              Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lsResolvedModelElementName As String
@@ -994,7 +1014,7 @@ EndProcessing:
 
             lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0, True)
 
-            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , True,  ,, abBroadcastInterfaceEvent)
+            lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , False,  ,, abBroadcastInterfaceEvent)
 
             Dim lrRole As FBM.Role
             Dim larRole As New List(Of FBM.Role)
@@ -1019,11 +1039,25 @@ EndProcessing:
 
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, arQuestion.sentence)
 
+            Dim larFactTypeReading = From FactType In Me.Model.FactType
+                                     From FactTypeReading In FactType.FactTypeReading
+                                     Where FactTypeReading.EqualsByPredicatePartTextModelElements(lrFactTypeReading)
+                                     Select FactTypeReading
+
+            If larFactTypeReading.Count > 0 Then
+                arDSCError.Success = False
+                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                arDSCError.ErrorString = "A Fact Type with this predicate already exists."
+                Return False
+            End If
+
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, abBroadcastInterfaceEvent)
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
                 lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, abBroadcastInterfaceEvent)
             End If
+
+            Call Me.Model.AddFactType(lrFactType)
             '===========================================================
 
             '===========================
@@ -1555,6 +1589,7 @@ EndProcessing:
                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
 
         Dim lsMessage As String
+        Dim lsErrorMessage = "Error creating the new Page."
 
         Try
             With New WaitCursor
@@ -1572,8 +1607,12 @@ EndProcessing:
 
                 Dim lrPage As New FBM.Page(Me.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
 
-                If lrPage Is Nothing Then
-                    lsMessage = "Error creating the new Page."
+                If Me.Model.Page.Find(Function(x) x.Name = lrPage.Name) IsNot Nothing Then
+                    lsErrorMessage = "A Page with the name, " & lrPage.Name & ", already exists."
+                End If
+
+                If lrPage Is Nothing Or Me.Model.Page.Find(Function(x) x.Name = lrPage.Name) IsNot Nothing Then
+                    lsMessage = lsErrorMessage
                     If arDSCError IsNot Nothing Then
                         arDSCError.Success = False
                         arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
