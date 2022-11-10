@@ -622,7 +622,12 @@ Partial Public Class tBrain
             Dim lrConcept As New FBM.Concept(lsConceptName)
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.GeneralConcept)
 
-            If Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+            If Me.Model.ExistsModelElement(lrConcept.Symbol) Then
+                arDSCError.Success = False
+                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                arDSCError.ErrorString = Trim(lrDictionaryEntry.Symbol) & " is already a model element within the Model."
+                Return False
+            ElseIf Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
                 lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
                 If lrDictionaryEntry.isGeneralConcept Then
                     lsMessage = Trim(lrDictionaryEntry.Symbol) & " is already a General Concept within the Model. But okay."
