@@ -610,7 +610,9 @@ Partial Public Class tBrain
     End Function 'Fact Statement
 
 
-    Private Function ProcessISACONCEPTStatement() As Boolean
+    Private Function ProcessISACONCEPTStatement(Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
 
         Try
             Me.VAQLProcessor.ISACONCEPTStatement.MODELELEMENTNAME = ""
@@ -623,12 +625,22 @@ Partial Public Class tBrain
             If Me.Model.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
                 lrDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
                 If lrDictionaryEntry.isGeneralConcept Then
-                    Me.OutputBuffer = Trim(lrDictionaryEntry.Symbol) & " is already a General Concept within the Model. But okay."
-                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                    lsMessage = Trim(lrDictionaryEntry.Symbol) & " is already a General Concept within the Model. But okay."
+                    If arDSCError Is Nothing Then
+                        Me.OutputBuffer = lsMessage
+                        Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                    Else
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                        arDSCError.ErrorString = lsMessage
+                    End If
+                    Return False
                 Else
                     lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
-                    Me.OutputBuffer = "Okay"
-                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                    If arDSCError Is Nothing Then
+                        Me.OutputBuffer = "Okay"
+                        Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                    End If
 
                     Me.Model.MakeDirty(False, False)
                 End If
@@ -642,14 +654,12 @@ Partial Public Class tBrain
                     'Not a biggie.
                 End Try
 
-
                 Me.Model.MakeDirty(False, False)
             End If
 
             Return True
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

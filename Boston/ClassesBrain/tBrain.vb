@@ -2730,7 +2730,7 @@ SkipOutputChannel:
                     Return Me.FormulateQuestionsONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
                 Case Is = VAQL.TokenType.KEYWDISACONCEPT
                     'Is StraightToAction
-                    Return Me.ProcessISACONCEPTStatement()
+                    Return Me.ProcessISACONCEPTStatement(arDSCError)
                 Case Is = VAQL.TokenType.KEYWDISWHERE
                     Return Me.FormulateQuestionsISWHEREStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
                 Case Is = VAQL.TokenType.KEYWDISAKINDOF
