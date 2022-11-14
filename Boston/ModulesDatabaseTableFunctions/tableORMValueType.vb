@@ -5,7 +5,7 @@ Namespace TableValueType
 
     Public Module Table_value_type
 
-        Sub AddValueType(ByVal arValueType As FBM.ValueType)
+        Public Function AddValueType(ByVal arValueType As FBM.ValueType) As Boolean
 
             Dim lsSQLQuery As String = ""
 
@@ -26,13 +26,20 @@ Namespace TableValueType
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
+
+                Return True
+
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueType.AddValueType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+
             End Try
-        End Sub
+
+        End Function
 
         Public Sub DeleteValueType(ByVal arValueType As FBM.ValueType)
 
@@ -180,7 +187,7 @@ Namespace TableValueType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return arValueType
             End Try
@@ -283,7 +290,7 @@ Namespace TableValueType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -318,7 +325,7 @@ Namespace TableValueType
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueType.ModifyKey"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -350,7 +357,7 @@ Namespace TableValueType
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 pdbConnection.RollbackTrans()
             End Try

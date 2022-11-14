@@ -2940,13 +2940,13 @@ Public Class frmDiagramPGS
             '  matches the selected FactType (if a FactType is selected by the user)
             '---------------------------------------------------------------------------
             Dim lrFactType As FBM.FactType
+            Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
 
+#Region "ORM Reading Editor"
             Dim lrORMReadingEditor As frmToolboxORMReadingEditor
             lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
             If IsSomething(lrORMReadingEditor) Then
-
-                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
 
                 If IsSomething(lrPGSLink.Relation.RelationFactType) Then
                     If lrPGSLink.Relation.IsPGSRelationNode Then
@@ -2965,8 +2965,34 @@ Public Class frmDiagramPGS
 
                     Call lrORMReadingEditor.SetupForm()
                 End If
+            End If
+#End Region
+
+#Region "Properties Grid"
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            If IsSomething(lrPropertyGridForm) Then
+                If IsSomething(lrPGSLink.Relation.RelationFactType) Then
+                    If lrPGSLink.Relation.IsPGSRelationNode Then
+                        If lrPGSLink.Relation.RelationFactType.IsLinkFactType Then
+                            lrFactType = lrPGSLink.Relation.RelationFactType.RoleGroup(0).JoinedORMObject
+                            lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                        Else
+                            lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                        End If
+                    Else
+                        lrFactTypeInstance = lrPGSLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                    End If
+
+                    Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                    lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrFactTypeInstance
+                End If
+
 
             End If
+
+#End Region
 
 #Region "Verbalisation"
 
@@ -5081,6 +5107,59 @@ EndProcessing:
             Call lfrmToolboxTableData.SetupForm()
 
         Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
+
+        Try
+
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+            Dim lrPropertyGridForm As frmToolboxProperties
+
+            Dim lrERDRelation As ERD.Relation
+            Try
+                lrERDRelation = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+                lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+                Dim lrFactType As FBM.FactType
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+                If IsSomething(lrPropertyGridForm) Then
+                    If IsSomething(lrERDRelation.RelationFactType) Then
+                        If lrERDRelation.IsPGSRelationNode Then
+                            If lrERDRelation.RelationFactType.IsLinkFactType Then
+                                lrFactType = lrERDRelation.RelationFactType.RoleGroup(0).JoinedORMObject
+                                lrFactTypeInstance = lrFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                            Else
+                                lrFactTypeInstance = lrERDRelation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                            End If
+                        Else
+                            lrFactTypeInstance = lrERDRelation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
+                        End If
+
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrFactTypeInstance
+                    End If
+                End If
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

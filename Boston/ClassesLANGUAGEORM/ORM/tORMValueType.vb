@@ -1035,7 +1035,19 @@ Namespace FBM
                             If TableValueType.ExistsValueType(Me) Then
                                 Call TableValueType.UpdateValueType(Me)
                             Else
-                                Call TableValueType.AddValueType(Me)
+                                If Not TableValueType.AddValueType(Me) Then
+                                    Try
+                                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType, Me.ShortDescription, Me.LongDescription)
+                                        Call lrDictionaryEntry.Save()
+                                        If Not TableValueType.AddValueType(Me) Then
+                                            pdbConnection.RollbackTrans()
+                                            Throw New Exception("Failed to save the Value Type, " & Me.Id & ".")
+                                        End If
+                                    Catch ex As Exception
+                                        pdbConnection.RollbackTrans()
+                                        Throw New Exception("Failed to save the Value Type, " & Me.Id & ".")
+                                    End Try
+                                End If
                             End If
                         Catch ar_err As Exception
                             MsgBox("Error: tValueType.Save: " & ar_err.Message & ": ValueTypeId: " & Me.Id)

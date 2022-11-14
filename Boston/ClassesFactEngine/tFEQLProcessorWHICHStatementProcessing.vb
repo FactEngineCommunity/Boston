@@ -1401,7 +1401,11 @@
                             Case Is = pcenumConceptType.EntityType
                                 lrBaseObject = arPreviousTargetNode.FBMModelObject
                             Case Is = pcenumConceptType.FactType
-                                Throw New Exception("Couldn't find an Objectified Fact Type / Property Edge for WITH WHAT Clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+                                If arQueryGraph.QueryEdges(liInd).TargetNode.FBMModelObject.IsObjectified Then
+                                    lrBaseObject = arQueryGraph.QueryEdges(liInd).TargetNode.FBMModelObject
+                                Else
+                                    Throw New Exception("Couldn't find an Objectified Fact Type / Property Edge for WITH WHAT Clause for Model Element, '" & lrFBMModelObject.Id & "'.")
+                                End If
                         End Select
                     End If
                 Next

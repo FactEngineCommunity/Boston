@@ -141,7 +141,7 @@ Namespace Boston
         Public Function OpenDatabase(Optional ByVal asDatabaseLocationFile As String = Nothing) As Boolean
 
             Dim lsMessage As String = ""
-            Dim lsConnectionString As String
+            Dim lsConnectionString As String = ""
             Dim lsDatabaseLocation As String = ""
             Dim lsDataProvider As String = ""
 
@@ -316,9 +316,10 @@ OpenConnection:
                 Return True
 
             Catch lo_ex As Exception
-                lsMessage = "Error: There was an error opening Richmond database: "
+                lsMessage = "Error: There was an error opening Boston database: "
                 lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "'" & Trim(lo_ex.Message) & "'" & vbCrLf & lo_ex.StackTrace
+                lsMessage.AppendDoubleLineBreak(lsConnectionString)
+                lsMessage.AppendDoubleLineBreak("'" & Trim(lo_ex.Message) & "'" & vbCrLf & lo_ex.StackTrace)
                 MsgBox(lsMessage)
                 Return False
             End Try

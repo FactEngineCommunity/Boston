@@ -711,9 +711,12 @@ Public Class frmFactEngine
                                 End If
 
                                 If lrModelElement IsNot Nothing Then
+                                    'CodeSafe
+                                    If lrModelElement.Id = "" Then GoTo NextModelElementFind 'Found something like this once.
                                     Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
                                 End If
                             End If
+NextModelElementFind:
                         Next
 #End Region
 
@@ -770,12 +773,15 @@ Public Class frmFactEngine
 
                         For Each lsWord In lasWords
 
+                            'CodeSafe
+                            If lsWord = "" Then GoTo NextWord
+
                             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsWord, True, True)
 
                             If lrModelElement IsNot Nothing Then
                                 Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsWord, lrModelElement.Id)
                             End If
-
+NextWord:
                         Next
 
                     Catch ex As Exception
