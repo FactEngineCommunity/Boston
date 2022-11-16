@@ -1,4 +1,6 @@
 ﻿Imports System.Reflection
+Imports System.Xml.Serialization
+Imports System.IO
 
 Public Class frmCRUDEditReferenceTable
 
@@ -6,6 +8,7 @@ Public Class frmCRUDEditReferenceTable
     Private zo_working_class As Object
     Private zlo_display_list As New List(Of Object)
     Private zb_grid_data_dirty As Boolean = False 'True if a user has modified any cell contents.
+    Private mrReferenceTable As New ReferenceTable
 
     Dim zls_field_list As New List(Of Object)
 
@@ -37,37 +40,46 @@ Public Class frmCRUDEditReferenceTable
 
         Call load_reference_tables()
 
-
     End Sub
 
     Sub load_reference_tables()
 
         Dim liInd As Integer = 0
-        Dim lo_reference_table As tReferenceTable
+        Dim lo_reference_table As ReferenceTable
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New ADODB.Recordset
 
-        lREcordset.ActiveConnection = pdbConnection
-        lREcordset.CursorType = pcOpenStatic
+        Try
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
 
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= "  FROM ReferenceTable"
-        lsSQLQuery &= " WHERE system = " & False
-        lsSQLQuery &= " ORDER BY reference_table_name"
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= "  FROM ReferenceTable"
+            lsSQLQuery &= " WHERE system = " & False
+            lsSQLQuery &= " ORDER BY reference_table_name"
 
-        lREcordset.Open(lsSQLQuery)
+            lREcordset.Open(lsSQLQuery)
 
-        If Not lREcordset.EOF Then
-            While Not lREcordset.EOF
-                liInd += 1
-                lo_reference_table = New tReferenceTable
-                lo_reference_table.reference_table_id = lREcordset("reference_table_id").Value
-                lo_reference_table.name = lREcordset("reference_table_name").Value
-                Me.ComboBox1.Items.Add(New tcomboboxitem(liInd, lREcordset("reference_table_name").Value, lo_reference_table))
-                lREcordset.MoveNext()
-            End While
-        End If
-        ComboBox1.SelectedIndex = 0
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    liInd += 1
+                    lo_reference_table = New ReferenceTable
+                    lo_reference_table.ReferenceTableId = lREcordset("reference_table_id").Value
+                    lo_reference_table.name = lREcordset("reference_table_name").Value
+                    Me.ComboBox1.Items.Add(New tComboboxItem(liInd, lREcordset("reference_table_name").Value, lo_reference_table))
+                    lREcordset.MoveNext()
+                End While
+            End If
+            ComboBox1.SelectedIndex = 0
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -77,7 +89,7 @@ Public Class frmCRUDEditReferenceTable
             '--------------------------------------------
             'Get the list of Tuples as a List(Of Object)
             '--------------------------------------------
-            zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.reference_table_id, Me.zo_working_class)
+            zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.ReferenceTableId, Me.zo_working_class, mrReferenceTable)
 
             '---------------------------------
             'Bind the tuples to the DataGrid
@@ -188,9 +200,9 @@ Public Class frmCRUDEditReferenceTable
                 prReferenceFieldValue.RowId = loObject.row_id
 
                 For liInd = 1 To lo_row.Cells.Count - 1
-                    prReferenceFieldValue.data = lo_row.Cells.Item(liInd).Value
+                    prReferenceFieldValue.Data = lo_row.Cells.Item(liInd).Value
                     prReferenceFieldValue.ReferenceFieldId = liInd
-                    prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.reference_table_id
+                    prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
                     prReferenceFieldValue.delete()
                 Next
             Next
@@ -199,11 +211,9 @@ Public Class frmCRUDEditReferenceTable
             Me.DataGridView1.DataSource = Nothing
             Me.DataGridView1.DataSource = zlo_display_list
 
-
             If Me.DataGridView1.RowCount > 0 Then
                 Me.DataGridView1.Columns(0).Visible = False
             End If
-
         End If
 
     End Sub
@@ -213,7 +223,6 @@ Public Class frmCRUDEditReferenceTable
         Call Save_data_grid_items()
 
     End Sub
-
 
     Private Sub DataGridView1_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridView1.CellEndEdit
 
@@ -248,10 +257,9 @@ Public Class frmCRUDEditReferenceTable
             For liInd = 1 To lo_row.Cells.Count - 1
                 prReferenceFieldValue.Data = CStr(lo_row.Cells.Item(liInd).Value).Replace("'", "''")
                 prReferenceFieldValue.ReferenceFieldId = liInd
-                prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.reference_table_id
+                prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
                 prReferenceFieldValue.save()
             Next
-
         Next
 
         Me.zb_grid_data_dirty = False
@@ -261,6 +269,57 @@ Public Class frmCRUDEditReferenceTable
     Private Sub ComboBox1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox1.SelectedIndexChanged
 
         Call Me.Populate_data_grid_for_selected_reference_table()
+
+    End Sub
+
+    Private Sub ButtonExportConfigurationItems_Click(sender As Object, e As EventArgs) Handles ButtonExportConfigurationItems.Click
+
+        Dim lsFileLocationName As String
+        Dim loStreamWriter As StreamWriter ' Create file by FileStream class
+        Dim loXMLSerialiser As XmlSerializer ' Create binary object
+
+        Try
+            'CodeSafe
+            If mrReferenceTable Is Nothing Then
+                MsgBox("Select a coniguration item before selecting this option.")
+                Exit Sub
+            End If
+
+            Dim lrSaveFileDialog As New SaveFileDialog()
+
+            Dim lsFileName = mrReferenceTable.Name & ".XML"
+
+            lrSaveFileDialog.Filter = "XML file (*.XML)|*.XML"
+            lrSaveFileDialog.FilterIndex = 0
+            lrSaveFileDialog.RestoreDirectory = True
+            lrSaveFileDialog.FileName = lsFileName
+
+            If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
+                lsFileLocationName = lrSaveFileDialog.FileName
+            Else
+                Exit Sub
+            End If
+
+            loStreamWriter = New StreamWriter(lsFileLocationName) 'lsFolderLocation & "\" & lsFileName)
+
+            'loXMLSerialiser = New XmlSerializer(GetType(FBM.tORMModel))
+            loXMLSerialiser = New XmlSerializer(GetType(ReferenceTable))
+
+            'Serialize object to file
+            If Boston.IsSerializable(mrReferenceTable) Then
+
+                loXMLSerialiser.Serialize(loStreamWriter, mrReferenceTable)
+                loStreamWriter.Close()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

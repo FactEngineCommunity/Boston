@@ -266,7 +266,7 @@ Namespace TableValueType
                         '------------------------------------------------
                         Dim lrDictionaryEntry As New FBM.DictionaryEntry(arModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription)
                         lrDictionaryEntry = arModel.AddModelDictionaryEntry(lrDictionaryEntry)
-
+                        lrValueType.DBName = lrDictionaryEntry.DBName
 
                         If lrDictionaryEntry Is Nothing Then
                             lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for ValueType:"

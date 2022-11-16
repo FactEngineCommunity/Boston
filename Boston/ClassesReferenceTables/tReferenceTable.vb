@@ -1,7 +1,15 @@
-﻿Public Class tReferenceTable
+﻿Imports System.Xml.Serialization
 
-    Public reference_table_id As Integer
-    Public name As String
+<Serializable()>
+Public Class ReferenceTable
+
+    <XmlAttribute>
+    Public ReferenceTableId As Integer
+
+    <XmlAttribute>
+    Public Name As String
+
+    Public ReferenceTuple As New List(Of ReferenceTuple)
 
     ''' <summary>
     ''' Parameterless Constructor
@@ -10,8 +18,51 @@
     End Sub
 
     Public Sub New(ByVal aiTableId As Integer, ByVal asTableName As String)
-        Me.reference_table_id = aiTableId
-        Me.name = asTableName
+        Me.ReferenceTableId = aiTableId
+        Me.Name = asTableName
     End Sub
 
 End Class
+
+<Serializable>
+Public Class ReferenceTuple
+
+    <XmlAttribute>
+    Public RowId As String
+
+    Public KeyValuePair As New List(Of KeyValuePair)
+
+    ''' <summary>
+    ''' Parameterless Constructor
+    ''' </summary>
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal asRowId As String)
+        Me.RowId = asRowId
+    End Sub
+
+End Class
+
+<Serializable>
+Public Class KeyValuePair
+
+    <XmlAttribute>
+    Public Key As String
+
+    <XmlAttribute>
+    Public Value As String
+
+    ''' <summary>
+    ''' Parameterless Constructor
+    ''' </summary>
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal asKey As String, ByVal asValue As String)
+        Me.Key = asKey
+        Me.Value = asValue
+    End Sub
+
+End Class
+

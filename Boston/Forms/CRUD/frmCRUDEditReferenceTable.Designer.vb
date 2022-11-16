@@ -22,19 +22,21 @@ Partial Class frmCRUDEditReferenceTable
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.Button_delete = New System.Windows.Forms.Button
-        Me.Button_add_new = New System.Windows.Forms.Button
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox
-        Me.button_save = New System.Windows.Forms.Button
-        Me.LabelPrompt_ConfigurationItem = New System.Windows.Forms.Label
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button_delete = New System.Windows.Forms.Button()
+        Me.Button_add_new = New System.Windows.Forms.Button()
+        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.button_save = New System.Windows.Forms.Button()
+        Me.LabelPrompt_ConfigurationItem = New System.Windows.Forms.Label()
+        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.ButtonExportConfigurationItems = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.ButtonExportConfigurationItems)
         Me.GroupBox1.Controls.Add(Me.Button_delete)
         Me.GroupBox1.Controls.Add(Me.Button_add_new)
         Me.GroupBox1.Controls.Add(Me.ComboBox1)
@@ -102,13 +104,22 @@ Partial Class frmCRUDEditReferenceTable
         Me.DataGridView1.Size = New System.Drawing.Size(530, 211)
         Me.DataGridView1.TabIndex = 0
         '
-        'frm_edit_reference_table
+        'ButtonExportConfigurationItems
+        '
+        Me.ButtonExportConfigurationItems.Location = New System.Drawing.Point(257, 291)
+        Me.ButtonExportConfigurationItems.Name = "ButtonExportConfigurationItems"
+        Me.ButtonExportConfigurationItems.Size = New System.Drawing.Size(145, 23)
+        Me.ButtonExportConfigurationItems.TabIndex = 6
+        Me.ButtonExportConfigurationItems.Text = "&Export configuration items"
+        Me.ButtonExportConfigurationItems.UseVisualStyleBackColor = True
+        '
+        'frmCRUDEditReferenceTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(675, 343)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Name = "frm_edit_reference_table"
+        Me.Name = "frmCRUDEditReferenceTable"
         Me.ShowIcon = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Maintain Configuration Reference Items"
@@ -125,4 +136,5 @@ Partial Class frmCRUDEditReferenceTable
     Friend WithEvents Button_add_new As System.Windows.Forms.Button
     Friend WithEvents Button_delete As System.Windows.Forms.Button
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
+    Friend WithEvents ButtonExportConfigurationItems As Button
 End Class

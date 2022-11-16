@@ -416,7 +416,7 @@ ConfigurationOK:
                 '----------------------------------------------------------------------------
                 'Housekeeping
                 '-------------------------
-                Dim lrReferenceTable As New tReferenceTable(34, "Registration")
+                Dim lrReferenceTable As New ReferenceTable(34, "Registration")
                 TableReferenceTable.CreateReferenceTableIfNotExists(lrReferenceTable)
                 Dim lrReferenceField As New tReferenceField(34, 1, "ApplicationKey", 3, 50, False, False)
                 tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)

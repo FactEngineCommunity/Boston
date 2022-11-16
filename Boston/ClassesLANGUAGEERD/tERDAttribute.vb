@@ -362,6 +362,8 @@ Namespace ERD
 
                 If IsSomething(aoChangedPropertyItem) Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "DBName"
+                            Call Me.Column.ActiveRole.JoinedORMObject.SetDBName(Me.DBName)
                         Case Is = "Name"
                             '-----------------------------------------------------------------------------------------------------------------
                             'If the Attribute is not part of a Relation, the the Attribute has a corresponding ValueType at the Model level.

@@ -4286,7 +4286,22 @@ CommitTransaction:
                             If TableFactType.ExistsFactType(Me) Then
                                 Call TableFactType.UpdateFactType(Me)
                             Else
-                                Call TableFactType.AddFactType(Me)
+                                If Not TableFactType.AddFactType(Me) Then
+#Region "CodeSafe"
+                                    Try
+                                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
+                                        lrDictionaryEntry.isDirty = True
+                                        Call lrDictionaryEntry.Save()
+                                        If Not TableFactType.AddFactType(Me) Then
+                                            pdbConnection.RollbackTrans()
+                                            Throw New Exception("Failed to save the Fact Type, " & Me.Id & ".")
+                                        End If
+                                    Catch ex As Exception
+                                        pdbConnection.RollbackTrans()
+                                        Throw New Exception("Failed to save the Fact Type, " & Me.Id & ".")
+                                    End Try
+#End Region
+                                End If
                             End If
                             pdbConnection.CommitTrans()
                         Catch ar_err As Exception
@@ -4654,6 +4669,7 @@ CommitTransaction:
                         For Each lrRole In larRole
                             lrRole.makeDirty()
                             lrRole.FactType.makeDirty()
+                            Me.Model.SaveModelDictionary()
                             lrRole.FactType.Save()
                         Next
                     End If

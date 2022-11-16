@@ -132,7 +132,9 @@ Namespace TableReferenceFieldValue
         ''' <param name="aoWorkingClass">Is set to a sample of the makeup of the Tuples returned</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Function GetReferenceFieldValueTuples(ByVal aiReferenceTableId As Integer, ByRef aoWorkingClass As Object) As List(Of Object)
+        Function GetReferenceFieldValueTuples(ByVal aiReferenceTableId As Integer,
+                                              ByRef aoWorkingClass As Object,
+                                              Optional ByRef arReferenceTable As ReferenceTable = Nothing) As List(Of Object)
 
             Dim liInd As Integer = 0
             Dim loField As New Object
@@ -149,12 +151,17 @@ Namespace TableReferenceFieldValue
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = ADODB.CursorTypeEnum.adOpenStatic
 
+                If arReferenceTable IsNot Nothing Then
+                    arReferenceTable.ReferenceTuple.Clear()
+                    arReferenceTable.Name = TableReferenceTable.getReferenceTableNameById(aiReferenceTableId)
+                End If
+
                 laaReferenceFieldList = GetReferenceFieldListByReferenceTableId(aiReferenceTableId)
 
                 Dim liFieldCount As Integer = laaReferenceFieldList.Count
 
 #Region "Check if new field added"
-                lsSQLQuery = "SELECT Max(RFV.reference_field_id) FROM ReferenceFieldValue RFV WHERE RFV.reference_table_Id = " & aiReferenceTableId
+                lsSQLQuery = "SELECT Max(RFV.reference_field_id) FROM ReferenceFieldValue RFV WHERE RFV.reference_table_id = " & aiReferenceTableId
 
                 lREcordset.Open(lsSQLQuery)
 
@@ -217,12 +224,15 @@ Namespace TableReferenceFieldValue
 
                 Dim loTuple_list As New List(Of Object)
 
+                Dim lrReferenceTuple As New ReferenceTuple
+
                 If Not lREcordset.EOF Then
                     While Not lREcordset.EOF
                         loTupleObject = loTuple.clone
                         '-------------------
                         'Set the values
                         '-------------------
+                        lrReferenceTuple = New ReferenceTuple(lREcordset("row_id").Value)
                         liInd = 0
                         For Each loField In lREcordset.Fields
                             Select Case liInd
@@ -237,10 +247,21 @@ Namespace TableReferenceFieldValue
                                     Dim pro As System.Reflection.PropertyInfo
                                     pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
                                     pro.SetValue(loTupleObject, CStr(Viev.NullVal(loField.value, " ")), Nothing)
+
+                                    If arReferenceTable IsNot Nothing Then
+                                        lrReferenceTuple.KeyValuePair.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(loField.value, " "))))
+                                    End If
                             End Select
+
                             liInd += 1
                         Next
                         loTuple_list.Add(loTupleObject)
+
+                        If arReferenceTable IsNot Nothing Then
+                            arReferenceTable.ReferenceTableId = CStr(aiReferenceTableId)
+                            arReferenceTable.ReferenceTuple.Add(lrReferenceTuple)
+                        End If
+
                         lREcordset.MoveNext()
                     End While
                     lREcordset.Close()
@@ -274,7 +295,7 @@ Namespace TableReferenceFieldValue
             lsSQLQuery &= ar_reference_field_value.ReferenceTableId & ","
             lsSQLQuery &= "'" & Trim(System.Guid.NewGuid.ToString) & "',"
             lsSQLQuery &= ar_reference_field_value.ReferenceFieldId & ","
-            lsSQLQuery &= "'" & Trim(ar_reference_field_value.data) & "'"
+            lsSQLQuery &= "'" & Trim(ar_reference_field_value.Data) & "'"
 
             pdbConnection.Execute(lsSQLQuery)
 

@@ -3,24 +3,24 @@ Imports System.Reflection
 Namespace TableReferenceTable
     Module TableReferenceTable
 
-        Sub AddReferenceTable(ByVal l_reference_table As tReferenceTable)
+        Sub AddReferenceTable(ByVal l_reference_table As ReferenceTable)
 
             Dim lsSQLQuery As String = ""
-            Dim l_reference_table_id As Integer
+            Dim lrReferenceTableId As Integer
 
 
-            l_reference_table_id = GetNextReferenceTableId()
+            lrReferenceTableId = GetNextReferenceTableId()
 
             lsSQLQuery = "INSERT INTO ReferenceTable"
             lsSQLQuery &= " VALUES ("
-            lsSQLQuery &= l_reference_table_id & ","
+            lsSQLQuery &= lrReferenceTableId & ","
             lsSQLQuery &= "'" & l_reference_table.name & "'" & ",0)"
 
             pdbConnection.Execute(lsSQLQuery)
 
         End Sub
 
-        Public Sub CreateReferenceTableIfNotExists(ByVal arReferenceTable As tReferenceTable)
+        Public Sub CreateReferenceTableIfNotExists(ByVal arReferenceTable As ReferenceTable)
 
             Try
                 If Not TableReferenceTable.ExistsReferenceTableByName(arReferenceTable.name) Then
@@ -38,12 +38,12 @@ Namespace TableReferenceTable
 
         End Sub
 
-        Sub DeleteReferenceTable(ByVal l_reference_table_id As Integer)
+        Sub DeleteReferenceTable(ByVal lrReferenceTableId As Integer)
 
             Dim lsSQLQuery As String = ""
 
             lsSQLQuery = "DELETE FROM ReferenceTable "
-            lsSQLQuery &= " WHERE Confguration_Item_Type_Id = " & l_reference_table_id
+            lsSQLQuery &= " WHERE Confguration_Item_Type_Id = " & lrReferenceTableId
 
             pdbConnection.Execute(lsSQLQuery)
 
@@ -89,7 +89,7 @@ Namespace TableReferenceTable
 
             Dim lsSQLQuery As String = ""
 
-            lsSQLQuery = "SELECT Max(reference_table_Id) + 1 FROM ReferenceTable"
+            lsSQLQuery = "SELECT Max(reference_table_id) + 1 FROM ReferenceTable"
 
             lREcordset.Open(lsSQLQuery, , , pc_cmd_table)  ' Create Snapshot.
 
@@ -132,14 +132,41 @@ Namespace TableReferenceTable
 
         End Function
 
+        Function GetReferenceTableNameById(ByVal aiReferenceTableId As Integer) As String
 
-        Sub UdateReferenceTable(ByVal ar_reference_table As tReferenceTable)
+            'Returns the TableId of a ReferenceTable given the as_table_name
+
+            Dim lsSQLQuery As String = ""
+            Dim lREcordset As New ADODB.Recordset
+
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
+
+            lsSQLQuery = "SELECT * "
+            lsSQLQuery &= " FROM ReferenceTable "
+            lsSQLQuery &= " WHERE reference_table_id = " & CStr(aiReferenceTableId)
+
+            lREcordset.Open(lsSQLQuery, , , pc_cmd_table)  ' Create Snapshot.
+
+            If Not lREcordset.EOF Then
+                GetReferenceTableNameById = lREcordset("reference_table_name").Value
+                lREcordset.Close()
+            Else
+                MsgBox("Error: GetReferenceTableIdByName: No Row Returned.")
+            End If
+
+            lREcordset = Nothing
+
+        End Function
+
+
+        Sub UdateReferenceTable(ByVal ar_reference_table As ReferenceTable)
 
             Dim lsSQLQuery As String = ""
 
             lsSQLQuery = "UPDATE ReferenceTable"
             lsSQLQuery &= " SET reference_table_name = " & ar_reference_table.name & ","
-            lsSQLQuery &= " WHERE reference_table_Id = " & ar_reference_table.reference_table_id
+            lsSQLQuery &= " WHERE reference_table_id = " & ar_reference_table.ReferenceTableId
 
             pdbConnection.Execute(lsSQLQuery)
 

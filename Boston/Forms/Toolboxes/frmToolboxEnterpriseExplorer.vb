@@ -2986,7 +2986,6 @@ Public Class frmToolboxEnterpriseExplorer
                     lsFileName = lrModel.Name & ".fbm"
                     lsFileLocationName = lsFileName
 
-
                     lrSaveFileDialog.Filter = "Fact-Based Model file (*.fbm)|*.fbm"
                     lrSaveFileDialog.FilterIndex = 0
                     lrSaveFileDialog.RestoreDirectory = True
@@ -3010,7 +3009,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'loXMLSerialiser = New XmlSerializer(GetType(FBM.tORMModel))
                 loXMLSerialiser = New XmlSerializer(GetType(XMLModel.Model))
 
-                ' Serialize object to file
+                'Serialize object to file
                 loXMLSerialiser.Serialize(loStreamWriter, lrExportModel)
                 loStreamWriter.Close()
 

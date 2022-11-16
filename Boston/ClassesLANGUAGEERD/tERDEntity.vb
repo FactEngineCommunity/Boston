@@ -570,6 +570,7 @@ Namespace ERD
 
                     lrERAttribute.Column = lrColumn
                     lrERAttribute.SupertypeColumn = lrColumn.SupertypeColumn
+                    lrERAttribute.DBName = lrColumn.ActiveRole.JoinedORMObject.DBName
 
                     Me.Attribute.AddUnique(lrERAttribute)
 

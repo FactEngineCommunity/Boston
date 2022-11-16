@@ -3007,6 +3007,9 @@ Namespace FBM
                         lrConceptInstance = Nothing
                     End If
 
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lrFactType.Id, pcenumConceptType.FactType, Me.ShortDescription, Me.LongDescription)
+                    Call Me.AddModelDictionaryEntry(lrDictionaryEntry,,,,,, True,,)
+
                     Me.AddFactType(lrFactType, abMakeModelDirty, abBroadcastInterfaceEvent, lrConceptInstance)
                 End If
 
@@ -3207,6 +3210,8 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return "Error-RoleConstraintName"
             End Try
 
         End Function
@@ -3275,6 +3280,10 @@ Namespace FBM
             'Add the new ValueType to the Model
             '-----------------------------------------
             If abAddtoModel Then
+
+                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lrValueType.Id, pcenumConceptType.ValueType, Me.ShortDescription, Me.LongDescription)
+                Call Me.AddModelDictionaryEntry(lrDictionaryEntry,,,,,, True,,)
+
                 Me.AddValueType(lrValueType, True, abBroadcastInterfaceEvent,, True)
                 Call Me.MakeDirty()
             End If
@@ -3372,6 +3381,8 @@ Namespace FBM
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Nothing
             End Try
 
         End Function

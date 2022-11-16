@@ -797,6 +797,7 @@ Namespace FBM
                         lrValueTypeInstance.DataType = .DataType
                         lrValueTypeInstance.DataTypeLength = .DataTypeLength
                         lrValueTypeInstance.DataTypePrecision = .DataTypePrecision
+                        lrValueTypeInstance.DBName = .DBName
                         lrValueTypeInstance.X = 0
                         lrValueTypeInstance.Y = 0
 
@@ -1038,6 +1039,7 @@ Namespace FBM
                                 If Not TableValueType.AddValueType(Me) Then
                                     Try
                                         Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.ValueType, Me.ShortDescription, Me.LongDescription)
+                                        lrDictionaryEntry.isDirty = True
                                         Call lrDictionaryEntry.Save()
                                         If Not TableValueType.AddValueType(Me) Then
                                             pdbConnection.RollbackTrans()
@@ -1261,6 +1263,7 @@ Namespace FBM
                     Me.Name = asNewName
                     Me.isDirty = True
                     If Not Me.Model.StoreAsXML Then
+                        Call Me.Model.SaveModelDictionary()
                         Call Me.Save() 'Sets the new Name, because Id is the same as Name and the database's Name hasn't been updated yet.
                     End If
 

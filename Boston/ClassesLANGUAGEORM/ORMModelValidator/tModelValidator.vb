@@ -78,7 +78,7 @@ Namespace Validation
                 'TooManyReadingRolesError
                 Me.AddErrorChecker(New Validation.RoleConstraintConflictError(Me.Model)) '129
                 'CompoundReferenceSchemeForEntityTypeWithReferenceMode
-                Me.AddErrorChecker(New Validation.ModelElementAppearsOnNoPageError(Me.Model)) '130
+                'Me.AddErrorChecker(New Validation.ModelElementAppearsOnNoPageError(Me.Model)) '130
 
             Catch ex As Exception
                 Dim lsMessage As String

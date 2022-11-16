@@ -1037,7 +1037,12 @@ Public Class frmDiagramPGS
                 '----------------------------------------------------------------------------------------
                 For Each lrDiagramNode In Me.Diagram.Nodes
                     If lrDiagramNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
-                        Call lrDiagramNode.Tag.ResetAttributeCellColours()
+                        Try
+                            Call lrDiagramNode.Tag.ResetAttributeCellColours()
+                        Catch ex As Exception
+                            'Debugger.Break()
+                        End Try
+
                     End If
                 Next
 
@@ -1066,7 +1071,7 @@ Public Class frmDiagramPGS
                 If IsSomething(lrPropertyGridForm) Then
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
-                    lrPropertyGridForm.PropertyGrid.SelectedObject = e.Cell.Tag
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = lrAttribute 'e.Cell.Tag
                 End If
 
                 '-------------------------------------------------------
@@ -3278,35 +3283,46 @@ Public Class frmDiagramPGS
         Dim lrRecordset As ORMQL.Recordset
         Dim lsSQLQuery As String = ""
 
-        lrAttribute = Me.zrPage.SelectedObject(0)
 
-        lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
-        lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
-        lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
+        Try
+            lrAttribute = Me.zrPage.SelectedObject(0)
 
-        Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+            lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
+            lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
 
-        lrAttribute.Entity.Attribute.Remove(lrAttribute)
+            Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-        lrAttribute.Entity.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
+            lrAttribute.Entity.Attribute.Remove(lrAttribute)
 
-        '----------------------------------------------------------------------------------
-        'Reset the OrdinalPosition of the Attributes above the Attribute that was deleted
-        '----------------------------------------------------------------------------------
-        For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
-            lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
-            'lrChangingAttribute.OrdinalPosition -= 1
+            lrAttribute.Entity.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
 
-            lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
+            '----------------------------------------------------------------------------------
+            'Reset the OrdinalPosition of the Attributes above the Attribute that was deleted
+            '----------------------------------------------------------------------------------
+            For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
+                lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
+                'lrChangingAttribute.OrdinalPosition -= 1
 
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFactInstance = lrRecordset.CurrentFact
-            lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+                lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
 
-            Call lrFactInstance.FactType.FactTable.ResortFactTable()
-        Next
+                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrFactInstance = lrRecordset.CurrentFact
+                lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+
+                Call lrFactInstance.FactType.FactTable.ResortFactTable()
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -3998,6 +4014,7 @@ Public Class frmDiagramPGS
 
             Dim lsValueTypeName As String = lrModel.CreateUniqueValueTypeName("NewValueType", 0)
             Dim lrValueType As FBM.ValueType = lrModel.CreateValueType(lsValueTypeName, True,,,, False)
+
             lfrmAddAttributeForm.zrValueType = lrValueType
 
             '----------------------------------------------------------------------------------------------------------------

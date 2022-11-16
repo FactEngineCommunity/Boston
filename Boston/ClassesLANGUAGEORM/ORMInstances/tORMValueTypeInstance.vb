@@ -898,6 +898,8 @@ RemoveAnyway:
                 'was -> Optional ByVal asAttributeName As String = Nothing, Optional ByVal aoOldValue As Object = Nothing, Optional ByVal aoNewValue As Object = Nothing
                 If IsSomething(aoChangedPropertyItem) Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "DBName"
+                            Call Me.ValueType.SetDBName(Me.DBName)
                         Case Is = "DataType"
                             Select Case Me.DataType
                                 Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
@@ -1396,6 +1398,21 @@ RemoveAnyway:
                 Return New Point(0, 0)
             End If
         End Function
+
+        Private Sub _ValueType_DBNameChanged(asDBName As String) Handles _ValueType.DBNameChanged
+
+            Try
+                Me.DBName = asDBName
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
     End Class
 

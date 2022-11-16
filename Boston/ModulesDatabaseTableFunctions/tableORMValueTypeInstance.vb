@@ -119,6 +119,7 @@ Namespace TableValueTypeInstance
                         lrValueTypeInstance.GUID = lrValueTypeInstance.ValueType.GUID
                         lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
                         lrValueTypeInstance.InstanceNumber = lREcordset("InstanceNumber").Value
+                        lrValueTypeInstance.DBName = lrValueTypeInstance.ValueType.DBName
 
                         lrValueTypeInstance.X = lREcordset("x").Value
                         lrValueTypeInstance.Y = lREcordset("y").Value

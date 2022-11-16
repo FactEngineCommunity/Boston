@@ -9,7 +9,7 @@ Module tableReferenceField
 
             lsSQLQuery = "INSERT INTO ReferenceField"
             lsSQLQuery &= " VALUES ("
-            lsSQLQuery &= arReferenceField.reference_table_id & ","
+            lsSQLQuery &= arReferenceField.ReferenceTableId & ","
             lsSQLQuery &= arReferenceField.reference_field_id & ","
             lsSQLQuery &= "'" & arReferenceField.label & "'" & ","
             lsSQLQuery &= arReferenceField.data_type & ","
@@ -34,7 +34,7 @@ Module tableReferenceField
 
         Try
             Dim lbReturnValue As Boolean
-            If Not tableReferenceField.ExistsReferenceTableFieldByLabel(arReferenceField.reference_table_id,
+            If Not tableReferenceField.ExistsReferenceTableFieldByLabel(arReferenceField.ReferenceTableId,
                                                                         arReferenceField.label,
                                                                         lbReturnValue) Then
                 Call tableReferenceField.AddReferenceField(arReferenceField)
@@ -184,7 +184,7 @@ Module tableReferenceField
         If Not lREcordset.EOF Then
             ar_reference_field.reference_field_id = l_reference_field_id
             ar_reference_field.label = lREcordset("reference_field_Label").Value
-            ar_reference_field.reference_table_id = lREcordset("reference_table_Id").Value
+            ar_reference_field.ReferenceTableId = lREcordset("reference_table_id").Value
             ar_reference_field.data_type = lREcordset("reference_data_type_Id").Value
             ar_reference_field.cardinality = lREcordset("Cardinality").Value
             ar_reference_field.required = lREcordset("Required").Value
