@@ -573,4 +573,59 @@ Public Class frmCRUDBostonConfiguration
 
     End Sub
 
+    Private Sub ButtonImportConfigurationTableItems_Click(sender As Object, e As EventArgs) Handles ButtonImportConfigurationTableItems.Click
+
+        Dim lsMessage As String
+
+        Try
+            If Me.DialogOpenFile.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+
+                'Deserialize text file to a new object.
+                Dim objStreamReader As New StreamReader(Me.DialogOpenFile.FileName)
+                Dim lrReferenceTable As New ReferenceTable
+                Dim x As New XmlSerializer(GetType(ReferenceTable))
+                lrReferenceTable = x.Deserialize(objStreamReader)
+                objStreamReader.Close()
+
+                If TableReferenceTable.ExistsReferenceTableByName(lrReferenceTable.Name) Then
+                    lsMessage = "Are you sure that you want to update the Reference Table, " & lrReferenceTable.Name & "?"
+                Else
+                    lsMessage = "Are you sure that you want to import the Reference Table, " & lrReferenceTable.Name & "?"
+                End If
+
+                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                    If Not TableReferenceTable.ExistsReferenceTableByName(lrReferenceTable.Name) Then
+                        Call TableReferenceTable.AddReferenceTable(lrReferenceTable)
+
+                        Dim liInd = 1
+                        For Each lrKeyValuePair In lrReferenceTable.ReferenceTuple(0).KeyValuePair
+                            Dim lrReferenceField As New tReferenceField(lrReferenceTable.ReferenceTableId, liInd, lrKeyValuePair.Key, 3, 100, False, False)
+                            Call tableReferenceField.AddReferenceField(lrReferenceField)
+                            liInd += 1
+                        Next
+
+                    End If
+
+                    For Each lrReferenceTuple In lrReferenceTable.ReferenceTuple
+                        For Each lrKeyValuePair In lrReferenceTuple.KeyValuePair
+                            Dim lrReferenceFieldValue As New tReferenceFieldValue(lrReferenceTable.ReferenceTableId, 1, lrReferenceTuple.RowId, lrKeyValuePair.Value)
+                            lrReferenceFieldValue.ReferenceFieldId = tableReferenceField.GetReferenceTableFieldIdByLabel(lrReferenceTable.ReferenceTableId, lrKeyValuePair.Key)
+                            Call TableReferenceFieldValue.AddReferenceFieldValue(lrReferenceFieldValue, True)
+                        Next
+                    Next
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

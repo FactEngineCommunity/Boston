@@ -13,7 +13,7 @@
 
     Public Sub New(ByVal aiReferenceTableId As Integer,
                    ByVal aiReferenceFieldId As Integer,
-                   ByVal aiRowId As Integer,
+                   ByVal aiRowId As String,
                    ByVal asData As String)
 
         Me.ReferenceTableId = aiReferenceTableId

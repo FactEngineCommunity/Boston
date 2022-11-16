@@ -5,7 +5,8 @@ Namespace TableReferenceFieldValue
 
     Module ztable_reference_field_value
 
-        Sub AddReferenceFieldValue(ByVal ar_reference_field_value As tReferenceFieldValue)
+        Sub AddReferenceFieldValue(ByVal ar_reference_field_value As tReferenceFieldValue,
+                                   Optional ByVal abIgnoreError As Boolean = False)
 
             Dim lsSQLQuery As String = ""
 
@@ -25,7 +26,9 @@ Namespace TableReferenceFieldValue
                 Dim lsMessage As String
                 lsMessage = "Error: TableReferenceFieldValue.AddReferenceFieldValue"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                If Not abIgnoreError Then
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                End If
             End Try
 
         End Sub

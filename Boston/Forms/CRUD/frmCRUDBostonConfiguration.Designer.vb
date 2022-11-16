@@ -56,6 +56,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.TextBoxBostonServerPortNumber = New System.Windows.Forms.TextBox()
+        Me.LabelPromptBostonServerPortNumber = New System.Windows.Forms.Label()
         Me.CheckBoxClientServerInitialiseClient = New System.Windows.Forms.CheckBox()
         Me.CheckBoxClientServerRequireLoginAtStartup = New System.Windows.Forms.CheckBox()
         Me.CheckBoxUseRemoteUI = New System.Windows.Forms.CheckBox()
@@ -83,6 +85,8 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.GroupBoxConfiguration = New System.Windows.Forms.GroupBox()
+        Me.ButtonImportConfigurationTableItems = New System.Windows.Forms.Button()
         Me.GroupBoxImportExport = New System.Windows.Forms.GroupBox()
         Me.CheckBoxExportSuppressMDAModelElements = New System.Windows.Forms.CheckBox()
         Me.CheckBoxAutomaticallyReportErrorEvents = New System.Windows.Forms.CheckBox()
@@ -101,8 +105,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.LabelPromptBostonServerPortNumber = New System.Windows.Forms.Label()
-        Me.TextBoxBostonServerPortNumber = New System.Windows.Forms.TextBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -122,6 +124,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox5.SuspendLayout()
         Me.TabPage5.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
+        Me.GroupBoxConfiguration.SuspendLayout()
         Me.GroupBoxImportExport.SuspendLayout()
         Me.TabPage7.SuspendLayout()
         Me.GroupBoxModelling.SuspendLayout()
@@ -466,6 +469,22 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox3.TabIndex = 0
         Me.GroupBox3.TabStop = False
         '
+        'TextBoxBostonServerPortNumber
+        '
+        Me.TextBoxBostonServerPortNumber.Location = New System.Drawing.Point(152, 142)
+        Me.TextBoxBostonServerPortNumber.Name = "TextBoxBostonServerPortNumber"
+        Me.TextBoxBostonServerPortNumber.Size = New System.Drawing.Size(60, 20)
+        Me.TextBoxBostonServerPortNumber.TabIndex = 6
+        '
+        'LabelPromptBostonServerPortNumber
+        '
+        Me.LabelPromptBostonServerPortNumber.AutoSize = True
+        Me.LabelPromptBostonServerPortNumber.Location = New System.Drawing.Point(7, 145)
+        Me.LabelPromptBostonServerPortNumber.Name = "LabelPromptBostonServerPortNumber"
+        Me.LabelPromptBostonServerPortNumber.Size = New System.Drawing.Size(139, 13)
+        Me.LabelPromptBostonServerPortNumber.TabIndex = 5
+        Me.LabelPromptBostonServerPortNumber.Text = "Boston Server Port Number:"
+        '
         'CheckBoxClientServerInitialiseClient
         '
         Me.CheckBoxClientServerInitialiseClient.AutoSize = True
@@ -752,6 +771,7 @@ Partial Class frmCRUDBostonConfiguration
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox4.AutoSize = True
+        Me.GroupBox4.Controls.Add(Me.GroupBoxConfiguration)
         Me.GroupBox4.Controls.Add(Me.GroupBoxImportExport)
         Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyReportErrorEvents)
         Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyCheckForUpdates)
@@ -765,6 +785,25 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox4.Size = New System.Drawing.Size(583, 484)
         Me.GroupBox4.TabIndex = 0
         Me.GroupBox4.TabStop = False
+        '
+        'GroupBoxConfiguration
+        '
+        Me.GroupBoxConfiguration.Controls.Add(Me.ButtonImportConfigurationTableItems)
+        Me.GroupBoxConfiguration.Location = New System.Drawing.Point(12, 230)
+        Me.GroupBoxConfiguration.Name = "GroupBoxConfiguration"
+        Me.GroupBoxConfiguration.Size = New System.Drawing.Size(559, 60)
+        Me.GroupBoxConfiguration.TabIndex = 6
+        Me.GroupBoxConfiguration.TabStop = False
+        Me.GroupBoxConfiguration.Text = "Configuration Items / Reference Tables"
+        '
+        'ButtonImportConfigurationTableItems
+        '
+        Me.ButtonImportConfigurationTableItems.Location = New System.Drawing.Point(6, 24)
+        Me.ButtonImportConfigurationTableItems.Name = "ButtonImportConfigurationTableItems"
+        Me.ButtonImportConfigurationTableItems.Size = New System.Drawing.Size(224, 23)
+        Me.ButtonImportConfigurationTableItems.TabIndex = 0
+        Me.ButtonImportConfigurationTableItems.Text = "&Import Confiuration/Reference Table Items"
+        Me.ButtonImportConfigurationTableItems.UseVisualStyleBackColor = True
         '
         'GroupBoxImportExport
         '
@@ -940,22 +979,6 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'LabelPromptBostonServerPortNumber
-        '
-        Me.LabelPromptBostonServerPortNumber.AutoSize = True
-        Me.LabelPromptBostonServerPortNumber.Location = New System.Drawing.Point(7, 145)
-        Me.LabelPromptBostonServerPortNumber.Name = "LabelPromptBostonServerPortNumber"
-        Me.LabelPromptBostonServerPortNumber.Size = New System.Drawing.Size(139, 13)
-        Me.LabelPromptBostonServerPortNumber.TabIndex = 5
-        Me.LabelPromptBostonServerPortNumber.Text = "Boston Server Port Number:"
-        '
-        'TextBoxBostonServerPortNumber
-        '
-        Me.TextBoxBostonServerPortNumber.Location = New System.Drawing.Point(152, 142)
-        Me.TextBoxBostonServerPortNumber.Name = "TextBoxBostonServerPortNumber"
-        Me.TextBoxBostonServerPortNumber.Size = New System.Drawing.Size(60, 20)
-        Me.TextBoxBostonServerPortNumber.TabIndex = 6
-        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -999,6 +1022,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
+        Me.GroupBoxConfiguration.ResumeLayout(False)
         Me.GroupBoxImportExport.ResumeLayout(False)
         Me.GroupBoxImportExport.PerformLayout()
         Me.TabPage7.ResumeLayout(False)
@@ -1091,4 +1115,6 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents LabelPromptNLAPIConvertsGeneralConceptsTo As Label
     Friend WithEvents TextBoxBostonServerPortNumber As TextBox
     Friend WithEvents LabelPromptBostonServerPortNumber As Label
+    Friend WithEvents GroupBoxConfiguration As GroupBox
+    Friend WithEvents ButtonImportConfigurationTableItems As Button
 End Class
