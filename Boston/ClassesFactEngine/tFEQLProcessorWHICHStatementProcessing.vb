@@ -379,7 +379,8 @@
 
 #Region "getModelElmentByBaseNodePredicate"
         Private Function getModelElmentByBaseNodePredicate(ByVal arBaseNode As FactEngine.QueryNode,
-                                                           ByVal asPredicate As String) As FBM.ModelObject
+                                                           ByVal asPredicate As String,
+                                                           Optional ByVal abUseFastenstein As Boolean = False) As FBM.ModelObject
             Try
 
                 Dim larPRedicatePart = From FactType In Me.Model.FactType
@@ -388,6 +389,15 @@
                                        Where PredicatePart.Role.JoinedORMObject.Id = arBaseNode.Name
                                        Where PredicatePart.PredicatePartText = asPredicate
                                        Select PredicatePart
+
+                If larPRedicatePart.Count = 0 And abUseFastenstein Then
+                    larPRedicatePart = From FactType In Me.Model.FactType
+                                       From FactTypeReading In FactType.FactTypeReading
+                                       From PredicatePart In FactTypeReading.PredicatePart
+                                       Where PredicatePart.Role.JoinedORMObject.Id = arBaseNode.Name
+                                       Where Fastenshtein.Levenshtein.Distance(PredicatePart.PredicatePartText, asPredicate) < 4
+                                       Select PredicatePart
+                End If
 
                 If larPRedicatePart.Count = 1 Then
                     Dim lrFactTypeReading As FBM.FactTypeReading = larPRedicatePart.First.FactTypeReading
@@ -739,7 +749,7 @@
             'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
             lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.MODELELEMENTNAME(0))
             If lrFBMModelObject Is Nothing Then
-                lrFBMModelObject = Me.getModelElmentByBaseNodePredicate(arQueryEdge.BaseNode, arQueryEdge.Predicate)
+                lrFBMModelObject = Me.getModelElmentByBaseNodePredicate(arQueryEdge.BaseNode, arQueryEdge.Predicate, True)
                 If lrFBMModelObject IsNot Nothing Then lbIdentityCreatedTargetNode = True
             End If
             If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHCLAUSE.MODELELEMENTNAME(0) & "'.")

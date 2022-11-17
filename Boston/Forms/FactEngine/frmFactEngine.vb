@@ -732,15 +732,12 @@ NextModelElementFind:
                         For liWordCount = 3 To 2 Step -1
 
                             For liInd = 0 To Words.Count - liWordCount
+
                                 lsConcatWords = ""
                                 For liInd2 = 0 To liWordCount - 1
                                     lsConcatWords &= Words(liInd + liInd2) & " "
                                 Next
                                 lsConcatWords = Trim(lsConcatWords)
-                                lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
-                                If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
-                                    Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
-                                End If
 
                                 lsConcatWordsUnderscore = ""
                                 For liInd2 = 0 To liWordCount - 1
@@ -751,7 +748,13 @@ NextModelElementFind:
                                 Next
                                 'Words(liInd) & "_" & Words(liInd + 1)
                                 lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
-                                If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True) IsNot Nothing Then
+                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True)
+                                If lrModelElement IsNot Nothing Then
+                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lrModelElement.Id)
+                                End If
+
+                                lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
+                                If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True) IsNot Nothing Then
                                     Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
                                 End If
                             Next

@@ -5152,7 +5152,8 @@ Namespace FBM
         Public Function GetModelObjectByName(ByVal asModelObjectName As String,
                                              Optional abIgnoreErrorIfNotInModel As Boolean = False,
                                              Optional abSwitchLowerCaseToDictionaryEntry As Boolean = False,
-                                             Optional abUseSafeMode As Boolean = False) As FBM.ModelObject
+                                             Optional abUseSafeMode As Boolean = False,
+                                             Optional abUseFastenstein As Boolean = False) As FBM.ModelObject
 
             Dim lrValueType As FBM.ValueType
             Dim lrEntityType As FBM.EntityType
@@ -5162,10 +5163,24 @@ Namespace FBM
             Dim lsModelObjectName = Trim(asModelObjectName)
 
             Try
-                If Me.ExistsModelElement(lsModelObjectName, abUseSafeMode) Then
+
+
+                If Me.ExistsModelElement(lsModelObjectName, abUseSafeMode) Or abUseFastenstein Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
                     lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsModelObjectName))
+
+                    If lrDictionaryEntry Is Nothing And abUseFastenstein Then
+                        lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) Fastenshtein.Levenshtein.Distance(LCase(x.Symbol), LCase(lsModelObjectName)) < 4)
+                        If lrDictionaryEntry IsNot Nothing Then
+                            If lrDictionaryEntry.Symbol <> lsModelObjectName Then
+                                lsModelObjectName = lrDictionaryEntry.Symbol
+                            End If
+                        End If
+                    End If
+
+                    'CodeSafe
+                    If lrDictionaryEntry Is Nothing Then Return Nothing
 
                     If abSwitchLowerCaseToDictionaryEntry Then lsModelObjectName = lrDictionaryEntry.Symbol
 

@@ -802,7 +802,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.ButtonImportConfigurationTableItems.Name = "ButtonImportConfigurationTableItems"
         Me.ButtonImportConfigurationTableItems.Size = New System.Drawing.Size(224, 23)
         Me.ButtonImportConfigurationTableItems.TabIndex = 0
-        Me.ButtonImportConfigurationTableItems.Text = "&Import Confiuration/Reference Table Items"
+        Me.ButtonImportConfigurationTableItems.Text = "&Import Configuration/Reference Table Items"
         Me.ButtonImportConfigurationTableItems.UseVisualStyleBackColor = True
         '
         'GroupBoxImportExport
