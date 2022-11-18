@@ -209,7 +209,7 @@ StartMatch:
                     larLocalMatchEdges.Remove(lrQueryEdge)
                     liInd += 1
                 Next
-
+#Region "old unused code/legacy SQL/TypeQL"
                 ''=================================================================================================
                 ''PartialFactTypeReadingMatch - I.e. Joins on ManyToMany(..ToMany) tables
                 'Dim larPartialFTMatchNode = From Node In larFromNodes
@@ -301,6 +301,7 @@ StartMatch:
 
                 '    lsCypherQuery &= ";" & vbCrLf
                 'Next
+#End Region
 
 #Region "Unary FactType Nodes"
 
@@ -446,6 +447,8 @@ StartMatch:
 
                     If Me.QueryEdges.Count = 1 And Me.HeadNode IsNot Nothing And Trim(lsCypherQuery = "MATCH") Then
                         lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")"
+                    ElseIf Trim(lsCypherQuery) = "MATCH" Then
+                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")" & vbCrLf & "WHERE "
                     Else
                         lsCypherQuery &= vbCrLf & "WHERE "
                     End If
@@ -868,6 +871,10 @@ ReturnClause:
                             End If
                             lbRequiresGroupByClause = True
                         End If
+                    End If
+
+                    If Not abIsStraightDerivationClause And NullVal(My.Settings.FactEngineDefaultQueryResultLimit, 0) > 0 Then
+                        lsCypherQuery &= vbCrLf & "LIMIT " & My.Settings.FactEngineDefaultQueryResultLimit
                     End If
 
                     lsCypherQuery &= ";"

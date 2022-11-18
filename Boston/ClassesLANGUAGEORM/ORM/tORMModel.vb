@@ -5171,7 +5171,7 @@ Namespace FBM
                     lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(lsModelObjectName))
 
                     If lrDictionaryEntry Is Nothing And abUseFastenstein Then
-                        lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) Fastenshtein.Levenshtein.Distance(LCase(x.Symbol), LCase(lsModelObjectName)) < 4)
+                        lrDictionaryEntry = Me.ModelDictionary.Find(Function(x) Fastenshtein.Levenshtein.Distance(LCase(x.Symbol), LCase(lsModelObjectName)) < 3)
                         If lrDictionaryEntry IsNot Nothing Then
                             If lrDictionaryEntry.Symbol <> lsModelObjectName Then
                                 lsModelObjectName = lrDictionaryEntry.Symbol

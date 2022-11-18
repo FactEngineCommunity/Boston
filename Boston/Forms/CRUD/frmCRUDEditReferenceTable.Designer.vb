@@ -23,19 +23,21 @@ Partial Class frmCRUDEditReferenceTable
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.ButtonExportConfigurationItems = New System.Windows.Forms.Button()
         Me.Button_delete = New System.Windows.Forms.Button()
         Me.Button_add_new = New System.Windows.Forms.Button()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.button_save = New System.Windows.Forms.Button()
         Me.LabelPrompt_ConfigurationItem = New System.Windows.Forms.Label()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
-        Me.ButtonExportConfigurationItems = New System.Windows.Forms.Button()
+        Me.ButtonDeleteReferenceTable = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.ButtonDeleteReferenceTable)
         Me.GroupBox1.Controls.Add(Me.ButtonExportConfigurationItems)
         Me.GroupBox1.Controls.Add(Me.Button_delete)
         Me.GroupBox1.Controls.Add(Me.Button_add_new)
@@ -48,6 +50,15 @@ Partial Class frmCRUDEditReferenceTable
         Me.GroupBox1.Size = New System.Drawing.Size(569, 328)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
+        '
+        'ButtonExportConfigurationItems
+        '
+        Me.ButtonExportConfigurationItems.Location = New System.Drawing.Point(257, 291)
+        Me.ButtonExportConfigurationItems.Name = "ButtonExportConfigurationItems"
+        Me.ButtonExportConfigurationItems.Size = New System.Drawing.Size(145, 23)
+        Me.ButtonExportConfigurationItems.TabIndex = 6
+        Me.ButtonExportConfigurationItems.Text = "&Export configuration items"
+        Me.ButtonExportConfigurationItems.UseVisualStyleBackColor = True
         '
         'Button_delete
         '
@@ -104,14 +115,14 @@ Partial Class frmCRUDEditReferenceTable
         Me.DataGridView1.Size = New System.Drawing.Size(530, 211)
         Me.DataGridView1.TabIndex = 0
         '
-        'ButtonExportConfigurationItems
+        'ButtonDeleteReferenceTable
         '
-        Me.ButtonExportConfigurationItems.Location = New System.Drawing.Point(257, 291)
-        Me.ButtonExportConfigurationItems.Name = "ButtonExportConfigurationItems"
-        Me.ButtonExportConfigurationItems.Size = New System.Drawing.Size(145, 23)
-        Me.ButtonExportConfigurationItems.TabIndex = 6
-        Me.ButtonExportConfigurationItems.Text = "&Export configuration items"
-        Me.ButtonExportConfigurationItems.UseVisualStyleBackColor = True
+        Me.ButtonDeleteReferenceTable.Location = New System.Drawing.Point(408, 290)
+        Me.ButtonDeleteReferenceTable.Name = "ButtonDeleteReferenceTable"
+        Me.ButtonDeleteReferenceTable.Size = New System.Drawing.Size(139, 23)
+        Me.ButtonDeleteReferenceTable.TabIndex = 7
+        Me.ButtonDeleteReferenceTable.Text = "&Delete Reference Table"
+        Me.ButtonDeleteReferenceTable.UseVisualStyleBackColor = True
         '
         'frmCRUDEditReferenceTable
         '
@@ -137,4 +148,5 @@ Partial Class frmCRUDEditReferenceTable
     Friend WithEvents Button_delete As System.Windows.Forms.Button
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents ButtonExportConfigurationItems As Button
+    Friend WithEvents ButtonDeleteReferenceTable As Button
 End Class

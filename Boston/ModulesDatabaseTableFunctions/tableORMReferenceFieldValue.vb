@@ -64,6 +64,28 @@ Namespace TableReferenceFieldValue
 
         End Sub
 
+        Public Sub DeleteReferenceFieldValuesForReferenceTableById(ByVal aiReferenceTableId As Integer)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "DELETE FROM ReferenceFieldValue "
+                lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId.ToString
+
+                pdbConnection.Execute(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+
         Function ExistsReferenceFieldValue(ByVal ar_reference_field_value As tReferenceFieldValue, Optional ByVal av_return_value As Object = Nothing) As Boolean
 
             Dim lsSQLQuery As String = ""

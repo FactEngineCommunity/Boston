@@ -729,12 +729,15 @@ NextModelElementFind:
                         Dim lsConcatWordsUnderscore As String = Nothing
                         Dim lsCamelConcatWords As String = Nothing
 
+                        Dim lasSkipWords() = {"a"}
+
                         For liWordCount = 3 To 2 Step -1
 
                             For liInd = 0 To Words.Count - liWordCount
 
                                 lsConcatWords = ""
                                 For liInd2 = 0 To liWordCount - 1
+                                    If lasSkipWords.Contains(Words(liInd + liInd2)) Then GoTo SkipWord
                                     lsConcatWords &= Words(liInd + liInd2) & " "
                                 Next
                                 lsConcatWords = Trim(lsConcatWords)
@@ -757,11 +760,10 @@ NextModelElementFind:
                                 If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True) IsNot Nothing Then
                                     Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
                                 End If
+SkipWord:
                             Next
                         Next
 #End Region
-
-
 
                         For Each loTransformation In larTransformationTuples
                             Dim regex As Regex = New Regex(loTransformation.FindRegEx)

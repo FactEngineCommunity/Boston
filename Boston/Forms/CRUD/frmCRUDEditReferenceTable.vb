@@ -323,4 +323,30 @@ Public Class frmCRUDEditReferenceTable
 
     End Sub
 
+    Private Sub ButtonDeleteReferenceTable_Click(sender As Object, e As EventArgs) Handles ButtonDeleteReferenceTable.Click
+
+        Dim lsMessage As String
+
+        Try
+            lsMessage = "Are you sure that you want to permanently delete the Reference Table, " & Me.ComboBox1.SelectedItem.Tag.Name
+
+            If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                Call TableReferenceTable.DeleteReferenceTable(Me.ComboBox1.SelectedItem.Tag.ReferenceTableId)
+                Call tableReferenceField.DeleteReferenceFieldsForReferenceTableById(Me.ComboBox1.SelectedItem.Tag.ReferenceTableId)
+                Call TableReferenceFieldValue.DeleteReferenceFieldValuesForReferenceTableById(Me.ComboBox1.SelectedItem.Tag.ReferenceTableId)
+
+            End If
+
+        Catch ex As Exception
+
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

@@ -11,6 +11,10 @@ Namespace TableReferenceTable
 
             lrReferenceTableId = GetNextReferenceTableId()
 
+            If l_reference_table IsNot Nothing Then
+                lrReferenceTableId = l_reference_table.ReferenceTableId
+            End If
+
             lsSQLQuery = "INSERT INTO ReferenceTable"
             lsSQLQuery &= " VALUES ("
             lsSQLQuery &= lrReferenceTableId & ","
@@ -40,12 +44,21 @@ Namespace TableReferenceTable
 
         Sub DeleteReferenceTable(ByVal lrReferenceTableId As Integer)
 
-            Dim lsSQLQuery As String = ""
+            Try
+                Dim lsSQLQuery As String = ""
 
-            lsSQLQuery = "DELETE FROM ReferenceTable "
-            lsSQLQuery &= " WHERE Confguration_Item_Type_Id = " & lrReferenceTableId
+                lsSQLQuery = "DELETE FROM ReferenceTable "
+                lsSQLQuery &= " WHERE reference_table_id = " & lrReferenceTableId
 
-            pdbConnection.Execute(lsSQLQuery)
+                pdbConnection.Execute(lsSQLQuery)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

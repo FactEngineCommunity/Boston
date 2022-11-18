@@ -933,7 +933,20 @@ FinalCleanup:
                               FEQL.pcenumFEQLComparitor.Carret
                         Return " = "
                     Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
-                        Return " LIKE "
+
+                        If prApplication.WorkingModel.DatabaseConnection IsNot Nothing Then
+
+                            Select Case prApplication.WorkingModel.TargetDatabaseType
+                                Case Is = pcenumDatabaseType.Neo4j
+                                    Return " =~ "
+                                Case Else
+                                    Return " LIKE "
+                            End Select
+
+                        Else
+                            Return " LIKE "
+                        End If
+
                 End Select
 
 
