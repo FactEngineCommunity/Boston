@@ -500,30 +500,75 @@ Public Class frmToolboxTableData
 
     Private Sub AdvancedDataGridView_FilterStringChanged(sender As Object, e As EventArgs) Handles AdvancedDataGridView.FilterStringChanged
 
-        Dim lsSQLQuery As String
+        Dim lsSQLQuery As String = ""
 
         Try
             If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
             Else
                 If Me.mrTable Is Nothing Then
                 Else
-                    lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j
+                            lsSQLQuery = "MATCH (" & LCase(mrTable.Name) & ":" & mrTable.DatabaseName & ")" & vbCrLf
 
-                    For liInd = 0 To Me.mrTable.Column.Count - 1
-                        For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
-                            If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
-                                Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                            For liInd = 0 To Me.mrTable.Column.Count - 1
+                                For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                                    If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                                    End If
+                                Next
+                            Next
+
+                            Dim lsFilterString As String = Me.AdvancedDataGridView.FilterString
+
+                            For Each lrColumn In Me.mrTable.Column
+                                lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(Me.mrTable.Name) & "." & lrColumn.Name)
+                            Next
+
+                            'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                            lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
+                            lsFilterString = lsFilterString.Replace("%", ".*")
+                            lsFilterString = lsFilterString.Replace("LIKE", "=~")
+                            Try
+                                lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
+                            Catch ex As Exception
+                                'Not a biggie at this stage.
+                            End Try
+
+                            'WHERE Clause                    
+                            If Trim(lsFilterString) <> "" Then
+                                lsSQLQuery &= " WHERE " & lsFilterString
                             End If
-                        Next
-                    Next
+                            Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                            lsSQLQuery &= vbCrLf & "RETURN " & lsColumnList
+                            lsSQLQuery &= vbCrLf & " LIMIT 100"
 
-                    Dim lsFilterString As String
-                    lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
-                    'WHERE Clause                    
-                    If Trim(lsFilterString) <> "" Then
-                        lsSQLQuery &= " WHERE " & lsFilterString
-                    End If
-                    lsSQLQuery &= vbCrLf & " LIMIT 100"
+                        Case Is = pcenumDatabaseType.SQLite,
+                                  pcenumDatabaseType.SQLServer,
+                                  pcenumDatabaseType.ORACLE,
+                                  pcenumDatabaseType.ODBC
+#Region "SQL"
+                            lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+
+                            For liInd = 0 To Me.mrTable.Column.Count - 1
+                                For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                                    If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                                    End If
+                                Next
+                            Next
+
+                            Dim lsFilterString As String
+                            lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                            'WHERE Clause                    
+                            If Trim(lsFilterString) <> "" Then
+                                lsSQLQuery &= " WHERE " & lsFilterString
+                            End If
+
+                            lsSQLQuery &= vbCrLf & "LIMIT 100"
+#End Region
+
+                    End Select
 
                     Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
