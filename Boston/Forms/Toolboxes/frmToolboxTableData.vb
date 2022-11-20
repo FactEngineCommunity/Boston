@@ -34,6 +34,10 @@ Public Class frmToolboxTableData
                 If Me.mrTable Is Nothing Then
                 Else
                     Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j
+                            lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+                            Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                            lsSQLQuery &= "RETURN " & lsColumnList & ";"
                         Case Is = pcenumDatabaseType.TypeDB
                             lsSQLQuery = "match $table isa " & mrTable.DatabaseName
                             For Each lrColumn In Me.mrTable.Column

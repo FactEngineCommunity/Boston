@@ -19,11 +19,20 @@ Namespace ORMQL
 
             Me.DynamicClass = New DynamicClassLibrary.Factory.tClass
             For Each lsColumn In Me.mrRecordset.Columns
+
+                Dim lsColumnName As String
+                Try
+                    lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                Catch ex As Exception
+                    lsColumnName = lsColumn
+                End Try
+
+
                 Select Case lsColumn
                     Case Is = "Date"
-                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("[" & lsColumn & "]", GetType(String)))
+                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("[" & lsColumnName & "]", GetType(String)))
                     Case Else
-                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsColumn, GetType(String)))
+                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsColumnName, GetType(String)))
                 End Select
             Next
             Me.DynamicObject = Me.DynamicClass.clone()
@@ -91,10 +100,19 @@ Namespace ORMQL
                     Dim lsDataAsString As String
 
                     For Each lrData In Me.mrRecordset.Facts(index).Data
-                        Dim lsString = Me.mrRecordset.Columns(liInd)
-                        Dim piInstance As PropertyInfo = Me.DynamicObject.GetType.GetProperty(lsString)
 
-                        Select Case Me.mrTable.Column.Find(Function(x) x.Name = lsString).getMetamodelDataType
+                        Dim lsColumn As String = Me.mrRecordset.Columns(liInd)
+                        Dim lsColumnName As String
+                        Try
+                            lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                        Catch ex As Exception
+                            lsColumnName = lsColumn
+                        End Try
+
+                        'Dim lsString = Me.mrRecordset.Columns(liInd)
+                        Dim piInstance As PropertyInfo = Me.DynamicObject.GetType.GetProperty(lsColumnName)
+
+                        Select Case Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName).getMetamodelDataType 'Was lsString
                             Case Is = pcenumORMDataType.TemporalDate,
                                       pcenumORMDataType.TemporalDateAndTime
                                 Try

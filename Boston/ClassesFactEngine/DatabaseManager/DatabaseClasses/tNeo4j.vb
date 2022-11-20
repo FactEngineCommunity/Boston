@@ -2,6 +2,7 @@
 Imports System.Data.SQLite
 Imports System.Reflection
 Imports System.Threading.Tasks
+Imports Neo4j
 Imports Neo4j.Driver
 
 Namespace FactEngine
@@ -983,72 +984,88 @@ Namespace FactEngine
                 Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
                 Dim lrFact As FBM.Fact
 
+#Region "New Code"
+
                 '=====================================================
                 'Works for: MATCH (p:Person)-[r:ACTED_IN]-(m:Movie {title:"The Matrix"}) RETURN p.name, m.title
                 'NB Neo4j is case sensitive.
-                Dim loResult = Me._driver.Session.ReadTransaction(Function(tx)
-                                                                      Dim result = tx.Run(asQuery)
-                                                                      Return result.ToList
-                                                                  End Function)
 
+                ' this will auto set the query type for you, this method can handle both Read/Write queries
+                Dim loResult As IResult = Me._driver.Session.Run(asQuery)
 
-
-                If loResult.Count > 0 Then
+                ' Just peek to check if any value available.
+                ' Getting count here will consume all the records
+                ' Use loResult.ToList() if you need all the record in separate list
+                If loResult.Peek() IsNot Nothing Then
 
                     '==================================================================
                     'Column Names   
                     Dim lsColumnName As String
-                    For liFieldInd = 0 To loResult(0).Keys.Count - 1
-                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
+                    For Each liFieldInd In loResult.Keys
+                        lsColumnName = liFieldInd
+                        '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
                         Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
                         lrFactType.RoleGroup.AddUnique(lrRole)
                         lrRecordset.Columns.Add(lsColumnName)
                     Next
                     '==================================================================
-                    For Each lrResult In loResult
+
+                    ' looping each record will consume the record from list
+                    ' consumed record will be removed from the list
+                    For Each lrRecord In loResult
 
                         lrFact = New FBM.Fact(lrFactType, False)
                         Dim loFieldValue As Object = Nothing
                         Dim liInd As Integer
-                        For liInd = 0 To loResult(0).Keys.Count - 1
+                        For liInd = 0 To lrRecord.Keys.Count - 1
 
-                            If lrResult.Values(loResult(0).Keys(liInd)) Is Nothing Then
+                            loFieldValue = lrRecord.Values(loResult.Keys(liInd))
+                            If loFieldValue Is Nothing Then
                                 loFieldValue = "NULL"
                                 GoTo AddFactData
                             End If
-                            Select Case lrResult.Values(loResult(0).Keys(liInd)).GetType '.GetFieldType(liInd)
-                                Case Is = GetType(String)
-                                    If Not Viev.NullVal(lrResult.Values(loResult(0).Keys(liInd)), "") = "" Then
-                                        loFieldValue = lrResult.Values(loResult(0).Keys(liInd))
+
+                            Select Case True
+
+                                Case TypeOf loFieldValue Is String
+                                    If Not NullVal(lrRecord.Values(loResult.Keys(liInd)), "") = "" Then
+                                        loFieldValue = lrRecord.Values(loResult.Keys(liInd))
                                     Else
                                         loFieldValue = ""
                                     End If
-                                Case Is = GetType(DateTime)
-                                    '                Try
-                                    '                    loFieldValue = lrSQLiteDataReader.GetDateTime(liInd).ToString(Me.DateTimeFormat)
-                                    '                Catch ex As Exception
-                                    '                    Try
-                                    '                        loFieldValue = lrSQLiteDataReader.GetValue(liInd)
-                                    '                    Catch ex1 As Exception
-                                    '                        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
-                                    '                        loFieldValue = lrSQLiteDataReader.GetString(liInd)
-                                    '                    End Try
-                                    '                End Try
+
+                                Case TypeOf loFieldValue Is Neo4j.Driver.IRelationship
+                                    ' cast the object to relationship interface
+                                    Dim loRelationship As Neo4j.Driver.IRelationship = loFieldValue
+                                    ' find the relational nodes
+                                    Dim lsFirst = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.StartNodeId).Value.Labels(0) ' StartNodeElementId
+                                    Dim lsLast = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.EndNodeId).Value.Labels(0) 'EndNodeElementId
+                                    ' build relationship string
+                                    loFieldValue = $"{lsFirst}-{loRelationship.Type}->{lsLast}"
+                                    Exit Select
+
+                                Case TypeOf loFieldValue Is INode
+                                    ' cast the object to Node interface
+                                    Dim loNode As INode = loFieldValue
+                                    loFieldValue = loNode.ToString()
+                                    Exit Select
+
                                 Case Else
-                                    '                Try
-                                    '                    loFieldValue = lrSQLiteDataReader.GetValue(liInd)
-                                    '                Catch ex As Exception
-                                    '                    'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
-                                    '                    loFieldValue = lrSQLiteDataReader.GetString(liInd)
-                                    '                End Try
-                                    loFieldValue = lrResult.Values(loResult(0).Keys(liInd))
+                                    '    Try
+                                    '        loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                                    '    Catch ex As Exception
+                                    '        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
+                                    '        loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                                    '    End Try
+                                    loFieldValue = lrRecord.Values(loResult.Keys(liInd))
                             End Select
 
+                            ' check 
 AddFactData:
                             Try
                                 lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
                                 '=====================================================
-                            Catch
+                            Catch ex As Exception
                                 Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
                             End Try
                         Next
@@ -1065,6 +1082,93 @@ AddFactData:
 FinishedProcessing:
 
                 lrRecordset.Facts = larFact
+
+#End Region
+
+#Region "Old Code"
+                '                '=====================================================
+                '                'Works for: MATCH (p:Person)-[r:ACTED_IN]-(m:Movie {title:"The Matrix"}) RETURN p.name, m.title
+                '                'NB Neo4j is case sensitive.
+                '                Dim loResult = Me._driver.Session.ReadTransaction(Function(tx)
+                '                                                                      Dim result = tx.Run(asQuery)
+                '                                                                      Return result.ToList
+                '                                                                  End Function)
+
+
+
+                '                If loResult.Count > 0 Then
+
+                '                    '==================================================================
+                '                    'Column Names   
+                '                    Dim lsColumnName As String
+                '                    For liFieldInd = 0 To loResult(0).Keys.Count - 1
+                '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
+                '                        Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+                '                        lrFactType.RoleGroup.AddUnique(lrRole)
+                '                        lrRecordset.Columns.Add(lsColumnName)
+                '                    Next
+                '                    '==================================================================
+                '                    For Each lrResult In loResult
+
+                '                        lrFact = New FBM.Fact(lrFactType, False)
+                '                        Dim loFieldValue As Object = Nothing
+                '                        Dim liInd As Integer
+                '                        For liInd = 0 To loResult(0).Keys.Count - 1
+
+                '                            If lrResult.Values(loResult(0).Keys(liInd)) Is Nothing Then
+                '                                loFieldValue = "NULL"
+                '                                GoTo AddFactData
+                '                            End If
+                '                            Select Case lrResult.Values(loResult(0).Keys(liInd)).GetType '.GetFieldType(liInd)
+                '                                Case Is = GetType(String)
+                '                                    If Not Viev.NullVal(lrResult.Values(loResult(0).Keys(liInd)), "") = "" Then
+                '                                        loFieldValue = lrResult.Values(loResult(0).Keys(liInd))
+                '                                    Else
+                '                                        loFieldValue = ""
+                '                                    End If
+                '                                Case Is = GetType(DateTime)
+                '                                    '                Try
+                '                                    '                    loFieldValue = lrSQLiteDataReader.GetDateTime(liInd).ToString(Me.DateTimeFormat)
+                '                                    '                Catch ex As Exception
+                '                                    '                    Try
+                '                                    '                        loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                '                                    '                    Catch ex1 As Exception
+                '                                    '                        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
+                '                                    '                        loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                '                                    '                    End Try
+                '                                    '                End Try
+                '                                Case Else
+                '                                    '                Try
+                '                                    '                    loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                '                                    '                Catch ex As Exception
+                '                                    '                    'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
+                '                                    '                    loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                '                                    '                End Try
+                '                                    loFieldValue = lrResult.Values(loResult(0).Keys(liInd))
+                '                            End Select
+
+                'AddFactData:
+                '                            Try
+                '                                lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
+                '                                '=====================================================
+                '                            Catch
+                '                                Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
+                '                            End Try
+                '                        Next
+
+                '                        larFact.Add(lrFact)
+
+                '                        If larFact.Count = Me.DefaultQueryLimit Then
+                '                            lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
+                '                            GoTo FinishedProcessing
+                '                        End If
+
+                '                    Next
+                '                End If
+                'FinishedProcessing:
+
+                '                lrRecordset.Facts = larFact
+#End Region
 
                 'Run the SQL against the database
                 Return lrRecordset
