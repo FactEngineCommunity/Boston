@@ -93,6 +93,8 @@ Public Class frmToolboxTableData
 
     Private Sub ToolStripButtonCommit_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCommit.Click
 
+        Dim lsMessage As String
+
         Try
             'Finalise Editing
             If Me.AdvancedDataGridView.IsCurrentCellInEditMode Then
@@ -105,36 +107,72 @@ Public Class frmToolboxTableData
                                       Where Fact.IsNewFact
                                       Select Fact
 
-            Dim lsSQLQuery As String
-            For Each lrFact In larNewModifiedFacts
-                lsSQLQuery = "INSERT INTO " & Me.mrTable.Name & "("
-                Dim liInd = 0
-                Dim lrColumn As RDS.Column
-                Dim larColumn As New List(Of RDS.Column)
-                For Each lsColumn In Me.mrRecordset.Columns
-                    If liInd > 0 Then lsSQLQuery &= ","
-                    lsSQLQuery &= lsColumn
-                    lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = lsColumn)
-                    larColumn.Add(lrColumn)
-                    liInd += 1
-                Next
-                lsSQLQuery &= ") VALUES ("
-                liInd = 0
-                For Each lsColumn In Me.mrRecordset.Columns
-                    If liInd > 0 Then lsSQLQuery &= ","
-                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
-                    Select Case larColumn(liInd).getMetamodelDataType
-                        Case Is = pcenumORMDataType.TemporalDate,
-                                  pcenumORMDataType.TemporalDateAndTime
-                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
-                        Case Else
-                            lsSQLQuery &= lrFact.Data(liInd).Data
-                    End Select
+            Dim lsSQLQuery As String = Nothing
+            Dim liInd = 0
 
-                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
-                    liInd += 1
-                Next
-                lsSQLQuery &= ")"
+            For Each lrFact In larNewModifiedFacts
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.SQLite,
+                              pcenumDatabaseType.PostgreSQL,
+                              pcenumDatabaseType.SQLServer,
+                              pcenumDatabaseType.ODBC
+#Region "SQL"
+                        lsSQLQuery = "INSERT INTO " & Me.mrTable.Name & "("
+
+                        Dim lrColumn As RDS.Column
+                        Dim larColumn As New List(Of RDS.Column)
+                        For Each lsColumn In Me.mrRecordset.Columns
+                            If liInd > 0 Then lsSQLQuery &= ","
+                            lsSQLQuery &= lsColumn
+                            lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = lsColumn)
+                            larColumn.Add(lrColumn)
+                            liInd += 1
+                        Next
+                        lsSQLQuery &= ") VALUES ("
+                        liInd = 0
+                        For Each lsColumn In Me.mrRecordset.Columns
+                            If liInd > 0 Then lsSQLQuery &= ","
+                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                            Select Case larColumn(liInd).getMetamodelDataType
+                                Case Is = pcenumORMDataType.TemporalDate,
+                                  pcenumORMDataType.TemporalDateAndTime
+                                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
+                                Case Else
+                                    lsSQLQuery &= lrFact.Data(liInd).Data
+                            End Select
+
+                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                            liInd += 1
+                        Next
+                        lsSQLQuery &= ")"
+#End Region
+                    Case Is = pcenumDatabaseType.Neo4j
+#Region "Cypher"
+                        lsSQLQuery = "CREATE (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
+
+                        liInd = 0
+                        For Each lrColumn In Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey)
+                            If liInd > 0 Then lsSQLQuery &= ","
+                            lsSQLQuery &= lrColumn.Name & ":"
+                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                            Select Case lrColumn.getMetamodelDataType
+                                Case Is = pcenumORMDataType.TemporalDate,
+                                  pcenumORMDataType.TemporalDateAndTime
+                                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
+                                Case Else
+                                    lsSQLQuery &= lrFact.Data(liInd).Data
+                            End Select
+
+                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                            liInd += 1
+                        Next
+
+                        lsSQLQuery &= "})"
+#End Region
+                    Case Else
+                        lsMessage = "Cannot create records for the database type, " & Me.mrModel.TargetDatabaseType.ToString
+                        Exit Sub
+                End Select
 
                 Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
 
@@ -149,7 +187,6 @@ Public Class frmToolboxTableData
             Next
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -227,8 +264,25 @@ Public Class frmToolboxTableData
 
     Private Sub AdvancedDataGridView1_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles AdvancedDataGridView.CellEndEdit
 
+        Dim lsMessage As String
+
         Try
-            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(e.ColumnIndex))
+            Dim lsColumnName As String
+
+            Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
+
+            Select Case Me.mrModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.Neo4j
+                    Try
+                        lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                    Catch ex As Exception
+                        lsColumnName = lsColumn
+                    End Try
+                Case Else
+                    lsColumnName = lsColumn
+            End Select
+
+            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName)
 
             Select Case lrColumn.getMetamodelDataType
                 Case Is = pcenumORMDataType.TemporalDate,
@@ -243,16 +297,28 @@ Public Class frmToolboxTableData
 
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
-            Dim larPKColumn As List(Of RDS.Column) = Me.mrTable.getPrimaryKeyColumns
+            Dim larPKColumn As List(Of RDS.Column)
+            '= Me.mrTable.getPrimaryKeyColumns
+            Select Case Me.mrModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.Neo4j
+                    larPKColumn = Me.mrTable.getFirstUniquenessConstraintColumns
+                Case Else
+                    larPKColumn = Me.mrTable.getPrimaryKeyColumns
+            End Select
+
+            If larPKColumn.Count = 0 Then
+                lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
+            End If
 
             Dim liColumnIndex As Integer
             Dim lsValue As String
             For Each lrPKColumn In larPKColumn
                 liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
-                If lrPKColumn.Name = Me.mrRecordset.Columns(e.ColumnIndex) Then
+                If lrPKColumn.Name = lsColumnName Then 'Me.mrRecordset.Columns(e.ColumnIndex) 
                     lsValue = lsOldValue
                 Else
-                    lsValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liColumnIndex)).Data
+                    lsValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data 'Me.mrRecordset.Columns(liColumnIndex)
                 End If
 
                 lrPKColumn.TemporaryData = lsValue
@@ -271,7 +337,6 @@ Public Class frmToolboxTableData
             End If
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -338,8 +403,11 @@ Public Class frmToolboxTableData
             lrFact.Id = System.Guid.NewGuid.ToString
             lrFact.IsNewFact = True
 
+            Dim liInd As Integer = 0
+
             For liInd = 0 To Me.mrTable.Column.Count - 1
 
+                'findall(Function(x) Not x.FactType.IsDerived) '20221120-VM-Might need this going forward
                 Dim lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(liInd))
 
                 If lrColumn IsNot Nothing Then

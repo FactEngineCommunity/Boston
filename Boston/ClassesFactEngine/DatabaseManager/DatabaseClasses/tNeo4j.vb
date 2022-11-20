@@ -1541,18 +1541,22 @@ FinishedProcessing:
 
             Dim lsSQLQuery As String
 
-            lsSQLQuery = "UPDATE " & asTableName & vbCrLf
-            lsSQLQuery &= " SET " & arColumn.Name & " = " & vbCrLf
-            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "")
-            lsSQLQuery &= asNewValue
-            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "") & vbCrLf
-            lsSQLQuery &= " WHERE "
+            lsSQLQuery = "MATCH (" & LCase(asTableName) & ":" & asTableName & "{" & vbCrLf
+
             For Each lrColumn In aarPKColumn
-                lsSQLQuery &= lrColumn.Name & " = "
+                lsSQLQuery &= lrColumn.Name & ": "
                 lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                 lsSQLQuery &= lrColumn.TemporaryData
                 lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
             Next
+            lsSQLQuery &= " }"
+
+            lsSQLQuery &= " SET " & LCase(asTableName) & "." & arColumn.Name & " = " & vbCrLf
+            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "")
+            lsSQLQuery &= asNewValue
+            lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "") & vbCrLf
+
+            lsSQLQuery &= "RETURN " & LCase(asTableName)
 
             Dim lrRecordset = Me.GO(lsSQLQuery)
 
