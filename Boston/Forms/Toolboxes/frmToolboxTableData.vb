@@ -54,6 +54,22 @@ Public Class frmToolboxTableData
 
                     Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
+                    If Me.mrRecordset.Facts.Count = 0 Then
+                        Select Case Me.mrModel.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.Neo4j
+                                Dim larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+
+                                For Each lrColumn In larColumn
+                                    Me.mrRecordset.Columns.Add(LCase(mrTable.DatabaseName) & "." & lrColumn.Name)
+                                Next
+
+                            Case Is = pcenumDatabaseType.TypeDB
+                                'N/A
+                            Case Else
+                                'N/A
+                        End Select
+                    End If
+
                     Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
                     'Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
                     Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
@@ -363,17 +379,49 @@ Public Class frmToolboxTableData
                         '20210608-VM-Put in code here to remove the record from the database
                         '=========================================================================
                         Dim lsSQLQuery As String = ""
-                        lsSQLQuery.AppendString("DELETE FROM " & Me.mrTable.Name & vbCrLf & " WHERE ")
-                        Dim liInd = 0
-                        For Each lrColumn In Me.mrTable.getPrimaryKeyColumns
-                            If liInd > 0 Then lsSQLQuery &= " AND "
-                            lsSQLQuery.AppendString(lrColumn.Name & " = ")
-                            Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
-                            lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
-                            lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
-                            lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
-                            liInd += 1
-                        Next
+
+                        Select Case Me.mrModel.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.Neo4j
+                                lsSQLQuery = "MATCH (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
+
+                                Dim larPKColumn As List(Of RDS.Column)
+
+                                larPKColumn = Me.mrTable.getFirstUniquenessConstraintColumns
+
+                                Dim liInd = 0
+                                For Each lrColumn In larPKColumn
+
+                                    If liInd > 0 Then lsSQLQuery &= ", "
+
+                                    lsSQLQuery &= lrColumn.Name & ": "
+
+                                    Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(LCase(Me.mrTable.Name) & "." & lrColumn.Name)
+                                    lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                                    lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
+                                    lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                                    liInd += 1
+                                Next
+
+                                lsSQLQuery &= "})" & vbCrLf
+                                lsSQLQuery &= "DELETE " & LCase(Me.mrTable.Name)
+
+
+                            Case Is = pcenumDatabaseType.TypeDB
+                                Throw New NotImplementedException("Not implemented for TypeDB.")
+                            Case Else
+                                lsSQLQuery.AppendString("DELETE FROM " & Me.mrTable.Name & vbCrLf & " WHERE ")
+                                Dim liInd = 0
+                                For Each lrColumn In Me.mrTable.getPrimaryKeyColumns
+                                    If liInd > 0 Then lsSQLQuery &= " AND "
+                                    lsSQLQuery.AppendString(lrColumn.Name & " = ")
+                                    Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
+                                    lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                                    lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
+                                    lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
+                                    liInd += 1
+                                Next
+                        End Select
+
                         Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsSQLQuery)
                         '=========================================================================
                         'Remove the Fact
@@ -404,14 +452,26 @@ Public Class frmToolboxTableData
             lrFact.IsNewFact = True
 
             Dim liInd As Integer = 0
+            Dim larColumn As List(Of RDS.Column)
 
-            For liInd = 0 To Me.mrTable.Column.Count - 1
+            Select Case Me.mrModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.Neo4j
+                    larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                Case Else
+                    larColumn = Me.mrTable.Column.ToList
+            End Select
 
-                'findall(Function(x) Not x.FactType.IsDerived) '20221120-VM-Might need this going forward
-                Dim lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = Me.mrRecordset.Columns(liInd))
+            For Each lrColumn In larColumn
+
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.Neo4j
+                        lrColumn.TemporaryData = LCase(Me.mrTable.Name) & "." & lrColumn.Name
+                    Case Else
+                        lrColumn.TemporaryData = lrColumn.Name
+                End Select
 
                 If lrColumn IsNot Nothing Then
-                    Dim lrRole = New FBM.Role(lrDummyFactType, lrColumn.Name, True, Nothing)
+                    Dim lrRole = New FBM.Role(lrDummyFactType, lrColumn.TemporaryData, True, Nothing)
                     lrDummyFactType.RoleGroup.AddUnique(lrRole)
                     Dim lrFactData = New FBM.FactData(lrRole, New FBM.Concept(""), lrFact)
                     lrFactData.setData("", pcenumConceptType.Value, False)

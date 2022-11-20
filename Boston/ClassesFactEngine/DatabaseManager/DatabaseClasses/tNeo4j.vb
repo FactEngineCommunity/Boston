@@ -1188,25 +1188,7 @@ FinishedProcessing:
             Try
                 lrRecordset.Query = asSQLQuery
 
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-
-                If lrSQLiteConnection Is Nothing Then
-                    Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
-                End If
-
-
-                Using cmd As New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
-                    cmd.CommandText = asSQLQuery
-                    cmd.Prepare()
-
-                    Try
-                        result = cmd.ExecuteNonQuery()
-                    Catch SQLiteException As System.Data.SQLite.SQLiteException
-                        Throw New Exception(SQLiteException.Message)
-                    End Try
-                End Using
-
-                lrSQLiteConnection.Close()
+                Dim loResult As IResult = Me._driver.Session.Run(asSQLQuery)
 
                 Return lrRecordset
 
@@ -1549,7 +1531,7 @@ FinishedProcessing:
                 lsSQLQuery &= lrColumn.TemporaryData
                 lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "") & vbCrLf
             Next
-            lsSQLQuery &= " }"
+            lsSQLQuery &= " })"
 
             lsSQLQuery &= " SET " & LCase(asTableName) & "." & arColumn.Name & " = " & vbCrLf
             lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsText, "'", "")
