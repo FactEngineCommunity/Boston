@@ -686,6 +686,7 @@ SkipRegistrationChecking:
             End If
             If My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
+                Me.ToolStripMenuItemLogInAs.Visible = True
             End If
 
             '-------------------------------------------------------------------------------------------------------
@@ -739,6 +740,8 @@ SkipRegistrationChecking:
                 If Not prApplication.User.Function.Contains(pcenumFunction.CreateUser) Then
                     Me.ToolStripMenuItemAddUser.Visible = False
                 End If
+
+                Me.ToolStripMenuItemLogInAs.Enabled = prApplication.User.IsSuperuser
 
                 'Group 
                 If Not prApplication.User.Function.Contains(pcenumFunction.CreateGroup) Then
@@ -3227,23 +3230,68 @@ SaveModel:
     Private Sub SaveAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveAllToolStripMenuItem.Click
 
         Dim lr_tree_node As TreeNode
-        'Dim lr_tree_node_model As TreeNode
         Dim lr_model As FBM.Model
 
-        Using lrWaitCursor As New WaitCursor
-            For Each lr_tree_node In Me.zfrmModelExplorer.TreeView.Nodes(0).Nodes
-                'For Each lr_tree_node_model In lr_tree_node.Nodes
-                If IsSomething(lr_tree_node.Tag.Tag) Then
-                    lr_model = lr_tree_node.Tag.Tag
-                    If lr_model.Loaded And lr_model.IsDirty Then
-                        Call lr_model.Save()
-                    End If
-                End If
-                'Next
-            Next
-        End Using
+        'CodeSafe
+        If Me.zfrmModelExplorer Is Nothing Then Exit Sub
 
-        Me.ToolStripButton_Save.Enabled = False
+        Try
+
+            Using lrWaitCursor As New WaitCursor
+                For Each lr_tree_node In Me.zfrmModelExplorer.TreeView.Nodes(0).Nodes
+                    If IsSomething(lr_tree_node.Tag.Tag) Then
+                        lr_model = lr_tree_node.Tag.Tag
+                        If lr_model.Loaded And lr_model.IsDirty Then
+                            Call lr_model.Save()
+                        End If
+                    End If
+                Next
+            End Using
+
+            Me.ToolStripButton_Save.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SaveAllModels()
+
+        Dim lr_tree_node As TreeNode
+        Dim lr_model As FBM.Model
+
+        'CodeSafe
+        If Me.zfrmModelExplorer Is Nothing Then Exit Sub
+
+        Try
+
+            Using lrWaitCursor As New WaitCursor
+                For Each lr_tree_node In Me.zfrmModelExplorer.TreeView.Nodes(0).Nodes
+                    If IsSomething(lr_tree_node.Tag.Tag) Then
+                        lr_model = lr_tree_node.Tag.Tag
+                        If lr_model.Loaded And lr_model.IsDirty Then
+                            Call lr_model.Save()
+                        End If
+                    End If
+                Next
+            End Using
+
+            Me.ToolStripButton_Save.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -5722,4 +5770,58 @@ SaveModel:
 
     End Sub
 
+    Private Sub ToolStripMenuItemLogInAs_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemLogInAs.Click
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection()
+            Dim lrUser As New ClientServer.User
+
+            Dim lsWhereClause As String = ""
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "User",
+                                               "ClientServerUser",
+                                               "FirstName & ' ' & LastName AS Name, Username",
+                                               "Username",
+                                               lsWhereClause,
+                                               Nothing,
+                                               pcenumComboBoxStyle.DropdownList,
+                                               "1,2",
+                                               2,
+                                               "120;120",
+                                               "Name,Username") = Windows.Forms.DialogResult.OK Then
+
+
+                lrUser.Username = lrGenericSelection.SelectValue
+                Call tableClientServerUser.getUserDetailsByUsername(lrUser.Username, lrUser)
+
+                If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
+
+                    prApplication.User = lrUser
+
+                    Call Me.SaveAllModels()
+
+                    If Me.zfrmModelExplorer IsNot Nothing Then
+                        Call Me.zfrmModelExplorer.Close()
+                    End If
+
+                    Call Me.logInUser(lrUser)
+                    Call Me.SetupForm()
+
+                End If
+
+
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

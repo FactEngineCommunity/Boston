@@ -159,6 +159,7 @@ Partial Class frmMain
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorkerStatusBar = New System.ComponentModel.BackgroundWorker()
+        Me.ToolStripMenuItemLogInAs = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -177,7 +178,7 @@ Partial Class frmMain
         '
         'mnu_Session
         '
-        Me.mnu_Session.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveToolStripMenuItem, Me.SaveAllToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItemNewModel, Me.ToolStripMenuItem2, Me.ToolStripSeparator5, Me.ToolStripMenuItemRecentNodes, Me.ToolStripSeparator11, Me.ToolStripMenuItemLogIn, Me.ToolStripMenuItemLogOut, Me.ToolStripSeparator6, Me.mnuOption_EndSession})
+        Me.mnu_Session.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveToolStripMenuItem, Me.SaveAllToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItemNewModel, Me.ToolStripMenuItem2, Me.ToolStripSeparator5, Me.ToolStripMenuItemRecentNodes, Me.ToolStripSeparator11, Me.ToolStripMenuItemLogIn, Me.ToolStripMenuItemLogInAs, Me.ToolStripMenuItemLogOut, Me.ToolStripSeparator6, Me.mnuOption_EndSession})
         Me.mnu_Session.Name = "mnu_Session"
         Me.mnu_Session.Size = New System.Drawing.Size(58, 22)
         Me.mnu_Session.Text = "&Session"
@@ -976,6 +977,13 @@ Partial Class frmMain
         '
         Me.BackgroundWorkerStatusBar.WorkerReportsProgress = True
         '
+        'ToolStripMenuItemLogInAs
+        '
+        Me.ToolStripMenuItemLogInAs.Name = "ToolStripMenuItemLogInAs"
+        Me.ToolStripMenuItemLogInAs.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemLogInAs.Text = "Log in a&s ..."
+        Me.ToolStripMenuItemLogInAs.Visible = False
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1124,4 +1132,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripMenuItemEditConfigurationData As ToolStripMenuItem
     Friend WithEvents BroadcastMessageToUsersToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorkerStatusBar As System.ComponentModel.BackgroundWorker
+    Friend WithEvents ToolStripMenuItemLogInAs As ToolStripMenuItem
 End Class
