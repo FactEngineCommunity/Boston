@@ -83,14 +83,13 @@ Namespace NORMA
     Partial Public Class ORMModelConstraints
 
         '''<remarks/>
-
         <XmlElement("ExclusionConstraint", GetType(Model.ExclusionConstraint)),
-            XmlElement("EqualityConstraint", GetType(Model.EqualityConstraintType)),
             XmlElement("FrequencyConstraint", GetType(Model.FrequencyConstraint)),
             XmlElement("MandatoryConstraint", GetType(Model.MandatoryConstraint)),
-            XmlElement("RingConstraint", GetType(Model.RingConstraintType)),
+            XmlElement("RingConstraint", GetType(Model.RingConstraint)),
             XmlElement("SubsetConstraint", GetType(Model.SubsetConstraint)),
-            XmlElement("UniquenessConstraint", GetType(Model.UniquenessConstraint))>
+            XmlElement("UniquenessConstraint", GetType(Model.UniquenessConstraint)),
+            XmlElement("EqualityConstraint", GetType(Model.EqualityConstraint))>
         Public Property Items() As List(Of Object)
 
     End Class

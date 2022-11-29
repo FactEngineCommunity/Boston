@@ -5283,6 +5283,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 Boston.WriteToStatusBar("Converting the Model to the .orm NORMA format")
                 lrNORMADocument = lrFBMModel.MapToNORMAORMModel(New NORMA.ORMDocument, frmMain.BackgroundWorkerStatusBar)
+                Boston.WriteToStatusBar("", True, 0)
 
                 Dim lrSaveFileDialog As New SaveFileDialog()
 
@@ -5290,7 +5291,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lrSaveFileDialog.Filter = "NORMA ORM file (*.orm)|*.orm"
                 lrSaveFileDialog.FilterIndex = 0
-                lrSaveFileDialog.InitialDirectory = Path.GetFullPath("..\..\..\TestOutputNORMAModels-OverwiteFilesHerein")
+                'lrSaveFileDialog.InitialDirectory = Path.GetFullPath("..\..\..\TestOutputNORMAModels-OverwiteFilesHerein")
                 lrSaveFileDialog.FileName = lsFileLocationName
 
                 If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
