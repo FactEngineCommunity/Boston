@@ -50,6 +50,7 @@ Partial Class frmMain
         Me.ToolStripMenuItemRecentNodes = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemLogIn = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemLogInAs = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemLogOut = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
         Me.mnuOption_EndSession = New System.Windows.Forms.ToolStripMenuItem()
@@ -159,7 +160,6 @@ Partial Class frmMain
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorkerStatusBar = New System.ComponentModel.BackgroundWorker()
-        Me.ToolStripMenuItemLogInAs = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -237,6 +237,13 @@ Partial Class frmMain
         Me.ToolStripMenuItemLogIn.Name = "ToolStripMenuItemLogIn"
         Me.ToolStripMenuItemLogIn.Size = New System.Drawing.Size(194, 22)
         Me.ToolStripMenuItemLogIn.Text = "&Log in"
+        '
+        'ToolStripMenuItemLogInAs
+        '
+        Me.ToolStripMenuItemLogInAs.Name = "ToolStripMenuItemLogInAs"
+        Me.ToolStripMenuItemLogInAs.Size = New System.Drawing.Size(194, 22)
+        Me.ToolStripMenuItemLogInAs.Text = "Log in a&s ..."
+        Me.ToolStripMenuItemLogInAs.Visible = False
         '
         'ToolStripMenuItemLogOut
         '
@@ -976,13 +983,6 @@ Partial Class frmMain
         'BackgroundWorkerStatusBar
         '
         Me.BackgroundWorkerStatusBar.WorkerReportsProgress = True
-        '
-        'ToolStripMenuItemLogInAs
-        '
-        Me.ToolStripMenuItemLogInAs.Name = "ToolStripMenuItemLogInAs"
-        Me.ToolStripMenuItemLogInAs.Size = New System.Drawing.Size(194, 22)
-        Me.ToolStripMenuItemLogInAs.Text = "Log in a&s ..."
-        Me.ToolStripMenuItemLogInAs.Visible = False
         '
         'frmMain
         '

@@ -73,9 +73,9 @@ Namespace NORMA
 
         '''<remarks/>
         <XmlElement("Fact", GetType(Model.Fact)),
-         XmlElement("ImpliedFact", GetType(Model.FactsImpliedFact)),
-         XmlElement("SubtypeFact", GetType(Model.ORMModelFactsSubtypeFact))>
-        Public Property Items() As Object()
+         XmlElement("ImpliedFact", GetType(Model.ImpliedFact)),
+         XmlElement("SubtypeFact", GetType(Model.SubtypeFact))>
+        Public Property Items() As New List(Of Object)
 
     End Class
 

@@ -1,4 +1,5 @@
 ﻿Imports System.Xml.Serialization
+Imports FBM_2_nORMa.NORMA.Model.Fact.FactReadingOrder
 
 Namespace NORMA.Model
 
@@ -8,8 +9,16 @@ Namespace NORMA.Model
     Partial Public Class Fact
 
         '''<remarks/>
+        <XmlAttribute(AttributeName:="id")>
+        Public Property Id() As String
+
+        '''<remarks/>
+        <XmlAttribute()>
+        Public Property _Name() As String
+
+        '''<remarks/>
         <XmlArrayItem("Role", IsNullable:=False)>
-        Public Property FactRoles() As List(Of FactRole)
+        Public Property FactRoles() As List(Of NORMA.Model.Fact.FactRole)
 
         '''<remarks/>
         <XmlArrayItem("ReadingOrder", IsNullable:=False)>
@@ -20,14 +29,6 @@ Namespace NORMA.Model
 
         '''<remarks/>
         Public Property DerivationRule() As FactDerivationRule
-
-        '''<remarks/>
-        <XmlAttribute(AttributeName:="id")>
-        Public Property Id() As String
-
-        '''<remarks/>
-        <XmlAttribute()>
-        Public Property _Name() As String
 
         Public Sub New()
         End Sub
@@ -86,7 +87,7 @@ Namespace NORMA.Model
 
                     '''<remarks/>
                     <XmlArrayItem("ValueRange", IsNullable:=False)>
-                    Public Property ValueRanges As New List(Of NORMA.Model.Fact.FactRole.FactRoleValueRestriction.ConstraintValueRangesValueRange)
+                    Public Property ValueRanges() As ConstraintValueRangesValueRange()
 
                     '''<remarks/>
                     <XmlAttribute(AttributeName:="id")>
@@ -95,21 +96,6 @@ Namespace NORMA.Model
                     '''<remarks/>
                     <XmlAttribute()>
                     Public Property Name() As String
-
-                    ''' <summary>
-                    ''' Parameterless Constructor
-                    ''' </summary>
-                    Public Sub New()
-                        Me.Id = "_" & System.Guid.NewGuid.ToString
-                    End Sub
-
-                End Class
-
-                <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
-                Partial Public Class ConstraintValueRanges
-
-                    '''<remarks/>
-                    Public Property ValueRange As New List(Of ConstraintValueRangesValueRange)
 
                 End Class
 
@@ -135,13 +121,6 @@ Namespace NORMA.Model
                     '''<remarks/>
                     <XmlAttribute()>
                     Public Property MaxInclusion() As String
-
-                    ''' <summary>
-                    ''' Parameterless Constructor
-                    ''' </summary>
-                    Public Sub New()
-                        Me.Id = "_" & System.Guid.NewGuid.ToString
-                    End Sub
 
                 End Class
 
@@ -201,7 +180,11 @@ Namespace NORMA.Model
             <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
             Partial Public Class ExpandedData
 
-                Public Property RoleText As New RoleText
+                <XmlElement("RoleText", IsNullable:=False)>
+                Public Property RoleText() As RoleText()
+
+                <XmlAttribute>
+                Public Property FrontText As String
 
             End Class
 
@@ -274,10 +257,10 @@ Namespace NORMA.Model
     End Class
 
     <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
-    Partial Public Class FactsImpliedFact
+    Partial Public Class ImpliedFact
 
         '''<remarks/>
-        Public Property FactRoles() As ImpliedFactRoles
+        Public Overloads Property FactRoles() As ImpliedFactRoles
 
         '''<remarks/>
         <XmlArrayItem("ReadingOrder", IsNullable:=False)>
@@ -297,14 +280,71 @@ Namespace NORMA.Model
         <XmlAttribute()>
         Public Property _Name() As String
 
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal aiId As String, ByVal asName As String)
+            Id = aiId
+            _Name = asName
+        End Sub
+
         <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
         Partial Public Class ImpliedFactRoles
+
+            '''<remarks/>
+            Public Property ObjectifiedUnaryRole() As ImpliedFactObjectifiedUnaryRole
 
             '''<remarks/>
             Public Property RoleProxy() As ImpliedFactRoleProxy
 
             '''<remarks/>
             Public Property Role() As ImpliedFactRole
+
+            <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+            Partial Public Class ImpliedFactObjectifiedUnaryRole
+
+                '''<remarks/>
+                Public Property RolePlayer() As New UnaryRolePlayer
+
+                '''<remarks/>
+                <XmlElement("UnaryRole")>
+                Public Property UnaryRoleRef() As New UnaryRole
+
+                '''<remarks/>
+                <XmlAttribute(AttributeName:="id")>
+                Public Property Id() As String
+
+                '''<remarks/>
+                <XmlAttribute()>
+                Public Property _IsMandatory() As Boolean
+
+                '''<remarks/>
+                <XmlAttribute()>
+                Public Property _Multiplicity() As String
+
+                '''<remarks/>
+                <XmlAttribute()>
+                Public Property Name() As String
+
+                <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+                Partial Public Class UnaryRolePlayer
+
+                    '''<remarks/>
+                    <XmlAttribute(AttributeName:="ref")>
+                    Public Property Ref() As String
+
+                End Class
+
+                <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+                Partial Public Class UnaryRole
+
+                    '''<remarks/>
+                    <XmlAttribute(AttributeName:="ref")>
+                    Public Property Ref() As String
+
+                End Class
+
+            End Class
 
             <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
             Partial Public Class ImpliedFactRoleProxy
@@ -387,12 +427,40 @@ Namespace NORMA.Model
             <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
             Partial Public Class OrderReading
 
-                '''<remarks/>
+                '''<remarks/> 
                 Public Property Data() As String
+
+                Public Property ExpandedData() As ExpandedData
 
                 '''<remarks/>
                 <XmlAttribute(AttributeName:="id")>
                 Public Property Id() As String
+
+
+                Public Sub New()
+
+                    Me.Id = "_" & Guid.NewGuid.ToString.ToUpper
+
+                End Sub
+
+            End Class
+
+            <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+            Partial Public Class ExpandedData
+
+                <XmlElement("RoleText", IsNullable:=False)>
+                Public Property RoleText() As RoleText()
+
+            End Class
+
+            <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+            Partial Public Class RoleText
+
+                <XmlAttribute>
+                Public Property RoleIndex As Integer
+
+                <XmlAttribute>
+                Public Property FollowingText As String
 
             End Class
 
@@ -448,7 +516,7 @@ Namespace NORMA.Model
     End Class
 
     <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
-    Partial Public Class ORMModelFactsSubtypeFact
+    Partial Public Class SubtypeFact
 
         '''<remarks/>
         Public Property FactRoles() As SubtypeFactRoles
@@ -467,6 +535,14 @@ Namespace NORMA.Model
         '''<remarks/>
         <XmlAttribute()>
         Public Property PreferredIdentificationPath() As Boolean
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal aiId As String, ByVal asName As String)
+            Id = aiId
+            _Name = asName
+        End Sub
 
         <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
         Partial Public Class SubtypeFactRoles
@@ -553,7 +629,7 @@ Namespace NORMA.Model
 
             '''<remarks/>
             <XmlElement("UniquenessConstraint")>
-            Public Property UniquenessConstraint() As InternalConstraintsUniquenessConstraint()
+            Public Property UniquenessConstraint() As List(Of InternalConstraintsUniquenessConstraint)
 
         End Class
 

@@ -103,6 +103,9 @@ Namespace NORMA.Model
         Public Property ImpliedByObjectType() As ConstraintImpliedByObjectType
 
         '''<remarks/>
+        Public Property InherentForObjectType() As ConstraintInherentForObjectType
+
+        '''<remarks/>
         <XmlAttribute(AttributeName:="id")>
         Public Property Id() As String
 
@@ -148,6 +151,15 @@ Namespace NORMA.Model
 
         End Class
 
+        <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+        Partial Public Class ConstraintInherentForObjectType
+
+            '''<remarks/>
+            <XmlAttribute(AttributeName:="ref")>
+            Public Property Ref() As String
+
+        End Class
+
     End Class
 
     <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
@@ -185,11 +197,54 @@ Namespace NORMA.Model
     End Class
 
     <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+    Partial Public Class EqualityConstraint
+
+        '''<remarks/>
+        <XmlAttribute(AttributeName:="id")>
+        Public Property Id() As String
+
+        '''<remarks/>
+        <XmlAttribute()>
+        Public Property Name() As String
+
+        '''<remarks/>
+        <XmlArrayItem("RoleSequence", IsNullable:=False)>
+        Public Property RoleSequences() As RoleSequence()
+
+        <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+        Partial Public Class RoleSequence
+
+            '''<remarks/>
+            <XmlElement("Role")>
+            Public Property Role() As Role()
+
+            '''<remarks/>
+            <XmlAttribute(AttributeName:="id")>
+            Public Property Id() As String
+
+        End Class
+
+        <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
+        Partial Public Class Role
+
+            '''<remarks/>
+            <XmlAttribute(AttributeName:="id")>
+            Public Property Id() As String
+
+            '''<remarks/>
+            <XmlAttribute(AttributeName:="ref")>
+            Public Property Ref() As String
+
+        End Class
+
+    End Class
+
+    <XmlType(AnonymousType:=True, [Namespace]:="http://schemas.neumont.edu/ORM/2006-04/ORMCore")>
     Partial Public Class SubsetConstraint
 
         '''<remarks/>
         <XmlArrayItem("RoleSequence", IsNullable:=False)>
-        Public Property RoleSequences As New List(Of ConstraintRoleSequence)
+        Public Property RoleSequences() As ConstraintRoleSequence()
 
         '''<remarks/>
         <XmlAttribute(AttributeName:="id")>
@@ -204,7 +259,7 @@ Namespace NORMA.Model
 
             '''<remarks/>
             <XmlElement("Role")>
-            Public Property Role As New List(Of SequenceRole)
+            Public Property Role() As SequenceRole()
 
             '''<remarks/>
             <XmlAttribute(AttributeName:="id")>
@@ -222,13 +277,6 @@ Namespace NORMA.Model
             '''<remarks/>
             <XmlAttribute(AttributeName:="ref")>
             Public Property Ref() As String
-
-            ''' <summary>
-            ''' Parameterless Constructor
-            ''' </summary>
-            Public Sub New()
-                Me.Id = "_" & System.Guid.NewGuid.ToString
-            End Sub
 
         End Class
 
