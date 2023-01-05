@@ -36,6 +36,8 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "allowzerolength" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_SHORTDESCRIPTION As String = "shortdescription" 'Boston specific. Not part of original Metadrone. The ShortDescription of the JoinedORMObject of the ActiveRole of the Column.
         Public Const VARIABLE_ATTRIBUTE_PREDICATE As String = "predicate" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_CHECKVALUE As String = "checkvalue" 'Boston specific. Not part of original Metadrone.
+        Public Const VARIABLE_ATTRIBUTE_HASCHECKVALUE As String = "hascheckvalue" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_LENGTH As String = "length"
         Public Const VARIABLE_ATTRIBUTE_PRECISION As String = "precision"
         Public Const VARIABLE_ATTRIBUTE_SCALE As String = "scale"
@@ -128,6 +130,7 @@ Namespace Parser.Syntax
         Public Const OBJECT_RELATION As String = "relation" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
         Public Const OBJECT_INCOMINGRELATION As String = "incomingrelation" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
         Public Const OBJECT_INDEX As String = "index" 'Boston specific. Not part of original Metadrone. Used to get individual Indexes for a Table
+        Public Const OBJECT_STRING As String = "string" 'Boston specific. Not part of original Metadrone. Used to get individual RDS.Relations for a Table
         Public Const OBJECT_COLUMN As String = "column"
         Public Const OBJECT_PKCOLUMN As String = "pkcolumn"
         Public Const OBJECT_FKCOLUMN As String = "fkcolumn"
@@ -221,6 +224,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_OBJECT_RELATION As String = "Loop through Relations specific to the Table/Column." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_INCOMINGRELATION As String = "Loop through Incoming Relations specific to the Table/Column." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_INDEX As String = "Loop through Indexes specific to the Table." 'Boston specific. Not in original Metadrone.
+        Friend Shared DOCO_OBJECT_STRING As String = "Loop through Strings specific to a variable." 'Boston specific. Not in original Metadrone.
         Friend Shared DOCO_OBJECT_COLUMN As String = "Loop through columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_PKCOLUMN As String = "Loop through primary key columns in the parent loop's current table/routine iteration."
         Friend Shared DOCO_OBJECT_FKCOLUMN As String = "Loop through foreign key columns in the parent loop's current table/routine iteration."
@@ -257,6 +261,8 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH As String = "Field allows zero length." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION As String = "Short Description of the Model Element for the field." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PREDICATE As String = "A predicate for the Field." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_CHECKVALUE As String = "A list of check values for the Field." 'Boston specific. Not part of original Metadrone.
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_HASCHECKVALUE As String = "True if the count of check values for the Field > 0." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_LENGTH As String = "Length of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PRECISION As String = "Precision of field."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_SCALE As String = "Scale of field."
@@ -349,6 +355,7 @@ Namespace Parser.Syntax
             If StrEq(value, OBJECT_RELATION) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_INCOMINGRELATION) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_INDEX) Then Return True 'Boston specific. Not part of the original Metadrone.
+            If StrEq(value, OBJECT_STRING) Then Return True 'Boston specific. Not part of the original Metadrone.
             If StrEq(value, OBJECT_TABLE) Then Return True
             If StrEq(value, OBJECT_VIEW) Then Return True
             If StrEq(value, OBJECT_COLUMN) Then Return True
@@ -397,6 +404,8 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_SHORTDESCRIPTION) Then Return True 'Boston specific. Not part of original Metadrone. ShortDescription of the JoinedORMObject for the ActiveRole of the Column for a field.
             If StrEq(value, VARIABLE_ATTRIBUTE_PREDICATE) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_CHECKVALUE) Then Return True 'Boston specific. Not part of original Metadrone.
+            If StrEq(value, VARIABLE_ATTRIBUTE_HASCHECKVALUE) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_LENGTH) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PRECISION) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_SCALE) Then Return True

@@ -39,6 +39,7 @@
         Private RelationField As New List(Of RDS.Relation)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
         Private IncomingRelationField As New List(Of RDS.Relation)  'Boston specific. The Incoming Relation to which the Column belongs if this SchemaRow record is for a Column
         Private IndexField As New List(Of RDS.Index)  'Boston specific. The Relation to which the Column belongs if this SchemaRow record is for a Column
+        Private CheckValueField As New List(Of String) 'Boston specific. Value Constraint for Value Type for a Column.        
 
         Public Function GetCopy() As SchemaRow
             Dim schema As New SchemaRow()
@@ -72,6 +73,7 @@
                 .IncomingRelation = Me.IncomingRelation
                 .ShortDescription = Me.ShortDescription
                 .Predicate = Me.Predicate
+                .CheckValue = Me.CheckValue
             End With
             Return schema
         End Function
@@ -123,6 +125,32 @@
             End Get
             Set(ByVal value As String)
                 Me.ColumnIdField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. From ValueConstraint of ValueType for the Column.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CheckValue() As List(Of String)
+            Get
+                Return Me.CheckValueField
+            End Get
+            Set(ByVal value As List(Of String))
+                Me.CheckValueField = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. See CheckValue (above)
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property HasCheckValue() As Boolean
+            Get
+                Return Me.CheckValueField.Count > 0
+            End Get
+            Set(ByVal value As Boolean)
+
             End Set
         End Property
 

@@ -40,15 +40,16 @@ Namespace Parser.Meta.Database
             Me.Connection = Connection
             Me.Transforms = Transforms
 
-            If SchemaRow Is Nothing Then Exit Sub 'Not used for columns on Indexes
+            If SchemaRow Is Nothing Then Exit Sub 'Not used for columns on Indexes            
 
             For Each lrRelation In SchemaRow.Relation
 
                 Try
                     If lrRelation.OriginColumns.FindAll(Function(x) x.Name = Me.Value).Count > 0 Then
-                        For Each lrDestinationColumn In lrRelation.DestinationColumns
-
-                            Dim lsReferencedTableName As String = ""
+                        Dim liIndex As Integer = lrRelation.OriginColumns.IndexOf(lrRelation.OriginColumns.Find(Function(x) x.Name = Me.Value))
+                        'For Each lrDestinationColumn In lrRelation.DestinationColumns '20221202-VM-Was
+                        Dim lrDestinationColumn = lrRelation.DestinationColumns(liIndex)
+                        Dim lsReferencedTableName As String = ""
                             Dim lsOriginRoleName As String = ""
                             Dim lsDestinationRoleName As String = ""
 
@@ -79,10 +80,10 @@ Namespace Parser.Meta.Database
                                                           lsDestinationRoleName,
                                                           lrRelation.ResponsibleFactType.IsLinkFactType))
 
-                        Next
+                        'Next
                     End If
                 Catch ex As Exception
-                    Throw New Exception("Error setting Relation in Column.New")
+                    Throw New Exception("Error setting Relation In Column.New")
                 End Try
             Next
 
@@ -137,6 +138,31 @@ Namespace Parser.Meta.Database
             End Get
             Set(ByVal value As Boolean)
                 Me.SchemaRowVal.AllowZeroLength = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property CheckValue As List(Of String)
+            Get
+                Return Me.SchemaRowVal.CheckValue
+            End Get
+            Set(ByVal value As List(Of String))
+                Me.SchemaRowVal.CheckValue = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Boston specific. Not originally part of Metadrone.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property HasCheckValue As Boolean
+            Get
+                Return Me.SchemaRowVal.CheckValue.Count > 0
+            End Get
+            Set(ByVal value As Boolean)
             End Set
         End Property
 
@@ -305,6 +331,10 @@ Namespace Parser.Meta.Database
                 'set Predicate
                 Me.Predicate = Conv.ToString(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_CHECKVALUE) Then 'Boston Specific
+                'set Predicate
+                Me.CheckValue = value
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'set length
                 Me.Length = Conv.ToInteger(value)
@@ -448,6 +478,16 @@ Namespace Parser.Meta.Database
                     'return Predicate
                     Call Me.CheckParamsForPropertyCall(AttribName, Params)
                     Return Me.Predicate
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_CHECKVALUE) Then 'Boston specific. Not part of original Metadrone.
+                    'return CheckValue
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.CheckValue
+
+                ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_HASCHECKVALUE) Then 'Boston specific. Not part of original Metadrone.
+                    'return HasCheckValue
+                    Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                    Return Me.HasCheckValue
 
                 ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                     'return length

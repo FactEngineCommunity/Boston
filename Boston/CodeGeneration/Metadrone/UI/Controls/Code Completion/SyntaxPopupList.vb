@@ -97,6 +97,7 @@ Namespace UI
                     Me.AddListItem(OBJECT_INDEX, DOCO_OBJECT_INDEX, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN) 'ToDo: Copy OBJECT_COLUMN icon. Boston Specific. Not part of original Meadrone. Used for RDS.Relations
                     Me.AddListItem(OBJECT_RELATION, DOCO_OBJECT_RELATION, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN) 'ToDo: Copy OBJECT_COLUMN icon. Boston Specific. Not part of original Meadrone. Used for RDS.Relations
                     Me.AddListItem(OBJECT_INCOMINGRELATION, DOCO_OBJECT_INCOMINGRELATION, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN) 'ToDo: Copy OBJECT_COLUMN icon. Boston Specific. Not part of original Meadrone. Used for RDS.Relations
+                    Me.AddListItem(OBJECT_STRING, DOCO_OBJECT_STRING, Nothing, SyntaxPopupListItem.Icons.OBJECT_STRING) 'ToDo: Copy OBJECT_COLUMN icon. Boston Specific. Not part of original Meadrone. Introduced for CheckValues (ValueConstraints on Columns)
                     Me.AddListItem(OBJECT_COLUMN, DOCO_OBJECT_COLUMN, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN)
                     Me.AddListItem(OBJECT_IDCOLUMN, DOCO_OBJECT_IDCOLUMN, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN)
                     Me.AddListItem(OBJECT_PKCOLUMN, DOCO_OBJECT_PKCOLUMN, Nothing, SyntaxPopupListItem.Icons.OBJECT_COLUMN)
@@ -399,6 +400,8 @@ Namespace UI
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PREDICATE, DOCO_VARIABLE_ATTRIBUTE_PREDICATE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_CHECKVALUE, DOCO_VARIABLE_ATTRIBUTE_CHECKVALUE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_HASCHECKVALUE, DOCO_VARIABLE_ATTRIBUTE_HASCHECKVALUE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_DATATYPE, DOCO_VARIABLE_ATTRIBUTE_DATATYPE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LENGTH, DOCO_VARIABLE_ATTRIBUTE_LENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRECISION, DOCO_VARIABLE_ATTRIBUTE_PRECISION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
@@ -442,6 +445,8 @@ Namespace UI
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, DOCO_VARIABLE_ATTRIBUTE_ALLOWZEROLENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, DOCO_VARIABLE_ATTRIBUTE_SHORTDESCRIPTION, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PREDICATE, DOCO_VARIABLE_ATTRIBUTE_PREDICATE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_CHECKVALUE, DOCO_VARIABLE_ATTRIBUTE_CHECKVALUE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_HASCHECKVALUE, DOCO_VARIABLE_ATTRIBUTE_HASCHECKVALUE, Nothing, SyntaxPopupListItem.Icons.PROPERTY) 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_DATATYPE, DOCO_VARIABLE_ATTRIBUTE_DATATYPE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_LENGTH, DOCO_VARIABLE_ATTRIBUTE_LENGTH, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRECISION, DOCO_VARIABLE_ATTRIBUTE_PRECISION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)

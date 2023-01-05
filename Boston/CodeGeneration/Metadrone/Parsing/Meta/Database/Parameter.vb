@@ -87,6 +87,15 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
+        Public Property CheckValue() As List(Of String) 'Boston specific. Not part of original Metadrone. A predicate for the Column, from the FactType for the Column and as per ActiveRole/Role of the Column.
+            Get
+                Return Me.SchemaRowVal.CheckValue
+            End Get
+            Set(ByVal value As List(Of String))
+                Me.SchemaRowVal.CheckValue = value
+            End Set
+        End Property
+
         Public Property Value() As Object
             Get
                 Return Me.mValue
@@ -214,6 +223,10 @@ Namespace Parser.Meta.Database
                 'set Predicate
                 Me.Predicate = Conv.ToString(value)
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_CHECKVALUE) Then 'Boston specific. Not part of original Metadrone.
+                'set CheckValue
+                Me.Predicate = value
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'set length
                 Me.Length = Conv.ToInteger(value)
@@ -307,6 +320,11 @@ Namespace Parser.Meta.Database
                 'return Predicate
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Predicate
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_CHECKVALUE) Then 'Boston specific. Not part of original Metadrone.
+                'return CheckValue
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.CheckValue
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_LENGTH) Then
                 'return length

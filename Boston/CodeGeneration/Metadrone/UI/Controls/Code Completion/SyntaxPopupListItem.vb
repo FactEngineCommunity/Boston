@@ -23,6 +23,7 @@
             TEMPLATE = 17
             TEMPLATE_PARAM = 18
             TRANSFORMATION = 19
+            OBJECT_STRING = 10 'Boston Specific.
         End Enum
 
         Public Item As String = Nothing

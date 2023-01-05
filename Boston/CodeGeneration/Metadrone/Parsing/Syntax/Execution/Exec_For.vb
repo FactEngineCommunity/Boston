@@ -62,6 +62,10 @@ Namespace Parser.Syntax
                     'Relation loop
                     Return Me.Process_Index()
 
+                Case SyntaxNode.ExecForEntities.OBJECT_STRING, SyntaxNode.ExecForEntities.OBJECT_STRING 'Boston specific. Not part of original Metadrone.
+                    'String loop
+                    Return Me.Process_String()
+
                 Case SyntaxNode.ExecForEntities.OBJECT_COLUMN, SyntaxNode.ExecForEntities.OBJECT_IDCOLUMN,
                      SyntaxNode.ExecForEntities.OBJECT_PKCOLUMN, SyntaxNode.ExecForEntities.OBJECT_FKCOLUMN
                     'Column loop
@@ -235,6 +239,100 @@ Namespace Parser.Syntax
 
                     'Set variable's value
                     PackageBuilder.Variables.Item(Me.TemplateContext, varName, Me.ScopeDepth + 1).Value = index.GetEntities(Me.ExecNode.ForEntity).Item(i)
+
+                    'Process block
+                    Me.proc = New Exec_Base(Me.ExecNode, Me.BasePath, Me.PreviewMode, Me.TemplateContext, Me.ScopeDepth + 2)
+                    sb.Append(Me.proc.ProcessBlock(CurrentBlockIdx, Me.ExecNode.Nodes.Count - 1, ExitIndex).ToString)
+
+                    'Clear variables inside this block
+                    PackageBuilder.Variables.Decommission(Me.TemplateContext, Me.ScopeDepth + 2)
+
+                    'Don't continue on exit
+                    If Me.proc.UserExitLoop Then
+                        ExitIndex = -1
+                        Exit For
+                    End If
+
+                    'Pass on output
+                    For Each o As OutputItem In Me.proc.OutputList
+                        Me.OutputList.Add(o)
+                    Next
+
+                    'If return encountered
+                    If Me.proc.UserReturnPathSet Then
+                        'Indicate as so
+                        Me.UserReturnPath = Me.proc.UserReturnPath
+                        Me.UserReturnPathSet = Me.proc.UserReturnPathSet
+
+                        'Exit processing
+                        ExitIndex = -1
+                        Exit For
+                    End If
+
+                    If ExitIndex = -1 Then
+                        'Column processed
+                        'RaiseEvent Notify(".")
+                    Else
+                        'Redo because of exit
+                        CurrentLoopIdx = i
+                        CurrentBlockIdx = ExitIndex + 1
+                        Exit For
+                    End If
+                Next
+            Loop Until ExitIndex = -1
+
+            'Clear the entity variable declared for the loop iterator
+            PackageBuilder.Variables.Decommission(Me.TemplateContext, Me.ScopeDepth + 1)
+
+            Return sb
+        End Function
+
+        ''' <summary>
+        ''' Boston specific. Not part of original Metadrone. Used to step through RDS.Relations for a Table/Column
+        ''' </summary>
+        ''' <returns></returns>
+        Private Function Process_String() As System.Text.StringBuilder
+            Dim sb As New System.Text.StringBuilder()
+
+            'Get parent entity (table variable)
+            Dim vals As List(Of Object) = Exec_Expr.EvalExpressionIntoParameters(Me.ExecNode.Tokens, 4, 4, Me.TemplateContext, Me.ScopeDepth, False)
+            Dim lsString As String = Nothing
+            Dim lasString As List(Of String) = Nothing
+
+
+            If Not TypeOf vals(0) Is IList Then
+                Throw New Exception("Variable '" & Me.ExecNode.Tokens(4).Text & "' is not a valid list of string variable.")
+            End If
+
+            lasString = vals(0)
+
+            'Get variable name
+            Dim varName As String = Me.ExecNode.Tokens(2).Text
+
+            'Add variable one scope level down
+            PackageBuilder.Variables.Add(Me.TemplateContext, varName, Me.ScopeDepth + 1, New Variable(Nothing, Variable.Types.Variable))
+
+            'Loop through child entities (parent table columns)
+            Dim ExitIndex As Integer = -1
+            Dim CurrentLoopIdx As Integer = 0
+            Dim CurrentBlockIdx As Integer = 0
+
+            Do
+                'Repeat if had to exit
+
+                'Prevent infinite loop
+                'If CurrentLoopIdx >= relation.GetEntities(Me.ExecNode.ForEntity).Count Then ExitIndex = -1
+
+                'Perform loop on block
+                For i As Integer = CurrentLoopIdx To lasString.Count - 1
+                    'Abort on cancel
+                    If PackageBuilder.StopRequest Then Return sb
+
+                    'Check that any filtering has not made this index go past the array range
+                    If i > lasString.Count - 1 Then Exit For
+
+                    'Set variable's value
+                    PackageBuilder.Variables.Item(Me.TemplateContext, varName, Me.ScopeDepth + 1).Value = lasString(i)
 
                     'Process block
                     Me.proc = New Exec_Base(Me.ExecNode, Me.BasePath, Me.PreviewMode, Me.TemplateContext, Me.ScopeDepth + 2)

@@ -159,6 +159,10 @@ Namespace SourcePlugins.Boston
                             sr.ColumnId = lrColumn.Id
                             sr.ShortDescription = lrColumn.ActiveRole.JoinedORMObject.ShortDescription
                             sr.PrimarySupertypeName = lrTable.PrimarySupertypeName
+                            If lrColumn.ActiveRole.JoinsValueType IsNot Nothing Then
+                                sr.CheckValue = lrColumn.ActiveRole.JoinsValueType.ValueConstraint.Cast(Of String)().ToList()
+                            End If
+
 
                             'Predicate for the Column
                             sr.Predicate = ""
@@ -188,7 +192,7 @@ Namespace SourcePlugins.Boston
                             sr.IsPGSRelation = lrTable.isPGSRelation
                             sr.IsObjectified = lrTable.FBMModelElement.IsObjectified
                             If lrTable.isPGSRelation Then
-                                sr.PGSEdgeName = lrTable.getPGSEdgeName
+                                sr.PGSEdgeName = lrTable.getPGSEdgeName(True)
                             End If
 
                             For Each lrRelation In lrColumn.OutgoingRelation '20210901-VM-Was just lrColumn.Relation

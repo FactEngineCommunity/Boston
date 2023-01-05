@@ -4604,9 +4604,6 @@ SkipRoleConstraintInstance:
 
         End Function
 
-
-
-
         Private Sub ReportModelLoadingError(ByRef arModel As FBM.Model, ByVal asErrorMessage As String)
 
             Try

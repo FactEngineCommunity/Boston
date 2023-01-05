@@ -619,7 +619,7 @@ Namespace RDS
 
         End Function
 
-        Public Function getPGSEdgeName() As String
+        Public Function getPGSEdgeName(Optional ByVal abIgnoreError As Boolean = False) As String
 
             Try
                 If Not Me.FBMModelElement.ConceptType = pcenumConceptType.FactType Then Return "" 'Throw New Exception("Table does not represent a Fact Type.")
@@ -640,7 +640,9 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                If Not abIgnoreError Then
+                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                End If
 
                 Return "ErrorGettingEdgeNameForTable"
             End Try

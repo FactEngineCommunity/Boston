@@ -111,8 +111,10 @@ Namespace Parser.Meta.Database
                                     lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
                                     If lrRelation.ResponsibleFactType.Arity > 2 Then
                                         lsDestinationRoleName = lsOriginRoleName
-                                    Else
+                                    ElseIf lrRelation.ResponsibleFactType.Arity = 2 Then
                                         lsDestinationRoleName = lrRelation.ResponsibleFactType.GetOtherRoleOfBinaryFactType(lrRelation.OriginColumns(0).Role.Id).DerivedRoleName
+                                    Else
+                                        lsDestinationRoleName = lrRelation.ResponsibleFactType.RoleGroup(0).DerivedRoleName
                                     End If
 
                                 Else
