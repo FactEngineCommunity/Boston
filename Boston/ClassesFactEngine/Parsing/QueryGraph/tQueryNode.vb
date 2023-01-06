@@ -106,6 +106,8 @@ Namespace FactEngine
                         Return "~"
                     Case Is = FEQL.pcenumFEQLComparitor.Carret
                         Return "^"
+                    Case Else
+                        Return ":"
                 End Select
             End Get
         End Property

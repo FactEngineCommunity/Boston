@@ -461,7 +461,6 @@ Namespace FEQL
         End Function
 
 
-
         ''' <summary>
         ''' Returns the type of Derivation for the given DerivationClause. E.g. TransitiveRingConstraintJoin
         ''' </summary>

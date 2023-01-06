@@ -1245,8 +1245,6 @@ Namespace FEQL
             End Set
         End Property
 
-
-
         Private _KEYWDCOUNT As String = Nothing
         Public Property KEYWDCOUNT As String
             Get
@@ -1312,7 +1310,6 @@ Namespace FEQL
                 Me._DERIVATIONFORMULA = value
             End Set
         End Property
-
 
         'Private _MODELELEMENT As New List(Of MODELELEMENTClause)
         'Public Property MODELELEMENT As List(Of MODELELEMENTClause)
