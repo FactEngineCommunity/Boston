@@ -1992,6 +1992,7 @@ ReattachRoles:
                         'Redraw Link to nearest ConceptInstance
                         If lrRoleInstance.JoinedORMObject IsNot Nothing Then
                             Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject)
+                                                          Where ModelElementInstance.Visible = True
                                                           Select ModelElementInstance
 
                             If larModelElementInstance.Count > 1 Then
