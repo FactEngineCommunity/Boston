@@ -969,6 +969,133 @@ Namespace FactEngine
 
         End Function
 
+        Public Overrides Async Function GOAsync(asQuery As String) As Threading.Tasks.Task(Of ORMQL.Recordset) Implements iDatabaseConnection.GOAsync
+
+            Dim lrRecordset As New ORMQL.Recordset
+
+            '==========================================================
+            'Populate the lrRecordset with results from the database
+
+            Dim larFact As New List(Of FBM.Fact)
+            Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
+            Dim lrFact As FBM.Fact
+
+            Try
+                Using session = _driver.AsyncSession(Function(configBuilder) configBuilder.WithDatabase("neo4j"))
+
+
+                    Try
+                        Dim ReadResults = Await session.ReadTransactionAsync(Async Function(tx)
+                                                                                 Dim result = Await tx.RunAsync(asQuery)
+                                                                                 Return Await result.ToListAsync()
+                                                                             End Function)
+
+                        ' Just peek to check if any value available.
+                        ' Getting count here will consume all the records
+                        ' Use loResult.ToList() if you need all the record in separate list
+                        Debugger.Break()
+                        Dim loResult As IResult
+
+                        If loResult.Peek() IsNot Nothing Then
+
+                            '==================================================================
+                            'Column Names   
+                            Dim lsColumnName As String
+                            For Each liFieldInd In loResult.Keys
+                                lsColumnName = liFieldInd
+                                '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
+                                Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+                                lrFactType.RoleGroup.AddUnique(lrRole)
+                                lrRecordset.Columns.Add(lsColumnName)
+                            Next
+                            '==================================================================
+
+                            ' looping each record will consume the record from list
+                            ' consumed record will be removed from the list
+                            For Each lrRecord In loResult
+
+                                lrFact = New FBM.Fact(lrFactType, False)
+                                Dim loFieldValue As Object = Nothing
+                                Dim liInd As Integer
+                                For liInd = 0 To lrRecord.Keys.Count - 1
+
+                                    loFieldValue = lrRecord.Values(loResult.Keys(liInd))
+                                    If loFieldValue Is Nothing Then
+                                        loFieldValue = "NULL"
+                                        GoTo AddFactData
+                                    End If
+
+                                    Select Case True
+
+                                        Case TypeOf loFieldValue Is String
+                                            If Not NullVal(lrRecord.Values(loResult.Keys(liInd)), "") = "" Then
+                                                loFieldValue = lrRecord.Values(loResult.Keys(liInd))
+                                            Else
+                                                loFieldValue = ""
+                                            End If
+
+                                        Case TypeOf loFieldValue Is Neo4j.Driver.IRelationship
+                                            ' cast the object to relationship interface
+                                            Dim loRelationship As Neo4j.Driver.IRelationship = loFieldValue
+                                            ' find the relational nodes
+                                            Dim lsFirst = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.StartNodeId).Value.Labels(0) ' StartNodeElementId
+                                            Dim lsLast = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.EndNodeId).Value.Labels(0) 'EndNodeElementId
+                                            ' build relationship string
+                                            '                                loFieldValue = $"{lsFirst}-{loRelationship.Type}->{lsLast}"
+                                            Exit Select
+
+                                        Case TypeOf loFieldValue Is INode
+                                            ' cast the object to Node interface
+                                            Dim loNode As INode = loFieldValue
+                                            loFieldValue = loNode.ToString()
+                                            Exit Select
+
+                                        Case Else
+                                            '    Try
+                                            '        loFieldValue = lrSQLiteDataReader.GetValue(liInd)
+                                            '    Catch ex As Exception
+                                            '        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
+                                            '        loFieldValue = lrSQLiteDataReader.GetString(liInd)
+                                            '    End Try
+                                            loFieldValue = lrRecord.Values(loResult.Keys(liInd))
+                                    End Select
+
+                                    ' check 
+AddFactData:
+                                    Try
+                                        lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
+                                        '=====================================================
+                                    Catch ex As Exception
+                                        Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
+                                    End Try
+                                Next
+
+                                larFact.Add(lrFact)
+
+                                If larFact.Count = Me.DefaultQueryLimit Then
+                                    lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
+                                    GoTo FinishedProcessing
+                                End If
+
+                            Next
+                        End If
+FinishedProcessing:
+
+                    Catch ex As Neo4jException
+                        Throw New Exception(ex.Message)
+                    End Try
+                End Using
+
+                lrRecordset.Facts = larFact
+
+            Catch ex As Exception
+                lrRecordset.ErrorString = ex.Message
+                Return lrRecordset
+            End Try
+
+        End Function
+
+
 
         Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
@@ -1546,9 +1673,6 @@ FinishedProcessing:
 
         End Function
 
-        Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
-            Throw New NotImplementedException()
-        End Function
     End Class
 
 End Namespace

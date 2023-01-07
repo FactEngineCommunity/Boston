@@ -22,6 +22,19 @@ Namespace FactEngine
 
         End Sub
 
+        Public Function GOAsync(ByVal asQuery As String) As ORMQL.Recordset
+
+            Dim lrRecordset As ORMQL.Recordset
+
+            If Me.Connection Is Nothing Then Throw New Exception("The connection to the database has been lost. Close and reopen FactEngine.")
+
+            Me.Connection.GOAsync(asQuery)
+            'lrRecordset = Me.Connection.GOAsync(asQuery).Result
+
+            Return lrRecordset
+
+        End Function
+
         Public Function GO(ByVal asQuery As String) As ORMQL.Recordset
 
             Dim lrRecordset As ORMQL.Recordset

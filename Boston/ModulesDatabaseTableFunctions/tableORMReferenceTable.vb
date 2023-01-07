@@ -166,6 +166,7 @@ Namespace TableReferenceTable
                 lREcordset.Close()
             Else
                 MsgBox("Error: GetReferenceTableIdByName: No Row Returned.")
+                Return "Error"
             End If
 
             lREcordset = Nothing
