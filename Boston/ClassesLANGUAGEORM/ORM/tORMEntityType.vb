@@ -3177,7 +3177,9 @@ FailsafeContinue:
                 'ReferenceModeFactTypeName if one exists
                 If Me.HasSimpleReferenceScheme And Me.ReferenceModeValueType IsNot Nothing Then
                     Dim lsValueTypeName = Me.MakeReferenceModeName
-                    Call Me.ReferenceModeValueType.SetName(lsValueTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
+                    If Not Me.ReferenceModeValueType.Id.EndsWith(Me.ReferenceMode) Then
+                        Call Me.ReferenceModeValueType.SetName(lsValueTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
+                    End If
                     Dim lsFactTypeName As String = Me.Id & "Has" & Me.ReferenceModeValueType.Id
                     Call Me.ReferenceModeFactType.setName(lsFactTypeName, abBroadcastInterfaceEvent, abSuppressModelSave)
                 End If

@@ -1237,6 +1237,15 @@ Namespace FBM
                     Return False
                 End If
 
+                Dim larExistingValueType = From ValueType In Me.Model.ValueType
+                                           Where ValueType IsNot Me
+                                           Where ValueType.Id = asNewName
+                                           Select ValueType
+
+                If larExistingValueType.Count > 0 Then
+                    Throw New Exception("Tried to change the name of Value Type, " & Me.Id & ", to the name of a Value Type that already exists, " & asNewName & ".")
+                End If
+
                 '--------------------------------------------------------------------------------------------------------
                 'The surrogate key for the ValueType is about to change (to match the name of the ValueType)
                 '  so update the ModelDictionary entry for the Concept/Symbol (the nominalistic idenity of the VactType

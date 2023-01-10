@@ -209,7 +209,11 @@ Namespace RDS
                 If Me._PrimarySupertype IsNot Nothing Then
                     Return Me._PrimarySupertype
                 Else
-                    Return Me.FBMModelElement.PrimarySupertypeName
+                    If Me.FBMModelElement IsNot Nothing Then
+                        Return Me.FBMModelElement.PrimarySupertypeName
+                    Else
+                        Return "Entity" 'See TypeDB
+                    End If
                 End If
             End Get
             Set(value As String)

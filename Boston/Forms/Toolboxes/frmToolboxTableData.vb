@@ -10,6 +10,9 @@ Public Class frmToolboxTableData
     'For Cell text editting
     Private OldValue, NewValue As String
 
+    'For Filtering Columns
+    Private msFilterString As String = ""
+
     Public Function EqualsByName(ByVal other As Form) As Boolean
         Return Me.Name = other.Name
     End Function
@@ -560,6 +563,18 @@ Public Class frmToolboxTableData
 
                             Dim lsFilterString As String
                             lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+
+                            If lsFilterString = "" Then
+                                Me.msFilterString = ""
+                            Else
+                                If Me.msFilterString <> "" Then
+                                    Me.msFilterString.AppendString(" AND " & lsFilterString)
+                                Else
+                                    Me.msFilterString = lsFilterString
+                                End If
+                            End If
+                            lsFilterString = Me.msFilterString
+
                             'WHERE Clause                    
                             If Trim(lsFilterString) <> "" Then
                                 lsSQLQuery &= " WHERE " & lsFilterString

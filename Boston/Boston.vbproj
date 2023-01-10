@@ -2598,7 +2598,6 @@
     </None>
     <None Include="ClassesLANGUAGENORMA\ClassesNORMA\README.md" />
     <None Include="CodeGeneration\bin\Release\Metadrone.exe.config" />
-    <None Include="CodeGeneration\bin\Release\Metadrone.settings" />
     <None Include="CodeGeneration\Metadrone\app.config" />
     <None Include="CodeGeneration\Metadrone\My Project\app.manifest" />
     <None Include="CodeGeneration\Metadrone\obj\Release\DesignTimeResolveAssemblyReferences.cache" />

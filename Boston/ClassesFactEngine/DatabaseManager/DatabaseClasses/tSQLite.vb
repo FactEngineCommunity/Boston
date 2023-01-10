@@ -779,6 +779,11 @@ Namespace FactEngine
 
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
+                If lrRecordset.EOF Then
+                    lsSQL = "SELECT '" & arTable.Name & "_PK' as 'name', l.name as 'column', 1 as 'unique', 'pk' as 'origin', 1 as 'partial' FROM pragma_table_info('" & arTable.Name & "') as l WHERE l.pk = 1;"
+                    lrRecordset = Me.GO(lsSQL)
+                End If
+
                 Dim lsIndexName As String = ""
                 Dim lbIsUnique As Boolean = False
                 Dim lbIsPrimaryKey As Boolean = False
