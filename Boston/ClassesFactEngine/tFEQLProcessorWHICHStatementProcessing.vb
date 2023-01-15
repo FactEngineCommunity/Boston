@@ -474,6 +474,10 @@
             arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             arQueryEdge.TargetNode.Alias = arWHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
+            If arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.NODEMODIFIERFUNCTION IsNot Nothing Then
+                arQueryEdge.TargetNode.ModifierFunction = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.NODEMODIFIERFUNCTION.GetNodeModifierFunction
+            End If
+
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -506,11 +510,20 @@
 
             '---------------------------------------------------------
             'Set the Identification
+            Dim lsIdentifier As String
             For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                 arQueryEdge.IdentifierList.Add(lsIdentifier)
                 arQueryEdge.TargetNode.HasIdentifier = True
                 arQueryEdge.TargetNode.IdentifierList.Add(lsIdentifier)
             Next
+            If Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.QUOTEDIDENTIFIERLIST.KEYWDTODAY IsNot Nothing Then
+                arQueryEdge.IdentifierList.Clear()
+                arQueryEdge.TargetNode.HasIdentifier = True
+                Dim loCC As Globalization.CultureInfo = System.Threading.Thread.CurrentThread.CurrentUICulture
+                lsIdentifier = Me.Model.DatabaseConnection.FormatDate(DateTime.Today.Date.ToString(loCC.DateTimeFormat.ShortDatePattern))
+                arQueryEdge.TargetNode.IdentifierList.Add(lsIdentifier)
+                arQueryEdge.IdentifierList.Add(lsIdentifier)
+            End If
 
             If arQueryGraph.QueryEdges.Count > 0 Then
                 If arQueryGraph.QueryEdges.Last.IsPartOfSubQuery Or arQueryGraph.QueryEdges.Last.IsSubQueryLeader Then

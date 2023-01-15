@@ -406,6 +406,28 @@ Namespace FactEngine
             Return "yyyy-MM-dd HH:mm:ss"
         End Function
 
+        Public Overrides Function FormatDate(ByVal asOriginalDate As String,
+                                                 Optional ByVal abIgnoreError As Boolean = False) As String
+
+            Try
+
+                Dim lsPattern As String = "yyyy-MM-dd"
+
+                Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return ""
+            End Try
+
+        End Function
+
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
                                                  Optional ByVal abIgnoreError As Boolean = False) As String
 

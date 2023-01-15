@@ -2836,7 +2836,14 @@ ReturnClause:
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "date(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                    Case Else
+                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                End Select
+
+
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
@@ -2850,7 +2857,13 @@ ReturnClause:
                                         If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
-                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
+                                        Dim lsDateTime As String
+                                        Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                                lsDateTime = Me.Model.DatabaseConnection.FormatDate(lsUserDateTime)
+                                            Case Else
+                                                lsDateTime = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
+                                        End Select
                                         lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                     Case Else
                                         lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf

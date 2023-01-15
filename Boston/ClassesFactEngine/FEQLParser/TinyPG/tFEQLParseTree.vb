@@ -405,6 +405,9 @@ Namespace FEQL
                 Case TokenType.DATATYPEPRECISION
                     Value = EvalDATATYPEPRECISION(tree, paramlist)
                     Exit Select
+                Case TokenType.FACTENGINEFUNCTION
+                    Value = EvalFACTENGINEFUNCTION(tree, paramlist)
+                    Exit Select
                 Case TokenType.FACTPREDICATE
                     Value = EvalFACTPREDICATE(tree, paramlist)
                     Exit Select
@@ -895,6 +898,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalDATATYPEPRECISION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTENGINEFUNCTION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

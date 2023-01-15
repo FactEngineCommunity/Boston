@@ -1028,6 +1028,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _KEYWDTODAY As String = Nothing
+        Public Property KEYWDTODAY As String
+            Get
+                Return Me._KEYWDTODAY
+            End Get
+            Set(value As String)
+                Me._KEYWDTODAY = value
+            End Set
+        End Property
+
         Private _QUOTEDIDENTIFIER As New List(Of QuotedIdentifier)
         Public Property QUOTEDIDENTIFIER As List(Of QuotedIdentifier)
             Get

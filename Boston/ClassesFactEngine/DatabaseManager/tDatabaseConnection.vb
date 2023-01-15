@@ -92,6 +92,11 @@
             Return ""
         End Function
 
+        Public Overridable Function FormatDate(ByVal asOriginalDate As String,
+                                               Optional ByVal abIgnoreError As Boolean = False) As String
+            Return ""
+        End Function
+
         Public Overridable Function FormatDateTime(ByVal asOriginalDate As String,
                                                  Optional ByVal abIgnoreError As Boolean = False) As String
             Return ""

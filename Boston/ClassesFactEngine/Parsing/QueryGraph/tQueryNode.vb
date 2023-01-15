@@ -52,6 +52,8 @@ Namespace FactEngine
 
         Public IsTargetNode As Boolean = False
 
+        Public ModifierFunction As FEQL.pcenumFEQLNodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None
+
         ''' <summary>
         ''' True if is Target node and is on the other side of a Shortest Path query.
         '''   E.g. (Account:1) made [SHORTEST PATH 0..10] WHICH Transaction THAT was made to (Account 2:4) 

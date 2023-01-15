@@ -2,8 +2,14 @@
 
     Public Class NodeModifierFunction
 
-        Public Function GetNodeModifierFunction() As FEQL.pcenumFEQLComparitor
-
+        Public Function GetNodeModifierFunction() As FEQL.pcenumFEQLNodeModifierFunction
+            If Me.KEYWDDATE IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Date
+            ElseIf Me.KEYWDTIME IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Time
+            Else
+                Return pcenumFEQLNodeModifierFunction.None
+            End If
         End Function
 
         Private _KEYWDDATE As String = Nothing

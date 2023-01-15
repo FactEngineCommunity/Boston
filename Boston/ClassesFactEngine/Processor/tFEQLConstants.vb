@@ -10,6 +10,7 @@
         End Enum
 
         Public Enum pcenumFEQLNodeModifierFunction
+            None
             [Date]
             Time
         End Enum
