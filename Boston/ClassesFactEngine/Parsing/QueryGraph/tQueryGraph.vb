@@ -454,8 +454,8 @@ StartMatch:
                     End If
 
                     'GoTo ReturnClause
-                ElseIf larConditionalQueryEdges.Count = 0 And Me.HeadNode.HasIdentifier Then
-                    If Me.QueryEdges.Count = 1 And Me.HeadNode IsNot Nothing Then
+                ElseIf larConditionalQueryEdges.Count = 0 And Me.HeadNode.HasIdentifier And (larMatchEdges.Count = 0 And larLocalMatchEdges.Count = 0) Then
+                    If Me.QueryEdges.Count <= 1 And Me.HeadNode IsNot Nothing Then
                         lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")" & vbCrLf & "WHERE "
                     End If
                 Else
@@ -470,7 +470,12 @@ StartMatch:
                 Dim lbHasWhereClause As Boolean = False
 
 #Region "WhereConditionals"
-                If Me.HeadNode.HasIdentifier And Not Me.QueryEdges(0).IsRecursive Then
+                Dim lbFirstEdgeIsRecursive As Boolean = False
+                If Me.QueryEdges.Count > 0 Then
+                    lbFirstEdgeIsRecursive = Me.QueryEdges(0).IsRecursive
+                End If
+
+                If Me.HeadNode.HasIdentifier And Not lbFirstEdgeIsRecursive Then
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
@@ -485,7 +490,8 @@ StartMatch:
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
 
-                    lsCypherQuery &= String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
+                    'lsCypherQuery &= String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
+                    lbIntialWhere = lrQueryEdge.WhichClause.getAndOr("") & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
 
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -655,7 +661,7 @@ StartMatch:
                                 End Select
                             End If
 
-                            lbIntialWhere = "AND "
+                            lbIntialWhere = lrQueryEdge.WhichClause.getAndOr & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
                         Case Else
 
                             Select Case lrQueryEdge.WhichClauseType
@@ -701,7 +707,7 @@ StartMatch:
                                             lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
 
                                         End If
-                                        lbIntialWhere = "AND "
+                                        lbIntialWhere = lrQueryEdge.WhichClause.getAndOr & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
                                     Else
                                         Dim lrTargetTable As RDS.Table = Nothing
                                         Dim lsAlias As String = ""
@@ -764,19 +770,20 @@ StartMatch:
 
                                                     lsCypherQuery &= LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(0).Name & " IN [" & lsIdentifierList & "]"
                                                 Case Else
+                                                    lsCypherQuery &= Viev.NullVal(lbIntialWhere, "")
 
                                                     For Each lsIdentifier In lrQueryEdge.IdentifierList
                                                         If liInd > 0 Then
                                                             lsCypherQuery &= "AND "
                                                             lbIntialWhere = ""
                                                         End If
-                                                        lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
+                                                        lsCypherQuery &= LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
                                                         liInd += 1
                                                     Next
                                             End Select
                                         End If
 
-                                        lbIntialWhere = "AND "
+                                        lbIntialWhere = lrQueryEdge.WhichClause.getAndOr("AND") & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
                                     End If
                             End Select
                     End Select
@@ -838,6 +845,11 @@ ReturnClause:
                     If Me.ProjectionColumn.Count > 0 Or arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
                         lsCypherQuery &= vbCrLf & "RETURN "
                     End If
+
+                    If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+                        lsCypherQuery &= Viev.NullVal(arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT, "") & " "
+                    End If
+
 
                     liInd = 1
 

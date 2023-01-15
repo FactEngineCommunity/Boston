@@ -122,7 +122,7 @@
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject,,, liComparitor)
 
                 If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
-                    If Me.WHICHSELECTStatement.MODELELEMENTNAME.Count > 1 Then
+                    If Me.WHICHSELECTStatement.MODELELEMENTNAME.Count > 1 And Me.WHICHSELECTStatement.WHICHCLAUSE.Count > 0 Then
                         Me.WHICHCLAUSE = New FEQL.WHICHCLAUSE
                         Call Me.GetParseTreeTokensReflection(Me.WHICHCLAUSE, Me.WHICHSELECTStatement.WHICHCLAUSE(0))
                         Select Case Me.getWHICHClauseType(Me.WHICHCLAUSE, Me.WHICHSELECTStatement.WHICHCLAUSE(0))
@@ -1610,14 +1610,14 @@
             End If
 
             If arWhichClauseNode.Nodes.Count >= 3 Then
-                If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+                If Me.WHICHCLAUSE.getAndOr Is Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                    arWhichClauseNode.Nodes(0).Token.Type = FEQL.TokenType.KEYWDWHICH And
                    arWhichClauseNode.Nodes(2).Token.Type = FEQL.TokenType.KEYWDTHAT Then
                     'E.g. WHICH involves THAT Lecturer
                     Return FactEngine.Constants.pcenumWhichClauseType.WhichPredicateThatModelElement
                 Else
                     If arWhichClauseNode.Nodes(0).Nodes.Count > 0 Then
-                        If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+                        If Me.WHICHCLAUSE.getAndOr Is Nothing And ''20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                            arWhichClauseNode.Nodes(0).Nodes(0).Token.Type = FEQL.TokenType.KEYWDTHAT And
                            {FEQL.TokenType.KEYWDWHICH, FEQL.TokenType.KEYWDA, FEQL.TokenType.NODE, FEQL.TokenType.KEYWDNO}.Contains(arWhichClauseNode.Nodes(1).Token.Type) Then
                             'E.g. WHICH involves THAT Lecturer
@@ -1627,7 +1627,7 @@
                 End If
             ElseIf arWhichClauseNode.Nodes.count = 2 Then
                 If arWhichClauseNode.Nodes(0).Nodes.Count = 2 Then
-                    If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+                    If Me.WHICHCLAUSE.getAndOr Is Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                    arWhichClauseNode.Nodes(0).Nodes(0).Token.Type = FEQL.TokenType.KEYWDTHAT And
                    arWhichClauseNode.Nodes(0).Nodes(1).Token.Type = FEQL.TokenType.PREDICATECLAUSE And
                    arWhichClauseNode.Nodes(1).Nodes(0).Token.Type = FEQL.TokenType.MODELELEMENTNAME Then
@@ -1637,8 +1637,8 @@
                 End If
             End If
 
-                '13
-                If Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+            '13
+            If Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
                 (Me.WHICHCLAUSE.KEYWDISNOT IsNot Nothing Or
                 Me.WHICHCLAUSE.KEYWDIS IsNot Nothing) Then
 
@@ -1652,21 +1652,21 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.WithClause
 
                 '1
-            ElseIf arWHICHClause.KEYWDAND Is Nothing And
+            ElseIf arWHICHClause.getAndOr Is Nothing And ''20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                    arWHICHClause.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
 
                 'E.g. "WHICH is in (Factulty:'IT') "
                 Return FactEngine.Constants.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification
 
                 '2
-            ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr Is Nothing And ''20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                    Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Then
 
                 'E.G. "holds WHICH Position"
                 Return FactEngine.Constants.pcenumWhichClauseType.PredicateWHICHModelElement
 
                 '3.
-            ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr Is Nothing And ''20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
                    Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 Then
 
                 'E.g. ...TimetableBooking "THAT involves THAT Lecturer"
@@ -1674,7 +1674,7 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatPredicateThatModelElement
 
                 '4
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.KEYWDTHAT.Count = 2 And '> 0 And '20200820-VM-Was  = 2
                    Me.WHICHCLAUSE.KEYWDWHICH Is Nothing Then
 
@@ -1691,14 +1691,14 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.ThatModelElementPredicate
 
                 '5
-            ElseIf Me.WHICHCLAUSE.KEYWDAND Is Nothing Then
+            ElseIf Me.WHICHCLAUSE.getAndOr Is Nothing Then '20230115-Was If Me.WHICHCLAUSE.KEYWDAND Is Nothing And
 
                 'E.g. "is in WHICH Room" in the above example
                 '  NB Also caters for "that is in A SemesterStructure" in "WHICH Room is in A Faculty THAT is in A SemesterStucture"
                 Return FactEngine.Constants.pcenumWhichClauseType.UnkownPredicateWhichModelElement
 
                 '6.1
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 And
                    Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing And
                    Me.WHICHCLAUSE.MODELELEMENT.Count = 2 Then
@@ -1707,7 +1707,7 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.AndModelElementPredicateWhichModelElement
 
                 '6
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    ((Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing) Or (Me.WHICHCLAUSE.KEYWDA IsNot Nothing)) And
                    Me.WHICHCLAUSE.KEYWDTHAT.Count = 0 Then
 
@@ -1715,20 +1715,20 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.AndPredicateWhichModelElement
 
                 '7
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
                    (Me.WHICHCLAUSE.KEYWDWHICH IsNot Nothing Or Me.WHICHCLAUSE.KEYWDA IsNot Nothing) Then
 
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateWhichModelElement
 
                 '8
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 Then
 
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatModelElementPredicateModelElement
 
                 '9
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing And
                    Me.WHICHCLAUSE.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
 
@@ -1736,7 +1736,7 @@
                 Return FactEngine.Constants.pcenumWhichClauseType.AndWhichPredicateNodePropertyIdentification
 
                 '9
-            ElseIf Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
+            ElseIf Me.WHICHCLAUSE.getAndOr IsNot Nothing And '20230115-Was If Me.WHICHCLAUSE.KEYWDAND IsNot Nothing And
                    Me.WHICHCLAUSE.MODELELEMENTNAME IsNot Nothing Then
 
                 'E.g. "AND is in A School"            

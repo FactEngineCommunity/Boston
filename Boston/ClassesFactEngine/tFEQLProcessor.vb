@@ -696,6 +696,18 @@ Namespace FEQL
             End Set
         End Property
 
+        Public Function getAndOr(Optional abDefault As String = Nothing) As String
+
+            If Me._KEYWDAND IsNot Nothing Then
+                Return "AND"
+            ElseIf Me._KEYWDOR IsNot Nothing Then
+                Return "OR"
+            Else
+                'CodeSafe
+                Return abDefault
+            End If
+        End Function
+
         Private _KEYWDAND As String = Nothing
         Public Property KEYWDAND As String
             Get
@@ -703,6 +715,16 @@ Namespace FEQL
             End Get
             Set(value As String)
                 Me._KEYWDAND = value
+            End Set
+        End Property
+
+        Private _KEYWDOR As String = Nothing
+        Public Property KEYWDOR As String
+            Get
+                Return Me._KEYWDOR
+            End Get
+            Set(value As String)
+                Me._KEYWDOR = value
             End Set
         End Property
 
