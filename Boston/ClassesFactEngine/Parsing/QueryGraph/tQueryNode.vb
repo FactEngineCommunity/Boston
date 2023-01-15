@@ -124,10 +124,13 @@ Namespace FactEngine
         ''' <param name="arFBMModelObject"></param>
         Public Sub New(ByRef arFBMModelObject As FBM.ModelObject,
                        Optional ByRef arQueryEdge As FactEngine.QueryEdge = Nothing,
-                       Optional abIsTargetNode As Boolean = False)
+                       Optional abIsTargetNode As Boolean = False,
+                       Optional aiComparitor As FEQL.pcenumFEQLComparitor = FEQL.pcenumFEQLComparitor.Colon)
+
             Me.FBMModelObject = arFBMModelObject
             Me.QueryEdge = arQueryEdge
             Me.IsTargetNode = abIsTargetNode
+            Me.Comparitor = aiComparitor
         End Sub
 
         Public Shadows Function Equals(other As QueryNode) As Boolean Implements IEquatable(Of QueryNode).Equals
@@ -135,6 +138,43 @@ Namespace FactEngine
             Return Me.FBMModelObject.Id = other.FBMModelObject.Id And NullVal(Me.Alias, "") = NullVal(other.Alias, "")
 
         End Function
+
+        Public Function getTargetSQLComparator() As String
+
+            Try
+
+                Select Case Me.Comparitor
+                    Case Is = FEQL.pcenumFEQLComparitor.Bang
+                        Return " <> "
+                    Case Is = FEQL.pcenumFEQLComparitor.Colon,
+                              FEQL.pcenumFEQLComparitor.Carret
+                        Return " = "
+                    Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
+
+                        If prApplication.WorkingModel.DatabaseConnection IsNot Nothing Then
+
+                            Select Case prApplication.WorkingModel.TargetDatabaseType
+                                Case Is = pcenumDatabaseType.Neo4j
+                                    Return " =~ "
+                                Case Else
+                                    Return " LIKE "
+                            End Select
+
+                        Else
+                            Return " LIKE "
+                        End If
+
+                End Select
+
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
+            End Try
+
+            Return " = "
+
+        End Function
+
 
         Public Function IsPGSRelationByDefacto() As Boolean
 

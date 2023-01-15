@@ -105,6 +105,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxFactEngineUseGPT3 = New System.Windows.Forms.CheckBox()
+        Me.LabelPromptFactEngineOpenAIAPIKey = New System.Windows.Forms.Label()
+        Me.TextBoxFactEngineOpenAIAPIKey = New System.Windows.Forms.TextBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -557,6 +560,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.TextBoxFactEngineOpenAIAPIKey)
+        Me.GroupBoxFactEngine.Controls.Add(Me.LabelPromptFactEngineOpenAIAPIKey)
+        Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineUseGPT3)
         Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineUseTransformations)
         Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineShowStackTrace)
         Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineUserDateTimeFormat)
@@ -578,9 +584,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxFactEngineUseTransformations.AutoSize = True
         Me.CheckBoxFactEngineUseTransformations.Location = New System.Drawing.Point(19, 204)
         Me.CheckBoxFactEngineUseTransformations.Name = "CheckBoxFactEngineUseTransformations"
-        Me.CheckBoxFactEngineUseTransformations.Size = New System.Drawing.Size(123, 17)
+        Me.CheckBoxFactEngineUseTransformations.Size = New System.Drawing.Size(185, 17)
         Me.CheckBoxFactEngineUseTransformations.TabIndex = 9
-        Me.CheckBoxFactEngineUseTransformations.Text = "Use Transformations"
+        Me.CheckBoxFactEngineUseTransformations.Text = "Use Transformations (NL-2-FEQL)"
         Me.CheckBoxFactEngineUseTransformations.UseVisualStyleBackColor = True
         '
         'CheckBoxFactEngineShowStackTrace
@@ -979,6 +985,32 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
+        'CheckBoxFactEngineUseGPT3
+        '
+        Me.CheckBoxFactEngineUseGPT3.AutoSize = True
+        Me.CheckBoxFactEngineUseGPT3.Location = New System.Drawing.Point(19, 227)
+        Me.CheckBoxFactEngineUseGPT3.Name = "CheckBoxFactEngineUseGPT3"
+        Me.CheckBoxFactEngineUseGPT3.Size = New System.Drawing.Size(225, 17)
+        Me.CheckBoxFactEngineUseGPT3.TabIndex = 10
+        Me.CheckBoxFactEngineUseGPT3.Text = "Use GPT3 for NL-2-FEQL Transformations"
+        Me.CheckBoxFactEngineUseGPT3.UseVisualStyleBackColor = True
+        '
+        'LabelPromptFactEngineOpenAIAPIKey
+        '
+        Me.LabelPromptFactEngineOpenAIAPIKey.AutoSize = True
+        Me.LabelPromptFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(19, 251)
+        Me.LabelPromptFactEngineOpenAIAPIKey.Name = "LabelPromptFactEngineOpenAIAPIKey"
+        Me.LabelPromptFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(87, 13)
+        Me.LabelPromptFactEngineOpenAIAPIKey.TabIndex = 11
+        Me.LabelPromptFactEngineOpenAIAPIKey.Text = "OpenAI API Key:"
+        '
+        'TextBoxFactEngineOpenAIAPIKey
+        '
+        Me.TextBoxFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(104, 248)
+        Me.TextBoxFactEngineOpenAIAPIKey.Name = "TextBoxFactEngineOpenAIAPIKey"
+        Me.TextBoxFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(295, 20)
+        Me.TextBoxFactEngineOpenAIAPIKey.TabIndex = 12
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1117,4 +1149,7 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents LabelPromptBostonServerPortNumber As Label
     Friend WithEvents GroupBoxConfiguration As GroupBox
     Friend WithEvents ButtonImportConfigurationTableItems As Button
+    Friend WithEvents LabelPromptFactEngineOpenAIAPIKey As Label
+    Friend WithEvents CheckBoxFactEngineUseGPT3 As CheckBox
+    Friend WithEvents TextBoxFactEngineOpenAIAPIKey As TextBox
 End Class

@@ -254,5 +254,11 @@
     <Setting Name="BostonServerIPAddress" Type="System.String" Scope="User">
       <Value Profile="(Default)">http://localhost</Value>
     </Setting>
+    <Setting Name="FactEngineUseGPT3" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="FactEngineOpenAIAPIKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">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</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

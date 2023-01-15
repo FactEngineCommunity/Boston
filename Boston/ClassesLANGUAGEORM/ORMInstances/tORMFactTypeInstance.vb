@@ -2386,7 +2386,7 @@ ReattachRoles:
                     End If
                     loFactTypeNode.Pen.Width = 0.5
 
-                    loFactTypeNode.Tag = New FBM.FactTypeInstance
+                    'loFactTypeNode.Tag = New FBM.FactTypeInstance '20230115-VM-Commented out.
                     loFactTypeNode.Tag = Me
                     Me.Shape = loFactTypeNode
 

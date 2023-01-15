@@ -1061,6 +1061,30 @@ Namespace My
                 Me("BostonServerIPAddress") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property FactEngineUseGPT3() As Boolean
+            Get
+                Return CType(Me("FactEngineUseGPT3"),Boolean)
+            End Get
+            Set
+                Me("FactEngineUseGPT3") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("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")>  _
+        Public Property FactEngineOpenAIAPIKey() As String
+            Get
+                Return CType(Me("FactEngineOpenAIAPIKey"),String)
+            End Get
+            Set
+                Me("FactEngineOpenAIAPIKey") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

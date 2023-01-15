@@ -94,6 +94,8 @@ Public Class frmCRUDBostonConfiguration
             Me.CheckBoxFactEngineShowStackTrace.Checked = My.Settings.ShowStackTraceFactEngineQuery
             Me.CheckBoxFactEngineUseTransformations.Enabled = My.Settings.SuperuserMode
             Me.CheckBoxFactEngineUseTransformations.Checked = My.Settings.FactEngineUseTransformations
+            Me.CheckBoxFactEngineUseGPT3.Checked = My.Settings.FactEngineUseGPT3
+            Me.TextBoxFactEngineOpenAIAPIKey.Text = Trim(My.Settings.FactEngineOpenAIAPIKey)
 
             'ER Diagrams
             Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
@@ -215,6 +217,8 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.FactEngineUseReferenceModeOnlyForSimpleReferenceSchemes = Me.CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes.Checked
                 My.Settings.ShowStackTraceFactEngineQuery = Me.CheckBoxFactEngineShowStackTrace.Checked
                 My.Settings.FactEngineUseTransformations = Me.CheckBoxFactEngineUseTransformations.Checked
+                My.Settings.FactEngineUseGPT3 = Me.CheckBoxFactEngineUseGPT3.Checked
+                My.Settings.FactEngineOpenAIAPIKey = Trim(Me.TextBoxFactEngineOpenAIAPIKey.Text)
 
                 My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
 

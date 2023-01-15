@@ -474,7 +474,7 @@ StartMatch:
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
-                        lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & Me.HeadNode.getTargetSQLComparator & "'" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
                         If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then
                             lsCypherQuery &= "AND "
                         End If
@@ -484,6 +484,9 @@ StartMatch:
                 End If
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
+
+                    lsCypherQuery &= String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
+
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Dim lrFactType As FBM.FactType = Nothing
@@ -601,7 +604,9 @@ StartMatch:
                                               pcenumORMDataType.TemporalDateAndTime
                                         lsCypherQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
+
                                 lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
+
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
@@ -614,7 +619,6 @@ StartMatch:
                                     Case Else
                                         lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                 End Select
-
                             Else
                                 lrTable = lrQueryEdge.BaseNode.RDSTable
 
@@ -630,20 +634,25 @@ StartMatch:
                                               pcenumORMDataType.TemporalDateAndTime
                                         lsCypherQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                 End Select
-                                lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
-                                Select Case lrColumn.getMetamodelDataType
-                                    Case Is = pcenumORMDataType.TemporalDateAndTime
-                                        Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
-                                        Dim loDateTime As DateTime = Nothing
-                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
-                                            Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
-                                        End If
-                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
-                                    Case Else
-                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
-                                End Select
 
+                                Select Case lrQueryEdge.TargetNode.Comparitor
+                                    Case Is = FEQL.pcenumFEQLComparitor.InComparitor
+                                        lsCypherQuery &= " IN [" & String.Join(",", lrQueryEdge.TargetNode.IdentifierList) & "]"
+                                    Case Else
+                                        lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
+                                        Select Case lrColumn.getMetamodelDataType
+                                            Case Is = pcenumORMDataType.TemporalDateAndTime
+                                                Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
+                                                Dim loDateTime As DateTime = Nothing
+                                                If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                                    Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
+                                                End If
+                                                Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
+                                                lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                            Case Else
+                                                lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                        End Select
+                                End Select
                             End If
 
                             lbIntialWhere = "AND "
@@ -745,14 +754,26 @@ StartMatch:
                                             Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
 
                                             liInd = 0
-                                            For Each lsIdentifier In lrQueryEdge.IdentifierList
-                                                If liInd > 0 Then
-                                                    lsCypherQuery &= "AND "
-                                                    lbIntialWhere = ""
-                                                End If
-                                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
-                                                liInd += 1
-                                            Next
+
+                                            Select Case lrQueryEdge.TargetNode.Comparitor
+                                                Case Is = FEQL.pcenumFEQLComparitor.InComparitor
+                                                    If larIndexColumns.Count > 1 Then Throw New Exception(lrTargetTable.Name & " has a multipart identifier. Cannot use in IN clause.")
+                                                    Dim lsIdentifierList = ""
+                                                    Dim lsJoinString As String = Boston.returnIfTrue(larIndexColumns(0).DataTypeIsNumeric, ",", "','")
+                                                    lsIdentifierList = Boston.returnIfTrue(larIndexColumns(0).DataTypeIsNumeric, ",", "'") & String.Join(lsJoinString, lrQueryEdge.TargetNode.IdentifierList) & Boston.returnIfTrue(larIndexColumns(0).DataTypeIsNumeric, ",", "'")
+
+                                                    lsCypherQuery &= LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(0).Name & " IN [" & lsIdentifierList & "]"
+                                                Case Else
+
+                                                    For Each lsIdentifier In lrQueryEdge.IdentifierList
+                                                        If liInd > 0 Then
+                                                            lsCypherQuery &= "AND "
+                                                            lbIntialWhere = ""
+                                                        End If
+                                                        lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
+                                                        liInd += 1
+                                                    Next
+                                            End Select
                                         End If
 
                                         lbIntialWhere = "AND "
@@ -760,6 +781,8 @@ StartMatch:
                             End Select
                     End Select
                     lbHasWhereClause = True
+
+                    lsCypherQuery &= String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBRCLOSE.ToArray)
                 Next
 #End Region
 #End Region

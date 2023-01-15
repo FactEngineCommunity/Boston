@@ -74,13 +74,7 @@ Partial Class frmFactEngine
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
-        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
-        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram3 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram4 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram5 = New MindFusion.Diagramming.Diagram()
-        Me.Diagram6 = New MindFusion.Diagramming.Diagram()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -628,19 +622,13 @@ Partial Class frmFactEngine
     Friend WithEvents ToolStripMenuItemLightBackground As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemDarkBackground As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
-    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
     Friend WithEvents ClearToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorker As System.ComponentModel.BackgroundWorker
     Friend WithEvents ToolStripStatusLabelError As ToolStripStatusLabel
-    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents DefaultAfterQueryToToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemDefaultToResultsTab As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemDefaultToQueryTab As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAutoCapitalise As ToolStripMenuItem
     Friend WithEvents ToolStripNaturalLanguage As ToolStrip
-    Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram4 As MindFusion.Diagramming.Diagram
-    Friend WithEvents Diagram5 As MindFusion.Diagramming.Diagram
     Friend WithEvents ToolStripLabelPromptNaturalLanguage As ToolStripLabel
-    Friend WithEvents Diagram6 As MindFusion.Diagramming.Diagram
 End Class

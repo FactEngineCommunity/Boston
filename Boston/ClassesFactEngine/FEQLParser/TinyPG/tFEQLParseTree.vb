@@ -450,6 +450,9 @@ Namespace FEQL
                 Case TokenType.NODE
                     Value = EvalNODE(tree, paramlist)
                     Exit Select
+                Case TokenType.NODEMODIFIERFUNCTION
+                    Value = EvalNODEMODIFIERFUNCTION(tree, paramlist)
+                    Exit Select
                 Case TokenType.NODEPROPERTYIDENTIFICATION
                     Value = EvalNODEPROPERTYIDENTIFICATION(tree, paramlist)
                     Exit Select
@@ -952,6 +955,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalNODE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalNODEMODIFIERFUNCTION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

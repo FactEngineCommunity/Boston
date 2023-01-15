@@ -97,9 +97,11 @@
 
                 'Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHSELECTStatement.MODELELEMENT(0)) '
                 Dim lrFBMModelObject As FBM.ModelObject
+                Dim liComparitor As FEQL.pcenumFEQLComparitor = pcenumFEQLComparitor.Colon
                 If Me.Parsetree.Nodes(0).Nodes(0).Nodes(0).Token.Type = TokenType.NODEPROPERTYIDENTIFICATION Then
                     If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME = Me.WHICHSELECTStatement.MODELELEMENTNAME(0) Then
                         lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).MODELELEMENTNAME) 'MODELELEMENTNAME
+                        liComparitor = Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION(0).getComparitorType
                     Else
                         lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENTNAME(0))
                     End If
@@ -117,7 +119,7 @@
                 End If
 
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
-                lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject)
+                lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject,,, liComparitor)
 
                 If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
                     If Me.WHICHSELECTStatement.MODELELEMENTNAME.Count > 1 Then

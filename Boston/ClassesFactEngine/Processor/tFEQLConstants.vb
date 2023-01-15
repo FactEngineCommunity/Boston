@@ -5,7 +5,13 @@
             Bang
             Carret
             Colon
+            InComparitor
             LikeComparitor
+        End Enum
+
+        Public Enum pcenumFEQLNodeModifierFunction
+            [Date]
+            Time
         End Enum
 
     End Module

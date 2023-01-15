@@ -4,6 +4,8 @@ Imports MindFusion.Diagramming
 Imports System.Runtime.InteropServices
 Imports System.ComponentModel
 Imports System.Text.RegularExpressions
+Imports OpenAI_API
+Imports System.Threading.Tasks
 
 Public Class frmFactEngine
 
@@ -26,6 +28,8 @@ Public Class frmFactEngine
     Private miDefaultForeColour As Color = Color.Wheat
 
     Private mrModel As FBM.Model
+
+    Dim mrOpenAIAPI As New OpenAI_API.OpenAIAPI(New APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
 
     <DllImport("user32.dll")>
     Private Shared Function GetKeyboardState(ByVal lpKeyState As Byte()) As Boolean
@@ -667,6 +671,26 @@ Public Class frmFactEngine
 
     End Sub
 
+    Private Function GetGPT3Result(ByVal asNLQuery As String) As CompletionResult
+
+        Try
+            Return Task.Run(Function() Me.mrOpenAIAPI.Completions.CreateCompletionAsync(
+                New CompletionRequest(asNLQuery, model:=Model.DavinciCode, temperature:=0, max_tokens:=60)
+                )).Result
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+            Return New CompletionResult
+        End Try
+
+    End Function
+
     Private Sub GO(Optional ByVal abUseNaturalLanguage As Boolean = False)
 
         Try
@@ -684,121 +708,145 @@ Public Class frmFactEngine
                 If My.Settings.FactEngineUseTransformations And abUseNaturalLanguage Then
 
                     'If abUseNaturalLanguage Then
-                    Me.TextBoxInput.Text = Trim(Me.TextBoxNaturalLanguage.Text)
+                    Dim lsNaturalLanguageQuery = Trim(Me.TextBoxNaturalLanguage.Text)
+                    Me.TextBoxInput.Text = lsNaturalLanguageQuery
                     'End If
 
                     Dim lrLanguageParser As New Language.LanguageGeneric(My.Settings.WordNetDictionaryEnglishPath)
 
                     Try
+                        If My.Settings.FactEngineUseGPT3 Then
+#Region "GPT3 Transforms"
+                            Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36, loTransformation)
+
+                            Dim lsGPT3TrainingExamplesFilePath = larTransformationTuples.Where(Function(x) x.ModelId = prApplication.WorkingModel.ModelId).Select(Function(x) x.GPT3TrainingFileLocation)(0)
+
+                            If lsGPT3TrainingExamplesFilePath Is Nothing Then Throw New Exception("Check to see if you have configured a GPT3 Training file path for the current model.")
+
+                            Dim lsGPTTrainingExamples = System.IO.File.ReadAllText(lsGPT3TrainingExamplesFilePath)
+
+                            Dim lrCompletionResult = Me.GetGPT3Result(lsGPTTrainingExamples & "#" & lsNaturalLanguageQuery & vbCrLf)
+                            Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+                            Me.TextBoxInput.Text = lsGPT3ReturnString.Substring(0, Boston.returnIfTrue(lsGPT3ReturnString.IndexOf(vbCrLf) = -1, lsGPT3ReturnString.Length - 1, lsGPT3ReturnString.IndexOf(vbCrLf)))
+#End Region
+
+                        Else
+#Region "Regular Expression Transforms"
 
 #Region "Substitute for ModelElement names"
-                        Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
+                            Dim lasWords() = Me.TextBoxInput.Text.Split(" ")
 
-                        Dim lrModelElement As FBM.ModelObject
-                        For Each lsWord In lasWords
-                            Dim lsTempWord = lsWord.Replace(",", "")
-                            Dim lsLemma As String = Nothing
-                            If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Or (prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True) IsNot Nothing) Then
+                            Dim lrModelElement As FBM.ModelObject
+                            For Each lsWord In lasWords
+                                Dim lsTempWord = lsWord.Replace(",", "")
+                                Dim lsLemma As String = Nothing
+                                If lrLanguageParser.WordIsNoun(lsTempWord, lsLemma) Or (prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True) IsNot Nothing) Then
 
-                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
+                                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsTempWord, True, True)
 
-                                If lrModelElement Is Nothing Then
-                                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsLemma, True, True)
+                                    If lrModelElement Is Nothing Then
+                                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsLemma, True, True)
+                                    End If
+
+                                    If lrModelElement Is Nothing Then
+                                        lrModelElement = prApplication.WorkingModel.ModelElements.Find(Function(x) Fastenshtein.Levenshtein.Distance(x.Id, lsTempWord) < 2)
+                                    End If
+
+                                    If lrModelElement IsNot Nothing Then
+                                        'CodeSafe
+                                        If lrModelElement.Id = "" Then GoTo NextModelElementFind 'Found something like this once.
+                                        Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
+                                    End If
                                 End If
-
-                                If lrModelElement Is Nothing Then
-                                    lrModelElement = prApplication.WorkingModel.ModelElements.Find(Function(x) Fastenshtein.Levenshtein.Distance(x.Id, lsTempWord) < 2)
-                                End If
-
-                                If lrModelElement IsNot Nothing Then
-                                    'CodeSafe
-                                    If lrModelElement.Id = "" Then GoTo NextModelElementFind 'Found something like this once.
-                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsTempWord, lrModelElement.Id)
-                                End If
-                            End If
 NextModelElementFind:
-                        Next
+                            Next
 #End Region
 
-                        Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                        Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
+                            Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
 
 #Region "Check for Double_Word with underscore model element names"
-                        Dim Words() As String = Me.TextBoxInput.Text.Split(" ")
-                        Dim lsConcatWords As String = Nothing
-                        Dim lsConcatWordsUnderscore As String = Nothing
-                        Dim lsCamelConcatWords As String = Nothing
+                            Dim Words() As String = Me.TextBoxInput.Text.Split(" ")
+                            Dim lsConcatWords As String = Nothing
+                            Dim lsConcatWordsUnderscore As String = Nothing
+                            Dim lsCamelConcatWords As String = Nothing
 
-                        Dim lasSkipWords() = {"a"}
+                            Dim lasSkipWords() = {"a"}
 
-                        For liWordCount = 3 To 2 Step -1
+                            For liWordCount = 3 To 2 Step -1
 
-                            For liInd = 0 To Words.Count - liWordCount
+                                For liInd = 0 To Words.Count - liWordCount
 
-                                lsConcatWords = ""
-                                For liInd2 = 0 To liWordCount - 1
-                                    If lasSkipWords.Contains(Words(liInd + liInd2)) Then GoTo SkipWord
-                                    lsConcatWords &= Words(liInd + liInd2) & " "
-                                Next
-                                lsConcatWords = Trim(lsConcatWords)
+                                    lsConcatWords = ""
+                                    For liInd2 = 0 To liWordCount - 1
+                                        If lasSkipWords.Contains(Words(liInd + liInd2)) Then GoTo SkipWord
+                                        lsConcatWords &= Words(liInd + liInd2) & " "
+                                    Next
+                                    lsConcatWords = Trim(lsConcatWords)
 
-                                lsConcatWordsUnderscore = ""
-                                For liInd2 = 0 To liWordCount - 1
-                                    lsConcatWordsUnderscore &= Words(liInd + liInd2)
-                                    If liInd2 < liWordCount - 1 Then
-                                        lsConcatWordsUnderscore &= "_"
+                                    lsConcatWordsUnderscore = ""
+                                    For liInd2 = 0 To liWordCount - 1
+                                        lsConcatWordsUnderscore &= Words(liInd + liInd2)
+                                        If liInd2 < liWordCount - 1 Then
+                                            lsConcatWordsUnderscore &= "_"
+                                        End If
+                                    Next
+                                    'Words(liInd) & "_" & Words(liInd + 1)
+                                    lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
+                                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True)
+                                    If lrModelElement IsNot Nothing Then
+                                        Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lrModelElement.Id)
                                     End If
-                                Next
-                                'Words(liInd) & "_" & Words(liInd + 1)
-                                lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
-                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True)
-                                If lrModelElement IsNot Nothing Then
-                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lrModelElement.Id)
-                                End If
 
-                                lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
-                                If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True) IsNot Nothing Then
-                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
-                                End If
+                                    lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
+                                    If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True) IsNot Nothing Then
+                                        Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
+                                    End If
 SkipWord:
+                                Next
                             Next
-                        Next
 #End Region
 
-                        For Each loTransformation In larTransformationTuples
-                            Dim regex As Regex = New Regex(loTransformation.FindRegEx)
-                            Dim match As Match = regex.Match(Me.TextBoxInput.Text)
-                            If match.Success Then
-                                Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
-                            End If
-                        Next
+                            For Each loTransformation In larTransformationTuples
+                                Dim regex As Regex = New Regex(loTransformation.FindRegEx)
+                                Dim match As Match = regex.Match(Me.TextBoxInput.Text)
+                                If match.Success Then
+                                    Me.TextBoxInput.Text = System.Text.RegularExpressions.Regex.Replace(Me.TextBoxInput.Text, loTransformation.FindRegEx, loTransformation.ReplaceWithRegEx)
+                                End If
+                            Next
 
-                        'Tidy up
-                        lasWords = Me.TextBoxInput.Text.Split(" ")
+                            'Tidy up
+                            lasWords = Me.TextBoxInput.Text.Split(" ")
 
-                        For Each lsWord In lasWords
+                            For Each lsWord In lasWords
 
-                            'CodeSafe
-                            If lsWord = "" Then GoTo NextWord
+                                'CodeSafe
+                                If lsWord = "" Then GoTo NextWord
 
-                            lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsWord, True, True)
+                                lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsWord, True, True)
 
-                            If lrModelElement IsNot Nothing Then
-                                Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsWord, lrModelElement.Id)
-                            End If
+                                If lrModelElement IsNot Nothing Then
+                                    Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsWord, lrModelElement.Id)
+                                End If
 NextWord:
-                        Next
+                            Next
+#End Region
 
+                        End If
                     Catch ex As Exception
                         Me.LabelError.BringToFront()
-                        Me.LabelError.Text = "Woops. Error executing Transformations. Contact FactEngine support."
+                        Me.LabelError.Text = "Woops. Error executing Transformations. Contact FactEngine support." & vbCrLf & vbCrLf & ex.Message
                         Me.TabControl1.SelectedTab = Me.TabPageResults
                         Me.LabelError.ForeColor = Color.Orange
                         Exit Sub
                     End Try
                 End If
-#End Region
 
+
+
+
+#End Region
                 Me.LabelError.Text = ""
                 Dim lsQuery = Me.TextBoxInput.Text.Replace(vbLf, " ")
                 If Me.TextBoxInput.SelectionLength > 0 Then

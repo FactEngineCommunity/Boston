@@ -21,7 +21,7 @@
                 Dim lsMessage As String
                 lsMessage = "Error: TableConcept.AddConcept"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -91,7 +91,7 @@
                 Dim lsMessage As String
                 lsMessage = "Error: TableConcept.ExistsConcept"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -114,7 +114,7 @@
                 Dim lsMessage As String
                 lsMessage = "Error: TableConcept.UpdateConcept"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
