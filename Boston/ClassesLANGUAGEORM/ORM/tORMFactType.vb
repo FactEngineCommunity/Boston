@@ -4610,7 +4610,7 @@ CommitTransaction:
                 '--------------------------------------------------------------------------------------------------------
                 'Check to see that the name begins with a capital letter.
                 If Not Char.IsUpper(asNewName.Chars(0)) Then
-                    Throw New tInformationException("Object Type names must start with a capital letter followed by one or more lowercase letters.")
+                    Throw New tInformationException("Warning: FactEngine and the Virtual Analyst require that Object Type names start with capital letters optionally followed by lowercase letters.")
                     Return False
                 End If
 

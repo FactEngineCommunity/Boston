@@ -159,6 +159,7 @@
                         For Each lsIdentifier In Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                             lrQueryGraph.HeadNode.IdentifierList.Add(lsIdentifier)
                         Next
+                        lrQueryGraph.HeadNode.Comparitor = Me.WHICHSELECTStatement.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
                     End If
                 End If
 

@@ -490,7 +490,7 @@ Public Class tApplication
             lsErrorMessage = asErrorMessage
 
             If My.Settings.UseAutomatedErrorReporting Then
-                asErrorMessage.AppendDoubleLineBreak("Boston will send this error to FactEngine to be fixed. Automatic error reporting is turned on.")
+                asErrorMessage.AppendDoubleLineBreak("Automatic error/warning reporting to FactEngine is turned on.")
             End If
 
             If (IsSomething(asStackTrace) And abShowStackTrace) And My.Settings.BostonErrorMessagesShowStackTrace Then

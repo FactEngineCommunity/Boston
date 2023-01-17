@@ -126,10 +126,10 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 66)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 31)
         Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(2)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1082, 79)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1082, 114)
         Me.TextBoxInput.TabIndex = 0
         Me.TextBoxInput.TabStop = False
         Me.TextBoxInput.Text = ""

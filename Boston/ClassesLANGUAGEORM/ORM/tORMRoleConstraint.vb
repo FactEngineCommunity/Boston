@@ -2432,7 +2432,7 @@ RemoveAnyway:
 
                 'Check to see that the name begins with a capital letter.
                 If Not Char.IsUpper(asNewName.Chars(0)) Then
-                    Throw New tInformationException("Object Type names must start with a capital letter followed by one or more lowercase letters.")
+                    Throw New tInformationException("Warning: The Virtual Analyst requires that Role Constraint names start with a capital letters optionally followed by lowercase letters.")
                     Return False
                 End If
 
