@@ -2,7 +2,7 @@
     Partial Public Class Processor
 
 #Region "ProcessWHICHSELECTStatementNew"
-        Public Function ProcessWHICHSELECTStatementNew(ByVal asFEQLStatement As String) As ORMQL.Recordset
+        Public Function ProcessWHICHSELECTStatementNew(ByVal asFEQLStatement As String, Optional ByVal abReturnQueryOnly As Boolean = False) As ORMQL.Recordset
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As New ORMQL.Recordset
@@ -29,18 +29,26 @@
                         lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
                 End Select
 
+                Dim lrTestRecordset As ORMQL.Recordset
 
-                If Me.DatabaseManager.Connection Is Nothing Then
-                    'Try and establish a connection
-                    Call Me.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+                If abReturnQueryOnly Then
+                    lrTestRecordset = New ORMQL.Recordset()
+                    lrTestRecordset.Query = lsSQLQuery
+                Else
+
                     If Me.DatabaseManager.Connection Is Nothing Then
-                        Throw New Exception("No database connection has been established.")
+                        'Try and establish a connection
+                        Call Me.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+                        If Me.DatabaseManager.Connection Is Nothing Then
+                            Throw New Exception("No database connection has been established.")
+                        End If
+                    ElseIf Me.DatabaseManager.Connection.Connected = False Then
+                        Throw New Exception("The database is not connected.")
                     End If
-                ElseIf Me.DatabaseManager.Connection.Connected = False Then
-                    Throw New Exception("The database is not connected.")
+
+                    lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
                 End If
 
-                Dim lrTestRecordset = Me.DatabaseManager.GO(lsSQLQuery)
                 lrTestRecordset.Warning = lrQueryGraph.Warning
                 lrTestRecordset.QueryGraph = lrQueryGraph
 

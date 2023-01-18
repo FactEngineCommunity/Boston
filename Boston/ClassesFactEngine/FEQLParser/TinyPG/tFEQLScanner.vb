@@ -777,6 +777,14 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDTODAY, regex)
             Tokens.Add(TokenType.KEYWDTODAY)
 
+            regex = new Regex("TOLOWER", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDTOLOWER, regex)
+            Tokens.Add(TokenType.KEYWDTOLOWER)
+
+            regex = new Regex("TOUPPER", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDTOUPPER, regex)
+            Tokens.Add(TokenType.KEYWDTOUPPER)
+
             regex = new Regex("TO PAGE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDTOPAGE, regex)
             Tokens.Add(TokenType.KEYWDTOPAGE)
@@ -1324,28 +1332,30 @@ Namespace FEQL
         KEYWDTHAT   = 334
         KEYWDTO     = 335
         KEYWDTODAY  = 336
-        KEYWDTOPAGE = 337
-        KEYWDTYPE   = 338
-        KEYWDUPDATE = 339
-        KEYWDVALUES = 340
-        KEYWDVALUETYPE= 341
-        KEYWDVALUETYPES= 342
-        KEYWDWHEN   = 343
-        KEYWDWHERE  = 344
-        KEYWDWITH   = 345
-        KEYWDWHAT   = 346
-        KEYWDWHEREALSO= 347
-        KEYWDWHICH  = 348
-        KEYWDWHO    = 349
-        KEYWDWRITTENAS= 350
-        PLUS        = 351
-        MINUS       = 352
-        DIVIDE      = 353
-        TIMES       = 354
-        EXPRESSIONSYMBOL= 355
-        KEYWDLESSTHAN= 356
-        KEYWDGREATERTHAN= 357
-        WHITESPACE  = 358
+        KEYWDTOLOWER= 337
+        KEYWDTOUPPER= 338
+        KEYWDTOPAGE = 339
+        KEYWDTYPE   = 340
+        KEYWDUPDATE = 341
+        KEYWDVALUES = 342
+        KEYWDVALUETYPE= 343
+        KEYWDVALUETYPES= 344
+        KEYWDWHEN   = 345
+        KEYWDWHERE  = 346
+        KEYWDWITH   = 347
+        KEYWDWHAT   = 348
+        KEYWDWHEREALSO= 349
+        KEYWDWHICH  = 350
+        KEYWDWHO    = 351
+        KEYWDWRITTENAS= 352
+        PLUS        = 353
+        MINUS       = 354
+        DIVIDE      = 355
+        TIMES       = 356
+        EXPRESSIONSYMBOL= 357
+        KEYWDLESSTHAN= 358
+        KEYWDGREATERTHAN= 359
+        WHITESPACE  = 360
     End Enum
 
     <Serializable()>

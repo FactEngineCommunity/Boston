@@ -13,6 +13,8 @@
             None
             [Date]
             Time
+            ToLower
+            ToUpper
         End Enum
 
     End Module

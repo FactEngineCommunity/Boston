@@ -457,11 +457,14 @@
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLScanner.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLTextHighlighter.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tTextMarker.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-Cypher.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-SQL.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLConstants.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-DerivationFormula.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-FactReading.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-NodeModifierFunction.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-NodePropertyIdentification.vb" />
+    <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-WhichClause.vb" />
     <Compile Include="ClassesFactEngine\tFEQLProcessor.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryEdge.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\tQueryGraph.vb" />
