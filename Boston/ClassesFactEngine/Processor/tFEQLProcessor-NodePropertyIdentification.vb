@@ -17,6 +17,16 @@
 
         End Function
 
+        Public Function GetNodeModifierFunction() As FEQL.pcenumFEQLNodeModifierFunction
+
+            If Me.NODEMODIFIERFUNCTION IsNot Nothing Then
+                Return Me.NODEMODIFIERFUNCTION.GetNodeModifierFunction
+            Else
+                Return FEQL.pcenumFEQLNodeModifierFunction.None
+            End If
+
+        End Function
+
         Private _BANG As String = Nothing
         Public Property BANG As String
             Get

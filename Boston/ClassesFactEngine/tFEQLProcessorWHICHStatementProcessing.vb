@@ -137,6 +137,7 @@
                             Case Is = FactEngine.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Case Else
                                 lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTSUFFIX
+                                lrQueryGraph.HeadNode.ModifierFunction = Me.WHICHSELECTStatement.NODE(0).GetNodeModifierFunction
                         End Select
 
                     Else
@@ -145,6 +146,7 @@
 
                 Else
                     lrQueryGraph.HeadNode.Alias = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTSUFFIX
+                    lrQueryGraph.HeadNode.ModifierFunction = Me.WHICHSELECTStatement.NODE(0).GetNodeModifierFunction
                 End If
 
                 If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
@@ -483,9 +485,7 @@
             arQueryEdge.TargetNode.PostboundText = arWHICHCLAUSE.NODE(0).POSTBOUNDREADINGTEXT
             arQueryEdge.TargetNode.Alias = arWHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
-            If arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.NODEMODIFIERFUNCTION IsNot Nothing Then
-                arQueryEdge.TargetNode.ModifierFunction = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.NODEMODIFIERFUNCTION.GetNodeModifierFunction
-            End If
+            arQueryEdge.TargetNode.ModifierFunction = arWHICHCLAUSE.NODE(0).GetNodeModifierFunction
 
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
@@ -919,6 +919,7 @@
                 arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
             Catch 'Not a biggie if not exists.
             End Try
+            arQueryEdge.TargetNode.ModifierFunction = arWHICHCLAUSE.NODE(0).GetNodeModifierFunction
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'Was AddUnique, but WHICH implies that we are talking of a different TargetNode, as where TargeNode has been referenced before
 
             '---------------------------------------------------------

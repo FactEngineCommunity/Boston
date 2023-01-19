@@ -254,6 +254,7 @@ Namespace RDS
         Public IsPartOfUniqueIdentifier As Boolean = False 'FactEngine specific. True if Column is part of unique Identifier.
         Public QueryEdge As FactEngine.QueryEdge 'The Edge that resulted in the Column, if is not the HeadNode of the Nodes of the QueryGraph
         Public ProjectionOrdinalPosition As Integer = 0 'The ordinal position of the Column in the set of ProjectionColumns such that the color can be set for the corresponding node in the GraphView of the FactEngine form.
+        Public NodeModifierFunction As FEQL.pcenumFEQLNodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None
 #End Region
 
         ''' <summary>
@@ -300,11 +301,13 @@ Namespace RDS
         ''' </summary>
         ''' <param name="arOriginTable">Must be populated if arRelation is populated. Specify if you want the cloned Column to be of that Table.</param>
         ''' <param name="arRelation">Populate if cloning for a Relation</param>
+        ''' <param name="aiNodeModifierFunction">FactEngine specific. Used for modifying the Column in SELECT/RETURN clauses. E.g. Date(DateTime)</param>
         ''' <returns></returns>
         Public Function Clone(Optional ByRef arOriginTable As RDS.Table = Nothing,
                               Optional ByRef arRelation As RDS.Relation = Nothing,
                               Optional ByVal abSetSupertypeColumnAsMe As Boolean = False,
-                              Optional ByVal abCreateNewId As Boolean = False) As RDS.Column
+                              Optional ByVal abCreateNewId As Boolean = False,
+                              Optional ByVal aiNodeModifierFunction As FEQL.pcenumFEQLNodeModifierFunction = FEQL.pcenumFEQLNodeModifierFunction.None) As RDS.Column
 
             Dim lrColumn As New RDS.Column
 
@@ -350,6 +353,11 @@ Namespace RDS
                 lrColumn.QueryEdge = .QueryEdge
                 lrColumn.TemporaryAlias = .TemporaryAlias
                 lrColumn.ProjectionOrdinalPosition = .ProjectionOrdinalPosition
+                If aiNodeModifierFunction <> FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None Then
+                    lrColumn.NodeModifierFunction = .NodeModifierFunction
+                Else
+                    lrColumn.NodeModifierFunction = aiNodeModifierFunction
+                End If
 
                 'SupertypeColumn
                 If abSetSupertypeColumnAsMe Then

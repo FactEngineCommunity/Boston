@@ -1057,7 +1057,7 @@
             Try
 #Region "Head Node"
                 If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
-
+#Region "RETURNCLAUSE"
                     For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
 
                         If lrReturnColumn.MODELELEMENTNAME IsNot Nothing Then
@@ -1124,7 +1124,9 @@
                         End If
 MoveForward:
                     Next
+#End Region
                 ElseIf abIsStraightDerivationClause Then
+#Region "Straight Derivation Clause"
                     Dim lrProjectionColumn As RDS.Column = Nothing
 
                     Select Case arDerivedModelElement.GetType
@@ -1198,7 +1200,7 @@ MoveForward:
                                 larColumn.Add(lrProjectionColumn)
                             Next
                     End Select
-
+#End Region
                 Else
                     'Head Column/s
                     Dim larHeadColumn As New List(Of RDS.Column)
@@ -1206,7 +1208,11 @@ MoveForward:
                     Select Case Me.HeadNode.FBMModelObject.ConceptType
                         Case Is = pcenumConceptType.ValueType
                             Dim lrVTColumn As RDS.Column
-                            If Me.QueryEdges(0).IsPartialFactTypeMatch Then
+                            If Me.QueryEdges(0).FBMFactType.IsLinkFactType Then
+                                lrVTColumn = (From Column In Me.QueryEdges(0).FBMFactType.LinkFactTypeRole.FactType.getCorrespondingRDSTable.Column
+                                              Where Column.Role Is Me.QueryEdges(0).FBMFactType.LinkFactTypeRole
+                                              Select Column).First
+                            ElseIf Me.QueryEdges(0).IsPartialFactTypeMatch Then
                                 lrVTColumn = (From Column In Me.QueryEdges(0).FBMFactType.getCorrespondingRDSTable.Column
                                               Where Column.Role Is Me.QueryEdges(0).FBMPredicatePart.Role
                                               Select Column).First
@@ -1221,6 +1227,7 @@ MoveForward:
                             lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
                             lrVTColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.QueryEdgeAlias, "")
                             lrVTColumn.GraphNodeType = Me.HeadNode.Name
+                            lrVTColumn.NodeModifierFunction = Me.HeadNode.ModifierFunction
                             larHeadColumn.Add(lrVTColumn)
 
                         Case Else
@@ -1284,27 +1291,32 @@ MoveForward:
                             Throw New Exception("Could not find Role for Query Edge Fact Type: " & lrQueryEdge.FBMFactType.Id)
                         End If
 
+                        Dim lrTempColumn As RDS.Column = Nothing
                         Select Case lrRole.JoinedORMObject.ConceptType 'lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.ConceptType
                             Case Is = pcenumConceptType.ValueType
                                 Dim lrColumn As RDS.Column
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
                                     lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrRole)
+                                    lrTempColumn = lrColumn.Clone(Nothing, Nothing)
                                 Else
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                                     If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType And lrQueryEdge.FBMFactType.IsDerived And Not lrQueryEdge.FBMFactType.IsObjectified Then
-                                        lrColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType), Nothing)
+                                        lrTempColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType), Nothing)
                                     ElseIf lrQueryEdge.BaseNode.FBMModelObject.IsDerived Then
-                                        lrColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.BaseNode.FBMModelObject.Id, lrQueryEdge.BaseNode.FBMModelObject), Nothing)
+                                        lrTempColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.BaseNode.FBMModelObject.Id, lrQueryEdge.BaseNode.FBMModelObject), Nothing)
                                     End If
                                 End If
-                                If lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
+                                If lrTempColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole).Clone(Nothing, Nothing)
-                                    lrColumn.TemporaryAlias = lrQueryEdge.Alias
-                                ElseIf lrColumn Is Nothing And lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.FBMFactType.HasTotalRoleConstraint Then
+                                    lrTempColumn = lrColumn.Clone(Nothing, Nothing,,, lrQueryEdge.BaseNode.ModifierFunction)
+                                    lrTempColumn.TemporaryAlias = lrQueryEdge.Alias
+                                ElseIf lrTempColumn Is Nothing And lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.FBMFactType.HasTotalRoleConstraint Then
                                     lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrQueryEdge.FBMFactType.RoleGroup(liRoleInd))
-                                    lrColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
+                                    lrTempColumn = lrColumn.Clone(Nothing, Nothing,,, lrQueryEdge.TargetNode.ModifierFunction)
+                                    lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                 Else
-                                    lrColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
+                                    lrTempColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
+                                    lrTempColumn.NodeModifierFunction = lrQueryEdge.BaseNode.ModifierFunction
                                 End If
                                 lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
                                 lrColumn.QueryEdge = lrQueryEdge
@@ -1317,7 +1329,7 @@ MoveForward:
                                 Else
                                     larEdgeColumn = lrQueryEdge.FBMFactType.RoleGroup(liRoleInd).JoinedORMObject.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns.OrderBy(Function(x) x.OrdinalPosition).ToList
                                 End If
-                                Dim lrTempColumn As RDS.Column
+
                                 For Each lrColumn In larEdgeColumn
                                     lrTempColumn = lrColumn.Clone(Nothing, Nothing)
                                     If lrRole IsNot Nothing Then
@@ -1334,6 +1346,7 @@ MoveForward:
                                     lrTempColumn.GraphNodeType = lrQueryEdge.TargetNode.Name
                                     lrTempColumn.IsPartOfUniqueIdentifier = True
                                     lrTempColumn.QueryEdge = lrQueryEdge
+                                    lrTempColumn.NodeModifierFunction = lrQueryEdge.TargetNode.ModifierFunction
                                     larColumn.Add(lrTempColumn)
                                 Next
                         End Select

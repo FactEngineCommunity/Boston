@@ -57,10 +57,26 @@
                             End If
 
                         Else
+#Region "Modifier Function"
+                            Select Case lrProjectColumn.NodeModifierFunction
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                    lsSelectClause &= "DATE("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
+                                    lsSelectClause &= "TIME("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
+                                    lsSelectClause &= "LOWER("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+                                    lsSelectClause &= "UPPER("
+                                Case Else
+                                    lsSelectClause &= ""
+                            End Select
+#End Region
+
                             lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
                             If lrProjectColumn.AsName IsNot Nothing Then
                                 lsSelectClause &= " AS " & lrProjectColumn.AsName
                             End If
+                            lsSelectClause &= Boston.returnIfTrue(lrProjectColumn.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
                         End If
                         If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
                         liInd += 1
@@ -621,7 +637,7 @@
                             Next
                         End If
                         If lrQueryEdge.TargetNode.FBMModelObject.GetType <> GetType(FBM.ValueType) Then
-                            If Not lbAddedAND Then lsSQLQuery &= Boston.returnIfTrue(lbAddedAND, "", " AND ")
+                            If Not lbAddedAND And (liInd > 1 Or liInd2 > 0) Then lsSQLQuery &= Boston.returnIfTrue(lbAddedAND, "", " AND ")
                             liInd2 = 0
                             For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= " AND "
@@ -1106,8 +1122,30 @@
                                                         lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             Else
-                                                lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                If lrQueryEdge.IsPartialFactTypeMatch Then
+                                                    lrColumn = lrQueryEdge.RDSColumn
+                                                Else
+                                                    lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
+                                                End If
+#Region "ModifierFunction"
+                                                Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "date("
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
+                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "time("
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
+                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "lower("
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "upper("
+                                                    Case Else
+                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "")
+                                                End Select
+#End Region
+                                                '20230119-VM-Was Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable
+                                                lsSQLQuery &= lrColumn.Table.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+
+                                                lsSQLQuery &= Boston.returnIfTrue(lrQueryEdge.TargetNode.ModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
+
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDate,
                                                               pcenumORMDataType.TemporalDateAndTime
@@ -1117,11 +1155,22 @@
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
-                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
+
+                                                        Dim lsDateTime As String = lrQueryEdge.IdentifierList(0)
+
+                                                        Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
+                                                                'Do nothing 
+                                                            Case Else
+                                                                lsDateTime = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
+                                                        End Select
+
                                                         lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                     Case Else
                                                         lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
+
                                             End If
 
                                         Else

@@ -431,6 +431,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _NODEMODIFIERFUNCTION As FEQL.NodeModifierFunction = Nothing
+        Public Property NODEMODIFIERFUNCTION As FEQL.NodeModifierFunction
+            Get
+                Return Me._NODEMODIFIERFUNCTION
+            End Get
+            Set(value As FEQL.NodeModifierFunction)
+                Me._NODEMODIFIERFUNCTION = value
+            End Set
+        End Property
+
     End Class
 
     Public Class WITHClause
@@ -626,6 +636,18 @@ Namespace FEQL
 
     Public Class NODE
 
+        Public Function GetNodeModifierFunction() As FEQL.pcenumFEQLNodeModifierFunction
+
+            If Me.NODEPROPERTYIDENTIFICATION IsNot Nothing Then
+                Return Me.NODEPROPERTYIDENTIFICATION.GetNodeModifierFunction
+            ElseIf Me.NODEMODIFIERFUNCTION IsNot Nothing Then
+                Return Me.NODEMODIFIERFUNCTION.GetNodeModifierFunction
+            Else
+                Return FEQL.pcenumFEQLNodeModifierFunction.None
+            End If
+
+        End Function
+
         Private _MODELELEMENT As MODELELEMENTClause
         Public Property MODELELEMENT As MODELELEMENTClause
             Get
@@ -653,6 +675,16 @@ Namespace FEQL
             End Get
             Set(value As String)
                 Me._MODELELEMENTSUFFIX = value
+            End Set
+        End Property
+
+        Private _NODEMODIFIERFUNCTION As FEQL.NodeModifierFunction = Nothing
+        Public Property NODEMODIFIERFUNCTION As FEQL.NodeModifierFunction
+            Get
+                Return Me._NODEMODIFIERFUNCTION
+            End Get
+            Set(value As FEQL.NodeModifierFunction)
+                Me._NODEMODIFIERFUNCTION = value
             End Set
         End Property
 

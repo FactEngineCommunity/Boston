@@ -675,7 +675,7 @@ Public Class frmFactEngine
 
         Try
             Return Task.Run(Function() Me.mrOpenAIAPI.Completions.CreateCompletionAsync(
-                New CompletionRequest(asNLQuery, model:=Model.DavinciCode, temperature:=0, max_tokens:=60)
+                New CompletionRequest(asNLQuery, model:=Model.DavinciCode, temperature:=0, max_tokens:=80)
                 )).Result
 
         Catch ex As Exception
