@@ -329,6 +329,18 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH)
 
+            regex = new Regex("TextFixedLength", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDDATATYPETEXTFIXEDLENGTH, regex)
+            Tokens.Add(TokenType.KEYWDDATATYPETEXTFIXEDLENGTH)
+
+            regex = new Regex("TextLargeLength", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDDATATYPETEXTLARGELENGTH, regex)
+            Tokens.Add(TokenType.KEYWDDATATYPETEXTLARGELENGTH)
+
+            regex = new Regex("TextVariableLength", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDDATATYPETEXTVARIABLELENGTH, regex)
+            Tokens.Add(TokenType.KEYWDDATATYPETEXTVARIABLELENGTH)
+
             regex = new Regex("IDENTIFIED BY ITS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDIDENTIFIEDBYITS, regex)
             Tokens.Add(TokenType.KEYWDIDENTIFIEDBYITS)
@@ -631,21 +643,24 @@ Namespace VAQL
         KEYWDDATATYPESTRINGFIXEDLENGTH= 117
         KEYWDDATATYPESTRINGLARGELENGTH= 118
         KEYWDDATATYPESTRINGVARIABLELENGTH= 119
-        KEYWDIDENTIFIEDBYITS= 120
-        KEYWDISACONCEPT= 121
-        KEYWDISAKINDOF= 122
-        KEYWDISANENTITYTYPE= 123
-        KEYWDISAVALUETYPE= 124
-        KEYWDISIDENTIFIEDBYITS= 125
-        KEYWDISWRITTENAS= 126
-        KEYWDNL     = 127
-        KEYWDONE    = 128
-        KEYWDPAGE   = 129
-        KEYWDREADING= 130
-        KEYWDTOPAGE = 131
-        KEYWDSTANDALONE= 132
-        KEYWDWRITTENAS= 133
-        WHITESPACE  = 134
+        KEYWDDATATYPETEXTFIXEDLENGTH= 120
+        KEYWDDATATYPETEXTLARGELENGTH= 121
+        KEYWDDATATYPETEXTVARIABLELENGTH= 122
+        KEYWDIDENTIFIEDBYITS= 123
+        KEYWDISACONCEPT= 124
+        KEYWDISAKINDOF= 125
+        KEYWDISANENTITYTYPE= 126
+        KEYWDISAVALUETYPE= 127
+        KEYWDISIDENTIFIEDBYITS= 128
+        KEYWDISWRITTENAS= 129
+        KEYWDNL     = 130
+        KEYWDONE    = 131
+        KEYWDPAGE   = 132
+        KEYWDREADING= 133
+        KEYWDTOPAGE = 134
+        KEYWDSTANDALONE= 135
+        KEYWDWRITTENAS= 136
+        WHITESPACE  = 137
     End Enum
 
     <Serializable()>

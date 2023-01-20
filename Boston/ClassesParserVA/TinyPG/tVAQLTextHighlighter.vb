@@ -652,47 +652,56 @@ Namespace VAQL
                     Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
                         sb.Append("{{\cf54 ")
                         Exit Select
-                    Case TokenType.KEYWDIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH:
                         sb.Append("{{\cf55 ")
                         Exit Select
-                    Case TokenType.KEYWDISACONCEPT:
+                    Case TokenType.KEYWDDATATYPETEXTLARGELENGTH:
                         sb.Append("{{\cf56 ")
                         Exit Select
-                    Case TokenType.KEYWDISAKINDOF:
+                    Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
                         sb.Append("{{\cf57 ")
                         Exit Select
-                    Case TokenType.KEYWDISANENTITYTYPE:
+                    Case TokenType.KEYWDIDENTIFIEDBYITS:
                         sb.Append("{{\cf58 ")
                         Exit Select
-                    Case TokenType.KEYWDISAVALUETYPE:
+                    Case TokenType.KEYWDISACONCEPT:
                         sb.Append("{{\cf59 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDISAKINDOF:
                         sb.Append("{{\cf60 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISANENTITYTYPE:
                         sb.Append("{{\cf61 ")
                         Exit Select
-                    Case TokenType.KEYWDNL:
+                    Case TokenType.KEYWDISAVALUETYPE:
                         sb.Append("{{\cf62 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
                         sb.Append("{{\cf63 ")
                         Exit Select
-                    Case TokenType.KEYWDPAGE:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf64 ")
                         Exit Select
-                    Case TokenType.KEYWDREADING:
+                    Case TokenType.KEYWDNL:
                         sb.Append("{{\cf65 ")
                         Exit Select
-                    Case TokenType.KEYWDTOPAGE:
+                    Case TokenType.KEYWDONE:
                         sb.Append("{{\cf66 ")
                         Exit Select
-                    Case TokenType.KEYWDSTANDALONE:
+                    Case TokenType.KEYWDPAGE:
                         sb.Append("{{\cf67 ")
                         Exit Select
-                    Case TokenType.KEYWDWRITTENAS:
+                    Case TokenType.KEYWDREADING:
                         sb.Append("{{\cf68 ")
+                        Exit Select
+                    Case TokenType.KEYWDTOPAGE:
+                        sb.Append("{{\cf69 ")
+                        Exit Select
+                    Case TokenType.KEYWDSTANDALONE:
+                        sb.Append("{{\cf70 ")
+                        Exit Select
+                    Case TokenType.KEYWDWRITTENAS:
+                        sb.Append("{{\cf71 ")
                         Exit Select
 
             Case Else
@@ -703,7 +712,7 @@ Namespace VAQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)

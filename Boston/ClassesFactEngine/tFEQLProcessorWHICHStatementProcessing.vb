@@ -927,6 +927,7 @@
             If Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION IsNot Nothing Then
                 For Each lsIdentifier In Me.WHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.IDENTIFIER
                     arQueryEdge.IdentifierList.Add(lsIdentifier)
+                    arQueryEdge.TargetNode.IdentifierList.Add(lsIdentifier)
                 Next
                 arQueryEdge.TargetNode.HasIdentifier = True
             End If

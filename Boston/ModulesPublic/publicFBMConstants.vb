@@ -3,6 +3,44 @@ Imports System.Reflection
 
 Public Module publicFBMConstants
 
+    <AttributeUsageAttribute(AttributeTargets.Field)>
+    Public Class AlternateDataTypeAttribute
+        Inherits Attribute
+        ' etc
+        Public m_name As String
+
+        Public Sub New(ByVal asDataTypeName As String)
+            Me.m_name = asDataTypeName
+        End Sub
+
+        ''' <summary>
+        ''' 20230121-VM-Implemented to transition from StringFixedLength (etc) to TextFixedLength.
+        ''' </summary>
+        ''' <param name="tp"></param>
+        ''' <param name="name"></param>
+        ''' <returns></returns>
+        Public Shared Function [Get](ByVal tp As Type, ByVal name As String) As String
+
+            Dim attr As AlternateDataTypeAttribute
+
+            Dim mi As MemberInfo
+            Dim mai As MemberInfo() = tp.GetMembers()
+
+            For Each mi In mai
+                attr = TryCast(Attribute.GetCustomAttribute(mi, GetType(AlternateDataTypeAttribute)), AlternateDataTypeAttribute)
+                If attr IsNot Nothing Then
+                    If attr.m_name = name Then
+                        Return mi.Name
+                        Exit For
+                    End If
+                End If
+            Next
+
+            Return Nothing
+
+        End Function
+    End Class
+
     <AttributeUsageAttribute(AttributeTargets.Field)> _
     Public Class DataTypeAttribute
         Inherits Attribute
@@ -30,7 +68,8 @@ Public Module publicFBMConstants
                 End If
             Next
 
-            Return Nothing
+            '20230121-VM-Implemented to transition from StringFixedLength (etc) to TextFixedLength.
+            Return AlternateDataTypeAttribute.Get(GetType(pcenumORMDataType), name)
 
         End Function
     End Class
@@ -103,9 +142,12 @@ Public Module publicFBMConstants
         <DataType("TemporalDate")> <Description("Temporal: Date")> TemporalDate
         <DataType("TemporalDateTime")> <Description("Temporal: Date & Time")> TemporalDateAndTime
         <DataType("Time")> <Description("Temporal: Time")> TemporalTime
-        <DataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLength
-        <DataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLength
-        <DataType("StringVariableLength")> <Description("Text: Variable Length")> TextVariableLength
+        '<DataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLengthLegacy
+        '<DataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLengthLegacy
+        '<DataType("StringVariableLength")> <Description("Text: Variable Length")> TextVariableLengthLegacy
+        <DataType("TextFixedLength")> <AlternateDataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLength
+        <DataType("TextLargeLength")> <AlternateDataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLength
+        <DataType("TextVariableLength")> <AlternateDataType("StringVariableLength")> <Description("Text: Variable Length")> TextVariableLength
     End Enum
 
     <Serializable()> _
