@@ -608,7 +608,13 @@ Public Class frmCRUDBostonConfiguration
                             Call tableReferenceField.AddReferenceField(lrReferenceField)
                             liInd += 1
                         Next
-
+                    Else
+                        Dim liInd = 1
+                        For Each lrKeyValuePair In lrReferenceTable.ReferenceTuple(0).KeyValuePair
+                            Dim lrReferenceField As New tReferenceField(lrReferenceTable.ReferenceTableId, liInd, lrKeyValuePair.Key, 3, 100, False, False)
+                            tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
+                            liInd += 1
+                        Next
                     End If
 
                     For Each lrReferenceTuple In lrReferenceTable.ReferenceTuple

@@ -184,7 +184,7 @@
                 Dim lasAlias As New List(Of String)
 #Region "Derived Entity Types"
                 For Each lrQueryNode In larFromNodes.FindAll(Function(x) x.FBMModelObject.IsDerived)
-                    lrDerivationProcessor = New FEQL.Processor(prApplication.WorkingModel)
+                    lrDerivationProcessor = New FEQL.Processor(Me.Model)
 
                     If liInd > 0 Then lsSQLQuery &= "," & vbCrLf
 
@@ -464,7 +464,7 @@
                 Next
 
                 'Derived FactTypes
-                lrDerivationProcessor = New FEQL.Processor(prApplication.WorkingModel)
+                lrDerivationProcessor = New FEQL.Processor(Me.Model)
 
                 Dim larDerivedFactType = (From QueryEdge In Me.QueryEdges
                                           Where QueryEdge.FBMFactType.IsDerived
@@ -1000,7 +1000,7 @@
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
-                                        lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                        lsSQLQuery &= Me.Model.DatabaseConnection.dateToTextOperator
                                 End Select
                                 lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
@@ -1035,7 +1035,7 @@
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
-                                        lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                        lsSQLQuery &= Me.Model.DatabaseConnection.dateToTextOperator
                                 End Select
                                 lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                 Select Case lrColumn.getMetamodelDataType
@@ -1149,7 +1149,7 @@
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDate,
                                                               pcenumORMDataType.TemporalDateAndTime
-                                                        lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
+                                                        lsSQLQuery &= Me.Model.DatabaseConnection.dateToTextOperator
                                                 End Select
                                                 lsSQLQuery &= lrQueryEdge.getTargetSQLComparator
                                                 Select Case lrColumn.getMetamodelDataType

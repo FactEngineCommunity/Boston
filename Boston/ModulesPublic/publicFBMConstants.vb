@@ -142,9 +142,9 @@ Public Module publicFBMConstants
         <DataType("TemporalDate")> <Description("Temporal: Date")> TemporalDate
         <DataType("TemporalDateTime")> <Description("Temporal: Date & Time")> TemporalDateAndTime
         <DataType("Time")> <Description("Temporal: Time")> TemporalTime
-        '<DataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLengthLegacy
-        '<DataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLengthLegacy
-        '<DataType("StringVariableLength")> <Description("Text: Variable Length")> TextVariableLengthLegacy
+        '<DataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLengthLegacy '20230121-VM-Deprecated. See AlternateDatatype instances below.
+        '<DataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLengthLegacy '20230121-VM-Deprecated. See AlternateDatatype instances below.
+        '<DataType("StringVariableLength")> <Description("Text: Variable Length")> TextVariableLengthLegacy '20230121-VM-Deprecated. See AlternateDatatype instances below.
         <DataType("TextFixedLength")> <AlternateDataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLength
         <DataType("TextLargeLength")> <AlternateDataType("StringLargeLength")> <Description("Text: Large Length")> TextLargeLength
         <DataType("TextVariableLength")> <AlternateDataType("StringVariableLength")> <Description("Text: Variable Length")> TextVariableLength

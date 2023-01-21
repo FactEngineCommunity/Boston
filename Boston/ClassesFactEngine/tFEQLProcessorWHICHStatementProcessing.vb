@@ -871,7 +871,6 @@
 
         '6
 #Region "analyseAndPredicateWhichModelElement"
-
         Public Sub analyseAndPredicateWhichModelElement(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
                                                         ByRef arQueryGraph As FactEngine.QueryGraph,
                                                         ByRef arQueryEdge As FactEngine.QueryEdge,
@@ -997,6 +996,7 @@
             End If
 
         End Sub
+
 #End Region
 
         '6.1
