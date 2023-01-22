@@ -586,6 +586,8 @@
             If arQueryGraph.QueryEdges.Count > 0 Then
                 If arQueryGraph.QueryEdges(arQueryGraph.QueryEdges.Count - 1).IsPartialFactTypeMatch Then
                     arQueryEdge.BaseNode = arPreviousTargetNode
+                ElseIf arPreviousTargetNode IsNot Nothing Then
+                    arQueryEdge.BaseNode = arPreviousTargetNode
                 End If
             End If
 
