@@ -3234,6 +3234,8 @@ NextWord:
                 Call Me.GO(True)
                 e.Handled = True
                 e.SuppressKeyPress = True
+            ElseIf e.KeyCode = Keys.Tab Then
+                Me.TextBoxInput.Focus()
             End If
         Catch ex As Exception
             Dim lsMessage As String

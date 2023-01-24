@@ -5,6 +5,10 @@
         Public Function GetNodeModifierFunction() As FEQL.pcenumFEQLNodeModifierFunction
             If Me.KEYWDDATE IsNot Nothing Then
                 Return FEQL.pcenumFEQLNodeModifierFunction.Date
+            ElseIf Me.KEYWDMONTH IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Month
+            ElseIf Me.KEYWDYEAR IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Year
             ElseIf Me.KEYWDTIME IsNot Nothing Then
                 Return FEQL.pcenumFEQLNodeModifierFunction.Time
             ElseIf Me.KEYWDTOLOWER IsNot Nothing Then
@@ -23,6 +27,26 @@
             End Get
             Set(value As String)
                 Me._KEYWDDATE = value
+            End Set
+        End Property
+
+        Private _KEYWDMONTH As String = Nothing
+        Public Property KEYWDMONTH As String
+            Get
+                Return Me._KEYWDMONTH
+            End Get
+            Set(value As String)
+                Me._KEYWDMONTH = value
+            End Set
+        End Property
+
+        Private _KEYWDYEAR As String = Nothing
+        Public Property KEYWDYEAR As String
+            Get
+                Return Me._KEYWDYEAR
+            End Get
+            Set(value As String)
+                Me._KEYWDYEAR = value
             End Set
         End Property
 

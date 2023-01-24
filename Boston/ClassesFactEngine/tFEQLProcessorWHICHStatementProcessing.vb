@@ -1617,6 +1617,21 @@
             Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
                                                   arQueryEdge.Predicate)
+
+            If arQueryEdge.FBMFactType IsNot Nothing Then
+                If arQueryEdge.FBMFactType.Arity = 2 Then
+                    If Not arQueryEdge.FBMFactType.getPrimaryFactTypeReading.PredicatePart(0).PredicatePartText = arQueryEdge.Predicate Then
+                        If arQueryEdge.FBMFactType.IsManyTo1BinaryFactType Then
+                            If arQueryEdge.BaseNode.Name <> arQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id Then
+                                arQueryEdge.IsReciprocal = True
+                            ElseIf arQueryEdge.BaseNode.Name = arQueryEdge.TargetNode.Name Then
+                                arQueryEdge.IsReciprocal = True
+                            End If
+                        End If
+                    End If
+                End If
+            End If
+
         End Sub
 #End Region
 

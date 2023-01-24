@@ -1304,6 +1304,8 @@ MoveForward:
                                         lrTempColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.FBMFactType.Id, lrQueryEdge.FBMFactType), Nothing)
                                     ElseIf lrQueryEdge.BaseNode.FBMModelObject.IsDerived Then
                                         lrTempColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.BaseNode.FBMModelObject.Id, lrQueryEdge.BaseNode.FBMModelObject), Nothing)
+                                    Else
+                                        lrTempColumn = lrColumn.Clone(New RDS.Table(Me.Model.RDS, lrQueryEdge.BaseNode.FBMModelObject.Id, lrQueryEdge.BaseNode.FBMModelObject), Nothing)
                                     End If
                                 End If
                                 If lrTempColumn Is Nothing And lrQueryEdge.FBMFactType.IsLinkFactType Then

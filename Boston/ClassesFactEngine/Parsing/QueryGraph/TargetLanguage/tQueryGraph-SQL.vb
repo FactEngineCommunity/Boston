@@ -61,6 +61,10 @@
                             Select Case lrProjectColumn.NodeModifierFunction
                                 Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
                                     lsSelectClause &= "DATE("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                    lsSelectClause &= "strftime('%m',"
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                    lsSelectClause &= "strftime('%Y',"
                                 Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
                                     lsSelectClause &= "TIME("
                                 Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
@@ -228,7 +232,7 @@
                     If Not lrQueryEdge.IsRecursive Then
                         If Me.Nodes.FindAll(Function(x) x.Name = lrQueryEdge.FBMFactType.Id).Count = 0 Then
                             If Not larFromNodes.Count = 0 Then lsSQLQuery &= vbCrLf & ","
-                            lsSQLQuery &= lrQueryEdge.FBMFactType.Id
+                            lsSQLQuery &= lrQueryEdge.FBMFactType.getCorrespondingRDSTable.DatabaseName
                             If lrQueryEdge.Alias IsNot Nothing Then
                                 lsSQLQuery &= " " & lrQueryEdge.FBMFactType.Id & Viev.NullVal(lrQueryEdge.Alias, "")
                             End If
@@ -779,8 +783,14 @@
 #Region "Other/Else"
                         Dim lrBaseNode, lrTargetNode As FactEngine.QueryNode
                         If lrQueryEdge.IsReciprocal Then
-                            lrBaseNode = lrQueryEdge.TargetNode
-                            lrTargetNode = lrQueryEdge.BaseNode
+                            If lrQueryEdge.FBMFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrQueryEdge.BaseNode.Id Then
+                                lrBaseNode = lrQueryEdge.TargetNode
+                                lrTargetNode = lrQueryEdge.BaseNode
+                            Else
+                                lrBaseNode = lrQueryEdge.BaseNode
+                                lrTargetNode = lrQueryEdge.TargetNode
+                            End If
+
                         ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
                             lrBaseNode = New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge, False)
                             lrTargetNode = lrQueryEdge.TargetNode
@@ -985,15 +995,21 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "")
+
                                 Select Case lrQueryEdge.TargetNode.ModifierFunction
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
-                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "date(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "date(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                        lsSQLQuery &= "strftime('%m'," & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                        lsSQLQuery &= "strftime('%Y'," & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
-                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "lower(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "lower(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
-                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "upper(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "upper(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
                                     Case Else
-                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                        lsSQLQuery &= lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
                                 End Select
 
 
@@ -1031,7 +1047,34 @@
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                                '20230124-VM-Was
+                                'lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+
+                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "")
+
+#Region "ModifierFunction"
+                                Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                        lsSQLQuery &= "date("
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                        lsSQLQuery &= "strftime('%m',"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                        lsSQLQuery &= "strftime('%Y',"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
+                                        lsSQLQuery &= "time("
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
+                                        lsSQLQuery &= "lower("
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+                                        lsSQLQuery &= "upper("
+                                    Case Else
+                                        lsSQLQuery &= ""
+                                End Select
+#End Region
+
+                                lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+
+                                lsSQLQuery &= Boston.returnIfTrue(lrQueryEdge.TargetNode.ModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
+
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
@@ -1127,18 +1170,24 @@
                                                 Else
                                                     lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                                                 End If
+
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "")
 #Region "ModifierFunction"
                                                 Select Case lrQueryEdge.TargetNode.ModifierFunction
                                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
-                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "date("
+                                                        lsSQLQuery &= "date("
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                                        lsSQLQuery &= "strftime('%m',"
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                                        lsSQLQuery &= "strftime('%Y',"
                                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
-                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "time("
+                                                        lsSQLQuery &= "time("
                                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
-                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "lower("
+                                                        lsSQLQuery &= "lower("
                                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
-                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & "upper("
+                                                        lsSQLQuery &= "upper("
                                                     Case Else
-                                                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "")
+                                                        lsSQLQuery &= ""
                                                 End Select
 #End Region
                                                 '20230119-VM-Was Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable

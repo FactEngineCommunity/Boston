@@ -665,6 +665,10 @@ Namespace FEQL
             Patterns.Add(TokenType.KEYWDMODEL, regex)
             Tokens.Add(TokenType.KEYWDMODEL)
 
+            regex = new Regex("MONTH", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDMONTH, regex)
+            Tokens.Add(TokenType.KEYWDMONTH)
+
             regex = new Regex("MODELNOTES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDMODELNOTES, regex)
             Tokens.Add(TokenType.KEYWDMODELNOTES)
@@ -852,6 +856,10 @@ Namespace FEQL
             regex = new Regex("WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWRITTENAS, regex)
             Tokens.Add(TokenType.KEYWDWRITTENAS)
+
+            regex = new Regex("YEAR", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDYEAR, regex)
+            Tokens.Add(TokenType.KEYWDYEAR)
 
             regex = new Regex("\+", RegexOptions.Compiled)
             Patterns.Add(TokenType.PLUS, regex)
@@ -1316,61 +1324,63 @@ Namespace FEQL
         KEYWDMATCH  = 306
         KEYWDMIN    = 307
         KEYWDMODEL  = 308
-        KEYWDMODELNOTES= 309
-        KEYWDMODELDICTIONARY= 310
-        KEYWDNO     = 311
-        KEYWDNULL   = 312
-        KEYWDOBJECT = 313
-        KEYWDOCCURSATLEASTONETIME= 314
-        KEYWDOCCURSATLEASTONETIMEINEACHOF= 315
-        KEYWDOF     = 316
-        KEYWDON     = 317
-        KEYWDONE    = 318
-        KEYWDONPAGE = 319
-        KEYWDOPEN   = 320
-        KEYWDOR     = 321
-        KEYWDORDERBY= 322
-        KEYWDPAGE   = 323
-        KEYWDPREDICATE= 324
-        KEYWDRETURN = 325
-        KEYWDROLE   = 326
-        KEYWDSELECT = 327
-        KEYWDRESTRICTEDTO= 328
-        KEYWDROLECONSTRAINTS= 329
-        KEYWDSET    = 330
-        KEYWDSHORTESTPATH= 331
-        KEYWDSHOW   = 332
-        KEYWDSHOWME = 333
-        KEYWDSTANDALONE= 334
-        KEYWDSUPERTYPE= 335
-        KEYWDTIME   = 336
-        KEYWDTHAT   = 337
-        KEYWDTO     = 338
-        KEYWDTODAY  = 339
-        KEYWDTOLOWER= 340
-        KEYWDTOUPPER= 341
-        KEYWDTOPAGE = 342
-        KEYWDTYPE   = 343
-        KEYWDUPDATE = 344
-        KEYWDVALUES = 345
-        KEYWDVALUETYPE= 346
-        KEYWDVALUETYPES= 347
-        KEYWDWHEN   = 348
-        KEYWDWHERE  = 349
-        KEYWDWITH   = 350
-        KEYWDWHAT   = 351
-        KEYWDWHEREALSO= 352
-        KEYWDWHICH  = 353
-        KEYWDWHO    = 354
-        KEYWDWRITTENAS= 355
-        PLUS        = 356
-        MINUS       = 357
-        DIVIDE      = 358
-        TIMES       = 359
-        EXPRESSIONSYMBOL= 360
-        KEYWDLESSTHAN= 361
-        KEYWDGREATERTHAN= 362
-        WHITESPACE  = 363
+        KEYWDMONTH  = 309
+        KEYWDMODELNOTES= 310
+        KEYWDMODELDICTIONARY= 311
+        KEYWDNO     = 312
+        KEYWDNULL   = 313
+        KEYWDOBJECT = 314
+        KEYWDOCCURSATLEASTONETIME= 315
+        KEYWDOCCURSATLEASTONETIMEINEACHOF= 316
+        KEYWDOF     = 317
+        KEYWDON     = 318
+        KEYWDONE    = 319
+        KEYWDONPAGE = 320
+        KEYWDOPEN   = 321
+        KEYWDOR     = 322
+        KEYWDORDERBY= 323
+        KEYWDPAGE   = 324
+        KEYWDPREDICATE= 325
+        KEYWDRETURN = 326
+        KEYWDROLE   = 327
+        KEYWDSELECT = 328
+        KEYWDRESTRICTEDTO= 329
+        KEYWDROLECONSTRAINTS= 330
+        KEYWDSET    = 331
+        KEYWDSHORTESTPATH= 332
+        KEYWDSHOW   = 333
+        KEYWDSHOWME = 334
+        KEYWDSTANDALONE= 335
+        KEYWDSUPERTYPE= 336
+        KEYWDTIME   = 337
+        KEYWDTHAT   = 338
+        KEYWDTO     = 339
+        KEYWDTODAY  = 340
+        KEYWDTOLOWER= 341
+        KEYWDTOUPPER= 342
+        KEYWDTOPAGE = 343
+        KEYWDTYPE   = 344
+        KEYWDUPDATE = 345
+        KEYWDVALUES = 346
+        KEYWDVALUETYPE= 347
+        KEYWDVALUETYPES= 348
+        KEYWDWHEN   = 349
+        KEYWDWHERE  = 350
+        KEYWDWITH   = 351
+        KEYWDWHAT   = 352
+        KEYWDWHEREALSO= 353
+        KEYWDWHICH  = 354
+        KEYWDWHO    = 355
+        KEYWDWRITTENAS= 356
+        KEYWDYEAR   = 357
+        PLUS        = 358
+        MINUS       = 359
+        DIVIDE      = 360
+        TIMES       = 361
+        EXPRESSIONSYMBOL= 362
+        KEYWDLESSTHAN= 363
+        KEYWDGREATERTHAN= 364
+        WHITESPACE  = 365
     End Enum
 
     <Serializable()>

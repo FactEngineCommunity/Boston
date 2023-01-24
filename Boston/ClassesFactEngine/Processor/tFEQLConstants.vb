@@ -12,6 +12,8 @@
         Public Enum pcenumFEQLNodeModifierFunction
             None
             [Date]
+            Month
+            Year
             Time
             ToLower
             ToUpper
