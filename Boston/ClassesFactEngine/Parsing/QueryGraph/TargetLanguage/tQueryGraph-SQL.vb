@@ -1,6 +1,24 @@
 ﻿Namespace FactEngine
     Partial Public Class QueryGraph
 
+        'THE MOST
+        'WHICH Customer placed THE MOST Orders
+        'Can extend to WHICH Customer placed THE MOST Orders THAT has (ShippedDate.YEAR:'2016')
+        '
+        'Select Case c.*
+        'From customers c
+        'Where c.customerId In
+        '(select customerId
+        ' from orders
+        ' group by customerId
+        ' having count(*) =
+        '(select count(*)
+        ' from orders ord
+        ' group by ord.customerId
+        ' order by count(*) desc 
+        'LIMIT 1))
+
+
         ''' <summary>
         ''' Generates SQL to run against the database for this QueryGraph
         ''' </summary>
