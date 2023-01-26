@@ -195,7 +195,7 @@
                         lsSQLQuery &= lrQueryNode.RDSTable.DatabaseName  'FBMModelObject.getCorrespondingRDSTable.Name
                     Else
                         'FBMModelObject.getCorrespondingRDSTable.Name
-                        lsSQLQuery &= lrQueryNode.RDSTable.DatabaseName & " " & lrQueryNode.Name & Viev.NullVal(lrQueryNode.Alias, "")
+                        lsSQLQuery &= lrQueryNode.RDSTable.DatabaseName & " " & lrQueryNode.FBMModelObject.DatabaseName & Viev.NullVal(lrQueryNode.Alias, "")
                     End If
 
                     liInd += 1
@@ -489,6 +489,7 @@
                 lrDerivationProcessor = New FEQL.Processor(Me.Model)
 
                 Dim larDerivedFactType = (From QueryEdge In Me.QueryEdges
+                                          Where QueryEdge.FBMFactType IsNot Nothing
                                           Where QueryEdge.FBMFactType.IsDerived
                                           Select New With {QueryEdge.FBMFactType, QueryEdge.Alias}).Distinct
 
@@ -512,7 +513,14 @@
 
                 'PartialFactTypeMatch
                 Dim lrPartialMatchFactType As FBM.FactType = Nothing
-                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) And Not x.FBMFactType.IsDerived And Not x.FBMFactType.IsUnaryFactType)
+                Dim larPotentialPartialFactTypeMatchEdges = From QueryEdge In Me.QueryEdges
+                                                            Where QueryEdge.FBMFactType IsNot Nothing
+                                                            Where Not (QueryEdge.IsSubQueryLeader Or QueryEdge.IsPartOfSubQuery)
+                                                            Where Not QueryEdge.FBMFactType.IsDerived
+                                                            Where Not QueryEdge.FBMFactType.IsUnaryFactType
+                                                            Select QueryEdge
+
+                For Each lrQueryEdge In larPotentialPartialFactTypeMatchEdges '20230126-VM-Was Me.QueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery) And Not x.FBMFactType.IsDerived And Not x.FBMFactType.IsUnaryFactType)
                     If lrQueryEdge.IsPartialFactTypeMatch Then
 
                         Dim larExistingNode = From Node In larFromNodes
@@ -544,6 +552,7 @@
                                                                                        x.IsRDSTable Or x.IsDerived)
 
                 Dim larEdgesWithDerivedFactType = (From QueryEdge In Me.QueryEdges
+                                                   Where QueryEdge.FBMFactType IsNot Nothing
                                                    Where QueryEdge.FBMFactType.IsDerived
                                                    Select QueryEdge).ToList
 
@@ -892,6 +901,7 @@
                     Dim lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
+                        If liInd > Me.HeadNode.IdentifierList.Count - 1 Then Exit For
                         lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
                         If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then
                             lsSQLQuery &= "AND "

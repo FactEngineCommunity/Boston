@@ -530,17 +530,27 @@ Public Class frmToolboxORMReadingEditor
 
         Try
 
-
             With New WaitCursor
 
                 Dim lbFactTypeReadingSuccessfullyCreated As Boolean = False
                 Dim lrFactTypeReading As New FBM.FactTypeReading(Me.zrFactTypeInstance.FactType)
+                Dim lrFactType As FBM.FactType = Me.zrFactTypeInstance.FactType
 
                 If Me.zrFactTypeInstance.FactType.FactTypeReading.Count = 0 Then
                     lrFactTypeReading.IsPreferred = True
                 End If
 
-                If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.TextboxReading.Text), lrFactTypeReading) Then
+                'E.g. For Employee reports to Employee on a ManyToOneBinaryFactType...make first Employee referenced Role that with an Internal Uniqueness Constraint.
+                Dim larRoleOrder As List(Of FBM.Role) = Nothing
+                If lrFactType.IsManyTo1BinaryFactType And
+                    lrFactType.FactTypeReading.Count = 0 And
+                    lrFactType.HasMoreThanOneRoleReferencingTheSameModelObject Then
+                    larRoleOrder = New List(Of FBM.Role)
+                    larRoleOrder.Add(lrFactType.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint))
+                    larRoleOrder.Add(lrFactType.RoleGroup.Find(Function(x) Not x.HasInternalUniquenessConstraint))
+                End If
+
+                If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.TextboxReading.Text), lrFactTypeReading, larRoleOrder) Then
                     '-------------------------------------------------
                     'All good. The reading text parsed successfully.
                     '-------------------------------------------------
