@@ -471,6 +471,9 @@ Namespace FEQL
                 Case TokenType.NUMBER2
                     Value = EvalNUMBER2(tree, paramlist)
                     Exit Select
+                Case TokenType.ORDERBYCOLUMN
+                    Value = EvalORDERBYCOLUMN(tree, paramlist)
+                    Exit Select
                 Case TokenType.PREDICATECLAUSE
                     Value = EvalPREDICATECLAUSE(tree, paramlist)
                     Exit Select
@@ -986,6 +989,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalNUMBER2(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalORDERBYCOLUMN(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
