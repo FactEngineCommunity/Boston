@@ -350,8 +350,10 @@ SkipThat:
                 Next
 #End Region
                 '=====================================================
+                Dim lbFactInstanceContainsNULLValueError As Boolean = False
 
                 For Each lrFactInstance In Me.FactTypeInstance.Fact
+                    lbFactInstanceContainsNULLValueError = lrFactInstance.Fact.ModelError.FindAll(Function(x) x.ErrorId = pcenumModelErrors.PopulationContainstNULLValueError).Count > 0
                     For liInd = 0 To (Me.FactTypeInstance.Arity - 1)
 
                         'CodeSafe
@@ -419,6 +421,8 @@ SkipThat:
 
                         End Select
                         If lrFactDataInstance.FactData.HasModelError Then
+                            lrFactDataInstance.Cell.TextColor = Color.Red
+                        ElseIf lbFactInstanceContainsNULLValueError Then
                             lrFactDataInstance.Cell.TextColor = Color.Red
                         Else
                             lrFactDataInstance.Cell.TextColor = Color.Black

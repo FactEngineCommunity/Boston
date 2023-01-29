@@ -35,6 +35,7 @@
         RoleConstraintConflictError = 129
         ModelLoadingError = 300
         ModelElementAppearsOnNoPage = 130
+        PopulationContainstNULLValueError = 131
     End Enum
 
 End Module

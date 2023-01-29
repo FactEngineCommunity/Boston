@@ -79,6 +79,7 @@ Namespace Validation
                 Me.AddErrorChecker(New Validation.RoleConstraintConflictError(Me.Model)) '129
                 'CompoundReferenceSchemeForEntityTypeWithReferenceMode
                 'Me.AddErrorChecker(New Validation.ModelElementAppearsOnNoPageError(Me.Model)) '130
+                Me.AddErrorChecker(New Validation.ErrorCheckerPopulationHasNULLValueError(Me.Model)) '131
 
             Catch ex As Exception
                 Dim lsMessage As String
