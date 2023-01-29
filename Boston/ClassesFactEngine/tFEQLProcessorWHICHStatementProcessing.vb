@@ -255,6 +255,9 @@
                         Case Is = FactEngine.pcenumWhichClauseType.AndThatIdentityCompatitor  '13. E.g. "Person 1 IS NOT Person 2" or "Person 1 IS Person 2"
                             Call Me.analystISNOTClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
 
+                        Case Is = FactEngine.pcenumWhichClauseType.AndThatValueComparitor  '13.3 E.g. "AND THAT Quantity > UnitsInStock"
+                            Call Me.analystMathComparitorClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge)
+
                         Case Is = FactEngine.pcenumWhichClauseType.BooleanPredicate  '14. E.g. Protein is enzyme
                             Call Me.analystBooleanPredicateClause(Me.WHICHCLAUSE, lrQueryGraph, lrQueryEdge, lrPreviousTargetNode)
 
@@ -341,7 +344,7 @@
                 Next
 
                 'Boston.WriteToStatusBar("Generating SQL", True)                
-                Dim larQueryEdgeTypes = {FactEngine.pcenumWhichClauseType.ISClause, FactEngine.pcenumWhichClauseType.ISNOTClause}
+                Dim larQueryEdgeTypes = {FactEngine.pcenumWhichClauseType.ISClause, FactEngine.pcenumWhichClauseType.ISNOTClause, FactEngine.pcenumWhichClauseType.AndThatValueComparitor}
 
                 'Try and fix ambiguities for PartialFactTypeMatch queries.
                 For liInd = lrQueryGraph.QueryEdges.Count - 1 To 0 Step -1
@@ -599,6 +602,8 @@
             arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge, True)
             arQueryEdge.TargetNode.PreboundText = Me.WHICHCLAUSE.NODE(0).PREBOUNDREADINGTEXT
             arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.ModifierFunction = Me.WHICHCLAUSE.NODE(0).GetNodeModifierFunction
+            arQueryEdge.TargetNode.IsDistinct = Me.WHICHCLAUSE.KEYWDDISTINCT IsNot Nothing
 
             If arWHICHCLAUSE.RECURSIVECLAUSE IsNot Nothing Then
                 If arWHICHCLAUSE.RECURSIVECLAUSE.KEYWDCIRCULAR IsNot Nothing Then
@@ -921,6 +926,7 @@
             Catch 'Not a biggie if not exists.
             End Try
             arQueryEdge.TargetNode.ModifierFunction = arWHICHCLAUSE.NODE(0).GetNodeModifierFunction
+            arQueryEdge.TargetNode.IsDistinct = arWHICHCLAUSE.KEYWDDISTINCT IsNot Nothing
             arQueryGraph.Nodes.Add(arQueryEdge.TargetNode) 'Was AddUnique, but WHICH implies that we are talking of a different TargetNode, as where TargeNode has been referenced before
 
             '---------------------------------------------------------
@@ -1539,6 +1545,40 @@
 
 #End Region
 
+        '13.3
+#Region "analystMathComparitorClause"
+
+        Public Sub analystMathComparitorClause(ByRef arWHICHCLAUSE As FEQL.WHICHCLAUSE,
+                                               ByRef arQueryGraph As FactEngine.QueryGraph,
+                                               ByRef arQueryEdge As FactEngine.QueryEdge)
+
+            arQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.AndThatValueComparitor
+            arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.AndThatValueComparitor
+
+            arQueryEdge.MathComparitor = arWHICHCLAUSE.COMPARITOR.getFEQLMathComparitor
+
+            'Set the BaseNode
+            Dim lrFBMModelObject As FBM.ModelObject
+            Me.MODELELEMENTCLAUSE = New FEQL.MODELELEMENTClause
+            Call Me.GetParseTreeTokensReflection(Me.MODELELEMENTCLAUSE, Me.WHICHCLAUSE.MODELELEMENT(0))
+
+            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.MODELELEMENTCLAUSE.MODELELEMENTNAME)
+            arQueryEdge.BaseNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
+            arQueryEdge.BaseNode.Alias = Me.MODELELEMENTCLAUSE.MODELELEMENTSUFFIX
+            arQueryEdge.BaseNode.RelativeFBMModelObject = arQueryGraph.FindPreviousQueryEdgeBaseNodeByTargetNodeName(arQueryEdge.BaseNode.Name).FBMModelObject
+
+            'Set the TargetNode
+            lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHCLAUSE.NODE(0).MODELELEMENTNAME)
+            arQueryEdge.TargetNode = New FactEngine.QueryNode(lrFBMModelObject, arQueryEdge)
+            arQueryEdge.TargetNode.Alias = Me.WHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
+            arQueryEdge.TargetNode.RelativeFBMModelObject = arQueryGraph.FindPreviousQueryEdgeBaseNodeByTargetNodeName(arQueryEdge.TargetNode.Name).FBMModelObject
+
+            'NB There is no Predicate or FBMFactType for this type of QueryEdge
+
+        End Sub
+
+#End Region
+
         '14
 #Region "analystBooleanPredicateClause"
 
@@ -1685,6 +1725,13 @@
 
                 'E.g. Person 1 IS NOT Person 2
                 Return FactEngine.Constants.pcenumWhichClauseType.AndThatIdentityCompatitor
+
+                '13.3
+            ElseIf Me.WHICHCLAUSE.KEYWDTHAT.Count = 1 And
+                   Me.WHICHCLAUSE.COMPARITOR IsNot Nothing Then
+
+                'E.g. AND THAT Quantity > UnitsInStock
+                Return FactEngine.Constants.pcenumWhichClauseType.AndThatValueComparitor
 
                 '12
             ElseIf Me.WHICHCLAUSE.WITHCLAUSE IsNot Nothing Then
