@@ -255,6 +255,7 @@ Namespace RDS
         Public QueryEdge As FactEngine.QueryEdge 'The Edge that resulted in the Column, if is not the HeadNode of the Nodes of the QueryGraph
         Public ProjectionOrdinalPosition As Integer = 0 'The ordinal position of the Column in the set of ProjectionColumns such that the color can be set for the corresponding node in the GraphView of the FactEngine form.
         Public NodeModifierFunction As FEQL.pcenumFEQLNodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None
+        Public IsDistinct As Boolean = False 'True if the Column is to be returned in a DISTINCT Clause in the SQL,Cypher,TypeQL. E.g. In "WHICH Order was placed on WHICH DISTINCT OrderDate.YEAR AND is for (Product:'Steeleye Stout')"
 #End Region
 
         ''' <summary>
