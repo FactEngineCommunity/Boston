@@ -20,6 +20,7 @@
             AndThatIdentityCompatitor = 13 '                    E.g. "Person 1 IS NOT Person 2" Or "Person 1 IS Person 2"            
             ISNOTClause = 131 '                                 E.g. Person 1 IS NOT Person 2
             ISClause = 132 '                                    E.g. Person 1 IS Person 2
+            AndThatValueComparitor = 133 '                      E.g. AND THAT Quantity > UnitsInStock
             BooleanPredicate = 14 '                             E.g. Protein is ensyme
             ThatModelElementPredicate = 15 '                    E.g. THAT James Dean played in (as in "SHOW ME Movies THAT James Dean played in")
 
