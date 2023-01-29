@@ -58,6 +58,29 @@
 
         End Function
 
+        Public Function FindPreviousQueryEdgeBaseNodeByTargetNodeName(ByVal asModelElementName As String) As FactEngine.QueryNode
+
+            Try
+                Dim liInd As Integer = Me.QueryEdges.Count - 1
+
+                If Me.QueryEdges.Count = 0 Then
+                    Return Nothing
+                Else
+                    For Each lrQueryEdge In Me.QueryEdges.ToArray.Reverse
+                        If lrQueryEdge.TargetNode.Name = asModelElementName Then
+                            Return lrQueryEdge.BaseNode
+                        End If
+                    Next
+                End If
+
+                Return Nothing
+
+            Catch ex As Exception
+                Return Nothing
+            End Try
+
+        End Function
+
         Public Function generateTypeQL(ByRef arWhichSelectStatement As FEQL.WHICHSELECTStatement,
                                        Optional ByVal abIsCountStarSubQuery As Boolean = False,
                                        Optional ByVal abIsStraightDerivationClause As Boolean = False,
@@ -1100,6 +1123,7 @@
 
                                 Try
                                     Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
+                                    lrColumn.NodeModifierFunction = lrReturnColumn.GetNodeModifierFunction
                                     lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
                                     If lrReturnColumn.ASCLAUSE IsNot Nothing Then
                                         lrColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
@@ -1318,12 +1342,17 @@ MoveForward:
                                     lrTempColumn.TemporaryAlias = lrQueryEdge.TargetNode.Alias
                                 Else
                                     lrTempColumn.TemporaryAlias = lrQueryEdge.BaseNode.Alias
-                                    lrTempColumn.NodeModifierFunction = lrQueryEdge.BaseNode.ModifierFunction
+                                    If lrRole.JoinedORMObject.Id = lrTempColumn.Table.Name Then
+                                        lrTempColumn.NodeModifierFunction = lrQueryEdge.BaseNode.ModifierFunction
+                                    Else
+                                        lrTempColumn.NodeModifierFunction = lrQueryEdge.TargetNode.ModifierFunction
+                                        lrTempColumn.IsDistinct = lrQueryEdge.TargetNode.IsDistinct
+                                    End If
                                 End If
-                                lrColumn.GraphNodeType = lrQueryEdge.BaseNode.Name
-                                lrColumn.QueryEdge = lrQueryEdge
+                                lrTempColumn.GraphNodeType = lrQueryEdge.BaseNode.Name '20230128-VM-Was lrColumn
+                                lrTempColumn.QueryEdge = lrQueryEdge '20230128-VM-Was lrColumn
 
-                                larColumn.AddUnique(lrColumn)
+                                larColumn.AddUnique(lrTempColumn) '20230128-VM-Was lrColumn
                             Case Else
                                 Dim larEdgeColumn As List(Of RDS.Column)
                                 If lrRole IsNot Nothing Then
