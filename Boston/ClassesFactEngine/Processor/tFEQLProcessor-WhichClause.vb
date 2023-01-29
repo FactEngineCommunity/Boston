@@ -41,6 +41,16 @@
             End Set
         End Property
 
+        Private _COMPARITOR As FEQL.Comparitor = Nothing
+        Public Property COMPARITOR As FEQL.Comparitor
+            Get
+                Return Me._COMPARITOR
+            End Get
+            Set(value As FEQL.Comparitor)
+                Me._COMPARITOR = value
+            End Set
+        End Property
+
         Private _KEYWDA As String = Nothing
         Public Property KEYWDA As String
             Get
@@ -151,6 +161,16 @@
             End Get
             Set(value As String)
                 Me._KEYWDWHICH = value
+            End Set
+        End Property
+
+        Private _KEYWDDISTINCT As String = Nothing
+        Public Property KEYWDDISTINCT As String
+            Get
+                Return Me._KEYWDDISTINCT
+            End Get
+            Set(value As String)
+                Me._KEYWDDISTINCT = value
             End Set
         End Property
 

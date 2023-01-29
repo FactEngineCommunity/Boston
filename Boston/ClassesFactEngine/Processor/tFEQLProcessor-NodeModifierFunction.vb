@@ -15,6 +15,14 @@
                 Return FEQL.pcenumFEQLNodeModifierFunction.ToLower
             ElseIf Me.KEYWDTOUPPER IsNot Nothing Then
                 Return FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+            ElseIf Me.KEYWDSUM IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Sum
+            ElseIf Me.KEYWDAVG IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Average
+            ElseIf Me.KEYWDMAX IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Max
+            ElseIf Me.KEYWDMIN IsNot Nothing Then
+                Return FEQL.pcenumFEQLNodeModifierFunction.Min
             Else
                 Return pcenumFEQLNodeModifierFunction.None
             End If
@@ -77,6 +85,46 @@
             End Get
             Set(value As String)
                 Me._KEYWDTOUPPER = value
+            End Set
+        End Property
+
+        Private _KEYWDSUM As String = Nothing
+        Public Property KEYWDSUM As String
+            Get
+                Return Me._KEYWDSUM
+            End Get
+            Set(value As String)
+                Me._KEYWDSUM = value
+            End Set
+        End Property
+
+        Private _KEYWDAVG As String = Nothing
+        Public Property KEYWDAVG As String
+            Get
+                Return Me._KEYWDAVG
+            End Get
+            Set(value As String)
+                Me._KEYWDAVG = value
+            End Set
+        End Property
+
+        Private _KEYWDMAX As String = Nothing
+        Public Property KEYWDMAX As String
+            Get
+                Return Me._KEYWDMAX
+            End Get
+            Set(value As String)
+                Me._KEYWDMAX = value
+            End Set
+        End Property
+
+        Private _KEYWDMIN As String = Nothing
+        Public Property KEYWDMIN As String
+            Get
+                Return Me._KEYWDMIN
+            End Get
+            Set(value As String)
+                Me._KEYWDMIN = value
             End Set
         End Property
 
