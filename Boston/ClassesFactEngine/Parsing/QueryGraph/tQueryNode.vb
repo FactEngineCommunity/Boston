@@ -79,14 +79,24 @@ Namespace FactEngine
         Public MathFunction As pcenumMathFunction = pcenumMathFunction.None
         Public MathNumber As Double = 0
 
-        Public ReadOnly Property RelativeFBMModelObject() As FBM.ModelObject
+        Private _RelativeFBMModelObject As FBM.ModelObject = Nothing
+        ''' <summary>
+        ''' A QueryNode may represent a ValueType for a Column, and so QueryNode.RDSTable will return the Column for the relative Table for the RelativeFBMModelObject
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property RelativeFBMModelObject() As FBM.ModelObject
             Get
-                If Me.FBMModelObject.IsAbsorbed Then
+                If Me._RelativeFBMModelObject IsNot Nothing Then
+                    Return Me._RelativeFBMModelObject
+                ElseIf Me.FBMModelObject.IsAbsorbed Then
                     Return Me.FBMModelObject.GetTopmostNonAbsorbedSupertype
                 Else
                     Return Me.FBMModelObject
                 End If
             End Get
+            Set(value As FBM.ModelObject)
+                Me._RelativeFBMModelObject = value
+            End Set
         End Property
 
         ''' <summary>
@@ -113,6 +123,8 @@ Namespace FactEngine
                 End Select
             End Get
         End Property
+
+        Public IsDistinct As Boolean = False 'As in WHICH Order was placed on WHICH DISTINCT OrderDate.YEAR AND is for (Product:'Steeleye Stout')
 
         ''' <summary>
         ''' Parameterless New
