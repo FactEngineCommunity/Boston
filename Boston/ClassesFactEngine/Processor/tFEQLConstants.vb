@@ -1,6 +1,13 @@
 ﻿Namespace FEQL
     Public Module tFEQLConstants
 
+        Public Enum pcenumFEQLMathComparitor
+            None
+            Equals
+            LessThan
+            GreaterThan
+        End Enum
+
         Public Enum pcenumFEQLComparitor
             Bang
             Carret
@@ -17,6 +24,16 @@
             Time
             ToLower
             ToUpper
+            Sum
+            Average
+            Max
+            Min
+        End Enum
+
+        Public Enum pcenumFEQLOrderByDirection
+            None
+            Ascending
+            Descending
         End Enum
 
     End Module
