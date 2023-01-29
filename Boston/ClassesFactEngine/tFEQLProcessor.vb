@@ -305,6 +305,16 @@ Namespace FEQL
 
     Public Class RETURNCOLUMN
 
+        Public Function GetNodeModifierFunction() As FEQL.pcenumFEQLNodeModifierFunction
+
+            If Me.NODEMODIFIERFUNCTION IsNot Nothing Then
+                Return Me.NODEMODIFIERFUNCTION.GetNodeModifierFunction
+            Else
+                Return FEQL.pcenumFEQLNodeModifierFunction.None
+            End If
+
+        End Function
+
         Private _MODELELEMENTNAME As String = Nothing
         Public Property MODELELEMENTNAME As String
             Get
@@ -355,6 +365,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _NODEMODIFIERFUNCTION As FEQL.NodeModifierFunction = Nothing
+        Public Property NODEMODIFIERFUNCTION As FEQL.NodeModifierFunction
+            Get
+                Return Me._NODEMODIFIERFUNCTION
+            End Get
+            Set(value As FEQL.NodeModifierFunction)
+                Me._NODEMODIFIERFUNCTION = value
+            End Set
+        End Property
+
     End Class
 
     Public Class RETURNCLAUSE
@@ -376,6 +396,66 @@ Namespace FEQL
             End Get
             Set(value As List(Of RETURNCOLUMN))
                 Me._RETURNCOLUMN = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class ORDERBYCOLUMN
+
+        Public ReadOnly Property OrderByDirection As FEQL.pcenumFEQLOrderByDirection
+            Get
+                If Me._KEYWDASC IsNot Nothing Then
+                    Return pcenumFEQLOrderByDirection.Ascending
+                ElseIf Me._KEYWDDESC IsNot Nothing Then
+                    Return pcenumFEQLOrderByDirection.Descending
+                Else
+                    Return pcenumFEQLOrderByDirection.None
+                End If
+            End Get
+        End Property
+
+        Private _RETURNCOLUMN As RETURNCOLUMN = Nothing
+        Public Property RETURNCOLUMN As RETURNCOLUMN
+            Get
+                Return Me._RETURNCOLUMN
+            End Get
+            Set(value As RETURNCOLUMN)
+                Me._RETURNCOLUMN = value
+            End Set
+        End Property
+
+        Private _KEYWDASC As String = Nothing
+        Public Property KEYWDASC As String
+            Get
+                Return Me._KEYWDASC
+            End Get
+            Set(value As String)
+                Me._KEYWDASC = value
+            End Set
+        End Property
+
+        Private _KEYWDDESC As String = Nothing
+        Public Property KEYWDDESC As String
+            Get
+                Return Me._KEYWDDESC
+            End Get
+            Set(value As String)
+                Me._KEYWDDESC = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class ORDERBYCLAUSE
+
+        Private _ORDERBYCOLUMN As New List(Of ORDERBYCOLUMN)
+        Public Property ORDERBYCOLUMN As List(Of ORDERBYCOLUMN)
+            Get
+                Return Me._ORDERBYCOLUMN
+            End Get
+            Set(value As List(Of ORDERBYCOLUMN))
+                Me._ORDERBYCOLUMN = value
             End Set
         End Property
 
@@ -549,6 +629,16 @@ Namespace FEQL
             End Get
             Set(value As RETURNCLAUSE)
                 Me._RETURNCLAUSE = value
+            End Set
+        End Property
+
+        Private _ORDERBYCLAUSE As ORDERBYCLAUSE
+        Public Property ORDERBYCLAUSE As ORDERBYCLAUSE
+            Get
+                Return Me._ORDERBYCLAUSE
+            End Get
+            Set(value As ORDERBYCLAUSE)
+                Me._ORDERBYCLAUSE = value
             End Set
         End Property
 
