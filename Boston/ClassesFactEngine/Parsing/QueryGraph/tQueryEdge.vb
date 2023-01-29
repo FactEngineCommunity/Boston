@@ -128,6 +128,8 @@ Namespace FactEngine
             End Get
         End Property
 
+        Public MathComparitor As FEQL.pcenumFEQLMathComparitor = FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None
+
         ''' <summary>
         ''' Paremeterless New
         ''' </summary>
