@@ -460,6 +460,7 @@
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-Cypher.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-SQL.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLConstants.vb" />
+    <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-Comparitor.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-DerivationFormula.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-FactReading.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-NodeModifierFunction.vb" />

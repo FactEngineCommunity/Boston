@@ -39,6 +39,7 @@
             Dim larColumn As New List(Of RDS.Column)
             Dim lbRequiresGroupByClause As Boolean = False
             Dim lsSelectClause As String = ""
+            Dim lbHasDistinctClause As Boolean = False
 
             Try
                 'Set the Node Aliases. E.g. If Lecturer occurs twice in the FROM clause, then Lecturer, Lecturer2 etc
@@ -50,7 +51,11 @@
                     If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
                         If arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing Then
                             lsSQLQuery &= "DISTINCT "
+                            lbHasDistinctClause = True
                         End If
+                    ElseIf Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
+                        lsSQLQuery &= "DISTINCT "
+                        lbHasDistinctClause = True
                     End If
 #Region "ProjectionColums"
                     liInd = 1
@@ -58,6 +63,9 @@
                     Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
                     Me.ProjectionColumn = larProjectionColumn
 
+                    If lbHasDistinctClause And Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
+                        larProjectionColumn.RemoveAll(Function(x) Not x.IsDistinct)
+                    End If
 
                     For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
@@ -89,6 +97,14 @@
                                     lsSelectClause &= "LOWER("
                                 Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
                                     lsSelectClause &= "UPPER("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Sum
+                                    lsSelectClause &= "SUM("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Average
+                                    lsSelectClause &= "AVG("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Max
+                                    lsSelectClause &= "MAX("
+                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Min
+                                    lsSelectClause &= "MIN("
                                 Case Else
                                     lsSelectClause &= ""
                             End Select
@@ -580,7 +596,8 @@
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None Or
+                                                                                              x.MathComparitor <> FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None))
                 '20210826-VM-Removed
                 'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
@@ -598,7 +615,7 @@
                 larConditionalQueryEdges.RemoveAll(Function(x) x.TargetNodeIsExcludedConditional)
 
                 If Not abIsStraightDerivationClause Then
-                    larConditionalQueryEdges.RemoveAll(Function(x) x.FBMFactType.IsDerived)
+                    larConditionalQueryEdges.RemoveAll(Function(x) x.IsDerived)
                 End If
 
                 'Recursive NodePropertyIdentification conditionals are excluded.
@@ -681,7 +698,6 @@
                     ElseIf lrQueryEdge.WhichClauseType = pcenumWhichClauseType.AndThatIdentityCompatitor Then
                         'E.g. Of the type "Person 1 Is Not Person 2" or "Person 1 Is Person 2"
 #Region "AndThatIdentityComparitor. 'E.g. Of the type 'Person 1 Is Not Person 2' or 'Person 1 Is Person 2'"
-
 
                         lsSQLQuery &= "("
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
@@ -903,7 +919,7 @@
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
                         If liInd > Me.HeadNode.IdentifierList.Count - 1 Then Exit For
                         lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
-                        If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then
+                        If (liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1) And (liInd < Me.HeadNode.IdentifierList.Count - 1) Then
                             lsSQLQuery &= "AND "
                         End If
                         liInd += 1
@@ -913,6 +929,23 @@
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
                     Select Case lrQueryEdge.WhichClauseSubType
+                        Case Is = pcenumWhichClauseType.AndThatValueComparitor
+                            'E.g. "AND THAT Quantity > UnitsInStock"
+#Region "AndThatValueComparitor. 'E.g. AND THAT Quantity > UnitsInStock"
+
+                            lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrQueryEdge.BaseNode.Name
+                            Select Case lrQueryEdge.MathComparitor
+                                Case Is = FEQL.pcenumFEQLMathComparitor.Equals
+                                    lsSQLQuery &= " = "
+                                Case Is = FEQL.pcenumFEQLMathComparitor.LessThan
+                                    lsSQLQuery &= " < "
+                                Case Is = FEQL.pcenumFEQLMathComparitor.GreaterThan
+                                    lsSQLQuery &= " > "
+                            End Select
+                            lsSQLQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrQueryEdge.TargetNode.Name
+
+#End Region
+
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
                             Dim lrFactType As FBM.FactType = Nothing
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
@@ -1338,6 +1371,47 @@
                 'Group By clause
                 If lbRequiresGroupByClause Then
                     lsSQLQuery &= "GROUP BY " & lsSelectClause
+                End If
+
+                If arWhichSelectStatement.ORDERBYCLAUSE IsNot Nothing Then
+                    lsSQLQuery.AppendLine("ORDER BY ")
+                    liInd = 0
+                    For Each lrOrderByColum In arWhichSelectStatement.ORDERBYCLAUSE.ORDERBYCOLUMN
+                        If liInd > 0 Then lsSQLQuery &= ","
+
+                        If lrOrderByColum.RETURNCOLUMN.KEYWDCOUNTSTAR IsNot Nothing Then
+                            lsSQLQuery &= " COUNT(*)"
+                        ElseIf lrOrderByColum.RETURNCOLUMN.COLUMNNAMESTR IsNot Nothing Then
+                            lsSQLQuery &= lrOrderByColum.RETURNCOLUMN.MODELELEMENTNAME & "." & lrOrderByColum.RETURNCOLUMN.COLUMNNAMESTR
+                        Else
+                            Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrOrderByColum.RETURNCOLUMN.MODELELEMENTNAME, True)
+                            If lrModelElement Is Nothing Then
+                                Throw New Exception("Could not find Model Element, " & lrOrderByColum.RETURNCOLUMN.MODELELEMENTNAME & ", in ORDER BY Clause.")
+                            Else
+                                Dim liInd2 = 0
+                                Dim lrTable As RDS.Table = lrModelElement.getCorrespondingRDSTable()
+                                If lrTable Is Nothing Then
+                                    Throw New Exception("Could not find a Table for Model Element name, " & lrOrderByColum.RETURNCOLUMN.MODELELEMENTNAME & ", in ORDER BY Clause.")
+                                End If
+                                For Each lrColumn In lrTable.getFirstUniquenessConstraintColumns
+                                    If liInd2 > 0 Then lsSQLQuery &= ","
+                                    lsSQLQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.DatabaseName
+                                    liInd2 += 1
+                                Next
+                            End If
+                        End If
+
+                        Select Case lrOrderByColum.OrderByDirection
+                            Case Is = FEQL.pcenumFEQLOrderByDirection.None
+                            Case Is = FEQL.pcenumFEQLOrderByDirection.Ascending
+                                lsSQLQuery &= " ASC"
+                            Case Is = FEQL.pcenumFEQLOrderByDirection.Descending
+                                lsSQLQuery &= " DESC"
+                        End Select
+
+                        liInd += 1
+                    Next
+
                 End If
 
 

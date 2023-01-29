@@ -671,11 +671,19 @@ Public Class frmFactEngine
 
     End Sub
 
-    Private Function GetGPT3Result(ByVal asNLQuery As String) As CompletionResult
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="asNLQuery">May contain training data</param>
+    ''' <param name="asActualNLQuery">The actual NL query being processed.</param>
+    ''' <returns></returns>
+    Private Function GetGPT3Result(ByVal asNLQuery As String, Optional ByVal asActualNLQuery As String = "") As CompletionResult
 
         Try
+            Dim liMaxTokens As Integer = Viev.Greater(80, CInt(asActualNLQuery.Split(" ").Length * 3.5))
+
             Return Task.Run(Function() Me.mrOpenAIAPI.Completions.CreateCompletionAsync(
-                New CompletionRequest(asNLQuery, model:=Model.DavinciCode, temperature:=0, max_tokens:=80)
+                New CompletionRequest(asNLQuery, model:=Model.DavinciCode, temperature:=0, max_tokens:=liMaxTokens)
                 )).Result
 
         Catch ex As Exception
@@ -726,7 +734,7 @@ Public Class frmFactEngine
 
                             Dim lsGPTTrainingExamples = System.IO.File.ReadAllText(lsGPT3TrainingExamplesFilePath)
 
-                            Dim lrCompletionResult = Me.GetGPT3Result(lsGPTTrainingExamples & "#" & lsNaturalLanguageQuery & vbCrLf)
+                            Dim lrCompletionResult = Me.GetGPT3Result(lsGPTTrainingExamples & "#" & lsNaturalLanguageQuery & vbCrLf, lsNaturalLanguageQuery)
                             Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
                             Me.TextBoxInput.Text = lsGPT3ReturnString.Substring(0, Boston.returnIfTrue(lsGPT3ReturnString.IndexOf(vbCrLf) = -1, lsGPT3ReturnString.Length - 1, lsGPT3ReturnString.IndexOf(vbCrLf)))
 #End Region
