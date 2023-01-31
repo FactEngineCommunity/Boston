@@ -49,8 +49,13 @@ Public Class frmCustomMessageBox
     End Sub
 
     Public Overloads Function ShowDialog() As String
-        MyBase.ShowDialog()
-        Return Me.ReturnValue
+        Try
+            MyBase.ShowDialog()
+            Return Me.ReturnValue
+        Catch ex As Exception
+            'Catestrophic. Don't know, at this stage, why this would happen.
+        End Try
+
     End Function
 
 

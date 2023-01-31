@@ -457,6 +457,7 @@
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLScanner.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tFEQLTextHighlighter.vb" />
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tTextMarker.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\Formula\tQueryFormulaToken.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-Cypher.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-SQL.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLConstants.vb" />

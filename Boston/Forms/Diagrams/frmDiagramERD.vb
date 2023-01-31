@@ -3863,4 +3863,36 @@ Aborted:
         End Try
 
     End Sub
+
+    Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
+
+        Try
+            Dim lrRDSRelation As RDS.Relation = Me.zrPage.SelectedObject(0)
+
+            prApplication.WorkingModel = Me.zrPage.Model
+            prApplication.WorkingPage = Me.zrPage
+
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Call prApplication.WorkingModel.connectToDatabase()
+            End If
+
+            Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+
+            lfrmToolboxTableData.mrTable = Nothing
+            lfrmToolboxTableData.mrFactType = lrRDSRelation.ResponsibleFactType
+            lfrmToolboxTableData.mrRDSRelation = lrRDSRelation
+            lfrmToolboxTableData.mrModel = prApplication.WorkingModel
+            Call lfrmToolboxTableData.SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

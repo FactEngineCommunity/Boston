@@ -85,6 +85,7 @@ Partial Class frmDiagramERD
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -432,24 +433,22 @@ Partial Class frmDiagramERD
         '
         'ContextMenuStrip_Relation
         '
-        Me.ContextMenuStrip_Relation.AutoSize = False
-        Me.ContextMenuStrip_Relation.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation})
+        Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemEditRelation, Me.ToolStripMenuItemDeleteRelation, Me.ToolStripMenuItem3})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(189, 86)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(181, 92)
         '
         'ToolStripMenuItemEditRelation
         '
         Me.ToolStripMenuItemEditRelation.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ToolStripMenuItemEditRelation.Name = "ToolStripMenuItemEditRelation"
-        Me.ToolStripMenuItemEditRelation.Size = New System.Drawing.Size(161, 30)
+        Me.ToolStripMenuItemEditRelation.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemEditRelation.Text = "&Edit Relation"
         '
         'ToolStripMenuItemDeleteRelation
         '
         Me.ToolStripMenuItemDeleteRelation.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ToolStripMenuItemDeleteRelation.Name = "ToolStripMenuItemDeleteRelation"
-        Me.ToolStripMenuItemDeleteRelation.Size = New System.Drawing.Size(161, 30)
+        Me.ToolStripMenuItemDeleteRelation.Size = New System.Drawing.Size(180, 22)
         Me.ToolStripMenuItemDeleteRelation.Text = "&Delete Relation"
         '
         'ContextMenuStripTab
@@ -507,6 +506,13 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView.Size = New System.Drawing.Size(938, 524)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
+        '
+        'ToolStripMenuItem3
+        '
+        Me.ToolStripMenuItem3.Image = Global.Boston.My.Resources.Resources.Table
+        Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem3.Text = "View &Table Data"
         '
         'frmDiagramERD
         '
@@ -588,4 +594,5 @@ Partial Class frmDiagramERD
     Friend WithEvents ToolStripMenuItemIndexManager As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemAddAttribute As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator9 As ToolStripSeparator
+    Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
 End Class

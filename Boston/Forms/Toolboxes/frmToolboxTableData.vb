@@ -3,7 +3,9 @@
 Public Class frmToolboxTableData
 
     Public mrModel As FBM.Model
-    Public mrTable As RDS.Table = Nothing
+    Public mrTable As RDS.Table = Nothing 'For when editing data of a Table/Node/Entity.
+    Public mrFactType As FBM.FactType = Nothing 'For when editing data of a link between Tables/Nodes/Entities
+    Public mrRDSRelation As RDS.Relation = Nothing
     Private mrRecordset As ORMQL.Recordset
     Private mrDataGridList As ORMQL.RecordsetDataGridList
 
@@ -27,15 +29,15 @@ Public Class frmToolboxTableData
 
         'RemoveHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
 
-        Dim lsSQLQuery As String
+        Dim lsSQLQuery As String = ""
 
         Try
             Call Me.mrModel.connectToDatabase(True)
 
             If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
             Else
-                If Me.mrTable Is Nothing Then
-                Else
+                If Me.mrTable IsNot Nothing Then
+
                     Select Case Me.mrModel.TargetDatabaseType
                         Case Is = pcenumDatabaseType.Neo4j
                             lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
@@ -55,31 +57,61 @@ Public Class frmToolboxTableData
                             lsSQLQuery &= " LIMIT 100"
                     End Select
 
-                    Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
+                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery)
 
-                    If Me.mrRecordset.Facts.Count = 0 Then
-                        Select Case Me.mrModel.TargetDatabaseType
-                            Case Is = pcenumDatabaseType.Neo4j
-                                Dim larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                ElseIf Me.mrFactType IsNot Nothing Then
 
-                                For Each lrColumn In larColumn
-                                    Me.mrRecordset.Columns.Add(LCase(mrTable.DatabaseName) & "." & lrColumn.Name)
-                                Next
+                    Dim lrRDSRelation As RDS.Relation = Nothing
 
-                            Case Is = pcenumDatabaseType.TypeDB
-                                'N/A
-                            Case Else
-                                'N/A
-                        End Select
-                    End If
+                    Try
+                        lrRDSRelation = (From Relation In Me.mrModel.RDS.Relation
+                                         Where Relation.ResponsibleFactType.Id = Me.mrFactType.Id
+                                         Select Relation).First
 
-                    Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
-                    'Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
-                    Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+                    Catch ex As Exception
+                        Throw New Exception("No relation found for the Fact Type, " & Me.mrFactType.Id)
+                    End Try
 
-                    If Me.mrRecordset.Facts.Count = 0 Then
-                        Me.ButtonAddRow.Enabled = True
-                    End If
+                    Dim larColumn As New List(Of RDS.Column)
+
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j
+                            'lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+                            'Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                            'lsSQLQuery &= "RETURN " & lsColumnList & ";"
+                        Case Is = pcenumDatabaseType.TypeDB
+                            'lsSQLQuery = "match $table isa " & mrTable.DatabaseName
+                            'For Each lrColumn In Me.mrTable.Column
+                            '    lsSQLQuery &= ", has " & lrColumn.Name & " $" & lrColumn.Name
+                            'Next
+                            'lsSQLQuery &= ";" & vbCrLf
+                            'Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.Select(Function(x) "$" & x.Name))
+
+                            'lsSQLQuery &= "get " & lsColumnList & ";"
+                        Case Else
+                            larColumn.AddRange(lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.ConvertAll(Function(x) x.Clone(Nothing, Nothing)))
+                            larColumn.AddRange(lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.ConvertAll(Function(x) x.Clone(Nothing, Nothing)))
+                            lsSQLQuery = "SELECT "
+                            Dim liInd = 0
+                            For Each lrColumn In larColumn
+                                If liInd > 0 Then lsSQLQuery &= ", "
+                                lsSQLQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            lsSQLQuery.AppendLine("FROM " & lrRDSRelation.OriginTable.DatabaseName & vbCrLf & ", " & lrRDSRelation.DestinationTable.DatabaseName)
+                            lsSQLQuery.AppendLine(" WHERE ")
+                            For liInd = 0 To lrRDSRelation.OriginColumns.Count - 1
+                                If liInd > 0 Then lsSQLQuery.AppendLine("AND ")
+                                lsSQLQuery &= lrRDSRelation.OriginTable.DatabaseName & "." & lrRDSRelation.OriginColumns(liInd).Name
+                                lsSQLQuery &= " = " & lrRDSRelation.DestinationTable.DatabaseName & "." & lrRDSRelation.DestinationColumns(liInd).Name
+                            Next
+                            lsSQLQuery.AppendLine(" LIMIT 100")
+                    End Select
+
+                    Dim lrTable As New RDS.Table(Me.mrModel.RDS, "DummyTable", Nothing)
+                    lrTable.Column.AddRange(larColumn)
+                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, lrTable)
+
                 End If
             End If
 
@@ -102,6 +134,49 @@ Public Class frmToolboxTableData
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
+    End Sub
+
+    Private Sub PopulateDataGridFromDatabaseQuery(ByVal asDatabaseQuery As String, Optional arTable As RDS.Table = Nothing)
+
+        Try
+            Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(asDatabaseQuery)
+
+            Dim lrTable As RDS.Table = Me.mrTable
+            If arTable IsNot Nothing Then
+                lrTable = arTable
+            End If
+
+            If Me.mrRecordset.Facts.Count = 0 And Me.mrTable IsNot Nothing Then
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.Neo4j
+                        Dim larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+
+                        For Each lrColumn In larColumn
+                            Me.mrRecordset.Columns.Add(LCase(mrTable.DatabaseName) & "." & lrColumn.Name)
+                        Next
+
+                    Case Is = pcenumDatabaseType.TypeDB
+                        'N/A
+                    Case Else
+                        'N/A
+                End Select
+            End If
+
+            Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, lrTable)
+            Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+
+            If Me.mrRecordset.Facts.Count = 0 Then
+                Me.ButtonAddRow.Enabled = True
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Private Sub frmToolboxTableData_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -249,8 +324,61 @@ Public Class frmToolboxTableData
     Private Sub AdvancedDataGridView1_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles AdvancedDataGridView.CellBeginEdit
 
         Me.ToolStripStatusLabel.Text = ""
+        Dim lsDatabaseQuery As String = ""
 
         Try
+            If Me.mrRDSRelation IsNot Nothing Then
+                'Create ComboBox Cell
+                Dim cmbcell As New DataGridViewComboBoxCell
+                If e.ColumnIndex = 0 Then
+                Else
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j
+                        Case Is = pcenumDatabaseType.TypeDB
+                        Case Else
+                            lsDatabaseQuery = "SELECT "
+                            Dim liInd = 0
+                            Dim larPKColumn = Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            For Each lrColumn In larPKColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS ItemData, "
+                            Dim larUCColumn = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            liInd = 0
+                            For Each lrColumn In larUCColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS Text"
+                            lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
+                            lsDatabaseQuery.AppendLine("LIMIT 100")
+                    End Select
+                End If
+                Dim lrTable As New RDS.Table(Me.mrModel.RDS, "DummyTable", Nothing)
+                lrTable.Column.Add(New RDS.Column(lrTable, "ItemData", Nothing, Nothing, True))
+                lrTable.Column.Add(New RDS.Column(lrTable, "Text", Nothing, Nothing, True))
+                Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsDatabaseQuery)
+                Dim lrDataGridList = New ORMQL.RecordsetDataGridList(lrRecordset, lrTable)
+
+                cmbcell.DataSource = lrDataGridList
+                cmbcell.DisplayMember = "Text"
+                cmbcell.ValueMember = "Text"
+
+                Me.AdvancedDataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex) = cmbcell
+
+                'Dim normalcell As DataGridViewCell = New DataGridViewTextBoxCell()
+                'normalcell.Value = "Name"
+                'dataGridView1.Rows(iRowIndex).Cells(1) = normalcell
+
+            End If
+
 
             If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
                 Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
@@ -286,73 +414,149 @@ Public Class frmToolboxTableData
         Dim lsMessage As String
 
         Try
-            Dim lsColumnName As String
+            If Me.mrRDSRelation Is Nothing Then
+                '---------------------------------------------
+                'Straight Table. I.e. mrTable isnot Nothing.
 
-            Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
+                Dim lsColumnName As String
 
-            Select Case Me.mrModel.TargetDatabaseType
-                Case Is = pcenumDatabaseType.Neo4j
-                    Try
-                        lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
-                    Catch ex As Exception
+                Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
+
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.Neo4j
+                        Try
+                            lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                        Catch ex As Exception
+                            lsColumnName = lsColumn
+                        End Try
+                    Case Else
                         lsColumnName = lsColumn
-                    End Try
-                Case Else
-                    lsColumnName = lsColumn
-            End Select
+                End Select
 
-            Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName)
+                Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName)
 
-            Select Case lrColumn.getMetamodelDataType
-                Case Is = pcenumORMDataType.TemporalDate,
-                          pcenumORMDataType.TemporalDateAndTime
-                    Me.NewValue = Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(Me.NewValue)
-                Case Else
-                    'Nothing to do.
-            End Select
+                Select Case lrColumn.getMetamodelDataType
+                    Case Is = pcenumORMDataType.TemporalDate,
+                              pcenumORMDataType.TemporalDateAndTime
+                        Me.NewValue = Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(Me.NewValue)
+                    Case Else
+                        'Nothing to do.
+                End Select
 
-            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
-            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
+                Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
 
-            If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
+                If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
-            Dim larPKColumn As List(Of RDS.Column)
-            '= Me.mrTable.getPrimaryKeyColumns
-            Select Case Me.mrModel.TargetDatabaseType
-                Case Is = pcenumDatabaseType.Neo4j
-                    larPKColumn = Me.mrTable.getFirstUniquenessConstraintColumns
-                Case Else
-                    larPKColumn = Me.mrTable.getPrimaryKeyColumns
-            End Select
+                Dim larPKColumn As List(Of RDS.Column)
+                '= Me.mrTable.getPrimaryKeyColumns
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.Neo4j
+                        larPKColumn = Me.mrTable.getFirstUniquenessConstraintColumns
+                    Case Else
+                        larPKColumn = Me.mrTable.getPrimaryKeyColumns
+                End Select
 
-            If larPKColumn.Count = 0 Then
-                lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
-            End If
-
-            Dim liColumnIndex As Integer
-            Dim lsValue As String
-            For Each lrPKColumn In larPKColumn
-                liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
-                If lrPKColumn.Name = lsColumnName Then 'Me.mrRecordset.Columns(e.ColumnIndex) 
-                    lsValue = lsOldValue
-                Else
-                    lsValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data 'Me.mrRecordset.Columns(liColumnIndex)
+                If larPKColumn.Count = 0 Then
+                    lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
                 End If
 
-                lrPKColumn.TemporaryData = lsValue
-            Next
+                Dim liColumnIndex As Integer
+                Dim lsValue As String
+                For Each lrPKColumn In larPKColumn
+                    liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
+                    If lrPKColumn.Name = lsColumnName Then 'Me.mrRecordset.Columns(e.ColumnIndex) 
+                        lsValue = lsOldValue
+                    Else
+                        lsValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data 'Me.mrRecordset.Columns(liColumnIndex)
+                    End If
 
-            Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
+                    lrPKColumn.TemporaryData = lsValue
+                Next
 
-            If Not lrRecordset.ErrorReturned Then
-                Me.ToolStripButtonCommit.Enabled = False
-                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
-                Me.ToolStripStatusLabel.ForeColor = Color.Black
+                Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
+
+                If Not lrRecordset.ErrorReturned Then
+                    Me.ToolStripButtonCommit.Enabled = False
+                    Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                    Me.ToolStripStatusLabel.ForeColor = Color.Black
+                Else
+                    Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
+                    Me.ToolStripStatusLabel.ForeColor = Color.Red
+                    Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+                End If
+
             Else
-                Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
-                Me.ToolStripStatusLabel.ForeColor = Color.Red
-                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
+
+                If e.ColumnIndex = 1 Then
+
+                    Dim lsDatabaseQuery As String = ""
+
+                    Dim larPKColumn As List(Of RDS.Column)
+
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j
+                            larPKColumn = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns
+                        Case Else
+                            larPKColumn = Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns
+                    End Select
+
+                    If larPKColumn.Count = 0 Then
+                        lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
+                    End If
+
+                    If Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns.Count = 1 Then
+
+                        lsDatabaseQuery = "SELECT "
+                        Dim liInd = 0
+                        For Each lrColumn In Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns
+                            If liInd > 0 Then lsDatabaseQuery &= ","
+                            lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
+                            liInd += 1
+                        Next
+                        lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.OriginTable.DatabaseName)
+                        lsDatabaseQuery.AppendLine("WHERE ")
+                        lsDatabaseQuery.AppendString(Me.mrRDSRelation.OriginTable.DatabaseName & "." & Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).Name)
+                        lsDatabaseQuery.AppendString(" = ")
+                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                        lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data))
+                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+
+
+                        Dim lsValue As String = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns(0).Name).Data
+
+                        larPKColumn(0).TemporaryData = lsValue
+                    End If
+
+                    If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
+
+                        lsDatabaseQuery = "SELECT "
+                        Dim liInd = 0
+                        For Each lrColumn In Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                            If liInd > 0 Then lsDatabaseQuery &= ","
+                            lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
+                            liInd += 1
+                        Next
+                        lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
+                        lsDatabaseQuery.AppendLine("WHERE ")
+                        lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
+                        lsDatabaseQuery.AppendString(" = ")
+                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                        lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.NewValue))
+                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                    End If
+
+                    Dim lsNewValue = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
+
+                    Dim lrRecordset = Me.mrModel.DatabaseConnection.UpdateAttributeValue(Me.mrRDSRelation.OriginTable.DatabaseName,
+                                                                                         Me.mrRDSRelation.OriginColumns(0),
+                                                                                         lsNewValue,
+                                                                                         larPKColumn)
+                End If
+
             End If
 
         Catch ex As Exception
@@ -582,7 +786,6 @@ Public Class frmToolboxTableData
 
                             lsSQLQuery &= vbCrLf & "LIMIT 100"
 #End Region
-
                     End Select
 
                     Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
@@ -592,8 +795,6 @@ Public Class frmToolboxTableData
                     Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
                 End If
             End If
-
-
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -605,4 +806,9 @@ Public Class frmToolboxTableData
         End Try
 
     End Sub
+
+    Private Sub AdvancedDataGridView_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles AdvancedDataGridView.DataError
+        'Debugger.Break()
+    End Sub
+
 End Class

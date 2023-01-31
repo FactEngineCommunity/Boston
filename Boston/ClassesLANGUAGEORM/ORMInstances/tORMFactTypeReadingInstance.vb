@@ -192,7 +192,7 @@ Namespace FBM
                 Me.Shape = loDroppedNode
 
                 'CodeSafe
-                If Not Me.FactType.ShapeIsWithinRadius(Me.ShapeMidPoint, 40) Then
+                If Not Me.FactType.ShapeIsWithinRadius(Me.ShapeMidPoint, 40) And Me.FactType.Visible Then
                     Call Me.Move(Me.FactType.X, Me.FactType.Y + StringSize.Height + 6, False)
                 End If
 
