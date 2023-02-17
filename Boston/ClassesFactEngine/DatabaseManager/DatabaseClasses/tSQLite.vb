@@ -1131,6 +1131,7 @@ Namespace FactEngine
                 End While
 
                 lrRecordset.Facts = larFact
+                lrRecordset.Reset()
                 lrSQLiteConnection.Close()
 
                 'Run the SQL against the database
