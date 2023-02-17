@@ -120,8 +120,7 @@
                                              Where QueryEdge.TargetNode IsNot Nothing
                                              Select QueryEdge
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) x.IdentifierList.Count > 0) '20230130-VM-Was Or x.TargetNode.MathFunction <> pcenumMathFunction.None))
                 '20210826-VM-Removed
                 'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
@@ -816,7 +815,7 @@
 
 
 
-                                    If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+                                    If lrQueryEdge.MathClause IsNot Nothing Then '20230130-VM-new regime: Was: TargetNode.MathFunction <> pcenumMathFunction.None Then
 
                                         If lrQueryEdge.FBMFactType.IsDerived Then
 
@@ -825,8 +824,10 @@
                                               "." &
                                               CType(lrQueryEdge.TargetNode.PreboundText & lrQueryEdge.TargetNode.Name, String).Replace("-", "")
 
-                                            lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            '20230130-VM-New Regime. QueryEdge.Formula: Removed below
+                                            'lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            'lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsTDBQuery &= lrQueryEdge.FormulaText
 
                                         Else
 
@@ -841,8 +842,10 @@
                                             '  "." &
                                             '  lrTargetColumn.Name
 
-                                            lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & ";" & vbCrLf
+                                            '20230130-VM-New Regime. QueryEdge.Formula: Removed below
+                                            'lsTDBQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            'lsTDBQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsTDBQuery &= lrQueryEdge.FormulaText
 
                                         End If
                                     Else
@@ -1041,7 +1044,8 @@
 
         End Function
 
-        Public Function getNodeModelElementList(Optional abGetSupertypeModelElements As Boolean = False) As List(Of FBM.ModelObject)
+        Public Function getNodeModelElementList(Optional abGetSupertypeModelElements As Boolean = False,
+                                                Optional abIgnoreTargetNodes As Boolean = False) As List(Of FBM.ModelObject)
 
             Dim larModelElement As New List(Of FBM.ModelObject)
 
@@ -1053,7 +1057,7 @@
                     If lrQueryEdge.BaseNode.FBMModelObject IsNot Nothing Then
                         larModelElement.AddUnique(lrQueryEdge.BaseNode.FBMModelObject)
                     End If
-                    If lrQueryEdge.TargetNode.FBMModelObject IsNot Nothing Then
+                    If lrQueryEdge.TargetNode.FBMModelObject IsNot Nothing And Not abIgnoreTargetNodes Then
                         larModelElement.AddUnique(lrQueryEdge.TargetNode.FBMModelObject)
                     End If
                 Next
@@ -1083,11 +1087,11 @@
 #Region "RETURNCLAUSE"
                     For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
 
-                        If lrReturnColumn.MODELELEMENTNAME IsNot Nothing Then
-
+                        If lrReturnColumn.MODELELEMENTNAME IsNot Nothing And lrReturnColumn.KEYWDCOUNTSTAR Is Nothing And lrReturnColumn.COUNTCLAUSE Is Nothing Then
+#Region "ModelElementName"
                             If lrReturnColumn.COLUMNNAMESTR Is Nothing Then
-
-                                'Check if use forgot to put TableName as in Cinema.CinemaName
+#Region "ColumnNameStr is Nothing"
+                                'Check if user forgot to put TableName as in Cinema.CinemaName
                                 Try
                                     Dim lrWhichSelectStatemet = arWhichSelectStatement
                                     Dim larTryColumn = From Table In Me.Model.RDS.Table
@@ -1104,6 +1108,28 @@
                                 Catch ex As Exception
 
                                 End Try
+                                Dim lrTempColumn As RDS.Column = Nothing
+                                Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrReturnColumn.MODELELEMENTNAME, True)
+                                If lrModelElement IsNot Nothing Then
+                                    Try
+                                        Select Case lrModelElement.GetType
+                                            Case Is = GetType(FBM.ValueType)
+                                                GoTo MoveForward
+                                            Case Is = GetType(FBM.EntityType),
+                                                          GetType(FBM.FactType)
+                                                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                                                    lrTempColumn = lrColumn.Clone(Nothing, Nothing)
+                                                    lrTempColumn.IsDistinct = arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing
+                                                    larColumn.Add(lrTempColumn)
+                                                Next
+                                                GoTo MoveForward
+                                            Case Else
+                                                Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
+                                        End Select
+                                    Catch ex As Exception
+                                        Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
+                                    End Try
+                                End If
 
                                 'Must be * (as in Lecturer.*)
                                 Try
@@ -1114,7 +1140,9 @@
                                 Catch ex As Exception
                                     Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
                                 End Try
+#End Region
                             Else
+#Region "Standard Table.ColumnName"
                                 Dim larReturnColumn = From Table In Me.Model.RDS.Table
                                                       From Column In Table.Column
                                                       Where Table.Name = lrReturnColumn.MODELELEMENTNAME
@@ -1133,10 +1161,13 @@
                                 Catch ex As Exception
                                     Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
                                 End Try
+#End Region
                             End If
-
+#End Region
                         ElseIf lrReturnColumn.KEYWDCOUNTSTAR IsNot Nothing Then
-                            'COUNT(*) is added in GenerateSQL
+                            'COUNT(*) is added in GenerateSQL. See main processing.
+                        ElseIf lrReturnColumn.COUNTCLAUSE IsNot Nothing Then
+                            'The COUNT(DISTINCT clause is added in the generated query. See main processing.
                         Else
                             'Must be * (STAR)
                             For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.Column
@@ -1266,6 +1297,7 @@ MoveForward:
                                 lrTempColumn.TemporaryAlias = Viev.NullVal(Me.HeadNode.Alias, "")
                                 lrTempColumn.GraphNodeType = Me.HeadNode.Name
                                 lrTempColumn.IsPartOfUniqueIdentifier = True
+                                lrTempColumn.IsDistinct = Me.HeadNode.IsDistinct
                                 If Me.QueryEdges.Count > 0 Then
                                     lrTempColumn.QueryEdge = Me.QueryEdges(0)
                                 End If
@@ -1351,7 +1383,7 @@ MoveForward:
                                 End If
                                 lrTempColumn.GraphNodeType = lrQueryEdge.BaseNode.Name '20230128-VM-Was lrColumn
                                 lrTempColumn.QueryEdge = lrQueryEdge '20230128-VM-Was lrColumn
-
+                                lrTempColumn.TemporaryAlias = Viev.NullVal(lrTempColumn.TemporaryAlias, "")
                                 larColumn.AddUnique(lrTempColumn) '20230128-VM-Was lrColumn
                             Case Else
                                 Dim larEdgeColumn As List(Of RDS.Column)
@@ -1378,7 +1410,8 @@ MoveForward:
                                     lrTempColumn.IsPartOfUniqueIdentifier = True
                                     lrTempColumn.QueryEdge = lrQueryEdge
                                     lrTempColumn.NodeModifierFunction = lrQueryEdge.TargetNode.ModifierFunction
-                                    larColumn.Add(lrTempColumn)
+                                    lrTempColumn.IsDistinct = lrQueryEdge.TargetNode.IsDistinct
+                                    larColumn.AddUnique(lrTempColumn)
                                 Next
                         End Select
                         lrRole = Nothing
@@ -1386,7 +1419,7 @@ MoveForward:
 
                 End If
 
-                Return larColumn
+                Return larColumn.Distinct.ToList
             Catch ex As Exception
                 Throw New Exception("Error in QueryGraph.getProjectionColumns:" & vbCrLf & vbCrLf & ex.Message & vbCrLf & vbCrLf & ex.StackTrace.ToString)
             End Try
