@@ -170,6 +170,7 @@ Namespace TableReferenceFieldValue
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New ADODB.Recordset
             Dim lsOrderByClause As String = " ORDER BY "
+            Dim liFieldCount As Integer
 
             Try
 
@@ -183,7 +184,7 @@ Namespace TableReferenceFieldValue
 
                 laaReferenceFieldList = GetReferenceFieldListByReferenceTableId(aiReferenceTableId)
 
-                Dim liFieldCount As Integer = laaReferenceFieldList.Count
+                liFieldCount = laaReferenceFieldList.Count
 
 #Region "Check if new field added"
                 lsSQLQuery = "SELECT Max(RFV.reference_field_id) FROM ReferenceFieldValue RFV WHERE RFV.reference_table_id = " & aiReferenceTableId
@@ -301,6 +302,8 @@ Namespace TableReferenceFieldValue
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage.AppendDoubleLineBreak("ReferenceTableId:" & aiReferenceTableId)
+                lsMessage.AppendLine("ReferenceFieldCount:" & liFieldCount)
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
