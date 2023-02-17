@@ -128,7 +128,53 @@ Namespace FactEngine
             End Get
         End Property
 
-        Public MathComparitor As FEQL.pcenumFEQLMathComparitor = FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None
+        Private _MathComparitor As FEQL.pcenumFEQLMathComparitor = FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None
+        Public Property MathComparitor As FEQL.pcenumFEQLMathComparitor '= FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None
+            Get
+                If Me._MathComparitor <> FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None Then
+                    Return Me._MathComparitor
+                ElseIf Me.MathClause Is Nothing Then
+                    Return FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None
+                Else
+                    Return Me.MathClause.COMPARITOR.getFEQLMathComparitor
+                End If
+            End Get
+            Set(value As FEQL.pcenumFEQLMathComparitor)
+                Me._MathComparitor = value
+            End Set
+        End Property
+
+
+        Public MathClause As FEQL.MATHCLAUSE = Nothing
+
+        Public Formula As New List(Of FactEngine.tQueryFormulaToken)
+
+        Public ReadOnly Property FormulaText
+            Get
+                If Me.MathClause Is Nothing Then
+                    Return ""
+                Else
+                    Dim lsFormula As String = ""
+                    Dim liInd = 0
+                    For Each lrFormulaToken In Me.Formula
+                        If liInd > 0 Then lsFormula &= " "
+                        Select Case lrFormulaToken.GetType
+                            Case Is = GetType(FactEngine.QueryFormulaToken)
+                                lsFormula &= CType(lrFormulaToken, FactEngine.QueryFormulaToken).TOKEN
+                            Case Is = GetType(FactEngine.QueryNode)
+                                If CType(lrFormulaToken, FactEngine.QueryNode)._RelativeFBMModelObject IsNot Nothing Then
+                                    lsFormula &= CType(lrFormulaToken, FactEngine.QueryNode).RelativeFBMModelObject.getCorrespondingRDSTable.DatabaseName & "." & CType(lrFormulaToken, FactEngine.QueryNode).Name
+                                Else
+                                    lsFormula &= CType(lrFormulaToken, FactEngine.QueryNode).Name
+                                End If
+                        End Select
+                        liInd += 1
+                    Next
+                    Return lsFormula
+                End If
+            End Get
+
+        End Property
 
         ''' <summary>
         ''' Paremeterless New
@@ -647,7 +693,13 @@ PartialFactTypeMatch:
                 '==================================================================================================================
                 'Far Side ModelElement predicate
 #Region "Far Side ModelElement predicate"
-                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
+                Dim lbIgnoreTargetNodes As Boolean = False
+                Select Case Me.WhichClauseType
+                    Case Is = pcenumWhichClauseType.AndPredicateWhichModelElement
+                        lbIgnoreTargetNodes = True
+                End Select
+
+                lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList(, lbIgnoreTargetNodes))
 
                 If lrFactType IsNot Nothing Then
                     Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
@@ -663,6 +715,18 @@ PartialFactTypeMatch:
                     If lrBaseNode IsNot Nothing Then
                         Me.BaseNode = lrBaseNode
                     ElseIf lrBaseNode Is Nothing And abUsePreviousFoundBaseNodeIfFound Then
+
+                        Dim larBaseNode = (From QueryEdge In Me.QueryGraph.QueryEdges
+                                           Select QueryEdge.BaseNode).Distinct
+
+                        For Each lrBaseNode In larBaseNode
+                            Dim larModelElement As New List(Of FBM.ModelObject)({lrBaseNode.FBMModelObject, arTargetNode.FBMModelObject})
+                            lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateNearSideModelElement(asPredicate, lrBaseNode.FBMModelObject, True, larModelElement)
+                            If lrFactType IsNot Nothing Then
+                                Me.BaseNode = lrBaseNode
+                                Exit For
+                            End If
+                        Next
                         Me.BaseNode = New FactEngine.QueryNode(Me.FBMFactTypeReading.PredicatePart(0).Role.JoinedORMObject, Me, False)
                     Else
                         Me.FBMFactType = Nothing
