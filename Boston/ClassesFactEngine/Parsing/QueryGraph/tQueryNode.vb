@@ -2,6 +2,7 @@
 
 Namespace FactEngine
     Public Class QueryNode
+        Inherits tQueryFormulaToken 'Because a QueryNode may be part of the formula for a QueryEdge. QueryNode is used as a FormulaToken because it contains a RelativeFBMModelObject to get the Table/NodeType of a Column/Property.
         Implements IEquatable(Of FactEngine.QueryNode)
 
         Public PreboundText As String = Nothing
@@ -76,10 +77,11 @@ Namespace FactEngine
             End Get
         End Property
 
-        Public MathFunction As pcenumMathFunction = pcenumMathFunction.None
-        Public MathNumber As Double = 0
+        '20230130-VM-Moved to new regime. QueryEdge.Formula
+        'Public MathFunction As pcenumMathFunction = pcenumMathFunction.None
+        'Public MathNumber As Double = 0
 
-        Private _RelativeFBMModelObject As FBM.ModelObject = Nothing
+        Public _RelativeFBMModelObject As FBM.ModelObject = Nothing
         ''' <summary>
         ''' A QueryNode may represent a ValueType for a Column, and so QueryNode.RDSTable will return the Column for the relative Table for the RelativeFBMModelObject
         ''' </summary>
