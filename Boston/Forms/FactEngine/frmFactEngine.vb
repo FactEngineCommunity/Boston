@@ -2071,6 +2071,7 @@ NextWord:
                                             lsSQLQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                         End If
                                         lsSQLQuery &= " LIKE '" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "'"
+                                        lsFEQLQuery &= " WHICH DISTINCT "
                                         lsFEQLQuery &= " (" & lsFEQLQueryAddition & "~'" & Me.zrTextHighlighter.GetCurrentContext.Token.Text & lsDatabaseWildcardOperator & "')"
                                         If lrColumn IsNot Nothing Then
                                             lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
@@ -3259,6 +3260,7 @@ NextWord:
     Private Sub TextBoxInput_Click(sender As Object, e As EventArgs) Handles TextBoxInput.Click
 
         Try
+            Me.zbTextBoxNaturalLanguageFocused = False
             Me.hideAutoComplete()
         Catch ex As Exception
             Dim lsMessage As String
@@ -3286,4 +3288,7 @@ NextWord:
 
     End Sub
 
+    Private Sub TextBoxNaturalLanguage_LostFocus(sender As Object, e As EventArgs) Handles TextBoxNaturalLanguage.LostFocus
+        Me.zbTextBoxNaturalLanguageFocused = False
+    End Sub
 End Class

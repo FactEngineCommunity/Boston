@@ -1640,6 +1640,53 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadToolboxAIPretrainingDataEditor(ByRef arModel As FBM.Model)
+
+        Dim lsMessage As String
+
+        Try
+            Dim lrModel = arModel
+
+            If My.Settings.FactEngineUseGPT3 Then
+#Region "GPT3 Transforms"
+                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36, loTransformation)
+
+                Dim lsGPT3TrainingExamplesFilePath = larTransformationTuples.Where(Function(x) x.ModelId = lrModel.ModelId).Select(Function(x) x.GPT3TrainingFileLocation)(0)
+
+                If Not System.IO.File.Exists(lsGPT3TrainingExamplesFilePath) Or lsGPT3TrainingExamplesFilePath Is Nothing Then
+
+                    lsMessage = "Please check the file path set up for your AI pretraining data."
+                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+                    Exit Sub
+                End If
+#End Region
+            Else
+                lsMessage = "Please check that your instance of Boston/FactEngine is set up for natural language queries using AI. Closing."
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+                Exit Sub
+            End If
+
+
+            '==================================================================================
+            Dim child As New frmToolboxAIPretrainingDataEditor
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Public Sub LoadToolboxTaxonomyTree(ByRef arModel As FBM.Model)
 
         Try

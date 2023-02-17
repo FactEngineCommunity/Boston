@@ -5389,4 +5389,39 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub EditAITrainingDataEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditAITrainingDataEditorToolStripMenuItem.Click
+
+        Dim lsMessage As String
+
+        Try
+            If My.Settings.FactEngineUseGPT3 Then
+
+                Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+
+                If Not lrModel.Loaded Then
+                    Call Me.DoModelLoading(lrModel)
+                End If
+
+                While (prApplication.WorkingModel.Loading And Not prApplication.WorkingModel.Loaded) Or prApplication.WorkingModel.Page.FindAll(Function(x) x.Loading).Count > 0
+                    Boston.WriteToStatusBar("Still loading the Model's Pages")
+                End While
+
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+
+                Call frmMain.LoadToolboxAIPretrainingDataEditor(lrModel)
+
+            Else
+                lsMessage = "Please check that your instance of Boston/FactEngine is set up for naural language queries using AI."
+                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+            End If
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

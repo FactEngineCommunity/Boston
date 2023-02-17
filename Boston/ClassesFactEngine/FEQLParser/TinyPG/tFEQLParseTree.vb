@@ -396,6 +396,18 @@ Namespace FEQL
                 Case TokenType.COMPARISONLIST
                     Value = EvalCOMPARISONLIST(tree, paramlist)
                     Exit Select
+                Case TokenType.COUNTRETURNCOLUMNCONCATENATIONSUB
+                    Value = EvalCOUNTRETURNCOLUMNCONCATENATIONSUB(tree, paramlist)
+                    Exit Select
+                Case TokenType.COUNTRETURNCOLUMNCONCATENATION
+                    Value = EvalCOUNTRETURNCOLUMNCONCATENATION(tree, paramlist)
+                    Exit Select
+                Case TokenType.COUNTRETURNCOLUMN
+                    Value = EvalCOUNTRETURNCOLUMN(tree, paramlist)
+                    Exit Select
+                Case TokenType.COUNTCLAUSE
+                    Value = EvalCOUNTCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.DATATYPE
                     Value = EvalDATATYPE(tree, paramlist)
                     Exit Select
@@ -889,6 +901,22 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalCOMPARISONLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCOUNTRETURNCOLUMNCONCATENATIONSUB(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCOUNTRETURNCOLUMNCONCATENATION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCOUNTRETURNCOLUMN(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCOUNTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

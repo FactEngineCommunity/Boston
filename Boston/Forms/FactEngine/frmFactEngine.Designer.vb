@@ -69,12 +69,15 @@ Partial Class frmFactEngine
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
-        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Diagram = New MindFusion.Diagramming.Diagram()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.Diagram1 = New MindFusion.Diagramming.Diagram()
+        Me.Diagram2 = New MindFusion.Diagramming.Diagram()
+        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -130,8 +133,7 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(2)
         Me.TextBoxInput.Name = "TextBoxInput"
         Me.TextBoxInput.Size = New System.Drawing.Size(1082, 114)
-        Me.TextBoxInput.TabIndex = 0
-        Me.TextBoxInput.TabStop = False
+        Me.TextBoxInput.TabIndex = 1
         Me.TextBoxInput.Text = ""
         '
         'ContextMenuStripFactEngine
@@ -275,6 +277,7 @@ Partial Class frmFactEngine
         Me.ToolStripNaturalLanguage.Name = "ToolStripNaturalLanguage"
         Me.ToolStripNaturalLanguage.Size = New System.Drawing.Size(1082, 35)
         Me.ToolStripNaturalLanguage.TabIndex = 0
+        Me.ToolStripNaturalLanguage.TabStop = True
         Me.ToolStripNaturalLanguage.Text = "ToolStrip4"
         Me.ToolStripNaturalLanguage.Visible = False
         '
@@ -286,6 +289,7 @@ Partial Class frmFactEngine
         '
         'TextBoxNaturalLanguage
         '
+        Me.TextBoxNaturalLanguage.AcceptsTab = True
         Me.TextBoxNaturalLanguage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxNaturalLanguage.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.TextBoxNaturalLanguage.Name = "TextBoxNaturalLanguage"
@@ -495,24 +499,6 @@ Partial Class frmFactEngine
         Me.TabPageGraph.Text = "Graph"
         Me.TabPageGraph.UseVisualStyleBackColor = True
         '
-        'GraphView
-        '
-        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
-        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
-        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
-        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.GraphView.Diagram = Me.Diagram
-        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.GraphView.Location = New System.Drawing.Point(0, 0)
-        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.GraphView.Name = "GraphView"
-        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
-        Me.GraphView.TabIndex = 0
-        Me.GraphView.Text = "DiagramView1"
-        '
         'ContextMenuStripGraph
         '
         Me.ContextMenuStripGraph.ImageScalingSize = New System.Drawing.Size(24, 24)
@@ -542,6 +528,24 @@ Partial Class frmFactEngine
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
+        '
+        'GraphView
+        '
+        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
+        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
+        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.GraphView.Diagram = Me.Diagram
+        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GraphView.Location = New System.Drawing.Point(0, 0)
+        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.GraphView.Name = "GraphView"
+        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
+        Me.GraphView.TabIndex = 0
+        Me.GraphView.Text = "DiagramView1"
         '
         'frmFactEngine
         '
@@ -631,4 +635,7 @@ Partial Class frmFactEngine
     Friend WithEvents ToolStripMenuItemAutoCapitalise As ToolStripMenuItem
     Friend WithEvents ToolStripNaturalLanguage As ToolStrip
     Friend WithEvents ToolStripLabelPromptNaturalLanguage As ToolStripLabel
+    Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
+    Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
+    Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
 End Class
