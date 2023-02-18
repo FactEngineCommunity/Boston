@@ -2,7 +2,7 @@
 
     Public Class Comparitor
 
-        Public Function getFEQLMathComparitor()
+        Public Function getFEQLMathComparitor() As FEQL.pcenumFEQLMathComparitor
 
             If Me._KEYWDEQUALS IsNot Nothing Then
                 Return FEQL.pcenumFEQLMathComparitor.Equals
@@ -12,6 +12,20 @@
                 Return FEQL.pcenumFEQLMathComparitor.GreaterThan
             Else
                 Return FEQL.pcenumFEQLMathComparitor.None
+            End If
+
+        End Function
+
+        Public Function getFEQLMathComparitorToken() As String
+
+            If Me._KEYWDEQUALS IsNot Nothing Then
+                Return "="
+            ElseIf Me._KEYWDLESSTHAN IsNot Nothing Then
+                Return "<"
+            ElseIf Me._KEYWDGREATERTHAN IsNot Nothing Then
+                Return ">"
+            Else
+                Return ""
             End If
 
         End Function
