@@ -325,13 +325,25 @@ Namespace FEQL
             End Set
         End Property
 
-        Private _KEYWDCOUNTSTAR As String = Nothing
-        Public Property KEYWDCOUNTSTAR As String
+        Public ReadOnly Property KEYWDCOUNTSTAR As String 'See CountClause below
             Get
-                Return Me._KEYWDCOUNTSTAR
+                If Me.COUNTCLAUSE Is Nothing Then
+                    Return Nothing
+                ElseIf Me.COUNTCLAUSE.STAR IsNot Nothing Then
+                    Return "COUNT(*)"
+                Else
+                    Return Nothing
+                End If
             End Get
-            Set(value As String)
-                Me._KEYWDCOUNTSTAR = value
+        End Property
+
+        Private _COUNTCLAUSE As CountClause = Nothing
+        Public Property COUNTCLAUSE As CountClause
+            Get
+                Return Me._COUNTCLAUSE
+            End Get
+            Set(value As CountClause)
+                Me._COUNTCLAUSE = value
             End Set
         End Property
 
@@ -378,6 +390,25 @@ Namespace FEQL
     End Class
 
     Public Class RETURNCLAUSE
+
+        Public Function ContainsCountDistinctClause() As Boolean
+            Try
+                Dim larCountDistinctClause = From ReturnColumn In Me.RETURNCOLUMN
+                                             Where ReturnColumn.COUNTCLAUSE IsNot Nothing
+                                             Where ReturnColumn.COUNTCLAUSE.COUNTRETURNCOLUMNCONCATENATION IsNot Nothing
+                                             Select ReturnColumn
+
+                Return larCountDistinctClause.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Function
 
         Private _KEYWDDISTINCT As String = Nothing
         Public Property KEYWDDISTINCT As String
@@ -569,6 +600,26 @@ Namespace FEQL
 
     Public Class WHICHSELECTStatement
 
+        Private _QUERYBEGINNING As WhichSelectQueryBeginning = Nothing
+        Public Property QUERYBEGINNING As WhichSelectQueryBeginning
+            Get
+                Return Me._QUERYBEGINNING
+            End Get
+            Set(value As WhichSelectQueryBeginning)
+                Me._QUERYBEGINNING = value
+            End Set
+        End Property
+
+        Private _KEYWDDISTINCT As String = Nothing
+        Public Property KEYWDDISTINCT As String
+            Get
+                Return Me._KEYWDDISTINCT
+            End Get
+            Set(value As String)
+                Me._KEYWDDISTINCT = value
+            End Set
+        End Property
+
         Private _NODE As New List(Of FEQL.NODE)
         Public Property NODE As List(Of FEQL.NODE)
             Get
@@ -592,12 +643,12 @@ Namespace FEQL
             End Set
         End Property
 
-        Private _MODELELEMENT As New List(Of Object)
-        Public Property MODELELEMENT As List(Of Object)
+        Private _MODELELEMENT As New List(Of FEQL.MODELELEMENTClause)
+        Public Property MODELELEMENT As List(Of FEQL.MODELELEMENTClause)
             Get
                 Return Me._MODELELEMENT
             End Get
-            Set(value As List(Of Object))
+            Set(value As List(Of FEQL.MODELELEMENTClause))
                 Me._MODELELEMENT = value
             End Set
         End Property
@@ -644,39 +695,128 @@ Namespace FEQL
 
     End Class
 
+    Public Class WhichSelectQueryBeginning
+
+
+    End Class
+
     Public Class MATHCLAUSE
 
-        Private _MATHFUNCTION As String = Nothing
-        Public Property MATHFUNCTION As String
+        Public Function GetFormulaTokenList() As List(Of FactEngine.tQueryFormulaToken)
+
+            Dim larFormulaToken As New List(Of FactEngine.tQueryFormulaToken)
+
+            Try
+                'Get the COMPARITOR
+                larFormulaToken.Add(New FactEngine.QueryFormulaToken(Me.COMPARITOR.getFEQLMathComparitorToken))
+
+                Call Me.BuildFomulaTokenList(larFormulaToken, Me.AddExpr)
+
+                Return larFormulaToken
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return New List(Of FactEngine.tQueryFormulaToken)
+            End Try
+
+        End Function
+
+        Private Sub BuildFomulaTokenList(ByRef aarFormulaToken As List(Of FactEngine.tQueryFormulaToken), ByVal arParseNode As FEQL.ParseNode)
+
+            Try
+                Select Case arParseNode.Token.Type
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        Dim lrQueryNode = New FactEngine.QueryNode(New FBM.ModelObject(arParseNode.Token.Text))
+                        aarFormulaToken.Add(lrQueryNode)
+                    Case Is = FEQL.TokenType.PLUS,
+                              FEQL.TokenType.MINUS,
+                              FEQL.TokenType.TIMES,
+                              FEQL.TokenType.DIVIDE,
+                              FEQL.TokenType.BROPEN,
+                              FEQL.TokenType.BRCLOSE,
+                              FEQL.TokenType.KEYWDTODAY,
+                              FEQL.TokenType.COMPARITOR,
+                              FEQL.TokenType.NUMBER
+                        aarFormulaToken.Add(New FactEngine.QueryFormulaToken(arParseNode.Token.Text))
+                    Case Else
+                        'Do nothing
+                End Select
+
+                For Each lrParseNode In arParseNode.Nodes
+                    Call Me.BuildFomulaTokenList(aarFormulaToken, lrParseNode)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private _COMPARITOR As FEQL.Comparitor = Nothing
+        Public Property COMPARITOR As FEQL.Comparitor
             Get
-                Return Me._MATHFUNCTION
+                Return Me._COMPARITOR
             End Get
-            Set(value As String)
-                Me._MATHFUNCTION = value
+            Set(value As FEQL.Comparitor)
+                Me._COMPARITOR = value
             End Set
         End Property
 
-        Private _NUMBER As String = Nothing
-
-        Public Property [NUMBER] As String
+        ''' <summary>
+        ''' Stores the ParseTree segment for the AddExpr
+        ''' </summary>
+        Private _AddExpr As Object = Nothing
+        Public Property AddExpr As Object
             Get
-                Return Me._NUMBER
+                Return Me._AddExpr
             End Get
-            Set(value As String)
-                Me._NUMBER = value
+            Set(value As Object)
+                Me._AddExpr = value
             End Set
         End Property
 
+        'Private _MATHFUNCTION As String = Nothing
+        'Public Property MATHFUNCTION As String
+        '    Get
+        '        Return Me._MATHFUNCTION
+        '    End Get
+        '    Set(value As String)
+        '        Me._MATHFUNCTION = value
+        '    End Set
+        'End Property
 
-        Private _MODELELEMENT As MODELELEMENTClause = Nothing
-        Public Property MODELELEMENT As MODELELEMENTClause
-            Get
-                Return Me._MODELELEMENT
-            End Get
-            Set(value As MODELELEMENTClause)
-                Me._MODELELEMENT = value
-            End Set
-        End Property
+        'Private _NUMBER As String = Nothing
+
+        'Public Property [NUMBER] As String
+        '    Get
+        '        Return Me._NUMBER
+        '    End Get
+        '    Set(value As String)
+        '        Me._NUMBER = value
+        '    End Set
+        'End Property
+
+
+        'Private _MODELELEMENT As MODELELEMENTClause = Nothing
+        'Public Property MODELELEMENT As MODELELEMENTClause
+        '    Get
+        '        Return Me._MODELELEMENT
+        '    End Get
+        '    Set(value As MODELELEMENTClause)
+        '        Me._MODELELEMENT = value
+        '    End Set
+        'End Property
 
     End Class
 
@@ -1317,38 +1457,43 @@ Namespace FEQL
                     ElseIf lrType Is lasListOfString.GetType Then
 
 
-                            Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                            Dim list As IList = CType(liInstance, IList)
-                            list.Add(Trim(aoParseTreeNode.Token.Text))
-                            ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        Dim list As IList = CType(liInstance, IList)
+                        list.Add(Trim(aoParseTreeNode.Token.Text))
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                        ElseIf lrType Is GetType(List(Of Object)) Then
+                    ElseIf lrType Is GetType(List(Of Object)) Then
 
-                            Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                            Dim list As IList = CType(liInstance, IList)
-                            list.Add(aoParseTreeNode)
-                            ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        Dim list As IList = CType(liInstance, IList)
+                        list.Add(aoParseTreeNode)
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
 
-                        ElseIf lrType Is GetType(Object) Then
+                    ElseIf lrType Is GetType(Object) Then
 
+                        If piInstance.GetValue(ao_object, Nothing) Is Nothing Then
                             piInstance.SetValue(ao_object, aoParseTreeNode)
+                        End If
 
-                        ElseIf lrType.Name = "List`1" Then
 
-                            Dim instance = Activator.CreateInstance(lrType.GenericTypeArguments(0))
-                            Call GetParseTreeTokensReflection(instance, loParseTreeNode)
-                            Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
-                            Dim list As IList = CType(liInstance, IList)
-                            list.Add(instance)
-                            ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+                    ElseIf lrType.Name = "List`1" Then
 
-                        Else
-                            Dim instance = Activator.CreateInstance(lrType)
+                        Dim instance = Activator.CreateInstance(lrType.GenericTypeArguments(0))
                         Call GetParseTreeTokensReflection(instance, loParseTreeNode)
-                        piInstance.SetValue(ao_object, instance)
+                        Dim liInstance As Object = ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).GetValue(ao_object)
+                        Dim list As IList = CType(liInstance, IList)
+                        list.Add(instance)
+                        ao_object.GetType.GetProperty(aoParseTreeNode.Token.Type.ToString).SetValue(ao_object, list, Nothing)
+
+                    Else
+                        Dim instance = Activator.CreateInstance(lrType)
+                        Call GetParseTreeTokensReflection(instance, loParseTreeNode)
+                        If piInstance.GetValue(ao_object, Nothing) Is Nothing Then '20230217-VM-Added.
+                            piInstance.SetValue(ao_object, instance)
+                        End If
                     End If
 
-                End If
+                    End If
 
                 For Each loParseTreeNode In aoParseTreeNode.Nodes.ToArray
                     Call GetParseTreeTokensReflection(ao_object, loParseTreeNode)
