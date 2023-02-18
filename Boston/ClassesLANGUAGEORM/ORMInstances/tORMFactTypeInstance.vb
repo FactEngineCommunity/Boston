@@ -1512,7 +1512,11 @@ ReattachRoles:
                 If Me.FactTypeReadingShape IsNot Nothing And abMoveFactTypeReading Then
                     If Not (Me.FactTypeReadingPoint.X = 0 And Me.FactTypeReadingPoint.Y = 0) Then
                         If Me.FactTypeReadingShape.Shape IsNot Nothing Then
-                            Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
+                            If Math.Sqrt((Math.Pow(Me.FactTypeReadingPoint.X - Me.X, 2) + Math.Pow(Me.FactTypeReadingPoint.Y - Me.Y, 2))) > 20 Then
+                                Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                            Else
+                                Call Me.FactTypeReadingShape.Shape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y)
+                            End If
                         End If
                     End If
                 End If
