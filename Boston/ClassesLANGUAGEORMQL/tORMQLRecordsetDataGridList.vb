@@ -130,7 +130,7 @@ Namespace ORMQL
                         piInstance.SetValue(Me.DynamicObject, lsDataAsString)
                         liInd += 1
                     Next
-                    Return Me.DynamicObject
+                    Return Me.DynamicObject.clone
                 Catch ex As Exception
                     Return Me.DynamicObject
                 End Try
@@ -187,13 +187,13 @@ Namespace ORMQL
 
         Public ReadOnly Property SupportsAdvancedSorting As Boolean Implements IBindingListView.SupportsAdvancedSorting
             Get
-                Throw New NotImplementedException()
+                Return False
             End Get
         End Property
 
         Public ReadOnly Property SupportsFiltering As Boolean Implements IBindingListView.SupportsFiltering
             Get
-                Throw New NotImplementedException()
+                Return False
             End Get
         End Property
 
@@ -240,7 +240,19 @@ Namespace ORMQL
         End Function
 
         Public Function Find([property] As PropertyDescriptor, key As Object) As Integer Implements IBindingList.Find
-            Throw New NotImplementedException()
+            'Throw New NotImplementedException()
+            Dim larFact = From Fact In Me.mrRecordset.Facts
+                          From FactData In Fact.Data
+                          Where FactData.Role.Name = [property].Name
+                          Where FactData.Data = key
+                          Select Me.mrRecordset.Facts.IndexOf(Fact)
+
+            If larFact.Count > 0 Then
+                Return larFact.First
+            Else
+                Return 0
+            End If
+
         End Function
 
         Public Function Add(value As Object) As Integer Implements IList.Add
@@ -256,7 +268,11 @@ Namespace ORMQL
         End Function
 
         Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
-            Throw New NotImplementedException()
+            Dim larItem As New List(Of Object)
+            For liInd = 0 To Me.mrRecordset.Facts.Count - 1
+                larItem.Add(Me.Item(liInd).clone)
+            Next
+            Return larItem.GetEnumerator
         End Function
 
         Public Sub ApplySort(sorts As ListSortDescriptionCollection) Implements IBindingListView.ApplySort

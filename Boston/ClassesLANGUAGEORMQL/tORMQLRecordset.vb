@@ -1,6 +1,7 @@
 ﻿Namespace ORMQL
-    <Serializable()> _
+    <Serializable()>
     Public Class Recordset
+        Implements IEnumerator
 
         Public Facts As New List(Of FBM.Fact)
         Public Columns As New List(Of String)
@@ -37,6 +38,7 @@
         Public Property CurrentFact() As FBM.Fact
             Get
                 If Me.Facts.Count > 0 Then
+                    If Me.CurrentFactIndex < 0 Then Return Nothing
                     Return Me.Facts(Me.CurrentFactIndex)
                 Else
                     Return Nothing
@@ -120,24 +122,37 @@
             End Set
         End Property
 
+        Public ReadOnly Property Current As Object Implements IEnumerator.Current
+            Get
+                Return Me.CurrentFact
+            End Get
+        End Property
+
         Public Sub MoveFirst()
             Me.CurrentFactIndex = 0
         End Sub
 
-        Public Sub MoveNext()
+        Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
             If Me.CurrentFactIndex < Me.Facts.Count Then
                 Me.CurrentFactIndex += 1
             Else
                 '------------
                 'Do nothing
                 '------------
+                Return False
             End If
-        End Sub
+            Return True
+        End Function
 
         Public Sub MoveLast()
 
             Me.CurrentFactIndex = Me.Facts.Count - 1
         End Sub
 
+        Public Sub Reset() Implements IEnumerator.Reset
+            Me.CurrentFactIndex = -1
+        End Sub
+
     End Class
+
 End Namespace
