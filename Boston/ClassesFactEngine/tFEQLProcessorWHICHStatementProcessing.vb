@@ -89,6 +89,7 @@
 
         Public Function getQueryGraph(Optional ByRef arWHICHSelectStatement As FEQL.WHICHSELECTStatement = Nothing) As FactEngine.QueryGraph
 
+            Dim lsMessage As String = ""
             Dim lrQueryGraph As New FactEngine.QueryGraph(Me.Model)
 
             Try
@@ -114,20 +115,32 @@
                         lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENTNAME(0))
                     End If
                 Else
-                    lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
+                    Try
+                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENT(0).MODELELEMENTNAME)
+                    Catch ex As Exception
+                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
+                    End Try
 
                     If lrFBMModelObject Is Nothing Then
                         Dim lsModelObjectName As String = Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME
-                        Dim larModelObject = From ModelObject In Me.Model.getModelObjects
-                                             Select New With {ModelObject, .Lev = Fastenshtein.Levenshtein.Distance(ModelObject.Id, lsModelObjectName)}
+                        Dim larModelObject = (From ModelObject In Me.Model.getModelObjects
+                                              Select New With {ModelObject, .Lev = Fastenshtein.Levenshtein.Distance(ModelObject.Id, lsModelObjectName)}).ToList
 
-                        lrFBMModelObject = larModelObject.OrderBy(Function(X) X.Lev).First.ModelObject
+                        Try
+                            lrFBMModelObject = larModelObject.FindAll(Function(x) x.Lev < 4).OrderBy(Function(X) X.Lev).First.ModelObject
+                        Catch ex As Exception
+                            lrFBMModelObject = Nothing
+                        End Try
+
                     End If
 
                 End If
 
                 If lrFBMModelObject Is Nothing Then Throw New Exception("The Model does not contain a Model Element called, '" & Me.WHICHSELECTStatement.MODELELEMENTNAME(0) & "'.")
                 lrQueryGraph.HeadNode = New FactEngine.QueryNode(lrFBMModelObject,,, liComparitor)
+
+                'Distinct
+                lrQueryGraph.HeadNode.IsDistinct = Me.WHICHSELECTStatement.KEYWDDISTINCT IsNot Nothing
 
                 If Me.WHICHSELECTStatement.NODEPROPERTYIDENTIFICATION.Count > 0 Then
                     If Me.WHICHSELECTStatement.MODELELEMENTNAME.Count > 1 And Me.WHICHSELECTStatement.WHICHCLAUSE.Count > 0 Then
@@ -276,6 +289,25 @@
                     '-------------------------------------------------
                     'Add the QueryEdge to the QueryGraph
                     lrQueryGraph.QueryEdges.Add(lrQueryEdge)
+
+                    If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
+                        For Each lrQueryNode As FactEngine.QueryNode In lrQueryEdge.Formula.FindAll(Function(x) x.GetType = GetType(FactEngine.QueryNode))
+                            Dim lrBaseNode As FactEngine.QueryNode = lrQueryGraph.FindPreviousQueryEdgeBaseNodeByTargetNodeName(lrQueryNode.Name)
+                            If lrBaseNode IsNot Nothing Then
+                                lrQueryNode.RelativeFBMModelObject = lrBaseNode.FBMModelObject
+                            Else
+                                Dim larColumn = From Table In Me.Model.RDS.Table
+                                                From Column In Table.Column
+                                                Where Column.Name = lrQueryNode.Name
+                                                Select Column
+
+                                If larColumn.Count = 1 Then
+                                    lrQueryNode.RelativeFBMModelObject = larColumn.First.Table.FBMModelElement
+                                End If
+                            End If
+                        Next
+                    End If
+
                     If lrQueryEdge.InjectsQueryEdge IsNot Nothing Then
                         If lrQueryEdge.InjectsQueryEdge.TargetNode.HasIdentifier Then
                             lrQueryEdge.InjectsQueryEdge.WhichClauseType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -289,10 +321,11 @@
                         End Select
 
                         If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                            lrQueryEdge.InjectsQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
-                            If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
-                                lrQueryEdge.InjectsQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
-                            End If
+                            '20230130-VM-Removed
+                            'lrQueryEdge.InjectsQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                            'If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                            '    lrQueryEdge.InjectsQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
+                            'End If
                         End If
 
                         lrQueryGraph.QueryEdges.Add(lrQueryEdge.InjectsQueryEdge)
@@ -369,7 +402,7 @@
                                            Select QueryEdge
 
                 If larErroredQueryEdges.Count > 0 Then
-                    Dim lsMessage = "Error: " & larErroredQueryEdges.First.ErrorMessage
+                    lsMessage = "Error: " & larErroredQueryEdges.First.ErrorMessage
                     Throw New Exception(lsMessage)
                 End If
 
@@ -379,7 +412,7 @@
                 Return lrQueryGraph
 
             Catch appex As ApplicationException
-                Dim lsMessage As String = appex.Message
+                lsMessage = appex.Message
                 If My.Settings.ShowStackTraceFactEngineQuery Then lsMessage.AppendDoubleLineBreak(appex.StackTrace)
                 Dim lrApplicationException As New ApplicationException(lsMessage)
                 If appex.Data.Contains("QueryEdgeGetFBMFactTypeFail") Then
@@ -387,7 +420,11 @@
                 End If
                 Throw lrApplicationException
             Catch ex As Exception
-                Throw New Exception(ex.Message)
+                lsMessage = "getQueryGraph" & ex.Message
+                For Each lsWarning In lrQueryGraph.Warning
+                    lsMessage.AppendDoubleLineBreak(lsWarning)
+                Next
+                Throw New Exception(lsMessage)
             End Try
 
         End Function
@@ -489,7 +526,7 @@
             arQueryEdge.TargetNode.Alias = arWHICHCLAUSE.NODE(0).MODELELEMENTSUFFIX
             arQueryEdge.TargetNode.Comparitor = arWHICHCLAUSE.NODE(0).NODEPROPERTYIDENTIFICATION.getComparitorType
             arQueryEdge.TargetNode.ModifierFunction = arWHICHCLAUSE.NODE(0).GetNodeModifierFunction
-
+            arQueryEdge.TargetNode.IsDistinct = (arWHICHCLAUSE.KEYWDDISTINCT IsNot Nothing)
 
             If lrFBMModelObject.ConceptType = pcenumConceptType.ValueType Then
                 arQueryEdge.WhichClauseSubType = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -640,10 +677,13 @@
             End If
 
             If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
-                If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
-                    arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
-                End If
+                '20230130-VM-Moved to new regime
+                arQueryEdge.MathClause = Me.WHICHCLAUSE.MATHCLAUSE
+                arQueryEdge.Formula = arQueryEdge.MathClause.GetFormulaTokenList
+                'arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                'If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                '    arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
+                'End If
             End If
 
             '-----------------------------------------
@@ -818,10 +858,13 @@
             End If
 
             If arWHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(arWHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
-                If arWHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
-                    arQueryEdge.TargetNode.MathNumber = CDbl(arWHICHCLAUSE.MATHCLAUSE.NUMBER)
-                End If
+                '20230130-VM-Moved to new regime
+                arQueryEdge.MathClause = Me.WHICHCLAUSE.MATHCLAUSE
+                arQueryEdge.Formula = arQueryEdge.MathClause.GetFormulaTokenList
+                'arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(arWHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                'If arWHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                '    arQueryEdge.TargetNode.MathNumber = CDbl(arWHICHCLAUSE.MATHCLAUSE.NUMBER)
+                'End If
             End If
 
             If arWHICHCLAUSE.KEYWDNO IsNot Nothing Then
@@ -979,7 +1022,7 @@
                     arQueryEdge.BaseNode = arPreviousTopicNode
                     Call arQueryEdge.getAndSetFBMFactType(arQueryEdge.BaseNode,
                                                   arQueryEdge.TargetNode,
-                                                  arQueryEdge.Predicate)
+                                                  arQueryEdge.Predicate, Nothing, True)
                 Catch ex As Exception
                     Throw New Exception(ex.Message)
                 Finally
@@ -1357,10 +1400,13 @@
             End If
 
             If Me.WHICHCLAUSE.MATHCLAUSE IsNot Nothing Then
-                arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
-                If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
-                    arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
-                End If
+                '20230130-VM-Moved to new regime
+                arQueryEdge.MathClause = Me.WHICHCLAUSE.MATHCLAUSE
+                arQueryEdge.Formula = arQueryEdge.MathClause.GetFormulaTokenList
+                'arQueryEdge.TargetNode.MathFunction = Boston.GetEnumFromDescriptionAttribute(Of pcenumMathFunction)(Me.WHICHCLAUSE.MATHCLAUSE.MATHFUNCTION)
+                'If Me.WHICHCLAUSE.MATHCLAUSE.NUMBER IsNot Nothing Then
+                '    arQueryEdge.TargetNode.MathNumber = CDbl(Me.WHICHCLAUSE.MATHCLAUSE.NUMBER)
+                'End If
             End If
 
             If arQueryEdge.FBMFactType IsNot Nothing Then
