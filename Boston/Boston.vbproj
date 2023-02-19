@@ -460,8 +460,12 @@
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\Formula\tQueryFormulaToken.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-Cypher.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-SQL.vb" />
+    <Compile Include="ClassesFactEngine\Processor\fFEQLProcessor-CountReturnColumnConcatenation.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLConstants.vb" />
+    <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-CountClause.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-Comparitor.vb" />
+    <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-CountReturnColumn.vb" />
+    <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-CountReturnColumnConcatenationSub.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-DerivationFormula.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-FactReading.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-NodeModifierFunction.vb" />
@@ -1560,6 +1564,12 @@
     <Compile Include="Forms\Toolboxes\frmAutoComplete.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxAIPretrainingDataEditor.Designer.vb">
+      <DependentUpon>frmToolboxAIPretrainingDataEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxAIPretrainingDataEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Toolboxes\frmToolboxTaxonomyTree.Designer.vb">
       <DependentUpon>frmToolboxTaxonomyTree.vb</DependentUpon>
     </Compile>
@@ -2430,6 +2440,9 @@
     <EmbeddedResource Include="Forms\Toolboxes\frmAutoComplete.resx">
       <DependentUpon>frmAutoComplete.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxAIPretrainingDataEditor.resx">
+      <DependentUpon>frmToolboxAIPretrainingDataEditor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxTaxonomyTree.resx">
       <DependentUpon>frmToolboxTaxonomyTree.vb</DependentUpon>
