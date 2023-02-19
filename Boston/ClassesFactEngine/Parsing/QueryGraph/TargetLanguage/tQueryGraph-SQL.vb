@@ -49,11 +49,11 @@
                 If Not abIsCountStarSubQuery Then
                     lsSQLQuery = "SELECT "
                     If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
-                        If arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing Then
+                        If arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing And Not arWhichSelectStatement.RETURNCLAUSE.ContainsCountDistinctClause Then
                             lsSQLQuery &= "DISTINCT "
                             lbHasDistinctClause = True
                         End If
-                    ElseIf Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
+                    ElseIf Me.QueryEdges.FindAll(Function(x) x.BaseNode.IsDistinct).Count > 0 Or Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
                         lsSQLQuery &= "DISTINCT "
                         lbHasDistinctClause = True
                     End If
@@ -63,7 +63,7 @@
                     Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
                     Me.ProjectionColumn = larProjectionColumn
 
-                    If lbHasDistinctClause And Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
+                    If lbHasDistinctClause And (Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Or Me.QueryEdges.FindAll(Function(x) x.BaseNode.IsDistinct).Count > 0) Then
                         larProjectionColumn.RemoveAll(Function(x) Not x.IsDistinct)
                     End If
 
@@ -136,9 +136,72 @@
                                 lbRequiresGroupByClause = True
                             End If
                         End If
+
+                        Dim larCountClauseColumn = From ReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
+                                                   Where ReturnColumn.COUNTCLAUSE IsNot Nothing
+                                                   Where ReturnColumn.KEYWDCOUNTSTAR Is Nothing
+                                                   Select ReturnColumn.COUNTCLAUSE
+
+                        If larCountClauseColumn.Count > 0 Then
+
+                            Dim lrModelElement As FBM.ModelObject
+                            For Each lrCountClause In larCountClauseColumn
+                                lsSQLQuery &= Boston.returnIfTrue(larProjectionColumn.Count > 0, ", ", "")
+                                lsSQLQuery &= "COUNT(DISTINCT "
+                                If lrCountClause.COUNTRETURNCOLUMNCONCATENATION IsNot Nothing Then
+
+                                    lrModelElement = Me.Model.GetModelObjectByName(lrCountClause.COUNTRETURNCOLUMNCONCATENATION.COUNTRETURNCOLUMN.MODELELEMENTNAME, True)
+                                    If lrModelElement Is Nothing Then
+                                        Throw New Exception(lrCountClause.COUNTRETURNCOLUMNCONCATENATION.COUNTRETURNCOLUMN.MODELELEMENTNAME & " is unknown in the model.")
+                                    Else
+                                        lsSQLQuery &= lrModelElement.DatabaseName & lrCountClause.COUNTRETURNCOLUMNCONCATENATION.COUNTRETURNCOLUMN.MODELELEMENTSUFFIX & "." & lrCountClause.COUNTRETURNCOLUMNCONCATENATION.COUNTRETURNCOLUMN.COLUMNNAMESTR
+                                    End If
+
+                                    For Each lrConcatColumn In lrCountClause.COUNTRETURNCOLUMNCONCATENATION.COUNTRETURNCOLUMNCONCATENATIONSUB
+
+                                        lsSQLQuery &= " || "
+
+                                        If lrConcatColumn.COUNTRETURNCOLUMN IsNot Nothing Then
+                                            lrModelElement = Me.Model.GetModelObjectByName(lrConcatColumn.COUNTRETURNCOLUMN.MODELELEMENTNAME, True)
+                                            If lrModelElement Is Nothing Then
+                                                Throw New Exception(lrConcatColumn.COUNTRETURNCOLUMN.MODELELEMENTNAME & " is unknown in the model.")
+                                            Else
+                                                lsSQLQuery &= lrModelElement.DatabaseName & lrConcatColumn.COUNTRETURNCOLUMN.MODELELEMENTSUFFIX & "." & lrConcatColumn.COUNTRETURNCOLUMN.COLUMNNAMESTR
+                                            End If
+                                        Else
+                                            lsSQLQuery &= lrConcatColumn.QUOTEDSTRING
+                                        End If
+                                    Next
+                                ElseIf lrCountClause.COUNTRETURNCOLUMN IsNot Nothing Then
+
+                                    lrModelElement = Me.Model.GetModelObjectByName(lrCountClause.COUNTRETURNCOLUMN.MODELELEMENTNAME, True)
+                                    If lrModelElement Is Nothing Then
+                                        Throw New Exception(lrCountClause.COUNTRETURNCOLUMN.MODELELEMENTNAME & " is unknown in the model.")
+                                    Else
+                                        lsSQLQuery &= lrModelElement.DatabaseName & lrCountClause.COUNTRETURNCOLUMN.MODELELEMENTSUFFIX & "." & lrCountClause.COUNTRETURNCOLUMN.COLUMNNAMESTR
+                                    End If
+
+                                ElseIf lrCountClause.MODELELEMENTNAME IsNot Nothing Then
+                                    'VM....to get PK cOlumns for ModelElement and produce DISTINCT clause
+                                    lrModelElement = Me.Model.GetModelObjectByName(lrCountClause.MODELELEMENTNAME, True)
+                                    If lrModelElement Is Nothing Then
+                                        Throw New Exception(lrCountClause.COUNTRETURNCOLUMN.MODELELEMENTNAME & " is unknown in the model.")
+                                    Else
+                                        liInd = 0
+                                        For Each lrPKColumn In lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                            If liInd > 0 Then lsSQLQuery &= " || '-' || "
+                                            lsSQLQuery &= lrModelElement.DatabaseName & "." & lrPKColumn.Name
+                                            liInd += 1
+                                        Next
+                                    End If
+                                End If
+                                lsSQLQuery &= ")"
+                            Next
+                        End If
+
                     End If
 #End Region
-                Else
+                    Else
                     lsSQLQuery = " 1 > (SELECT COUNT(*)"
                 End If
 
@@ -595,8 +658,9 @@
                 Next
 
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
+                '20230130-VM-Moved to new QueryEdge.Formula regime.
+                'Removed: 'x.TargetNode.MathFunction <> pcenumMathFunction.None Or (below)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None Or
                                                                                               x.MathComparitor <> FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None))
                 '20210826-VM-Removed
                 'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
@@ -1084,13 +1148,15 @@
                                     Case Is = pcenumORMDataType.TemporalDateAndTime
                                         Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
                                         Dim loDateTime As DateTime = Nothing
-                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
+                                        If Not DateTime.TryParse(lsUserDateTime, loDateTime) And (lrQueryEdge.TargetNode.ModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None) Then
                                             Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                         End If
                                         Dim lsDateTime As String
                                         Select Case lrQueryEdge.TargetNode.ModifierFunction
                                             Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
                                                 lsDateTime = Me.Model.DatabaseConnection.FormatDate(lsUserDateTime)
+                                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                                lsDateTime = lsUserDateTime
                                             Case Else
                                                 lsDateTime = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                         End Select
@@ -1174,7 +1240,7 @@
 
 
 
-                                    If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+                                    If lrQueryEdge.MathClause IsNot Nothing Then '20230130-VM-new regime: Was: TargetNode.MathFunction <> pcenumMathFunction.None Then
 
                                         If lrQueryEdge.FBMFactType.IsDerived Then
 
@@ -1184,8 +1250,10 @@
                                               "." &
                                               CType(lrQueryEdge.TargetNode.PreboundText & lrQueryEdge.TargetNode.Name, String).Replace("-", "")
 
-                                            lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            '20230130-VM-New Regime. QueryEdge.Formula: Removed below
+                                            'lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            'lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsSQLQuery &= lrQueryEdge.FormulaText
 
                                         Else
 
@@ -1199,8 +1267,10 @@
                                               "." &
                                               lrTargetColumn.Name
 
-                                            lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            '20230130-VM-New Regime. QueryEdge.Formula: Removed below
+                                            'lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            'lsSQLQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsSQLQuery &= lrQueryEdge.FormulaText
 
                                         End If
                                         lbIntialWhere = "AND "

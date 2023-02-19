@@ -36,8 +36,7 @@
                                              Where QueryEdge.TargetNode IsNot Nothing
                                              Select QueryEdge
                 Dim larConditionalQueryEdges As New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) x.IdentifierList.Count > 0) '20230130-VM-Was Or x.MathFunction <> pcenumMathFunction.None))
                 'BooleanPredicate edges. E.g. Protein is enzyme
                 Dim larExtraConditionalQueryEdges = From QueryEdge In Me.QueryEdges
                                                     Where QueryEdge.FBMFactType IsNot Nothing
@@ -357,8 +356,7 @@ StartMatch:
                 Next
 
                 larConditionalQueryEdges = New List(Of FactEngine.QueryEdge)
-                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
-                                                                                              x.TargetNode.MathFunction <> pcenumMathFunction.None))
+                larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) x.IdentifierList.Count > 0) '20230130-VM-Was Or x.TargetNode.MathFunction <> pcenumMathFunction.None))
                 '20210826-VM-Removed
                 'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
@@ -383,6 +381,8 @@ StartMatch:
 
                     If Me.QueryEdges.Count = 0 And Me.HeadNode IsNot Nothing Then
                         lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")"
+                    ElseIf larMatchEdges.Count = 0 And larLocalMatchEdges.Count = 0 And larConditionalQueryEdges.Count = 0 Then
+                        lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")"
                     End If
 
                     GoTo ReturnClause 'There is no WHERE Conditionals.
@@ -401,6 +401,8 @@ StartMatch:
                     If Me.QueryEdges.Count <= 1 And Me.HeadNode IsNot Nothing Then
                         lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")" & vbCrLf & "WHERE "
                     End If
+                ElseIf larMatchEdges.Count = 0 And larLocalMatchEdges.Count = 0 Then
+                    lsCypherQuery &= "(" & Me.HeadNode.Name.LCase & ":" & Me.HeadNode.Name & ")" & vbCrLf & "WHERE "
                 Else
                     lsCypherQuery &= vbCrLf & "WHERE "
                 End If
@@ -578,7 +580,23 @@ StartMatch:
                                                 Where Column.ActiveRole.JoinedORMObject Is lrQueryEdge.TargetNode.FBMModelObject
                                                 Select Column).First
 
-                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrQueryEdge.BaseNode.RDSTable.DatabaseName) & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") '20230202-VM-Was LCase(lrQueryEdge.BaseNode.RDSTable.DatabaseName) & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+
+                                Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & ".date"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & ".month"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & ".year"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
+                                        lsCypherQuery &= "tolower(" & lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & ")"
+                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+                                        lsCypherQuery &= "toupper(" & lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & ")"
+                                    Case Else
+                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                                End Select
+
                                 Select Case lrColumn.getMetamodelDataType
                                     Case Is = pcenumORMDataType.TemporalDate,
                                               pcenumORMDataType.TemporalDateAndTime
@@ -622,7 +640,7 @@ StartMatch:
 
 
 
-                                    If lrQueryEdge.TargetNode.MathFunction <> pcenumMathFunction.None Then
+                                    If lrQueryEdge.MathClause IsNot Nothing Then '20230130-VM-new regime: Was: TargetNode.MathFunction <> pcenumMathFunction.None Then
 
                                         If lrQueryEdge.FBMFactType.IsDerived Then
 
@@ -632,8 +650,10 @@ StartMatch:
                                               "." &
                                               CType(lrQueryEdge.TargetNode.PreboundText & lrQueryEdge.TargetNode.Name, String).Replace("-", "")
 
-                                            lsCypherQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            '20230130-VM-New Regime. QueryEdge.Formula: Removed below
+                                            'lsCypherQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            'lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsCypherQuery &= lrQueryEdge.FormulaText
 
                                         Else
 
@@ -647,8 +667,10 @@ StartMatch:
                                               "." &
                                               lrTargetColumn.Name
 
-                                            lsCypherQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
-                                            lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            '20230130-VM-New Regime. QueryEdge.Formula: Removed below
+                                            'lsCypherQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
+                                            'lsCypherQuery &= " " & lrQueryEdge.TargetNode.MathNumber.ToString & vbCrLf
+                                            lsCypherQuery &= lrQueryEdge.FormulaText
 
                                         End If
                                         lbIntialWhere = lrQueryEdge.WhichClause.getAndOr & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
@@ -674,8 +696,25 @@ StartMatch:
                                                         lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select
                                             Else
+                                                Dim lrTable As RDS.Table = lrQueryEdge.BaseNode.RDSTable
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
-                                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrQueryEdge.BaseNode.RDSTable.DatabaseName) & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") '20230202-VM-Was & LCase(lrQueryEdge.BaseNode.RDSTable.DatabaseName) & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+
+                                                Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ".date"
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ".month"
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ".year"
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
+                                                        lsCypherQuery &= "tolower(" & lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+                                                        lsCypherQuery &= "toupper(" & lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                                    Case Else
+                                                        lsCypherQuery &= lrTable.DatabaseName.LCase & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                End Select
+
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDate,
                                                               pcenumORMDataType.TemporalDateAndTime
@@ -804,8 +843,16 @@ ReturnClause:
                         lsCypherQuery &= vbCrLf & "RETURN "
                     End If
 
-                    If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
-                        lsCypherQuery &= Viev.NullVal(arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT, "") & " "
+                    Dim lbHasDistinctClause As Boolean = False
+
+                    If Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
+                        lsCypherQuery &= "DISTINCT "
+                        lbHasDistinctClause = True
+                    ElseIf arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
+                        If arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing Then
+                            lsCypherQuery &= "DISTINCT "
+                            lbHasDistinctClause = True
+                        End If
                     End If
 
 
@@ -813,6 +860,11 @@ ReturnClause:
 
                     Dim larProjectColumn = (From Column In Me.ProjectionColumn
                                             Where Column IsNot Nothing).GroupBy(Function(d) New With {Key d.Table.Name, Key d.TemporaryAlias, Key .ColumnName = d.Name}).Select(Function(d) d.FirstOrDefault()).ToList()
+
+                    If lbHasDistinctClause And Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Then
+                        larProjectionColumn.RemoveAll(Function(x) Not x.IsDistinct)
+                    End If
+
                     'Group New With {.TableName = Column.Table.Name,
                     '                 .TableDatabaseName = Column.Table.DatabaseName,
                     '                 .TableDBVariableName = Column.Table.DBVariableName,
