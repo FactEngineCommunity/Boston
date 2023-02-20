@@ -1354,6 +1354,8 @@ MoveForward:
                                 If lrQueryEdge.IsPartialFactTypeMatch Then
                                     lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrRole)
                                     lrTempColumn = lrColumn.Clone(Nothing, Nothing)
+                                ElseIf lrRole.FactType.IsLinkFactType Then
+                                    lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id Is lrRole.FactType.LinkFactTypeRole.Id)
                                 Else
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                                     If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType And lrQueryEdge.FBMFactType.IsDerived And Not lrQueryEdge.FBMFactType.IsObjectified Then

@@ -116,7 +116,7 @@
                     End If
                 Else
                     Try
-                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENT(0).MODELELEMENTNAME)
+                        lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.MODELELEMENTNAME(0)) '.MODELELEMENTNAME)
                     Catch ex As Exception
                         lrFBMModelObject = Me.Model.GetModelObjectByName(Me.WHICHSELECTStatement.NODE(0).MODELELEMENTNAME) 'MODELELEMENTNAME
                     End Try
