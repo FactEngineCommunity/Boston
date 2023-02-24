@@ -261,54 +261,54 @@ Namespace FEQL
 
             ' undo/redo
             If e.KeyValue = 89 AndAlso e.Control Then
-            Redo()
-            ' CTRL-Y
-        End If
-        If e.KeyValue = 90 AndAlso e.Control Then
-            Undo()
-            ' CTRL-Z
-        End If
+                Redo()
+                ' CTRL-Y
+            End If
+            If e.KeyValue = 90 AndAlso e.Control Then
+                Undo()
+                ' CTRL-Z
+            End If
 
-        RaiseEvent KeyDown(sender, e)
+            RaiseEvent KeyDown(sender, e)
 
-    End Sub
+        End Sub
 
-    Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
-        If stateLocked <> IntPtr.Zero Then
-            Return
-        End If
-    End Sub
+        Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
+            If stateLocked <> IntPtr.Zero Then
+                Return
+            End If
+        End Sub
 
-    Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
-        If stateLocked <> IntPtr.Zero Then
-            Return
-        End If
+        Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
+            If stateLocked <> IntPtr.Zero Then
+                Return
+            End If
 
-        Dim newContext As ParseNode = GetCurrentContext()
+            Dim newContext As ParseNode = GetCurrentContext()
 
-        If currentContext Is Nothing Then
-            currentContext = newContext
-        End If
-        If newContext Is Nothing Then
-            Return
-        End If
+            If currentContext Is Nothing Then
+                currentContext = newContext
+            End If
+            If newContext Is Nothing Then
+                Return
+            End If
 
-        If newContext.Token.Type <> currentContext.Token.Type Then
-            RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
-            'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
-            currentContext = newContext
-        End If
+            If newContext.Token.Type <> currentContext.Token.Type Then
+                RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
+                'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
+                currentContext = newContext
+            End If
 
-    End Sub
+        End Sub
 
-    ''' <summary>
-    ''' this handy function returns the section in which the user is editing currently
-    ''' </summary>
-    ''' <returns></returns>
-    Public Function GetCurrentContext() As ParseNode
-        Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
-        Return node
-    End Function
+        ''' <summary>
+        ''' this handy function returns the section in which the user is editing currently
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function GetCurrentContext() As ParseNode
+            Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
+            Return node
+        End Function
 
         Public Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
 
@@ -345,62 +345,67 @@ Namespace FEQL
         End Sub
 
         Private Sub HighlightTextInternal()
-        ' highlight the text (used internally only)
-        Lock()
+            ' highlight the text (used internally only)
+            Lock()
 
-        Dim hscroll As Integer = HScrollPos
-        Dim vscroll As Integer = VScrollPos
+            Dim hscroll As Integer = HScrollPos
+            Dim vscroll As Integer = VScrollPos
 
             Dim selstart As Integer = Textbox.SelectionStart
 
             HighlighTextCore()
 
 
-                Textbox.[Select](selstart, 0)
+            Textbox.[Select](selstart, 0)
 
-        HScrollPos = hscroll
-        VScrollPos = vscroll
+            HScrollPos = hscroll
+            VScrollPos = vscroll
 
-        Unlock()
-    End Sub
+            Unlock()
+        End Sub
 
-    ''' <summary>
-    ''' this method should be used only by HighlightText or RestoreState methods
-    ''' </summary>
-    Private Sub HighlighTextCore()
-        'Tree = Parser.Parse(Textbox.Text);
-        Dim sb As New StringBuilder()
-        If Tree Is Nothing Then
-            Return
-        End If
+        ''' <summary>
+        ''' this method should be used only by HighlightText or RestoreState methods
+        ''' </summary>
+        Private Sub HighlighTextCore()
+            Try
+                'Tree = Parser.Parse(Textbox.Text);
+                Dim sb As New StringBuilder()
+                If Tree Is Nothing Then
+                    Return
+                End If
 
-            If Tree.Errors.Count > 0 Then
-                Exit Sub
-            End If
+                If Tree.Errors.Count > 0 Then
+                    Exit Sub
+                End If
 
-        Dim start As ParseNode = Tree.Nodes(0)
-        HightlightNode(start, sb)
+                Dim start As ParseNode = Tree.Nodes(0)
+                HightlightNode(start, sb)
 
-        ' append any trailing skipped tokens that were scanned
-        For Each skiptoken As Token In Scanner.Skipped
-            HighlightToken(skiptoken, sb)
-            sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
-        Next
+                ' append any trailing skipped tokens that were scanned
+                For Each skiptoken As Token In Scanner.Skipped
+                    HighlightToken(skiptoken, sb)
+                    sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
+                Next
 
-        sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
+                sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
 
-        AddRtfHeader(sb)
-        AddRtfEnd(sb)
+                AddRtfHeader(sb)
+                AddRtfEnd(sb)
 
-        Textbox.Rtf = sb.ToString()
+                Textbox.Rtf = sb.ToString()
 
-    End Sub
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
 
 
-    ''' <summary>
-    ''' added function to convert unicode characters in the stringbuilder to rtf unicode escapes
-    ''' </summary>
-    Function Unicode(ByVal sb As StringBuilder) As StringBuilder
+        ''' <summary>
+        ''' added function to convert unicode characters in the stringbuilder to rtf unicode escapes
+        ''' </summary>
+        Function Unicode(ByVal sb As StringBuilder) As StringBuilder
 
         Dim i As Integer
         Dim uc As StringBuilder = New StringBuilder
