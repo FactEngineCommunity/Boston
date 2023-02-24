@@ -618,7 +618,14 @@ StartMatch:
                                                 Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
                                                 lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                             Case Else
-                                                lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                                    Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date,
+                                                              FEQL.pcenumFEQLNodeModifierFunction.Month,
+                                                              FEQL.pcenumFEQLNodeModifierFunction.Year
+                                                        lsCypherQuery &= lrQueryEdge.IdentifierList(0) & vbCrLf
+                                                    Case Else
+                                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                End Select
                                         End Select
                                 End Select
                             End If
