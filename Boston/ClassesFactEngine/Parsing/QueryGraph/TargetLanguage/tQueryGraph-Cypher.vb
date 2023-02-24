@@ -13,6 +13,7 @@
             Dim lbRequiresGroupByClause As Boolean = False
             Dim lsSelectClause As String = ""
 
+
             Try
                 'Set the Node Aliases. E.g. If Lecturer occurs twice in the FROM clause, then Lecturer, Lecturer2 etc
                 Call Me.setNodeAliases()
