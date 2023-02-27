@@ -13,7 +13,6 @@
             Dim lbRequiresGroupByClause As Boolean = False
             Dim lsSelectClause As String = ""
 
-
             Try
                 'Set the Node Aliases. E.g. If Lecturer occurs twice in the FROM clause, then Lecturer, Lecturer2 etc
                 Call Me.setNodeAliases()
@@ -438,7 +437,7 @@ StartMatch:
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
 
                     'lsCypherQuery &= String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
-                    lbIntialWhere = lrQueryEdge.WhichClause.getAndOr(Boston.returnIfTrue(liInd = 0, "", "AND")) & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
+                    lbIntialWhere = lrQueryEdge.WhichClause.getAndOr(Boston.returnIfTrue(liInd = 0, NullVal(lbIntialWhere, ""), "AND")) & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
 
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -725,15 +724,24 @@ StartMatch:
 
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDate,
-                                                              pcenumORMDataType.TemporalDateAndTime
+                                                              pcenumORMDataType.TemporalDateAndTime,
+                                                              pcenumORMDataType.TemporalAutoTimestamp
                                                         lsCypherQuery &= prApplication.WorkingModel.DatabaseConnection.dateToTextOperator
                                                 End Select
                                                 lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
-                                                              pcenumORMDataType.TemporalDate
-                                                        Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
-                                                        lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                              pcenumORMDataType.TemporalDate,
+                                                              pcenumORMDataType.TemporalAutoTimestamp
+                                                        Select Case lrQueryEdge.TargetNode.ModifierFunction
+                                                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date,
+                                                                      FEQL.pcenumFEQLNodeModifierFunction.Month,
+                                                                      FEQL.pcenumFEQLNodeModifierFunction.Year
+                                                                lsCypherQuery &= lrQueryEdge.IdentifierList(0) & vbCrLf
+                                                            Case Else
+                                                                Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lrQueryEdge.IdentifierList(0), True)
+                                                                lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                        End Select
                                                     Case Else
                                                         lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lrQueryEdge.IdentifierList(0) & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                                 End Select

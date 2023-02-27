@@ -1184,7 +1184,7 @@ FinishedProcessing:
                                     '        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
                                     '        loFieldValue = lrSQLiteDataReader.GetString(liInd)
                                     '    End Try
-                                    loFieldValue = lrRecord.Values(loResult.Keys(liInd))
+                                    loFieldValue = lrRecord.Values(loResult.Keys(liInd)).ToString
                             End Select
 
                             ' check 

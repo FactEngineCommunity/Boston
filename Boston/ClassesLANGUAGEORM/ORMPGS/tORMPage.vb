@@ -130,6 +130,130 @@ Namespace FBM
 
         End Function
 
+        Public Function CreatePropertyGraphSchemaFromEntityRelationshipDiagram(ByRef aoBackgroundWorker As BackgroundWorker) As FBM.Page
+
+            Try
+
+                Dim lrModelElement As FBM.ModelObject = Nothing
+                Dim lrPage As FBM.Page
+                Dim lsSQLQuery As String
+                Dim lrORMRecordset As ORMQL.Recordset
+                Dim lrORMRecordset1 As ORMQL.Recordset
+
+                Boston.WriteToStatusBar("Loading the MetaModel for Property Graph Schema")
+                aoBackgroundWorker.ReportProgress(15)
+
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CorePropertyGraphSchema.ToString,
+                                               pcenumCMMLCorePage.CorePropertyGraphSchema.ToString,
+                                               pcenumLanguage.ORMModel)
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CorePropertyGraphSchema.ToString & "', in the Core Model.")
+                End If
+
+                '----------------------------------------------------
+                'Create the Page for the EntityRelationshipDiagram.
+                '----------------------------------------------------
+                lrPage = lrCorePage.Clone(Me.Model, False, True)
+                lrPage.IsDirty = True
+                lrPage.Name = "PGS-" & Trim(Me.Name) '"NewEntityRelationshipDiagram"
+                lrPage.Name = Me.Model.CreateUniquePageName(lrPage.Name, 0)
+                lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
+
+                Me.Model.Page.Add(lrPage)
+
+                aoBackgroundWorker.ReportProgress(20)
+
+                '=========================================================================================
+                'Model Level first.
+                '=========================================================================================
+                'Create the Entities, Attributes and Relations at the Model level first
+                'This is because there may be Attributes identified at the Model level that aren't available on the Page being processed.
+                If Not Me.Model.HasCoreModel Then
+                    Call Me.Model.createEntityRelationshipArtifacts()
+                End If
+
+                '---------------------------------------------------
+                'Drop the Node Types onto the Page as Object Types
+                '---------------------------------------------------
+                Boston.WriteToStatusBar("Creating Entities")
+
+                '=========================================================================================
+
+                aoBackgroundWorker.ReportProgress(40)
+
+                Dim lrFactInstance As FBM.FactInstance = Nothing
+
+                For Each lrPGSNode As ERD.Entity In Me.ERDiagram.Entity
+                    '===============================================================
+                    'Check if is a FactType with TotalInternalUniquenessConstraint
+                    '===============================================================
+                    '---------------------------------------------------------------
+                    'Check to see if the Entity already exists in the ERD MetaModel
+                    '---------------------------------------------------------------
+                    lsSQLQuery = " SELECT COUNT(*)"
+                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+                    lsSQLQuery &= " WHERE Element = '" & lrPGSNode.Name & "'"
+
+                    lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrORMRecordset("Count").Data = 0 Then
+
+                        Boston.WriteToStatusBar("Creating Node Type, '" & lrPGSNode.Name & "'")
+
+                        lsSQLQuery = " SELECT *"
+                        lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                        lsSQLQuery &= " WHERE Element = '" & lrPGSNode.Name & "'"
+
+                        lrORMRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        If Not lrORMRecordset1.EOF Then
+
+                            lsSQLQuery = "ADD FACT '" & lrORMRecordset1.CurrentFact.Id & "'"
+                            lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                            lsSQLQuery &= " ON PAGE '" & lrPage.Name & "'"
+
+                            lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            lrFactInstance.Data(0).X = lrPGSNode.X
+                            lrFactInstance.Data(0).Y = lrPGSNode.Y
+                            lrFactInstance.FactType.isDirty = True
+                            lrFactInstance.isDirty = True
+                            Me.IsDirty = True
+
+                        End If
+
+                    End If
+                Next
+
+                Boston.WriteToStatusBar("Completed creating the Property Graph Schema, '" & lrPage.Name & "'")
+
+                '---------------------------------
+                'Save the new Page to the database
+                '---------------------------------
+                Me.MakeDirty()
+                lrPage.MakeDirty()
+                Call Me.Form.EnableSaveButton()
+
+                Return lrPage
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
 
         Public Function CreateObjectRoleModelFromPropertyGraphSchema(ByRef aoBackgroundWorker As BackgroundWorker) As FBM.Page
 

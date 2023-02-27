@@ -1658,7 +1658,7 @@ Namespace FBM
 
                             For Each lrRole In Me.JoinsFactType.RoleGroup
 
-                                If aarCoveredRoles.Contains(Me) Then
+                                If aarCoveredRoles.Contains(lrRole) Then '20230226-VM-Was 'Contains(Me)'
                                     Return larRolesToReturn
                                 End If
 

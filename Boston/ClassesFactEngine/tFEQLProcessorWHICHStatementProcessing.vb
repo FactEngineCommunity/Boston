@@ -420,7 +420,7 @@
                 End If
                 Throw lrApplicationException
             Catch ex As Exception
-                lsMessage = "getQueryGraph" & ex.Message
+                lsMessage = "getQueryGraph: " & ex.Message
                 For Each lsWarning In lrQueryGraph.Warning
                     lsMessage.AppendDoubleLineBreak(lsWarning)
                 Next
