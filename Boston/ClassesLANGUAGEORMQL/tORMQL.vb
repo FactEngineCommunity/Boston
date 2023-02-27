@@ -2409,7 +2409,8 @@ Namespace ORMQL
                             Return True
                         Case Is = "ADDFACT"
 
-                            Return Me.ProcessADDFACTStatement()
+                            '20230226-VM-Now in ADDMODELELEMENTSTMT (below)
+                            'Return Me.ProcessADDFACTStatement()
 
                         Case Is = "DELETESTMT"
 
@@ -2432,7 +2433,15 @@ Namespace ORMQL
 
                         Case Is = "ADDMODELELEMENTSTMT"
 
-                            Return Me.ProcessADDMODELELEMENTStatement
+                            Try
+                                If Me.Parsetree.Nodes(0).Nodes(0).Nodes(1).Text = "ADDFACTSTMT" Then
+                                    Return Me.ProcessADDFACTStatement()
+                                Else
+                                    Return Me.ProcessADDMODELELEMENTStatement
+                                End If
+                            Catch ex As Exception
+                                Return Me.ProcessADDMODELELEMENTStatement
+                            End Try
 
                         Case Is = "REMOVEMODELELEMENTSTMT"
 

@@ -4136,6 +4136,8 @@ ReattachRoles:
 
 
             Try
+                If Not abAddToPage Then Exit Sub
+
                 'CodeSafe
                 If Me.Page Is Nothing Then Exit Sub
                 If Me.Page.Diagram Is Nothing Then Exit Sub

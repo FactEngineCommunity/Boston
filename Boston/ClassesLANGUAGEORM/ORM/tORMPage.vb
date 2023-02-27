@@ -3339,6 +3339,8 @@ NextY:
                 Select Case Me.Language
                     Case Is = pcenumLanguage.PropertyGraphSchema
                         Return Me.CreateObjectRoleModelFromPropertyGraphSchema(aoBackgroundWorker)
+                    Case Is = pcenumLanguage.EntityRelationshipDiagram
+                        Return Me.CreateObjectRoleModelFromEntityRelationshipDiagram(aoBackgroundWorker)
                 End Select
 
                 Return Nothing

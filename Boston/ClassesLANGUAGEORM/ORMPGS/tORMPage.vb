@@ -161,7 +161,7 @@ Namespace FBM
                 lrPage.IsDirty = True
                 lrPage.Name = "PGS-" & Trim(Me.Name) '"NewEntityRelationshipDiagram"
                 lrPage.Name = Me.Model.CreateUniquePageName(lrPage.Name, 0)
-                lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
+                lrPage.Language = pcenumLanguage.PropertyGraphSchema
 
                 Me.Model.Page.Add(lrPage)
 
@@ -253,6 +253,153 @@ Namespace FBM
             End Try
 
         End Function
+
+        Public Function CreateObjectRoleModelFromEntityRelationshipDiagram(ByRef aoBackgroundWorker As BackgroundWorker) As FBM.Page
+
+            Try
+
+                Dim lrModelElement As FBM.ModelObject = Nothing
+                Dim lrPage As FBM.Page
+
+                Dim lsPageName = Me.Model.CreateUniquePageName("NewObjectRoleModel", 0)
+                lrPage = New FBM.Page(Me.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
+                lrPage.IsDirty = True
+
+                Me.Model.Page.Add(lrPage)
+
+                '---------------------------------------------------
+                'Drop the Node Types onto the Page as Object Types
+                '---------------------------------------------------
+                Boston.WriteToStatusBar("Creating Object Types")
+
+                Dim lrEntityType As FBM.EntityType = Nothing
+                Dim lrFactType As FBM.FactType = Nothing
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+                For Each lrERDEntity As ERD.Entity In Me.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.FBMModelElement.GetType = GetType(FBM.EntityType))
+
+                    lrEntityType = lrERDEntity.RDSTable.FBMModelElement
+                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                    If lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) Is Nothing Then
+                        lrEntityTypeInstance = lrPage.DropEntityTypeAtPoint(lrEntityType, New PointF(lrERDEntity.X, lrERDEntity.Y), False)
+                    End If
+
+                    If lrEntityType.HasCompoundReferenceMode Then
+
+                        Dim loPointF As PointF = Nothing
+                        Dim larModelElement = New List(Of FBM.ModelObject)
+
+                        For Each lrRole In lrEntityType.ReferenceModeRoleConstraint.Role
+
+                            Dim lbEmptySpaceFound As Boolean = False
+                            loPointF = lrPage.FindBlankSpaceInRelationToModelObject(lrEntityTypeInstance, lbEmptySpaceFound)
+                            lrFactTypeInstance = lrPage.DropFactTypeAtPoint(lrRole.FactType, loPointF, False,,,,, False)
+
+                            lrModelElement = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRole.Id).JoinedORMObject
+                            larModelElement.Add(lrModelElement)
+                        Next
+
+                        loPointF = Me.GetMidPointOfModelObjects(larModelElement)
+                        Call lrPage.DropRoleConstraintAtPoint(lrEntityType.ReferenceSchemeRoleConstraint, loPointF, True)
+
+                    End If
+
+                Next
+
+                lrFactType = Nothing
+                For Each lrERDEntity As ERD.Entity In Me.ERDiagram.Entity.FindAll(Function(x) x.getCorrespondingRDSTable.FBMModelElement.GetType = GetType(FBM.FactType))
+
+                    lrFactType = lrERDEntity.RDSTable.FBMModelElement
+
+                    If lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) Is Nothing Then
+                        Call lrPage.DropFactTypeAtPoint(lrFactType, New PointF(lrERDEntity.X, lrERDEntity.Y), False,,,,, False, True)
+                    End If
+
+                    Dim larFactType As New List(Of FBM.FactType)
+                    If lrFactType.hasAssociatedFactTypes(larFactType) Then
+
+                        For Each lrAssociatedFactType In larFactType
+
+                            Dim larRole = From Role In lrAssociatedFactType.RoleGroup
+                                          Where Role.JoinedORMObject.Id = lrFactType.Id
+                                          Where Role.HasInternalUniquenessConstraint
+                                          Select Role
+
+                            If larRole.Count > 0 Then
+                                If larRole(0).FactType.IsManyTo1BinaryFactType Then
+                                    Call lrPage.DropFactTypeAtPoint(lrAssociatedFactType, New PointF(lrERDEntity.X, lrERDEntity.Y), False,,,,, False)
+                                End If
+                            End If
+
+                        Next
+
+                    End If
+                Next
+
+                Dim larFactTypeInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                          Where FactTypeInstance.IsObjectified
+                                          Select FactTypeInstance
+
+                For Each lrFactTypeInstance In larFactTypeInstance
+                    Dim loPointF = lrPage.GetMidPointOfModelObjects(lrFactTypeInstance.FactType.ModelObjects)
+                    Call lrFactTypeInstance.Move(loPointF.X, loPointF.Y, True)
+                Next
+
+                aoBackgroundWorker.ReportProgress(40)
+
+                '---------------------------------------------------
+                'Drop the Relations onto the Page as Fact Types
+                '---------------------------------------------------
+                Dim larERDRelation = From ERDRelation In Me.ERDiagram.Relation
+                                     Where ERDRelation.RDSRelation IsNot Nothing
+                                     Where ERDRelation.RDSRelation.ResponsibleFactType IsNot Nothing
+                                     Select ERDRelation
+
+                For Each lrRelation As ERD.Relation In larERDRelation
+
+                    If lrRelation.RDSRelation.ResponsibleFactType.IsObjectified Or lrRelation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                        If lrRelation.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+                            lrFactType = lrRelation.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
+                        Else
+                            lrFactType = lrRelation.RDSRelation.ResponsibleFactType
+                        End If
+                    Else
+                        lrFactType = lrRelation.RDSRelation.ResponsibleFactType
+                    End If
+
+                    If Not lrFactType.IsLinkFactType And lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) Is Nothing Then
+                        Call lrPage.DropFactTypeIfFoundObjects(lrFactType)
+                    End If
+                Next
+
+                '============================================================================================================================================
+                'Bring in Attributes from the Model level that are not at the Page level                
+                aoBackgroundWorker.ReportProgress(100)
+
+                Boston.WriteToStatusBar("Completed creating the Object Role Model, '" & lrPage.Name & "'")
+
+                '---------------------------------
+                'Save the new Page to the database
+                '---------------------------------
+                Me.MakeDirty()
+                lrPage.MakeDirty()
+                Call Me.Form.EnableSaveButton()
+
+                Return lrPage
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
 
 
         Public Function CreateObjectRoleModelFromPropertyGraphSchema(ByRef aoBackgroundWorker As BackgroundWorker) As FBM.Page

@@ -1620,25 +1620,70 @@ SkipRelation:
         Sub DropEntityAtPoint(ByRef arEntityInstance As ERD.Entity, ByVal aoPointF As PointF)
 
             Dim lsSQLQuery As String
-            Dim lrFactInstance As FBM.FactInstance
+            Dim lrORMRecordset As ORMQL.Recordset
+            Dim lrORMRecordset1 As ORMQL.Recordset
+            Dim lrFactInstance As FBM.FactInstance = Nothing
 
             Try
+                '---------------------------------------------------------------
+                'Check to see if the Entity already exists in the ERD MetaModel
+                '---------------------------------------------------------------
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE Element = '" & arEntityInstance.Name & "'"
 
-                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                lsSQLQuery &= " (" & pcenumCMML.Element.ToString
-                lsSQLQuery &= " , " & pcenumCMML.ElementType.ToString & ")"
-                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & arEntityInstance.Name & "'"
-                lsSQLQuery &= ",'" & pcenumCMML.Entity.ToString & "'"
-                lsSQLQuery &= ")"
+                lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                If lrORMRecordset.EOF Then
 
-                arEntityInstance = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me)
+                    Boston.WriteToStatusBar("Creating Entity, '" & arEntityInstance.Name & "'")
 
-                arEntityInstance.X = aoPointF.X
-                arEntityInstance.Y = aoPointF.Y
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " (" & pcenumCMML.Element.ToString
+                    lsSQLQuery &= " , " & pcenumCMML.ElementType.ToString & ")"
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    lsSQLQuery &= " VALUES ("
+                    lsSQLQuery &= "'" & arEntityInstance.Name & "'"
+                    lsSQLQuery &= ",'" & pcenumCMML.Entity.ToString & "'"
+                    lsSQLQuery &= ")"
+
+                    lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    arEntityInstance = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me)
+
+                    arEntityInstance.X = aoPointF.X
+                    arEntityInstance.Y = aoPointF.Y
+
+
+                Else
+                    lsSQLQuery = " SELECT *"
+                    lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    lsSQLQuery &= " WHERE Element = '" & arEntityInstance.Name & "'"
+
+                    lrORMRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrORMRecordset1.EOF Then
+
+                        lsSQLQuery = "ADD FACT '" & lrORMRecordset.CurrentFact.Id & "'"
+                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                        lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        arEntityInstance = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me)
+
+                        lrFactInstance.Data(0).X = aoPointF.X
+                        lrFactInstance.Data(0).Y = aoPointF.Y
+                        lrFactInstance.FactType.isDirty = True
+                        lrFactInstance.isDirty = True
+                        Me.IsDirty = True
+                    Else
+                        arEntityInstance = lrORMRecordset1.Current.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).CloneEntity(Me)
+                        Exit Sub 'Already on the Page.
+                    End If
+
+                End If
 
                 Call arEntityInstance.DisplayAndAssociate()
 

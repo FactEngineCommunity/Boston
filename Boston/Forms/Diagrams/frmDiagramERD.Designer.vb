@@ -272,7 +272,7 @@ Partial Class frmDiagramERD
         '
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator5, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator12, Me.AutoLayoutToolStripMenuItem, Me.CopyToolStripMenuItem})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 148)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 126)
         '
         'ViewToolStripMenuItem
         '
@@ -348,7 +348,7 @@ Partial Class frmDiagramERD
         '
         Me.mnuOption_ViewGrid.Image = Global.Boston.My.Resources.MenuImagesMain.Grid
         Me.mnuOption_ViewGrid.Name = "mnuOption_ViewGrid"
-        Me.mnuOption_ViewGrid.Size = New System.Drawing.Size(180, 22)
+        Me.mnuOption_ViewGrid.Size = New System.Drawing.Size(96, 22)
         Me.mnuOption_ViewGrid.Text = "&Grid"
         '
         'ToolStripSeparator5
@@ -539,6 +539,10 @@ Partial Class frmDiagramERD
         Me.CloseAllButThisPageToolStripMenuItem.Name = "CloseAllButThisPageToolStripMenuItem"
         Me.CloseAllButThisPageToolStripMenuItem.Size = New System.Drawing.Size(190, 22)
         Me.CloseAllButThisPageToolStripMenuItem.Text = "Close all but this &Page"
+        '
+        'BackgroundWorker
+        '
+        Me.BackgroundWorker.WorkerReportsProgress = True
         '
         'DiagramView
         '
