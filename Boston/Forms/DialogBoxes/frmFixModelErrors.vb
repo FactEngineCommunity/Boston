@@ -19,9 +19,25 @@ Public Class frmFixModelErrors
 
             Me.CheckedListBoxFixTypes.Items.Clear()
 
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RolesWithoutJoinedORMObject,
-                                                                  "Roles Without JoinedORMObject. Remove from Model.",
-                                                                  pcenumModelFixType.RolesWithoutJoinedORMObject))
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.DuplicateFactsRemoveDuplicates,
+                                                                  "Duplicate Facts. Remove Duplicates.",
+                                                                  pcenumModelFixType.DuplicateFactsRemoveDuplicates))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect,
+                                                                  "Internal Uniqueness Constraints Where Level Numbers Are Not Correct. Fix.",
+                                                                  pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType,
+                                                                  "Objectifying Entity Type Ids Not the same As Objectified Fact Type Id.",
+                                                                  pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ObjectifiedFactTypesWithNoCorrespondingRDSTable,
+                                                                  "Objectied Fact Types with no corresponding RDS Table.",
+                                                                  pcenumModelFixType.ObjectifiedFactTypesWithNoCorrespondingRDSTable))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing,
+                                                                  "Remove FactTypeInstances From Page Where FactTypeIntance Has RoleInstance That JoinsNothing.",
+                                                                  pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RelationsInvalidActiveRoleOnOriginColumns,
                                                                   "RDS Relations. Invalid ActiveRole On OriginColumns.",
@@ -39,10 +55,6 @@ Public Class frmFixModelErrors
                                                                   "RDS Columns Where Column is no longer part of Subtype Relationship Hierarchy. Remove The Column.",
                                                                   pcenumModelFixType.ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn))
 
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect,
-                                                                  "Internal Uniqueness Constraints Where Level Numbers Are Not Correct. Fix.",
-                                                                  pcenumModelFixType.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect))
-
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder,
                                                                   "RDS Column. Ordinal Positions. Reset Where Out Of Synchronous Order.",
                                                                   pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder))
@@ -55,17 +67,9 @@ Public Class frmFixModelErrors
                                                                   "RDS Columns That Should Be Mandatory. Make Mandatory.",
                                                                   pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory))
 
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing,
-                                                                  "Remove FactTypeInstances From Page Where FactTypeIntance Has RoleInstance That JoinsNothing.",
-                                                                  pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing))
-
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat,
                                                                   "RDS Tables Where The Number Of PrimaryKey Columns Does Not Match The Number Of Roles In The PreferredIdentifier. FixThat.",
                                                                   pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat))
-
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.DuplicateFactsRemoveDuplicates,
-                                                                  "Duplicate Facts. Remove Duplicates.",
-                                                                  pcenumModelFixType.DuplicateFactsRemoveDuplicates))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations,
                                                                   "RDS Tables And PGS Nodes That Are Missing Relations. Add The Relations.",
@@ -84,16 +88,17 @@ Public Class frmFixModelErrors
                                                                   pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount,
-                                                                              "RDS Relations, where Origin Column count <> Destination Column count.",
-                                                                              pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount))
+                                                                  "RDS Relations, where Origin Column count <> Destination Column count.",
+                                                                  pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount))
 
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType,
-                                                                              "Objectifying Entity Type Ids Not the same As Objectified Fact Type Id.",
-                                                                              pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType))
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RolesWithoutJoinedORMObject,
+                                                                  "Roles Without JoinedORMObject. Remove from Model.",
+                                                                  pcenumModelFixType.RolesWithoutJoinedORMObject))
+
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.SubtypeRelationshipWithNoFactType,
-                                                                              "Subtype Relationships with no Fact Type, fix.",
-                                                                              pcenumModelFixType.SubtypeRelationshipWithNoFactType))
+                                                                  "Subtype Relationships with no Fact Type, fix.",
+                                                                  pcenumModelFixType.SubtypeRelationshipWithNoFactType))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

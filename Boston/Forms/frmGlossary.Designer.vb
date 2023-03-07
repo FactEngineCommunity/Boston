@@ -28,7 +28,7 @@ Partial Class frmGlossary
         Me.CheckBoxShowGeneralConcepts = New System.Windows.Forms.CheckBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModel = New System.Windows.Forms.Label()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.TextBoxSearch = New System.Windows.Forms.TextBox()
         Me.ListBoxGlossary = New System.Windows.Forms.ListBox()
         Me.ContextMenuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
@@ -37,6 +37,7 @@ Partial Class frmGlossary
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -56,11 +57,12 @@ Partial Class frmGlossary
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonRefresh)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonGenerateHTMLGlossary)
         Me.SplitContainer1.Panel1.Controls.Add(Me.CheckBoxShowGeneralConcepts)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelModelName)
         Me.SplitContainer1.Panel1.Controls.Add(Me.LabelPromptModel)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.TextBox1)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.TextBoxSearch)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ListBoxGlossary)
         '
         'SplitContainer1.Panel2
@@ -109,12 +111,12 @@ Partial Class frmGlossary
         Me.LabelPromptModel.TabIndex = 2
         Me.LabelPromptModel.Text = "Model:"
         '
-        'TextBox1
+        'TextBoxSearch
         '
-        Me.TextBox1.Location = New System.Drawing.Point(12, 43)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(195, 20)
-        Me.TextBox1.TabIndex = 1
+        Me.TextBoxSearch.Location = New System.Drawing.Point(12, 43)
+        Me.TextBoxSearch.Name = "TextBoxSearch"
+        Me.TextBoxSearch.Size = New System.Drawing.Size(195, 20)
+        Me.TextBoxSearch.TabIndex = 1
         '
         'ListBoxGlossary
         '
@@ -185,6 +187,15 @@ Partial Class frmGlossary
         Me.WebBrowser.Size = New System.Drawing.Size(591, 358)
         Me.WebBrowser.TabIndex = 2
         '
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 6
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
+        '
         'frmGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -207,7 +218,7 @@ Partial Class frmGlossary
 
     End Sub
     Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxSearch As System.Windows.Forms.TextBox
     Friend WithEvents ListBoxGlossary As System.Windows.Forms.ListBox
     Friend WithEvents SplitContainer2 As System.Windows.Forms.SplitContainer
     Friend WithEvents WebBrowser As System.Windows.Forms.WebBrowser
@@ -220,4 +231,5 @@ Partial Class frmGlossary
     Friend WithEvents ToolStripMenuItemViewInDiagramSpy As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemRemoveFromModel As ToolStripMenuItem
     Friend WithEvents PropertiesToolStripMenuItem1 As ToolStripMenuItem
+    Friend WithEvents ButtonRefresh As Button
 End Class

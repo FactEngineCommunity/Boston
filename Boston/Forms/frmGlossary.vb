@@ -138,13 +138,13 @@ Public Class frmGlossary
 
     End Sub
 
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBoxSearch.TextChanged
 
         'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
         '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
 
         Dim items = From it In Me.mrModel.ModelDictionary
-                    Where it.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                    Where it.Symbol.IndexOf(TextBoxSearch.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
                     And ((it.isEntityType Or it.isValueType) _
                     Or (Me.CheckBoxShowGeneralConcepts.Checked And it.isGeneralConcept))
 
@@ -277,7 +277,7 @@ Public Class frmGlossary
 
             For Each lrFactType In FactType
 
-                lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.class, "FTR")
+                lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "FTR")
                 lrVerbaliser.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
 
                 If lrFactType.FactTypeReading.Count = 0 Then
@@ -421,7 +421,32 @@ Public Class frmGlossary
                 lrModelObject = Me.mrModel.GetModelObjectByName(lsSelectedString)
 
                 Call Me.DescribeModelElement(lrModelObject)
+
+                'House Keeping
+                Select Case lrModelObject.GetType
+                    Case Is = GetType(FBM.FactType)
+                        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+                        If IsSomething(lrORMReadingEditor) Then
+
+                            '-------------------------------------------------------------------------
+                            'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                            '-------------------------------------------------------------------------
+                            Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
+                            lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                            lrORMReadingEditor.zrFactType = lrModelObject
+                            lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                            lrORMReadingEditor.DataGrid_Readings.Refresh()
+                            lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                            lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                            Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
+                        End If
+                End Select
+
             End If
+
         End With
 
     End Sub
@@ -435,10 +460,33 @@ Public Class frmGlossary
                     lrEntityType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
                     Call Me.VerbaliseEntityType(lrEntityType)
 
+#Region "ORM Verbalisation"
+                    '-------------------------------------------------------
+                    'ORM Verbalisation
+                    '-------------------------------------------------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If IsSomething(lrToolboxForm) Then
+                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                        lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
+                    End If
+#End Region
                 Case Is = pcenumConceptType.ValueType
                     Dim lrValueType As FBM.ValueType
                     lrValueType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
                     Call Me.VerbaliseValueType(lrValueType)
+
+#Region "ORM Verbalisation"
+                    '-------------------------------------------------------
+                    'ORM Verbalisation
+                    '-------------------------------------------------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If IsSomething(lrToolboxForm) Then
+                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                        lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
+                    End If
+#End Region
 
                 Case Is = pcenumConceptType.FactType
                     Dim lrFactType As FBM.FactType
@@ -522,11 +570,11 @@ Public Class frmGlossary
                 Select Case lrRoleConstraint.RoleConstraintType
                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                         lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                    Case Is = pcenumRoleConstraintType.RingConstraint, _
-                              pcenumRoleConstraintType.EqualityConstraint, _
-                              pcenumRoleConstraintType.ExternalUniquenessConstraint, _
-                              pcenumRoleConstraintType.ExclusiveORConstraint, _
-                              pcenumRoleConstraintType.ExclusionConstraint, _
+                    Case Is = pcenumRoleConstraintType.RingConstraint,
+                              pcenumRoleConstraintType.EqualityConstraint,
+                              pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                              pcenumRoleConstraintType.ExclusiveORConstraint,
+                              pcenumRoleConstraintType.ExclusionConstraint,
                               pcenumRoleConstraintType.SubsetConstraint
                         lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
                     Case Is = pcenumRoleConstraintType.FrequencyConstraint
@@ -923,7 +971,7 @@ Public Class frmGlossary
                 For Each lrRoleConstraint In arFactType.InternalUniquenessConstraint
 
                     lrVerbaliser.VerbaliseQuantifier("Role Constraint: ")
-                    lrVerbaliser.VerbaliseModelObject(lrRoleConstraint)                
+                    lrVerbaliser.VerbaliseModelObject(lrRoleConstraint)
                     lrVerbaliser.HTW.WriteBreak()
                     lrVerbaliser.VerbaliseIndent()
 
@@ -1061,17 +1109,77 @@ Public Class frmGlossary
             Select Case lrModelObject.ConceptType
                 Case Is = pcenumConceptType.ValueType
                     Call Me.VerbaliseValueType(lrModelObject)
+
+#Region "ORM Verbalisation"
+                    '-------------------------------------------------------
+                    'ORM Verbalisation
+                    '-------------------------------------------------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If IsSomething(lrToolboxForm) Then
+                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                        lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
+                    End If
+#End Region
                 Case Is = pcenumConceptType.EntityType
                     Call Me.VerbaliseEntityType(lrModelObject)
+
+#Region "ORM Verbalisation"
+                    '-------------------------------------------------------
+                    'ORM Verbalisation
+                    '-------------------------------------------------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If IsSomething(lrToolboxForm) Then
+                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                        lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
+                    End If
+#End Region
                 Case Is = pcenumConceptType.FactType
                     Call Me.VerbaliseFactType(lrModelObject)
+
+                    'House Keeping/ORM Reading Editor/ORM Verbaliser
+#Region "HouseKeeping"
+                    '-------------------------------------------------------
+                    'ORM Reading Editor
+                    '-------------------------------------------------------
+#Region "ORM Reading Editor"
+                    Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                    lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+                    If IsSomething(lrORMReadingEditor) Then
+                        '-------------------------------------------------------------------------
+                        'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                        '-------------------------------------------------------------------------
+                        Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
+                        lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                        lrORMReadingEditor.zrFactType = lrModelObject
+                        lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                        lrORMReadingEditor.DataGrid_Readings.Refresh()
+                        lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                        lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                        Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
+                    End If
+#End Region
+
+                    '-------------------------------------------------------
+                    'ORM Verbalisation
+                    '-------------------------------------------------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If IsSomething(lrToolboxForm) Then
+                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                        lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
+                    End If
+#End Region
                 Case Is = pcenumConceptType.RoleConstraint
                     'TBA
             End Select
 
             Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
 
-            Me.TextBox1.Text = ""
+            Me.TextBoxSearch.Text = ""
             Call Me.LoadGlossaryListbox()
             If Me.ListBoxGlossary.Items.Contains(lrModelObject.Id) Then
                 Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.FindString(lrModelObject.Id)
@@ -1545,6 +1653,22 @@ Public Class frmGlossary
         Try
             Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.IndexFromPoint(e.X, e.Y)
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
+
+        Try
+            Me.TextBoxSearch.Text = ""
+            Call Me.ShowGlossary(prApplication.WorkingModel)
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

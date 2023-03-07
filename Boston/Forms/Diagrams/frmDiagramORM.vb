@@ -4886,6 +4886,10 @@ Public Class frmDiagramORM
 
                     Dim lrFactTypeInstance As FBM.FactTypeInstance = e.Node.Tag
                     Call lrFactTypeInstance.NodeModified()
+                    Select Case lrFactTypeInstance.Arity
+                        Case Is = 1
+                            lrFactTypeInstance.SortRoleGroup()
+                    End Select
                 Case Is = pcenumConceptType.FactTypeReading
                     Dim lrFactTypeReading As FBM.FactTypeReadingInstance = e.Node.Tag
                     lrFactTypeReading.Shape.AttachTo(lrFactTypeReading.FactType.Shape, AttachToNode.MiddleRight)

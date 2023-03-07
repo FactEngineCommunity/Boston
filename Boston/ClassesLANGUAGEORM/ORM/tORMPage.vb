@@ -1755,7 +1755,16 @@ Namespace FBM
             Dim OutputList As New List(Of Object)
             Try
 
-                If arModelElement Is Nothing Then
+                Dim lbModelElementIsObjectifyingEntityType As Boolean = False
+
+                If arModelElement IsNot Nothing Then
+                    Select Case arModelElement.GetType
+                        Case Is = GetType(FBM.EntityTypeInstance)
+                            lbModelElementIsObjectifyingEntityType = CType(arModelElement, FBM.EntityTypeInstance).IsObjectifyingEntityType
+                    End Select
+                End If
+
+                If arModelElement Is Nothing Or lbModelElementIsObjectifyingEntityType Then
                     For Each lrValueTypeInstance In Me.ValueTypeInstance
                         OutputList.Add(lrValueTypeInstance)
                     Next
@@ -1764,7 +1773,7 @@ Namespace FBM
                         OutputList.Add(lrFactTypeInstance)
                     Next
 
-                    For Each lrEntityTypeInstance In Me.EntityTypeInstance
+                    For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.Visible)
                         OutputList.Add(lrEntityTypeInstance)
                     Next
 
@@ -1796,7 +1805,7 @@ Namespace FBM
                                 OutputList.Add(lrFactTypeInstance)
                             Next
                             'ObjectifyingEntityTypes may be displayed on the Page as a ModelElement that can be linked to.
-                            For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id)
+                            For Each lrEntityTypeInstance In Me.EntityTypeInstance.FindAll(Function(x) x.Id = arModelElement.Id And x.Visible)
                                 OutputList.Add(lrEntityTypeInstance)
                             Next
                         Case Is = pcenumConceptType.RoleConstraint
@@ -3176,6 +3185,23 @@ NextY:
 
             Me.Name = asNewName
             Call Me.MakeDirty()
+        End Sub
+
+        Public Sub SetSelectedObject(ByRef arModelObject As FBM.ModelObject)
+
+            Try
+                Me.SelectedObject.Clear()
+                Me.SelectedObject.Add(arModelObject)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         Public Sub select_object_type(ByVal ao_object_type As FBM.ModelObject)

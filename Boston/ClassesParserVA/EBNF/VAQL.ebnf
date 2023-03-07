@@ -3,17 +3,20 @@ BRClose = ")".
 CapitalLetter = ( "'A'" | "'B'" | "'C'" | "'D'" | "'E'" | "'F'" | "'G'" | "'H'" | "'I'" | "'J'" | "'K'" | "'L'" | "'M'" | "'N'" |
                   "'O'" | "'P'" | "'Q'" | "'R'" | "'S'" | "'T'" | "'U'" | "'V'" | "'W'" | "'X'" | "'Y'" | "'Z'").
 BinaryFactTypeProduction = ModelElementName PredicatePart ['ONE' | 'AT MOST ONE' | 'AT LEAST ONE' | 'ANY ONE OF' ] ModelElementName.
-DataType = ("'LogicalTrueFalse'" | "'LogicalYesNo'" | "'AutoCounter'" | "'FloatDoublePrecision'" | "'FloatSinglePrecision'" |
-                          "'SignedBigInteger'" | "'SignedInteger'" | "'SignedSmallInteger'" | "'UnsignedBigInteger'" | "'UnsignedInteger'" |
-                          "'UnsignedSmallInteger'" | "'UnsignedTinyInteger'" | "'ObjectId'" | "'RowId'" | "'RawDataOLEObject'" |
-                          "'RawData'" | "'AutoTimeStamp'" | "'Date'" | "'DateTime'" | "'Time'").
+DataType = ("'LogicalTrueFalse'" | "'LogicalYesNo'" | "'AutoCounter'" | "'Decimal'" | "'FloatCustomPrecision'" | "'FloatDoublePrecision'" | "'FloatSinglePrecision'" | "'Money'" |
+            "'SignedBigInteger'" | "'SignedInteger'" | "'SignedSmallInteger'" | "'UnsignedBigInteger'" | "'UnsignedInteger'" |
+            "'UnsignedSmallInteger'" | "'UnsignedTinyInteger'" | "'ObjectId'" | "'RowId'" | "'RawData'" | "'RawDataOLEObject'" | "'RawDataLargeLength'" | "'RawDataOLEObject'" | "'RawDataPicture'" |
+            "'VariableLength'" | "'AutoTimeStamp'" | "'Date'" | "'DateTime'" | "'Time'" |
+	    "'StringFixedLength'" | "'StringLargeLength'" | "'StringVariableLength'" | "'TextFixedLength'" | "'TextLargeLength'" | "'TextVariableLength'"
+            ).
 DataTypeWithLength = ("'RawDataFixedLength'" | "'RawDataLargeLength'" | "'RawDataVariableLength'" |
-                          "'StringFixedLength'" | "'StringLargeLength'" | "'StringVariableLength'") BROpen Number BRClose.
+                          "'StringFixedLength'" | "'StringLargeLength'" | "'StringVariableLength'" |
+			"'TextFixedLength'" | "'TextLargeLength'" | "'TextVariableLength'"
+                     ) BROpen Number BRClose.
 DataTypeWithPrecision = ("'FloatCustomPrecision'" | "'Decimal'" | "'Money'") BROpen Number BRClose.
 Digit = ("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ).
-EntityTypeIsIdentifiedByItsProduction = begin ModelElementName "'IS IDENTIFIED BY ITS'" ModelElementName [ValueTypeIsWrittenAsProduction] end.
-FactTypeProduction = ModelElementName {PredicatePart ModelElementName}.
-IsWhereClause = ModelElementName "IS WHERE" FactTypeProduction [{"," FactTypeProduction}].
+EntityTypeIsIdentifiedByItsProduction = begin ModelElementName "'IS IDENTIFIED BY ITS'" ModelElementName [ValueTypeWrittenAsClause] end.
+EntityTypeIdentifiedByItsClause = "'IDENTIFIED BY ITS'" ModelElementName [ValueTypeWrittenAsClause].
 LowercaseLetter = ( "'a'" | "'b'" | "'c'" | "'d'" | "'e'" | "'f'" | "'g'" | "'h'" | "'i'" | "'j'" | "'k'" | "'l'" | "'m'" | "'n'" |
                   "'o'" | "'p'" | "'q'" | "'r'" | "'s'" | "'t'" | "'u'" | "'v'" | "'w'" | "'x'" | "'y'" | "'z'").
 LowerORUppercaseLetter = ( "'A'" | "'B'" | "'C'" | "'D'" | "'E'" | "'F'" | "'G'" | "'H'" | "'I'" | "'J'" | "'K'" | "'L'" | "'M'" | "'N'" |
@@ -26,8 +29,32 @@ OptionalManyToOneProduction = begin ModelElementName PredicatePart "'AT MOST ONE
 ModelElementName = CapitalLetter {LowerORUppercaseLetter}.
 PredicatePart = PredicatePartWord {Space PredicatePartWord}.
 PredicatePartWord = LowercaseLetter {LowercaseLetter}.
+ValueTypeProduction = ModelElementName "'IS A VALUE TYPE'" ["'WRITTEN AS'" (DataType | DataTypeWithLength | DataTypeWithPrecision)].
 ValueTypeIsWrittenAsProduction = begin ModelElementName "'IS WRITTEN AS'" (DataType | DataTypeWithLength | DataTypeWithPrecision) end.
+ValueTypeWrittenAsClause = "'WRITTEN AS'" (DataType | DataTypeWithLength | DataTypeWithPrecision).
 ValueConstraintValue = String.
 ValueConstraintValueList = "'{'" ValueConstraintValue {"','" ValueConstraintValue} "'}'".
 ValueTypeValueConstraintProduction = begin ModelElementName "'INCLUDES'" (ValueConstraintValue | ValueConstraintValueList) end.
 VAQLStatement = [FactTypeProduction | MandatoryManyToOneProduction | OptionalManyToOneProduction | ValueTypeIsWrittenAsProduction | ValueTypeValueConstraintStatement].
+FactTypeProduction = ModelElementName [IsWhereClause | BinaryPredicateClause | UnaryPredicateClause].
+IsWhereClause = "'IS WHERE'" FactTypeStatement {"','" FactTypeStatement}.
+BinaryPredicateClause = {PredicateClause ModelElementType}.
+UnaryPredicateClause = {UnaryPredicatePart}.
+UnaryPredicatePart = "((?>[a-z])+[\s]?)+$".
+ModelElement = {PreboundReadingText} ModelElementName {PostBoundReadingText}.
+PreboundReadingText = "\-[a-z]+".
+PostBoundReadingText = "[a-z]+\-".
+ModelElementType = [BinaryFactTypeAnyNumberOfClause
+                    | BinaryFactTypeAtLeastOneClause
+                    | BinaryFactTypeManyToOneDefinitionClause
+                    | BinaryFactTypeAtMostOneClause
+                    | ModelElement] [ValueTypeWrittenAsClause | EntityTypeIdentifiedByItsClause].
+BinaryFactTypeAnyNumberOfClause = "'ANY NUMBER OF'" ModelElement.
+BinaryFactTypeAtLeastOneClause = "'AT LEAST ONE'" ModelElement.
+BinaryFactTypeAtMostOneClause = "'AT MOST ONE'" ModelElement.
+BinaryFactTypeManyToOneDefinitionClause = "'ONE'" ModelElement.
+BinaryPredicateClause = {PredicateClause ModelElementType}.
+PredicateClause = {PredicatePart}.
+PredicatePart = "(?!([a-z]+\-))(?!([a-z]+$))([a-z]+[^\-])".
+FactTypeStatement = FactTypeIdentification ModelElement {PredicateClause ModelElement}.
+FactTypeIdentification = ModelElement PredicateClause.

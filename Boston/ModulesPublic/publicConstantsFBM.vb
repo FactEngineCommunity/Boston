@@ -29,24 +29,25 @@
     End Enum
 
     Public Enum pcenumModelFixType
-        ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
-        RolesWithoutJoinedORMObject
-        RelationsInvalidActiveRoleOnOriginColumns
+        ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
         ColumnsWhereActiveRoleIsNothingTryAndFix
         ColumnsWhereActiveRoleIsNothingRemoveTheColumn
         ColumnsWhereNoLongerPartOfSupertypeHierarchyRemoveColumn
-        InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect
-        ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
-        RDSTablesWithNoColumnsRemoveThoseTables
-        RDSColumnsThatShouldBeMandatoryMakeMandatory
-        RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
-        RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
         DuplicateFactsRemoveDuplicates
-        RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations
-        RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations
+        InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect
+        ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
+        ObjectifiedFactTypesWithNoCorrespondingRDSTable
+        RelationsInvalidActiveRoleOnOriginColumns
+        RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
+        RolesWithoutJoinedORMObject
+        RDSColumnsThatShouldBeMandatoryMakeMandatory
         RDSRelationsThatHaveNoOriginColumnsRemoveRelation
         RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
         RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
+        RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations
+        RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations
+        RDSTablesWithNoColumnsRemoveThoseTables
+        RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
         SubtypeRelationshipWithNoFactType
     End Enum
 

@@ -50,7 +50,9 @@ Namespace FBM
                             Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
                                 Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount(arModelElementToFix)
                             Case Is = pcenumModelFixType.SubtypeRelationshipWithNoFactType
-                                Call Me.SubtypeRelationshipWithNoFactType
+                                Call Me.SubtypeRelationshipWithNoFactType()
+                            Case Is = pcenumModelFixType.ObjectifiedFactTypesWithNoCorrespondingRDSTable
+                                Call Me.ObjectifiedFactTypesWithNoCorrespondingRDSTable
                         End Select
 
                     Next
@@ -832,8 +834,270 @@ SkipColumn2:
 
         End Sub
 
+        Private Sub ObjectifiedFactTypesWithNoCorrespondingRDSTable()
+
+            Try
+                Dim lrColumn As RDS.Column
+
+                Dim larObjectifiedFactType = From FactType In Me.FactType.FindAll(Function(x) Not x.IsMDAModelElement)
+                                             Where FactType.IsObjectified
+                                             Where Me.RDS.Table.Find(Function(x) x.Name = FactType.Id) Is Nothing
+                                             Select FactType
+
+                For Each lrFactType In larObjectifiedFactType
+
+                    'Create the Table
+                    Dim lrTable As New RDS.Table(Me.RDS, lrFactType.Id, lrFactType)
+                    Call Me.RDS.addTable(lrTable)
+
+                    'If the FactType for the RoleConstraint  (InternalUniquenessConstraint) is Objectified
+                    ' AND the ObjectifiedFactType has no outgoing FactTypes 
+                    ' then the Table must be a PGS Relation
+                    If lrFactType.IsObjectified Then
+                        If Not lrFactType.JoinedFactTypes.Count = 0 Then
+                            lrTable.setIsPGSRelation(True)
+                        End If
+                    ElseIf lrFactType.JoinedFactTypes.Count = 0 Then
+                        lrTable.setIsPGSRelation(True)
+                    End If
+
+                    '---------------------------------------------------------
+                    'Columns
+                    'Must have a column for all of the Roles of the FactType
+                    '--------------------------------------------------------
+#Region "Columns for Roles"
+                    For Each lrRole In lrFactType.RoleGroup
+
+                        Select Case lrRole.JoinedORMObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType
+#Region "ValueType"
+                                If Not lrTable.Column.Exists(Function(x) x.Role.Id = lrRole.Id) Then
+                                    'There is no Column in the Table for the Role.
+                                    lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
+                                    lrColumn.IsMandatory = True
+                                    'End If
+                                    lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                End If
+#End Region
+                            Case Is = pcenumConceptType.EntityType
+#Region "Entity Type"
+                                If Not lrTable.Column.Exists(Function(x) x.Role.Id = lrRole.Id) Then
+                                    'There is no Column in the Table for the Role.
+                                    Dim lrEntityType As FBM.EntityType = lrRole.JoinedORMObject
+
+                                    If lrEntityType.HasCompoundReferenceMode Then
+
+                                        Dim larColumn As New List(Of RDS.Column)
+                                        Call lrEntityType.getCompoundReferenceSchemeColumns(lrTable, lrRole, larColumn)
+
+                                        For Each lrColumn In larColumn
+                                            If lrRole.InternalUniquenessConstraint.Count > 0 Then
+                                                lrColumn.IsMandatory = True
+                                            End If
+                                            lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                        Next
+                                    Else
+                                        lrColumn = lrRole.GetCorrespondingFactTypeColumn(lrTable)
+
+                                        lrColumn.IsMandatory = True
+                                        lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                    End If
+
+                                End If
+#End Region
+                            Case Else 'Joins a FactType.
+#Region "FactType"
+
+                                Dim larColumn As New List(Of RDS.Column)
+
+                                larColumn = lrRole.getColumns(lrTable, lrRole)
+
+                                For Each lrColumn In larColumn
+                                    Dim lbFailed As Boolean = False
+                                    If Not lrTable.Column.Exists(Function(x) x.Role.Id = lrRole.Id And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Then
+                                        'There is no existing Column in the Table for lrColumn.
+                                        lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
+                                        If lrRole.InternalUniquenessConstraint.Count > 0 Then
+                                            lrColumn.IsMandatory = True
+                                        End If
+                                        lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                    Else
+                                        lbFailed = True
+                                    End If
+
+                                    If lbFailed Then
+                                        'Could be a good reason why it Failed but shouldn't have.
+                                        'E.g.The joined FactType has more than on Role in PK pointing to the same EntityType
+                                        Try
+                                            If lrRole.JoinedORMObject.getCorrespondingRDSTable IsNot Nothing Then
+
+                                                Dim larDownstreamColumn = From Column In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                                                          Where Column.ActiveRole Is lrColumn.ActiveRole
+                                                                          Select Column
+
+                                                If larDownstreamColumn.Count > 1 Then
+                                                    'Add the Column anyway.
+                                                    lrColumn.Name = lrTable.createUniqueColumnName(lrColumn.Name, lrColumn, 0)
+                                                    If lrRole.InternalUniquenessConstraint.Count > 0 Then
+                                                        lrColumn.IsMandatory = True
+                                                    End If
+                                                    lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+                                                End If
+                                            End If
+                                        Catch ex As Exception
+                                            'Not a biggie, but will be problematic.
+                                        End Try
+                                    End If
+                                Next
+#End Region
+                        End Select
+
+                        'Relation  
+                        If lrFactType.IsObjectified Then
+                            Dim larLinkFactTypeRole = From FactType In Me.FactType
+                                                      Where FactType.IsLinkFactType = True _
+                                                                        And FactType.LinkFactTypeRole Is lrRole
+                                                      Select FactType.RoleGroup(0)
+
+                            If larLinkFactTypeRole.Count > 0 Then
+                                For Each lrLinkFactTypeRole In larLinkFactTypeRole
+                                    Call Me.generateRelationForManyTo1BinaryFactType(lrLinkFactTypeRole)
+                                Next
+                            Else
+                                Select Case lrRole.JoinedORMObject.ConceptType
+                                    Case Is = pcenumConceptType.EntityType, pcenumConceptType.FactType
+                                        Call Me.generateRelationForManyToManyFactTypeRole(lrRole)
+                                End Select
+                            End If
+                        Else
+                            Select Case lrRole.JoinedORMObject.ConceptType
+                                Case Is = pcenumConceptType.EntityType, pcenumConceptType.FactType
+                                    Call Me.generateRelationForManyToManyFactTypeRole(lrRole)
+                            End Select
+
+                        End If
+
+                        Dim lrModelElement As FBM.ModelObject = lrRole.JoinedORMObject
+
+                    Next 'Role in the FactType's RoleGroup
 #End Region
 
+                    '-------------------------------------------------
+                    'Columns - Adjoined Many-To-One BinaryFactTypes.
+                    '--------------------------------------------------
+#Region "Columns - Adjoined Many-to-One BinaryFactTypes"
+
+                    Dim larManyToOneFactTypeRoles = From FactType In Me.FactType.FindAll(Function(x) x.IsManyTo1BinaryFactType)
+                                                    From Role In FactType.RoleGroup
+                                                    Where Role.JoinedORMObject.Id = lrFactType.Id
+                                                    Select Role
+
+                    For Each lrManyToOneFactTypeRole In larManyToOneFactTypeRoles
+
+                        If lrManyToOneFactTypeRole.InternalUniquenessConstraint.Count > 0 Then
+
+                            Dim lrModelObject As FBM.ModelObject = Nothing
+
+                            lrColumn = lrManyToOneFactTypeRole.GetCorrespondingUnaryOrBinaryFactTypeColumn(lrTable)
+                            lrColumn.FactType = lrManyToOneFactTypeRole.FactType
+
+                            If lrManyToOneFactTypeRole.Mandatory Then
+                                lrColumn.IsMandatory = True
+                            End If
+
+                            lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
+
+                        End If
+
+                    Next
+#End Region
+
+
+                    For Each lrRoleConstraint In lrFactType.InternalUniquenessConstraint
+
+                        Dim larColumn As List(Of RDS.Column) = Nothing
+
+                        '------------------------
+                        'Index 
+                        '------------------------
+#Region "Index"
+                        Dim larIndexColumn As New List(Of RDS.Column)
+
+                        For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
+
+                            Dim larTableColumn = From Column In lrTable.Column
+                                                 Where Column.Role.Id = lrRoleConstraintRole.Role.Id
+                                                 Select Column
+
+                            For Each lrColumn In larTableColumn
+                                larIndexColumn.Add(lrColumn)
+                            Next 'Column
+
+                        Next 'RoleConstraintRole
+
+                        Dim lsQualifier As String
+                        Dim lbIsPrimaryKey As Boolean = False
+                        If lrFactType.InternalUniquenessConstraint.Count = 1 Or lrRoleConstraint.IsPreferredIdentifier Then
+                            lsQualifier = lrTable.generateUniqueQualifier("PK")
+                            lrFactType.InternalUniquenessConstraint(0).SetIsPreferredIdentifier(True, False)
+                            lbIsPrimaryKey = True
+                        Else
+                            lsQualifier = lrTable.generateUniqueQualifier("UC")
+                        End If
+
+
+                        Dim lsIndexName As String = lrTable.Name & "_" & Trim(lsQualifier)
+                        lsIndexName = Me.RDS.createUniqueIndexName(lsIndexName, 0)
+
+                        'Add the new Index
+                        Dim lrIndex As New RDS.Index(lrTable,
+                                                     lsIndexName,
+                                                     lsQualifier,
+                                                     pcenumODBCAscendingOrDescending.Ascending,
+                                                     lbIsPrimaryKey,
+                                                     True,
+                                                     False,
+                                                     larIndexColumn,
+                                                     False,
+                                                     True)
+
+                        Call lrTable.addIndex(lrIndex)
+#End Region
+                        '----------------------------------------
+                        'PGS Relation
+                        '----------------------------------------
+                        If (lrFactType.Arity = 2 Or lrFactType.Arity = 3) _
+                               And lrRoleConstraint.RoleConstraintRole.Count = 2 _
+                               And Not lrFactType.InternalUniquenessConstraint.Count > 1 _
+                               And Not lrRoleConstraint.atLeastOneRoleJoinsAValueType Then
+                            lrTable.setIsPGSRelation(True)
+                        End If
+                    Next
+
+#Region "Flashcard"
+                    Dim lfrmFlashCard As New frmFlashCard
+                    lfrmFlashCard.ziIntervalMilliseconds = 5600
+                    lfrmFlashCard.BackColor = Color.DarkSeaGreen
+                    Dim lsMessage As String = ""
+                    lsMessage = "Created RDS Table for Fact Type, " & lrFactType.Id & "."
+                    lfrmFlashCard.zsText = lsMessage
+                    Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(frmMain)
+#End Region
+
+                Next
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+#End Region
 
     End Class
 

@@ -3126,6 +3126,8 @@ Public Class frmToolboxORMVerbalisation
                 Call Me.VerbaliseEntityType(CType(arModelElement, FBM.EntityType))
             Case Is = pcenumConceptType.ValueType
                 Call Me.VerbaliseValueType(CType(arModelElement, FBM.ValueType))
+            Case Is = pcenumConceptType.FactType
+                Call Me.VerbaliseFactType(CType(arModelElement, FBM.FactType))
         End Select
 
     End Sub

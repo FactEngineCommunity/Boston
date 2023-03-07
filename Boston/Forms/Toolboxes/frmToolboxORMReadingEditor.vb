@@ -73,7 +73,7 @@ Public Class frmToolboxORMReadingEditor
 
     End Sub
 
-    Sub SetupForm()
+    Sub SetupForm(Optional ByRef arPage As FBM.Page = Nothing, Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing)
 
         Dim ls_joined_object_name As String = ""
 
@@ -88,6 +88,12 @@ Public Class frmToolboxORMReadingEditor
                                FTRParser)
             End If
 
+            If arPage IsNot Nothing Then
+                Me.zrPage = arPage
+            End If
+            If arFactTypeInstance IsNot Nothing Then
+                Me.zrPage.SetSelectedObject(arFactTypeInstance)
+            End If
             '----------------
             'Setup the grid
             '----------------
