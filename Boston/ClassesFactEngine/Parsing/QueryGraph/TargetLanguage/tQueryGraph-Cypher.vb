@@ -609,14 +609,16 @@ StartMatch:
                                     Case Else
                                         lsCypherQuery &= lrQueryEdge.getTargetSQLComparator
                                         Select Case lrColumn.getMetamodelDataType
-                                            Case Is = pcenumORMDataType.TemporalDateAndTime
+                                            Case Is = pcenumORMDataType.TemporalDateAndTime,
+                                                      pcenumORMDataType.TemporalAutoTimestamp
                                                 Dim lsUserDateTime = lrQueryEdge.IdentifierList(0)
                                                 Dim loDateTime As DateTime = Nothing
                                                 If Not DateTime.TryParse(lsUserDateTime, loDateTime) Then
                                                     Throw New Exception(lsUserDateTime & " is not a valid DateTime. Try entering a DateTime value in the FactEngine configuration format: " & My.Settings.FactEngineUserDateTimeFormat)
                                                 End If
-                                                Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime)
-                                                lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
+                                                Dim lsDateTime As String = Me.Model.DatabaseConnection.FormatDateTime(lsUserDateTime,, True)
+                                                lsCypherQuery &= "date('" & lsDateTime & "')"
+                                                'lsCypherQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsDateTime & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & vbCrLf
                                             Case Else
                                                 Select Case lrQueryEdge.TargetNode.ModifierFunction
                                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date,

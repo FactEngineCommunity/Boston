@@ -384,9 +384,10 @@ Public Class frmDiagramORMForGlossary
 
         For Each lrFactType In larFactType
             If lrFactType.IsObjectified Then
-                Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
+                '20230306-VM-Removed for now. ObjectifyingEntityType
+                'Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If
-            Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False)
+            Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False,,,,,,, True)
         Next
 
     End Sub
@@ -5174,124 +5175,139 @@ Public Class frmDiagramORMForGlossary
 
     End Sub
 
-    Public Sub AutoLayout()
+    Public Sub AutoLayout(Optional ByRef arCentralModelElementInstance As FBM.ModelObject = Nothing)
 
         Dim liHighestOutgoingLinkCount As Integer = 0
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
         Dim lrFactTypeInstance As FBM.FactTypeInstance
-        Dim lrCentralEntityTypeInstance As New FBM.EntityTypeInstance
+        Dim lrCentralModelElementInstance As New FBM.ModelObject
         'Dim lrLink As MindFusion.Diagramming.DiagramLink
-        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+        'Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
         Try
-            For Each lrModelElement In Me.zrPage.GetAllPageObjects
-                lrModelElement.HasBeenMoved = False
-                If lrModelElement.Shape IsNot Nothing Then
-                    lrModelElement.X = lrModelElement.Shape.Bounds.X
-                    lrModelElement.Y = lrModelElement.Shape.Bounds.Y
-                End If
-            Next
 
             If Me.zrPage.EntityTypeInstance.Count = 0 Then
                 Exit Sub
             End If
 
             'Every EntityType at least 10,10 from the corner of the screen
-            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                lrEntityTypeInstance.HasBeenMoved = False
-                If IsSomething(lrEntityTypeInstance.Shape) Then
-                    lrEntityTypeInstance.Move(Viev.Greater(10, lrEntityTypeInstance.Shape.Bounds.X), _
-                                                    Viev.Greater(10, lrEntityTypeInstance.Shape.Bounds.Y), False)
-                End If
-            Next
+            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+            '    lrEntityTypeInstance.HasBeenMoved = False
+            '    If IsSomething(lrEntityTypeInstance.shape) Then
+            '        lrEntityTypeInstance.shape.Move(Viev.Greater(10, lrEntityTypeInstance.shape.Bounds.X), _
+            '                                        Viev.Greater(10, lrEntityTypeInstance.shape.Bounds.Y))
+            '    End If
+            'Next
 
-            'Every FactType at least 10,10 from the corner of the screen
-            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                lrFactTypeInstance.HasBeenMoved = False
-                If IsSomething(lrFactTypeInstance.Shape) Then
-                    lrFactTypeInstance.Move(Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.X),
-                                            Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.Y),
-                                            False)
-                End If
-            Next
+            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+            '    lrFactTypeInstance.HasBeenMoved = False
+            '    If IsSomething(lrFactTypeInstance.Shape) Then
+            '        lrFactTypeInstance.Shape.Move(Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.X), Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.Y))
+            '    End If
+            'Next
 
             '---------------------------------------------------------------
             'Put the EntityTypes with SubTypes towards the top of the page
             '---------------------------------------------------------------
-            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.HasSubTypes = True)
-            '    lrEntityTypeInstance.Shape.Move(50, 15)
-            '    lrEntityTypeInstance.HasBeenMoved = True
-            '    Call lrEntityTypeInstance.AutoLayout(False, False)
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.HasSubTypes = True And Not x.IsObjectifyingEntityType)
+                lrEntityTypeInstance.Shape.Move(200, 85)
+                lrEntityTypeInstance.HasBeenMoved = True
+                Call lrEntityTypeInstance.AutoLayout(False, False)
 
-            '    Dim lrSubtypeEntityTypeInstance As FBM.EntityTypeInstance
-            '    Dim liInd As Integer = 30
-            '    Dim larSubTypes As New List(Of FBM.EntityTypeInstance)
+                Dim lrSubtypeEntityTypeInstance As FBM.EntityTypeInstance
+                Dim liInd As Integer = 30
+                Dim larSubTypes As New List(Of FBM.EntityTypeInstance)
 
-            '    larSubTypes = lrEntityTypeInstance.GetSubTypes
-            '    larSubTypes.Sort(AddressOf FBM.EntityTypeInstance.CompareTotalLinks)
-            '    For Each lrSubtypeEntityTypeInstance In larSubTypes
-            '        lrSubtypeEntityTypeInstance.Shape.Move(liInd, 60)
-            '        Call lrSubtypeEntityTypeInstance.AutoLayout(True, False)
-            '        lrSubtypeEntityTypeInstance.HasBeenMoved = True
-            '        liInd += 50
-            '    Next
-            'Next
-
-            '-----------------------------
-            'Find the central EntityType
-            '-----------------------------
-            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
-
-                Dim liTotalLinkCount = lrEntityTypeInstance.Shape.IncomingLinks.Count + lrEntityTypeInstance.Shape.OutgoingLinks.Count
-
-                If liTotalLinkCount >= liHighestOutgoingLinkCount Then
-                    liHighestOutgoingLinkCount = liTotalLinkCount
-                    lrCentralEntityTypeInstance = lrEntityTypeInstance
-                End If
-
+                larSubTypes = lrEntityTypeInstance.GetSubTypes
+                larSubTypes.Sort(AddressOf FBM.EntityTypeInstance.CompareTotalLinks)
+                For Each lrSubtypeEntityTypeInstance In larSubTypes
+                    lrSubtypeEntityTypeInstance.Shape.Move(liInd, 120)
+                    Call lrSubtypeEntityTypeInstance.AutoLayout(True, False)
+                    lrSubtypeEntityTypeInstance.HasBeenMoved = True
+                    liInd += 50
+                Next
             Next
 
-            Dim liX As Integer = Viev.Lesser(150, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
-            Dim liY As Integer = Viev.Greater(50, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
+            '-----------------------------
+            'Set the central ModelElement
+            '-----------------------------
+            If arCentralModelElementInstance Is Nothing Then
+                For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
 
-            If lrCentralEntityTypeInstance.HasBeenMoved Then
+                    Dim liTotalLinkCount = lrEntityTypeInstance.Shape.IncomingLinks.Count + lrEntityTypeInstance.Shape.OutgoingLinks.Count
+
+                    If liTotalLinkCount >= liHighestOutgoingLinkCount Then
+                        liHighestOutgoingLinkCount = liTotalLinkCount
+                        lrCentralModelElementInstance = lrEntityTypeInstance
+                    End If
+
+                Next
+            Else
+                lrCentralModelElementInstance = arCentralModelElementInstance
+            End If
+
+            Dim liX As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
+            Dim liY As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
+
+            If CType(lrCentralModelElementInstance, Object).HasBeenMoved Then
                 '--------------------
                 'Moved as a SubType
                 '--------------------
             Else
-                lrCentralEntityTypeInstance.Move(liX, liY, False)
-                lrCentralEntityTypeInstance.HasBeenMoved = True
+                If CType(lrCentralModelElementInstance, Object).Shape IsNot Nothing Then
+                    CType(lrCentralModelElementInstance, Object).Shape.Move(liX, liY)
+                    CType(lrCentralModelElementInstance, Object).HasBeenMoved = True
+                End If
             End If
 
+            Dim liDegrees As Integer
+            If lrCentralModelElementInstance.HasSubTypes Then
+                liDegrees = 270
+            Else
+                liDegrees = 320
+            End If
 
-            Dim liDegrees As Integer = 320
+            'For Each lrLink In lrCentralEntityTypeInstance.Shape.IncomingLinks
+            'If lrLink.Tag.ConceptType = pcenumConceptType.Role Then
 
+            For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralModelElementInstance)
 
-            For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralEntityTypeInstance)
+                Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralModelElementInstance.Id)
+                'lrRoleInstance = lrLink.Tag
+                'lrFactTypeInstance = lrRoleInstance.FactType
 
-                Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralEntityTypeInstance.Id)
+                liX = Viev.Greater(10, CType(lrCentralModelElementInstance, Object).Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
+                liY = Viev.Greater(10, CType(lrCentralModelElementInstance, Object).Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
+                If lrFactTypeInstance.Shape IsNot Nothing Then
+                    lrFactTypeInstance.Shape.Move(liX, liY)
+                End If
 
-                lrFactTypeInstance = lrRoleInstance.FactType
-
-                liX = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
-                liY = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
-                lrFactTypeInstance.Move(liX, liY, False)
                 lrFactTypeInstance.HasBeenMoved = True
 
-                If lrFactTypeInstance.IsBinaryFactType Then
+                If lrFactTypeInstance.IsBinaryFactType And Not lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
                     Dim lrObject As Object
                     lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
+                    liX = Viev.Greater(40, CType(lrCentralModelElementInstance, Object).Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 65)
+                    liY = Viev.Greater(40, CType(lrCentralModelElementInstance, Object).Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 65)
+                    If Not lrObject.HasBeenMoved Then
+                        lrObject.Shape.Move(liX, liY)
+                    End If
+                    lrObject.HasBeenMoved = True
 
-                    If Not (lrObject.Id = lrCentralEntityTypeInstance.Id) Then
-                        liX = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 80)
-                        liY = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 80)
-                        lrObject.Move(liX, liY, False)
-                        lrObject.HasBeenMoved = True
+                    If (lrObject.ConceptType = pcenumConceptType.EntityType) Then
+
+                        Dim lrChildEntityTypeInstance As FBM.EntityTypeInstance
+                        lrChildEntityTypeInstance = lrObject
+
+                        Call lrChildEntityTypeInstance.AutoLayout(False, False)
+
                     End If
 
                 End If
 
-                liDegrees += 35
+
+                liDegrees += 21
+
             Next
 
             'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
@@ -5307,60 +5323,76 @@ Public Class frmDiagramORMForGlossary
                 lrFactTypeInstance.HasBeenMoved = False
             Next
 
-            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                'lrEntityTypeInstance.RepellNeighbouringPageObjects(1)
-            Next
-
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 Call lrFactTypeInstance.BringStrandedJoinedObjectsCloser()
             Next
 
+            'Dim lrValueTypeInstance As FBM.ValueTypeInstance
+            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.IsObjectified)
+            '    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+            '        Select Case lrRoleInstance.JoinedORMObject.ConceptType
+            '            Case Is = pcenumConceptType.ValueType
+            '                lrValueTypeInstance = lrRoleInstance.JoinedORMObject
+            '                lrValueTypeInstance.X = lrRoleInstance.X
+            '                lrValueTypeInstance.Y = lrRoleInstance.Y + (20 * (lrValueTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
+            '                lrValueTypeInstance.RepellNeighbouringPageObjects(15)
+            '            Case Is = pcenumConceptType.EntityType
+            '                lrEntityTypeInstance = lrRoleInstance.JoinedORMObject
+            '                lrEntityTypeInstance.X = lrRoleInstance.X
+            '                lrEntityTypeInstance.Y = lrRoleInstance.Y + (20 * (lrEntityTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
+            '                lrEntityTypeInstance.RepellNeighbouringPageObjects(15)
+            '            Case Is = pcenumConceptType.FactType
+            '                lrFactTypeInstance = lrRoleInstance.JoinedORMObject
+            '                lrFactTypeInstance.X = lrRoleInstance.X
+            '                lrFactTypeInstance.Y = lrRoleInstance.Y + (20 * (lrFactTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
+            '                Call lrFactTypeInstance.RepellNeighbouringPageObjects(15)
+            '        End Select
+            '    Next
+            'Next
 
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                'Call lrEntityTypeInstance.SetAdjoinedFactTypesBetweenModelElements()
+                lrEntityTypeInstance.RepellNeighbouringPageObjects(1)
             Next
 
-            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint)
+            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+            '    Call lrEntityTypeInstance.SetAdjoinedFactTypesBetweenModelElements()
+            'Next
 
-                Dim larRoleInstance As New List(Of FBM.RoleInstance)
-                Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-                Dim lrPointF As PointF
+            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.IsObjectified)
+            '    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
 
-                For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                    larRoleInstance.Add(lrRoleConstraintRoleInstance.Role)
-                Next
-                lrPointF = Me.zrPage.GetMidOfRoleInstances(larRoleInstance)
-                lrRoleConstraintInstance.Move(lrPointF.X, lrPointF.Y, False)
-            Next
+            '        Select Case lrRoleInstance.JoinedORMObject.ConceptType
+            '            Case Is = pcenumConceptType.ValueType
+            '                lrValueTypeInstance = lrRoleInstance.JoinedORMObject
+            '                lrValueTypeInstance.X = lrRoleInstance.X
+            '                lrValueTypeInstance.Y = lrRoleInstance.Y + (20 * (lrValueTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
+            '                lrValueTypeInstance.RepellNeighbouringPageObjects(25)
+            '            Case Is = pcenumConceptType.EntityType
+            '                lrEntityTypeInstance = lrRoleInstance.JoinedORMObject
+            '                lrEntityTypeInstance.X = lrRoleInstance.X
+            '                lrEntityTypeInstance.Y = lrRoleInstance.Y + (20 * (lrEntityTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
+            '                lrEntityTypeInstance.RepellNeighbouringPageObjects(25)
+            '            Case Is = pcenumConceptType.FactType
+            '                lrFactTypeInstance = lrRoleInstance.JoinedORMObject
+            '                lrFactTypeInstance.X = lrRoleInstance.X
+            '                lrFactTypeInstance.Y = lrRoleInstance.Y + (20 * (lrFactTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
+            '                Call lrFactTypeInstance.RepellNeighbouringPageObjects(50)
+            '        End Select
+            '    Next
+            'Next
 
-            '==================================================================================================================
-            'Subtypes: for the CentralEntityTypeInstance only, arrange the Subtypes            
+            'For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint)
 
+            '    Dim larRoleInstance As New List(Of FBM.RoleInstance)
+            '    Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+            '    Dim lrPointF As PointF
 
-            Dim larSuptypeRelationshipParent = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
-                                               From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
-                                               Select SubtypeRelationshipInstance.parentModelElement
-
-            If larSuptypeRelationshipParent.Count > 0 Then
-                For Each lrSubtypeRelationsipParent In larSuptypeRelationshipParent
-
-                    If lrSubtypeRelationsipParent IsNot Nothing Then
-                        Dim larSubtypeRelationhipChildren = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
-                                                            From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
-                                                            Where SubtypeRelationshipInstance.parentModelElement IsNot Nothing
-                                                            Where SubtypeRelationshipInstance.parentModelElement.Id = lrSubtypeRelationsipParent.Id
-                                                            Select SubtypeRelationshipInstance.ModelElement
-
-                        liX = CType(lrSubtypeRelationsipParent, Object).X - (larSubtypeRelationhipChildren.Count / 2) * 30
-
-                        For Each lrEntityTypeInstance In larSubtypeRelationhipChildren
-                            lrEntityTypeInstance.Move(liX, CType(lrSubtypeRelationsipParent, Object).Y + 40, False)
-                            liX += 30
-                        Next
-                    End If
-                Next
-            End If
-
+            '    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
+            '        larRoleInstance.Add(lrRoleConstraintRoleInstance.Role)
+            '    Next
+            '    lrPointF = Me.zrPage.GetMidOfRoleInstances(larRoleInstance)
+            '    lrRoleConstraintInstance.Shape.Move(lrPointF.X, lrPointF.Y)
+            'Next
 
             'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
             '    lrEntityTypeInstance.HasBeenMoved = False
@@ -5374,21 +5406,43 @@ Public Class frmDiagramORMForGlossary
                 Call lrFactTypeInstance.SetSuitableFactTypeReading()
             Next
 
-            For Each lrModelElement In Me.zrPage.GetAllPageObjects
+            '---------------------
+            'Put the diagram (all visible Shapes) in a nice Top Left position.
+            Dim liLeftmostShapeX = (From Shape In Me.Diagram.Nodes
+                                    Where Shape.Visible = True
+                                    Select Shape.Bounds.X).Min
+
+            Dim liTopmostShapeY = (From Shape In Me.Diagram.Nodes
+                                   Where Shape.Visible = True
+                                   Select Shape.Bounds.Y).Min
+
+            For Each ModelElement In Me.zrPage.GetAllPageObjects.FindAll(Function(x) x.shape IsNot Nothing)
+                ModelElement.Move(ModelElement.X - Viev.Greater(liLeftmostShapeX - 10, 0),
+                                  ModelElement.Y - Viev.Greater(liTopmostShapeY - 10, 0),
+                                  False)
+            Next
+            '---------------------
+
+            For Each lrModelElement In Me.zrPage.GetAllPageObjects.FindAll(Function(x) x.shape IsNot Nothing)
                 lrModelElement.HasBeenMoved = False
             Next
 
-            Me.zrPage.DiagramView.ZoomFactor = 80
+            Call Me.ResetNodeAndLinkColors()
 
-            Dim lrLink As DiagramLink
-            For Each lrLink In Me.zrPage.Diagram.Links
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
+                lrEntityTypeInstance.Shape.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+            Next
+
+            For Each lrLink As MindFusion.Diagramming.DiagramLink In Me.Diagram.Links
                 Call lrLink.ReassignAnchorPoints()
             Next
 
-
-            Me.zrPage.Diagram.Invalidate()
-
-            Call Me.ResetNodeAndLinkColors()
+            'Derivation Texts - FactTypes
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                If lrFactTypeInstance.IsDerived Then
+                    Call lrFactTypeInstance.FactTypeDerivationText.Move(lrFactTypeInstance.X, Viev.Greater(lrFactTypeInstance.Y - 10 - lrFactTypeInstance.FactTypeDerivationText.Shape.Bounds.Height, 0), False)
+                End If
+            Next
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -5400,6 +5454,235 @@ Public Class frmDiagramORMForGlossary
         End Try
 
     End Sub
+
+
+    '20230309-VM-Old. Replaced with ORMDiagram code.
+    'Public Sub AutoLayout()
+
+    '    Dim liHighestOutgoingLinkCount As Integer = 0
+    '    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+    '    Dim lrFactTypeInstance As FBM.FactTypeInstance
+    '    Dim lrCentralEntityTypeInstance As New FBM.EntityTypeInstance
+    '    'Dim lrLink As MindFusion.Diagramming.DiagramLink
+    '    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+
+    '    Try
+    '        For Each lrModelElement In Me.zrPage.GetAllPageObjects
+    '            lrModelElement.HasBeenMoved = False
+    '            If lrModelElement.Shape IsNot Nothing Then
+    '                lrModelElement.X = lrModelElement.Shape.Bounds.X
+    '                lrModelElement.Y = lrModelElement.Shape.Bounds.Y
+    '            End If
+    '        Next
+
+    '        If Me.zrPage.EntityTypeInstance.Count = 0 Then
+    '            Exit Sub
+    '        End If
+
+    '        'Every EntityType at least 10,10 from the corner of the screen
+    '        For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+    '            lrEntityTypeInstance.HasBeenMoved = False
+    '            If IsSomething(lrEntityTypeInstance.Shape) Then
+    '                lrEntityTypeInstance.Move(Viev.Greater(10, lrEntityTypeInstance.Shape.Bounds.X), _
+    '                                                Viev.Greater(10, lrEntityTypeInstance.Shape.Bounds.Y), False)
+    '            End If
+    '        Next
+
+    '        'Every FactType at least 10,10 from the corner of the screen
+    '        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+    '            lrFactTypeInstance.HasBeenMoved = False
+    '            If IsSomething(lrFactTypeInstance.Shape) Then
+    '                lrFactTypeInstance.Move(Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.X),
+    '                                        Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.Y),
+    '                                        False)
+    '            End If
+    '        Next
+
+    '        '---------------------------------------------------------------
+    '        'Put the EntityTypes with SubTypes towards the top of the page
+    '        '---------------------------------------------------------------
+    '        'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.HasSubTypes = True)
+    '        '    lrEntityTypeInstance.Shape.Move(50, 15)
+    '        '    lrEntityTypeInstance.HasBeenMoved = True
+    '        '    Call lrEntityTypeInstance.AutoLayout(False, False)
+
+    '        '    Dim lrSubtypeEntityTypeInstance As FBM.EntityTypeInstance
+    '        '    Dim liInd As Integer = 30
+    '        '    Dim larSubTypes As New List(Of FBM.EntityTypeInstance)
+
+    '        '    larSubTypes = lrEntityTypeInstance.GetSubTypes
+    '        '    larSubTypes.Sort(AddressOf FBM.EntityTypeInstance.CompareTotalLinks)
+    '        '    For Each lrSubtypeEntityTypeInstance In larSubTypes
+    '        '        lrSubtypeEntityTypeInstance.Shape.Move(liInd, 60)
+    '        '        Call lrSubtypeEntityTypeInstance.AutoLayout(True, False)
+    '        '        lrSubtypeEntityTypeInstance.HasBeenMoved = True
+    '        '        liInd += 50
+    '        '    Next
+    '        'Next
+
+    '        '-----------------------------
+    '        'Find the central EntityType
+    '        '-----------------------------
+    '        For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
+
+    '            Dim liTotalLinkCount = lrEntityTypeInstance.Shape.IncomingLinks.Count + lrEntityTypeInstance.Shape.OutgoingLinks.Count
+
+    '            If liTotalLinkCount >= liHighestOutgoingLinkCount Then
+    '                liHighestOutgoingLinkCount = liTotalLinkCount
+    '                lrCentralEntityTypeInstance = lrEntityTypeInstance
+    '            End If
+
+    '        Next
+
+    '        Dim liX As Integer = Viev.Lesser(150, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
+    '        Dim liY As Integer = Viev.Greater(50, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
+
+    '        If lrCentralEntityTypeInstance.HasBeenMoved Then
+    '            '--------------------
+    '            'Moved as a SubType
+    '            '--------------------
+    '        Else
+    '            lrCentralEntityTypeInstance.Move(liX, liY, False)
+    '            lrCentralEntityTypeInstance.HasBeenMoved = True
+    '        End If
+
+
+    '        Dim liDegrees As Integer = 320
+
+
+    '        For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralEntityTypeInstance)
+
+    '            Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralEntityTypeInstance.Id)
+
+    '            lrFactTypeInstance = lrRoleInstance.FactType
+
+    '            liX = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
+    '            liY = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
+    '            lrFactTypeInstance.Move(liX, liY, False)
+    '            lrFactTypeInstance.HasBeenMoved = True
+
+    '            If lrFactTypeInstance.IsBinaryFactType Then
+    '                Dim lrObject As Object
+    '                lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
+
+    '                If Not (lrObject.Id = lrCentralEntityTypeInstance.Id) Then
+    '                    liX = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 80)
+    '                    liY = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 80)
+    '                    lrObject.Move(liX, liY, False)
+    '                    lrObject.HasBeenMoved = True
+    '                End If
+
+    '            End If
+
+    '            liDegrees += 35
+    '        Next
+
+    '        'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
+    '        '    If lrEntityTypeInstance.HasBeenMoved Then
+    '        '    Else
+    '        '        lrEntityTypeInstance.Shape.Move(50, 50)
+    '        '        Call lrEntityTypeInstance.AutoLayout(False, False)
+    '        '    End If
+    '        'Next
+
+    '        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+    '            lrFactTypeInstance.SortRoleGroup()
+    '            lrFactTypeInstance.HasBeenMoved = False
+    '        Next
+
+    '        For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+    '            'lrEntityTypeInstance.RepellNeighbouringPageObjects(1)
+    '        Next
+
+    '        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+    '            Call lrFactTypeInstance.BringStrandedJoinedObjectsCloser()
+    '        Next
+
+
+    '        For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+    '            'Call lrEntityTypeInstance.SetAdjoinedFactTypesBetweenModelElements()
+    '        Next
+
+    '        For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint)
+
+    '            Dim larRoleInstance As New List(Of FBM.RoleInstance)
+    '            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+    '            Dim lrPointF As PointF
+
+    '            For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
+    '                larRoleInstance.Add(lrRoleConstraintRoleInstance.Role)
+    '            Next
+    '            lrPointF = Me.zrPage.GetMidOfRoleInstances(larRoleInstance)
+    '            lrRoleConstraintInstance.Move(lrPointF.X, lrPointF.Y, False)
+    '        Next
+
+    '        '==================================================================================================================
+    '        'Subtypes: for the CentralEntityTypeInstance only, arrange the Subtypes            
+
+
+    '        Dim larSuptypeRelationshipParent = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
+    '                                           From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
+    '                                           Select SubtypeRelationshipInstance.parentModelElement
+
+    '        If larSuptypeRelationshipParent.Count > 0 Then
+    '            For Each lrSubtypeRelationsipParent In larSuptypeRelationshipParent
+
+    '                If lrSubtypeRelationsipParent IsNot Nothing Then
+    '                    Dim larSubtypeRelationhipChildren = From EntityTypeInstance In Me.zrPage.EntityTypeInstance
+    '                                                        From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
+    '                                                        Where SubtypeRelationshipInstance.parentModelElement IsNot Nothing
+    '                                                        Where SubtypeRelationshipInstance.parentModelElement.Id = lrSubtypeRelationsipParent.Id
+    '                                                        Select SubtypeRelationshipInstance.ModelElement
+
+    '                    liX = CType(lrSubtypeRelationsipParent, Object).X - (larSubtypeRelationhipChildren.Count / 2) * 30
+
+    '                    For Each lrEntityTypeInstance In larSubtypeRelationhipChildren
+    '                        lrEntityTypeInstance.Move(liX, CType(lrSubtypeRelationsipParent, Object).Y + 40, False)
+    '                        liX += 30
+    '                    Next
+    '                End If
+    '            Next
+    '        End If
+
+
+    '        'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+    '        '    lrEntityTypeInstance.HasBeenMoved = False
+    '        'Next
+
+    '        'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+    '        '    Call lrFactTypeInstance.RepellNeighbouringPageObjects(1)
+    '        'Next
+
+    '        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+    '            Call lrFactTypeInstance.SetSuitableFactTypeReading()
+    '        Next
+
+    '        For Each lrModelElement In Me.zrPage.GetAllPageObjects
+    '            lrModelElement.HasBeenMoved = False
+    '        Next
+
+    '        Me.zrPage.DiagramView.ZoomFactor = 80
+
+    '        Dim lrLink As DiagramLink
+    '        For Each lrLink In Me.zrPage.Diagram.Links
+    '            Call lrLink.ReassignAnchorPoints()
+    '        Next
+
+
+    '        Me.zrPage.Diagram.Invalidate()
+
+    '        Call Me.ResetNodeAndLinkColors()
+
+    '    Catch ex As Exception
+    '        Dim lsMessage As String
+    '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+    '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+    '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+    '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+    '    End Try
+
+    'End Sub
 
     Private Sub AutoLayoutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AutoLayoutToolStripMenuItem.Click
 

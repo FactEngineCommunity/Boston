@@ -1208,8 +1208,14 @@ Public Class frmStateTransitionDiagram
 
             Select Case e.Node.Tag.GetType
                 Case Is = GetType(STD.State)
+                    e.Node.ZTop()
                     Me.LabelHelp.Text &= "Hint: Hold the [Shift] key down and drag to create a link/transition."
                 Case Is = GetType(STD.StartStateIndicator)
+                    e.Node.ZTop()
+                    'CodeSafe - Move away from Top of sceen, so not possible to be hidden behind Combobox showing the ValueType name.
+                    If e.Node.Bounds.Y < 15 Then
+                        e.Node.Move(e.Node.Bounds.X, 20)
+                    End If
                     Me.LabelHelp.Text &= "Hint: Hold the [Shift] key down and drag to create a link/transition."
                 Case Is = GetType(STD.EndStateIndicator)
 

@@ -27,6 +27,14 @@ Namespace FBM
             Dim lrNode2 As PGS.Node = Nothing
 
             Try
+                'CodeSafe
+                If arRelation.ResponsibleFactType.RoleGroup(0).JoinedORMObject.GetType = GetType(FBM.ValueType) Or arRelation.ResponsibleFactType.RoleGroup(1).JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                    'This is a problem, because the FactType should not be a PGSRelationNodeLink, but rather a Property on a Node Type that is a list,
+                    '  but there is little we can do about it at this stage. Abort displaying the link, because there will by no Value Type as a Node Type to link to.
+                    Exit Sub
+                End If
+
+
                 lsSQLQuery = "SELECT *"
                 lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
                 lsSQLQuery &= " WHERE Entity = '" & arOriginatingNode.Name & "'"

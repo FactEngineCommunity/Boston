@@ -97,6 +97,8 @@ Namespace PGS
                 If Me.OriginModelElement.Shape Is Nothing Then Exit Sub
                 If Me.Link IsNot Nothing Then Exit Sub
 
+                If Me.OriginModelElement Is Nothing Or Me.DestinationModelElement Is Nothing Then Exit Sub
+
                 Dim lrDiagramLink As New DiagramLink(Me.Page.Diagram, Me.OriginModelElement.Shape, Me.DestinationModelElement.Shape)
 
                 lrDiagramLink.Style = LinkStyle.Bezier
@@ -517,7 +519,26 @@ SetPredicateNoMatterWhat:
                     'End If
                 Else
 SimplePredicate:
-                    Me.Link.Text = Me.RDSRelation.DestinationPredicate
+                    '=================================================================
+                    'Destination Predicates. CodeSafe - GetIt
+                    Dim lsOriginPredicate As String = ""
+                    Dim lsDestinationPredicate As String = ""
+
+                    Dim larRole As New List(Of FBM.Role)
+                    Dim lrFactTypeReading As FBM.FactTypeReading
+
+                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
+                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1))
+
+                    lrFactTypeReading = Me.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
+
+                    If lrFactTypeReading IsNot Nothing Then
+                        lsDestinationPredicate = lrFactTypeReading.PredicatePart(0).PredicatePartText & " " & lrFactTypeReading.PredicatePart(1).PreBoundText
+                    Else
+                        lsDestinationPredicate = "unknown predicate"
+                    End If
+
+                    Me.Link.Text = lsDestinationPredicate '20230310-VM-Was Me.RDSRelation.DestinationPredicate
                 End If
 
             Catch ex As Exception

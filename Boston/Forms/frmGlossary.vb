@@ -5,6 +5,16 @@ Public Class frmGlossary
 
     Public WithEvents mrModel As FBM.Model
     Private zrFrmORMDiagramViewer As frmDiagramORMForGlossary
+    Private mrCurrentModelElement As FBM.ModelObject
+
+    ''' <summary>
+    ''' If a verbalisation is for a FactType, on the right hand side there is a faded-text link to that FactType.
+    ''' Trouble is...if you copy the verbalisation text to a Word document (for example)...the faded-text FactType names
+    ''' are copied over too. A Business Analysis document might not want that...and a Business Analyst might not
+    ''' want to have to cut those Fact Type names out of the document after they have done a copy/paste.
+    ''' </summary>
+    Private mbHideFadedFactTypeNames As Boolean = False
+
 
     Private Sub frmGlossary_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
 
@@ -22,7 +32,7 @@ Public Class frmGlossary
             If prApplication.WorkingModel IsNot Nothing Then
                 Me.mrModel = prApplication.WorkingModel
                 Me.LabelModelName.Text = Me.mrModel.Name
-                Call Me.ShowGlossary(prApplication.WorkingModel)
+                Call Me.ShowGlossary(Me.mrModel)
             Else
                 Throw New Exception("There is no current Model selected. Try selecting a Model in the Model Explorer and trying again.")
             End If
@@ -67,11 +77,11 @@ Public Class frmGlossary
 
         Dim items As New List(Of FBM.ModelObject)
 
-        For Each lrValueType In prApplication.WorkingModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
+        For Each lrValueType In Me.mrModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
             items.Add(lrValueType)
         Next
 
-        For Each lrEntityType In prApplication.WorkingModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
+        For Each lrEntityType In Me.mrModel.EntityType.FindAll(Function(x) x.IsMDAModelElement = False)
             items.Add(lrEntityType)
         Next
 
@@ -83,7 +93,7 @@ Public Class frmGlossary
         Next
 
         If Me.CheckBoxShowGeneralConcepts.Checked Then
-            For Each lrDictionaryEntry In prApplication.WorkingModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+            For Each lrDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
                 ListBoxGlossary.Items.Add(New tComboboxItem(lrDictionaryEntry, lrDictionaryEntry.Symbol, lrDictionaryEntry))
             Next
         End If
@@ -135,29 +145,6 @@ Public Class frmGlossary
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
-
-    End Sub
-
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBoxSearch.TextChanged
-
-        'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
-        '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
-
-        Dim items = From it In Me.mrModel.ModelDictionary
-                    Where it.Symbol.IndexOf(TextBoxSearch.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                    And ((it.isEntityType Or it.isValueType) _
-                    Or (Me.CheckBoxShowGeneralConcepts.Checked And it.isGeneralConcept))
-
-
-        'Dim matchingItemList As List(Of Object) = items.ToList()
-
-        ListBoxGlossary.BeginUpdate()
-        ListBoxGlossary.Items.Clear()
-        For Each item In items 'matchingItemList
-            Dim lrModelObject As FBM.ModelObject = Me.mrModel.GetModelObjectByName(item.Symbol, True)
-            ListBoxGlossary.Items.Add(New tComboboxItem(lrModelObject, lrModelObject.Id, lrModelObject))
-        Next
-        ListBoxGlossary.EndUpdate()
 
     End Sub
 
@@ -294,55 +281,57 @@ Public Class frmGlossary
                         lrFactTypeReading.GetReadingText(lrVerbaliser, True)
                     End If
 
-                    lrVerbaliser.VerbaliseTextLightGray(" (")
-                    lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
-                    lrVerbaliser.VerbaliseTextLightGray(") ")
+                    If Not Me.mbHideFadedFactTypeNames Then
+                        lrVerbaliser.VerbaliseTextLightGray(" (")
+                        lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
+                        lrVerbaliser.VerbaliseTextLightGray(") ")
+                    End If
                     '=======================================================================================
                     If lrFactType.IsBinaryFactType Then
-                        If lrFactType.Is1To1BinaryFactType Then
-                            If lrFactType.FactTypeReading.Count = 1 Then
-                                'No reverse reading is provided for the FactType.
-                                lrVerbaliser.HTW.WriteBreak()
-                                lrVerbaliser.VerbaliseIndent()
-                                Dim lrRole As FBM.Role
-                                Dim larRole As New List(Of FBM.Role)
-                                lrRole = lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id)
-                                larRole.Add(lrRole)
-                                lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
-                                larRole.Add(lrRole)
-                                Dim lrSentence As New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
-                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
-                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
-                                lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
-                                If lrFactTypeReading IsNot Nothing Then
-                                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
-                                End If
-                                lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
-                                lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
-                                lrVerbaliser.VerbaliseModelObject(arEntityType)
-                            Else
-                                lrVerbaliser.HTW.WriteBreak()
-                                lrVerbaliser.VerbaliseIndent()
-                                lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
-                            End If
-                        Else
-                            If lrFactType.FactTypeReading.Count > 1 Then
-                                lrVerbaliser.HTW.WriteBreak()
-                                lrVerbaliser.VerbaliseIndent()
-                                Try
+                            If lrFactType.Is1To1BinaryFactType Then
+                                If lrFactType.FactTypeReading.Count = 1 Then
+                                    'No reverse reading is provided for the FactType.
+                                    lrVerbaliser.HTW.WriteBreak()
+                                    lrVerbaliser.VerbaliseIndent()
+                                    Dim lrRole As FBM.Role
+                                    Dim larRole As New List(Of FBM.Role)
+                                    lrRole = lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id)
+                                    larRole.Add(lrRole)
+                                    lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                                    larRole.Add(lrRole)
+                                    Dim lrSentence As New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                    lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
+                                    If lrFactTypeReading IsNot Nothing Then
+                                        lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                                    End If
+                                    lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
+                                    lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
+                                    lrVerbaliser.VerbaliseModelObject(arEntityType)
+                                Else
+                                    lrVerbaliser.HTW.WriteBreak()
+                                    lrVerbaliser.VerbaliseIndent()
                                     lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
-                                Catch ex As Exception
-                                    'Not a biggie.
-                                End Try
+                                End If
+                            Else
+                                If lrFactType.FactTypeReading.Count > 1 Then
+                                    lrVerbaliser.HTW.WriteBreak()
+                                    lrVerbaliser.VerbaliseIndent()
+                                    Try
+                                        lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
+                                    Catch ex As Exception
+                                        'Not a biggie.
+                                    End Try
 
+                                End If
                             End If
                         End If
+                        '=======================================================================================                
                     End If
-                    '=======================================================================================                
-                End If
 
-                lrVerbaliser.HTW.RenderEndTag()
+                    lrVerbaliser.HTW.RenderEndTag()
                 lrVerbaliser.HTW.WriteBreak()
 
             Next
@@ -454,6 +443,8 @@ Public Class frmGlossary
     Public Sub DescribeModelElement(ByVal arModelElement As FBM.ModelObject)
 
         Try
+            Me.mrCurrentModelElement = arModelElement
+
             Select Case Me.mrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
                 Case Is = pcenumConceptType.EntityType
                     Dim lrEntityType As FBM.EntityType
@@ -606,11 +597,14 @@ Public Class frmGlossary
         '===================================================================================
         Dim liHeight As Integer = Me.WebBrowser.Height - 1
 
-        liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height
+        Me.SplitContainer2.SplitterDistance = 0
+
+        liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 22 'StatusBar Height=22
 
         Me.SplitContainer2.SplitterDistance = liHeight
-        zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
-        zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+        'zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+        'zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+        zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 80
         '===================================================================================
 
     End Sub
@@ -1096,103 +1090,116 @@ Public Class frmGlossary
         Dim lasURLArgument() As String
         Dim lsModelObjectName As String
 
-        lasURLArgument = e.Url.ToString.Split(":")
+        Try
 
-        If lasURLArgument(0) = "elementid" Then
+            lasURLArgument = e.Url.ToString.Split(":")
 
-            lsModelObjectName = lasURLArgument(1)
+            If lasURLArgument(0) = "elementid" Then
 
-            Dim lrModelObject As FBM.ModelObject
+                lsModelObjectName = lasURLArgument(1)
 
-            lrModelObject = Me.mrModel.GetModelObjectByName(lsModelObjectName)
+                Dim lrModelObject As FBM.ModelObject
 
-            Select Case lrModelObject.ConceptType
-                Case Is = pcenumConceptType.ValueType
-                    Call Me.VerbaliseValueType(lrModelObject)
+                lrModelObject = Me.mrModel.GetModelObjectByName(lsModelObjectName)
 
-#Region "ORM Verbalisation"
-                    '-------------------------------------------------------
-                    'ORM Verbalisation
-                    '-------------------------------------------------------
-                    Dim lrToolboxForm As frmToolboxORMVerbalisation
-                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
-                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                        lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
-                    End If
-#End Region
-                Case Is = pcenumConceptType.EntityType
-                    Call Me.VerbaliseEntityType(lrModelObject)
+                Me.mrCurrentModelElement = lrModelObject
+
+                Select Case lrModelObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Call Me.VerbaliseValueType(lrModelObject)
 
 #Region "ORM Verbalisation"
-                    '-------------------------------------------------------
-                    'ORM Verbalisation
-                    '-------------------------------------------------------
-                    Dim lrToolboxForm As frmToolboxORMVerbalisation
-                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
-                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                        lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
-                    End If
+                        '-------------------------------------------------------
+                        'ORM Verbalisation
+                        '-------------------------------------------------------
+                        Dim lrToolboxForm As frmToolboxORMVerbalisation
+                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                        If IsSomething(lrToolboxForm) Then
+                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                            lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
+                        End If
 #End Region
-                Case Is = pcenumConceptType.FactType
-                    Call Me.VerbaliseFactType(lrModelObject)
+                    Case Is = pcenumConceptType.EntityType
+                        Call Me.VerbaliseEntityType(lrModelObject)
 
-                    'House Keeping/ORM Reading Editor/ORM Verbaliser
+#Region "ORM Verbalisation"
+                        '-------------------------------------------------------
+                        'ORM Verbalisation
+                        '-------------------------------------------------------
+                        Dim lrToolboxForm As frmToolboxORMVerbalisation
+                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                        If IsSomething(lrToolboxForm) Then
+                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                            lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
+                        End If
+#End Region
+                    Case Is = pcenumConceptType.FactType
+                        Call Me.VerbaliseFactType(lrModelObject)
+
+                        'House Keeping/ORM Reading Editor/ORM Verbaliser
 #Region "HouseKeeping"
-                    '-------------------------------------------------------
-                    'ORM Reading Editor
-                    '-------------------------------------------------------
+                        '-------------------------------------------------------
+                        'ORM Reading Editor
+                        '-------------------------------------------------------
 #Region "ORM Reading Editor"
-                    Dim lrORMReadingEditor As frmToolboxORMReadingEditor
-                    lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+                        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                    If IsSomething(lrORMReadingEditor) Then
-                        '-------------------------------------------------------------------------
-                        'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
-                        '-------------------------------------------------------------------------
-                        Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
-                        Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
-                        lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
-                        lrORMReadingEditor.zrFactType = lrModelObject
-                        lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
-                        lrORMReadingEditor.DataGrid_Readings.Refresh()
-                        lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
-                        lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
-                        Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
-                    End If
+                        If IsSomething(lrORMReadingEditor) Then
+                            '-------------------------------------------------------------------------
+                            'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                            '-------------------------------------------------------------------------
+                            Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
+                            lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                            lrORMReadingEditor.zrFactType = lrModelObject
+                            lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                            lrORMReadingEditor.DataGrid_Readings.Refresh()
+                            lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                            lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                            Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
+                        End If
 #End Region
 
-                    '-------------------------------------------------------
-                    'ORM Verbalisation
-                    '-------------------------------------------------------
-                    Dim lrToolboxForm As frmToolboxORMVerbalisation
-                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
-                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                        lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
-                    End If
+                        '-------------------------------------------------------
+                        'ORM Verbalisation
+                        '-------------------------------------------------------
+                        Dim lrToolboxForm As frmToolboxORMVerbalisation
+                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                        If IsSomething(lrToolboxForm) Then
+                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                            lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
+                        End If
 #End Region
-                Case Is = pcenumConceptType.RoleConstraint
-                    'TBA
-            End Select
+                    Case Is = pcenumConceptType.RoleConstraint
+                        'TBA
+                End Select
 
-            Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
+                Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
 
-            Me.TextBoxSearch.Text = ""
-            Call Me.LoadGlossaryListbox()
-            If Me.ListBoxGlossary.Items.Contains(lrModelObject.Id) Then
-                Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.FindString(lrModelObject.Id)
+                Me.TextBoxSearch.Text = ""
+                Call Me.LoadGlossaryListbox()
+                If Me.ListBoxGlossary.FindString(lrModelObject.Id) > -1 Then
+                    Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.FindString(lrModelObject.Id)
+                End If
+
+                '------------------------------------------------------------------------------------------
+                'Cancel the Navigation so that the new verbalisation isn't wiped out.
+                '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
+                '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
+                '------------------------------------------------------------------------------------------
+                e.Cancel = True
+
             End If
 
-            '------------------------------------------------------------------------------------------
-            'Cancel the Navigation so that the new verbalisation isn't wiped out.
-            '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
-            '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
-            '------------------------------------------------------------------------------------------
-            e.Cancel = True
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1337,7 +1344,7 @@ Public Class frmGlossary
         Dim lrPage As FBM.Page
 
         Try
-            lrModel = prApplication.WorkingModel
+            lrModel = Me.mrModel
 
             aoMenuStripItem.DropDownItems.Clear()
 
@@ -1371,7 +1378,7 @@ Public Class frmGlossary
                         '---------------------------------------------------
                         'Add the Page(Name) to the MenuOption.DropDownItems
                         '---------------------------------------------------
-                        lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asEntityTypeId)
+                        lr_enterprise_view.FocusModelElement = Me.mrModel.GetModelObjectByName(asEntityTypeId)
 
                         loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
                         loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
@@ -1403,7 +1410,7 @@ Public Class frmGlossary
         Dim lrPage As FBM.Page
 
         Try
-            lrModel = prApplication.WorkingModel
+            lrModel = Me.mrModel
 
             aoMenuStripItem.DropDownItems.Clear()
 
@@ -1431,7 +1438,7 @@ Public Class frmGlossary
                                                                Nothing, lrPage.PageId)
 
                     lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asFactTypeId)
+                    lr_enterprise_view.FocusModelElement = Me.mrModel.GetModelObjectByName(asFactTypeId)
                     loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
                     loToolStripMenuItem.Tag = lr_enterprise_view
 
@@ -1461,7 +1468,7 @@ Public Class frmGlossary
 
         Try
 
-            lrModel = prApplication.WorkingModel
+            lrModel = Me.mrModel
 
             aoMenuStripItem.DropDownItems.Clear()
 
@@ -1489,7 +1496,7 @@ Public Class frmGlossary
                                                                Nothing, lrPage.PageId)
 
                     lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asValueTypeId)
+                    lr_enterprise_view.FocusModelElement = Me.mrModel.GetModelObjectByName(asValueTypeId)
                     loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
                     loToolStripMenuItem.Tag = lr_enterprise_view
 
@@ -1668,7 +1675,133 @@ Public Class frmGlossary
 
         Try
             Me.TextBoxSearch.Text = ""
-            Call Me.ShowGlossary(prApplication.WorkingModel)
+            Call Me.ShowGlossary(Me.mrModel)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CheckBoxHideFadedFactTypeNamesVerbalisationView_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxHideFadedFactTypeNamesVerbalisationView.CheckedChanged
+
+        Try
+            'If a verbalisation is for a FactType, on the right hand side there is a faded-text link to that FactType.
+            'Trouble is...if you copy the verbalisation text to a Word document (for example)...the faded-text FactType names
+            'are copied over too. A Business Analysis document might not want that...and a Business Analyst might not
+            'want to have to cut those Fact Type names out of the document after they have done a copy/paste.
+            Me.mbHideFadedFactTypeNames = Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Checked
+
+            If Me.mrCurrentModelElement IsNot Nothing Then
+                Call Me.DescribeModelElement(Me.mrCurrentModelElement)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ShowInModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInModelDictionaryToolStripMenuItem.Click
+        Dim lrModelObject As FBM.ModelObject
+
+        Try
+            lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id)
+
+            Dim lrModelDictionaryForm As frmToolboxModelDictionary
+            lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
+
+            If lrModelDictionaryForm Is Nothing Then
+                lrModelDictionaryForm = frmMain.LoadToolboxModelDictionary(True)
+            End If
+
+            Call lrModelDictionaryForm.LoadToolboxModelDictionary(pcenumLanguage.ORMModel)
+
+            Call lrModelDictionaryForm.FindTreeNode(lrModelObject.Id)
+
+            lrModelDictionaryForm.Show()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CopyToClipboardToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CopyToClipboardToolStripMenuItem.Click
+
+        Try
+            Try
+                Clipboard.Clear()
+                Dim selectionText As String = WebBrowser.Document.Body.InnerText
+                'Clipboard.SetText(selectionText)
+                Clipboard.SetData(DataFormats.Text, CType(selectionText, Object))
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextboxSearch_InitiateSearch(asSearchString As String) Handles TextboxSearch.InitiateSearch
+
+        Try
+            'Dim items = From it In ListBox1.Items.Cast(Of Object)() _
+            '    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
+
+            Dim items = From it In Me.mrModel.ModelDictionary
+                        Where it.Symbol.IndexOf(TextboxSearch.TextBox.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                        And ((it.isEntityType Or it.isValueType) _
+                        Or (Me.CheckBoxShowGeneralConcepts.Checked And it.isGeneralConcept))
+
+
+            'Dim matchingItemList As List(Of Object) = items.ToList()
+
+            ListBoxGlossary.BeginUpdate()
+            ListBoxGlossary.Items.Clear()
+            For Each item In items 'matchingItemList
+                Dim lrModelObject As FBM.ModelObject = Me.mrModel.GetModelObjectByName(item.Symbol, True)
+                ListBoxGlossary.Items.Add(New tComboboxItem(lrModelObject, lrModelObject.Id, lrModelObject))
+            Next
+            ListBoxGlossary.EndUpdate()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextboxSearch_TextBoxCleared() Handles TextboxSearch.TextBoxCleared
+
+        Try
+            Call Me.ShowGlossary(Me.mrModel)
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

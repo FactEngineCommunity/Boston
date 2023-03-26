@@ -122,7 +122,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub LoadERDModelDictionary()
+    Private Sub LoadERDModelDictionary(Optional ByVal asSearchString As String = Nothing)
 
         Try
             Dim loNode As New TreeNode
@@ -138,8 +138,18 @@ Public Class frmToolboxModelDictionary
 
             prApplication.WorkingModel.RDS.Table.Sort(AddressOf RDS.Table.CompareName)
 
+            Dim larTable As List(Of RDS.Table)
+            If asSearchString Is Nothing Then
+                larTable = prApplication.WorkingModel.RDS.Table
+            Else
+                larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) x.Name.LCase.StartsWith(asSearchString.LCase) Or x.Name.LCase.Contains(asSearchString.LCase))
+            End If
+
+            'Display ModelElementCount
+            Me.ToolStripStatusLabelModelElementCount.Text = larTable.Count
+
             Dim loColumnNode As New TreeNode
-            For Each lrEntity In prApplication.WorkingModel.RDS.Table
+            For Each lrEntity In larTable
                 'loNode = New TreeNode
                 loNode = Me.TreeView1.Nodes("Entity").Nodes.Add("Entity" & lrEntity.Name, lrEntity.Name, 0, 0)
                 loNode.Tag = lrEntity
@@ -352,6 +362,13 @@ Public Class frmToolboxModelDictionary
                 Next
             End If
 
+            'Display ModelElementCount
+            Try
+                Me.ToolStripStatusLabelModelElementCount.Text = larValueType.Count + larEntityType.Count + larFactType.Count + larRoleConstraint.Count
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
             Me.zrLoadedModel = Me.zrORMModel
 
             If asSearchString IsNot Nothing Then
@@ -433,7 +450,7 @@ Public Class frmToolboxModelDictionary
     End Sub
 
 
-    Private Sub LoadPGSModelDictionary()
+    Private Sub LoadPGSModelDictionary(Optional ByVal asSearchString As String = Nothing)
 
         Try
             Dim loNode As New TreeNode
@@ -449,8 +466,18 @@ Public Class frmToolboxModelDictionary
 
             prApplication.WorkingModel.RDS.Table.Sort(AddressOf RDS.Table.CompareName)
 
+            Dim larTable As List(Of RDS.Table)
+            If asSearchString Is Nothing Then
+                larTable = prApplication.WorkingModel.RDS.Table
+            Else
+                larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) x.Name.LCase.StartsWith(asSearchString.LCase) Or x.Name.LCase.Contains(asSearchString.LCase))
+            End If
+
+            'Display ModelElementCount
+            Me.ToolStripStatusLabelModelElementCount.Text = larTable.Count
+
             Dim loColumnNode As New TreeNode
-            For Each lrEntity In prApplication.WorkingModel.RDS.Table
+            For Each lrEntity In larTable
                 'loNode = New TreeNode
                 If lrEntity.isPGSRelation Then
                     loNode = Me.TreeView1.Nodes("Node").Nodes.Add("Node" & lrEntity.Name, lrEntity.Name, 22, 22)
@@ -1527,9 +1554,9 @@ Public Class frmToolboxModelDictionary
                 Case Is = pcenumLanguage.ORMModel
                     Call Me.LoadORMModelDictionary(asSearchString)
                 Case Is = pcenumLanguage.EntityRelationshipDiagram
-                    Call Me.LoadERDModelDictionary()
+                    Call Me.LoadERDModelDictionary(asSearchString)
                 Case Is = pcenumLanguage.PropertyGraphSchema
-                    Call Me.LoadPGSModelDictionary()
+                    Call Me.LoadPGSModelDictionary(asSearchString)
                 Case Is = pcenumLanguage.CMML
                     Call Me.LoadCMMLModelDictionary()
             End Select
@@ -1644,6 +1671,22 @@ Public Class frmToolboxModelDictionary
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub SearchTextbox1_TextBoxCleared() Handles SearchTextbox1.TextBoxCleared
+
+        Try
+            Call Me.LoadTree()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

@@ -1499,7 +1499,15 @@ Public Class frmToolboxEnterpriseExplorer
                 Exit Sub
             End If
 
-            Call Me.LoadSelectedPage()
+            Dim lsFocusModelElementId As String = Nothing
+
+            Try
+                lsFocusModelElementId = Me.TreeView.SelectedNode.Tag.FocusModelElement.Id
+            Catch ex As Exception
+                lsFocusModelElementId = Nothing
+            End Try
+
+            Call Me.LoadSelectedPage(lsFocusModelElementId)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -2093,47 +2101,40 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
 
-        Call Me.FindTreeNode(Me.TreeView, Me.TextBox1.Text)
+        Call Me.FindTreeNode(Me.TreeView, Me.SearchTextbox.Textbox.Text)
 
     End Sub
 
-    Private Sub TextBox1_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBox1.GotFocus
+    Private Sub TextBoxSearch_InitiateSearch() Handles SearchTextbox.InitiateSearch
 
-        Me.LabelHelpTips.Text = "V (Down Key) to scroll through recently searched items in the Enterprise Viewer"
+        'If e.KeyCode = Keys.Down Then
+        '    If IsSomething(My.Settings.EnterpriseTreeSearchList) Then
+        '        If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
+        '            Me.ziCurrentSearchItem += 1
+        '            If Me.ziCurrentSearchItem > My.Settings.EnterpriseTreeSearchList.Count Then
+        '                Me.ziCurrentSearchItem = 1 'My.Settings.EnterpriseTreeSearchList.Count
+        '            End If
+        '            If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
+        '                Me.SearchTextbox.TextBox.Text = My.Settings.EnterpriseTreeSearchList(Me.ziCurrentSearchItem - 1)
+        '            End If
+        '        End If
+        '    End If
+        'ElseIf e.KeyCode = Keys.Up Then
+        '    If IsSomething(My.Settings.EnterpriseTreeSearchList) Then
+        '        If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
+        '            'If Trim(TextBox1.Text) = "" Then
+        '            Me.ziCurrentSearchItem -= 1
+        '            If Me.ziCurrentSearchItem < 1 Then
+        '                Me.ziCurrentSearchItem = 1
+        '            End If
+        '            If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
+        '                Me.SearchTextbox.TextBox.Text = My.Settings.EnterpriseTreeSearchList(Me.ziCurrentSearchItem - 1)
+        '            End If
+        '        End If
+        '    End If
+        'ElseIf e.KeyCode = Keys.Enter Then
 
-
-    End Sub
-
-    Private Sub TextBoxSearch_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles TextBox1.KeyDown
-
-        If e.KeyCode = Keys.Down Then
-            If IsSomething(My.Settings.EnterpriseTreeSearchList) Then
-                If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
-                    Me.ziCurrentSearchItem += 1
-                    If Me.ziCurrentSearchItem > My.Settings.EnterpriseTreeSearchList.Count Then
-                        Me.ziCurrentSearchItem = 1 'My.Settings.EnterpriseTreeSearchList.Count
-                    End If
-                    If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
-                        TextBox1.Text = My.Settings.EnterpriseTreeSearchList(Me.ziCurrentSearchItem - 1)
-                    End If
-                End If
-            End If
-        ElseIf e.KeyCode = Keys.Up Then
-            If IsSomething(My.Settings.EnterpriseTreeSearchList) Then
-                If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
-                    'If Trim(TextBox1.Text) = "" Then
-                    Me.ziCurrentSearchItem -= 1
-                    If Me.ziCurrentSearchItem < 1 Then
-                        Me.ziCurrentSearchItem = 1
-                    End If
-                    If My.Settings.EnterpriseTreeSearchList.Count > 0 Then
-                        TextBox1.Text = My.Settings.EnterpriseTreeSearchList(Me.ziCurrentSearchItem - 1)
-                    End If
-                End If
-            End If
-        ElseIf e.KeyCode = Keys.Enter Then
-
-            Dim lsSearchString As String = Trim(TextBox1.Text)
+        Dim lsSearchString As String = Trim(Me.SearchTextbox.TextBox.Text)
             '------------------------------------------------------------------
             'Add the Search String to the EnterpriseTreeViewSearchList Setting
             '------------------------------------------------------------------
@@ -2161,18 +2162,27 @@ Public Class frmToolboxEnterpriseExplorer
             End If
 
             Call Me.FindTreeNode(Me.TreeView, lsSearchString)
-        End If
+        'End If '20230311-VM-Was for KeyDown. Can remove if all good.
 
     End Sub
 
-    Private Sub FindTreeNodeRecursive(ByRef arTreeNode As TreeNode, ByVal asSearchString As String)
+    Private Sub FindTreeNodeRecursive(ByRef arTreeNode As cTreeNode, ByVal asSearchString As String)
 
-        Dim lrTreeNode As TreeNode
+        Dim lrTreeNode As cTreeNode
 
         For Each lrTreeNode In arTreeNode.Nodes
-            If lrTreeNode.Text = asSearchString Then
-                lrTreeNode.EnsureVisible()
+            If asSearchString Is Nothing Then
+                lrTreeNode.BackColor = Color.White
+                lrTreeNode.Collapse()
+            Else
+                If lrTreeNode.Text.Contains(asSearchString) Then
+                    lrTreeNode.BackColor = Color.DarkSeaGreen
+                    lrTreeNode.EnsureVisible()
+                Else
+                    lrTreeNode.BackColor = Color.White
+                End If
             End If
+
             Call Me.FindTreeNodeRecursive(lrTreeNode, asSearchString)
         Next
 
@@ -2186,13 +2196,6 @@ Public Class frmToolboxEnterpriseExplorer
         For Each lrTreeNode In Me.TreeView.Nodes
             Call Me.FindTreeNodeRecursive(lrTreeNode, asSearchString)
         Next
-
-    End Sub
-
-
-    Private Sub TextBox1_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles TextBox1.LostFocus
-
-        Me.LabelHelpTips.Text = ""
 
     End Sub
 
@@ -3183,6 +3186,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'MsgBox(lsMessage)
             End If
 
+            'Project 
             If prApplication.WorkingProject Is Nothing Then prApplication.WorkingProject = New ClientServer.Project("MyPersonalModels", "MyPersonalModels")
             lrModel.ProjectId = prApplication.WorkingProject.Id
 
@@ -4605,9 +4609,46 @@ Public Class frmToolboxEnterpriseExplorer
 
                 If lrFrmGetDocumentGenerationSettings.ShowDialog = Windows.Forms.DialogResult.OK Then
 
+                    Dim lrWordDocument As WordDocument = Nothing
                     Using lrWaitCursor As New WaitCursor
-                        Call lrFBMWordVerbaliser.createWordDocument(prApplication.WorkingModel)
+                        lrWordDocument = lrFBMWordVerbaliser.createWordDocument(prApplication.WorkingModel)
                     End Using
+
+                    If lrWordDocument IsNot Nothing Then
+                        'Create the RTF/Word Document
+                        Dim lsFileName As String = ""
+                        Try
+                            Dim saveFileDialog As New SaveFileDialog
+
+                            saveFileDialog.Filter = "Word Document (*.doc)|*.doc"
+                            saveFileDialog.Title = "Save model documentation"
+                            saveFileDialog.InitialDirectory = "C:\"
+                            saveFileDialog.FilterIndex = 0
+                            saveFileDialog.CheckFileExists = False
+                            saveFileDialog.CheckPathExists = False
+                            saveFileDialog.CreatePrompt = False
+
+                            If saveFileDialog.ShowDialog(frmMain) = DialogResult.OK Then
+
+                                If saveFileDialog.FileName <> "" Then
+                                    Try
+
+                                        lsFileName = saveFileDialog.FileName
+                                        lrWordDocument.SaveToFile(saveFileDialog.FileName) '"..\\..\\Example1.doc")
+
+                                        If lsFileName <> "" Then
+                                            System.Diagnostics.Process.Start(lsFileName) ' "..\..\Example1.doc")
+                                        End If
+                                    Catch ex As Exception
+                                        MsgBox("Couldn't open the file.")
+                                    End Try
+                                End If
+                            End If
+
+                        Catch ex As Exception
+                            MsgBox("Couldn't save the document. Check to see if you already have the document open.")
+                        End Try
+                    End If
 
                 End If
             End With
@@ -4929,6 +4970,22 @@ Public Class frmToolboxEnterpriseExplorer
                 '==================================================================
                 'Create the Model
                 Dim lrModel As New FBM.Model(lsModelName, lsModelName)
+
+                'Project 
+                If prApplication.WorkingProject Is Nothing Then prApplication.WorkingProject = New ClientServer.Project("MyPersonalModels", "MyPersonalModels")
+                lrModel.ProjectId = prApplication.WorkingProject.Id
+
+                'Namespace
+                If prApplication.WorkingProject.Id = "MyPersonalModels" Then
+                    lrModel.Namespace = Nothing
+                Else
+                    lrModel.Namespace = Me.ComboBoxNamespace.SelectedItem.Tag
+                End If
+
+                If My.Settings.UseClientServer And (prApplication.User IsNot Nothing) Then
+                    lrModel.CreatedByUserId = prApplication.User.Id
+                End If
+
                 Call lrModel.AddCoreERDPGSSTMUMLModelElements(Nothing)
 
                 If TableModel.ExistsModelById(lrModel.ModelId) Or lrModel.ModelId.Length > 49 Then
@@ -5415,6 +5472,22 @@ Public Class frmToolboxEnterpriseExplorer
                 Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
             End If
         Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SearchTextbox_TextBoxCleared() Handles SearchTextbox.TextBoxCleared
+
+        Try
+            Call Me.FindTreeNode(Me.TreeView, Nothing)
+
+        Catch ex As Exception
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

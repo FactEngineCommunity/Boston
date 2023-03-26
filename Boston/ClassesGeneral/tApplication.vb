@@ -459,7 +459,7 @@ Public Class tApplication
     End Sub
 
     ''' <summary>
-    ''' 
+    ''' Throws a message to screen, log or flashcard.
     ''' </summary>
     ''' <param name="asErrorMessage">The error message</param>
     ''' <param name="aiMessageType">Informatio, Warning, Critical</param>

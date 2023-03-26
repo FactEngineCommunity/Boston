@@ -429,7 +429,8 @@ Namespace FactEngine
         End Function
 
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
-                                                 Optional ByVal abIgnoreError As Boolean = False) As String
+                                                 Optional ByVal abIgnoreError As Boolean = False,
+                                                 Optional ByVal abJustDate As Boolean = False) As String
 
             Try
 

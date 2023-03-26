@@ -252,13 +252,13 @@
       <HintPath>..\packages\Neo4j.Driver.Simple.4.4.0\lib\netstandard2.0\Neo4j.Driver.Simple.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NotificationBar">
       <HintPath>..\Dependencies\NotificationBar.dll</HintPath>
     </Reference>
-    <Reference Include="OpenAI_API, Version=1.3.0.0, Culture=neutral, PublicKeyToken=1b0a4c0430762146, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenAI.1.3.0\lib\netstandard2.0\OpenAI_API.dll</HintPath>
+    <Reference Include="OpenAI_API, Version=1.6.0.0, Culture=neutral, PublicKeyToken=1b0a4c0430762146, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenAI.1.6.0\lib\netstandard2.0\OpenAI_API.dll</HintPath>
     </Reference>
     <Reference Include="Overview, Version=5.1.1.19450, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

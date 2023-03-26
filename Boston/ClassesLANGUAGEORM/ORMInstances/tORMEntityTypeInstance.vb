@@ -405,7 +405,11 @@ Namespace FBM
 
         Public Property Visible As Boolean Implements iPageObject.Visible
             Get
-                Return Me._Visible
+                If Me.Shape Is Nothing Then
+                    Return Me._Visible
+                Else
+                    Return Me.Shape.Visible
+                End If
             End Get
             Set(value As Boolean)
                 Me._Visible = value
@@ -3057,7 +3061,7 @@ MoveOn:
 
                 Me.isDirty = True
                 If Me.Page IsNot Nothing Then
-                    Me.Page.IsDirty = True
+                    Me.Page.MakeDirty()
                 End If
             Catch ex As Exception
                 Dim lsMessage As String

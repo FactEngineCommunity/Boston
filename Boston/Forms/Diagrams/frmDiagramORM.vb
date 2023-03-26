@@ -581,10 +581,11 @@ Public Class frmDiagramORM
         For Each lrFactType In larFactType
 
             If lrFactType.IsObjectified Then
-                Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
+                '20230307-Vm-Removed at this stage.
+                'Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If
 
-            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False)
+            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False,,,,,,, True)
 
             If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
 
@@ -4053,6 +4054,12 @@ Public Class frmDiagramORM
                 End If
                 loNode = Diagram.GetNodeAt(lo_point)
 
+                Try
+                    Call loNode.Tag.MouseDown
+                Catch ex As Exception
+                    'Not a Biggie
+                End Try
+
                 If (Control.ModifierKeys And Keys.Control) Or
                     Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.ORMSubtypeConnector Then
                     '------------------------------------
@@ -4783,6 +4790,12 @@ Public Class frmDiagramORM
                 loNode.Tag.x = loNode.Bounds.X
                 loNode.Tag.y = loNode.Bounds.Y
             End If
+
+            Try
+                Call loNode.Tag.MouseUp
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
 
             Call Me.ResetNodeAndLinkColors()
         Else
@@ -7422,9 +7435,15 @@ SkipPopup:
                 lrEntityTypeInstance.Shape.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
             Next
 
-
             For Each lrLink As MindFusion.Diagramming.DiagramLink In Me.Diagram.Links
                 Call lrLink.ReassignAnchorPoints()
+            Next
+
+            'Derivation Texts - FactTypes
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                If lrFactTypeInstance.IsDerived Then
+                    Call lrFactTypeInstance.FactTypeDerivationText.Move(lrFactTypeInstance.X, Viev.Greater(lrFactTypeInstance.Y - 10 - lrFactTypeInstance.FactTypeDerivationText.Shape.Bounds.Height, 0), False)
+                End If
             Next
 
         Catch ex As Exception
@@ -7755,14 +7774,14 @@ SkipPopup:
                         'Add the new Fact to the FactType                        
                         'Adds the new FactInstance to the FactTypeInstance by event.
                         '-----------------------------------------------------------
-                        lrFactType.AddFact(lrFact)
+                        lrFactType.AddFact(lrFact, True, Me.zrPage)
 
                         lrFactTypeInstance.Id = lrFactType.Id
                         lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
 
                         Dim lrFactInstance As FBM.FactInstance
 
-                        lrFactInstance = Me.zrPage.CreateFactInstance(lrFactTypeInstance, lrFact)
+                        'lrFactInstance = Me.zrPage.CreateFactInstance(lrFactTypeInstance, lrFact)
 
 
                         lrFactTypeInstance.FactTable.ResortFactTable()

@@ -406,7 +406,11 @@ Namespace FBM
         Private _Visible As Boolean = False
         Public Property Visible As Boolean Implements iPageObject.Visible
             Get
-                Return Me._Visible
+                If Me.Shape Is Nothing Then
+                    Return Me._Visible
+                Else
+                    Return Me.Shape.Visible
+                End If
             End Get
             Set(value As Boolean)
                 Me._Visible = value
@@ -1433,7 +1437,7 @@ ReattachRoles:
             '-----------------------------------------------------------------------------------
             Try
                 'CodeSafe
-                If Not Me.Model.Page.Contains(Me.Page) Then Return Nothing
+                If Not Me.Model.Page.Contains(Me.Page) And Not Me.Page.Name = "Diagram Spy" Then Return Nothing
 
                 Dim lrFactTypeReading As New FBM.FactTypeReading(Me.FactType, Me.Id)
                 Dim lar_ORM_object_type As New List(Of FBM.ModelObject)
@@ -4132,11 +4136,14 @@ ReattachRoles:
             End If
         End Function
 
-        Private Sub _FactType_FactTableUpdated(ByRef arFact As Fact, abAddToPage As Boolean) Handles _FactType.FactTableUpdated
+        Private Sub _FactType_FactTableUpdated(ByRef arFact As Fact, ByVal abAddToPage As Boolean, ByRef arPage As FBM.Page) Handles _FactType.FactTableUpdated
 
 
             Try
                 If Not abAddToPage Then Exit Sub
+                If abAddToPage And arPage IsNot Nothing Then
+                    If arPage.PageId <> Me.Page.PageId Then Exit Sub
+                End If
 
                 'CodeSafe
                 If Me.Page Is Nothing Then Exit Sub

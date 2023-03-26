@@ -374,12 +374,17 @@ Namespace FactEngine
         End Function
 
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
-                                                 Optional ByVal abIgnoreError As Boolean = False) As String
+                                                 Optional ByVal abIgnoreError As Boolean = False,
+                                                 Optional ByVal abJustDate As Boolean = False) As String
 
             Try
+                Dim lsPattern As String
 
-
-                Dim lsPattern As String = "yyyy-MM-dd HH:mm:ss"
+                If abJustDate Then
+                    lsPattern = "yyyy-MM-dd"
+                Else
+                    lsPattern = "yyyy-MM-dd HH:mm:ss"
+                End If
 
                 Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
 
@@ -992,8 +997,7 @@ Namespace FactEngine
 
                         ' Just peek to check if any value available.
                         ' Getting count here will consume all the records
-                        ' Use loResult.ToList() if you need all the record in separate list
-                        Debugger.Break()
+                        ' Use loResult.ToList() if you need all the record in separate list                        
                         Dim loResult As IResult
 
                         If loResult.Peek() IsNot Nothing Then

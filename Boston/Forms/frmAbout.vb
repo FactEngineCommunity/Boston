@@ -18,6 +18,19 @@ Public Class frmAbout
 
         label_versioning.Text = ls_message
 
+        If prApplication.SoftwareCategory = pcenumSoftwareCategory.Professional Then
+            If My.Settings.UseClientServer And My.Settings.InitialiseClient And My.Settings.RequireLoginAtStartup Then
+                'Enterprise
+                Me.LabelCategory.Text = "Enterprise"
+            Else
+                'Professional
+                Me.LabelCategory.Text = prApplication.SoftwareCategory.ToString
+            End If
+        Else
+            'Student
+            Me.LabelCategory.Text = prApplication.SoftwareCategory.ToString
+        End If
+
         Me.LabelCategory.Text = prApplication.SoftwareCategory.ToString
 
         ls_message = "Written by FactEngine and Victor Morgante."

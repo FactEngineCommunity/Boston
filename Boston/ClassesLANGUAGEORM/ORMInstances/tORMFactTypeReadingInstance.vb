@@ -193,7 +193,7 @@ Namespace FBM
 
                 'CodeSafe
                 If Not Me.FactType.ShapeIsWithinRadius(Me.ShapeMidPoint, 40) And Me.FactType.Visible Then
-                    Call Me.Move(Me.FactType.X, Me.FactType.Y + StringSize.Height + 6, False)
+                    Call Me.Move(Me.FactType.X, Me.FactType.Y + StringSize.Height + 8, False)
                 End If
 
             Catch ex As Exception

@@ -4765,8 +4765,16 @@ Namespace FBM
 
                     lsFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
                     Me.Name = asNewName
-                    lsNewFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
-                    System.IO.File.Move(lsFileName, lsNewFileName)
+                    lsNewFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & asNewName) & ".fbm"
+                    Try
+                        System.IO.File.Move(lsFileName, lsNewFileName)
+                    Catch ex As Exception
+                        If System.IO.File.Exists(lsNewFileName) Then
+                            System.IO.File.Delete(lsNewFileName)
+                            System.IO.File.Move(lsFileName, lsNewFileName)
+                        End If
+                    End Try
+
                     Call Me.MakeDirty()
                     Call Me.Save() 'Saves the database details of the Model.
 

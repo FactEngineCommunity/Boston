@@ -174,15 +174,38 @@ Namespace FBM
         End Sub
 
 
-        Public Sub MouseDown() Implements iPageObject.MouseDown
+        Public Overloads Sub MouseDown() Implements iPageObject.MouseDown
+
+            Try
+                Me.FactTypeInstance.Shape.Pen.Color = Color.BlueViolet
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
-        Public Sub MouseMove() Implements iPageObject.MouseMove
+        Public Overloads Sub MouseMove() Implements iPageObject.MouseMove
 
         End Sub
 
-        Public Sub MouseUp() Implements iPageObject.MouseUp
+        Public Overloads Sub MouseUp() Implements iPageObject.MouseUp
+
+            Try
+                Me.FactTypeInstance.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

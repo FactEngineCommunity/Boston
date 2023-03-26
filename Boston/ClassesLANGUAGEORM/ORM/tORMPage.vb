@@ -1032,7 +1032,8 @@ Namespace FBM
                                             Optional ByVal abExpandIfReferenceModeFactType As Boolean = False,
                                             Optional ByVal abForceDropOfRelatedModelElements As Boolean = False,
                                             Optional ByVal abDropLinkFactTypes As Boolean = True,
-                                            Optional ByVal abShowFactTypeName As Boolean = False) As FBM.FactTypeInstance
+                                            Optional ByVal abShowFactTypeName As Boolean = False,
+                                            Optional ByVal abShowFactTypeNames As Boolean = False) As FBM.FactTypeInstance
 
             Dim lrRoleInstance As New FBM.RoleInstance
             Dim lrFactTypeInstance As New FBM.FactTypeInstance
@@ -1069,7 +1070,7 @@ Namespace FBM
                     '  are already loaded on the Page. Just make sure their shapes are visible.
                     '--------------------------------------------------------------
                 Else
-                    Call Me.DropModelElementsForFactType(arFactType)
+                    Call Me.DropModelElementsForFactType(arFactType, abShowFactTypeNames)
                 End If
 
                 '-----------------------------------------------------------------------------------
@@ -1103,6 +1104,7 @@ Namespace FBM
                     If lrFactType.IsObjectified Then
                         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                         lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, New PointF(10, 10),, False)
+                        lrEntityTypeInstance.Hide()
                     End If
 
                     lrFactTypeInstance = arFactType.CloneInstance(Me, False)
@@ -1223,7 +1225,7 @@ Namespace FBM
                     End If
                 End If
 
-                If abShowFactTypeName Then
+                If abShowFactTypeName Or (arFactType.IsObjectified And abShowFactTypeNames) Then
                     Call lrFactTypeInstance.FactType.SetShowFactTypeName(True, Me)
                 End If
 
@@ -1242,7 +1244,7 @@ Namespace FBM
 
         End Function
 
-        Public Sub DropModelElementsForFactType(ByRef arFactType As FBM.FactType)
+        Public Sub DropModelElementsForFactType(ByRef arFactType As FBM.FactType, Optional ByVal abShowFactTypeNames As Boolean = False)
 
             Try
                 '--------------------------------------------------------------
@@ -1334,7 +1336,12 @@ Namespace FBM
                             lrRoleJoinedFactType.Model = Me.Model
 
                             If Me.FactTypeInstance.Find(AddressOf lrRoleJoinedFactType.Equals) Is Nothing Then
-                                Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False)
+                                Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False,,,,,, abShowFactTypeNames)
+                            End If
+
+                            If lrRoleJoinedFactType.IsObjectified And abShowFactTypeNames Then
+                                lrRoleJoinedFactType.ShowFactTypeName = True
+                                Call Me.RefreshShape()
                             End If
 
                     End Select
@@ -2384,7 +2391,7 @@ NextY:
                 '---------------
                 'Get FactTypes
                 '---------------                
-                Call TableFactTypeInstance.GetFactTypeInstancesByPage(Me)
+                Me.FactTypeInstance = TableFactTypeInstance.GetFactTypeInstancesByPage(Me)
 
                 '====================================================================================================================
                 'Sometimes if a Role within an ObjectifiedFactType references another ObjectifiedFactType the SQL sort order

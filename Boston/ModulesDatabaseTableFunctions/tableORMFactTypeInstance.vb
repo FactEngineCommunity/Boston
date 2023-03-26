@@ -218,7 +218,7 @@ Namespace TableFactTypeInstance
                             Dim lrObjectifyingEntityTypeInstance As FBM.EntityTypeInstance
 
                             If IsSomething(lrFactTypeInstance.FactType.ObjectifyingEntityType) Then
-                                lrObjectifyingEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id)
+                                lrObjectifyingEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id And x.InstanceNumber = lrFactTypeInstance.InstanceNumber)
                                 If IsSomething(lrObjectifyingEntityTypeInstance) Then
                                     '---------------------------------------------
                                     'All okay. Found the EntityType on the Page.
@@ -477,8 +477,6 @@ Namespace TableFactTypeInstance
                             Next
                         Next
                     Next
-                Else
-                    GetFactTypeInstancesByPage = Nothing
                 End If
 
             Catch ex As Exception

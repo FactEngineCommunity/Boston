@@ -24,7 +24,9 @@ Public Class frmSplash
 
         Dim ls_message As String = ""
 
-        If prSoftwareCategory = pcenumSoftwareCategory.Student Then
+        If My.Settings.UseClientServer And My.Settings.InitialiseClient And My.Settings.RequireLoginAtStartup Then
+            Me.LabelSoftwareCategory.Text = "Enterprise"
+        ElseIf prSoftwareCategory = pcenumSoftwareCategory.Student Then
             Me.LabelSoftwareCategory.Text = "Student"
         End If
 

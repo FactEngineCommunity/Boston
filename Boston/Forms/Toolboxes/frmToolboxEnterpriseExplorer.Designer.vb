@@ -34,7 +34,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.LabelPromptProject = New System.Windows.Forms.Label()
         Me.LabelHelpTips = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.ImageList = New System.Windows.Forms.ImageList(Me.components)
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.Timer_FormSetup = New System.Windows.Forms.Timer(Me.components)
@@ -54,6 +53,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItemKeywordExtractionTool = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemTaxonomyTree = New System.Windows.Forms.ToolStripMenuItem()
         Me.FEKLUploaderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditAITrainingDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.AddPageToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPastePage = New System.Windows.Forms.ToolStripMenuItem()
@@ -103,7 +103,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
-        Me.EditAITrainingDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SearchTextbox = New SearchTextbox()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -117,6 +117,7 @@ Partial Class frmToolboxEnterpriseExplorer
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox_main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.GroupBox_main.Controls.Add(Me.SearchTextbox)
         Me.GroupBox_main.Controls.Add(Me.ButtonNewModel)
         Me.GroupBox_main.Controls.Add(Me.ComboBoxNamespace)
         Me.GroupBox_main.Controls.Add(Me.LabelPromptNamespace)
@@ -124,7 +125,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GroupBox_main.Controls.Add(Me.LabelPromptProject)
         Me.GroupBox_main.Controls.Add(Me.LabelHelpTips)
         Me.GroupBox_main.Controls.Add(Me.Button1)
-        Me.GroupBox_main.Controls.Add(Me.TextBox1)
         Me.GroupBox_main.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox_main.Name = "GroupBox_main"
         Me.GroupBox_main.Size = New System.Drawing.Size(383, 588)
@@ -199,15 +199,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.Button1.TabIndex = 2
         Me.Button1.Text = "S&earch"
         Me.Button1.UseVisualStyleBackColor = True
-        '
-        'TextBox1
-        '
-        Me.TextBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextBox1.Location = New System.Drawing.Point(3, 24)
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(289, 20)
-        Me.TextBox1.TabIndex = 1
         '
         'ImageList
         '
@@ -320,7 +311,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 512)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 490)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -376,6 +367,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.FEKLUploaderToolStripMenuItem.Name = "FEKLUploaderToolStripMenuItem"
         Me.FEKLUploaderToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.FEKLUploaderToolStripMenuItem.Text = "FEKL Uploader"
+        '
+        'EditAITrainingDataEditorToolStripMenuItem
+        '
+        Me.EditAITrainingDataEditorToolStripMenuItem.Name = "EditAITrainingDataEditorToolStripMenuItem"
+        Me.EditAITrainingDataEditorToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.EditAITrainingDataEditorToolStripMenuItem.Text = "Edit AI &Training Data"
         '
         'ToolStripSeparator7
         '
@@ -695,11 +692,14 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
         '
-        'EditAITrainingDataEditorToolStripMenuItem
+        'SearchTextbox
         '
-        Me.EditAITrainingDataEditorToolStripMenuItem.Name = "EditAITrainingDataEditorToolStripMenuItem"
-        Me.EditAITrainingDataEditorToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.EditAITrainingDataEditorToolStripMenuItem.Text = "Edit AI &Training Data"
+        Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.SearchTextbox.Location = New System.Drawing.Point(0, 22)
+        Me.SearchTextbox.Name = "SearchTextbox"
+        Me.SearchTextbox.Size = New System.Drawing.Size(290, 26)
+        Me.SearchTextbox.TabIndex = 11
         '
         'frmToolboxEnterpriseExplorer
         '
@@ -742,7 +742,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItem12 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents Button1 As System.Windows.Forms.Button
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents LabelHelpTips As System.Windows.Forms.Label
     Friend WithEvents DeleteModelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemEmptyModel As System.Windows.Forms.ToolStripMenuItem
@@ -800,4 +799,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItemMoveModel As ToolStripMenuItem
     Friend WithEvents FEKLUploaderToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EditAITrainingDataEditorToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SearchTextbox As SearchTextbox
 End Class

@@ -325,7 +325,7 @@ Namespace FBM
 
         Public Shadows Event Updated()
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
-        Public Event FactTableUpdated(ByRef arFact As FBM.Fact, ByVal abAddToPage As Boolean)
+        Public Event FactTableUpdated(ByRef arFact As FBM.Fact, ByVal abAddToPage As Boolean, ByRef arPage As FBM.Page)
         Public Event IUConstraintAdded(ByRef arFactType As FBM.FactType, ByRef arRoleConstraint As FBM.RoleConstraint)
         Public Event IUConstraintRemoved(ByRef arFactType As FBM.FactType, ByVal arRoleConstraint As FBM.RoleConstraint)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
@@ -1140,7 +1140,15 @@ Namespace FBM
         End Sub
 
 
-        Public Sub AddFact(ByVal arFact As FBM.Fact, Optional ByVal abAddToPages As Boolean = False)
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arFact">The Fact to add to the FactType</param>
+        ''' <param name="abAddToPages">True if the Fact is to be created as a FactTypeInstance for the FactTypeInstance for this FactType.</param>
+        ''' <param name="arPage">The Page to add the Fact to.</param>
+        Public Sub AddFact(ByVal arFact As FBM.Fact,
+                           Optional ByVal abAddToPages As Boolean = False,
+                           Optional ByRef arPage As FBM.Page = Nothing)
 
             Dim lrFactData As FBM.FactData
 
@@ -1178,7 +1186,7 @@ Namespace FBM
                     End If
                 End If
 
-                RaiseEvent FactTableUpdated(arFact, abAddToPages)
+                RaiseEvent FactTableUpdated(arFact, abAddToPages, arPage)
 
 
                 Me.Model.MakeDirty(False, False)
