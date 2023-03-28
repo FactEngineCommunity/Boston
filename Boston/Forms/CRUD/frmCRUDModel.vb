@@ -734,7 +734,7 @@ ConnectionFailed:
                     With New WaitCursor
                         Call Me.zrModel.RapidEmpty(True)
                         Call Me.zrModel.SaveToXMLDocument()
-                        Me.zrModel.StoreAsXML = True
+                        Me.zrModel.SetStoreAsXMl(True, True)
                     End With
                 Else
                     RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged

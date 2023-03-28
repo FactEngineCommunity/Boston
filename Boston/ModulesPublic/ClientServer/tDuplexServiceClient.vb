@@ -439,7 +439,7 @@ Namespace DuplexServiceClient
                         If lrModel Is Nothing Then Exit Sub
 
                         'Model save method may have changed.
-                        lrModel.StoreAsXML = lrInterfaceModel.StoreAsXML
+                        'lrModel.StoreAsXML = lrInterfaceModel.StoreAsXML  '20230327-VM-Removed because moved to SetStoreAsXML method so SaveModel is broadcast.
 
                         If lrModel Is Nothing And
                         Not e.BroadcastType = [Interface].pcenumBroadcastType.AddModel Then Exit Sub 'Nothing more to do here.

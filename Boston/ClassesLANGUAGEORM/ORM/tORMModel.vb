@@ -4443,7 +4443,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Sub Save(Optional ByVal abRapidSave As Boolean = False,
                  Optional ByVal abModelDictionaryRapidSave As Boolean = False,
-                 Optional ByVal abForceDatabaseSave As Boolean = False)
+                 Optional ByVal abForceDatabaseSave As Boolean = False,
+                 Optional ByVal abBroadcastInterfaceEvent As Boolean = False)
 
             '-------------------------------------------------------
             'Saves the currently loaded ORM model to the database
@@ -4490,6 +4491,15 @@ Namespace FBM
                     Call Me.SaveToXMLDocument()
                 Else
                     Call Me.SaveToDatabase(abRapidSave, abModelDictionaryRapidSave)
+                End If
+
+                If abBroadcastInterfaceEvent And My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                    Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                    lrInterfaceModel.ModelId = Me.ModelId
+                    lrInterfaceModel.StoreAsXML = Me.StoreAsXML
+                    Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                    lrBroadcast.Model = lrInterfaceModel
+                    Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
                 End If
 
             Catch ex As Exception
@@ -4795,6 +4805,32 @@ Namespace FBM
 
                 Me.Name = lsOldName
                 Return False
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Important to use this method so that the broadcast is sent in ClientServer mode, Boston Enterprise.
+        ''' </summary>
+        ''' <param name="abStoreAsXML"></param>
+        ''' <param name="abSaveModel"></param>
+        ''' <returns></returns>
+        Public Function SetStoreAsXML(ByVal abStoreAsXML As Boolean, ByVal abSaveModel As Boolean)
+
+            Try
+                Me.StoreAsXML = abStoreAsXML
+
+                If abSaveModel Then
+                    Call Me.Save(False, False, False, True)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function

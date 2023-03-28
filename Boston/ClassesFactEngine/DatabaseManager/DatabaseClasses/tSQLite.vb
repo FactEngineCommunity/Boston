@@ -664,6 +664,10 @@ Namespace FactEngine
                             lasToTableNames.AddUnique(lrDestinationTable.Name)
                         End If
 
+                        If lrDestinationTable.getPrimaryKeyColumns.Count = 1 Then
+                            lasToTableNames.Remove(lrDestinationTable.Name)
+                        End If
+
                     End While
 
                     lrRecordset.MoveNext()

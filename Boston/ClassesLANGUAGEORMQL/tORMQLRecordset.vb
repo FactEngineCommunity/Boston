@@ -150,7 +150,14 @@
         End Sub
 
         Public Sub Reset() Implements IEnumerator.Reset
-            Me.CurrentFactIndex = -1
+
+            Select Case Me.Facts.Count
+                Case Is = 0
+                    Me.CurrentFactIndex = -1
+                Case Else
+                    Me.CurrentFactIndex = 0
+            End Select
+
         End Sub
 
     End Class

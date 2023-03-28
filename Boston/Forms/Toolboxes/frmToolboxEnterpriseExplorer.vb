@@ -1225,7 +1225,7 @@ Public Class frmToolboxEnterpriseExplorer
                                 '  be found using LiNQ.
                                 '  NB The call to GetPagesByModel() will not duplicate reloading of a Page.
                                 '-------------------------------------------------------------------------------                                
-                                If Not lrModel.LoadedFromXMLFile And Not (lrModel.ModelId = "Core") Then
+                                If Not lrModel.LoadedFromXMLFile And Not (lrModel.ModelId = "Core") And Not lrModel.StoreAsXML Then
                                     Call TablePage.GetPagesByModel(lrModel, True)
                                 End If
                                 If lrModel.Loaded Then
