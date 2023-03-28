@@ -894,7 +894,6 @@ Skip: 'Because is not a ValueType
             For Each lrTable In Me.TempModel.RDS.Table
                 lrTable.Model = Me.TempModel.RDS
 
-                If lrTable.Name = "Relationship" Then Debugger.Break()
                 Dim larRelation As New List(Of RDS.Relation)
                 Try
                     larRelation = Me.TempModel.DatabaseConnection.getForeignKeyRelationshipsByTable(lrTable)

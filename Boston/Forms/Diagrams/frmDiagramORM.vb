@@ -12474,7 +12474,7 @@ SkipRemovalFromModel:
                         'CodeSafe: Create the missing LinkFactType.
                         lsMessage = "The Link Fact Type for the selected Role seems to be missing. Do you want Boston to create it now?"
                         If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Yes Then
-                            lrLinkFactType = lrRoleInstance.Role.FactType.createLinkFactTypeForRole(lrRoleInstance.Role)
+                            lrLinkFactType = lrRoleInstance.Role.FactType.createLinkFactTypeForRole(lrRoleInstance.Role, True)
                         End If
                     End Try
 
@@ -12482,7 +12482,7 @@ SkipRemovalFromModel:
                         'CodeSafe: Create the missing LinkFactType.
                         lsMessage = "The Link Fact Type for the selected Role seems to be missing. Do you want Boston to create it now?"
                         If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.Exclamation) = MsgBoxResult.Yes Then
-                            lrLinkFactType = lrRoleInstance.Role.FactType.createLinkFactTypeForRole(lrRoleInstance.Role)
+                            lrLinkFactType = lrRoleInstance.Role.FactType.createLinkFactTypeForRole(lrRoleInstance.Role, True)
                         Else
                             Exit Sub
                         End If

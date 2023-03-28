@@ -833,7 +833,7 @@ Partial Public Class tBrain
             End If
 #End Region
 
-            Call Me.Model.AddFactType(lrFactType)
+            Call Me.Model.AddFactType(lrFactType, abBroadcastInterfaceEvent)
 
             '====================================================================
             'Check to see that the FactType doesn't clash with another FactType

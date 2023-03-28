@@ -1046,7 +1046,7 @@ Namespace FBM
 
             If Me.IsObjectified Then
                 If arRole.JoinedORMObject IsNot Nothing Then
-                    Call Me.createLinkFactTypeForRole(arRole)
+                    Call Me.createLinkFactTypeForRole(arRole, abBroadcastInterfaceEvent)
                 End If
             End If
 
@@ -2211,7 +2211,7 @@ Namespace FBM
 
         End Function
 
-        Public Function createLinkFactTypeForRole(ByRef arRole As FBM.Role) As FBM.FactType
+        Public Function createLinkFactTypeForRole(ByRef arRole As FBM.Role, ByVal abBroadcastInterfaceEvent As Boolean) As FBM.FactType
 
             Dim larRole As New List(Of FBM.Role)
             Dim larModelObject As New List(Of FBM.ModelObject)
@@ -2232,7 +2232,7 @@ Namespace FBM
                                                      arRole,
                                                      False)
 
-                Call Me.Model.AddFactType(lrFactType, False, True)
+                Call Me.Model.AddFactType(lrFactType, False, abBroadcastInterfaceEvent)
 
                 larRole.Clear()
                 larRole.Add(lrFactType.RoleGroup(0))
