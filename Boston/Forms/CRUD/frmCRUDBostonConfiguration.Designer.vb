@@ -65,6 +65,9 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.TextBoxFactEngineOpenAIAPIKey = New System.Windows.Forms.TextBox()
+        Me.LabelPromptFactEngineOpenAIAPIKey = New System.Windows.Forms.Label()
+        Me.CheckBoxFactEngineUseGPT3 = New System.Windows.Forms.CheckBox()
         Me.CheckBoxFactEngineUseTransformations = New System.Windows.Forms.CheckBox()
         Me.CheckBoxFactEngineShowStackTrace = New System.Windows.Forms.CheckBox()
         Me.ComboBoxFactEngineUserDateTimeFormat = New System.Windows.Forms.ComboBox()
@@ -105,9 +108,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxFactEngineUseGPT3 = New System.Windows.Forms.CheckBox()
-        Me.LabelPromptFactEngineOpenAIAPIKey = New System.Windows.Forms.Label()
-        Me.TextBoxFactEngineOpenAIAPIKey = New System.Windows.Forms.TextBox()
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -579,6 +580,32 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.TabIndex = 0
         Me.GroupBoxFactEngine.TabStop = False
         '
+        'TextBoxFactEngineOpenAIAPIKey
+        '
+        Me.TextBoxFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(104, 248)
+        Me.TextBoxFactEngineOpenAIAPIKey.Name = "TextBoxFactEngineOpenAIAPIKey"
+        Me.TextBoxFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(295, 20)
+        Me.TextBoxFactEngineOpenAIAPIKey.TabIndex = 12
+        '
+        'LabelPromptFactEngineOpenAIAPIKey
+        '
+        Me.LabelPromptFactEngineOpenAIAPIKey.AutoSize = True
+        Me.LabelPromptFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(19, 251)
+        Me.LabelPromptFactEngineOpenAIAPIKey.Name = "LabelPromptFactEngineOpenAIAPIKey"
+        Me.LabelPromptFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(87, 13)
+        Me.LabelPromptFactEngineOpenAIAPIKey.TabIndex = 11
+        Me.LabelPromptFactEngineOpenAIAPIKey.Text = "OpenAI API Key:"
+        '
+        'CheckBoxFactEngineUseGPT3
+        '
+        Me.CheckBoxFactEngineUseGPT3.AutoSize = True
+        Me.CheckBoxFactEngineUseGPT3.Location = New System.Drawing.Point(19, 227)
+        Me.CheckBoxFactEngineUseGPT3.Name = "CheckBoxFactEngineUseGPT3"
+        Me.CheckBoxFactEngineUseGPT3.Size = New System.Drawing.Size(225, 17)
+        Me.CheckBoxFactEngineUseGPT3.TabIndex = 10
+        Me.CheckBoxFactEngineUseGPT3.Text = "Use GPT3 for NL-2-FEQL Transformations"
+        Me.CheckBoxFactEngineUseGPT3.UseVisualStyleBackColor = True
+        '
         'CheckBoxFactEngineUseTransformations
         '
         Me.CheckBoxFactEngineUseTransformations.AutoSize = True
@@ -692,6 +719,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxERDiagrams.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxERDiagrams.Controls.Add(Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName)
         Me.GroupBoxERDiagrams.Controls.Add(Me.CheckBoxHideUnknownPredicates)
         Me.GroupBoxERDiagrams.Location = New System.Drawing.Point(3, 6)
         Me.GroupBoxERDiagrams.Name = "GroupBoxERDiagrams"
@@ -985,31 +1013,15 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxFactEngineUseGPT3
+        'CheckBoxImportColumnNameEqualsFKReferencedEntityName
         '
-        Me.CheckBoxFactEngineUseGPT3.AutoSize = True
-        Me.CheckBoxFactEngineUseGPT3.Location = New System.Drawing.Point(19, 227)
-        Me.CheckBoxFactEngineUseGPT3.Name = "CheckBoxFactEngineUseGPT3"
-        Me.CheckBoxFactEngineUseGPT3.Size = New System.Drawing.Size(225, 17)
-        Me.CheckBoxFactEngineUseGPT3.TabIndex = 10
-        Me.CheckBoxFactEngineUseGPT3.Text = "Use GPT3 for NL-2-FEQL Transformations"
-        Me.CheckBoxFactEngineUseGPT3.UseVisualStyleBackColor = True
-        '
-        'LabelPromptFactEngineOpenAIAPIKey
-        '
-        Me.LabelPromptFactEngineOpenAIAPIKey.AutoSize = True
-        Me.LabelPromptFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(19, 251)
-        Me.LabelPromptFactEngineOpenAIAPIKey.Name = "LabelPromptFactEngineOpenAIAPIKey"
-        Me.LabelPromptFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(87, 13)
-        Me.LabelPromptFactEngineOpenAIAPIKey.TabIndex = 11
-        Me.LabelPromptFactEngineOpenAIAPIKey.Text = "OpenAI API Key:"
-        '
-        'TextBoxFactEngineOpenAIAPIKey
-        '
-        Me.TextBoxFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(104, 248)
-        Me.TextBoxFactEngineOpenAIAPIKey.Name = "TextBoxFactEngineOpenAIAPIKey"
-        Me.TextBoxFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(295, 20)
-        Me.TextBoxFactEngineOpenAIAPIKey.TabIndex = 12
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.AutoSize = True
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Location = New System.Drawing.Point(17, 42)
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Name = "CheckBoxImportColumnNameEqualsFKReferencedEntityName"
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Size = New System.Drawing.Size(334, 17)
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.TabIndex = 1
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Text = "Import/Export - Column Name equals FK Referenced Entity Name"
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -1152,4 +1164,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents LabelPromptFactEngineOpenAIAPIKey As Label
     Friend WithEvents CheckBoxFactEngineUseGPT3 As CheckBox
     Friend WithEvents TextBoxFactEngineOpenAIAPIKey As TextBox
+    Friend WithEvents CheckBoxImportColumnNameEqualsFKReferencedEntityName As CheckBox
 End Class

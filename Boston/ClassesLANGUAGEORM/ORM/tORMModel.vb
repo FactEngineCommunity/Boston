@@ -839,7 +839,6 @@ Namespace FBM
             Dim lsMessage As String = ""
 
             Try
-
                 If (Not arRoleConstraint.IsMDAModelElement) _
                         And Me.RDSCreated Then 'For now, check this...because otherwise RDS may have no Tables.
 

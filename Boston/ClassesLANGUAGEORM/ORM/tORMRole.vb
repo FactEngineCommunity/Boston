@@ -1006,13 +1006,25 @@ Namespace FBM
                                                 Dim lrTopMostSupertypeEntityType As FBM.EntityType = lrModelObject
 
                                                 lrActiveRole = lrTopMostSupertypeEntityType.ReferenceModeFactType.RoleGroup(1)
-                                                lsColumnName = lrTopMostSupertypeEntityType.ReferenceModeValueType.Id
+
+                                                If My.Settings.ImportExportColumnNameForFKReferenceEqualsReferencedEntityName Then
+                                                    lsColumnName = lrEntityType.Id
+                                                Else
+                                                    lsColumnName = lrTopMostSupertypeEntityType.ReferenceModeValueType.Id
+                                                End If
+
                                             Else 'TopmostSupertype is an ObjectifiedFactType
                                                 Throw New NotImplementedException("Called EntityType.GetCorrespondingUnaryOrBinaryFactTypeColumn for Entity Type that has a topmost Supertype that is a FactType. Not yet implmented.")
                                             End If
                                         Else
                                             lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1)
-                                            lsColumnName = lrEntityType.ReferenceModeValueType.Id
+
+                                            If My.Settings.ImportExportColumnNameForFKReferenceEqualsReferencedEntityName Then
+                                                lsColumnName = lrEntityType.Id
+                                            Else
+                                                lsColumnName = lrEntityType.ReferenceModeValueType.Id
+                                            End If
+
                                         End If
 
                                     Else
@@ -1047,7 +1059,12 @@ Namespace FBM
                                 Select Case Me.JoinedORMObject.GetType
                                     Case Is = GetType(FBM.EntityType)
                                         If Me.JoinsEntityType.HasSimpleReferenceScheme Then
-                                            lsColumnName = CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeValueType.Id
+                                            If My.Settings.ImportExportColumnNameForFKReferenceEqualsReferencedEntityName Then
+                                                lsColumnName = Me.JoinsEntityType.Id
+                                            Else
+                                                lsColumnName = CType(Me.JoinsEntityType.GetTopmostNonAbsorbedSupertype(True), FBM.EntityType).ReferenceModeValueType.Id
+                                            End If
+
                                         ElseIf Me.JoinsEntityType.HasCompoundReferenceMode Then
                                             Throw New Exception("Called for Entity Type with Compound Reference Scheme.")
                                         Else
@@ -1137,7 +1154,7 @@ Namespace FBM
 
                 Select Case Me.JoinedORMObject.ConceptType
                     Case Is = pcenumConceptType.EntityType
-
+#Region "Entity Type"
                         lrActiveRole = Me
                         lrModelElement = lrActiveRole.JoinedORMObject
 
@@ -1163,6 +1180,10 @@ Namespace FBM
                                         lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1)
                                         lsColumnName = lrEntityType.ReferenceModeValueType.Id
                                     End If
+
+                                    If My.Settings.ImportExportColumnNameForFKReferenceEqualsReferencedEntityName Then
+                                        lsColumnName = lrEntityType.Id
+                                    End If
                                 Else
                                     lsColumnName = lrEntityType.Id
                                 End If
@@ -1180,8 +1201,9 @@ Namespace FBM
                         'If lrFactTypeReading IsNot Nothing Then
                         '    lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
                         'End If
-
+#End Region
                     Case Is = pcenumConceptType.ValueType
+#Region "Value Type"
                         lrActiveRole = Me
                         lsColumnName = Me.JoinedORMObject.Name
 
@@ -1193,7 +1215,12 @@ Namespace FBM
                         'If lrFactTypeReading IsNot Nothing Then
                         '    lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
                         'End If
+#End Region
                 End Select
+
+                If (Trim(Me.Name) <> "" Or Me.Name Is Nothing) And (Me.FactType.IsObjectified Or Me.FactType.HasTotalRoleConstraint) Then
+                    lsColumnName = Me.Name
+                End If
 
                 lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
                 lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)

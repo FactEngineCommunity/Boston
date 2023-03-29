@@ -4584,7 +4584,7 @@ FinishedPretesting:
             If lrModelElement.GetType = GetType(FBM.FactType) Then
                 lrFactType = CType(lrModelElement, FBM.FactType)
 
-                If lrFactType.IsObjectified Then
+                If lrFactType.IsObjectified Or lrFactType.HasTotalRoleConstraint Then
 
                     If lrFactType.RoleGroup.Count = 2 Then
                         lbCanConvert = True

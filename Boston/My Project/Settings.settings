@@ -260,5 +260,8 @@
     <Setting Name="FactEngineOpenAIAPIKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">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</Value>
     </Setting>
+    <Setting Name="ImportExportColumnNameForFKReferenceEqualsReferencedEntityName" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

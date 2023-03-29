@@ -99,6 +99,7 @@ Public Class frmCRUDBostonConfiguration
 
             'ER Diagrams
             Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
+            Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Checked = My.Settings.ImportExportColumnNameForFKReferenceEqualsReferencedEntityName 'As in when importing NORMA .orm file.
 
             'Diagrams General
             Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked = My.Settings.DiagramSpyShowLinkFactTypes
