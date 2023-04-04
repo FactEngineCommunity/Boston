@@ -244,11 +244,13 @@ Public Class frmFactEngine
     End Function
 
     Private Sub AddEnterpriseAwareItem(ByVal asEAItem As String,
-                                       Optional ByVal aoTagObject As Object = Nothing,
-                                       Optional abSetSelectedIndex As Boolean = False,
-                                       Optional asModelElementName As String = "",
-                                       Optional ab0Index As Boolean = False,
-                                       Optional abOverrideAlreadyExists As Boolean = False)
+                                       Optional ByRef aoTagObject As Object = Nothing,
+                                       Optional ByVal abSetSelectedIndex As Boolean = False,
+                                       Optional ByVal asModelElementName As String = "",
+                                       Optional ByVal ab0Index As Boolean = False,
+                                       Optional ByVal abOverrideAlreadyExists As Boolean = False)
+
+        If aoTagObject Is Nothing Then aoTagObject = VAQL.TokenType.PREDICATEPART
 
         Dim lrListItem = New tComboboxItem(asModelElementName, asEAItem, aoTagObject)
 

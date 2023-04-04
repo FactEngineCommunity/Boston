@@ -524,6 +524,7 @@ Namespace RDS
 
             Try
                 Dim larColumn = From Column In Me.Column
+                                Where Column.ActiveRole IsNot Nothing
                                 Where Column.ActiveRole.HasInternalUniquenessConstraint
                                 Where Column.ActiveRole.JoinedORMObject IsNot Nothing
                                 Where Column.ActiveRole.JoinedORMObject.GetType = GetType(FBM.ValueType)

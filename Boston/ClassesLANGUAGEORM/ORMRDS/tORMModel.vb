@@ -2603,8 +2603,8 @@ Namespace FBM
 
                         If larOriginColumn.Count > 0 Then
                             lrColumn = larOriginColumn.First
-                            lrColumn.Relation.Add(lrRelation)
-                            lrRelation.OriginColumns.Add(lrColumn)
+                            lrColumn.Relation.AddUnique(lrRelation)
+                            lrRelation.OriginColumns.AddUnique(lrColumn)
                         Else
                             prApplication.ThrowErrorMessage("Relation: " & lrRelation.Id & ", had no origin column with " & lrDictionaryEntry.Value, pcenumErrorType.Warning, Nothing, False, False, False)
                         End If
@@ -2653,12 +2653,32 @@ Namespace FBM
                             lrRelation.DestinationColumns.Add(lrColumn)
                         Catch ex As Exception
                             'CodeSafe
-                            lsMessage = "Could not find Column in Destination Table, " & lrRelation.DestinationTable.Name
-                            lsMessage.AppendDoubleLineBreak("Origin Table: " & lrRelation.OriginTable.Name)
-                            lsMessage.AppendLine("Origin Column count: " & lrRelation.OriginColumns.Count)
-                            lsMessage.AppendLine("Destination Column count: " & lrRelation.DestinationColumns.Count)
-                            lsMessage.AppendDoubleLineBreak("Column Id: " & lrDictionaryEntry.Value)
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                            Dim lrGhostColumn = From Table In Me.RDS.Table
+                                                From Column In Table.Column
+                                                Where Column.Id = lrDictionaryEntry.Value
+                                                Select Column
+
+                            If lrGhostColumn.Count = 0 Then
+                                'The Column doesn't exist anywhere in the RDS model, so get rid of it.
+                                Call lrRelation.RemoveDestinationColumn(New RDS.Column(lrRelation.DestinationTable, "DummyColumn", Nothing, Nothing, , lrDictionaryEntry.Value))
+                            Else
+                                lsMessage = "Could not find Column in Destination Table, " & lrRelation.DestinationTable.Name
+                                lsMessage.AppendDoubleLineBreak("Origin Table: " & lrRelation.OriginTable.Name)
+                                lsMessage.AppendLine("Origin Column count: " & lrRelation.OriginColumns.Count)
+                                lsMessage.AppendLine("Destination Column count: " & lrRelation.DestinationColumns.Count)
+                                lsMessage.AppendDoubleLineBreak("Column Id: " & lrDictionaryEntry.Value)
+
+                                Dim lrModelError = New FBM.ModelError(pcenumModelErrors.CMMLModelError,
+                                                                      lsMessage,
+                                                                      Nothing,
+                                                                      Nothing,
+                                                                      False,
+                                                                      pcenumModelSubErrorType.RDSRelationOriginDestintaionColumnCountMismatch,
+                                                                      lrRelation)
+                                Me.AddModelError(lrModelError)
+
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, , True)
+                            End If
                         End Try
                     Next
 

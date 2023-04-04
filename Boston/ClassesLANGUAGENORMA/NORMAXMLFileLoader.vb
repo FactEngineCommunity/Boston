@@ -1452,9 +1452,12 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
                         lrRoleConstraint.isDirty = True
                         lrRoleConstraint.NORMAReferenceId = loXMLRoleConstraint.Attribute("id").Value
-                        arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing)
+                        If loXMLRoleConstraint.Attribute("Modality") IsNot Nothing Then
+                            lrRoleConstraint.IsDeontic = loXMLRoleConstraint.Attribute("Modality").Value = "Deontic"
+                        End If
+                        arModel.AddRoleConstraint(lrRoleConstraint, False, False, Nothing, False, Nothing, lrRoleConstraint.IsDeontic)
                     End If
-                End If
+                    End If
 
                 Return lrRoleConstraint
 

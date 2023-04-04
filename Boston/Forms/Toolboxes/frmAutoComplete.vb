@@ -37,53 +37,78 @@ Public Class frmAutoComplete
 
     Private Sub ListBox_DrawItem(ByVal sender As Object, ByVal e As System.Windows.Forms.DrawItemEventArgs) Handles ListBox.DrawItem
 
-        If e.Index < 0 Then
+        Try
+
+            If e.Index < 0 Then
+                e.DrawFocusRectangle()
+                Exit Sub
+            End If
+            Dim CurrentText As String = Me.ListBox.Items(e.Index).ToString
+            Dim ForeColor As Color = e.ForeColor
+
+            ' Draw the background of the ListBox control for each item.
+            e.DrawBackground()
+
+            If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
+                e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(210, 210, 210)), e.Bounds)
+            End If
+
+            Dim liTokenType As VAQL.TokenType
+
+            If Me.ListBox.Items(e.Index).Tag Is Nothing Then
+                liTokenType = VAQL.TokenType.PREDICATEPART
+            Else
+                Select Case Me.ListBox.Items(e.Index).Tag.GetType
+                    Case Is = GetType(FBM.FactTypeReading)
+                        liTokenType = VAQL.TokenType.FACTSTMT 'Just use this.
+                    Case Else
+                        liTokenType = Me.ListBox.Items(e.Index).Tag
+                End Select
+            End If
+
+            Select Case liTokenType
+                Case Is = FEQL.TokenType.MODELELEMENTNAME, VAQL.TokenType.MODELELEMENTNAME
+                    ForeColor = Color.FromArgb(76, 153, 0)
+                Case Is = VAQL.TokenType.PREDICATEPART, FEQL.TokenType.PREDICATE
+                    ForeColor = Color.FromArgb(153, 0, 153)
+                Case Is = VAQL.TokenType.FACTSTMT
+                    ForeColor = Color.RoyalBlue
+            End Select
+
+            Select Case liTokenType.ToString Like "KEYWD*"
+                Case Is = True
+                    ForeColor = Color.Blue
+            End Select
+
+            Select Case True
+                Case e.Index = Me.ListBox.SelectedIndex
+                    ForeColor = Color.White
+                Case Else
+                    'ForeColor = Color.Black
+            End Select
+
             e.DrawFocusRectangle()
-            Exit Sub
-        End If
-        Dim CurrentText As String = Me.ListBox.Items(e.Index).ToString
-        Dim ForeColor As Color = e.ForeColor
+            e.Graphics.DrawString(CurrentText, Me.ListBox.Font, New SolidBrush(ForeColor), e.Bounds, StringFormat.GenericDefault)
 
-        ' Draw the background of the ListBox control for each item.
-        e.DrawBackground()
+            Dim lrFEQLTokenType = CType(Me.ListBox.Items(e.Index), tComboboxItem)
+            Select Case lrFEQLTokenType.Tag.GetType
+                Case Is = GetType(FBM.FactTypeReading)
+                    'N/A at this stage.
+                Case Else
+                    If lrFEQLTokenType.Tag = FEQL.TokenType.PREDICATE Then
+                        Dim liStringWidth = e.Graphics.MeasureString(CurrentText, Me.ListBox.Font).Width
+                        Dim lrRectangle = New Rectangle(e.Bounds.X + liStringWidth + 2, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height)
+                        e.Graphics.DrawString(lrFEQLTokenType.ItemData, Me.ListBox.Font, New SolidBrush(Color.FromArgb(158, 158, 158)), lrRectangle, StringFormat.GenericDefault)
+                    End If
+            End Select
+        Catch ex As Exception
+            Dim lsMessage As String
+        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
-            e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(210, 210, 210)), e.Bounds)
-        End If
-
-        Dim liTokenType As VAQL.TokenType
-
-        liTokenType = Me.ListBox.Items(e.Index).Tag
-
-
-        Select Case liTokenType
-            Case Is = FEQL.TokenType.MODELELEMENTNAME, VAQL.TokenType.MODELELEMENTNAME
-                ForeColor = Color.FromArgb(76, 153, 0)
-            Case Is = VAQL.TokenType.PREDICATEPART, FEQL.TokenType.PREDICATE
-                ForeColor = Color.FromArgb(153, 0, 153)
-        End Select
-
-        Select Case liTokenType.ToString Like "KEYWD*"
-            Case Is = True
-                ForeColor = Color.Blue
-        End Select
-
-        Select Case True
-            Case e.Index = Me.ListBox.SelectedIndex
-                ForeColor = Color.White
-            Case Else
-                'ForeColor = Color.Black
-        End Select
-
-        e.DrawFocusRectangle()
-        e.Graphics.DrawString(CurrentText, Me.ListBox.Font, New SolidBrush(ForeColor), e.Bounds, StringFormat.GenericDefault)
-
-        Dim lrFEQLTokenType = CType(Me.ListBox.Items(e.Index), tComboboxItem)
-        If lrFEQLTokenType.Tag = FEQL.TokenType.PREDICATE Then
-            Dim liStringWidth = e.Graphics.MeasureString(CurrentText, Me.ListBox.Font).Width
-            Dim lrRectangle = New Rectangle(e.Bounds.X + liStringWidth + 2, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height)
-            e.Graphics.DrawString(lrFEQLTokenType.ItemData, Me.ListBox.Font, New SolidBrush(Color.FromArgb(158, 158, 158)), lrRectangle, StringFormat.GenericDefault)
-        End If
+        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -130,11 +155,12 @@ Public Class frmAutoComplete
                     Me.zoTextEditor.Focus()
 
                 Case Is = Keys.Enter,
-                          Keys.Space,
-                          Keys.Tab
+                          Keys.Space
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.None)
                     e.Handled = True
                     Me.zoTextEditor.Focus()
+                Case Is = Keys.Tab
+                    e.Handled = True
                 Case Is = Keys.A
                     Call Me.processKeyDown(publicConstantsAutoComplete.pcenumACActionType.A)
                     e.Handled = True
@@ -195,12 +221,23 @@ Public Class frmAutoComplete
                     'Nothing to remove
                     '-------------------
                     If Me.ListBox.SelectedIndex >= 0 Then
-                        lsSelectedItem = Me.ListBox.SelectedItem.ToString
+                        Select Case Me.ListBox.SelectedItem.Tag.GetType
+                            Case Is = GetType(FBM.FactTypeReading)
+                                lsSelectedItem = "" 'CType(Me.ListBox.SelectedItem.Tag, FBM.FactTypeReading).GetReadingText
+                            Case Else
+                                lsSelectedItem = Me.ListBox.SelectedItem.ToString
+                        End Select
                     End If
                 Else
                     Select Case aiActionType
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.None
-                            lsSelectedItem = Me.ListBox.SelectedItem.ToString
+                            Select Case Me.ListBox.SelectedItem.Tag.GetType
+                                Case Is = GetType(FBM.FactTypeReading)
+                                    lsSelectedItem = "" 'CType(Me.ListBox.SelectedItem.Tag, FBM.FactTypeReading).GetReadingText
+                                Case Else
+                                    lsSelectedItem = Me.ListBox.SelectedItem.ToString
+                            End Select
+
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.A
                             lsSelectedItem = Me.ListBox.SelectedItem.ToString & " A " & Trim(Me.ListBox.SelectedItem.ItemData) & " "
                         Case Is = publicConstantsAutoComplete.pcenumACActionType.ModelElement
@@ -281,6 +318,11 @@ Public Class frmAutoComplete
                 Select Case Me.zrCallingForm.Name
                     Case Is = "frmFactEngine"
                         CType(Me.zrCallingForm, frmFactEngine).ProcessAutoComplete(New KeyEventArgs(Keys.Space))
+                    Case Is = frmToolboxORMReadingEditor.Name
+                        CType(Me.zrCallingForm, frmToolboxORMReadingEditor).processFactTypeReading(CType(Me.ListBox.SelectedItem.Tag, FBM.FactTypeReading).GetReadingText)
+                        If CType(Me.ListBox.SelectedItem.Tag, FBM.FactTypeReading).ReverseFactTypeReading IsNot Nothing Then
+                            CType(Me.zrCallingForm, frmToolboxORMReadingEditor).processFactTypeReading(CType(Me.ListBox.SelectedItem.Tag, FBM.FactTypeReading).ReverseFactTypeReading.GetReadingText, False)
+                        End If
                 End Select
 
                 'Me.Visible = Me.CheckIfCanDisplayEnterpriseAwareBox

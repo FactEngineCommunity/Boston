@@ -554,23 +554,34 @@ Namespace ERD
                 For Each lrColumn In Me.RDSTable.Column
 
                     lrERAttribute = New ERD.Attribute
-                    lrERAttribute.Column = lrColumn
-                    lrERAttribute.Model = Me.Page.Model
-                    lrERAttribute.Id = lrColumn.Id
-                    lrERAttribute.Entity = Me
-                    lrERAttribute.AttributeName = lrColumn.Name
-                    lrERAttribute.ResponsibleRole = lrColumn.Role
-                    lrERAttribute.ActiveRole = lrColumn.ActiveRole
-                    lrERAttribute.ResponsibleFactType = lrERAttribute.ResponsibleRole.FactType
-                    lrERAttribute.Mandatory = lrColumn.IsMandatory
-                    'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
-                    lrERAttribute.PartOfPrimaryKey = lrColumn.isPartOfPrimaryKey
-                    lrERAttribute.IsDerivationParameter = lrColumn.IsDerivationParameter
-                    lrERAttribute.Page = Me.Page
 
-                    lrERAttribute.Column = lrColumn
-                    lrERAttribute.SupertypeColumn = lrColumn.SupertypeColumn
-                    lrERAttribute.DBName = lrColumn.ActiveRole.JoinedORMObject.DBName
+                    Try
+                        lrERAttribute.Column = lrColumn
+                        lrERAttribute.Model = Me.Page.Model
+                        lrERAttribute.Id = lrColumn.Id
+                        lrERAttribute.Entity = Me
+                        lrERAttribute.AttributeName = lrColumn.Name
+                        lrERAttribute.ResponsibleRole = lrColumn.Role
+                        lrERAttribute.ActiveRole = lrColumn.ActiveRole
+                        lrERAttribute.ResponsibleFactType = lrERAttribute.ResponsibleRole.FactType
+                        lrERAttribute.Mandatory = lrColumn.IsMandatory
+                        'lrERAttribute.OrdinalPosition = lrColumn.OrdinalPosition
+                        lrERAttribute.PartOfPrimaryKey = lrColumn.isPartOfPrimaryKey
+                        lrERAttribute.IsDerivationParameter = lrColumn.IsDerivationParameter
+                        lrERAttribute.Page = Me.Page
+
+                        lrERAttribute.Column = lrColumn
+                        lrERAttribute.SupertypeColumn = lrColumn.SupertypeColumn
+                        lrERAttribute.DBName = lrColumn.ActiveRole.JoinedORMObject.DBName
+
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    End Try
 
                     Me.Attribute.AddUnique(lrERAttribute)
 

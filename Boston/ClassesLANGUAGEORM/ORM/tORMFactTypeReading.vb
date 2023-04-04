@@ -96,6 +96,8 @@ Namespace FBM
         ''' <remarks></remarks>
         Public IsPreferredForPredicate As Boolean = True
 
+        Public ReverseFactTypeReading As FBM.FactTypeReading = Nothing 'Used (at this stage) only when in the ORM Reading Editor, AutoComplete....to add a forward reading and a reverse reading in one go. See AutoComplete and frmToolboxORMReadingEditor.
+
         Delegate Function MatchDelegate(ByVal arFactTypeReading As FBM.FactTypeReading) '20150201-No longer used. Can likely delete this line. Was referenced with...See 'matches' function below....but no reference in Matches.. methods found.
 
         Public Sub New()
@@ -711,6 +713,62 @@ Namespace FBM
             Next
 
         End Sub
+
+        Public Function CreateFactTypeReadingSentence(ByRef aarRole As List(Of FBM.Role), ByVal aasPredicate As List(Of String)) As Language.Sentence
+
+            Try
+                Dim liInd = 1
+                Dim lsSentence As String = ""
+
+                Dim lrSentence As New Language.Sentence("", "")
+
+                lrSentence.FrontText = ""
+                lrSentence.FollowingText = ""
+                Dim lsPredicatePart As String = ""
+
+                For Each lrRole As FBM.Role In aarRole
+
+                    lsSentence &= lrRole.JoinedORMObject.Id
+
+                    Dim lrPredicatePart As New Language.PredicatePart
+
+                    lrPredicatePart.PreboundText = ""
+                    lrPredicatePart.PostboundText = ""
+                    lrPredicatePart.ObjectName = lrRole.JoinedORMObject.Id
+                    lrSentence.ModelElement.Add(lrPredicatePart.ObjectName)
+
+                    For Each lsPredicatePartPart In aasPredicate
+                        lsPredicatePart &= lsPredicatePartPart
+                    Next
+
+                    lsSentence &= " " & lsPredicatePart & " "
+
+                    lrPredicatePart.PredicatePartText = lsPredicatePart
+                    lrPredicatePart.SequenceNr = liInd
+                    lrSentence.PredicatePart.Add(lrPredicatePart)
+
+                    liInd += 1
+                Next
+
+                lsSentence = Trim(lsSentence)
+
+                lrSentence.Sentence = lsSentence
+                lrSentence.OriginalSentence = lsSentence
+
+                Return lrSentence
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Nothing
+            End Try
+
+        End Function
 
         Public Overridable Function GetDottedReadingText() As String
 

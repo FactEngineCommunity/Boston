@@ -41,6 +41,7 @@
         RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
         RolesWithoutJoinedORMObject
         RDSColumnsThatShouldBeMandatoryMakeMandatory
+        RDSColumnsWithoutActiveRoles
         RDSRelationsThatHaveNoOriginColumnsRemoveRelation
         RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
         RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount

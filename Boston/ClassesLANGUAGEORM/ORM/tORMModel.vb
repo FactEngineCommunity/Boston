@@ -787,7 +787,7 @@ Namespace FBM
                     Next
                 Next
 
-                Me.ModelError.Clear()
+                Me.ModelError.RemoveAll(Function(x) x.SubErrorId = pcenumModelSubErrorType.None)
                 RaiseEvent ModelErrorsCleared()
 
             Catch ex As Exception
@@ -1679,9 +1679,14 @@ Namespace FBM
 
                     If Not abIgnoreRDSProcessing Then
 
+                        'CodeSafe
+                        If arRoleConstraint.IsDeontic Then GoTo PostRDSProcessing
+
                         Call Me.DoRDSProcessingForRoleConstraint(arRoleConstraint, abIsSubtypeRelationshipSubtypeRole, arTopmostSupertypeModelObject)
 
                     End If
+
+PostRDSProcessing:
                     '=====================================================================================
                     'Broadcast the addition to the DuplexServer
                     If My.Settings.UseClientServer _
@@ -3085,22 +3090,34 @@ Namespace FBM
                 lsTrialFactTypeName = asRootFactTypeName & CStr(aiCounter)
             End If
 
-            Dim lrFactType As New FBM.FactType(Me, lsTrialFactTypeName, True)
-            Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lsTrialFactTypeName, pcenumConceptType.FactType)
+            Try
+                Dim lrFactType As New FBM.FactType(Me, lsTrialFactTypeName, True)
+                Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me, lsTrialFactTypeName, pcenumConceptType.FactType)
 
-            CreateUniqueFactTypeName = lsTrialFactTypeName
+                CreateUniqueFactTypeName = lsTrialFactTypeName
 
-            If Me.FactType.Exists(AddressOf lrFactType.EqualsByName) Or
-               Me.ExistsModelElement(lsTrialFactTypeName) Or
-               Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
-                CreateUniqueFactTypeName = Me.CreateUniqueFactTypeName(asRootFactTypeName, aiCounter + 1)
-            ElseIf abIncludeDatabaseLookup Then
-                If TableFactType.ExistsFactType(lrFactType) Then
+                If Me.FactType.Exists(AddressOf lrFactType.EqualsByName) Or
+                   Me.ExistsModelElement(lsTrialFactTypeName) Or
+                   Me.ModelDictionary.Exists(AddressOf lrDictionaryEntry.EqualsBySymbol) Then
                     CreateUniqueFactTypeName = Me.CreateUniqueFactTypeName(asRootFactTypeName, aiCounter + 1)
+                ElseIf abIncludeDatabaseLookup Then
+                    If TableFactType.ExistsFactType(lrFactType) Then
+                        CreateUniqueFactTypeName = Me.CreateUniqueFactTypeName(asRootFactTypeName, aiCounter + 1)
+                    End If
+                Else
+                    Return lsTrialFactTypeName
                 End If
-            Else
-                Return lsTrialFactTypeName
-            End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return lsTrialFactTypeName & "-ErrorCreatingUniqueName"
+            End Try
 
         End Function
 
@@ -4388,7 +4405,7 @@ Namespace FBM
 
             Try
 
-                Me.ModelError.Clear()
+                Me.ClearModelErrors()
 
                 'lrModelErrors = New List(Of FBM.ModelError)
                 'If lrFact.DoesFactMeetRoleConstraintsOfFactType(lrModelErrors) Then

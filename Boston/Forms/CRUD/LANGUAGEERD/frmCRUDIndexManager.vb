@@ -455,6 +455,19 @@ ProcessExistingIndex:
                                     Call lrRoleConstraint.AddRoleConstraintRole(lrRoleConstraintRole)
                                 End If
                             Next
+                        ElseIf lrRoleConstraint Is Nothing And lrActualIndex.ResponsibleRoleConstraint Is Nothing Then
+                            'Try and Fix the situation.
+                            If lrFactType.IsObjectified And lrActualIndex.IsPrimaryKey And lrFactType.getPreferredInternalUniquenessConstraint IsNot Nothing Then
+                                lrActualIndex.ResponsibleRoleConstraint = lrFactType.getPreferredInternalUniquenessConstraint
+                                For Each lrRole In lrActualIndex.ResponsibleRoleConstraint.Role
+                                    Dim larColumn As List(Of RDS.Column) = lrRole.getResponsibleColumns
+                                    For Each lrColumn In larColumn
+                                        If Not lrActualIndex.Column.Contains(lrColumn) Then
+                                            lrActualIndex.addColumn(lrColumn)
+                                        End If
+                                    Next
+                                Next
+                            End If
                         End If
 #End Region
                 End Select

@@ -36,6 +36,15 @@
         ModelLoadingError = 300
         ModelElementAppearsOnNoPage = 130
         PopulationContainstNULLValueError = 131
+        CMMLModelError = 140 'E.g. When there are errors within an RDS Table. E.g. When Columns have ActiveRole = Nothing etc.
     End Enum
+
+    Public Enum pcenumModelSubErrorType
+        'Start at 500 so as not to confuse with ModelErrors.
+        None = 500
+        RDSRelationOriginDestintaionColumnCountMismatch = 501
+
+    End Enum
+
 
 End Module

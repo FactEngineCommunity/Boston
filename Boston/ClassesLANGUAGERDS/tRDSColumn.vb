@@ -34,6 +34,21 @@ Namespace RDS
         <XmlAttribute()>
         Public Name As String = ""
 
+        <XmlAttribute()>
+        Public ReadOnly Property DBName As String
+            Get
+                Try
+                    Dim lsDBName = Me.ActiveRole.JoinedORMObject.DBName
+                    If lsDBName Is Nothing Or lsDBName = "" Then
+                        lsDBName = Me.Name
+                    End If
+                    Return lsDBName
+                Catch ex As Exception
+                    Return Me.Name
+                End Try
+            End Get
+        End Property
+
         ''' <summary>
         ''' As when "SELECT Horse.Id AS Horse_Id"
         ''' </summary>
@@ -285,7 +300,8 @@ Namespace RDS
         Public Sub New(ByRef arTable As RDS.Table, asName As String,
                        ByRef arResponsibleRole As FBM.Role,
                        ByRef arActiveRole As FBM.Role,
-                       Optional ByVal abIsMandatory As Boolean = False)
+                       Optional ByVal abIsMandatory As Boolean = False,
+                       Optional ByVal asColumnId As String = Nothing)
 
             Me.Model = arTable.Model
             Me.Table = arTable
@@ -294,6 +310,9 @@ Namespace RDS
             Me.ActiveRole = arActiveRole
             Me.Nullable = Not abIsMandatory
             Me.IsMandatory = abIsMandatory
+            If asColumnId IsNot Nothing Then
+                Me.Id = asColumnId
+            End If
 
         End Sub
 

@@ -6,6 +6,8 @@ Public Class frmToolboxErrorList
     Private cManager As CurrencyManager
     Public WithEvents zrModel As FBM.Model
 
+    Public WithEvents mrApplication As tApplication
+
     Private WithEvents HelpProvider As New System.Windows.Forms.HelpProvider
     Private ziSelectedErrorNumber As Integer = 0
     Private mbShowCoreModelErrors As Boolean = False
@@ -32,20 +34,13 @@ Public Class frmToolboxErrorList
     Sub SetupForm()
 
         Try
-            If mbShowCoreModelErrors Then
-                DataGrid_ErrorList.DataSource = Me.zrModel.ModelError
-            Else
-                Dim larModelError = From ModelError In Me.zrModel.ModelError
-                                    Where ModelError.ModelObject IsNot Nothing
-                                    Where ModelError.ModelObject.IsMDAModelElement = False
-                                    Select ModelError
+            Me.LabelModelName.Text = "<Select a Model in the Model Explorer>"
 
-                DataGrid_ErrorList.DataSource = larModelError.ToList
+            If Me.zrModel IsNot Nothing Then
+                Me.LabelModelName.Text = Me.zrModel.Name
             End If
 
-            Me.cManager = CType(DataGrid_ErrorList.BindingContext(Me.zrModel.ModelError), CurrencyManager)
-            Me.DataGrid_ErrorList.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            Me.DataGrid_ErrorList.Refresh()
+            Call Me.DisplayErrorList
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -59,7 +54,45 @@ Public Class frmToolboxErrorList
 
     End Sub
 
-    Sub UpdateErrorList()
+    Private Sub DisplayErrorList()
+
+        Try
+            If mbShowCoreModelErrors Then
+                DataGrid_ErrorList.DataSource = Me.zrModel.ModelError
+            Else
+                Dim larModelError = From ModelError In Me.zrModel.ModelError
+                                    Where ModelError.ModelObject IsNot Nothing
+                                    Where ModelError.ModelObject.IsMDAModelElement = False
+                                    Select ModelError
+
+                Dim larCMMLModelError = From ModelError In Me.zrModel.ModelError
+                                        Where ModelError.ErrorId = pcenumModelErrors.CMMLModelError
+                                        Select ModelError
+
+                Dim larAllErrors As New List(Of FBM.ModelError)
+
+                larAllErrors.AddRange(larModelError.ToList)
+                larAllErrors.AddRange(larCMMLModelError.ToList)
+
+                DataGrid_ErrorList.DataSource = larAllErrors
+            End If
+
+            Me.cManager = CType(DataGrid_ErrorList.BindingContext(Me.zrModel.ModelError), CurrencyManager)
+            Me.DataGrid_ErrorList.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            Me.DataGrid_ErrorList.Refresh()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub UpdateErrorList()
 
         Try
             Call Me.SetupForm()
@@ -159,16 +192,28 @@ Public Class frmToolboxErrorList
                 'Load the ORMDiagrams that relate to the ValueType
                 '  as selectable menuOptions
                 '--------------------------------------------------------        
-                Select Case lrModelError.ModelObject.ConceptType
-                    Case Is = pcenumConceptType.ValueType
-                        larPage = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrModelError.ModelObject)
-                    Case Is = pcenumConceptType.EntityType
-                        larPage = prApplication.CMML.getORMDiagramPagesForEntityType(lrModelError.ModelObject)
-                    Case Is = pcenumConceptType.FactType
-                        larPage = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrModelError.ModelObject)
-                    Case Is = pcenumConceptType.RoleConstraint
-                        larPage = prApplication.CMML.GetORMDiagramPagesForRoleConstraint(lrModelError.ModelObject)
+                Select Case lrModelError.ErrorId
+                    Case Is = pcenumModelErrors.CMMLModelError
+                        Select Case lrModelError.SubErrorId
+                            Case Is = pcenumModelSubErrorType.RDSRelationOriginDestintaionColumnCountMismatch
+                                larPage = prApplication.CMML.getERDiagramPagesForModelElementName(Me.zrModel, CType(lrModelError.CMMLModelElement, RDS.Relation).OriginTable.Name)
+                            Case Else
+
+                        End Select
+
+                    Case Else
+                        Select Case lrModelError.ModelObject.ConceptType
+                            Case Is = pcenumConceptType.ValueType
+                                larPage = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrModelError.ModelObject)
+                            Case Is = pcenumConceptType.EntityType
+                                larPage = prApplication.CMML.getORMDiagramPagesForEntityType(lrModelError.ModelObject)
+                            Case Is = pcenumConceptType.FactType
+                                larPage = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrModelError.ModelObject)
+                            Case Is = pcenumConceptType.RoleConstraint
+                                larPage = prApplication.CMML.GetORMDiagramPagesForRoleConstraint(lrModelError.ModelObject)
+                        End Select
                 End Select
+
 
                 Me.ToolStripMenuItemShowInDiagram.DropDownItems.Clear()
 
@@ -398,6 +443,25 @@ Public Class frmToolboxErrorList
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub mrApplication_WorkingModelChanged() Handles mrApplication.WorkingModelChanged
+
+        Try
+            Me.zrModel = prApplication.WorkingModel
+            Me.LabelModelName.Text = Me.zrModel.Name
+
+            Call Me.DisplayErrorList()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

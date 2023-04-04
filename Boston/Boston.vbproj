@@ -614,6 +614,7 @@
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelValueType.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker131PopulationHasNULLValueError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker130ModelElementAppearsOnNoPage.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker140CMMLModelError.vb" />
     <Compile Include="ClassesLANGUAGEUMLUCD\tUCDActorName.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLModel.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLPage.vb" />

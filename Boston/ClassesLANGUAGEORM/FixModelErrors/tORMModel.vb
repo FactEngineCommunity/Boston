@@ -29,10 +29,12 @@ Namespace FBM
                                 Call Me.InternalUniquenessConstraintsWhereLevelNumbersAreNotCorrect()
                             Case Is = pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
                                 Call Me.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder()
-                            Case Is = pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables
-                                Call Me.RDSTablesWithNoColumnsRemoveThoseTables()
                             Case Is = pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory
                                 Call Me.RDSColumnsThatShouldBeMandatoryMakeMandatory()
+                            Case Is = pcenumModelFixType.RDSColumnsWithoutActiveRoles
+                                Call Me.RDSColumnsWithoutActiveRoles
+                            Case Is = pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables
+                                Call Me.RDSTablesWithNoColumnsRemoveThoseTables()
                             Case Is = pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
                                 Call Me.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing()
                             Case Is = pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
@@ -339,6 +341,35 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub RDSColumnsWithoutActiveRoles()
+
+            Try
+                Dim larColumn = From Table In Me.RDS.Table
+                                From Column In Table.Column
+                                Where Column.ActiveRole Is Nothing
+                                Select Column
+
+                For Each lrColumn In larColumn
+                    If lrColumn.FactType IsNot Nothing And lrColumn.Role IsNot Nothing Then
+                        Dim larCoveredRoles As New List(Of FBM.Role)
+                        Dim larRole As List(Of FBM.Role) = lrColumn.Role.getDownstreamRoleActiveRoles(larCoveredRoles)
+                        If larRole.Count = 1 Then
+                            Call lrColumn.setActiveRole(larRole(0))
+                        End If
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         ''' <summary>

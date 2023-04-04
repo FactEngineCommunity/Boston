@@ -30,8 +30,21 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _SubError_id As pcenumModelSubErrorType = pcenumModelSubErrorType.None
+        Public Property SubErrorId() As pcenumModelSubErrorType
+            Get
+                Return Me._SubError_id
+            End Get
+            Set(value As pcenumModelSubErrorType)
+                Me._SubError_id = value
+            End Set
+        End Property
+
         Public DictionaryEntry As FBM.DictionaryEntry
         Public ModelObject As FBM.ModelObject
+        Public CMMLModelElement As Object = Nothing
 
         Public Sub New()
             '-------------------
@@ -51,10 +64,14 @@ Namespace FBM
                        ByVal asErrorDescription As String,
                        Optional ByRef arDictionaryEntry As FBM.DictionaryEntry = Nothing,
                        Optional ByRef arModelObject As FBM.ModelObject = Nothing,
-                       Optional ByVal abAddToModelElementAndModel As Boolean = False)
+                       Optional ByVal abAddToModelElementAndModel As Boolean = False,
+                       Optional ByVal aiSubErrorId As pcenumModelSubErrorType = pcenumModelSubErrorType.None,
+                       Optional ByRef arCMMLModelElement As Object = Nothing)
 
             Me._error_id = asErrorId
             Me._error_description = asErrorDescription
+            Me._SubError_id = aiSubErrorId
+            Me.CMMLModelElement = arCMMLModelElement
 
             '20220530-VM-Eventually can get rid of Me._error_description = asErrorDescription, above. Try/Catch for now
             Try
@@ -74,9 +91,9 @@ Namespace FBM
                 Me.ModelObject = arModelObject
             End If
 
-            If abAddToModelElementAndModel Then
-                arModelObject._ModelError.Add(Me)
-                arModelObject.Model._ModelError.Add(Me)
+            If abAddToModelElementAndModel And arModelObject IsNot Nothing Then
+                arModelObject._ModelError.AddUnique(Me)
+                arModelObject.Model._ModelError.AddUnique(Me)
             End If
 
         End Sub

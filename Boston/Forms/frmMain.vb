@@ -1149,6 +1149,7 @@ SkipRegistrationChecking:
 
         Try
             child.zrModel = prApplication.WorkingModel
+            child.mrApplication = prApplication
 
             If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
                 '-------------------------------------------------------------

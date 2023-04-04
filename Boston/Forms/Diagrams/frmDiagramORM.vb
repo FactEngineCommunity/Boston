@@ -12669,21 +12669,26 @@ SkipRemovalFromModel:
                 If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
 
                     lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
-                    If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
 
-                        Try
-                            Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                                 Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                                 Select SubtypeRelationshipInstance).First
+                    If lrFactTypeInstance IsNot Nothing Then
+                        If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
 
-                            Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
-                        Catch ex As Exception
-                            'Not a biggie. But shouldn't fail.
-                        End Try
+                            Try
+                                Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                                     Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                                     Select SubtypeRelationshipInstance).First
 
+                                Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                            Catch ex As Exception
+                                'Not a biggie. But shouldn't fail.
+                            End Try
+
+                        End If
+                    Else
+                        prApplication.ThrowErrorMessage("There was an error dropping the Fact Type, " & lrFactTypeReading.FactType.Id & ", on the Page.", pcenumErrorType.Warning,, False, False, True,, True)
                     End If
                 ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
-                    Try
+                        Try
                         lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
 
                         Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship

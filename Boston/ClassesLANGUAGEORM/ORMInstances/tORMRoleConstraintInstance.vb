@@ -1237,15 +1237,27 @@ Namespace FBM
                     Dim lrShape As MindFusion.Diagramming.Shape
                     If Me.IsDeontic Then
                         lrShape = New Shape(
-                                       New ElementTemplate() _
-                                       {
-                                            New LineTemplate(23, 0, 100, 0)
-                                       },
-                                       New ElementTemplate() _
-                                       {
-                                            New ArcTemplate(0, -23, 23, 48, 0, 360)
-                                       },
-                                        Nothing, FillMode.Winding, "test")
+                                    New ElementTemplate() _
+                                    {
+                                        New LineTemplate(0, 0, 100, 0),
+                                        New LineTemplate(100, 0, 100, 100),
+                                        New LineTemplate(100, 100, 0, 100),
+                                        New LineTemplate(0, 100, 0, 0)
+                                    },
+                                    New ElementTemplate() _
+                                    {
+                                    New ArcTemplate(0, 40, 23, 60, 0, 360),
+                                        New LineTemplate(24, 50, 100, 50)
+                                    },
+                                        Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
+
+                        'New ElementTemplate() _
+                        '{
+                        '     New LineTemplate(23, 0, 100, 0)
+                        '},
+                        'New ArcTemplate(0, -23, 23, 48, 0, 360),
+                        lrShape.Decorations(0).Color = Color.Blue
+                        lrShape.Decorations(1).Color = Color.Blue
                     ElseIf Me.IsPreferredIdentifier Then
                         '-------------------------------------
                         'For preferred uniqueness constraint
@@ -1713,16 +1725,45 @@ Namespace FBM
                         Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance = Nothing
 
                         If Me.IsDeontic Then
-                            Me.RoleConstraintRole(0).Shape.Shape = New Shape(
-                                                                   New ElementTemplate() _
-                                                                   {
-                                                                        New LineTemplate(23, 0, 100, 0)
-                                                                   },
-                                                                   New ElementTemplate() _
-                                                                   {
-                                                                        New ArcTemplate(0, -23, 23, 48, 0, 360)
-                                                                   },
-                                                                    Nothing, FillMode.Winding, "test")
+                            'Me.RoleConstraintRole(0).Shape.Shape = New Shape(
+                            '                                       New ElementTemplate() _
+                            '                                       {
+                            '                                            New LineTemplate(23, 0, 100, 0)
+                            '                                       },
+                            '                                       New ElementTemplate() _
+                            '                                       {
+                            '                                            New ArcTemplate(0, -23, 23, 48, 0, 360)
+                            '                                       },
+                            '                                        Nothing, FillMode.Winding, "test")
+
+                            Dim loRectangle As New Rectangle(Me.RoleConstraintRole(0).Shape.Bounds.X,
+                                                             Me.RoleConstraintRole(0).Shape.Bounds.Y,
+                                                             Me.RoleConstraintRole(0).Shape.Bounds.Width,
+                                                             3)
+
+                            Dim lrShape As Shape = New Shape(
+                                        New ElementTemplate() _
+                                        {
+                                            New LineTemplate(0, 0, 100, 0),
+                                            New LineTemplate(100, 0, 100, 100),
+                                            New LineTemplate(100, 100, 0, 100),
+                                            New LineTemplate(0, 100, 0, 0)
+                                        },
+                                        New ElementTemplate() _
+                                        {
+                                        New ArcTemplate(0, 40, 23, 60, 0, 360),
+                                            New LineTemplate(24, 50, 100, 50)
+                                        },
+                                            Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
+
+                            lrShape.Decorations(0).Color = Color.Blue
+                            lrShape.Decorations(1).Color = Color.Blue
+
+                            For Each lrRoleConstraintRole In Me.RoleConstraintRole
+                                lrRoleConstraintRole.Shape.Shape = lrShape
+                            Next
+
+
                         ElseIf Me.IsPreferredIdentifier Then
                             '-------------------------------------
                             'For preferred uniqueness constraint

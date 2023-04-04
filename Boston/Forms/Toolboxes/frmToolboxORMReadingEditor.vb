@@ -115,7 +115,7 @@ Public Class frmToolboxORMReadingEditor
 
             If Me.zrPage.SelectedObject.Count > 0 Then
 
-                Me.LabelFactTypeReadingEditor.Text = "Fact Type Reading Editor: Write a Fact Type Reading such as '"
+                Me.LabelFactTypeReadingEditor.Text = "Write a Fact Type Reading such as '"
                 Dim liInd As Integer
                 For Each lrRoleInstance In Me.zrFactTypeInstance.RoleGroup
                     If lrRoleInstance.JoinedORMObject IsNot Nothing Then
@@ -130,7 +130,7 @@ Public Class frmToolboxORMReadingEditor
                         liInd += 1
                     End If
                 Next
-                Me.LabelFactTypeReadingEditor.Text &= "'"
+                Me.LabelFactTypeReadingEditor.Text &= "'. Then press [Enter] to add the Fact Type Reading to the Fact Type."
 
                 If Me.zrFactTypeInstance.FactType.HasAtLeastOneRolePointingToNothing Then
                     Exit Sub
@@ -532,9 +532,20 @@ Public Class frmToolboxORMReadingEditor
 
     End Function
 
-    Public Sub processFactTypeReading()
+    Public Sub processFactTypeReading(Optional ByVal asFactTypeReading As String = Nothing, Optional ByVal abAskChangeName As Boolean = True)
 
         Try
+
+            Dim lsFactTypeReading As String = asFactTypeReading
+
+            If asFactTypeReading Is Nothing Then
+                lsFactTypeReading = Trim(Me.TextboxReading.Text)
+            End If
+
+            'CodeSafe: Check that the FactTypeReading doesn't already exist.
+            If Me.zrFactType.ExistsFactTypeReadingByText(lsFactTypeReading) Then
+                Exit Sub 'FactTypeReading already exists for the Facttype.
+            End If
 
             With New WaitCursor
 
@@ -556,7 +567,7 @@ Public Class frmToolboxORMReadingEditor
                     larRoleOrder.Add(lrFactType.RoleGroup.Find(Function(x) Not x.HasInternalUniquenessConstraint))
                 End If
 
-                If Me.GetPredicatePartsFromReadingUsingParser(Trim(Me.TextboxReading.Text), lrFactTypeReading, larRoleOrder) Then
+                If Me.GetPredicatePartsFromReadingUsingParser(lsFactTypeReading, lrFactTypeReading, larRoleOrder) Then
                     '-------------------------------------------------
                     'All good. The reading text parsed successfully.
                     '-------------------------------------------------
@@ -612,7 +623,7 @@ Public Class frmToolboxORMReadingEditor
                     Dim lsNewName As String = Me.zrFactTypeInstance.FactType.MakeNameFromFactTypeReadings()
                     Dim lsOldName As String = Me.zrFactTypeInstance.FactType.Id
                     Dim lsMessage = "Change the Fact Type's name to, '" & lsNewName & "'?"
-                    If lsNewName <> lsOldName Then
+                    If lsNewName <> lsOldName And abAskChangeName Then
                         If MsgBox(lsMessage, MsgBoxStyle.DefaultButton2 + MsgBoxStyle.YesNo, "Rename Fact Type?") = DialogResult.Yes Then
 
                             Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
@@ -1109,6 +1120,7 @@ Public Class frmToolboxORMReadingEditor
 
         Try
             Me.AutoComplete.Owner = Me
+            Me.AutoComplete.zrCallingForm = Me
             Me.AutoComplete.Show()
 
             Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
@@ -1215,37 +1227,7 @@ ProcessToken:
                 'Last effort.
                 Call Me.PopulateEnterpriseAwareBasedOnOutstandingModelObjects()
 
-
-                If e.KeyCode = Keys.Down Then
-                    If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        Me.AutoComplete.ListBox.Focus()
-                        Me.AutoComplete.ListBox.SelectedIndex = 0
-                        e.Handled = True
-                    End If
-                End If
-
-                If e.Control Then
-                    If e.KeyValue = Keys.J Then
-                        'Call Me.AddFactTypeReadingsToEnterpriseAware()
-                        Exit Sub
-                    End If
-                End If
-
-                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
-
-                    Me.AutoComplete.Owner = Me
-                    Me.AutoComplete.Show()
-
-                    Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
-                    lo_point.X += Me.TextboxReading.Bounds.X
-                    lo_point.Y += Me.TextboxReading.Bounds.Y
-                    lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
-                    Me.AutoComplete.Location = PointToScreen(lo_point)
-                End If
-
-                If e.KeyCode <> Keys.Down Then
-                    Me.TextboxReading.Focus()
-                End If
+                GoTo CreateSuggestions
             Else
                 '=========================================================================================================================
                 'Load all the MododelObjects of the FactType anyway, because Intellisense for FactTypeReadings doesn't always come up with
@@ -1290,22 +1272,117 @@ ProcessToken:
                     End Select
                 End If
 
-                If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+            End If
 
-                    Me.AutoComplete.Owner = Me
-                    Me.AutoComplete.Show()
+CreateSuggestions:
 
-                    Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
-                    lo_point.X += Me.TextboxReading.Bounds.X
-                    lo_point.Y += Me.TextboxReading.Bounds.Y
-                    lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 6
-                    Me.AutoComplete.Location = PointToScreen(lo_point)
+#Region "Suggestions - AutoCreated"
+            If Trim(Me.TextboxReading.Text).Length >= 0 Then
+
+                Dim lsPredicatePart As String = ""
+                Dim lrSentence As New Language.Sentence("", "")
+                lrSentence.FrontText = ""
+                lrSentence.FollowingText = ""
+
+                Dim lsSentence As String = ""
+
+                Dim larRole As New List(Of FBM.Role)
+                For Each lrRole In Me.zrFactType.RoleGroup
+                    larRole.Add(lrRole)
+                Next
+
+                Dim liInd = 1
+                For Each lrRole As FBM.Role In larRole
+
+                    lsSentence &= lrRole.JoinedORMObject.Id
+
+                    Dim lrPredicatePart As New Language.PredicatePart
+
+                    lrPredicatePart.PreboundText = ""
+                    lrPredicatePart.PostboundText = ""
+                    lrPredicatePart.ObjectName = lrRole.JoinedORMObject.Id
+                    lrSentence.ModelElement.Add(lrPredicatePart.ObjectName)
+
+                    lsPredicatePart = "has"
+                    If lrRole.InternalUniquenessConstraint.Count = 0 And Me.zrFactType.Arity = 2 And liInd > 1 Then
+                        lsPredicatePart = "is of"
+                    End If
+
+                    If liInd = Me.zrFactType.Arity Then
+                        lsPredicatePart = ""
+                    End If
+                    lsSentence &= " " & lsPredicatePart & " "
+
+                    lrPredicatePart.PredicatePartText = lsPredicatePart
+                    lrPredicatePart.SequenceNr = liInd
+                    lrSentence.PredicatePart.Add(lrPredicatePart)
+
+                    liInd += 1
+                Next
+
+                lsSentence = Trim(lsSentence)
+
+                lrSentence.Sentence = lsSentence
+                lrSentence.OriginalSentence = lsSentence
+
+                Dim lrFactTypeReading As FBM.FactTypeReading
+
+                lrFactTypeReading = New FBM.FactTypeReading(Me.zrFactType, larRole, lrSentence)
+
+
+                Dim lsReverseSentence As String = ""
+                Dim lsReversePredicate As String = ""
+
+                If Me.zrFactType.Arity = 2 Then
+                    lsReverseSentence = lrSentence.ModelElement(1)
+                    Select Case lsPredicatePart
+                        Case Is = ""
+                            lsReversePredicate = " is of "
+                            lsReverseSentence &= lsReversePredicate
+                        Case Else
+                            lsReversePredicate = " has "
+                            lsReverseSentence &= lsReversePredicate
+                    End Select
+                    lsReverseSentence &= lrSentence.ModelElement(0)
+
+                    larRole.Reverse()
+                    lrFactTypeReading.ReverseFactTypeReading = New FBM.FactTypeReading(Me.zrFactType, larRole, lrFactTypeReading.CreateFactTypeReadingSentence(larRole, New List(Of String) From {Trim(lsReversePredicate)}))
                 End If
 
-                If e.KeyCode <> Keys.Down Then
-                    Me.TextboxReading.Focus()
-                End If
+                Me.AddEnterpriseAwareItem(lsSentence & Boston.returnIfTrue(Me.zrFactType.Arity = 2, (", " & lsReverseSentence), ""), lrFactTypeReading)
 
+            End If
+#End Region
+
+            If e.KeyCode = Keys.Down Then
+                If Me.AutoComplete.ListBox.Items.Count > 0 Then
+                    Me.AutoComplete.ListBox.Focus()
+                    Me.AutoComplete.ListBox.SelectedIndex = 0
+                    e.Handled = True
+                End If
+            End If
+
+            If e.Control Then
+                If e.KeyValue = Keys.J Then
+                    'Call Me.AddFactTypeReadingsToEnterpriseAware()
+                    Exit Sub
+                End If
+            End If
+
+            If Me.AutoComplete.Enabled And Me.AutoComplete.ListBox.Items.Count > 0 Then
+                Call Me.ShowAutoCompleteTool()
+                'Me.AutoComplete.Owner = Me
+                'Me.AutoComplete.Show()
+
+                'Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
+                'lo_point.X += Me.TextboxReading.Bounds.X
+                'lo_point.Y += Me.TextboxReading.Bounds.Y
+                'lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
+                'Me.AutoComplete.Location = PointToScreen(lo_point)
+            End If
+
+            If e.KeyCode <> Keys.Down Then
+                Me.TextboxReading.Focus()
             End If
 
             If Me.AutoComplete.ListBox.Items.Count > 0 Then

@@ -678,7 +678,7 @@ Public Class frmToolboxEnterpriseExplorer
             'Register the Page so that when Morphing from Diagram to Diagram, Language to Language
             '  i.e. 'Walking the model via LS', then the TreeNode within the Tree can be found
             '----------------------------------------------------------------------------------------
-            prPageNodes.Add(loNode.Tag)
+            prPageNodes.AddUnique(loNode.Tag)
             'Else
             '------------------------------------------------
             'The Page is still valid but does not belong 
@@ -1735,7 +1735,7 @@ Public Class frmToolboxEnterpriseExplorer
                 'Register the Page so that when Morphing from Diagram to Diagram, Language to Language
                 '  i.e. 'Walking the model via LS', then the TreeNode within the Tree can be found
                 '----------------------------------------------------------------------------------------
-                prPageNodes.Add(loNode.Tag)
+                prPageNodes.AddUnique(loNode.Tag)
 
                 If abMakeVisible Then
                     Call loNode.EnsureVisible()
@@ -2500,7 +2500,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                 lr_enterprise_view = Me.AddPageToModel(lrModelTreeNode, lrPage, False, False, False, True)
 
-                prPageNodes.Add(lr_enterprise_view)
+                prPageNodes.AddUnique(lr_enterprise_view)
 
             End If
         Next

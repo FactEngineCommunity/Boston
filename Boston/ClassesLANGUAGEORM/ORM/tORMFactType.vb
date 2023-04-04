@@ -774,6 +774,28 @@ Namespace FBM
 
         End Function
 
+        Public Function ExistsFactTypeReadingByText(ByVal asFactTypeReadingText As String) As Boolean
+
+            Try
+                Dim larFactTypeReading = From FactTypeReading In Me.FactTypeReading
+                                         Where FactTypeReading.GetReadingText = asFactTypeReadingText
+                                         Select FactTypeReading
+
+                Return larFactTypeReading.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' RETURNS TRUE if a Fact Type Reading exists for the Fact Type, and where that Fact Type Reading has the same Roles
         '''   in the same sequence as the supplied Fact Type Reading;
