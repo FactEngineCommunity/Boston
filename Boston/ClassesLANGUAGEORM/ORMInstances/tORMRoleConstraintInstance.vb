@@ -1246,7 +1246,7 @@ Namespace FBM
                                     },
                                     New ElementTemplate() _
                                     {
-                                    New ArcTemplate(0, 40, 23, 60, 0, 360),
+                                    New ArcTemplate(0, 20, 23, 60, 0, 360),
                                         New LineTemplate(24, 50, 100, 50)
                                     },
                                         Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")
@@ -1751,7 +1751,7 @@ Namespace FBM
                                         },
                                         New ElementTemplate() _
                                         {
-                                        New ArcTemplate(0, 40, 23, 60, 0, 360),
+                                        New ArcTemplate(0, 20, 23, 60, 0, 360),
                                             New LineTemplate(24, 50, 100, 50)
                                         },
                                             Nothing, System.Drawing.Drawing2D.FillMode.Winding, "test")

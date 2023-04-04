@@ -550,7 +550,6 @@ Public Class frmToolboxEnterpriseExplorer
 
         'Dim lo_parent_node As TreeNode = Nothing 'Used to see what type of page is being added.
         'lo_parent_node = arTreeNode.Parent
-
         For Each lrPage In arModel.Page
             '-----------------------------------------------------------
             'Check to see that the Language of the Page matches the 

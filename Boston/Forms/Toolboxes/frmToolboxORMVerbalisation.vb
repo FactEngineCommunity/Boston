@@ -300,9 +300,14 @@ Public Class frmToolboxORMVerbalisation
                     lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole)
 
                     If IsSomething(lrFactTypeReading) Then
-                        lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseIndent()
+                    If arRoleConstraint.IsDeontic Then
+                        lrVerbaliser.VerbaliseQuantifier("It is obligatory that each ")
+                    Else
                         lrVerbaliser.VerbaliseQuantifier("Each ")
-                        lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject)
+                    End If
+
+                    lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject)
 
                     If arRoleConstraint.RoleConstraintRole(0).Role.Id = lrFactTypeReading.RoleList(0).Id Then
                         lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
