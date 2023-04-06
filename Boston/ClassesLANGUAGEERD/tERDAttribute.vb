@@ -208,17 +208,18 @@ Namespace ERD
 
         End Sub
 
-        Public Sub New(ByVal asAttributeId As String, ByRef arEntity As ERD.Entity)
+        Public Sub New(ByVal asAttributeId As String, ByRef arEntity As ERD.Entity, Optional arPage As FBM.Page = Nothing)
 
             Me.Id = asAttributeId
             Me.Name = Me.Id
             Me.Entity = arEntity
+            Me.Page = arPage
 
         End Sub
 
         Public Shadows Function Equals(ByVal other As Attribute) As Boolean Implements System.IEquatable(Of Attribute).Equals
 
-            If Me.Entity.Name = other.Entity.Name And Me.Column.Id = other.Column.Id Then
+            If Me.Column.Id = other.Column.Id Then '20230406-VM-Was with "Me.Entity.Name = other.Entity.Name And"
                 Return True
             Else
                 Return False
@@ -272,6 +273,28 @@ Namespace ERD
             Try
                 Dim lsPartOfPrimaryKey As String = ""
                 Dim lsMandatory As String = ""
+
+                If IsSomething(aoChangedPropertyItem) Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+                        Case Is = "DBName"
+                            Call Me.Column.ActiveRole.JoinedORMObject.SetDBName(Me.DBName)
+                        Case Is = "Name"
+                            '-----------------------------------------------------------------------------------------------------------------
+                            'If the Attribute is not part of a Relation, the the Attribute has a corresponding ValueType at the Model level.
+                            '  The Name/Id of that ValueType must be updated as well.
+                            '  This is done automatically when the Concept of the Attribute is updated/switchec.
+                            '-----------------------------------------------------------------------------------------------------------------
+                            If Me.Name.Length > 0 Then
+                                Call Me.Column.setName(Me.Name)
+                            Else
+                                Me.AttributeName = Me.Column.Name
+                                MsgBox("You can't have a zero length Attribute name.")
+                            End If
+                        Case Is = "IsDerivationParameter"
+                            Call Me.Column.setIsDerivationParameter(Me.IsDerivationParameter)
+                    End Select
+                End If
+
 
                 'CodeSafe
                 If Me.Cell Is Nothing Then Exit Sub
@@ -358,27 +381,6 @@ Namespace ERD
 
                 If Me.Page.Diagram IsNot Nothing Then
                     Me.Page.Diagram.Invalidate()
-                End If
-
-                If IsSomething(aoChangedPropertyItem) Then
-                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
-                        Case Is = "DBName"
-                            Call Me.Column.ActiveRole.JoinedORMObject.SetDBName(Me.DBName)
-                        Case Is = "Name"
-                            '-----------------------------------------------------------------------------------------------------------------
-                            'If the Attribute is not part of a Relation, the the Attribute has a corresponding ValueType at the Model level.
-                            '  The Name/Id of that ValueType must be updated as well.
-                            '  This is done automatically when the Concept of the Attribute is updated/switchec.
-                            '-----------------------------------------------------------------------------------------------------------------
-                            If Me.Name.Length > 0 Then
-                                Call Me.Column.setName(Me.Name)
-                            Else
-                                Me.AttributeName = Me.Column.Name
-                                MsgBox("You can't have a zero length Attribute name.")
-                            End If
-                        Case Is = "IsDerivationParameter"
-                            Call Me.Column.setIsDerivationParameter(Me.IsDerivationParameter)
-                    End Select
                 End If
 
                 Try
@@ -668,6 +670,20 @@ Namespace ERD
 
         End Sub
 
+        Private Sub ActiveRole_DBNameChanged(asDBName As String) Handles ActiveRole.DBNameChanged
+
+            Try
+                Me._DBName = asDBName
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

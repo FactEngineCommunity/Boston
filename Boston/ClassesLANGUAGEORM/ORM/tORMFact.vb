@@ -523,7 +523,7 @@ Namespace FBM
                 End If
 
                 For Each lrFactData In larFactData
-                    Call lrFactData.RemoveFromModel(False, False, abDoDatabaseProcessing, abDeleteAll)
+                    Call lrFactData.RemoveFromModel(False, False, abDoDatabaseProcessing And Not Me.Model.StoreAsXML, abDeleteAll)
                 Next
 
                 Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Symbol, pcenumConceptType.Fact)

@@ -48,6 +48,7 @@
         RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations
         RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations
         RDSTablesWithNoColumnsRemoveThoseTables
+        RDSTablesWhereColumnAppearsTwiceForSameFactType
         RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
         SubtypeRelationshipWithNoFactType
     End Enum

@@ -938,7 +938,19 @@ Public Class frmDiagramORM
                 End If
 
                 Select Case lrModelObject.ConceptType
+                    Case Is = pcenumConceptType.Entity, pcenumConceptType.PGSNode
+
+                        lrModelObject = lrDraggedNode.Tag.FBMModelElement
+
+                        Select Case lrModelObject.GetType
+                            Case Is = GetType(FBM.EntityType)
+                                GoTo ProcessEntityType
+                            Case Is = GetType(FBM.FactType)
+                                GoTo ProcessFactType
+                        End Select
+
                     Case Is = pcenumConceptType.EntityType 'Entity Type
+ProcessEntityType:
 #Region "EntityType"
                         Dim lrEntityType As New FBM.EntityType
 
@@ -1042,6 +1054,7 @@ Public Class frmDiagramORM
                         Exit Sub
 #End Region
                     Case Is = pcenumConceptType.FactType 'Fact Type
+ProcessFactType:
 #Region "FactType"
                         lrFactType = New FBM.FactType
 

@@ -376,6 +376,11 @@ Public Class ODBCDatabaseReverseEngineer
 
                         lrModelElement2 = Me.Model.GetModelObjectByName(lrColumn.Name)
 
+                        If lrModelElement2 Is Nothing Then
+                            Me.ReportError("Cannot find a Model Element in the Model with the name, " & lrColumn.Name & ", for addition to the " & lrModelTable.Name & " table.")
+                            GoTo NextValueTypeColumn
+                        End If
+
                         larModelElement.Add(lrModelElement1)
                         larModelElement.Add(lrModelElement2)
 
@@ -415,7 +420,7 @@ Public Class ODBCDatabaseReverseEngineer
                     Else
                         'Throw warning
                     End If
-
+NextValueTypeColumn:
                 Next
                 Call Me.AppendProgress(".")
             Next

@@ -469,7 +469,7 @@ Public Class frmToolboxTableData
                     If lrPKColumn.Name = lsColumnName Then 'Me.mrRecordset.Columns(e.ColumnIndex) 
                         lsValue = lsOldValue
                     Else
-                        lsValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data 'Me.mrRecordset.Columns(liColumnIndex)
+                        lsValue = Me.mrRecordset.Facts(e.RowIndex)(lrPKColumn.Name).Data 'Me.mrRecordset.Columns(liColumnIndex)
                     End If
 
                     lrPKColumn.TemporaryData = lsValue

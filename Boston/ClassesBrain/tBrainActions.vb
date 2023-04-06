@@ -767,6 +767,28 @@ Partial Public Class tBrain
                         lrJoinedFactType = New FBM.FactType(Me.Model, lrResolvedWord.Word, True)
                         lrJoinedFactType = Me.Model.FactType.Find(AddressOf lrJoinedFactType.Equals)
 
+                        If lrJoinedFactType Is Nothing Then
+
+                            If Me.Model.ModelElementIsGeneralConceptOnly(Trim(lrResolvedWord.Word)) Then
+                                Select Case My.Settings.DefaultGeneralConceptToObjectTypeConversion
+                                    Case Is = "Value Type"
+                                        Call Me.Model.CreateValueType(lrResolvedWord.Word, True, ,,, abBroadcastInterfaceEvent)
+                                    Case Is = "Entity Type"
+                                        Call Me.Model.CreateEntityType(lrResolvedWord.Word, True, abBroadcastInterfaceEvent, False, True)
+                                End Select
+                                GoTo ModelElementFound
+                            Else
+                                lsMessage = "Cannot find a Model Element/Object Type called, " & lrResolvedWord.Word & "."
+                                If arDSCError IsNot Nothing Then
+                                    arDSCError.Success = False
+                                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                                    arDSCError.ErrorString = lsMessage
+                                End If
+                                Me.send_data(lsMessage)
+                                Return False
+                            End If
+                        End If
+
                         If lrJoinedFactType.IsObjectified Then
                             larModelObject.Add(lrJoinedFactType)
                         Else
@@ -784,6 +806,7 @@ Partial Public Class tBrain
                 Else
                     larModelObject.Add(lrEntityType)
                 End If
+ModelElementFound:
             Next
 
             Dim lrModelObject As FBM.ModelObject
@@ -800,6 +823,17 @@ Partial Public Class tBrain
             If arQuestion.sentence.PredicatePart.Count = 1 Then
                 lsFactTypeName &= Viev.Strings.MakeCapCamelCase(arQuestion.sentence.PredicatePart(0).PredicatePartText)
                 lsFactTypeName = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            End If
+
+            If lsFactTypeName.Length > 100 Then
+                lsMessage = "The maximum Fact Type name length is 100 characters. Try using shorter Model Element/Object Type names."
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDSCError.ErrorString = lsMessage
+                End If
+                Me.send_data(lsMessage)
+                Return False
             End If
 
             '==========================================================================
@@ -1005,6 +1039,7 @@ EndProcessing:
         Dim lsResolvedModelElementName As String
         Dim lrModelObject As FBM.ModelObject
         Dim larModelObject As New List(Of FBM.ModelObject)
+        Dim lsMessage As String
 
         Try
             Me.Model = prApplication.WorkingModel
@@ -1028,6 +1063,17 @@ EndProcessing:
             Next
 
             lsFactTypeName = Me.Model.CreateUniqueFactTypeName(lsFactTypeName, 0, True)
+
+            If lsFactTypeName.Length > 100 Then
+                lsMessage = "The maximum Fact Type name length is 100 characters. Try using shorter Model Element/Object Type names."
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    arDSCError.ErrorString = lsMessage
+                End If
+                Me.send_data(lsMessage)
+                Return False
+            End If
 
             lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , False,  ,, abBroadcastInterfaceEvent)
 
@@ -1168,7 +1214,6 @@ EndProcessing:
 #End Region
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

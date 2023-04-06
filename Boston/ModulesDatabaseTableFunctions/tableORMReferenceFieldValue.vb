@@ -163,7 +163,7 @@ Namespace TableReferenceFieldValue
 
             Dim liInd As Integer = 0
             Dim loField As New Object
-            Dim loTuple As New DynamicClassLibrary.Factory.tClass
+            Dim loTuple As New tClass
             Dim loTupleObject As New Object
             Dim laaReferenceFieldList As New List(Of String)
             Dim lsFieldName As String = ""

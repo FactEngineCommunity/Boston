@@ -57,6 +57,9 @@ Public Class frmToolboxErrorList
     Private Sub DisplayErrorList()
 
         Try
+            'CodeSafe
+            If Me.IsDisposed Then Exit Sub
+
             If mbShowCoreModelErrors Then
                 DataGrid_ErrorList.DataSource = Me.zrModel.ModelError
             Else
@@ -346,6 +349,8 @@ Public Class frmToolboxErrorList
     End Sub
 
     Private Sub zrModel_ModelErrorAdded() Handles zrModel.ModelErrorAdded
+
+        If Me.IsDisposed Then Exit Sub
 
         Call Me.UpdateErrorList()
 

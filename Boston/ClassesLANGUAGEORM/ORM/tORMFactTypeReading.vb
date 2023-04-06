@@ -288,33 +288,47 @@ Namespace FBM
 
             Dim liInd As Integer = 0
 
-            If Me.PredicatePart.Count <> other.PredicatePart.Count Then
-                Return False
-            End If
-
-            For Each lrPredicatePart In Me.PredicatePart
-
-                If lrPredicatePart.Role.JoinedORMObject.Id <> other.PredicatePart(liInd).Role.JoinedORMObject.Id Then
+            Try
+                If Me.PredicatePart.Count <> other.PredicatePart.Count Then
                     Return False
                 End If
 
-                If abUseFastenshtein Then
-                    If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) > 4) Or
-                     (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
-                     (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
-                        Return False
-                    End If
-                Else
-                    If (lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText) Or
-                     (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
-                     (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
-                        Return False
-                    End If
-                End If
-                liInd += 1
-            Next
+                For Each lrPredicatePart In Me.PredicatePart
 
-            Return True
+                    If other.PredicatePart(liInd).Role.JoinedORMObject Is Nothing Then
+                        Return False
+                    ElseIf lrPredicatePart.Role.JoinedORMObject.Id <> other.PredicatePart(liInd).Role.JoinedORMObject.Id Then
+                        Return False
+                    End If
+
+                    If abUseFastenshtein Then
+                        If (Fastenshtein.Levenshtein.Distance(lrPredicatePart.PredicatePartText, other.PredicatePart(liInd).PredicatePartText) > 4) Or
+                         (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
+                         (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
+                            Return False
+                        End If
+                    Else
+                        If (lrPredicatePart.PredicatePartText <> other.PredicatePart(liInd).PredicatePartText) Or
+                         (lrPredicatePart.PreBoundText <> other.PredicatePart(liInd).PreBoundText) Or
+                         (lrPredicatePart.PostBoundText <> other.PredicatePart(liInd).PostBoundText) Then
+                            Return False
+                        End If
+                    End If
+                    liInd += 1
+                Next
+
+                Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
 
         End Function
 

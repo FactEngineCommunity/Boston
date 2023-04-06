@@ -80,6 +80,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.DomainUpDownFactEngineDefaultQueryResultLimit = New System.Windows.Forms.DomainUpDown()
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.GroupBoxERDiagrams = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName = New System.Windows.Forms.CheckBox()
         Me.CheckBoxHideUnknownPredicates = New System.Windows.Forms.CheckBox()
         Me.TabPage6 = New System.Windows.Forms.TabPage()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
@@ -108,7 +109,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -727,6 +728,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxERDiagrams.TabIndex = 0
         Me.GroupBoxERDiagrams.TabStop = False
         '
+        'CheckBoxImportColumnNameEqualsFKReferencedEntityName
+        '
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.AutoSize = True
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Location = New System.Drawing.Point(17, 42)
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Name = "CheckBoxImportColumnNameEqualsFKReferencedEntityName"
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Size = New System.Drawing.Size(334, 17)
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.TabIndex = 1
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Text = "Import/Export - Column Name equals FK Referenced Entity Name"
+        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.UseVisualStyleBackColor = True
+        '
         'CheckBoxHideUnknownPredicates
         '
         Me.CheckBoxHideUnknownPredicates.AutoSize = True
@@ -923,6 +934,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxModelling
         '
+        Me.GroupBoxModelling.Controls.Add(Me.CheckBoxModelllingUseThreadingLoadingXMLPage)
         Me.GroupBoxModelling.Controls.Add(Me.ComboBoxDefaultGeneralConceptConversion)
         Me.GroupBoxModelling.Controls.Add(Me.LabelPromptNLAPIConvertsGeneralConceptsTo)
         Me.GroupBoxModelling.Controls.Add(Me.TextBoxDefaultReferenceMode)
@@ -1013,15 +1025,15 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxImportColumnNameEqualsFKReferencedEntityName
+        'CheckBoxModelllingUseThreadingLoadingXMLPage
         '
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.AutoSize = True
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Location = New System.Drawing.Point(17, 42)
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Name = "CheckBoxImportColumnNameEqualsFKReferencedEntityName"
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Size = New System.Drawing.Size(334, 17)
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.TabIndex = 1
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Text = "Import/Export - Column Name equals FK Referenced Entity Name"
-        Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.UseVisualStyleBackColor = True
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.AutoSize = True
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Location = New System.Drawing.Point(18, 123)
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Name = "CheckBoxModelllingUseThreadingLoadingXMLPage"
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Size = New System.Drawing.Size(190, 17)
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.TabIndex = 5
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Text = "Use Threading Loading XML Page"
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -1165,4 +1177,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxFactEngineUseGPT3 As CheckBox
     Friend WithEvents TextBoxFactEngineOpenAIAPIKey As TextBox
     Friend WithEvents CheckBoxImportColumnNameEqualsFKReferencedEntityName As CheckBox
+    Friend WithEvents CheckBoxModelllingUseThreadingLoadingXMLPage As CheckBox
 End Class

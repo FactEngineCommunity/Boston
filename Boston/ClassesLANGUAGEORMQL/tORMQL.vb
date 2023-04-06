@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports DynamicClassLibrary.Factory
 
 Namespace ORMQL
 
@@ -2048,7 +2049,17 @@ Namespace ORMQL
                     End If
                 End If
             Else
+                Dim lbDoDatabaseProcessingTemp As Boolean = pbDoDatabaseProcessing
+                If Me.Model.StoreAsXML Then
+                    pbDoDatabaseProcessing = False
+                End If
+
                 lrFactType.RemoveFactByData(lrFact, True, pbDoDatabaseProcessing)
+
+                pbDoDatabaseProcessing = lbDoDatabaseProcessingTemp
+                If pbDoDatabaseProcessing And Me.Model.StoreAsXML Then
+                    Call Me.Model.Save()
+                End If
             End If
 
             Return True
@@ -2168,8 +2179,8 @@ Namespace ORMQL
             '-------------------------------------------
             'Create the DynamicClass within the Factory
             '-------------------------------------------
-            Dim lrClass As New DynamicClassLibrary.Factory.tClass
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
+            Dim lrClass As New tClass
+            lrClass.add_attribute(New tAttribute("USERTABLENAME", GetType(List(Of String))))
 
 
             '-------------------------
@@ -2225,10 +2236,10 @@ Namespace ORMQL
             '-------------------------------------------
             'Create the DynamicClass within the Factory
             '-------------------------------------------
-            Dim lrClass As New DynamicClassLibrary.Factory.tClass
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(List(Of String))))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("COLUMNNAME", GetType(List(Of String))))
-            lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(List(Of String))))
+            Dim lrClass As New tClass
+            lrClass.add_attribute(New tAttribute("USERTABLENAME", GetType(List(Of String))))
+            lrClass.add_attribute(New tAttribute("COLUMNNAME", GetType(List(Of String))))
+            lrClass.add_attribute(New tAttribute("VALUE", GetType(List(Of String))))
 
             '-------------------------
             'Create the DynamicObject
@@ -2244,12 +2255,12 @@ Namespace ORMQL
             '----------------------------------
             Call Me.GetParseTreeTokensReflection(lrParseValuesObject, Me.Parsetree.Nodes(0))
 
-            Dim lrDynamicClass As New DynamicClassLibrary.Factory.tClass
+            Dim lrDynamicClass As New tClass
             Dim lsAttributeName As String
             For Each lsAttributeName In lrParseValuesObject.COLUMNNAME
-                lrDynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsAttributeName, GetType(String)))
+                lrDynamicClass.add_attribute(New tAttribute(lsAttributeName, GetType(String)))
             Next
-            lrDynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("ConceptType", GetType(Integer)))
+            lrDynamicClass.add_attribute(New tAttribute("ConceptType", GetType(Integer)))
 
             lrDynamicObject = lrDynamicClass.clone
 

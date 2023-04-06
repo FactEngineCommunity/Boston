@@ -3819,7 +3819,11 @@ SkipOutputChannel:
             If Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree) Then
                 Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True, lrDuplexServiceClientError)
             Else
-                lrDuplexServiceClientError = New DuplexServiceClient.DuplexServiceClientError(False, [Interface].publicConstants.pcenumErrorType.SyntaxError, "Syntax Error")
+                Dim lsErrorMessage = ""
+                If Me.VAQLParsetree.Errors.Count > 0 Then
+                    lsErrorMessage = Me.VAQLParsetree.Errors(0).Message
+                End If
+                lrDuplexServiceClientError = New DuplexServiceClient.DuplexServiceClientError(False, [Interface].publicConstants.pcenumErrorType.SyntaxError, "Syntax Error: " & lsErrorMessage)
             End If
 
             Return lrDuplexServiceClientError

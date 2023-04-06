@@ -1086,6 +1086,70 @@ Public Class frmDiagramPGS
                             Call lrToolboxForm.VerbaliseColumn(e.Cell.Tag)
                     End Select
                 End If
+
+                '-------------------------------------------------------
+                'ORM Reading Editor
+                '-------------------------------------------------------
+                Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+                If IsSomething(lrORMReadingEditor) Then
+
+                    lrORMReadingEditor.zrPage = Me.zrPage
+
+                    If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
+
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+                        Dim lrFactType As FBM.FactType = Nothing
+
+                        If lrAttribute.Column.FactType IsNot Nothing Then
+                            lrFactType = lrAttribute.Column.FactType
+                        Else
+                            lrFactType = lrAttribute.Column.Role.FactType
+                        End If
+
+                        If Control.ModifierKeys = Keys.Control And lrFactType.IsObjectified Then
+
+                            Dim larLinkFactType = From LinkFactType In lrFactType.getLinkFactTypes
+                                                  Where LinkFactType.LinkFactTypeRole Is lrAttribute.Column.Role
+                                                  Select LinkFactType
+
+                            If larLinkFactType.Count = 0 Then GoTo SkipORMReadingEditor
+
+                            lrFactTypeInstance = larLinkFactType(0).CloneInstance(Me.zrPage, False)
+
+
+                        ElseIf lrAttribute.Column.FactType IsNot Nothing Then
+                            lrFactTypeInstance = lrAttribute.Column.FactType.CloneInstance(Me.zrPage, False)
+                        Else
+                            lrFactTypeInstance = lrAttribute.Column.Role.FactType.CloneInstance(Me.zrPage, False)
+                        End If
+
+                        If lrFactTypeInstance Is Nothing Then GoTo SkipORMReadingEditor
+
+                        If lrAttribute.Column.FactType IsNot Nothing Then
+                            lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                            Call lrORMReadingEditor.SetupForm()
+                        Else
+                            '-------------------------------------------------------------------------
+                            'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                            '-------------------------------------------------------------------------
+                            lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance()
+                            lrORMReadingEditor.zrFactTypeInstance = Nothing
+                            lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                            lrORMReadingEditor.DataGrid_Readings.Refresh()
+                            lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                            lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                            lrORMReadingEditor.LabelFactTypeName.Text = "No Fact Type Selected"
+                        End If
+                    End If
+
+                End If
+SkipORMReadingEditor:
+
+
+
             ElseIf e.MouseButton = MouseButton.Right Then
                 ContextMenuStripAttribute.Show(Me.DiagramView, Me.DiagramView.DocToClient(e.MousePosition))
             End If

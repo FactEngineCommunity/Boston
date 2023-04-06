@@ -3836,7 +3836,7 @@ SaveModel:
                     '-----------------------------------------------------
                     'Setup the Class to display the SignatureResolutions
                     '-----------------------------------------------------
-                    Dim lrSignatureResolutionClass As New DynamicClassLibrary.Factory.tClass
+                    Dim lrSignatureResolutionClass As New tClass
                     Dim loTuple As New Object
                     lrSignatureResolutionClass.add_attribute(New tAttribute("CopiedModelObjectName", GetType(String)))
                     lrSignatureResolutionClass.add_attribute(New tAttribute("NewModelObjectName", GetType(String)))

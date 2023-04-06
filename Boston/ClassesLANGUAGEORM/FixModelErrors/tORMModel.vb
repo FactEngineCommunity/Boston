@@ -37,6 +37,8 @@ Namespace FBM
                                 Call Me.RDSTablesWithNoColumnsRemoveThoseTables()
                             Case Is = pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
                                 Call Me.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing()
+                            Case Is = pcenumModelFixType.RDSTablesWhereColumnAppearsTwiceForSameFactType
+                                Call Me.RDSTablesWhereColumnAppearsTwiceForSameFactType
                             Case Is = pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
                                 Call Me.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat()
                             Case Is = pcenumModelFixType.DuplicateFactsRemoveDuplicates
@@ -396,6 +398,38 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub RDSTablesWhereColumnAppearsTwiceForSameFactType()
+
+            Try
+                Dim larDuplicateColumn = From Table In Me.RDS.Table
+                                         Where Table.FBMModelElement.GetType <> GetType(FBM.FactType)
+                                         From Column In Table.Column.GroupBy(Function(x) New With {.TableName = x.Table.Name, .FactTypeId = x.FactType.Id, .RoleId = x.Role.Id, .ActiveRoleId = x.ActiveRole.Id}) _
+                                                                    .Where(Function(g) g.Count() > 1) _
+                                                                    .Select(Function(g) g)
+                                         Select Column
+
+
+                For Each lrColumnDef In larDuplicateColumn.ToList
+                    Debugger.Break()
+                    'Dim lrColumn = lrColumnDef.Table.Column.Find(Function(x) x.Role.Id = lrColumnDef.RoleId
+                    '                                             And x.ActiveRole.Id = lrColumnDef.ActiveRoleId 
+                    '                                             And x.FactType.Id = lrColumnDef.FactTypeId)
+                    'Call lrColumn.Table.removeColumn(lrColumn)
+                Next
+
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         ''' <summary>
@@ -808,6 +842,15 @@ SkipColumn2:
                             'Couldn't fix it.
                         End Try
                     End If
+                Next
+
+                Dim larExcessOriginColumns = (From OriginColumn In lrRDSRelation.OriginColumns
+                                              Select OriginColumn.ActiveRole.Id).ToList.Except(From DestinationColumn In lrRDSRelation.DestinationColumns
+                                                                                               Select DestinationColumn.ActiveRole.Id).ToList
+
+                For Each lsActiveRoleId In larExcessOriginColumns
+                    Dim lrColumn As RDS.Column = lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lsActiveRoleId)
+                    Call lrRDSRelation.RemoveOriginColumn(lrColumn)
                 Next
 
                 '20220726-VM-Doesn't seem to work.

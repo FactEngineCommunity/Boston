@@ -1571,7 +1571,7 @@ Namespace FactEngine
             Dim lsSQLQuery As String
 
             lsSQLQuery = "UPDATE " & asTableName & vbCrLf
-            lsSQLQuery &= " SET " & arColumn.Name & " = " & vbCrLf
+            lsSQLQuery &= " SET " & arColumn.Name & " = "
             lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "")
             lsSQLQuery &= asNewValue
             lsSQLQuery &= Boston.returnIfTrue(arColumn.DataTypeIsTextOrDate, "'", "") & vbCrLf

@@ -1135,35 +1135,39 @@ SkipModelNote:
             Dim lrModel As FBM.Model = arModel
             Dim loBackgroundWorker As System.ComponentModel.BackgroundWorker = aoBackgroundWorker
             Try
-                'For Each lrXMLPage In Me.ORMDiagram
-                '    lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
-                '    If lrPage Is Nothing Then
-                '        lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
-                '    Else
-                '        Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage)
-                '    End If
-
-                '    lrPage.Loaded = True
-                '    lrPage.IsDirty = True
-                '    lrModel.Page.AddUnique(lrPage)
-                'Next 'XMLModel.Page
-
-                Parallel.ForEach(Me.ORMDiagram,
-                                 Sub(lrXMLPage As XMLModel.Page)
-                                     lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
-                                     If lrPage Is Nothing Then
-                                         lrPage = Me.MapToFBMPage(lrXMLPage, lrModel,,, True)
-                                     Else
-                                         If Not lrPage.Loaded Then
-                                             Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker, True)
+                If My.Settings.ModelingUseThreadedXMLPageLoading Then
+                    Parallel.ForEach(Me.ORMDiagram,
+                                     Sub(lrXMLPage As XMLModel.Page)
+                                         lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
+                                         If lrPage Is Nothing Then
+                                             lrPage = Me.MapToFBMPage(lrXMLPage, lrModel,,, True)
+                                         Else
+                                             If Not lrPage.Loaded Then
+                                                 Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker, True)
+                                             End If
                                          End If
-                                     End If
 
-                                     lrPage.Loaded = True
-                                     lrPage.IsDirty = True
-                                     lrModel.Page.AddUnique(lrPage)
+                                         lrPage.Loaded = True
+                                         lrPage.IsDirty = True
+                                         lrModel.Page.AddUnique(lrPage)
 
-                                 End Sub)
+                                     End Sub)
+
+                Else
+
+                    For Each lrXMLPage In Me.ORMDiagram
+                        lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
+                        If lrPage Is Nothing Then
+                            lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                        Else
+                            Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker, False)
+                        End If
+
+                        lrPage.Loaded = True
+                        lrPage.IsDirty = True
+                        lrModel.Page.AddUnique(lrPage)
+                    Next 'XMLModel.Page
+                End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String

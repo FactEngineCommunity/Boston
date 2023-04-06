@@ -1,5 +1,6 @@
 ﻿Imports System.ComponentModel
 Imports System.Reflection
+Imports DynamicClassLibrary.Factory
 
 Namespace ORMQL
     Public Class RecordsetDataGridList
@@ -7,7 +8,7 @@ Namespace ORMQL
 
         Public mrRecordset As ORMQL.Recordset
         Public mrTable As RDS.Table
-        Private DynamicClass As DynamicClassLibrary.Factory.tClass
+        Private DynamicClass As tClass
         Public DynamicObject As Object
 
 
@@ -17,22 +18,22 @@ Namespace ORMQL
             Me.mrRecordset = arRecordset
             Me.mrTable = arTable
 
-            Me.DynamicClass = New DynamicClassLibrary.Factory.tClass
+            Me.DynamicClass = New tClass
             For Each lsColumn In Me.mrRecordset.Columns
 
                 Dim lsColumnName As String
                 Try
                     lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
                 Catch ex As Exception
-                    lsColumnName = lsColumn
+                    lsColumnName = Trim(lsColumn)
                 End Try
 
 
-                Select Case lsColumn
+                Select Case lsColumnName
                     Case Is = "Date"
-                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("[" & lsColumnName & "]", GetType(String)))
+                        Me.DynamicClass.add_attribute(New tAttribute("[" & lsColumnName & "]", GetType(Date)))
                     Case Else
-                        Me.DynamicClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute(lsColumnName, GetType(String)))
+                        Me.DynamicClass.add_attribute(New tAttribute(lsColumnName, GetType(String)))
                 End Select
             Next
             Me.DynamicObject = Me.DynamicClass.clone()

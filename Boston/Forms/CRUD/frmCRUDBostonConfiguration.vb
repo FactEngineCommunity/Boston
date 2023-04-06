@@ -120,6 +120,7 @@ Public Class frmCRUDBostonConfiguration
             Me.CheckBoxUseDefaultReferenceMode.Checked = My.Settings.UseDefaultReferenceModeNewEntityTypes
             Me.TextBoxDefaultReferenceMode.Text = Trim(My.Settings.DefaultReferenceMode)
             Me.ComboBoxDefaultGeneralConceptConversion.SelectedIndex = Me.ComboBoxDefaultGeneralConceptConversion.Items.IndexOf(My.Settings.DefaultGeneralConceptToObjectTypeConversion)
+            Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Checked = My.Settings.ModelingUseThreadedXMLPageLoading
 
             'Code Generation
             Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked = My.Settings.CodeGenerationUseSquareBracketsSQLTableNames
@@ -234,6 +235,7 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.UseDefaultReferenceModeNewEntityTypes = Me.CheckBoxUseDefaultReferenceMode.Checked
                 My.Settings.DefaultReferenceMode = Trim(Me.TextBoxDefaultReferenceMode.Text)
                 My.Settings.DefaultGeneralConceptToObjectTypeConversion = Me.ComboBoxDefaultGeneralConceptConversion.SelectedItem.ToString
+                My.Settings.ModelingUseThreadedXMLPageLoading = Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Checked
 
                 'CodeGeneration
                 'Code Generation

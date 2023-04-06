@@ -67,6 +67,10 @@ Public Class frmFixModelErrors
                                                                   "RDS Columns That Should Be Mandatory. Make Mandatory.",
                                                                   pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory))
 
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWhereColumnAppearsTwiceForSameFactType,
+                                                                  "RDS Tables Where The Same Column Appears Twice For The Same Fact Type, Role, and Active Role. FixThat.",
+                                                                  pcenumModelFixType.RDSTablesWhereColumnAppearsTwiceForSameFactType))
+
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat,
                                                                   "RDS Tables Where The Number Of PrimaryKey Columns Does Not Match The Number Of Roles In The PreferredIdentifier. FixThat.",
                                                                   pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat))

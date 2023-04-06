@@ -524,12 +524,14 @@ Public Class frmToolboxModelDictionary
 
             If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
 
-            Select Case e.Node.Tag.GetType.ToString
+            Dim lrDiagramElement As Object = e.Node.Tag 'Can be Tables/NodeTypes, Attributes/Properties or ORM Model Elements.
+
+            Select Case lrDiagramElement.GetType.ToString
                 Case Is = GetType(FBM.DictionaryEntry).ToString
 
-                    Dim lrModelElement As New FBM.ModelObject(e.Node.Tag.Symbol, pcenumConceptType.GeneralConcept)
+                    Dim lrModelElement As New FBM.ModelObject(lrDiagramElement.Symbol, pcenumConceptType.GeneralConcept)
                     lrModelElement.Model = Me.zrLoadedModel
-                    Dim lrModelDictionaryEntry As FBM.DictionaryEntry = e.Node.Tag
+                    Dim lrModelDictionaryEntry As FBM.DictionaryEntry = lrDiagramElement
                     lrModelElement.ShortDescription = lrModelDictionaryEntry.ShortDescription
                     lrModelElement.LongDescription = lrModelDictionaryEntry.LongDescription
 
@@ -541,7 +543,7 @@ Public Class frmToolboxModelDictionary
                     End If
                 Case Is = GetType(FBM.ValueType).ToString
 #Region "ValueType"
-                    lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, e.Node.Tag.Id, pcenumConceptType.ValueType)
+                    lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, lrDiagramElement.Id, pcenumConceptType.ValueType)
                     lrDictionaryEntry = Me.zrLoadedModel.AddModelDictionaryEntry(lrDictionaryEntry)
 
                     Me.ToolStripStatusLabelRealisationsCount.Text = lrDictionaryEntry.Realisations.Count
@@ -551,19 +553,19 @@ Public Class frmToolboxModelDictionary
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
                     If IsSomething(lrORMToolboxVerbalisation) Then
-                        lrORMToolboxVerbalisation.VerbaliseValueType(e.Node.Tag)
+                        lrORMToolboxVerbalisation.VerbaliseValueType(lrDiagramElement)
                     End If
 
                     '--------------------------------------------
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
                     If IsSomething(lrModelElementDescriptionsEditor) Then
-                        Call lrModelElementDescriptionsEditor.setDescriptions(e.Node.Tag)
+                        Call lrModelElementDescriptionsEditor.setDescriptions(lrDiagramElement)
                     End If
 #End Region
                 Case Is = GetType(FBM.EntityType).ToString
 #Region "EntityType"
-                    lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, e.Node.Tag.Id, pcenumConceptType.EntityType)
+                    lrDictionaryEntry = New FBM.DictionaryEntry(Me.zrLoadedModel, lrDiagramElement.Id, pcenumConceptType.EntityType)
                     lrDictionaryEntry = Me.zrLoadedModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
 
                     Me.ToolStripStatusLabelRealisationsCount.Text = lrDictionaryEntry.Realisations.Count
@@ -573,14 +575,14 @@ Public Class frmToolboxModelDictionary
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
                     If IsSomething(lrORMToolboxVerbalisation) Then
-                        lrORMToolboxVerbalisation.VerbaliseEntityType(e.Node.Tag)
+                        lrORMToolboxVerbalisation.VerbaliseEntityType(lrDiagramElement)
                     End If
 
                     '--------------------------------------------
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
                     If IsSomething(lrModelElementDescriptionsEditor) Then
-                        Call lrModelElementDescriptionsEditor.setDescriptions(e.Node.Tag)
+                        Call lrModelElementDescriptionsEditor.setDescriptions(lrDiagramElement)
                     End If
 #End Region
                 Case Is = GetType(FBM.FactType).ToString
@@ -589,21 +591,21 @@ Public Class frmToolboxModelDictionary
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
                     If IsSomething(lrORMToolboxVerbalisation) Then
-                        lrORMToolboxVerbalisation.VerbaliseFactType(e.Node.Tag)
+                        lrORMToolboxVerbalisation.VerbaliseFactType(lrDiagramElement)
                     End If
                     If prApplication.WorkingPage IsNot Nothing Then
 
                         Dim lrFactTypeInstance As FBM.FactTypeInstance
-                        lrFactTypeInstance = prApplication.WorkingPage.FactTypeInstance.Find(Function(x) x.Id = e.Node.Tag.Id)
+                        lrFactTypeInstance = prApplication.WorkingPage.FactTypeInstance.Find(Function(x) x.Id = lrDiagramElement.Id)
                         If lrFactTypeInstance IsNot Nothing Then
                             If Not lrFactTypeInstance.IsSubtypeRelationshipFactType Then
                                 Call lrFactTypeInstance.Selected()
                             End If
-                        ElseIf e.Node.Tag.IsLinkFactType Then
+                        ElseIf lrDiagramElement.IsLinkFactType Then
                             Dim lrFactType As FBM.FactType
                             Dim lrRoleInstance As FBM.RoleInstance
 
-                            lrFactType = e.Node.Tag
+                            lrFactType = lrDiagramElement
                             lrRoleInstance = prApplication.WorkingPage.RoleInstance.Find(Function(x) x.Id = lrFactType.LinkFactTypeRole.Id)
 
                             If lrRoleInstance IsNot Nothing Then
@@ -621,7 +623,7 @@ Public Class frmToolboxModelDictionary
 
                     If IsSomething(lrORMReadingEditor) Then
                         Dim lrFactType As FBM.FactType
-                        lrFactType = e.Node.Tag
+                        lrFactType = lrDiagramElement
                         If prApplication.WorkingPage IsNot Nothing Then
 
                             Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(prApplication.WorkingPage, False)
@@ -637,24 +639,48 @@ Public Class frmToolboxModelDictionary
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
                     If IsSomething(lrModelElementDescriptionsEditor) Then
-                        Call lrModelElementDescriptionsEditor.setDescriptions(e.Node.Tag)
+                        Call lrModelElementDescriptionsEditor.setDescriptions(lrDiagramElement)
                     End If
 
 #End Region
                 Case Is = GetType(RDS.Column).ToString
+
+                    Dim lrColumn As RDS.Column = lrDiagramElement
+
                     If IsSomething(lrORMToolboxVerbalisation) Then
-                        lrORMToolboxVerbalisation.VerbaliseColumn(e.Node.Tag)
+                        lrORMToolboxVerbalisation.VerbaliseColumn(lrColumn)
                     End If
+
+                    If lrColumn.FactType IsNot Nothing Then
+                        'ORM Reading Editor
+                        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+                        If IsSomething(lrORMReadingEditor) Then
+                            Dim lrFactType As FBM.FactType
+                            lrFactType = lrColumn.FactType
+                            If prApplication.WorkingPage IsNot Nothing Then
+
+                                Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(prApplication.WorkingPage, False)
+                                lrORMReadingEditor.zrPage = prApplication.WorkingPage
+                                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                                prApplication.WorkingPage.SelectedObject.Clear()
+                                prApplication.WorkingPage.SelectedObject.Add(lrFactTypeInstance)
+                                Call lrORMReadingEditor.SetupForm()
+                            End If
+                        End If
+                    End If
+
                 Case Is = GetType(RDS.Table).ToString
                     If IsSomething(lrORMToolboxVerbalisation) Then
-                        lrORMToolboxVerbalisation.VerbaliseTable(e.Node.Tag)
+                        lrORMToolboxVerbalisation.VerbaliseTable(lrDiagramElement)
                     End If
                 Case Is = GetType(FBM.RoleConstraint).ToString
                     If lrORMToolboxVerbalisation IsNot Nothing Then
-                        Dim lrRoleConstraint As FBM.RoleConstraint = e.Node.Tag
+                        Dim lrRoleConstraint As FBM.RoleConstraint = lrDiagramElement
                         Select Case lrRoleConstraint.RoleConstraintType
                             Case = pcenumRoleConstraintType.InternalUniquenessConstraint
-                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintInternalUniquenessConstraint(e.Node.Tag)
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintInternalUniquenessConstraint(lrDiagramElement)
                             Case Else
                                 'not implemented
                         End Select
@@ -672,15 +698,23 @@ Public Class frmToolboxModelDictionary
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myHiddenMiscAttribute})
 
                 Dim lrModelObjectInstance As Object = Nothing
-                Select Case e.Node.Tag.GetType
+                Select Case lrDiagramElement.GetType
+                    Case Is = GetType(RDS.Column)
+                        Dim lrColumn = CType(lrDiagramElement, RDS.Column)
+                        Dim lrAttribute As New ERD.Attribute("DummyId", Nothing, New FBM.Page(Me.zrORMModel))
+                        lrAttribute.Name = lrColumn.Name
+                        lrAttribute.Column = lrColumn
+                        If lrColumn.ActiveRole IsNot Nothing And lrColumn.ActiveRole.JoinsValueType IsNot Nothing Then
+                            lrModelObjectInstance = lrAttribute
+                        End If
                     Case Is = GetType(FBM.EntityType)
-                        lrModelObjectInstance = CType(e.Node.Tag, FBM.EntityType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                        lrModelObjectInstance = CType(lrDiagramElement, FBM.EntityType).CloneInstance(New FBM.Page(Me.zrORMModel))
                     Case Is = GetType(FBM.ValueType)
-                        lrModelObjectInstance = CType(e.Node.Tag, FBM.ValueType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                        lrModelObjectInstance = CType(lrDiagramElement, FBM.ValueType).CloneInstance(New FBM.Page(Me.zrORMModel))
                     Case Is = GetType(FBM.FactType)
-                        lrModelObjectInstance = CType(e.Node.Tag, FBM.FactType).CloneInstance(New FBM.Page(Me.zrORMModel))
+                        lrModelObjectInstance = CType(lrDiagramElement, FBM.FactType).CloneInstance(New FBM.Page(Me.zrORMModel))
                     Case Is = GetType(RDS.Table)
-                        lrModelObjectInstance = CType(e.Node.Tag, RDS.Table).CloneEntity(New FBM.Page(Me.zrORMModel))
+                        lrModelObjectInstance = CType(lrDiagramElement, RDS.Table).CloneEntity(New FBM.Page(Me.zrORMModel))
                 End Select
                 If lrModelObjectInstance IsNot Nothing Then
                     Call lrPropertyGridForm.SetSelectedObject(lrModelObjectInstance)

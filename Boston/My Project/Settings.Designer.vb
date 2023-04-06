@@ -1097,6 +1097,18 @@ Namespace My
                 Me("ImportExportColumnNameForFKReferenceEqualsReferencedEntityName") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property ModelingUseThreadedXMLPageLoading() As Boolean
+            Get
+                Return CType(Me("ModelingUseThreadedXMLPageLoading"),Boolean)
+            End Get
+            Set
+                Me("ModelingUseThreadedXMLPageLoading") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

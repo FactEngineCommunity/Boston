@@ -2050,7 +2050,6 @@ Namespace FBM
                         lrORMRecordset2.MoveNext()
                     End While
                     '==========================================================================================================
-
                     '===========================
                     'Indexes                    
                     Call Me.loadIndexesForTable(lrTable)

@@ -13,7 +13,7 @@ Namespace ERD
     <Serializable()>
     Public Class Entity
         Inherits FBM.FactDataInstance
-        Implements IEquatable(Of FBM.EntityTypeInstance)
+        Implements IEquatable(Of ERD.Entity)
         Implements FBM.iTableNodePageObject
 
         <XmlAttribute()>
@@ -246,12 +246,9 @@ Namespace ERD
 
         End Function
 
-
-        Public Shadows Function Equals(ByVal other As FBM.EntityTypeInstance) As Boolean Implements System.IEquatable(Of FBM.EntityTypeInstance).Equals
-
-
+        Public Shadows Function Equals(other As Entity) As Boolean Implements IEquatable(Of Entity).Equals
+            Return Me.RDSTable.Name = other.RDSTable.Name
         End Function
-
 
         Public Sub DisplayAndAssociate()
 
@@ -915,5 +912,6 @@ Namespace ERD
                 End Try
             End If
         End Sub
+
     End Class
 End Namespace
