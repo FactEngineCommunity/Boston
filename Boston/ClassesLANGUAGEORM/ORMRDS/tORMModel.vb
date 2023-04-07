@@ -1916,6 +1916,8 @@ Namespace FBM
 
                 For Each lrTable In larSortedTables
 
+                    Boston.WriteToStatusBar("Loading Model. CMML Load for Entity: " & lrTable.Name, True)
+
                     '==========================================================================================================
                     'Columns
                     lsSQLQuery = " SELECT *"

@@ -751,7 +751,11 @@ SkipValueType:
                     Else
                         lrEntityType.ReferenceModeValueType = New FBM.ValueType
                         lrEntityType.ReferenceModeValueType.Id = lrXMLEntityType.ReferenceModeValueTypeId
-                        lrEntityType.ReferenceModeValueType = lrModel.ValueType.Find(AddressOf lrEntityType.ReferenceModeValueType.Equals)
+                        lrEntityType.ReferenceModeValueType = lrModel.ValueType.Find(Function(x) x.Id = lrXMLEntityType.ReferenceModeValueTypeId)
+
+                        If lrEntityType.ReferenceModeValueType Is Nothing Then
+                            lrModel.AddModelError(New FBM.ModelError(pcenumModelErrors.ModelLoadingError, "Model Element Not Found, " & lrXMLEntityType.ReferenceModeValueTypeId & "."))
+                        End If
                     End If
 
                     lrEntityType.PreferredIdentifierRCId = lrXMLEntityType.ReferenceSchemeRoleConstraintId
@@ -846,6 +850,12 @@ SkipFactType:
                     Dim lrParentModelElement As FBM.ModelObject
                     lrModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(0).JoinedORMObject.Id)
                     lrParentModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(1).JoinedORMObject.Id)
+
+                    If lrParentModelElement Is Nothing Then
+                        lrModel.AddModelError(New FBM.ModelError(pcenumModelErrors.ModelLoadingError, "Model Element Not Found, " & lrFactType.RoleGroup(1).JoinedORMObject.Id & "."))
+                        GoTo SkipSubtypeRelationship
+                    End If
+
                     If lrParentModelElement.GetType = GetType(FBM.FactType) Then
                         lrParentModelElement = CType(lrParentModelElement, FBM.FactType).ObjectifyingEntityType
                     End If
@@ -1192,6 +1202,11 @@ SkipModelNote:
             Try
                 Dim lrConceptInstance As FBM.ConceptInstance
                 Dim lrPage As FBM.Page
+
+                If Not abCalledAsThread Then
+                    Boston.WriteToStatusBar("Loading Model. Mapping Page: " & arXMLPage.Name & ".", True)
+                End If
+
                 If arPage Is Nothing Then
                     lrPage = New FBM.Page(arModel,
                                           arXMLPage.Id,

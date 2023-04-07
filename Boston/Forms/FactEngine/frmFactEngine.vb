@@ -1530,12 +1530,15 @@ NextWord:
 
                 Dim larModelMatch As New List(Of ModelMatch)
                 Dim larMissingModelElement = From ParseNode In larModelElementNameParseNode
-                                             Where prApplication.WorkingModel.GetModelObjectByName(ParseNode.Token.Text) Is Nothing
+                                             Where prApplication.WorkingModel.GetModelObjectByName(Trim(ParseNode.Token.Text)) Is Nothing
                                              Select ParseNode
 
                 For Each lrParseNode In larMissingModelElement ' ModelElementNameParseNode
-                    'lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrParseNode.Token.Text)
-                    'If lrModelElement Is Nothing Then
+
+                    'CodeSafe - An opportunity to help heal a Model if it is broken.
+                    '  Calling GetModelObjectByName in SafeMode self heals the ModelDictionary if the ModelElement is found.
+                    prApplication.WorkingModel.GetModelObjectByName(Trim(lrParseNode.Token.Text), True,, True)
+
                     Me.TextMarker.AddWord(lrParseNode.Token.StartPos, lrParseNode.Token.Length, Color.Red, "Uknown Model Element")
 
                     For Each lrModel In prApplication.getModelsByModelElementName(lrParseNode.Token.Text)

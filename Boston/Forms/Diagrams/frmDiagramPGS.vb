@@ -1017,7 +1017,17 @@ Public Class frmDiagramPGS
             Dim lrNodeType As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrColumn.Table.Name)
             Dim lrAttribute As ERD.Attribute = lrNodeType.Attribute.Find(Function(x) x.Column Is lrColumn)
 
-            Me.zrPage.SelectedObject.Clear()
+            If lrAttribute Is Nothing and lrNodeType IsNot nothing Then
+                prApplication.ThrowErrorMessage("The Property, " & lrColumn.Name & " could not be found against the Node Type. I'll try and fix that", pcenumErrorType.Warning,, False,, True, True, True)
+                lrAttribute = New ERD.Attribute(lrColumn, Me.zrPage)
+                If lrAttribute IsNot Nothing Then
+                    lrNodeType.Attribute.AddUnique(lrAttribute)
+                Else
+                    Exit Sub
+                End If
+            End If
+
+                Me.zrPage.SelectedObject.Clear()
             Me.zrPage.SelectedObject.Add(lrAttribute)
 
             If e.MouseButton = MouseButton.Left Then

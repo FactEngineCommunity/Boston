@@ -5224,7 +5224,6 @@ PostRDSProcessing:
 
             Try
 
-
                 If Me.ExistsModelElement(lsModelObjectName, abUseSafeMode) Or abUseFastenstein Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
@@ -5614,17 +5613,17 @@ PostRDSProcessing:
                        lrDictionaryEntry.isRoleConstraint Or
                        lrDictionaryEntry.isModelNote Then
 
-                        ExistsModelElement = True
+                        Return True
                     End If
                 End If
 
                 If abUseSafeMode And Not ExistsModelElement Then
                     'CodeSafe
-                    Dim larModelElement = From ValueType In Me.ValueType
-                                          From EntityType In Me.EntityType
-                                          From FactType In Me.FactType
-                                          From RoleConstraint In Me.RoleConstraint
-                                          From ModelNote In Me.ModelNote
+                    Dim larModelElement = From ValueType In Me.ValueType.FindAll(Function(x) x.Id = asModelElementName)
+                                          From EntityType In Me.EntityType.FindAll(Function(x) x.Id = asModelElementName)
+                                          From FactType In Me.FactType.FindAll(Function(x) x.Id = asModelElementName)
+                                          From RoleConstraint In Me.RoleConstraint.FindAll(Function(x) x.Id = asModelElementName)
+                                          From ModelNote In Me.ModelNote.FindAll(Function(x) x.Id = asModelElementName)
                                           Where ValueType.Id = asModelElementName Or
                                                 EntityType.Id = asModelElementName Or
                                                 FactType.Id = asModelElementName Or
@@ -5632,9 +5631,22 @@ PostRDSProcessing:
                                                 ModelNote.Id = asModelElementName
                                           Select True
 
-                    Return larModelElement.Count > 0
+                    If larModelElement.Count > 0 Then
+
+                        Dim liConceptType = Me.GetConceptTypeByNameFuzzy(asModelElementName, asModelElementName)
+                        If liConceptType <> pcenumConceptType.Class Then
+                            If lrDictionaryEntry Is Nothing Then
+                                lrDictionaryEntry = New FBM.DictionaryEntry(Me, asModelElementName, liConceptType, ,, True, True,)
+                            End If
+                            Call Me.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, False, True, False, False)
+                        End If
+
+                        Return True
+                    End If
 
                 End If
+
+                Return False
 
             Catch ex As Exception
                 Dim lsMessage As String

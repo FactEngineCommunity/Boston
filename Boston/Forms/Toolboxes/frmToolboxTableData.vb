@@ -435,6 +435,15 @@ Public Class frmToolboxTableData
 
                 Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName)
 
+                If lrColumn Is Nothing Then
+                    lsMessage = "A column with the name, " & lsColumnName & ", does not exist in the Entity, " & Me.mrTable.Name & ", in the Model you are working on."
+                    Me.ToolStripStatusLabel.Text = lsMessage
+                    Me.ToolStripStatusLabel.ForeColor = Color.Red
+                    Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True)
+                    Exit Sub
+                End If
+
                 Select Case lrColumn.getMetamodelDataType
                     Case Is = pcenumORMDataType.TemporalDate,
                               pcenumORMDataType.TemporalDateAndTime

@@ -217,6 +217,35 @@ Namespace ERD
 
         End Sub
 
+        Public Sub New(ByRef arColumn As RDS.Column, ByRef arPage As FBM.Page)
+
+            Try
+                Me.Column = arColumn
+                Me.Page = arPage
+                Me.Model = arPage.Model
+                Me.Id = arColumn.Id
+                Me.Entity = arPage.ERDiagram.Entity.Find(Function(x) x.Name = Me.Name)
+                Me.AttributeName = arColumn.Name
+                Me.ResponsibleRole = arColumn.Role
+                Me.ActiveRole = arColumn.ActiveRole
+                Me.ResponsibleFactType = Me.ResponsibleRole.FactType
+                Me.Mandatory = arColumn.IsMandatory
+                'Me..OrdinalPosition = arColumn.OrdinalPosition
+                Me.PartOfPrimaryKey = arColumn.isPartOfPrimaryKey
+                Me.IsDerivationParameter = arColumn.IsDerivationParameter
+                Me.SupertypeColumn = arColumn.SupertypeColumn
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Shadows Function Equals(ByVal other As Attribute) As Boolean Implements System.IEquatable(Of Attribute).Equals
 
             If Me.Column.Id = other.Column.Id Then '20230406-VM-Was with "Me.Entity.Name = other.Entity.Name And"
