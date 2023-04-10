@@ -22,59 +22,69 @@ Public Class frmCRUDModel
     '   "Driver={Microsoft Text Driver (*.txt; *.csv)};DBQ=c:\bin"
     '   "DSN=dsnname"
 
-    Private Sub SetupForm()
-
-        Me.LabelModelName.Text = Me.zrModel.Name
-        Me.LabelCoreVersion.Text = Me.zrModel.CoreVersionNumber
-
-        Call Me.LoadDatabaseTypes()
-
-        Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
-        Me.CheckBoxIsDatabaseSynchronised.Checked = Me.zrModel.IsDatabaseSynchronised
-
-        If Me.zrModel.IsEmpty Then
-            Me.GroupBoxReverseEngineering.Visible = True
-            Me.ButtonReverseEngineerDatabase.Enabled = True
-        End If
-
-        Me.TextBoxServerName.Text = Me.zrModel.Server
-        Me.TextBoxDatabaseName.Text = Me.zrModel.Database
-        Me.TextBoxSchemaName.Text = Me.zrModel.Schema
-        Me.TextBoxWarehouseName.Text = Me.zrModel.Warehouse
-        Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
-        Me.TextBoxPort.Text = Me.zrModel.Port
-
-        RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
-        Me.CheckBoxSaveToXML.Checked = Me.zrModel.StoreAsXML
-        AddHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
-
-        If Me.CheckBoxSaveToXML.Checked Then Me.ButtonReplaceDatabaseModel.Visible = True
-
-        Me.LabelModelId.Text = "Model Id: " & Me.zrModel.ModelId
-
-        'Project
-        If Me.zrModel.ProjectId IsNot Nothing Then
-            Dim lrProject As ClientServer.Project = Nothing
-            lrProject = tableClientServerProject.getProjectDetailsById(Me.zrModel.ProjectId, lrProject, True)
-            If lrProject IsNot Nothing Then
-                Me.LabelProject.Text = lrProject.Name
-            End If
-        End If
-
-        'Namespace
-        If Me.zrModel.Namespace IsNot Nothing Then
-            Dim lrNamespace As ClientServer.Namespace = Nothing
-            lrNamespace = tableClientServerNamespace.getNamespaceDetailsById(Me.zrModel.Namespace.Id, lrNamespace, True)
-            If lrNamespace IsNot Nothing Then
-                Me.LabelNamespace.Text = lrNamespace.Name
-            End If
-        End If
-
-    End Sub
-
     Private Sub frmCRUDModel_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Call Me.SetupForm()
+
+    End Sub
+
+    Private Sub SetupForm()
+
+        Try
+            Me.LabelModelName.Text = Me.zrModel.Name
+            Me.LabelCoreVersion.Text = Me.zrModel.CoreVersionNumber
+
+            Call Me.LoadDatabaseTypes()
+
+            Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
+            Me.CheckBoxIsDatabaseSynchronised.Checked = Me.zrModel.IsDatabaseSynchronised
+
+            If Me.zrModel.IsEmpty Then
+                Me.GroupBoxReverseEngineering.Visible = True
+                Me.ButtonReverseEngineerDatabase.Enabled = True
+            End If
+
+            Me.TextBoxServerName.Text = Me.zrModel.Server
+            Me.TextBoxDatabaseName.Text = Me.zrModel.Database
+            Me.TextBoxSchemaName.Text = Me.zrModel.Schema
+            Me.TextBoxWarehouseName.Text = Me.zrModel.Warehouse
+            Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
+            Me.TextBoxPort.Text = Me.zrModel.Port
+
+            RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
+            Me.CheckBoxSaveToXML.Checked = Me.zrModel.StoreAsXML
+            AddHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
+
+            If Me.CheckBoxSaveToXML.Checked Then Me.ButtonReplaceDatabaseModel.Visible = True
+
+            Me.LabelModelId.Text = "Model Id: " & Me.zrModel.ModelId
+
+            'Project
+            If Me.zrModel.ProjectId IsNot Nothing Then
+                Dim lrProject As ClientServer.Project = Nothing
+                lrProject = tableClientServerProject.getProjectDetailsById(Me.zrModel.ProjectId, lrProject, True)
+                If lrProject IsNot Nothing Then
+                    Me.LabelProject.Text = lrProject.Name
+                End If
+            End If
+
+            'Namespace
+            If Me.zrModel.Namespace IsNot Nothing Then
+                Dim lrNamespace As ClientServer.Namespace = Nothing
+                lrNamespace = tableClientServerNamespace.getNamespaceDetailsById(Me.zrModel.Namespace.Id, lrNamespace, True)
+                If lrNamespace IsNot Nothing Then
+                    Me.LabelNamespace.Text = lrNamespace.Name
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -120,6 +130,12 @@ Public Class frmCRUDModel
                             Case Is = pcenumDatabaseType.ODBC
                                 Me.zrModel.TreeNode.ImageIndex = 10
                                 Me.zrModel.TreeNode.SelectedImageIndex = 10
+                            Case Is = pcenumDatabaseType.Neo4j
+                                Me.zrModel.TreeNode.ImageIndex = 14
+                                Me.zrModel.TreeNode.SelectedImageIndex = 14
+                            Case Is = pcenumDatabaseType.RelationalAI
+                                Me.zrModel.TreeNode.ImageIndex = 21
+                                Me.zrModel.TreeNode.SelectedImageIndex = 21
                             Case Is = pcenumDatabaseType.None
                                 Me.zrModel.TreeNode.ImageIndex = 1
                                 Me.zrModel.TreeNode.SelectedImageIndex = 1
@@ -152,28 +168,39 @@ Public Class frmCRUDModel
         Dim liInd As Integer = 0
         Dim liNewIndex As Integer = 0
 
-        Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.None, pcenumDatabaseType.None.ToString, pcenumDatabaseType.None))
-        Me.ComboBoxDatabaseType.SelectedIndex = 0
+        Try
 
-        If pdbConnection.State <> 0 Then
-            liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
-            larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
+            Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.None, pcenumDatabaseType.None.ToString, pcenumDatabaseType.None))
+            Me.ComboBoxDatabaseType.SelectedIndex = 0
 
-            For liInd = 1 To larDatabaseType.Count
-                Dim liDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(larDatabaseType(liInd - 1).DatabaseType, pcenumDatabaseType.None)), pcenumDatabaseType)
-                Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
-                liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
-                If larDatabaseType(liInd - 1).DatabaseType = Trim(Me.zrModel.TargetDatabaseType.ToString) Then
-                    Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
-                End If
-            Next
-        Else
-            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLite.ToString)
-            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.MSJet.ToString)
-            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLServer.ToString)
+            If pdbConnection.State <> 0 Then
+                liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
+                larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
-            Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(Me.zrModel.TargetDatabaseType.ToString)
-        End If
+                For liInd = 1 To larDatabaseType.Count
+                    Dim liDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(larDatabaseType(liInd - 1).DatabaseType, pcenumDatabaseType.None)), pcenumDatabaseType)
+                    Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
+                    liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+                    If larDatabaseType(liInd - 1).DatabaseType = Trim(Me.zrModel.TargetDatabaseType.ToString) Then
+                        Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
+                    End If
+                Next
+            Else
+                Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLite.ToString)
+                Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.MSJet.ToString)
+                Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLServer.ToString)
+
+                Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(Me.zrModel.TargetDatabaseType.ToString)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -300,6 +327,28 @@ Public Class frmCRUDModel
                             GoTo ConnectionFailed
                         End Try
 ConnectionFailed:
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
+                        Me.LabelOpenSuccessfull.Text = "Fail"
+
+                    Case Is = pcenumDatabaseType.RelationalAI
+                        Dim lsReturnMessage As String = Nothing
+
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        Try
+                            Dim lrConnection = New FactEngine.RelationalAIConnection(Me.zrModel,
+                                                                                     Trim(Me.TextBoxDatabaseConnectionString.Text),
+                                                                                     0,
+                                                                                     False)
+                            Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                            Me.LabelOpenSuccessfull.Text = "Success"
+
+                            Return True
+
+                        Catch ex As Exception
+                            GoTo RAIConnectionFailed
+                        End Try
+RAIConnectionFailed:
                         Me.LabelOpenSuccessfull.ForeColor = Color.Red
                         Me.LabelOpenSuccessfull.Text = "Fail"
 
@@ -660,6 +709,12 @@ ConnectionFailed:
                                 Case Is = pcenumDatabaseType.TypeDB
                                     Me.zrModel.TreeNode.ImageIndex = 13
                                     Me.zrModel.TreeNode.SelectedImageIndex = 13
+                                Case Is = pcenumDatabaseType.Neo4j
+                                    Me.zrModel.TreeNode.ImageIndex = 14
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 14
+                                Case Is = pcenumDatabaseType.RelationalAI
+                                    Me.zrModel.TreeNode.ImageIndex = 21
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 21
                                 Case Is = pcenumDatabaseType.None
                                     Me.zrModel.TreeNode.ImageIndex = 1
                                     Me.zrModel.TreeNode.SelectedImageIndex = 1

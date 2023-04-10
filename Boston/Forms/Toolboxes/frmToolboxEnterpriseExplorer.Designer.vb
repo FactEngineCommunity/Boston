@@ -27,6 +27,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxEnterpriseExplorer))
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
+        Me.SearchTextbox = New SearchTextbox()
         Me.ButtonNewModel = New System.Windows.Forms.Button()
         Me.ComboBoxNamespace = New System.Windows.Forms.ComboBox()
         Me.LabelPromptNamespace = New System.Windows.Forms.Label()
@@ -103,7 +104,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
-        Me.SearchTextbox = New SearchTextbox()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -130,6 +130,15 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GroupBox_main.Size = New System.Drawing.Size(383, 588)
         Me.GroupBox_main.TabIndex = 0
         Me.GroupBox_main.TabStop = False
+        '
+        'SearchTextbox
+        '
+        Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.SearchTextbox.Location = New System.Drawing.Point(0, 22)
+        Me.SearchTextbox.Name = "SearchTextbox"
+        Me.SearchTextbox.Size = New System.Drawing.Size(290, 26)
+        Me.SearchTextbox.TabIndex = 11
         '
         'ButtonNewModel
         '
@@ -225,6 +234,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(18, "BPMN-ConversationDiagram-16x16.png")
         Me.ImageList.Images.SetKeyName(19, "BPMN-ProcessDiagram-16x16.png")
         Me.ImageList.Images.SetKeyName(20, "DatabaseXML16x16.jpg")
+        Me.ImageList.Images.SetKeyName(21, "RelationalAI16x16.png")
         '
         'CircularProgressBar
         '
@@ -691,15 +701,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
-        '
-        'SearchTextbox
-        '
-        Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SearchTextbox.Location = New System.Drawing.Point(0, 22)
-        Me.SearchTextbox.Name = "SearchTextbox"
-        Me.SearchTextbox.Size = New System.Drawing.Size(290, 26)
-        Me.SearchTextbox.TabIndex = 11
         '
         'frmToolboxEnterpriseExplorer
         '

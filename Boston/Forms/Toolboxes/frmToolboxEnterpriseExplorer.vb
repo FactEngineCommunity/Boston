@@ -269,6 +269,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.Neo4j
                     loNode.ImageIndex = 14
                     loNode.SelectedImageIndex = 14
+                Case Is = pcenumDatabaseType.RelationalAI
+                    loNode.ImageIndex = 21
+                    loNode.SelectedImageIndex = 21
                 Case Is = pcenumDatabaseType.None
                     If arModel.StoreAsXML Then
                         loNode.ImageIndex = 20
@@ -2070,6 +2073,9 @@ Public Class frmToolboxEnterpriseExplorer
                         Case Is = pcenumDatabaseType.TypeDB
                             loNode.ImageIndex = 13
                             loNode.SelectedImageIndex = 13
+                        Case Is = pcenumDatabaseType.RelationalAI
+                            loNode.ImageIndex = 21
+                            loNode.SelectedImageIndex = 21
                     End Select
                 End If
             End If

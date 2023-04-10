@@ -1714,11 +1714,22 @@ SkipRegistrationChecking:
 
         Dim child As New frmCRUDModel
 
-        child.MdiParent = Me
+        Try
 
-        child.zrModel = arModel
+            child.MdiParent = Me
 
-        child.Show(Me.DockPanel)
+            child.zrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

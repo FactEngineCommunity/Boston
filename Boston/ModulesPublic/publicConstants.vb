@@ -92,6 +92,7 @@ Public Module publicConstants
         TypeDB = 109
         NORMA = 110
         Neo4j = 111
+        RelationalAI = 112
     End Enum
 
     Public Enum pcenumDebugMode

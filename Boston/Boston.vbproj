@@ -439,6 +439,7 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMSAccess.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMongoDb.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tPostgreSQL.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tRelationalAI.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSnowflake.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tNeo4j.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
@@ -459,7 +460,9 @@
     <Compile Include="ClassesFactEngine\FEQLParser\TinyPG\tTextMarker.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\Formula\tQueryFormulaToken.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-Cypher.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-RelationalAI.vb" />
     <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-SQL.vb" />
+    <Compile Include="ClassesFactEngine\Parsing\QueryGraph\TargetLanguage\tQueryGraph-TypeDB.vb" />
     <Compile Include="ClassesFactEngine\Processor\fFEQLProcessor-CountReturnColumnConcatenation.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLConstants.vb" />
     <Compile Include="ClassesFactEngine\Processor\tFEQLProcessor-CountClause.vb" />
@@ -3395,6 +3398,7 @@
     <None Include="Images\BPMN\ElementDecorations\Gateway-Parallel.png" />
     <None Include="Images\BPMN\Gateway-EventBased.png" />
     <None Include="Images\BPMN\Event-Intermediate-Timer-BoundaryNonInterupting.png" />
+    <None Include="Images\DatabaseLogos\RelationalAI16x16.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />

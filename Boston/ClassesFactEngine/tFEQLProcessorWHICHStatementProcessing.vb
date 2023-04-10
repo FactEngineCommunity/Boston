@@ -25,6 +25,8 @@
                         lsSQLQuery = lrQueryGraph.generateTypeQL(Me.WHICHSELECTStatement)
                     Case Is = pcenumDatabaseType.Neo4j
                         lsSQLQuery = lrQueryGraph.generateCypher(Me.WHICHSELECTStatement)
+                    Case Is = pcenumDatabaseType.RelationalAI
+                        lsSQLQuery = lrQueryGraph.generateRelationalAIQL(Me.WHICHSELECTStatement)
                     Case Else
                         lsSQLQuery = lrQueryGraph.generateSQL(Me.WHICHSELECTStatement)
                 End Select
