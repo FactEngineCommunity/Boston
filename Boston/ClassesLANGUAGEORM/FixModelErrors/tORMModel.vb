@@ -826,6 +826,12 @@ SkipColumn2:
 
                 End If
 
+                Dim lrNewColumn As RDS.Column
+                Dim lrRole As FBM.Role = Nothing
+                If arRDSRelation.ResponsibleFactType.IsManyTo1BinaryFactType Then
+                    lrRole = arRDSRelation.ResponsibleFactType.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+                End If
+
                 For Each lrDestinationColumn In lrRDSRelation.DestinationColumns
                     If lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) Is Nothing Then
                         Try
@@ -839,7 +845,13 @@ SkipColumn2:
                             End If
 
                         Catch ex As Exception
-                            'Couldn't fix it.
+                            'Couldn't fix it that way.
+                            '=====================================================
+                            'The Column doesn't exist in the Table yet.                                            
+                            Dim lsColumnName As String = arRDSRelation.OriginTable.createUniqueColumnName(lrDestinationColumn.ActiveRole.JoinedORMObject.Id)
+                            lrNewColumn = New RDS.Column(arRDSRelation.OriginTable, lsColumnName, lrRole, lrDestinationColumn.ActiveRole, lrRole.Mandatory)
+                            arRDSRelation.OriginTable.addColumn(lrNewColumn)
+                            Call lrRDSRelation.AddOriginColumn(lrNewColumn)
                         End Try
                     End If
                 Next
@@ -851,6 +863,34 @@ SkipColumn2:
                 For Each lsActiveRoleId In larExcessOriginColumns
                     Dim lrColumn As RDS.Column = lrRDSRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lsActiveRoleId)
                     Call lrRDSRelation.RemoveOriginColumn(lrColumn)
+                Next
+
+                'Missing Origin Columns
+                Dim larMissingOriginColumns = (From DestinationColumn In lrRDSRelation.DestinationColumns
+                                               Select DestinationColumn.ActiveRole.Id).ToList.Except(From OriginColumn In lrRDSRelation.OriginColumns
+                                                                                                     Select OriginColumn.ActiveRole.Id).ToList
+
+
+                For Each lsDestinationColumnId In larMissingOriginColumns
+
+                    Dim lrDestinationColumn As RDS.Column = arRDSRelation.DestinationColumns.Find(Function(x) x.Id = lsDestinationColumnId)
+                    lrRole = arRDSRelation.ResponsibleFactType.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+
+                    lrNewColumn = arRDSRelation.OriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
+                                                                        And x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id)
+
+                    If arRDSRelation.ResponsibleFactType.IsManyTo1BinaryFactType Then
+
+                        If lrNewColumn Is Nothing Then
+                            '=====================================================
+                            'The Column doesn't exist in the Table yet.                                            
+                            Dim lsColumnName As String = arRDSRelation.OriginTable.createUniqueColumnName(lrDestinationColumn.ActiveRole.JoinedORMObject.Id)
+                            lrNewColumn = New RDS.Column(arRDSRelation.OriginTable, lsColumnName, lrRole, lrDestinationColumn.ActiveRole, lrRole.Mandatory)
+                            arRDSRelation.OriginTable.addColumn(lrNewColumn)
+                        End If
+                    End If
+
+                    arRDSRelation.AddOriginColumn(lrNewColumn)
                 Next
 
                 '20220726-VM-Doesn't seem to work.

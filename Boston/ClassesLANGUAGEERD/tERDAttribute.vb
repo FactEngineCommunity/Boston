@@ -608,7 +608,8 @@ Namespace ERD
         Private Sub Column_OrdinalPositionChanged(aiNewOrdinalPosition As Integer) Handles Column.OrdinalPositionChanged
 
             Try
-                'Me.OrdinalPosition = aiNewOrdinalPosition '20210422-VM-Removed because made ReadOnly Property returning Attribute.Column.OrdinalPosition
+                'CodeSafe
+                If Me.Entity Is Nothing Then Exit Sub
 
                 If Me.Entity.Name = Me.Column.Table.Name Then
                     'Column may be moved to a new Table/Entity, so may not exist in Me.Entity.

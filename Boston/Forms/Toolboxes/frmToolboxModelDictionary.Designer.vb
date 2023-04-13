@@ -50,10 +50,10 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripStatusLabelPromptModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelModelElementTypeCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelPromptModelElementCount = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelModelElementCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ContextMenuStripGeneralConcept = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ConvertToEntityTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConvertToValueTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripStatusLabelModelElementCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStripMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -296,8 +296,14 @@ Partial Class frmToolboxModelDictionary
         'ToolStripStatusLabelPromptModelElementCount
         '
         Me.ToolStripStatusLabelPromptModelElementCount.Name = "ToolStripStatusLabelPromptModelElementCount"
-        Me.ToolStripStatusLabelPromptModelElementCount.Size = New System.Drawing.Size(126, 17)
+        Me.ToolStripStatusLabelPromptModelElementCount.Size = New System.Drawing.Size(126, 15)
         Me.ToolStripStatusLabelPromptModelElementCount.Text = "Model Element Count:"
+        '
+        'ToolStripStatusLabelModelElementCount
+        '
+        Me.ToolStripStatusLabelModelElementCount.Name = "ToolStripStatusLabelModelElementCount"
+        Me.ToolStripStatusLabelModelElementCount.Size = New System.Drawing.Size(13, 15)
+        Me.ToolStripStatusLabelModelElementCount.Text = "0"
         '
         'ContextMenuStripGeneralConcept
         '
@@ -316,12 +322,6 @@ Partial Class frmToolboxModelDictionary
         Me.ConvertToValueTypeToolStripMenuItem.Name = "ConvertToValueTypeToolStripMenuItem"
         Me.ConvertToValueTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
         Me.ConvertToValueTypeToolStripMenuItem.Text = "convert to &Value Type"
-        '
-        'ToolStripStatusLabelModelElementCount
-        '
-        Me.ToolStripStatusLabelModelElementCount.Name = "ToolStripStatusLabelModelElementCount"
-        Me.ToolStripStatusLabelModelElementCount.Size = New System.Drawing.Size(13, 17)
-        Me.ToolStripStatusLabelModelElementCount.Text = "0"
         '
         'frmToolboxModelDictionary
         '

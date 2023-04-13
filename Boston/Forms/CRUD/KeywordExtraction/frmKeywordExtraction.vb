@@ -472,43 +472,54 @@ Public Class frmKeywordExtraction
 	Private Sub SelectFileButton_Click(sender As Object, e As EventArgs) Handles SelectFileButton.Click
 
 		Dim ofd As New OpenFileDialog()
-		ofd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
-		If ofd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-			PathTextBox.Text = ofd.FileName
-			Dim encode As Encoding = Encoding.GetEncoding("GB2312")
-			MyData.TheDoc = File.ReadAllText(ofd.FileName, encode)
-			TextRichTextBox.Text = MyData.TheDoc
-			SaveButton.Enabled = False
-			ResultListView.Items.Clear()
-			StandardizationButton.Enabled = True
-			RemoveStopButton.Enabled = True
-			KeywordExtractionMaxButton.Enabled = True
-			KeywordExtractionNormalButton.Enabled = True
-			StatusLabel.Text = ofd.FileName & " file open finish."
+
+		Try
+			ofd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
+			If ofd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+				PathTextBox.Text = ofd.FileName
+				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
+				MyData.TheDoc = File.ReadAllText(ofd.FileName, encode)
+				TextRichTextBox.Text = MyData.TheDoc
+				SaveButton.Enabled = False
+				ResultListView.Items.Clear()
+				StandardizationButton.Enabled = True
+				RemoveStopButton.Enabled = True
+				KeywordExtractionMaxButton.Enabled = True
+				KeywordExtractionNormalButton.Enabled = True
+				StatusLabel.Text = ofd.FileName & " file open finish."
 
 #Region "Highlight existing ModelElements"
-			For Each lrModelElement In Me.mrModel.getModelObjects
-				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.RoyalBlue)
-			Next
+				For Each lrModelElement In Me.mrModel.getModelObjects
+					Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.RoyalBlue)
+				Next
 
-			For Each lrModelElement In Me.mrModel.ValueType
-				Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.DarkGreen)
-			Next
+				For Each lrModelElement In Me.mrModel.ValueType
+					Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.DarkGreen)
+				Next
 
-			Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType
-									 From ValueConstraint In ValueType.ValueConstraint
-									 Select ValueConstraint
+				Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType
+										 From ValueConstraint In ValueType.ValueConstraint
+										 Select ValueConstraint
 
-			For Each lsValueConstraint In lasValueConstraint
-				Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
-			Next
+				For Each lsValueConstraint In lasValueConstraint
+					Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
+				Next
 
-			For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
-				Call Me.HighlightText(Me.TextRichTextBox, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
-			Next
+				For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+					Call Me.HighlightText(Me.TextRichTextBox, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
+				Next
 #End Region
 
-		End If
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 
 	End Sub
 

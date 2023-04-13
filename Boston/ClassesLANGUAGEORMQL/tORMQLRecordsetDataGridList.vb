@@ -103,7 +103,7 @@ Namespace ORMQL
                     For Each lrData In Me.mrRecordset.Facts(index).Data
 
                         Try
-                            Dim lsColumn As String = Me.mrRecordset.Columns(liInd)
+                            Dim lsColumn As String = Me.mrRecordset.Facts(index).Data(liInd).Role.Name '20230414-VM-Me.mrRecordset.Columns(liInd)
                             Dim lsColumnName As String
                             Try
                                 lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)

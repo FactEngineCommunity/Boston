@@ -851,11 +851,24 @@ Public Class frmToolboxModelDictionary
                 lsWorkingPageId = prApplication.WorkingPage.PageId
             End If
 
-            Dim larPage = From Page In lrModel.Page
-                          From EntityTypeInstance In Page.EntityTypeInstance
-                          Where (EntityTypeInstance.Id = asEntityTypeId)
-                          Select Page Distinct
-                          Order By Page.Name
+            Dim larPage As New List(Of FBM.Page)
+
+            Dim larORMPage = From Page In lrModel.Page
+                             From EntityTypeInstance In Page.EntityTypeInstance
+                             Where (EntityTypeInstance.Id = asEntityTypeId)
+                             Select Page Distinct
+                             Order By Page.Name
+
+            Dim larERDPage = From Page In lrModel.Page
+                             From FactTypeInstance In Page.FactTypeInstance
+                             Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
+                             From Fact In FactTypeInstance.Fact
+                             Where Fact("Element").Data = asEntityTypeId
+                             Select Page Distinct
+                             Order By Page.Name
+
+            larPage.AddRange(larORMPage.ToList)
+            larPage.AddRange(larERDPage.ToList)
 
             If IsSomething(larPage) Then
                 For Each lrPage In larPage
@@ -866,7 +879,7 @@ Public Class frmToolboxModelDictionary
                     lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
-                                                               pcenumLanguage.ORMModel,
+                                                               lrPage.Language,
                                                                Nothing, lrPage.PageId)
 
 
@@ -882,6 +895,14 @@ Public Class frmToolboxModelDictionary
                         loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
                         AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
                         aoMenuStripItem.Enabled = True
+                        Select Case lrPage.Language
+                            Case Is = pcenumLanguage.ORMModel
+                                loToolStripMenuItem.Image = My.Resources.MenuImages.ORM16x16
+                            Case Is = pcenumLanguage.EntityRelationshipDiagram
+                                loToolStripMenuItem.Image = My.Resources.MenuImages.ERD16x16
+                            Case Is = pcenumLanguage.PropertyGraphSchema
+                                loToolStripMenuItem.Image = My.Resources.MenuImages.PGS16x16
+                        End Select
                     End If
 
                 Next
@@ -1590,7 +1611,13 @@ Public Class frmToolboxModelDictionary
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxView.SelectedIndexChanged
 
         Try
-            Call Me.LoadTree
+            Dim lrModelElement As Object = Nothing
+
+            If Me.TreeView1.SelectedNode IsNot Nothing Then
+                lrModelElement = Me.TreeView1.SelectedNode.Tag
+            End If
+
+            Call Me.LoadTree(Nothing, lrModelElement)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1603,9 +1630,25 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub LoadTree(Optional ByVal asSearchString As String = Nothing)
+    Private Sub LoadTree(Optional ByVal asSearchString As String = Nothing, Optional ByRef arModelElement As Object = Nothing)
 
         Try
+            If arModelElement IsNot Nothing Then
+                Select Case arModelElement.GetType
+                    Case Is = GetType(FBM.EntityType),
+                              GetType(FBM.ValueType),
+                              GetType(FBM.FactType)
+                        Me.SearchTextbox1.TextBox.Text = arModelElement.Id
+                        asSearchString = arModelElement.Id
+                    Case Is = GetType(RDS.Table)
+                        Me.SearchTextbox1.TextBox.Text = arModelElement.Name
+                        asSearchString = arModelElement.Name
+                    Case Else
+                        asSearchString = Nothing
+                End Select
+
+            End If
+
             Call Me.TreeView1.Nodes.Clear()
             Select Case Me.ComboBoxView.SelectedItem.ItemData
                 Case Is = pcenumLanguage.ORMModel

@@ -211,7 +211,7 @@ Public Class frmToolboxTableData
                               pcenumDatabaseType.SQLServer,
                               pcenumDatabaseType.ODBC
 #Region "SQL"
-                        lsSQLQuery = "INSERT INTO " & Me.mrTable.Name & "("
+                        lsSQLQuery = "INSERT INTO [" & Me.mrTable.Name & "] ("
 
                         Dim lrColumn As RDS.Column
                         Dim larColumn As New List(Of RDS.Column)

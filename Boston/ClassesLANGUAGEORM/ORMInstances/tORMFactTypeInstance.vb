@@ -1527,7 +1527,7 @@ ReattachRoles:
 
                 If Me.Shape IsNot Nothing Then
                     Me.Shape.ZBottom()
-                    Me.Page.Diagram.Invalidate()
+                    If Me.Page.Diagram IsNot Nothing Then Me.Page.Diagram.Invalidate()
                 End If
 
 
