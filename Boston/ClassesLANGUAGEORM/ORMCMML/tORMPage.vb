@@ -1962,6 +1962,8 @@ SkipRelation:
 
                 Me.ERDiagram.Entity.AddUnique(arPGSNode)
 
+                arPGSNode.GetAttributesFromRDSColumns()
+
                 '=====================
                 'Load the Attributes
                 '=====================
@@ -1971,92 +1973,103 @@ SkipRelation:
 
                 lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                Dim lrRecordset1 As ORMQL.Recordset
+                Dim lrRecordset1 As ORMQL.Recordset = Nothing
 
                 While Not lrRecordset.EOF
 
                     Dim lsMandatory As String = ""
 
-                    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    Try
+#Region "Attributes/Properties"
+                        'lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
+                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
+                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                    lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'lrRecordset("Attribute")
+                        'lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'lrRecordset("Attribute")
 
-                    lrFactDataInstance = lrFactInstance.GetFactDataInstanceByRoleName("Attribute")
+                        'lrFactDataInstance = lrFactInstance.GetFactDataInstanceByRoleName("Attribute")
 
-                    '-------------------------------
-                    'Get the Name of the Attribute
-                    '-------------------------------
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'"
+                        ''-------------------------------
+                        ''Get the Name of the Attribute
+                        ''-------------------------------
+                        'lsSQLQuery = "SELECT *"
+                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'"
 
-                    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
+                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    '-------------------------------------------------
-                    'Check to see whether the Attribute is Mandatory
-                    '-------------------------------------------------
-                    lsSQLQuery = "SELECT *"
-                    lsSQLQuery &= " FROM CoreIsMandatory"
-                    lsSQLQuery &= " WHERE IsMandatory = '" & lrRecordset("Attribute").Data & "'"
+                        ''-------------------------------------------------
+                        ''Check to see whether the Attribute is Mandatory
+                        ''-------------------------------------------------
+                        'lsSQLQuery = "SELECT *"
+                        'lsSQLQuery &= " FROM CoreIsMandatory"
+                        'lsSQLQuery &= " WHERE IsMandatory = '" & lrRecordset("Attribute").Data & "'"
 
-                    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If lrRecordset1.Facts.Count = 1 Then
-                        lsMandatory = "*"
+                        'If lrRecordset1.Facts.Count = 1 Then
+                        '    lsMandatory = "*"
 
-                        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                        '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                        '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                        '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    End If
+                        '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'End If
 
-                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
+                        'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
-                    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    '=============
-                    'Role
-                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
+                        ''=============
+                        ''Role
+                        'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
-                    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    '=============
+                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        ''=============
 
-                    '=============
-                    'FactType
-                    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
+                        ''=============
+                        ''FactType
+                        'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
 
-                    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
+                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    '=============
+                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        '=============
+#End Region
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    End Try
 
                     lrRecordset.MoveNext()
                 End While

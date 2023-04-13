@@ -2412,6 +2412,8 @@ Namespace FBM
             Dim lsMessage As String
 
             Try
+                Boston.WriteToStatusBar("Populating Relations for Entity: " & arOriginTable.Name, True)
+
                 '-----------------------------
                 'Find the Destination Entity
                 '-----------------------------

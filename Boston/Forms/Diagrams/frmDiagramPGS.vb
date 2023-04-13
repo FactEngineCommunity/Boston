@@ -14,7 +14,7 @@ Public Class frmDiagramPGS
 
     Private MorphVector As New List(Of tMorphVector)
 
-    Private PropertyTableNode As TableNode
+    Public PropertyTableNode As TableNode
     Public Function areAllEntitiesAtPoint00() As Boolean
 
         For Each lrEntity As PGS.Node In Me.zrPage.ERDiagram.Entity
@@ -1323,55 +1323,9 @@ SkipORMReadingEditor:
             If Not TypeOf (e.Node) Is TableNode Then
                 If Me.PropertyTableNode Is Nothing And
                     ((Control.ModifierKeys = Keys.Control) Or (Control.ModifierKeys = Keys.ControlKey)) Then
-
-                    Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(e.Node.Bounds.X, e.Node.Bounds.Y + 25, 30, 20, 1, 0)
-                    Me.PropertyTableNode.EnableStyledText = True
-                    Me.PropertyTableNode.Caption = "<B>" & " " & lrNode.Name & " "
-                    Me.PropertyTableNode.Tag = lrNode
-
-                    Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.Id)
-
-                    Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
-
-                    '--------------------------------------------------------------------
-                    'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
-                    Dim liInd As Integer
-                    Dim larSupertypeTable = lrRDSTable.getSupertypeTables
-                    If larSupertypeTable.Count > 0 Then
-                        larSupertypeTable.Reverse()
-                        larSupertypeTable.Add(lrRDSTable)
-                        liInd = 0
-                        For Each lrSupertypeTable In larSupertypeTable
-                            For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
-                                larColumn.Remove(lrColumn)
-                                larColumn.Insert(liInd, lrColumn)
-                                liInd += 1
-                            Next
-                        Next
-                    End If
-
-                    For Each lrColumn In larColumn
-
-                        '============================================================
-                        'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
-                        '    'Don't show the Column
-                        'Else
-
-                        '20200326-VM-Removed for demo purposes.
-                        'If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
-                        '    'ForeignKey. Don't show the Column
-                        'Else
-                        Me.PropertyTableNode.RowCount += 1
-
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
-                        Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
-                        'End If
-                        '============================================================
-                    Next
-                    Me.PropertyTableNode.ResizeToFitText(True)
+                    Call Me.DisplayNodeTypeProperties(lrNode, e.Node.Bounds.X, e.Node.Bounds.Y + 25)
                 End If
             End If
-
 
             '----------------------------------------------------
             'Set the ContextMenuStrip menu for the selected item
@@ -1440,6 +1394,73 @@ SkipORMReadingEditor:
                 End If
 
             End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Public Sub DisplayNodeTypeProperties(ByRef arNodeType As PGS.Node,
+                                          ByVal aiX As Integer,
+                                          ByVal aiY As Integer,
+                                          Optional ByVal abRemoveExistingPropertyTableNode As Boolean = False)
+
+        Try
+            If abRemoveExistingPropertyTableNode And Me.PropertyTableNode IsNot Nothing Then
+                Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+            End If
+
+            Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(aiX, aiY, 30, 20, 1, 0)
+            Me.PropertyTableNode.EnableStyledText = True
+            Me.PropertyTableNode.Caption = "<B>" & " " & arNodeType.Name & " "
+            Me.PropertyTableNode.Tag = arNodeType
+
+            Dim lrNodeType = arNodeType
+            Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNodeType.Id)
+
+            Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
+
+            '--------------------------------------------------------------------
+            'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
+            Dim liInd As Integer
+            Dim larSupertypeTable = lrRDSTable.getSupertypeTables
+            If larSupertypeTable.Count > 0 Then
+                larSupertypeTable.Reverse()
+                larSupertypeTable.Add(lrRDSTable)
+                liInd = 0
+                For Each lrSupertypeTable In larSupertypeTable
+                    For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                        larColumn.Remove(lrColumn)
+                        larColumn.Insert(liInd, lrColumn)
+                        liInd += 1
+                    Next
+                Next
+            End If
+
+            For Each lrColumn In larColumn
+
+                '============================================================
+                'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
+                '    'Don't show the Column
+                'Else
+
+                '20200326-VM-Removed for demo purposes.
+                'If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
+                '    'ForeignKey. Don't show the Column
+                'Else
+                Me.PropertyTableNode.RowCount += 1
+
+                Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                'End If
+                '============================================================
+            Next
+            Me.PropertyTableNode.ResizeToFitText(True)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -2462,10 +2483,12 @@ SkipORMReadingEditor:
                     'Select the ShapeNode/ORMObject just clicked on
                     '  Updates the Me.zrPage.SelectedObject collection.
                     '----------------------------------------------------                 
-                    If loNode.GetType = GetType(MindFusion.Diagramming.ShapeNode) Then
-                        loNode.Selected = True
-                        Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
-                    End If
+                    Select Case loNode.GetType
+                        Case Is = GetType(MindFusion.Diagramming.ShapeNode),
+                                  GetType(MindFusion.Diagramming.TableNode)
+                            loNode.Selected = True
+                            Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
+                    End Select
 
                 End If
 
@@ -2488,7 +2511,18 @@ SkipORMReadingEditor:
                 'Get the Node/Shape under the mouse cursor.
                 '----------------------------------------------------
                 loNode = Diagram.GetNodeAt(lo_point)
-                Me.DiagramView.DrawLinkCursor = Cursors.Hand
+
+                Select Case loNode.GetType
+                    Case Is = GetType(MindFusion.Diagramming.ShapeNode)
+                        Me.DiagramView.Behavior = Behavior.DrawLinks
+                        Me.DiagramView.DrawLinkCursor = Cursors.Hand
+                    Case Is = GetType(MindFusion.Diagramming.TableNode)
+                        Me.DiagramView.Behavior = Behavior.Modify
+                    Case Else
+                        Me.DiagramView.Behavior = Behavior.DrawLinks
+                        Me.DiagramView.DrawLinkCursor = Cursors.Hand
+                End Select
+
                 Cursor.Show()
 
 
@@ -3145,139 +3179,102 @@ SkipORMReadingEditor:
 
     End Sub
 
-    Private Sub ToolStripMenuItemIsPartOfPrimaryKey_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemIsPartOfPrimaryKey.Click
-
-        Dim lrAttribute As ERD.Attribute
-        Dim lsSQLQuery As String = ""
-        Dim lrRecordset As ORMQL.Recordset
-
-        lrAttribute = Me.zrPage.SelectedObject(0)
-
-        Me.ToolStripMenuItemIsPartOfPrimaryKey.Checked = Not Me.ToolStripMenuItemIsPartOfPrimaryKey.Checked
-
-        lrAttribute.PartOfPrimaryKey = Me.ToolStripMenuItemIsPartOfPrimaryKey.Checked
-
-        Call lrAttribute.RefreshShape()
-
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIndexIsForEntity.ToString
-        lsSQLQuery &= " WHERE Entity = '" & lrAttribute.Entity.Id & "'"
-
-        lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-        Dim lrFactInstance As FBM.FactInstance
-
-        Dim lsIndexName As String = ""
-        lsIndexName = Viev.Strings.RemoveWhiteSpace(lrAttribute.Entity.Id & "PK")
-
-        If lrAttribute.PartOfPrimaryKey Then
-
-            If lrRecordset.Facts.Count = 0 Then
-                '-------------------------------------------------
-                'Must create a Primary Identifier for the Entity
-                '-------------------------------------------------
-                lsSQLQuery = "INSERT INTO "
-                lsSQLQuery &= pcenumCMMLRelations.CoreIndexIsForEntity.ToString
-                lsSQLQuery &= " (Entity, Index)"
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= "'" & lrAttribute.Entity.Id & "'"
-                lsSQLQuery &= ",'" & lsIndexName & "'"
-                lsSQLQuery &= ")"
-
-                lrFactInstance = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            End If
-
-            '-------------------------------------
-            'Add the Attribute to the PrimaryKey
-            '-------------------------------------
-            lsSQLQuery = "INSERT INTO "
-            lsSQLQuery &= pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString
-            lsSQLQuery &= " (Index, Property)"
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " VALUES ("
-            lsSQLQuery &= "'" & lsIndexName & "'"
-            lsSQLQuery &= ",'" & lrAttribute.Name & "'"
-            lsSQLQuery &= ")"
-
-            Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-        Else
-            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreIndexMakesUseOfProperty.ToString
-            lsSQLQuery &= " WHERE Index = '" & lsIndexName & "'"
-            lsSQLQuery &= " AND Property = '" & lrAttribute.Name & "'"
-
-            Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-            'lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreIndexIsForEntity.ToString
-            'lsSQLQuery &= " WHERE Class = '" & lrAttribute.Entity.Id & "'"
-
-            'Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-        End If
-
-    End Sub
-
     Private Sub MoveUpToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MoveUpToolStripMenuItem.Click
 
         Dim lrAttribute As ERD.Attribute
         Dim lsSQLQuery As String = ""
 
-        lrAttribute = Me.zrPage.SelectedObject(0)
-
-        If lrAttribute.OrdinalPosition = 1 Then
-            '-----------------------------------------------------------------
-            'Can't move up any further in the OrdinalPositions of Attributes
-            '-----------------------------------------------------------------
+        Try
+            lrAttribute = Me.zrPage.SelectedObject(0)
+        Catch ex As Exception
             Exit Sub
-        Else
-            'lrAttribute.OrdinalPosition -= 1
+        End Try
 
-            '--------------------------------------------------------------------
-            'Change the Ordinal Positions of the Attributes above the Attribute
-            '--------------------------------------------------------------------
-            Dim lrChangingAttribute As ERD.Attribute
+        Try
+            If lrAttribute.OrdinalPosition = 1 Then
+                '-----------------------------------------------------------------
+                'Can't move up any further in the OrdinalPositions of Attributes
+                '-----------------------------------------------------------------
+                Exit Sub
+            Else
+                'lrAttribute.OrdinalPosition -= 1
 
-            Dim lrTableNode As MindFusion.Diagramming.TableNode = Me.Diagram.Selection.Items(0)
-            Dim lrEntity As New ERD.Entity
-            '---------------------------------------------------------
-            'Get the EntityType represented by the (selected) Entity
-            '---------------------------------------------------------
-            lrEntity = lrTableNode.Tag
+                Try
+                    Dim lrTableNode As MindFusion.Diagramming.TableNode = Me.Diagram.Selection.Items(0)
+                    Dim lrNodeType As PGS.Node = lrTableNode.Tag
 
-            lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
-            'lrChangingAttribute.OrdinalPosition += 1
+                    Call lrAttribute.Column.moveToOrdinalPosition(lrAttribute.Column.OrdinalPosition - 1, lrAttribute.Column.OrdinalPosition)
 
-            lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
-            lrAttribute.Cell.Tag = lrAttribute
-            lrChangingAttribute.Cell = lrEntity.TableShape.Item(0, lrChangingAttribute.OrdinalPosition - 1)
-            lrChangingAttribute.Cell.Tag = lrChangingAttribute
+                    Call Me.zrPage.Diagram.Nodes.Remove(lrTableNode)
 
-            Call lrAttribute.RefreshShape()
-            Call lrChangingAttribute.RefreshShape()
+                    Call Me.DisplayNodeTypeProperties(lrNodeType, lrNodeType.Shape.Bounds.X, lrNodeType.Shape.Bounds.Y + 25)
 
-            lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition - 1, lrAttribute)
-            lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition + 1)
+                    'VM-20230412-Removed and replaced with the above. Remove if all okay. Seems okay 20230412.
+                    ''--------------------------------------------------------------------
+                    ''Change the Ordinal Positions of the Attributes above the Attribute
+                    ''--------------------------------------------------------------------
+                    'Dim lrChangingAttribute As ERD.Attribute
 
-            Dim lrFactInstance As FBM.FactInstance
+                    'Dim lrTableNode As MindFusion.Diagramming.TableNode = Me.Diagram.Selection.Items(0)
+                    'Dim lrEntity As New PGS.Node
+                    ''---------------------------------------------------------
+                    ''Get the EntityType represented by the (selected) Entity
+                    ''---------------------------------------------------------
+                    '
 
-            lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " WHERE Property = '" & lrAttribute.FactDataInstance.Fact.Id & "'"
+                    'lrChangingAttribute = lrEntity.Attribute(lrAttribute.OrdinalPosition - 1)
+                    ''lrChangingAttribute.OrdinalPosition += 1
 
-            Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFactInstance = lrRecordset.CurrentFact
-            lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
+                    'lrAttribute.Cell = lrEntity.TableShape.Item(0, lrAttribute.OrdinalPosition - 1)
+                    'lrAttribute.Cell.Tag = lrAttribute
+                    'lrChangingAttribute.Cell = lrEntity.TableShape.Item(0, lrChangingAttribute.OrdinalPosition - 1)
+                    'lrChangingAttribute.Cell.Tag = lrChangingAttribute
 
-            lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-            lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
+                    'Call lrAttribute.RefreshShape()
+                    'Call lrChangingAttribute.RefreshShape()
 
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-            lrFactInstance = lrRecordset.CurrentFact
-            lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+                    'lrEntity.Attribute.Insert(lrAttribute.OrdinalPosition - 1, lrAttribute)
+                    'lrEntity.Attribute.RemoveAt(lrAttribute.OrdinalPosition + 1)
 
-            Call lrFactInstance.FactType.FactTable.ResortFactTable()
+                    'Dim lrFactInstance As FBM.FactInstance
 
-        End If
+                    'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                    'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    'lsSQLQuery &= " WHERE Property = '" & lrAttribute.FactDataInstance.Fact.Id & "'"
+
+                    'Dim lrRecordset As ORMQL.Recordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    'lrFactInstance = lrRecordset.CurrentFact
+                    'lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrAttribute.OrdinalPosition.ToString
+
+                    'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                    'lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    'lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
+
+                    'lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    'lrFactInstance = lrRecordset.CurrentFact
+                    'lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+
+                    'Call lrFactInstance.FactType.FactTable.ResortFactTable()
+
+                Catch ex As Exception
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                End Try
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
 
 
@@ -3361,33 +3358,43 @@ SkipORMReadingEditor:
         Try
             lrAttribute = Me.zrPage.SelectedObject(0)
 
-            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
-            lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
-            lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
+            Dim lsMessage = "Are you sure that you want to delete the attribute, " & lrAttribute.Name & ", from the entity, " & lrAttribute.Entity.Name & "?"
+            lsMessage &= vbCrLf & vbCrLf & "This action cannot be undone and is only available to you because you are using Boston in Superuser Mode."
 
-            Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            If MsgBox(lsMessage, MsgBoxStyle.YesNo + MsgBoxStyle.Critical) = MsgBoxResult.Yes Then
+                Call lrAttribute.Column.Table.removeColumn(lrAttribute.Column)
+            End If
 
-            lrAttribute.Entity.Attribute.Remove(lrAttribute)
+            '20230413-VM-Replaced with above. Remove if not missed.
+            'lrAttribute = Me.zrPage.SelectedObject(0)
 
-            lrAttribute.Entity.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
+            'lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+            'lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
+            'lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
 
-            '----------------------------------------------------------------------------------
-            'Reset the OrdinalPosition of the Attributes above the Attribute that was deleted
-            '----------------------------------------------------------------------------------
-            For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
-                lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
-                'lrChangingAttribute.OrdinalPosition -= 1
+            'Call Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
+            'lrAttribute.Entity.Attribute.Remove(lrAttribute)
 
-                lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                lrFactInstance = lrRecordset.CurrentFact
-                lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+            'lrAttribute.Entity.TableShape.DeleteRow(lrAttribute.OrdinalPosition - 1)
 
-                Call lrFactInstance.FactType.FactTable.ResortFactTable()
-            Next
+            ''----------------------------------------------------------------------------------
+            ''Reset the OrdinalPosition of the Attributes above the Attribute that was deleted
+            ''----------------------------------------------------------------------------------
+            'For liInd = lrAttribute.OrdinalPosition To lrAttribute.Entity.Attribute.Count
+            '    lrChangingAttribute = lrAttribute.Entity.Attribute(liInd - 1)
+            '    'lrChangingAttribute.OrdinalPosition -= 1
+
+            '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+            '    lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+            '    lsSQLQuery &= " WHERE Property = '" & lrChangingAttribute.FactDataInstance.Fact.Id & "'"
+
+            '    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+            '    lrFactInstance = lrRecordset.CurrentFact
+            '    lrFactInstance.GetFactDataInstanceByRoleName("Position").Data = lrChangingAttribute.OrdinalPosition.ToString
+
+            '    Call lrFactInstance.FactType.FactTable.ResortFactTable()
+            'Next
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -5248,6 +5255,106 @@ EndProcessing:
                 End If
             End If
 
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub PropertiesToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles PropertiesToolStripMenuItem2.Click
+
+        Try
+            '---------------------------------------------------------
+            'Get the Attribute represented by the (selected) Property
+            '---------------------------------------------------------
+            Dim lrAttribute As ERD.Attribute
+            Try
+                lrAttribute = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+
+            '--------------------------------------
+            'Set the PropertiesGrid.SeletedObject
+            '--------------------------------------
+            Dim lrPropertyGridForm As frmToolboxProperties
+
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            If IsSomething(lrPropertyGridForm) Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                lrPropertyGridForm.PropertyGrid.SelectedObject = lrAttribute 'e.Cell.Tag
+                lrPropertyGridForm.Show()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ContextMenuStripAttribute_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripAttribute.Opening
+
+        Try
+            '---------------------------------------------------------
+            'Get the Attribute represented by the (selected) Property
+            '---------------------------------------------------------
+            Dim lrAttribute As ERD.Attribute
+            Try
+                lrAttribute = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            Me.ToolStripMenuItemIsPartOfPrimaryKey.Checked = lrAttribute.Column.isPartOfPrimaryKey
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemNodeTypeShowInModelDictionary_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemNodeTypeShowInModelDictionary.Click
+
+        Dim lrPGSNode As New PGS.Node
+        Dim lfrmModelDictionary As frmToolboxModelDictionary
+
+        Try
+            'CodeSafe
+            If Me.Diagram.Selection.Items.Count = 0 Then Exit Sub
+
+            '-------------------------
+            'Get the selected PGS Node            
+            lrPGSNode = Me.Diagram.Selection.Items(0).Tag
+
+            If prApplication.RightToolboxForms.FindAll(Function(x) x.Name = frmToolboxModelDictionary.Name).Count = 0 Then
+                Call frmMain.LoadToolboxModelDictionary()
+            End If
+
+            lfrmModelDictionary = prApplication.RightToolboxForms.Find(Function(x) x.Name = frmToolboxModelDictionary.Name)
+
+            Call lfrmModelDictionary.LoadToolboxModelDictionary(pcenumLanguage.PropertyGraphSchema, True)
+
+            Call lfrmModelDictionary.FindTreeNode(lrPGSNode.Name)
+
+            lfrmModelDictionary.Show()
 
         Catch ex As Exception
             Dim lsMessage As String

@@ -66,6 +66,7 @@ Public Class frmToolboxErrorList
                 Dim larModelError = From ModelError In Me.zrModel.ModelError
                                     Where ModelError.ModelObject IsNot Nothing
                                     Where ModelError.ModelObject.IsMDAModelElement = False
+                                    Where ModelError.ErrorId <> pcenumModelErrors.CMMLModelError
                                     Select ModelError
 
                 Dim larCMMLModelError = From ModelError In Me.zrModel.ModelError

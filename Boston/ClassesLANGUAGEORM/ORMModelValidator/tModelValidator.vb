@@ -80,6 +80,7 @@ Namespace Validation
                 'CompoundReferenceSchemeForEntityTypeWithReferenceMode
                 'Me.AddErrorChecker(New Validation.ModelElementAppearsOnNoPageError(Me.Model)) '130
                 Me.AddErrorChecker(New Validation.ErrorCheckerPopulationHasNULLValueError(Me.Model)) '131
+                Me.AddErrorChecker(New Validation.ErrorCheckerCMMLModelError(Me.Model)) '140
 
             Catch ex As Exception
                 Dim lsMessage As String

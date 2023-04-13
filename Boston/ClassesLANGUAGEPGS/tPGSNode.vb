@@ -808,6 +808,36 @@ Namespace PGS
 
         End Sub
 
+        Private Sub RDSTable_ColumnRemoved(arColumn As Column) Handles RDSTable.ColumnRemoved
+
+            Try
+                'CodeSafe
+                If Me.Page Is Nothing Then Exit Sub
+
+                If Me.Page.Form IsNot Nothing Then
+                    If Me.Page.Form.PropertyTableNode IsNot Nothing Then
+                        Try
+                            If Me.Page.Form.PropertyTableNode.Tag.Id = Me.FBMModelElement.Id Then
+                                Call Me.Page.Form.DisplayNodeTypeProperties(Me, Me.X, Me.Y, True)
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie. Tried
+                        End Try
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

@@ -102,33 +102,39 @@ Namespace ORMQL
 
                     For Each lrData In Me.mrRecordset.Facts(index).Data
 
-                        Dim lsColumn As String = Me.mrRecordset.Columns(liInd)
-                        Dim lsColumnName As String
                         Try
-                            lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                            Dim lsColumn As String = Me.mrRecordset.Columns(liInd)
+                            Dim lsColumnName As String
+                            Try
+                                lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                            Catch ex As Exception
+                                lsColumnName = lsColumn
+                            End Try
+
+                            'Dim lsString = Me.mrRecordset.Columns(liInd)
+                            Dim piInstance As PropertyInfo = Me.DynamicObject.GetType.GetProperty(lsColumnName)
+
+                            Select Case Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName).getMetamodelDataType 'Was lsString
+                                Case Is = pcenumORMDataType.TemporalDate,
+                                          pcenumORMDataType.TemporalDateAndTime
+                                    Try
+                                        'lsDataAsString = DateTime.ParseExact(lrData.Data,
+                                        '                                     System.Threading.Thread.CurrentThread.CurrentUICulture.DateTimeFormat.FullDateTimePattern,
+                                        '                                     System.Globalization.CultureInfo.InvariantCulture).ToString(System.Threading.Thread.CurrentThread.CurrentUICulture.DateTimeFormat.FullDateTimePattern)
+                                        lsDataAsString = Convert.ToDateTime(lrData.Data).ToString(My.Settings.FactEngineUserDateTimeFormat)
+                                    Catch ex As Exception
+                                        lsDataAsString = lrData.Data
+                                    End Try
+                                Case Else
+                                    lsDataAsString = lrData.Data
+                            End Select
+
+                            piInstance.SetValue(Me.DynamicObject, lsDataAsString)
                         Catch ex As Exception
-                            lsColumnName = lsColumn
+                            'Not a biggie. Column's data won't be set,
+                            ' but indicates to the user there is something wrong with the Column; possibly ColumnName mismatch between Model and Database Table/NodeType.
                         End Try
 
-                        'Dim lsString = Me.mrRecordset.Columns(liInd)
-                        Dim piInstance As PropertyInfo = Me.DynamicObject.GetType.GetProperty(lsColumnName)
-
-                        Select Case Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName).getMetamodelDataType 'Was lsString
-                            Case Is = pcenumORMDataType.TemporalDate,
-                                      pcenumORMDataType.TemporalDateAndTime
-                                Try
-                                    'lsDataAsString = DateTime.ParseExact(lrData.Data,
-                                    '                                     System.Threading.Thread.CurrentThread.CurrentUICulture.DateTimeFormat.FullDateTimePattern,
-                                    '                                     System.Globalization.CultureInfo.InvariantCulture).ToString(System.Threading.Thread.CurrentThread.CurrentUICulture.DateTimeFormat.FullDateTimePattern)
-                                    lsDataAsString = Convert.ToDateTime(lrData.Data).ToString(My.Settings.FactEngineUserDateTimeFormat)
-                                Catch ex As Exception
-                                    lsDataAsString = lrData.Data
-                                End Try
-                            Case Else
-                                lsDataAsString = lrData.Data
-                        End Select
-
-                        piInstance.SetValue(Me.DynamicObject, lsDataAsString)
                         liInd += 1
                     Next
                     Return Me.DynamicObject.clone

@@ -43,6 +43,7 @@
         'Start at 500 so as not to confuse with ModelErrors.
         None = 500
         RDSRelationOriginDestintaionColumnCountMismatch = 501
+        RDSColumnNotInCorrespondingDatabaseEntity = 502
 
     End Enum
 

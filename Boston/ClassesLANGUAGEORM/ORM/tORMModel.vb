@@ -762,32 +762,32 @@ Namespace FBM
             Try
 
                 For Each lrValueType In Me.ValueType
-                    lrValueType.ModelError.Clear()
+                    lrValueType._ModelError.Clear()
                 Next
 
                 For Each lrEntityType In Me.EntityType
-                    lrEntityType.ModelError.Clear()
+                    lrEntityType._ModelError.Clear()
                 Next
 
                 For Each lrFactType In Me.FactType
 
-                    lrFactType.ModelError = New List(Of ModelError) 'For copying/pasting
+                    lrFactType._ModelError = New List(Of ModelError) 'For copying/pasting
 
                     lrFactType.ModelError.Clear()
                     For Each lrFact In lrFactType.Fact
-                        lrFact.ModelError.Clear()
+                        lrFact._ModelError.Clear()
                     Next
                 Next
 
                 For Each lrRoleConstraint In Me.RoleConstraint
-                    lrRoleConstraint.ModelError = New List(Of ModelError) 'For copying/pasting
-                    lrRoleConstraint.ModelError.Clear()
+                    lrRoleConstraint._ModelError = New List(Of ModelError) 'For copying/pasting
+                    lrRoleConstraint._ModelError.Clear()
                     For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
                         'lrRoleConstraintRole.ModelError.Clear()
                     Next
                 Next
 
-                Me.ModelError.RemoveAll(Function(x) x.SubErrorId = pcenumModelSubErrorType.None)
+                Me._ModelError.RemoveAll(Function(x) x.SubErrorId = pcenumModelSubErrorType.None)
                 RaiseEvent ModelErrorsCleared()
 
             Catch ex As Exception

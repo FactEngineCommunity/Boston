@@ -807,6 +807,16 @@ Public Class frmToolboxModelDictionary
                                             Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
                                     End Select
                                     Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
+                                Case Is = GetType(RDS.Column)
+                                    Dim lrColumn As RDS.Column = loModelObject
+                                    Dim lrTable As RDS.Table = lrColumn.Table
+                                    Select Case lrTable.FBMModelElement.GetType
+                                        Case Is = GetType(FBM.EntityType)
+                                            Call LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
+                                        Case Is = GetType(FBM.FactType)
+                                            Call LoadPagesForFactType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
+                                    End Select
+                                    Me.TreeView1.ContextMenuStrip = Me.ContextMenuStripMain
                                 Case Else
                                     Me.TreeView1.ContextMenuStrip = Nothing
                             End Select
@@ -1163,10 +1173,17 @@ Public Class frmToolboxModelDictionary
     Private Sub ContextMenuStrip1_Opening(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStripMain.Opening
 
         Try
+            Me.ViewInGlossaryToolStripMenuItem.Enabled = True
+            Me.ToolStripMenuItemMakeNewPageForThisModelElement.Enabled = True
+
             Select Case Me.TreeView1.SelectedNode.Tag.GetType
                 Case Is = GetType(FBM.EntityType),
                           GetType(FBM.ValueType),
                           GetType(FBM.FactType)
+                    Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
+                Case Is = GetType(RDS.Column)
+                    Me.ViewInGlossaryToolStripMenuItem.Enabled = False
+                    Me.ToolStripMenuItemMakeNewPageForThisModelElement.Enabled = False
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
                 Case Is = GetType(RDS.Table)
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
@@ -1334,10 +1351,16 @@ Public Class frmToolboxModelDictionary
 
             Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrLoadedModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
-            Dim lrModelObject As FBM.ModelObject
+            Dim lrModelObject As FBM.ModelObject = Nothing
 
             Try
-                lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+                Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                    Case Is = GetType(RDS.Column)
+                        Dim lrColumn As RDS.Column = Me.TreeView1.SelectedNode.Tag
+                        lrModelObject = lrColumn.FactType
+                    Case Else
+                        lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+                End Select
 
                 If frmMain.IsDiagramSpyFormLoaded Then
                     prApplication.ActivePages.Find(Function(x) x.Tag.GetType Is GetType(FBM.DiagramSpyPage)).Close()

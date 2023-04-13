@@ -524,6 +524,11 @@ Namespace FBM
         Public Function connectToDatabase(Optional abForceConnection As Boolean = False) As Boolean
 
             Try
+                'CodeSafe
+                If Me.TargetDatabaseType = pcenumDatabaseType.None Then
+                    Return False
+                End If
+
                 If abForceConnection Then
                     'Try and establish a connection
                     Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString)

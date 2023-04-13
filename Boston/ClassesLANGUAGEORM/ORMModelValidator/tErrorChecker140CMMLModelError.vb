@@ -19,7 +19,36 @@ Namespace Validation
             Dim lrModelError As FBM.ModelError
 
             Try
-                Throw New NotImplementedException("Not yet implemented. 202304")
+
+                '================================================================
+                'RDS Column not in corresponding Database Table/NodeType/Entity
+                '================================================================
+                Me.Model.connectToDatabase(False)
+
+                If Me.Model.DatabaseConnection IsNot Nothing Then
+
+                    For Each lrTable In Me.Model.RDS.Table
+
+                        Dim larDatabaseColumn = Me.Model.DatabaseConnection.getColumnsByTable(lrTable)
+
+                        For Each lrColumn In lrTable.Column
+
+                            If larDatabaseColumn.Find(Function(x) x.Name = lrColumn.Name Or x.Name = lrColumn.DBName) Is Nothing Then
+
+                                lsErrorMessage = "Column/Property, " & lrColumn.Name & ", is not represented in the database, for the Table/Node Type/Entity, " & lrTable.Name & "."
+
+                                lrModelError = New FBM.ModelError(pcenumModelErrors.CMMLModelError,
+                                                                  lsErrorMessage,
+                                                                  Nothing,
+                                                                  lrTable.FBMModelElement, True, pcenumModelSubErrorType.RDSColumnNotInCorrespondingDatabaseEntity, lrTable)
+
+                            End If
+                        Next
+                    Next
+                End If
+
+
+
                 'For Each lrFactType In Me.Model.FactType
 
                 '    If lrFactType.Fact.Count > 0 Then
