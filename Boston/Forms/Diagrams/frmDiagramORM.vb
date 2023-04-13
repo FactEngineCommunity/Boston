@@ -5502,6 +5502,7 @@ SkipPopup:
             Me.zrPage = arPage
             Me.Tag = arPage
             Me.TabText = arPage.Name
+            Me.zrPage.Diagram = Me.Diagram
 
             '===========================
             'Set the Zoom factor

@@ -319,6 +319,7 @@ Public Class frmDiagramPGS
             '-------------------------------------------------------
             Me.zrPage = arPage
             Me.TabText = arPage.Name
+            Me.Tag = arPage
 
             Me.zoTreeNode = aoTreeNode
 

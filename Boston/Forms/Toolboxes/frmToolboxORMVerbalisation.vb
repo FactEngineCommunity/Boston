@@ -3102,11 +3102,43 @@ Public Class frmToolboxORMVerbalisation
                                   Where FactType.IsLinkFactType = False
                                   Select FactType
 
-                For Each lrFactType In larFactType
-                    lrVerbaliser.VerbaliseModelObject(lrFactType)
-                    lrVerbaliser.HTW.WriteBreak()
-                Next
+                If larFactType.Count > 0 Then
+                    For Each lrFactType In larFactType
+                        lrVerbaliser.VerbaliseModelObject(lrFactType)
+                        lrVerbaliser.HTW.WriteBreak()
+                    Next
+                Else
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseQuantifier("There are none")
+                End If
+
             End If
+
+            If arFactType.IsManyTo1BinaryFactType Then
+
+                Dim larRDSColumn = From Table In Me.zrModel.RDS.Table
+                                   From Column In Table.Column
+                                   Where Column.FactType IsNot Nothing
+                                   Where Column.FactType.Id = arFactType.Id
+                                   Select Column
+
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseHeading("Attribute/Property for this Fact Type:")
+
+                If larRDSColumn.Count > 0 Then
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseQuantifier(larRDSColumn(0).Name)
+                Else
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseQuantifier("There are none.")
+                End If
+
+            End If
+
 
             Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
@@ -3484,42 +3516,52 @@ Public Class frmToolboxORMVerbalisation
 
         lasURLArgument = e.Url.ToString.Split(":")
 
-        If lasURLArgument(0) = "elementid" Then
+        Try
 
-            lsModelObjectName = lasURLArgument(1)
-            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+            If lasURLArgument(0) = "elementid" Then
 
-            Dim lrModelObject As FBM.ModelObject
+                lsModelObjectName = lasURLArgument(1)
+                Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
-            lrModelObject = Me.zrModel.GetModelObjectByName(lsModelObjectName)
+                Dim lrModelObject As FBM.ModelObject
 
-            If frmMain.IsDiagramSpyFormLoaded Then
-                prApplication.ActivePages.Find(Function(x) x.Tag.GetType Is GetType(FBM.DiagramSpyPage)).Close()
+                lrModelObject = Me.zrModel.GetModelObjectByName(lsModelObjectName)
+
+                If frmMain.IsDiagramSpyFormLoaded Then
+                    prApplication.ActivePages.Find(Function(x) x.Tag.GetType Is GetType(FBM.DiagramSpyPage)).Close()
+                End If
+
+                '------------------------------------------------------------------------------------------
+                'Cancel the Navigation so that the new verbalisation isn't wiped out.
+                '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
+                '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
+                '------------------------------------------------------------------------------------------
+                e.Cancel = True
+
+                Select Case lrModelObject.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Call Me.VerbaliseValueType(lrModelObject)
+                    Case Is = pcenumConceptType.EntityType
+                        Call Me.VerbaliseEntityType(lrModelObject)
+                    Case Is = pcenumConceptType.FactType
+                        Call Me.VerbaliseFactType(lrModelObject)
+                    Case Is = pcenumConceptType.RoleConstraint
+                        'TBA
+                End Select
+
+                Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+
             End If
 
-            '------------------------------------------------------------------------------------------
-            'Cancel the Navigation so that the new verbalisation isn't wiped out.
-            '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
-            '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
-            '------------------------------------------------------------------------------------------
-            e.Cancel = True
+            'e.Cancel = True
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Select Case lrModelObject.ConceptType
-                Case Is = pcenumConceptType.ValueType
-                    Call Me.VerbaliseValueType(lrModelObject)
-                Case Is = pcenumConceptType.EntityType
-                    Call Me.VerbaliseEntityType(lrModelObject)
-                Case Is = pcenumConceptType.FactType
-                    Call Me.VerbaliseFactType(lrModelObject)
-                Case Is = pcenumConceptType.RoleConstraint
-                    'TBA
-            End Select
-
-            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
-
-        End If
-
-        'e.Cancel = True
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -3872,6 +3914,213 @@ Public Class frmToolboxORMVerbalisation
         End If
         If liDataTypePrecision > 0 And Not lbPrecisionDone Then
             lrVerbaliser.VerbaliseBlackText("(" & liDataTypePrecision.ToString & ")")
+        End If
+
+        Dim lrFactTypeReading As FBM.FactTypeReading
+        Dim lrFactType As FBM.FactType = arColumn.Role.FactType
+
+        '===========================================
+        Dim lrRoleConstraint As FBM.RoleConstraint
+
+        If lrFactType.HasTotalRoleConstraint Then
+            lrVerbaliser.HTW.WriteBreak()
+            lrRoleConstraint = lrFactType.InternalUniquenessConstraint(0)
+
+            lrVerbaliser.VerbaliseModelObject(lrFactType)
+            lrVerbaliser.VerbaliseQuantifier(" has a Total Internal Uniqueness Constraint.")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Role Constraint:")
+            lrVerbaliser.VerbaliseModelObject(lrRoleConstraint)
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("In each population of ")
+            lrVerbaliser.VerbaliseModelObject(lrFactType)
+            lrVerbaliser.VerbaliseQuantifier(" each ")
+
+            Dim liInd As Integer = 0
+
+            For Each lrRole In lrFactType.RoleGroup
+                lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
+                liInd += 1
+                If liInd < lrFactType.Arity Then
+                    lrVerbaliser.VerbaliseSeparator(",")
+                End If
+            Next
+
+            lrVerbaliser.VerbaliseQuantifier(" combination occurs at most once.")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("This association of ")
+
+            liInd = 0
+            For Each lrRole In lrFactType.RoleGroup
+                lrVerbaliser.HTW.Write(" ")
+                lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
+                If liInd < lrFactType.Arity Then
+                    lrVerbaliser.VerbaliseSeparator(",")
+                End If
+            Next
+
+            lrVerbaliser.VerbaliseQuantifier(" provides the preferred identification scheme for ")
+            lrVerbaliser.VerbaliseModelObject(lrFactType)
+            lrVerbaliser.VerbaliseQuantifier(".")
+            lrVerbaliser.HTW.WriteBreak()
+
+            '===========================================
+        ElseIf lrFactType.Arity = 2 Then
+            If lrFactType.FactTypeReading.Count > 0 Then
+
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseHeading("ORM Level")
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+
+                lrFactTypeReading = arColumn.Role.FactType.FactTypeReading(0)
+                lrFactTypeReading.GetReadingText(lrVerbaliser)
+                lrVerbaliser.VerbaliseTextLightGray(" Fact Type: ")
+                lrVerbaliser.VerbaliseModelObjectLightGray(arColumn.Role.FactType)
+                lrVerbaliser.HTW.WriteBreak()
+
+                lrVerbaliser.VerbaliseIndent()
+                lrVerbaliser.VerbaliseQuantifier("Each ")
+                lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(0).JoinedORMObject)
+                lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
+                lrVerbaliser.VerbaliseQuantifier(" at most one ")
+                lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(1).JoinedORMObject)
+
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseIndent()
+
+                If lrFactType.IsManyToOneByRoleOrder(lrFactTypeReading.RoleList) Then
+                    lrVerbaliser.VerbaliseQuantifier("It is possible that more than one ")
+                    lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(0).JoinedORMObject)
+                    lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
+                    lrVerbaliser.VerbaliseQuantifier(" the same ")
+                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                    lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(1).JoinedORMObject)
+                ElseIf lrFactType.Is1To1BinaryFactType Then
+                    Dim larRole As New List(Of FBM.Role)
+                    larRole.Add(lrFactType.RoleGroup(1))
+                    larRole.Add(lrFactType.RoleGroup(0))
+                    lrFactTypeReading = lrFactType.FindSuitableFactTypeReadingByRoles(larRole)
+                    lrVerbaliser.VerbaliseQuantifier("Each ")
+                    lrVerbaliser.VerbaliseModelObject(larRole(0).JoinedORMObject)
+                    lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
+                    lrVerbaliser.VerbaliseQuantifier(" at most one ")
+                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                    lrVerbaliser.VerbaliseModelObject(larRole(1).JoinedORMObject)
+                End If
+
+                If arColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
+                    Dim lrEntityType As FBM.EntityType = arColumn.Role.JoinedORMObject
+                    Dim lrTopmostSupertype As FBM.EntityType = lrEntityType.GetTopmostSupertype
+
+                    If lrTopmostSupertype.HasSimpleReferenceScheme Then
+
+                        If lrTopmostSupertype.ReferenceModeRoleConstraint Is Nothing Then
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.VerbaliseError("Error: Entity Type, '" & lrEntityType.Id & ", has no Reference Mode Role Constraint.")
+                        Else
+
+                            If lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role Is arColumn.ActiveRole Then
+
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseQuantifier("This association with ")
+                                lrVerbaliser.VerbaliseModelObject(lrEntityType.ReferenceModeValueType)
+                                lrVerbaliser.VerbaliseQuantifier(" provides the preferred reference scheme for ")
+                                lrVerbaliser.VerbaliseModelObject(lrEntityType)
+                            End If
+                        End If
+
+                    End If
+                End If
+            End If
+        ElseIf lrFactType.Arity > 2 Then
+            Select Case arColumn.Role.JoinedORMObject.ConceptType
+                Case Is = pcenumConceptType.EntityType
+                    Dim lrEntityType As FBM.EntityType = arColumn.Role.JoinedORMObject
+                    If lrEntityType.HasSimpleReferenceScheme Then
+                        If lrEntityType.ReferenceModeValueType Is arColumn.ActiveRole.JoinedORMObject Then
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.VerbaliseHeading("ORM Level")
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.VerbaliseQuantifier("This Attribute ultimately references the ORM Entity Type ")
+                            lrVerbaliser.VerbaliseModelObject(lrEntityType)
+                            lrVerbaliser.VerbaliseQuantifier(" with a Reference Mode Value Type with name ")
+                            lrVerbaliser.VerbaliseModelObject(lrEntityType.ReferenceModeValueType)
+                        End If
+                    End If
+                Case Is = pcenumConceptType.FactType
+                    Select Case arColumn.ActiveRole.JoinedORMObject.ConceptType
+                        Case Is = pcenumConceptType.EntityType
+                        Case Is = pcenumConceptType.ValueType
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.VerbaliseHeading("ORM Level")
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.HTW.WriteBreak()
+                            lrVerbaliser.VerbaliseQuantifier("This Attribute ultimately references the ORM Value Type ")
+                            lrVerbaliser.VerbaliseModelObject(arColumn.ActiveRole.JoinedORMObject)
+                    End Select
+            End Select
+        Else
+            'Is UnaryFactType Column/Attribute
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseHeading("ORM Level")
+            lrVerbaliser.HTW.WriteBreak()
+
+            lrFactTypeReading = arColumn.Role.FactType.FactTypeReading(0)
+            lrVerbaliser.HTW.WriteBreak()
+
+            lrFactTypeReading.GetReadingText(lrVerbaliser)
+            'lrVerbaliser.VerbaliseModelObject(lrFactType.RoleGroup(0).JoinedORMObject)
+            'lrVerbaliser.VerbalisePredicateText(" " & lrFactTypeReading.PredicatePart(0).PredicatePartText)
+
+
+            lrVerbaliser.HTW.WriteBreak()
+
+        End If
+
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.VerbaliseHeading("Value Constraints:")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+
+        Dim liCounter As Integer = 0
+        Dim lrResponsibleModelObject As FBM.ModelObject = Nothing
+        If arColumn.getMetamodelValueContraintValues(lrResponsibleModelObject).Count > 0 Then
+
+            If lrResponsibleModelObject Is Nothing Then
+                lrVerbaliser.VerbaliseError("Error: Column has no Active Role.")
+            Else
+
+                lrVerbaliser.VerbaliseQuantifier("Possible Values for ")
+                lrVerbaliser.VerbaliseModelObject(lrResponsibleModelObject)
+                lrVerbaliser.VerbaliseQuantifier(" are {")
+                For Each lsString In arColumn.getMetamodelValueContraintValues(lrResponsibleModelObject)
+                    liCounter += 1
+                    If liCounter = 1 Then
+                        lrVerbaliser.HTW.Write("'" & lsString & "'")
+                    Else
+                        lrVerbaliser.HTW.Write(", '" & lsString & "'")
+                    End If
+                Next
+                lrVerbaliser.VerbaliseQuantifier("}")
+            End If
+        Else
+            lrVerbaliser.VerbaliseQuantifier("There are no Value Constraints for this Attribute.")
+        End If
+
+        If My.Settings.SuperuserMode Then
+            If arColumn.ActiveRole.JoinedORMObject.GetType = GetType(FBM.EntityType) And Not arColumn.ActiveRole.FactType.Arity = 1 Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseError("Error: This Attribute is joined to an EntityType (" & arColumn.ActiveRole.JoinedORMObject.Id & ") rather than the Entity Type's Reference Scheme's Value Type.")
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseError("Either set the Reference Scheme for the joined Entity Type or contact support for how to resolve this issue.")
+            End If
         End If
 
 
