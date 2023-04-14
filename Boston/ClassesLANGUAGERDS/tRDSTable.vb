@@ -1551,10 +1551,11 @@ Namespace RDS
                                 Optional abById As Boolean = False)
 
             Try
+                Dim lrColumn As RDS.Column = arColumn
+
                 'CodeSafe
                 If arColumn Is Nothing Then Exit Sub
-
-                Dim lrColumn As RDS.Column = arColumn
+                If Me.Column.FindAll(Function(x) x.Name = lrColumn.Name).Count > 1 Then abById = True
 
                 If abById Then
                     Me.Column.RemoveAll(Function(x) x.Id = lrColumn.Id)

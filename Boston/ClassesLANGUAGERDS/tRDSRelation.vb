@@ -581,7 +581,8 @@ Namespace RDS
         Public Sub RemoveDestinationColumn(ByRef arColumn As RDS.Column)
 
             Try
-                Me.DestinationColumns.Remove(arColumn)
+                Dim lrColumn = arColumn
+                Me.DestinationColumns.RemoveAll(Function(x) x.Id = lrColumn.Id)
 
                 'CMML
                 Call Me.Model.Model.removeCMMLRelationDestinationColumn(Me, arColumn)
@@ -1077,7 +1078,7 @@ Namespace RDS
 
             Try
                 'CodeSafe
-                If Me.DestinationColumns.Contains(arColumn) Then
+                If Me.DestinationColumns.FindAll(Function(x) x.Id = arColumn.Id).Count > 0 Then
                     Call Me.RemoveDestinationColumn(arColumn)
                     If Me.ResponsibleFactType.IsManyTo1BinaryFactType Then
                         Dim lrRole = Me.ResponsibleFactType.RoleGroup.Find(Function(x) x.InternalUniquenessConstraint.Count > 0)

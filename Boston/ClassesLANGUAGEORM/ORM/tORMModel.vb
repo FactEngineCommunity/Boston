@@ -787,7 +787,10 @@ Namespace FBM
                     Next
                 Next
 
-                Me._ModelError.RemoveAll(Function(x) x.SubErrorId = pcenumModelSubErrorType.None)
+                Dim laiSubErrorId() As Integer = {502}
+                Me._ModelError.RemoveAll(Function(x) x.SubErrorId = pcenumModelSubErrorType.None Or laiSubErrorId.Contains(x.SubErrorId))
+
+
                 RaiseEvent ModelErrorsCleared()
 
             Catch ex As Exception
@@ -4108,6 +4111,18 @@ PostRDSProcessing:
                         Dim lrTable As RDS.Table
                         Dim lrColumn As RDS.Column
 
+                        Dim lrRoleConstraint = arRoleConstraint
+
+                        Dim duplicateRoleConstraints = From rc1 In Me.RoleConstraint
+                                                       From rc2 In Me.RoleConstraint
+                                                       Where rc1.Id = lrRoleConstraint.Id
+                                                       Where rc1 IsNot rc2 AndAlso rc1.Role.OrderBy(Function(r) r.Id).SequenceEqual(rc2.Role.OrderBy(Function(r) r.Id))
+                                                       Select rc1, rc2
+
+                        If duplicateRoleConstraints.Count > 0 Then
+                            GoTo SkipRDSProcessing
+                        End If
+
                         If arRoleConstraint.impliesSingleColumnForRDSTable Then
                             Dim lrRole As FBM.Role
 
@@ -4290,6 +4305,7 @@ PostRDSProcessing:
 
                     End If 'Is InternalUniquenessConstraint
                 End If
+SkipRDSProcessing:
 
             Catch ex As Exception
                 Dim lsMessage As String

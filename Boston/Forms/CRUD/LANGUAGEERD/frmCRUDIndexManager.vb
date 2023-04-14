@@ -770,7 +770,10 @@ EnableRevert:
                 Me.mrApplyTable.Index.Remove(lrIndex)
 
                 'Prechecking
-                If Me.mrTable.FBMModelElement.GetType = GetType(FBM.EntityType) And lrRoleConstaint.IsPreferredIdentifier And lrRoleConstaint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+                If Me.mrTable.FBMModelElement.GetType = GetType(FBM.EntityType) And
+                    lrRoleConstaint.IsPreferredIdentifier And
+                    lrRoleConstaint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint And
+                    Me.mrTable.Index.FindAll(Function(x) x.IsPrimaryKey).Count = 1 Then
                     'Tryin to delete the ReferenceMode of an EntityType. Don't allow. Direct to PropertiesGrid toolbox.
                     e.Cancel = True
 
