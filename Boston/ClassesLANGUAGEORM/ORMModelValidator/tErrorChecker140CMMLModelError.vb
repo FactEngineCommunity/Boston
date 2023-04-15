@@ -23,7 +23,9 @@ Namespace Validation
                 '================================================================
                 'RDS Column not in corresponding Database Table/NodeType/Entity
                 '================================================================
-                Me.Model.connectToDatabase(False)
+                If Me.Model.DatabaseConnection Is Nothing Then
+                    Me.Model.connectToDatabase(False)
+                End If
 
                 If Me.Model.DatabaseConnection IsNot Nothing Then
 
@@ -31,7 +33,7 @@ Namespace Validation
 
                         Dim larDatabaseColumn = Me.Model.DatabaseConnection.getColumnsByTable(lrTable)
 
-                        For Each lrColumn In lrTable.Column
+                        For Each lrColumn In lrTable.Column.FindAll(Function(x) Not x.IsInherited)
 
                             If larDatabaseColumn.Find(Function(x) x.Name = lrColumn.Name Or x.Name = lrColumn.DBName) Is Nothing Then
 

@@ -190,11 +190,11 @@ Namespace FactEngine
                             cmd.Transaction = tr
                             cmd.CommandText = Me.generateSQLCREATETABLEStatement(arRelation.OriginTable, arRelation.OriginTable.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arRelation.OriginTable.Name & "_temp SELECT " & lsColumnList & " FROM [" & arRelation.OriginTable.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arRelation.OriginTable.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arRelation.OriginTable.Name & "]"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "DROP TABLE [" & arRelation.OriginTable.Name & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arRelation.OriginTable.Name & "_temp RENAME TO [" & arRelation.OriginTable.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arRelation.OriginTable.Name & "_temp] RENAME TO [" & arRelation.OriginTable.Name & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 

@@ -1518,6 +1518,7 @@ Namespace FBM
 
             Try
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                Dim lsMessage As String = ""
 
                 Select Case Me.RoleConstraintType
                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint,
@@ -1561,30 +1562,35 @@ Namespace FBM
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     For Each lrRoleConstraintRole In Me.RoleConstraintRole
 
-                        If arFactTypeInstance Is Nothing Then
-                            lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
-                            If lrRoleInstance Is Nothing Then
-                                'This is a problem.
-                                Call arPage.DropFactTypeAtPoint(lrRoleConstraintRole.Role.FactType, New PointF(10, 10), False, False, False, False, True, True, False)
+                        Try
+                            If arFactTypeInstance Is Nothing Then
                                 lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                                If lrRoleInstance Is Nothing Then
+                                    'This is a problem.
+                                    Call arPage.DropFactTypeAtPoint(lrRoleConstraintRole.Role.FactType, New PointF(10, 10), False, False, False, False, True, True, False)
+                                    lrRoleInstance = arPage.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                                End If
+                            Else
+                                lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
                             End If
-                        Else
-                            lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
-                        End If
 
-                        '--------------------------------------------------------------------
-                        'Create a RoleConstraintRoleInstance for the RoleConstraintInstance
-                        '--------------------------------------------------------------------
-                        lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
-                        lrRoleConstraintRoleInstance.IsEntry = lrRoleConstraintRole.IsEntry
-                        lrRoleConstraintRoleInstance.IsExit = lrRoleConstraintRole.IsExit
+                            '--------------------------------------------------------------------
+                            'Create a RoleConstraintRoleInstance for the RoleConstraintInstance
+                            '--------------------------------------------------------------------
+                            lrRoleConstraintRoleInstance = New FBM.RoleConstraintRoleInstance(lrRoleConstraintRole, lrRoleConstraintInstance, lrRoleInstance)
+                            lrRoleConstraintRoleInstance.IsEntry = lrRoleConstraintRole.IsEntry
+                            lrRoleConstraintRoleInstance.IsExit = lrRoleConstraintRole.IsExit
 
 
-                        If lrRoleInstance.Role.FactType.IsSubtypeRelationshipFactType Then
-                            lrRoleConstraintRoleInstance.SubtypeConstraintInstance = arPage.SubtypeRelationship.Find(Function(x) x.SubtypeRelationship.FactType.Id = lrRoleInstance.Role.FactType.Id)
-                        End If
+                            If lrRoleInstance.Role.FactType.IsSubtypeRelationshipFactType Then
+                                lrRoleConstraintRoleInstance.SubtypeConstraintInstance = arPage.SubtypeRelationship.Find(Function(x) x.SubtypeRelationship.FactType.Id = lrRoleInstance.Role.FactType.Id)
+                            End If
 
-                        lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                            lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
+                        Catch ex As Exception
+                            lsMessage = "Error creating RoleConstraintRoleInstance for RoleConstraint, " & Me.Id
+                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
+                        End Try
                     Next
 
                     For Each lsValueConstraint In Me.ValueConstraint
@@ -2211,7 +2217,12 @@ RemoveAnyway:
                 End Select
 
                 For Each lrRoleConstraintRole In Me.RoleConstraintRole
-                    lrRoleConstraintRole.Role.RoleConstraintRole.Remove(lrRoleConstraintRole)
+                    Try
+                        lrRoleConstraintRole.Role.RoleConstraintRole.Remove(lrRoleConstraintRole)
+                    Catch ex As Exception
+                        'Not a biggie, but need to keep the show on the Role. RoleConstraintRole may not have Role through other error.
+                    End Try
+
                 Next
 
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)

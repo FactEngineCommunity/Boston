@@ -5239,7 +5239,6 @@ SkipRDSProcessing:
             Dim lsModelObjectName = Trim(asModelObjectName)
 
             Try
-
                 If Me.ExistsModelElement(lsModelObjectName, abUseSafeMode) Or abUseFastenstein Then
 
                     Dim lrDictionaryEntry As FBM.DictionaryEntry
@@ -5262,6 +5261,9 @@ SkipRDSProcessing:
                     If lrDictionaryEntry IsNot Nothing Then
                         If lrDictionaryEntry.isFactType Then
                             Return Me.FactType.Find(Function(x) x.Id = lsModelObjectName)
+                        ElseIf lrDictionaryEntry.isValueType And lrDictionaryEntry.isEntityType Then
+                            'CodeSafe: Rarety but sometimes can happen.
+                            Return Me.EntityType.Find(Function(x) x.Id = lsModelObjectName)
                         ElseIf lrDictionaryEntry.isValueType Then
                             Return Me.ValueType.Find(Function(x) x.Id = lsModelObjectName)
                         ElseIf lrDictionaryEntry.isEntityType Then

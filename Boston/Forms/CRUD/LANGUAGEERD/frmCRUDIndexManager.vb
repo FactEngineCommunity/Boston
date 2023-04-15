@@ -527,6 +527,8 @@ ProcessNewIndex:
 
                                 Call Me.mrTable.Model.Model.AddRoleConstraint(lrRoleConstraint, True, True, Nothing, False, Nothing, False)
 
+                                Call Me.mrTable.addIndex(lrNewIndex, lrRoleConstraint)
+
                                 If lrNewIndex.IsPrimaryKey Then
                                     Call lrRoleConstraint.SetIsPreferredIdentifier(True)
                                     Call lrEntityType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
@@ -811,8 +813,11 @@ EnableRevert:
                 Call lrRoleConstaint.Model.MakeDirty(True, True)
                 'Call Me.mrTable.Model.Model.RemoveRoleConstraint(lrRoleConstaint, True, True, False, True)
             Else
-                MsgBox("Boston could not find the responsible Role Constraint for this Index.")
+                If MsgBox("Boston could not find the responsible Role Constraint for this Index. Do you want to remove the Index from the Table anyway?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes And lrActualIndex IsNot Nothing Then
+                    Me.mrApplyTable.removeIndex(lrActualIndex)
+                End If
             End If
+
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

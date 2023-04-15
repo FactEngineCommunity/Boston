@@ -1892,9 +1892,9 @@ NextWord:
                                         End If
                                     Next
 
-                                    If Me.AutoComplete.Visible = False Then
-                                        Me.showAutoCompleteForm()
-                                    End If
+                                    'If Me.AutoComplete.Visible = False Then
+                                    Me.showAutoCompleteForm()
+                                    'End If
                                     'Exit Sub '20210901-VM-Something funky happens after here...might be removing what was put in above.
                                 End If
 
@@ -2152,8 +2152,14 @@ NextWord:
                                     For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
 
                                         Try
-                                            Dim lrPredicatePart As FBM.PredicatePart = lrColumn.FactType.FactTypeReading.Find(Function(x) x.PredicatePart(0).Role Is lrColumn.Role).PredicatePart(0)
-                                            lsFEQLQuery &= " " & lrPredicatePart.PredicatePartText & " (" & lrColumn.ActiveRole.JoinedORMObject.Id & "~'" & lsCurrentTokenText & lsDatabaseWildcardOperator & "')"
+                                            Dim lrFactTypeReading = lrColumn.FactType.FactTypeReading.Find(Function(x) x.PredicatePart(0).Role Is lrColumn.Role)
+                                            Dim lrPredicatePart As FBM.PredicatePart = lrFactTypeReading.PredicatePart(0)
+                                            Dim lrPredicatePart2 As FBM.PredicatePart = Nothing
+                                            If lrColumn.FactType.Arity > 1 Then
+                                                lrPredicatePart2 = lrFactTypeReading.PredicatePart(1)
+                                            End If
+                                            lsFEQLQuery &= " " & lrPredicatePart.PredicatePartText & " " & Boston.returnIfTrue(lrPredicatePart2 Is Nothing, "", lrPredicatePart2.PreBoundText) & "(" & lrColumn.ActiveRole.JoinedORMObject.Id & "~'" & lsCurrentTokenText & lsDatabaseWildcardOperator & "')"
+                                            Exit For
                                         Catch ex As Exception
                                             'Not a biggie
                                         End Try
@@ -2200,6 +2206,7 @@ NextWord:
                     End Try
 
                     Call Me.showAutoCompleteForm()
+                    Call Me.setAutoCompletePosition()
                     Exit Sub
                 End If
             End If
@@ -2439,6 +2446,7 @@ NextWord:
 
             End If
 
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2605,18 +2613,20 @@ NextWord:
             Me.AutoComplete.zrCallingForm = Me
             If Me.AutoComplete.Visible = False Then
                 Me.AutoComplete.Visible = True
-                'Me.TextBoxInput.Focus() 'Originally was here. 20210416
             End If
+            Call Me.populateHelpLabel()
+
+            Me.AutoComplete.Visible = True '20230415
+            Me.AutoComplete.BringToFront()
             Me.TextBoxInput.Focus()
             Me.AutoComplete.Owner = Me
-            Call Me.populateHelpLabel()
         End If
 
     End Sub
 
     Private Sub setAutoCompletePosition()
         Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
-        lo_point.X += Me.TextBoxInput.Bounds.X
+        lo_point.X += Me.TextBoxInput.Bounds.X + 6
         lo_point.Y += Me.TextBoxInput.Bounds.Y
         lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
         Me.AutoComplete.Location = PointToScreen(lo_point)

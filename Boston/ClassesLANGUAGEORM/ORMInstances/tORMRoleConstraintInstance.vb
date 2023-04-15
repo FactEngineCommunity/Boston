@@ -684,12 +684,16 @@ Namespace FBM
 
                 If Me.RoleConstraint.Argument.Count > 0 Then
                     For Each lrRoleConstraintRole In Me.RoleConstraint.RoleConstraintRole
-                        lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
-                        If lrRoleInstance IsNot Nothing And lrRoleConstraintRole.RoleConstraintArgument IsNot Nothing Then
-                            lrRoleInstance.Shape.Text = lrRoleConstraintRole.RoleConstraintArgument.SequenceNr.ToString &
-                            "." &
-                            lrRoleConstraintRole.ArgumentSequenceNr.ToString
-                        End If
+                        Try
+                            lrRoleInstance = Me.Page.RoleInstance.Find(Function(x) x.Id = lrRoleConstraintRole.Role.Id)
+                            If lrRoleInstance IsNot Nothing And lrRoleConstraintRole.RoleConstraintArgument IsNot Nothing Then
+                                lrRoleInstance.Shape.Text = lrRoleConstraintRole.RoleConstraintArgument.SequenceNr.ToString &
+                                "." &
+                                lrRoleConstraintRole.ArgumentSequenceNr.ToString
+                            End If
+                        Catch ex As Exception
+                            prApplication.ThrowErrorMessage("Error setting Shadding/Numbering text for Role Constraint, " & Me.Id, pcenumErrorType.Warning, ex.StackTrace, True,,,,, ex)
+                        End Try
                     Next
                     Dim lrArgument As FBM.RoleConstraintArgument
                     Dim lrRole As FBM.Role

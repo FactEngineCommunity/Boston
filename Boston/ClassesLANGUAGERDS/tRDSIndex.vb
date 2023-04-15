@@ -301,6 +301,7 @@ KeepChecking1:
                         Dim loRoleConstraint = From RoleConstraint In Me.Model.Model.RoleConstraint
                                                From RoleConstraintRole In RoleConstraint.RoleConstraintRole
                                                From Column In Me.Column
+                                               Where RoleConstraintRole.Role IsNot Nothing
                                                Where RoleConstraintRole.Role.FactType Is Column.Role.FactType
                                                Where RoleConstraint.RoleConstraintRole.Count = Me.Column.Count
                                                Select RoleConstraint Distinct
@@ -329,6 +330,7 @@ KeepChecking1:
                         Dim loRoleConstraint = From RoleConstraint In Me.Model.Model.RoleConstraint
                                                From RoleConstraintRole In RoleConstraint.RoleConstraintRole
                                                From Column In Me.Column
+                                               Where RoleConstraintRole.Role IsNot Nothing
                                                Where RoleConstraintRole.Role.FactType Is Column.Role.FactType
                                                Where RoleConstraint.RoleConstraintRole.Count = Me.Column.Count
                                                Select RoleConstraint Distinct

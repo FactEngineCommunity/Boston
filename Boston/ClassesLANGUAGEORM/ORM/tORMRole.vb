@@ -1833,8 +1833,9 @@ Namespace FBM
 
                 Dim larRoleConstraintRole = From RoleConstraint In Me.Model.RoleConstraint
                                             From RoleConstraintRole In RoleConstraint.RoleConstraintRole
-                                            Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint _
-                                            And RoleConstraintRole.Role.Id = Me.Id
+                                            Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint
+                                            Where RoleConstraintRole.Role IsNot Nothing
+                                            Where RoleConstraintRole.Role.Id = Me.Id
                                             Select RoleConstraintRole
 
                 Return larRoleConstraintRole.Count > 0
@@ -2223,7 +2224,7 @@ Namespace FBM
 
                 Dim lbJoiningToSameObject As Boolean = False
                 Try
-                    lbJoiningToSameObject = (arNewJoinedModelObject.Id = Me.JoinedORMObject.Id)
+                    lbJoiningToSameObject = (arNewJoinedModelObject.Id = Me.JoinedORMObject.Id) And arNewJoinedModelObject.ConceptType = Me.JoinedORMObject.ConceptType
                 Catch ex As Exception
                     'JoinedORMObject may be false.
                 End Try

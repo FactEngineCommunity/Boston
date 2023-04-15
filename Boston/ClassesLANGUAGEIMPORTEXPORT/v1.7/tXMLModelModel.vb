@@ -964,26 +964,31 @@ SkipSubtypeRelationship:
                     Dim lrRole As New FBM.Role
 
                     For Each lrXMLRoleConstraintRole In lrXMLRoleConstraint.RoleConstraintRoles
-                        lrRoleConstraintRole = New FBM.RoleConstraintRole
-                        lrRoleConstraintRole.Model = lrModel
-                        lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
-                        lrRoleConstraintRole.SequenceNr = lrXMLRoleConstraintRole.SequenceNr
-                        lrRoleConstraintRole.IsEntry = lrXMLRoleConstraintRole.IsEntry
-                        lrRoleConstraintRole.IsExit = lrXMLRoleConstraintRole.IsExit
+                        Try
+                            lrRoleConstraintRole = New FBM.RoleConstraintRole
+                            lrRoleConstraintRole.Model = lrModel
+                            lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
+                            lrRoleConstraintRole.SequenceNr = lrXMLRoleConstraintRole.SequenceNr
+                            lrRoleConstraintRole.IsEntry = lrXMLRoleConstraintRole.IsEntry
+                            lrRoleConstraintRole.IsExit = lrXMLRoleConstraintRole.IsExit
 
 
-                        lrRole.Id = lrXMLRoleConstraintRole.RoleId
+                            lrRole.Id = lrXMLRoleConstraintRole.RoleId
 
-                        lrRoleConstraintRole.Role = lrModel.Role.Find(AddressOf lrRole.Equals)
+                            lrRoleConstraintRole.Role = lrModel.Role.Find(AddressOf lrRole.Equals)
 
-                        '-------------------------------------------------------------------
-                        'lrRoleConstraintRole.RoleConstraintArgument is set further below.
-                        '-------------------------------------------------------------------
-                        lrRoleConstraintRole.ArgumentSequenceNr = lrXMLRoleConstraintRole.ArgumentSequenceNr
+                            '-------------------------------------------------------------------
+                            'lrRoleConstraintRole.RoleConstraintArgument is set further below.
+                            '-------------------------------------------------------------------
+                            lrRoleConstraintRole.ArgumentSequenceNr = lrXMLRoleConstraintRole.ArgumentSequenceNr
 
-                        lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
-                        lrRoleConstraint.Role.Add(lrRoleConstraintRole.Role)
-                        lrRoleConstraintRole.Role.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                            lrRoleConstraint.Role.Add(lrRoleConstraintRole.Role)
+                            lrRoleConstraintRole.Role.RoleConstraintRole.Add(lrRoleConstraintRole)
+                        Catch ex As Exception
+                            prApplication.ThrowErrorMessage("Error loading RoleConsraintRole for RoleConstraint," & lrXMLRoleConstraint.Id, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
+                        End Try
+SkipRoleConstraintRole:
                     Next
 
                     If lrRoleConstraint.RoleConstraintRole.Count = 0 Then

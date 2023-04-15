@@ -2717,6 +2717,8 @@ SkipORMReadingEditor:
                 End If
             End If
 
+
+
             '-----------------------------------------------------------------------------------
             'Highlight the Attributes of the Relation
             Dim lrAttribute As ERD.Attribute

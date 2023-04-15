@@ -17,6 +17,23 @@ Namespace RDS
         Public Table As RDS.Table
 
         <XmlIgnore()>
+        Public ReadOnly Property IsInherited As Boolean
+            Get
+                '20230415-VM-More rules to be added.
+                Try
+                    If Me.FactType Is Nothing Then Return False
+                    If Me.FactType.IsManyTo1BinaryFactType And Me.Role.JoinedORMObject.Id <> Me.Table.Name Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+                Catch ex As Exception
+                    Return False
+                End Try
+            End Get
+        End Property
+
+        <XmlIgnore()>
         <NonSerialized()>
         Public Index As New List(Of RDS.Index)
 

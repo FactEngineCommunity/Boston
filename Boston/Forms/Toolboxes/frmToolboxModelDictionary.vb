@@ -352,7 +352,11 @@ Public Class frmToolboxModelDictionary
             Next
 
             If Me.CheckBoxShowModelDictionary.Checked Then
-                For Each lrDictionaryEntry In Me.zrORMModel.ModelDictionary
+                Dim larDictionaryEntry As List(Of FBM.DictionaryEntry) = Me.zrORMModel.ModelDictionary
+                If asSearchString IsNot Nothing Then
+                    larDictionaryEntry = Me.zrORMModel.ModelDictionary.FindAll(Function(x) x.Symbol.Contains(lsSearchString))
+                End If
+                For Each lrDictionaryEntry In larDictionaryEntry
                     loNode = Me.TreeView1.Nodes("ModelDictionary").Nodes.Add("DictionaryEntry" & lrDictionaryEntry.Symbol, lrDictionaryEntry.Symbol, 0, 0)
                     loNode.Tag = lrDictionaryEntry
                     For Each lrRealisation As pcenumConceptType In lrDictionaryEntry.Realisations
