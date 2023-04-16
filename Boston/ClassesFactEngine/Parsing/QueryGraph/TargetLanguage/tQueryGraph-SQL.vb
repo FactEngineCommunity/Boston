@@ -78,63 +78,67 @@
                             'Defaults to False
                         End Try
 
+#Region "Modifier Function"
+                        Select Case lrProjectColumn.NodeModifierFunction
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
+                                lsSelectClause &= "DATE("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
+                                lsSelectClause &= "strftime('%m',"
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
+                                lsSelectClause &= "strftime('%Y',"
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
+                                lsSelectClause &= "TIME("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
+                                lsSelectClause &= "LOWER("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
+                                lsSelectClause &= "UPPER("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Sum
+                                lsSelectClause &= "SUM("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Average
+                                lsSelectClause &= "AVG("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Max
+                                lsSelectClause &= "MAX("
+                            Case Is = FEQL.pcenumFEQLNodeModifierFunction.Min
+                                lsSelectClause &= "MIN("
+                            Case Else
+                                lsSelectClause &= ""
+                        End Select
+#End Region
+
                         If lbColumnIsDerived Then
                             If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
                                 'for now
-                                lsSelectClause &= lrProjectColumn.Name
+                                lsSelectClause &= lrProjectColumn.DBName
                             Else
-                                If abIsStraightDerivationClause And Not lrProjectColumn.Role.FactType.IsObjectified Then
-                                    lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                                If abIsStraightDerivationClause And lrProjectColumn.FactType.IsDerived Then
+                                    lsSelectClause &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.DBName
+                                ElseIf abIsStraightDerivationClause And Not lrProjectColumn.Role.FactType.IsObjectified Then
+                                    lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.DBName
                                 Else
-                                    lsSelectClause &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
+                                    lsSelectClause &= lrProjectColumn.Role.FactType.Id & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.DBName
                                 End If
 
                             End If
 
                         Else
-#Region "Modifier Function"
-                            Select Case lrProjectColumn.NodeModifierFunction
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
-                                    lsSelectClause &= "DATE("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
-                                    lsSelectClause &= "strftime('%m',"
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
-                                    lsSelectClause &= "strftime('%Y',"
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Time
-                                    lsSelectClause &= "TIME("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
-                                    lsSelectClause &= "LOWER("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
-                                    lsSelectClause &= "UPPER("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Sum
-                                    lsSelectClause &= "SUM("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Average
-                                    lsSelectClause &= "AVG("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Max
-                                    lsSelectClause &= "MAX("
-                                Case Is = FEQL.pcenumFEQLNodeModifierFunction.Min
-                                    lsSelectClause &= "MIN("
-                                Case Else
-                                    lsSelectClause &= ""
-                            End Select
-#End Region
                             Select Case lrProjectColumn.ColumnType
                                 Case Is = pcenumRDSColumnType.StandardRDSColumn
-                                    lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & ".[" & lrProjectColumn.Name & "]"
+                                    lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & ".[" & lrProjectColumn.DBName & "]"
                                 Case Is = pcenumRDSColumnType.ReturnFunctionColumn
                                     lsSelectClause &= lrProjectColumn.TemporaryData
                                 Case Else
                                     Throw New NotImplementedException("Not sure what type of Column for ProjectionColumn.")
                             End Select
 
-                            lsSelectClause &= Boston.returnIfTrue(lrProjectColumn.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
-
-                            If lrProjectColumn.AsName IsNot Nothing Then
-                                lsSelectClause &= " AS [" & lrProjectColumn.AsName & "]"
-                            End If
-
                             '20230416-was here lsSelectClause &= Boston.returnIfTrue(lrProjectColumn.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
                         End If
+
+                        lsSelectClause &= Boston.returnIfTrue(lrProjectColumn.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
+
+                        If lrProjectColumn.AsName IsNot Nothing Then
+                            lsSelectClause &= " AS [" & lrProjectColumn.AsName & "]"
+                        End If
+
                         If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
                         liInd += 1
                     Next
@@ -217,7 +221,7 @@
                                         liInd = 0
                                         For Each lrPKColumn In lrModelElement.getCorrespondingRDSTable.getPrimaryKeyColumns
                                             If liInd > 0 Then lsSQLQuery &= " || '-' || "
-                                            lsSQLQuery &= lrModelElement.DatabaseName & "." & lrPKColumn.Name
+                                            lsSQLQuery &= lrModelElement.DatabaseName & "." & lrPKColumn.DBName
                                             liInd += 1
                                         Next
                                     End If
@@ -539,7 +543,7 @@
                                 lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
                                 liInd = 0
                                 For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
-                                    lsSQLQuery &= lrTargetTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrTargetTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & " = '"
                                     lsSQLQuery &= lrQueryEdge.BaseNode.IdentifierList(liInd) & "'" & vbCrLf
                                     If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then lsSQLQuery &= "AND "
                                     liInd += 1
@@ -552,7 +556,7 @@
                                 liInd = 0
                                 For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
                                     lsSQLQuery &= vbCrLf & " AND "
-                                    lsSQLQuery &= lrTargetTable.DatabaseName & "." & lrColumn.Name & " = '"
+                                    lsSQLQuery &= lrTargetTable.DatabaseName & "." & lrColumn.DBName & " = '"
                                     lsSQLQuery &= lrQueryEdge.TargetNode.IdentifierList(liInd) & "'" & vbCrLf
                                     liInd += 1
                                 Next
@@ -763,7 +767,7 @@
                         Dim liInd2 = 0
                         For Each lrColumn In lrOriginTable.getPrimaryKeyColumns
                             If liInd2 > 0 Then lsSQLQuery &= "AND "
-                            lsSQLQuery &= lrOriginTable.DatabaseName & "." & lrColumn.Name & " = " & lrQueryEdge.FBMFactType.Id & "." & lrColumn.Name & vbCrLf
+                            lsSQLQuery &= lrOriginTable.DatabaseName & "." & lrColumn.DBName & " = " & lrQueryEdge.FBMFactType.Id & "." & lrColumn.DBName & vbCrLf
                             liInd2 += 1
                         Next
 
@@ -776,7 +780,7 @@
                                 If Not lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).IsDerivationParameter Then
                                     If liInd2 > 0 Then lsSQLQuery &= Boston.returnIfTrue(lbAddedAND, "", " AND ")
                                     lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                    lsSQLQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.Name & vbCrLf
+                                    lsSQLQuery &= "=" & lrColumn.Table.DatabaseName & "." & lrColumn.DBName & vbCrLf
                                     liInd2 += 1
                                     lbAddedAND = False
                                 End If
@@ -788,7 +792,7 @@
                             For Each lrColumn In lrQueryEdge.TargetNode.RDSTable.getPrimaryKeyColumns
                                 If liInd2 > 0 Then lsSQLQuery &= " AND "
                                 lsSQLQuery &= lrNaryTable.DatabaseName & "." & lrNaryTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
-                                lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.Name & vbCrLf
+                                lsSQLQuery &= "=" & lrColumn.Table.Name & "." & lrColumn.DBName & vbCrLf
                                 liInd2 += 1
                             Next
                         End If
@@ -799,13 +803,13 @@
 
                         lsSQLQuery &= "("
                         For Each lrColumn In lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
-                            lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                            lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.DBName
                             If lrQueryEdge.WhichClauseSubType = pcenumWhichClauseType.ISClause Then
                                 lsSQLQuery &= " = "
                             Else
                                 lsSQLQuery &= " <> "
                             End If
-                            lsSQLQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.Name
+                            lsSQLQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrColumn.DBName
                         Next
                         lsSQLQuery &= ")"
 #End Region
@@ -826,11 +830,11 @@
                                 If liInd2 > 0 Then lsSQLQuery &= "AND "
                                 Dim lrOriginColumn As RDS.Column = lrOriginTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
                                 If lrOriginColumn Is Nothing Then
-                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & " = "
                                 Else
-                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.Name & " = "
+                                    lsSQLQuery &= lrOriginTable.Name & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrOriginColumn.DBName & " = "
                                 End If
-                                lsSQLQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name & vbCrLf
+                                lsSQLQuery &= lrDestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.DBName & vbCrLf
                                 liInd2 += 1
                             Next
                             liInd += 1
@@ -871,7 +875,7 @@
                                             Case Else
                                                 lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
                                                 Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrTargetColumn.DBName & vbCrLf
                                         End Select
                                     Case Else
                                         Select Case lrQueryEdge.TargetNode.FBMModelObject.ConceptType
@@ -880,7 +884,7 @@
                                             Case Else
                                                 lsSQLQuery &= lrRelation.OriginTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrRelation.OriginColumns(liColumnCounter).Name & " = "
                                                 Dim lrTargetColumn = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole Is lrRelation.OriginColumns(liColumnCounter).ActiveRole)
-                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.Name & vbCrLf
+                                                lsSQLQuery &= lrRelation.DestinationTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrTargetColumn.DBName & vbCrLf
                                         End Select
                                 End Select
 
@@ -974,8 +978,8 @@
                             Dim larTargetColumn = lrQueryEdge.BaseNode.RDSTable.getPrimaryKeyColumns
                             For Each lrColumn In larTargetColumn
                                 Dim lrOriginColumn = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole)
-                                lsSQLQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrOriginColumn.Name
-                                lsSQLQuery &= " = " & lrQueryEdge.BaseNode.RDSTable.DatabaseName & "." & lrColumn.Name
+                                lsSQLQuery &= lrQueryEdge.TargetNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") & "." & lrOriginColumn.DBName
+                                lsSQLQuery &= " = " & lrQueryEdge.BaseNode.RDSTable.DatabaseName & "." & lrColumn.DBName
                                 If liInd2 < larTargetColumn.Count Then lsSQLQuery &= vbCrLf & "AND "
                                 liInd2 += 1
                             Next
@@ -1016,7 +1020,7 @@
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
                         If liInd > Me.HeadNode.IdentifierList.Count - 1 Then Exit For
-                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
+                        lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.DBName & " = '" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
                         If (liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1) And (liInd < Me.HeadNode.IdentifierList.Count - 1) Then
                             lsSQLQuery &= "AND "
                         End If
@@ -1162,17 +1166,17 @@
 
                                 Select Case lrQueryEdge.TargetNode.ModifierFunction
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Date
-                                        lsSQLQuery &= "date(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "date(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & ")"
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Month
-                                        lsSQLQuery &= "strftime('%m'," & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "strftime('%m'," & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & ")"
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.Year
-                                        lsSQLQuery &= "strftime('%Y'," & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "strftime('%Y'," & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & ")"
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToLower
-                                        lsSQLQuery &= "lower(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "lower(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & ")"
                                     Case Is = FEQL.pcenumFEQLNodeModifierFunction.ToUpper
-                                        lsSQLQuery &= "upper(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & ")"
+                                        lsSQLQuery &= "upper(" & lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & ")"
                                     Case Else
-                                        lsSQLQuery &= lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                        lsSQLQuery &= lrTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName
                                 End Select
 
 
@@ -1236,7 +1240,7 @@
                                 End Select
 #End Region
 
-                                lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.Name
+                                lsSQLQuery &= lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.BaseNode.Alias, "") & "." & lrColumn.DBName
 
                                 lsSQLQuery &= Boston.returnIfTrue(lrQueryEdge.TargetNode.ModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
 
@@ -1273,7 +1277,7 @@
                                     lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
 
-                                    lsSQLQuery &= lrTargetColumn.Name & " = True"
+                                    lsSQLQuery &= lrTargetColumn.DBName & " = True"
 
                                 Case Else
 
@@ -1304,7 +1308,7 @@
                                               lrTargetTable.DatabaseName &
                                               Viev.NullVal(lrQueryEdge.TargetNode.Alias, "") &
                                               "." &
-                                              lrTargetColumn.Name
+                                              lrTargetColumn.DBName
 
                                             '20230130-VM-New Regime. QueryEdge.Formula: Removed below
                                             'lsSQLQuery &= " " & Viev.GetEnumDescription(lrQueryEdge.TargetNode.MathFunction)
@@ -1326,7 +1330,7 @@
                                             If lrQueryEdge.FBMFactType.IsLinkFactType Then
                                                 lrColumn = lrQueryEdge.BaseNode.RDSTable.Column.Find(Function(x) x.Role Is lrQueryEdge.FBMFactType.LinkFactTypeRole)
                                                 '20210820-VM-Added below. Was not hear for some reason.
-                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name & " = "
+                                                lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName & " = "
                                                 Select Case lrColumn.getMetamodelDataType
                                                     Case Is = pcenumORMDataType.TemporalDateAndTime,
                                                               pcenumORMDataType.TemporalDate
@@ -1362,7 +1366,7 @@
                                                 End Select
 #End Region
                                                 '20230119-VM-Was Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable
-                                                lsSQLQuery &= lrColumn.Table.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.Name
+                                                lsSQLQuery &= lrColumn.Table.DatabaseName & Viev.NullVal(lrQueryEdge.Alias, "") & "." & lrColumn.DBName
 
                                                 lsSQLQuery &= Boston.returnIfTrue(lrQueryEdge.TargetNode.ModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
 
@@ -1507,7 +1511,7 @@
                 If lbRequiresGroupByClause Then
                     lsSQLQuery &= "GROUP BY "
                     For Each lrColumn In larProjectionColumn.FindAll(Function(x) x.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None)
-                        lsSQLQuery &= "[" & lrColumn.Table.DatabaseName & "].[" & Boston.returnIfTrue(lrColumn.AsName Is Nothing, lrColumn.Name, lrColumn.AsName) & "]"
+                        lsSQLQuery &= "[" & lrColumn.Table.DatabaseName & "].[" & Boston.returnIfTrue(lrColumn.AsName Is Nothing, lrColumn.DBName, lrColumn.AsName) & "]"
                     Next
                 End If
 
