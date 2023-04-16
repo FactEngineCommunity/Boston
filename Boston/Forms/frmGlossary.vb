@@ -137,6 +137,11 @@ Public Class frmGlossary
         Try
             Me.ListBoxGlossary.SelectedIndex = Me.ListBoxGlossary.Items.IndexOf(arModelElement.Id)
 
+            Dim Index As Integer = Me.ListBoxGlossary.FindString(arModelElement.Id) 'Find the index of the item starting with whatever is in TextBox1.
+            If Index > -1 Then 'Check if the item exists/was found.
+                Me.ListBoxGlossary.SelectedIndex = Index
+            End If
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -204,7 +209,7 @@ Public Class frmGlossary
             End If
 
             If lrTopmostSupertype.HasSimpleReferenceScheme Then
-                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: " & lrTopmostSupertype.Name & " has ")
+                lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
                 lrVerbaliser.VerbaliseQuantifier(" has ")
 

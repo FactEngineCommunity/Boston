@@ -46,6 +46,8 @@
                 Call Me.setNodeAliases()
                 Call Me.setQueryEdgeAliases()
 
+                Dim larProjectionColumn As New List(Of RDS.Column)
+
                 If Not abIsCountStarSubQuery Then
                     lsSQLQuery = "SELECT "
                     If arWhichSelectStatement.RETURNCLAUSE IsNot Nothing Then
@@ -60,7 +62,7 @@
 #Region "ProjectionColums"
                     liInd = 1
 
-                    Dim larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
+                    larProjectionColumn = Me.getProjectionColumns(arWhichSelectStatement, abIsStraightDerivationClause, arDerivedModelElement)
                     Me.ProjectionColumn = larProjectionColumn
 
                     If lbHasDistinctClause And (Me.QueryEdges.FindAll(Function(x) x.TargetNode.IsDistinct).Count > 0 Or Me.QueryEdges.FindAll(Function(x) x.BaseNode.IsDistinct).Count > 0) Then
@@ -69,7 +71,14 @@
 
                     For Each lrProjectColumn In larProjectionColumn.FindAll(Function(x) x IsNot Nothing)
 
-                        If lrProjectColumn.Role.FactType.IsDerived Then
+                        Dim lbColumnIsDerived As Boolean = False
+                        Try
+                            lbColumnIsDerived = lrProjectColumn.Role.FactType.IsDerived
+                        Catch
+                            'Defaults to False
+                        End Try
+
+                        If lbColumnIsDerived Then
                             If lrProjectColumn.Role.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
                                 'for now
                                 lsSelectClause &= lrProjectColumn.Name
@@ -109,12 +118,22 @@
                                     lsSelectClause &= ""
                             End Select
 #End Region
+                            Select Case lrProjectColumn.ColumnType
+                                Case Is = pcenumRDSColumnType.StandardRDSColumn
+                                    lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & ".[" & lrProjectColumn.Name & "]"
+                                Case Is = pcenumRDSColumnType.ReturnFunctionColumn
+                                    lsSelectClause &= lrProjectColumn.TemporaryData
+                                Case Else
+                                    Throw New NotImplementedException("Not sure what type of Column for ProjectionColumn.")
+                            End Select
 
-                            lsSelectClause &= lrProjectColumn.Table.DatabaseName & Viev.NullVal(lrProjectColumn.TemporaryAlias, "") & "." & lrProjectColumn.Name
-                            If lrProjectColumn.AsName IsNot Nothing Then
-                                lsSelectClause &= " AS " & lrProjectColumn.AsName
-                            End If
                             lsSelectClause &= Boston.returnIfTrue(lrProjectColumn.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
+
+                            If lrProjectColumn.AsName IsNot Nothing Then
+                                lsSelectClause &= " AS [" & lrProjectColumn.AsName & "]"
+                            End If
+
+                            '20230416-was here lsSelectClause &= Boston.returnIfTrue(lrProjectColumn.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None, "", ")")
                         End If
                         If liInd < larProjectionColumn.Count Then lsSelectClause &= ","
                         liInd += 1
@@ -126,12 +145,20 @@
                                                  Where ReturnColumn.KEYWDCOUNTSTAR IsNot Nothing
                                                  Select ReturnColumn
 
+                        Dim larCountModifierFunction = From ReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
+                                                       Where ReturnColumn.NODEMODIFIERFUNCTION IsNot Nothing
+                                                       Select ReturnColumn
+
                         If larCountStarColumn.Count > 0 Then
                             lsSQLQuery &= Boston.returnIfTrue(larProjectionColumn.Count > 0, ", ", "")
                             lsSQLQuery &= "COUNT(*)"
                             If larCountStarColumn(0).ASCLAUSE IsNot Nothing Then
                                 lsSQLQuery &= " AS " & larCountStarColumn(0).ASCLAUSE.COLUMNNAMESTR
                             End If
+                            If larProjectionColumn.Count > 0 Then
+                                lbRequiresGroupByClause = True
+                            End If
+                        ElseIf larCountModifierFunction.Count > 0 Then
                             If larProjectionColumn.Count > 0 Then
                                 lbRequiresGroupByClause = True
                             End If
@@ -201,9 +228,10 @@
 
                     End If
 #End Region
-                    Else
+                Else
                     lsSQLQuery = " 1 > (SELECT COUNT(*)"
                 End If
+
 
                 lsSQLQuery &= vbCrLf & "FROM "
 
@@ -322,6 +350,8 @@
                     larRDSTableQueryEdge.AddUnique(lrQueryEdge)
                 Next
 
+                Dim lrTargetTable As RDS.Table = Nothing
+                Dim lsAlias As String = ""
 
                 'RDS Tables
                 For Each lrQueryEdge In larRDSTableQueryEdge
@@ -505,7 +535,7 @@
                                 lsSQLQuery &= vbCrLf & "," & "" & lrQueryEdge.TargetNode.RDSTable.DatabaseName
                             End If
                             If lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
-                                Dim lrTargetTable As RDS.Table = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
+                                lrTargetTable = larLeftColumn(0).Relation.Find(Function(x) x.OriginTable.Name = lrRDSTable.Name).DestinationTable
                                 lsSQLQuery &= "," & lrTargetTable.Name & vbCrLf & " WHERE "
                                 liInd = 0
                                 For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
@@ -517,7 +547,7 @@
                                 lsSQLQuery &= vbCrLf & " AND " & lrRDSTable.DatabaseName & "." & larLeftColumn(0).Name & " = " & lrTargetTable.DatabaseName & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
                             End If
                             If lrQueryEdge.TargetNode.HasIdentifier Then
-                                Dim lrTargetTable As RDS.Table = lrQueryEdge.TargetNode.RDSTable
+                                lrTargetTable = lrQueryEdge.TargetNode.RDSTable
                                 lsSQLQuery &= vbCrLf & " WHERE " & lrRDSTable.DatabaseName & "." & larRightColumn(0).Name & " = " & lrTargetTable.DatabaseName & "." & lrTargetTable.getPrimaryKeyColumns(0).Name
                                 liInd = 0
                                 For Each lrColumn In lrTargetTable.getFirstUniquenessConstraintColumns
@@ -662,6 +692,10 @@
                 'Removed: 'x.TargetNode.MathFunction <> pcenumMathFunction.None Or (below)
                 larConditionalQueryEdges = larEdgesWithTargetNode.ToList.FindAll(Function(x) (x.IdentifierList.Count > 0 Or
                                                                                               x.MathComparitor <> FEQL.tFEQLConstants.pcenumFEQLMathComparitor.None))
+
+                'Derived FactTypes (e.g. Function Columns, may have a BaseNode that has an identifier)
+                larConditionalQueryEdges.AddRange(larEdgesWithTargetNode.ToList.FindAll(Function(x) abIsStraightDerivationClause And x.BaseNode.IdentifierList.Count > 0))
+
                 '20210826-VM-Removed
                 'And (Not (x.FBMFactType.IsDerived And x.TargetNode.FBMModelObject.GetType Is GetType(FBM.ValueType))))
 
@@ -978,7 +1012,7 @@
 
 #Region "WhereConditionals"
                 If Me.HeadNode.HasIdentifier And Not lbFirstQueryEdgeIsRecursive Then
-                    Dim lrTargetTable = Me.HeadNode.RDSTable
+                    lrTargetTable = Me.HeadNode.RDSTable
                     liInd = 0
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
                         If liInd > Me.HeadNode.IdentifierList.Count - 1 Then Exit For
@@ -990,6 +1024,8 @@
                     Next
                     lbIntialWhere = "AND "
                 End If
+
+
 
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
                     Select Case lrQueryEdge.WhichClauseSubType
@@ -1011,6 +1047,8 @@
 #End Region
 
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
+#Region "PredicateNodePropertyIdentification"
+
                             Dim lrFactType As FBM.FactType = Nothing
                             Dim lrPredicatePart As FBM.PredicatePart = Nothing
 
@@ -1224,6 +1262,7 @@
                             End If
 
                             lbIntialWhere = "AND "
+#End Region
                         Case Else
 
                             Select Case lrQueryEdge.WhichClauseType
@@ -1231,7 +1270,7 @@
 
                                     lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrQueryEdge.BaseNode.RDSTable.DatabaseName & "."
 
-                                    Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                    lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                     Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
 
                                     lsSQLQuery &= lrTargetColumn.Name & " = True"
@@ -1241,7 +1280,7 @@
 
 
                                     If lrQueryEdge.MathClause IsNot Nothing Then '20230130-VM-new regime: Was: TargetNode.MathFunction <> pcenumMathFunction.None Then
-
+#Region "MathClause"
                                         If lrQueryEdge.FBMFactType.IsDerived Then
 
                                             lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
@@ -1259,7 +1298,7 @@
 
 
                                             'Math function
-                                            Dim lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                                            lrTargetTable = lrQueryEdge.BaseNode.RDSTable
                                             Dim lrTargetColumn = lrTargetTable.Column.Find(Function(x) x.FactType Is lrQueryEdge.FBMFactType)
                                             lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") &
                                               lrTargetTable.DatabaseName &
@@ -1274,9 +1313,10 @@
 
                                         End If
                                         lbIntialWhere = "AND "
+#End Region
                                     Else
-                                        Dim lrTargetTable As RDS.Table = Nothing
-                                        Dim lsAlias As String = ""
+                                        lrTargetTable = Nothing
+                                        lsAlias = ""
 
                                         'Check for reciprocal reading. As in WHICH Person was armed by (Person 2:'David') rather than WHICH Person armed (Person 2:'Saul')
                                         If lrQueryEdge.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType) Then
@@ -1379,6 +1419,31 @@
                                     End If
                             End Select
                     End Select
+
+                    '=====================================
+                    If abIsStraightDerivationClause And lrQueryEdge.BaseNode.IdentifierList.Count > 0 Then
+
+                        lrTargetTable = lrQueryEdge.BaseNode.RDSTable
+                        lsAlias = Viev.NullVal(lrQueryEdge.BaseNode.Alias, "")
+
+                        Dim larIndexColumns = lrTargetTable.getFirstUniquenessConstraintColumns
+
+                        liInd = 0
+                        For Each lsIdentifier In lrQueryEdge.BaseNode.IdentifierList
+                            If liInd > 0 And Not lsSQLQuery.EndsWith("AND ") Then
+                                lsSQLQuery &= vbCrLf & "AND "
+                                lbIntialWhere = ""
+                            ElseIf lsSQLQuery.EndsWith("AND ") Then
+                                lbIntialWhere = ""
+                            End If
+                            lsSQLQuery &= Viev.NullVal(lbIntialWhere, "") & lrTargetTable.DatabaseName & lsAlias & "." & larIndexColumns(liInd).Name & lrQueryEdge.getTargetSQLComparator & "'" & lsIdentifier & "'" & vbCrLf
+                            liInd += 1
+                        Next
+
+                        lbIntialWhere = "AND "
+                    End If
+                    '======================================
+
                     lbHasWhereClause = True
                 Next
 #End Region
@@ -1440,7 +1505,10 @@
                 '=====================================
                 'Group By clause
                 If lbRequiresGroupByClause Then
-                    lsSQLQuery &= "GROUP BY " & lsSelectClause
+                    lsSQLQuery &= "GROUP BY "
+                    For Each lrColumn In larProjectionColumn.FindAll(Function(x) x.NodeModifierFunction = FEQL.tFEQLConstants.pcenumFEQLNodeModifierFunction.None)
+                        lsSQLQuery &= "[" & lrColumn.Table.DatabaseName & "].[" & Boston.returnIfTrue(lrColumn.AsName Is Nothing, lrColumn.Name, lrColumn.AsName) & "]"
+                    Next
                 End If
 
                 If arWhichSelectStatement.ORDERBYCLAUSE IsNot Nothing Then

@@ -143,7 +143,7 @@
 #Region "RETURNCLAUSE"
                     For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
 
-                        If lrReturnColumn.MODELELEMENTNAME IsNot Nothing And lrReturnColumn.KEYWDCOUNTSTAR Is Nothing And lrReturnColumn.COUNTCLAUSE Is Nothing Then
+                        If lrReturnColumn.MODELELEMENTNAME IsNot Nothing And lrReturnColumn.KEYWDCOUNTSTAR Is Nothing And lrReturnColumn.COUNTCLAUSE Is Nothing And lrReturnColumn.RETURNFUNCTION Is Nothing Then
 #Region "ModelElementName"
                             If lrReturnColumn.COLUMNNAMESTR Is Nothing Then
 #Region "ColumnNameStr is Nothing"
@@ -224,6 +224,14 @@
                             'COUNT(*) is added in GenerateSQL. See main processing.
                         ElseIf lrReturnColumn.COUNTCLAUSE IsNot Nothing Then
                             'The COUNT(DISTINCT clause is added in the generated query. See main processing.
+                        ElseIf lrReturnColumn.RETURNFUNCTION IsNot Nothing Then
+                            Dim lrFunctionColumn As New RDS.Column(New RDS.Table(Me.Model.RDS, "DummyTable", Nothing), "ReturnFunction", Nothing, Nothing, False, System.Guid.NewGuid.ToString)
+                            lrFunctionColumn.ColumnType = pcenumRDSColumnType.ReturnFunctionColumn
+                            Dim lrDerivationProcessor = New FEQL.Processor(Me.Model)
+                            lrFunctionColumn.TemporaryData = lrDerivationProcessor.walkReturnFunctionTree(lrReturnColumn.RETURNFUNCTION)
+                            lrFunctionColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
+                            lrFunctionColumn.NodeModifierFunction = lrReturnColumn.GetNodeModifierFunction
+                            larColumn.Add(lrFunctionColumn)
                         Else
                             'Must be * (STAR)
                             For Each lrColumn In Me.HeadNode.FBMModelObject.getCorrespondingRDSTable.Column

@@ -29,6 +29,11 @@ Public Module publicConstants
         Professional
     End Enum
 
+    Public Enum pcenumRDSColumnType
+        StandardRDSColumn
+        ReturnFunctionColumn 'As used in Functions returned as a Column in a SQL Query etc.
+    End Enum
+
     Public Enum pcenumTargetMorphShape
         RoundRectangle
         Circle

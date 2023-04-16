@@ -360,6 +360,9 @@ Namespace FEQL
                 Case TokenType.RESERVEDWORD
                     Value = EvalRESERVEDWORD(tree, paramlist)
                     Exit Select
+                Case TokenType.RETURNFUNCTION
+                    Value = EvalRETURNFUNCTION(tree, paramlist)
+                    Exit Select
                 Case TokenType.ADDITIONALMODELELEMENT
                     Value = EvalADDITIONALMODELELEMENT(tree, paramlist)
                     Exit Select
@@ -506,6 +509,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.REFERENCEMODECLAUSE
                     Value = EvalREFERENCEMODECLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.RETURNMODELELEMENT
+                    Value = EvalRETURNMODELELEMENT(tree, paramlist)
                     Exit Select
                 Case TokenType.RETURNCOLUMN
                     Value = EvalRETURNCOLUMN(tree, paramlist)
@@ -856,6 +862,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalRETURNFUNCTION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalADDITIONALMODELELEMENT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -1049,6 +1059,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalREFERENCEMODECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalRETURNMODELELEMENT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

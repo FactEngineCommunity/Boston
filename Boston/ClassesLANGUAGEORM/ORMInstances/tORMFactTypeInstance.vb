@@ -2852,6 +2852,8 @@ ReattachRoles:
         Private Sub _FactType_DerivationTextChanged(asDerivationText As String) Handles _FactType.DerivationTextChanged
 
             Try
+                'CodeSafe
+                If Me.Shape Is Nothing Then Exit Sub
 
                 Me.DerivationText = asDerivationText
 

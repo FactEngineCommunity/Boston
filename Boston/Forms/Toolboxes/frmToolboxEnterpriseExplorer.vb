@@ -2976,6 +2976,12 @@ Public Class frmToolboxEnterpriseExplorer
             lrExportModel.ORMModel.ModelId = lrModel.ModelId
             lrExportModel.ORMModel.Name = lrModel.Name
 
+            If My.Settings.ExportFBMExcludeMDAModelElements Then
+                If MsgBox("Important: Your configuration settings will only allow the export of Object-Role Models. Are you happy to proceed?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then
+                    Exit Sub
+                End If
+            End If
+
             If Not lrExportModel.MapFromFBMModel(lrModel, My.Settings.ExportFBMExcludeMDAModelElements) Then
                 MsgBox("Fix the model errors, then try again.")
                 Exit Sub

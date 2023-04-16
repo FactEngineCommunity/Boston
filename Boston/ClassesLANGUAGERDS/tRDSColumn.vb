@@ -16,6 +16,9 @@ Namespace RDS
         <NonSerialized()>
         Public Table As RDS.Table
 
+        <XmlAttribute>
+        Public ColumnType As pcenumRDSColumnType = pcenumRDSColumnType.StandardRDSColumn
+
         <XmlIgnore()>
         Public ReadOnly Property IsInherited As Boolean
             Get

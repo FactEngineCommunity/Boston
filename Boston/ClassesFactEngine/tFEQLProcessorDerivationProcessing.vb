@@ -146,37 +146,6 @@ Namespace FEQL
 
                 Dim lsDerivationFormula As String = Trim(string_after)
 
-                '==========================================================================
-                'Parameters
-                Dim larParameterNode = (From QueryEdge In aarParameterArray
-                                        Select QueryEdge.BaseNode).Union(
-                                        From QueryEdge In aarParameterArray
-                                        Where QueryEdge.TargetNode IsNot Nothing
-                                        Select QueryEdge.TargetNode)
-
-                For Each lrParameterNode In larParameterNode
-                    If lrParameterNode.IdentifierList.Count > 0 Then
-
-                        Dim lsIdentifierList As String = ""
-                        Dim liInd As Integer = 0
-                        For Each lsIdentifier In lrParameterNode.IdentifierList
-                            If liInd > 0 Then lsIdentifierList &= ","
-                            Select Case lrParameterNode.FBMModelObject.GetType
-                                Case Is = GetType(FBM.ValueType)
-                                    Dim lrValueType As FBM.ValueType = lrParameterNode.FBMModelObject
-                                    lsIdentifierList &= Boston.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'") & lsIdentifier & Boston.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'")
-                                Case Else
-                                    For Each lrColumn In lrParameterNode.RDSTable.getFirstUniquenessConstraintColumns
-                                        lsIdentifierList &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsIdentifier & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'")
-                                    Next
-                            End Select
-                            liInd += 1
-                        Next
-                        lsDerivationFormula = lsDerivationFormula.Replace(lrParameterNode.Name, "(" & lrParameterNode.Name & lrParameterNode.ComparitorSymbol & lsIdentifierList & ")")
-                    End If
-                Next
-                '==========================================================================
-
                 While lsDerivationFormula.Contains("  ")
                     lsDerivationFormula = lsDerivationFormula.Replace("  ", " ")
                 End While
@@ -185,6 +154,62 @@ Namespace FEQL
                 Dim lrQueryGraph As FactEngine.QueryGraph
 
                 lrQueryGraph = Me.getQueryGraph()
+
+                '==========================================================================
+                'Parameters - If a particular Identifier for a Node is required, need to modify the Derivation formula. Speeds query time.
+                'Modify the graph
+                Dim larParameterNode = (From QueryEdge In aarParameterArray
+                                        Select QueryEdge.BaseNode).Union(
+                                        From QueryEdge In aarParameterArray
+                                        Where QueryEdge.TargetNode IsNot Nothing
+                                        Select QueryEdge.TargetNode)
+
+                'cut_at = "RETURN"
+                'liCutPoint = InStr(arModelElement.DerivationText, cut_at)
+                'Dim lsDerivationBeforeRETURN As String = lsDerivationFormula
+                'Dim lsDerivationAfterRETURN As String = ""
+                'If liCutPoint > 0 Then
+                '    lsDerivationBeforeRETURN = lsDerivationFormula.Substring(0, liCutPoint)
+                '    lsDerivationAfterRETURN = lsDerivationFormula.Substring(liCutPoint + cut_at.Length - 1)
+                'End If
+
+                For Each lrParameterNode In larParameterNode
+                    If lrParameterNode.IdentifierList.Count > 0 Then
+
+                        Dim lsIdentifierList As String = ""
+                        Dim liInd As Integer = 0
+
+                        Dim lrNode As FactEngine.QueryNode = Nothing
+
+                        Try
+                            lrNode = lrQueryGraph.QueryEdges.FindAll(Function(x) x.BaseNode.Name = lrParameterNode.Name).First.BaseNode
+                        Catch
+                            'Defaults to Nothing, above
+                        End Try
+
+
+                        If lrNode Is Nothing Then GoTo SkipParameterNode
+
+                        For Each lsIdentifier In lrParameterNode.IdentifierList
+                            lrNode.IdentifierList.Add(lsIdentifier)
+                            '    If liInd > 0 Then lsIdentifierList &= ","
+                            '    Select Case lrParameterNode.FBMModelObject.GetType
+                            '        Case Is = GetType(FBM.ValueType)
+                            '            Dim lrValueType As FBM.ValueType = lrParameterNode.FBMModelObject
+                            '            lsIdentifierList &= Boston.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'") & lsIdentifier & Boston.returnIfTrue(lrValueType.DataTypeIsNumeric, "", "'")
+                            '        Case Else
+                            '            For Each lrColumn In lrParameterNode.RDSTable.getFirstUniquenessConstraintColumns
+                            '                lsIdentifierList &= Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'") & lsIdentifier & Boston.returnIfTrue(lrColumn.DataTypeIsNumeric, "", "'")
+                            '            Next
+                            '    End Select
+                            '    liInd += 1
+                        Next
+                        'lsDerivationFormula = lsDerivationFormula.Replace(lrParameterNode.Name, "(" & lrParameterNode.Name & lrParameterNode.ComparitorSymbol & lsIdentifierList & ")")
+                    End If
+SkipParameterNode:
+                Next
+                '==========================================================================
+
 
                 Dim lrWhichSelectStatement As New FEQL.WHICHSELECTStatement
                 Call Me.GetParseTreeTokensReflection(lrWhichSelectStatement, Me.Parsetree.Nodes(0))
@@ -238,6 +263,35 @@ Namespace FEQL
 
         End Function
 
+        Public Function walkReturnFunctionTree(ByRef arDerivationFormula As FEQL.ParseNode,
+                                                  ByVal ParamArray aarParameterArray As FactEngine.QueryEdge())
+
+            Dim lsSQL As String = ""
+            Dim lsTokenText As String = Nothing
+            Try
+                'Not used in ReturnFunctions
+                Dim larQueryNodeParameters As New List(Of FactEngine.QueryNode)
+
+                lsSQL &= Me.processNode(arDerivationFormula, larQueryNodeParameters, True)
+
+                For Each lrParseNode In arDerivationFormula.Nodes
+                    lsSQL &= walkReturnFunctionTree(lrParseNode, aarParameterArray)
+                Next
+
+                Return lsSQL
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lsSQL
+            End Try
+
+        End Function
+
         Public Function walkDerivationFormulaTree(ByRef arDerivationFormula As FEQL.ParseNode,
                                                   ByVal ParamArray aarParameterArray As FactEngine.QueryEdge())
 
@@ -276,7 +330,8 @@ Namespace FEQL
         End Function
 
         Public Function processNode(ByRef arParseNode As FEQL.ParseNode,
-                                    ByRef aarQueryNodeParameters As List(Of FactEngine.QueryNode)) As String
+                                    ByRef aarQueryNodeParameters As List(Of FactEngine.QueryNode),
+                                    Optional ByVal abUseSquareBrackets As Boolean = False) As String
 
             Dim lsSQL As String = ""
             Dim lsTokenText As String
@@ -284,18 +339,22 @@ Namespace FEQL
                 lsTokenText = Nothing
 
                 Select Case arParseNode.Token.Type
-                    Case Is = FEQL.TokenType.MODELELEMENTNAME,
-                              FEQL.TokenType.EQUALS,
-                              FEQL.TokenType.KEYWDLESSTHAN,
-                              FEQL.TokenType.KEYWDGREATERTHAN,
-                              FEQL.TokenType.PLUS,
+                    Case Is = FEQL.TokenType.MODELELEMENTNAME
+                        lsTokenText = Boston.returnIfTrue(abUseSquareBrackets, "[", "") & Trim(arParseNode.Token.Text) & Boston.returnIfTrue(abUseSquareBrackets, "]", "")
+                    Case Is = FEQL.TokenType.COLUMNNAMESTR,
+                              FEQL.TokenType.BROPEN,
+                              FEQL.TokenType.BRCLOSE,
+                              FEQL.TokenType.PERIOD
+                        lsTokenText = Trim(arParseNode.Token.Text)
+                    Case Is = FEQL.TokenType.PLUS,
                               FEQL.TokenType.MINUS,
                               FEQL.TokenType.TIMES,
                               FEQL.TokenType.DIVIDE,
                               FEQL.TokenType.NUMBER,
-                              FEQL.TokenType.BROPEN,
-                              FEQL.TokenType.BRCLOSE
-                        lsTokenText = Trim(arParseNode.Token.Text)
+                              FEQL.TokenType.EQUALS,
+                              FEQL.TokenType.KEYWDLESSTHAN,
+                              FEQL.TokenType.KEYWDGREATERTHAN
+                        lsTokenText = Trim(arParseNode.Token.Text) & " "
                     Case Is = FEQL.TokenType.KEYWDTODAY 'Reserved Words
                         lsTokenText = Trim(arParseNode.Token.Text)
                     Case Else
@@ -305,14 +364,17 @@ Namespace FEQL
                 Dim lrModelElement As FBM.ModelObject
                 Select Case arParseNode.Token.Type
                     Case Is = FEQL.TokenType.MODELELEMENTNAME
-                        lrModelElement = Me.Model.GetModelObjectByName(lsTokenText)
-                        Select Case lrModelElement.GetType
-                            Case GetType(FBM.ValueType)
-                                Select Case CType(lrModelElement, FBM.ValueType).DataType
-                                    Case Is = pcenumORMDataType.TemporalDate
-                                        lsTokenText = "julianday(" & lsTokenText & ")"
-                                End Select
-                        End Select
+                        lrModelElement = Me.Model.GetModelObjectByName(arParseNode.Token.Text, True)
+                        If lrModelElement IsNot Nothing Then
+                            lsTokenText = Boston.returnIfTrue(abUseSquareBrackets, "[", "") & lrModelElement.DBName & Boston.returnIfTrue(abUseSquareBrackets, "]", "")
+                            Select Case lrModelElement.GetType
+                                Case GetType(FBM.ValueType)
+                                    Select Case CType(lrModelElement, FBM.ValueType).DataType
+                                        Case Is = pcenumORMDataType.TemporalDate
+                                            lsTokenText = "julianday(" & lsTokenText & ")"
+                                    End Select
+                            End Select
+                        End If
                 End Select
 
                 If lsTokenText IsNot Nothing Then
@@ -329,8 +391,10 @@ Namespace FEQL
                     Select Case LCase(lsTokenText)
                         Case Is = "today" 'Reserved word
                             lsTokenText = "julianday('now') "
+                        Case Is = "."
+                            'Do nothing
                         Case Else
-                            lsTokenText &= " "
+                            'lsTokenText &= " "
                     End Select
                 End If
 

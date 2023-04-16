@@ -3647,18 +3647,18 @@ Public Class frmToolboxORMVerbalisation
             lrVerbaliser.HTW.WriteBreak()
 
             Select Case liDataType
-                Case Is = pcenumORMDataType.NumericFloatCustomPrecision, _
-                          pcenumORMDataType.NumericDecimal, _
+                Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                          pcenumORMDataType.NumericDecimal,
                           pcenumORMDataType.NumericMoney
 
                     lrVerbaliser.VerbaliseQuantifier("Data Precision: ")
                     lrVerbaliser.VerbaliseBlackText(arAttribute.Column.getMetamodelDataTypePrecision.ToString)
                     lrVerbaliser.HTW.WriteBreak()
-                Case Is = pcenumORMDataType.RawDataFixedLength, _
-                          pcenumORMDataType.RawDataLargeLength, _
-                          pcenumORMDataType.RawDataVariableLength, _
-                          pcenumORMDataType.TextFixedLength, _
-                          pcenumORMDataType.TextLargeLength, _
+                Case Is = pcenumORMDataType.RawDataFixedLength,
+                          pcenumORMDataType.RawDataLargeLength,
+                          pcenumORMDataType.RawDataVariableLength,
+                          pcenumORMDataType.TextFixedLength,
+                          pcenumORMDataType.TextLargeLength,
                           pcenumORMDataType.TextVariableLength
                     lrVerbaliser.VerbaliseQuantifier("Data Length: ")
                     lrVerbaliser.VerbaliseBlackText(arAttribute.Column.getMetamodelDataTypeLength.ToString)
@@ -3669,6 +3669,17 @@ Public Class frmToolboxORMVerbalisation
 
             Dim lrFactTypeReading As FBM.FactTypeReading
             Dim lrFactType As FBM.FactType = arAttribute.Column.Role.FactType
+
+            '===========================================
+            'Derivation
+            If lrFactType.IsDerived Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseHeading("Derivation")
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseBlackText(lrFactType.DerivationText)
+                lrVerbaliser.HTW.WriteBreak()
+            End If
 
             '===========================================
             Dim lrRoleConstraint As FBM.RoleConstraint

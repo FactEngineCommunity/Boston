@@ -403,223 +403,13 @@ SkipModelLevelRoleConstraint:
                 '================================
 #Region "Pages"
                 Dim lrPage As FBM.Page
+                Dim lrExportPage As XMLModel.Page = Nothing
 
                 For Each lrPage In arFBMModel.Page
 
                     If lrPage.Language <> pcenumLanguage.ORMModel And abExcludedMDAModelElements Then Continue For
 
-                    Dim lrExportPage As New XMLModel.Page
-
-                    lrExportPage.Id = lrPage.PageId
-                    lrExportPage.Name = lrPage.Name
-                    lrExportPage.Language = lrPage.Language
-                    lrExportPage.IsCoreModelPage = lrPage.IsCoreModelPage
-                    '--------------------------------------------------------------------
-                    'Add all of the ConceptTypes that are in the ModelConceptInstance table.
-                    ' These are:
-                    '           - EntityType(s)
-                    '           - ValueTypes(s)
-                    '           - FactType(s)
-                    '           - RoleConstraint(s)
-                    '           - Fact(s)
-                    '           - Value(s)
-                    '           - ModelNotes
-                    '
-                    ' Nothing else is required to draw a ConceptualModel.
-                    ' Different types of ConceptualModel require different types of Concepts
-                    ' as they appear in a Model such that the ConceptualModel can be drawn.
-                    ' e.g. Within a Use Case Diagram, Actors are Values within a Fact.
-                    ' The Fact has no X/Y co-ordinate, but the Value/Actor does.
-                    ' NB A Value (e.g. 'Storeman' may well be an EntityType within an ORM-Diagram
-                    '  but within a Use Case Diagram, drawn from the Core-UseCaseDiagram (metamodel)
-                    '  ORM-Diagram, the Value becomes an Actor(Entity).
-                    ' Although this is Higher-Order Logic at work, FOL is preserved because
-                    ' the modeler (or tool. e.g. Richmond) only works with on Page/View (i.e. 'Interpretation')
-                    ' at a time. i.e. While working with a Use Case Diagram, Richmond works over
-                    ' the MetaModel of a Use Case Diagram in First-Order Logic.
-                    '-----------------------------------------------------------------------
-
-                    '------------------------------------------
-                    'Establish ConceptInstances for the Page.
-                    '------------------------------------------
-                    Dim lrConceptInstance As New FBM.ConceptInstance
-
-                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                    Dim lrValueTypeInstance As FBM.ValueTypeInstance
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance
-                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                    Dim lrFactInstance As FBM.FactInstance
-                    Dim lrFactDataInstance As FBM.FactDataInstance
-                    Dim lrRoleInstance As FBM.RoleInstance
-                    Dim lrModelNoteInstance As FBM.ModelNoteInstance
-
-                    '--------------------------------------------------------------
-                    'Establish the set of EntityTypeInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
-
-                        lrConceptInstance = lrEntityTypeInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
-
-                    '--------------------------------------------------------------
-                    'Establish the set of ValueTypeInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    For Each lrValueTypeInstance In lrPage.ValueTypeInstance
-                        lrConceptInstance = lrValueTypeInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
-
-                    '--------------------------------------------------------------
-                    'Establish the set of FactTypeInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    For Each lrFactTypeInstance In lrPage.FactTypeInstance
-                        lrConceptInstance = lrFactTypeInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-
-                        If lrFactTypeInstance.FactType.IsDerived _
-                            And (Trim(lrFactTypeInstance.FactType.DerivationText) <> "") _
-                            And lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
-
-                            lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
-                                                                         lrFactTypeInstance.Page,
-                                                                         lrFactTypeInstance.Id,
-                                                                         pcenumConceptType.DerivationText)
-                            lrConceptInstance.X = lrFactTypeInstance.FactTypeDerivationText.X
-                            lrConceptInstance.Y = lrFactTypeInstance.FactTypeDerivationText.Y
-
-                            '-------------------------------------
-                            'Add the ConceptInstance to the Page
-                            '-------------------------------------
-                            lrExportPage.ConceptInstance.Add(lrConceptInstance)
-
-                        End If
-
-                        'FactTypeReading
-                        lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
-                                                                     lrFactTypeInstance.Page,
-                                                                     lrFactTypeInstance.Id,
-                                                                     pcenumConceptType.FactTypeReading,
-                                                                     lrFactTypeInstance.InstanceNumber)
-
-                        lrConceptInstance.X = lrFactTypeInstance.FactTypeReadingPoint.X
-                        lrConceptInstance.Y = lrFactTypeInstance.FactTypeReadingPoint.Y
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-
-                        'FactTypeName
-                        lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
-                                                                     lrFactTypeInstance.Page,
-                                                                     lrFactTypeInstance.Id,
-                                                                     pcenumConceptType.FactTypeName,
-                                                                     lrFactTypeInstance.InstanceNumber)
-                        lrConceptInstance.Visible = lrFactTypeInstance.ShowFactTypeName
-                        lrConceptInstance.X = lrFactTypeInstance.FactTypeName.X
-                        lrConceptInstance.Y = lrFactTypeInstance.FactTypeName.Y
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-
-                        'DerivationText
-                        If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
-                            lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
-                                                                     lrFactTypeInstance.Page,
-                                                                     lrFactTypeInstance.Id,
-                                                                     pcenumConceptType.DerivationText,
-                                                                     lrFactTypeInstance.InstanceNumber)
-                            lrConceptInstance.Visible = True
-                            lrConceptInstance.X = lrFactTypeInstance.FactTypeDerivationText.X
-                            lrConceptInstance.Y = lrFactTypeInstance.FactTypeDerivationText.Y
-                            lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                        End If
-                    Next
-
-                    '--------------------------------------------------------------
-                    'Establish the set of RoleConstraintInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
-
-                        lrConceptInstance = lrRoleConstraintInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
-
-                    '--------------------------------------------------------------
-                    'Establish the set of FactInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    Dim larFactInstance = From FactTypeInstance In lrPage.FactTypeInstance
-                                          From FactInstance In FactTypeInstance.Fact
-                                          Select FactInstance
-
-                    For Each lrFactInstance In larFactInstance
-                        lrConceptInstance = lrFactInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
-
-                    '--------------------------------------------------------------
-                    'Establish the set of ValueInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    Dim larFactData = From FactInstance In larFactInstance
-                                      From FactData In FactInstance.Data
-                                      Select FactData
-
-                    For Each lrFactDataInstance In larFactData
-                        lrConceptInstance = lrFactDataInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
-
-                    '--------------------------------------------------------------
-                    'Establish the set of RoleNameInstances that are on the Page
-                    '  as ConceptInstances.
-                    '--------------------------------------------------------------
-                    For Each lrRoleInstance In lrPage.RoleInstance.FindAll(Function(x) x.Name <> "")
-                        lrConceptInstance = New FBM.ConceptInstance
-
-                        lrConceptInstance.PageId = lrPage.PageId
-                        lrConceptInstance.ModelId = lrPage.Model.ModelId
-                        lrConceptInstance.ConceptType = pcenumConceptType.RoleName
-                        lrConceptInstance.RoleId = lrRoleInstance.Id
-                        lrConceptInstance.Symbol = lrRoleInstance.Name
-                        lrConceptInstance.X = lrRoleInstance.RoleName.X
-                        lrConceptInstance.Y = lrRoleInstance.RoleName.Y
-                        lrConceptInstance.Visible = True
-                        lrConceptInstance.Orientation = 0
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
-
-                    '-----------------------------------------------
-                    'Model Notes
-                    '-----------------------------------------------
-                    For Each lrModelNoteInstance In lrPage.ModelNoteInstance
-                        lrConceptInstance = lrModelNoteInstance.CloneConceptInstance
-                        '-------------------------------------
-                        'Add the ConceptInstance to the Page
-                        '-------------------------------------
-                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
-                    Next
+                    lrExportPage = Me.MapToXMLPage(lrPage)
 
                     Me.ORMDiagram.Add(lrExportPage)
                 Next
@@ -636,6 +426,231 @@ SkipModelLevelRoleConstraint:
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
+            End Try
+
+        End Function
+
+        Private Function MapToXMLPage(ByRef arPage As FBM.Page) As XMLModel.Page
+
+            Dim lrExportPage As New XMLModel.Page
+            Dim lrPage = arPage
+
+            Try
+                lrExportPage.Id = lrPage.PageId
+                lrExportPage.Name = lrPage.Name
+                lrExportPage.Language = lrPage.Language
+                lrExportPage.IsCoreModelPage = lrPage.IsCoreModelPage
+                '--------------------------------------------------------------------
+                'Add all of the ConceptTypes that are in the ModelConceptInstance table.
+                ' These are:
+                '           - EntityType(s)
+                '           - ValueTypes(s)
+                '           - FactType(s)
+                '           - RoleConstraint(s)
+                '           - Fact(s)
+                '           - Value(s)
+                '           - ModelNotes
+                '
+                ' Nothing else is required to draw a ConceptualModel. Different types of ConceptualModel require different types of Concepts
+                ' as they appear in a Model such that the ConceptualModel can be drawn.
+                ' e.g. Within a Use Case Diagram, Actors are Values within a Fact. The Fact has no X/Y co-ordinate, but the Value/Actor does.
+                ' NB A Value (e.g. 'Storeman' may well be an EntityType within an ORM-Diagram but within a Use Case Diagram,
+                ' drawn from the Core-UseCaseDiagram (metamodel) ORM-Diagram, the Value becomes an Actor(Entity).
+                ' Although this is Higher-Order Logic at work, FOL is preserved because
+                ' the modeler (or tool. e.g. Richmond) only works with on Page/View (i.e. 'Interpretation')
+                ' at a time. i.e. While working with a Use Case Diagram, Richmond works over
+                ' the MetaModel of a Use Case Diagram in First-Order Logic.
+                '-----------------------------------------------------------------------
+
+                '------------------------------------------
+                'Establish ConceptInstances for the Page.
+                '------------------------------------------
+                Dim lrConceptInstance As New FBM.ConceptInstance
+
+                Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                Dim lrValueTypeInstance As FBM.ValueTypeInstance
+                Dim lrFactTypeInstance As FBM.FactTypeInstance
+                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                Dim lrFactInstance As FBM.FactInstance
+                Dim lrFactDataInstance As FBM.FactDataInstance
+                Dim lrRoleInstance As FBM.RoleInstance
+                Dim lrModelNoteInstance As FBM.ModelNoteInstance
+
+                '--------------------------------------------------------------
+                'Establish the set of EntityTypeInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
+
+                    lrConceptInstance = lrEntityTypeInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                Next
+
+                '--------------------------------------------------------------
+                'Establish the set of ValueTypeInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                For Each lrValueTypeInstance In lrPage.ValueTypeInstance
+                    lrConceptInstance = lrValueTypeInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                Next
+
+                '--------------------------------------------------------------
+                'Establish the set of FactTypeInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                For Each lrFactTypeInstance In lrPage.FactTypeInstance
+                    lrConceptInstance = lrFactTypeInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+
+                    If lrFactTypeInstance.FactType.IsDerived _
+                        And (Trim(lrFactTypeInstance.FactType.DerivationText) <> "") _
+                        And lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+
+                        lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                     lrFactTypeInstance.Page,
+                                                                     lrFactTypeInstance.Id,
+                                                                     pcenumConceptType.DerivationText)
+                        lrConceptInstance.X = lrFactTypeInstance.FactTypeDerivationText.X
+                        lrConceptInstance.Y = lrFactTypeInstance.FactTypeDerivationText.Y
+
+                        '-------------------------------------
+                        'Add the ConceptInstance to the Page
+                        '-------------------------------------
+                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
+
+                    End If
+
+                    'FactTypeReading
+                    lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                 lrFactTypeInstance.Page,
+                                                                 lrFactTypeInstance.Id,
+                                                                 pcenumConceptType.FactTypeReading,
+                                                                 lrFactTypeInstance.InstanceNumber)
+
+                    lrConceptInstance.X = lrFactTypeInstance.FactTypeReadingPoint.X
+                    lrConceptInstance.Y = lrFactTypeInstance.FactTypeReadingPoint.Y
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+
+                    'FactTypeName
+                    lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                 lrFactTypeInstance.Page,
+                                                                 lrFactTypeInstance.Id,
+                                                                 pcenumConceptType.FactTypeName,
+                                                                 lrFactTypeInstance.InstanceNumber)
+                    lrConceptInstance.Visible = lrFactTypeInstance.ShowFactTypeName
+                    lrConceptInstance.X = lrFactTypeInstance.FactTypeName.X
+                    lrConceptInstance.Y = lrFactTypeInstance.FactTypeName.Y
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+
+                    'DerivationText
+                    If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                        lrConceptInstance = New FBM.ConceptInstance(lrFactTypeInstance.Model,
+                                                                 lrFactTypeInstance.Page,
+                                                                 lrFactTypeInstance.Id,
+                                                                 pcenumConceptType.DerivationText,
+                                                                 lrFactTypeInstance.InstanceNumber)
+                        lrConceptInstance.Visible = True
+                        lrConceptInstance.X = lrFactTypeInstance.FactTypeDerivationText.X
+                        lrConceptInstance.Y = lrFactTypeInstance.FactTypeDerivationText.Y
+                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                    End If
+                Next
+
+                '--------------------------------------------------------------
+                'Establish the set of RoleConstraintInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
+
+                    lrConceptInstance = lrRoleConstraintInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                Next
+
+                '--------------------------------------------------------------
+                'Establish the set of FactInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                Dim larFactInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                      From FactInstance In FactTypeInstance.Fact
+                                      Select FactInstance
+
+                For Each lrFactInstance In larFactInstance
+                    lrConceptInstance = lrFactInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                Next
+
+                '--------------------------------------------------------------
+                'Establish the set of ValueInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                Dim larFactData = From FactInstance In larFactInstance
+                                  From FactData In FactInstance.Data
+                                  Select FactData
+
+                For Each lrFactDataInstance In larFactData
+                    lrConceptInstance = lrFactDataInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                Next
+
+                '--------------------------------------------------------------
+                'Establish the set of RoleNameInstances that are on the Page
+                '  as ConceptInstances.
+                '--------------------------------------------------------------
+                For Each lrRoleInstance In lrPage.RoleInstance.FindAll(Function(x) x.Name <> "")
+                    Try
+                        lrConceptInstance = New FBM.ConceptInstance
+                        lrConceptInstance.PageId = lrPage.PageId
+                        lrConceptInstance.ModelId = lrPage.Model.ModelId
+                        lrConceptInstance.ConceptType = pcenumConceptType.RoleName
+                        lrConceptInstance.RoleId = lrRoleInstance.Id
+                        lrConceptInstance.Symbol = lrRoleInstance.Name
+                        lrConceptInstance.X = lrRoleInstance.RoleName.X
+                        lrConceptInstance.Y = lrRoleInstance.RoleName.Y
+                        lrConceptInstance.Visible = True
+                        lrConceptInstance.Orientation = 0
+                        '-------------------------------------
+                        'Add the ConceptInstance to the Page
+                        '-------------------------------------
+                        lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                    Catch ex As Exception
+                        'Skip RoleInstance
+                    End Try
+                Next
+
+                '-----------------------------------------------
+                'Model Notes
+                '-----------------------------------------------
+                For Each lrModelNoteInstance In lrPage.ModelNoteInstance
+                    lrConceptInstance = lrModelNoteInstance.CloneConceptInstance
+                    '-------------------------------------
+                    'Add the ConceptInstance to the Page
+                    '-------------------------------------
+                    lrExportPage.ConceptInstance.Add(lrConceptInstance)
+                Next
+
+                Return lrExportPage
+
+            Catch ex As Exception
+                Return lrExportPage
             End Try
 
         End Function
@@ -1222,6 +1237,9 @@ SkipModelNote:
                     Dim lsPageId = arXMLPage.Id
                     lrPage = arModel.Page.Find(Function(x) x.PageId = lsPageId)
                 End If
+
+                'Make sure Language is captured.
+                lrPage.Language = arXMLPage.Language
 
                 '=============================
                 'Map the ValueTypeInstances

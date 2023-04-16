@@ -2485,8 +2485,8 @@ SkipRegistrationChecking:
             child.Show(DockPanel)
 
             If arModelElement IsNot Nothing Then
-                child.FocusModelElement(arModelElement)
                 child.DescribeModelElement(arModelElement)
+                child.FocusModelElement(arModelElement)
             End If
 
             Me.Cursor = Cursors.Default

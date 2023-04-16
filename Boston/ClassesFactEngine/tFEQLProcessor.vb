@@ -387,6 +387,16 @@ Namespace FEQL
             End Set
         End Property
 
+        Private _RETURNFUNCTION As Object = Nothing
+        Public Property RETURNFUNCTION As Object
+            Get
+                Return Me._RETURNFUNCTION
+            End Get
+            Set(value As Object)
+                Me._RETURNFUNCTION = value
+            End Set
+        End Property
+
     End Class
 
     Public Class RETURNCLAUSE
