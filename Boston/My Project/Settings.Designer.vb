@@ -1109,6 +1109,18 @@ Namespace My
                 Me("ModelingUseThreadedXMLPageLoading") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property ModelErrorCheckingValidateRDSColumnsAgainstDatabaseColumns() As Boolean
+            Get
+                Return CType(Me("ModelErrorCheckingValidateRDSColumnsAgainstDatabaseColumns"),Boolean)
+            End Get
+            Set
+                Me("ModelErrorCheckingValidateRDSColumnsAgainstDatabaseColumns") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

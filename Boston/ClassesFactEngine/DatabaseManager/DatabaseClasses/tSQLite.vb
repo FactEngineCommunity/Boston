@@ -693,7 +693,7 @@ Namespace FactEngine
 
             Dim larColumn As New List(Of RDS.Column)
             Try
-                Dim lsSQL As String = "PRAGMA table_info('" & arTable.Name & "')"
+                Dim lsSQL As String = "PRAGMA table_info('" & arTable.DBName & "')"
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
                 Dim lsColumnName As String

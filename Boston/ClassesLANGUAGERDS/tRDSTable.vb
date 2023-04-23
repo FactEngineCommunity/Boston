@@ -18,6 +18,16 @@ Namespace RDS
         <XmlIgnore()>
         Private _DatabaseName As String = ""
 
+        Public ReadOnly Property DBName As String
+            Get
+                If Me.FBMModelElement Is Nothing Then
+                    Return Me.Name
+                Else
+                    Return Me.FBMModelElement.DBName
+                End If
+            End Get
+        End Property
+
         Public Property DatabaseName As String
             Get
                 If Me.FBMModelElement Is Nothing Then

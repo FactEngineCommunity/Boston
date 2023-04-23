@@ -21,7 +21,7 @@ Namespace FEQL
                 Dim lrDerivationStatement As New FEQL.DERIVATIONSTMT
 
                 If Me.Parsetree.Errors.Count > 0 Then
-                    Throw New Exception("Error in Derivation Text for Fact Type, '" & arModelElement.Id & "'.")
+                    Throw New Exception("Error in Derivation Text for Fact Type, '" & arModelElement.Id & "'. Text:" & vbCrLf & vbCrLf & asDerivationText)
                 End If
 
                 Call Me.GetParseTreeTokensReflection(lrDerivationStatement, Me.Parsetree.Nodes(0))

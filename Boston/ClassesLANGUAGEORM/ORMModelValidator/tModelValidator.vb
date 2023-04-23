@@ -80,7 +80,10 @@ Namespace Validation
                 'CompoundReferenceSchemeForEntityTypeWithReferenceMode
                 'Me.AddErrorChecker(New Validation.ModelElementAppearsOnNoPageError(Me.Model)) '130
                 Me.AddErrorChecker(New Validation.ErrorCheckerPopulationHasNULLValueError(Me.Model)) '131
-                Me.AddErrorChecker(New Validation.ErrorCheckerCMMLModelError(Me.Model)) '140
+
+                If My.Settings.ModelErrorCheckingValidateRDSColumnsAgainstDatabaseColumns Then
+                    Me.AddErrorChecker(New Validation.ErrorCheckerCMMLModelError(Me.Model)) '140
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

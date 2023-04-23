@@ -39,6 +39,8 @@ Public Class frmDiagramORM
     Public _ComboBoxEntityTypeInstance As New ComboBox 'NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
     Public _ComboBoxValueTypeInstance As New ComboBox 'NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
 
+    Private PropertyTableNode As TableNode
+
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
 
         Call MyBase.BringToFront()
@@ -1971,7 +1973,10 @@ ProcessFactType:
 
         Try
 
-            lrFactTable = e.Table.Tag
+            Select Case e.Table.Tag.GetType
+                Case Is = GetType(FBM.FactTable)
+
+                    lrFactTable = e.Table.Tag
             lrFactTable.ResetBlackCellText()
             lrFactTable.SelectedRow = e.Row + 1
 
@@ -2039,32 +2044,148 @@ ProcessFactType:
             '----------------
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
-                lrToolboxForm.zrModel = Me.zrPage.Model
-                If lrFactTable.FactTypeInstance.Fact.Count > 0 Then
-                    lrFactDataInstance = lrFactTable.TableShape.Item(0, lrFactTable.SelectedRow - 1).Tag
-                    lrFact = lrFactDataInstance.Fact.Fact
-                    If My.Settings.SuperuserMode Then
-                        Try
-                            Call lrToolboxForm.VerbaliseFactInstance(lrFactDataInstance.Fact)
-                        Catch ex As Exception
+                    If IsSomething(lrToolboxForm) Then
+                        lrToolboxForm.zrModel = Me.zrPage.Model
+                        If lrFactTable.FactTypeInstance.Fact.Count > 0 Then
+                            lrFactDataInstance = lrFactTable.TableShape.Item(0, lrFactTable.SelectedRow - 1).Tag
+                            lrFact = lrFactDataInstance.Fact.Fact
+                            If My.Settings.SuperuserMode Then
+                                Try
+                                    Call lrToolboxForm.VerbaliseFactInstance(lrFactDataInstance.Fact)
+                                Catch ex As Exception
 
-                        End Try
-                    Else
-                        Try
-                            Call lrToolboxForm.VerbaliseFact(lrFact)
-                        Catch ex As Exception
+                                End Try
+                            Else
+                                Try
+                                    Call lrToolboxForm.VerbaliseFact(lrFact)
+                                Catch ex As Exception
 
-                        End Try
+                                End Try
+                            End If
+
+
+                        End If
+                    End If
+                Case Is = GetType(FBM.EntityType),
+                          GetType(FBM.FactType)
+
+#Region "Properties Table Cell"
+                    Dim lrColumn As RDS.Column
+                    lrColumn = e.Cell.Tag
+
+                    Dim lrAttribute As New ERD.Attribute(lrColumn, Me.zrPage)
+
+                    Me.zrPage.SelectedObject.Clear()
+                    Me.zrPage.SelectedObject.Add(lrAttribute)
+
+                    e.Cell.TextColor = Color.White
+                    e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                    Me.Diagram.Invalidate()
+
+                    Call Me.resetAttributeCellColours()
+
+                    '-----------------------------------------------
+                    'Paint the cell again. First is for GUI speed.
+                    '-----------------------------------------------
+                    e.Cell.TextColor = Color.White
+                    e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
+                    Me.Diagram.Invalidate()
+
+                    '--------------------------------------
+                    'Set the PropertiesGrid.SeletedObject
+                    '--------------------------------------
+                    Dim lrPropertyGridForm As frmToolboxProperties
+
+                    lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                    If IsSomething(lrPropertyGridForm) Then
+                        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                        lrPropertyGridForm.PropertyGrid.SelectedObject = lrAttribute 'e.Cell.Tag
                     End If
 
+                    '-------------------------------------------------------
+                    'ORM Verbalisation
+                    '-------------------------------------------------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If IsSomething(lrToolboxForm) Then
+                        lrToolboxForm.zrModel = Me.zrPage.Model
+                        Select Case TypeOf (e.Cell.Tag) Is RDS.Column
+                            Case Is = pcenumConceptType.Actor
+                                Call lrToolboxForm.VerbaliseColumn(e.Cell.Tag)
+                        End Select
+                    End If
 
-                End If
-            End If
+                    '-------------------------------------------------------
+                    'ORM Reading Editor
+                    '-------------------------------------------------------
+                    Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                    lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+                    If IsSomething(lrORMReadingEditor) Then
+
+                        lrORMReadingEditor.zrPage = Me.zrPage
+
+                        If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
+
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
+
+                            Dim lrFactType As FBM.FactType = Nothing
+
+                            If lrAttribute.Column.FactType IsNot Nothing Then
+                                lrFactType = lrAttribute.Column.FactType
+                            Else
+                                lrFactType = lrAttribute.Column.Role.FactType
+                            End If
+
+                            If Control.ModifierKeys = Keys.Control And lrFactType.IsObjectified Then
+
+                                Dim larLinkFactType = From LinkFactType In lrFactType.getLinkFactTypes
+                                                      Where LinkFactType.LinkFactTypeRole Is lrAttribute.Column.Role
+                                                      Select LinkFactType
+
+                                If larLinkFactType.Count = 0 Then GoTo SkipORMReadingEditor
+
+                                lrFactTypeInstance = larLinkFactType(0).CloneInstance(Me.zrPage, False)
+
+
+                            ElseIf lrAttribute.Column.FactType IsNot Nothing Then
+                                lrFactTypeInstance = lrAttribute.Column.FactType.CloneInstance(Me.zrPage, False)
+                            Else
+                                lrFactTypeInstance = lrAttribute.Column.Role.FactType.CloneInstance(Me.zrPage, False)
+                            End If
+
+                            If lrFactTypeInstance Is Nothing Then GoTo SkipORMReadingEditor
+
+                            If lrAttribute.Column.FactType IsNot Nothing Then
+                                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                                Call lrORMReadingEditor.SetupForm()
+                            Else
+                                '-------------------------------------------------------------------------
+                                'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                                '-------------------------------------------------------------------------
+                                lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance()
+                                lrORMReadingEditor.zrFactTypeInstance = Nothing
+                                lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                                lrORMReadingEditor.DataGrid_Readings.Refresh()
+                                lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                                lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                                lrORMReadingEditor.LabelFactTypeName.Text = "No Fact Type Selected"
+                            End If
+                        End If
+
+                    End If
+SkipORMReadingEditor:
+
+#End Region
+
+            End Select
 
         Catch ex As Exception
             Dim lsMessage As String
-            lsMessage = "Error: frmDiagramORM.Diagram.CellClicked"
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
@@ -2210,6 +2331,10 @@ ProcessFactType:
         Dim lrLinkToRemove As New DiagramLink(Me.Diagram)
 
         Try
+            'CodeSafe
+            If e.Link.Destination.GetType = GetType(TableNode) Then Exit Sub
+
+
             lrModelObject = e.Link.Tag
 
             'CodeSafe
@@ -2981,30 +3106,30 @@ ProcessFactType:
         'Me.zrPage.SelectedObject.Clear() 'Didn't seem to work
 
         If IsSomething(e.Node) Then
-            Select Case e.Node.Tag.ConceptType
-                Case Is = pcenumConceptType.EntityType
+            Select Case e.Node.Tag.GetType
+                Case Is = GetType(FBM.EntityTypeInstance)
                     If Not (Control.ModifierKeys = Keys.Control) Then
                         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                         lrEntityTypeInstance = e.Node.Tag
                         Call lrEntityTypeInstance.NodeDeselected()
                     End If
-                Case Is = pcenumConceptType.RoleConstraint
+                Case Is = GetType(FBM.RoleConstraintInstance)
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                     lrRoleConstraintInstance = e.Node.Tag
                     Call lrRoleConstraintInstance.NodeDeselected()
-                Case Is = pcenumConceptType.FactTable
+                Case Is = GetType(FBM.FactTable)
                     Call e.Node.Tag.GetFactsFromTableNode()
                     e.Node.Tag.ResetBlackCellText()
-                Case Is = pcenumConceptType.FactType
+                Case Is = GetType(FBM.FactTypeInstance)
                     Dim lrFactTypeInstance As FBM.FactTypeInstance = e.Node.Tag
                     Call lrFactTypeInstance.NodeDeselected()
                     For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
                         Call lrRoleInstance.NodeDeselected()
                     Next
-                Case Is = pcenumConceptType.RoleConstraintRole
+                Case Is = GetType(FBM.RoleConstraintRoleInstance)
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance = e.Node.Tag
                     Call lrRoleConstraintRoleInstance.Role.NodeDeselected()
-                Case Is = pcenumConceptType.Role
+                Case Is = GetType(FBM.RoleInstance)
                     If Not (Control.ModifierKeys = Keys.Control) Then
                         Call e.Node.Tag.NodeDeselected()
                     End If
@@ -4110,14 +4235,31 @@ ProcessFactType:
                             Me.Diagram.Invalidate()
                     End Select
 
+                    '==================================================================================
+                    'Properties Table. Although in an ORM diagram, the ModelElement may represent
+                    ' a Table/Entity or NodeType. Show it's properties.
+                    If Not Me.zrPage.MultiSelectionPerformed And ((Control.ModifierKeys = Keys.Control) Or (Control.ModifierKeys = Keys.ControlKey)) Then
+                        Select Case loNode.Tag.GetType
+                            Case Is = GetType(FBM.EntityTypeInstance)
+                                Call Me.DisplayNodeTypeProperties(loNode.Tag.EntityType, loNode.Bounds.X, loNode.Bounds.Y + 25)
+                            Case Is = GetType(FBM.FactTypeInstance)
+                                If CType(loNode.Tag, FBM.FactType).IsObjectified Then
+                                    Call Me.DisplayNodeTypeProperties(loNode.Tag.FactType, loNode.Bounds.X, loNode.Bounds.Y + 25)
+                                End If
+                            Case Is = GetType(FBM.EntityTypeName)
+                                Call Me.DisplayNodeTypeProperties(loNode.Tag.EntityTypeInstance.EntityType, loNode.Bounds.X, loNode.Bounds.Y + 25)
+                        End Select
+                    End If
+                    '===================================================================================
+
                     '-------------------------------------------------------
                     'Don't allow UnconnectedLinks when doing a multiselect.
                     '-------------------------------------------------------
                     Me.Diagram.AllowUnconnectedLinks = False
 
-                    Exit Sub
-                Else
-                    If Me.zrPage.MultiSelectionPerformed Then
+                        Exit Sub
+                    Else
+                        If Me.zrPage.MultiSelectionPerformed Then
                         If Diagram.Selection.Nodes.Contains(loNode) Then
                             '-----------------------------------------------------------------------
                             'Don't clear the SelectedObjects if the ShapeNode selected/clicked on 
@@ -4280,6 +4422,15 @@ ProcessFactType:
                 'Mouse is over the Canvas
                 '----------------------------
                 Me.Diagram.AllowUnconnectedLinks = False
+
+                '-----------------------------------------------------------------------------------------------------------------------
+                'Properties Node. I.e. Properties table, as in PropertyGrphSchema Properties shown for EntityType/ObjectifiedFactType.
+                If Me.PropertyTableNode IsNot Nothing Then
+                    Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+                    Me.PropertyTableNode = Nothing
+                End If
+                Me.PropertyTableNode = Nothing
+
 
                 '-------------------------------------------------------
                 'Set the context menu to the default for the Diagram,
@@ -4853,94 +5004,108 @@ ProcessFactType:
         '-----------------------------------------        
         frmMain.ToolStripButton_Save.Enabled = True
 
-        If IsSomething(e.Node.Tag) Then
+        Try
+            'CodeSafe
+            If Not e.Node.Tag.IsInstanceObjectType Then Exit Sub 'E.g. Properties TableNode.
 
-            Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
-            lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
 
-            e.Node.Tag.x = e.Node.Bounds.X
-            e.Node.Tag.y = e.Node.Bounds.Y
-            Call e.Node.Tag.Move(e.Node.Tag.X, e.Node.Tag.Y, True)
+            If IsSomething(e.Node.Tag) Then
 
-            Dim loORMObject As Object = e.Node.Tag
-            '==============================================================================
-            'Broadcast the moving of the Object
-            '  NB See also: SelectionMoved. Need this code in both places for some reason VM-20180316
-            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
+                lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
 
-                Dim lrModel As New Viev.FBM.Interface.Model
-                Dim lrPage As New Viev.FBM.Interface.Page()
+                e.Node.Tag.x = e.Node.Bounds.X
+                e.Node.Tag.y = e.Node.Bounds.Y
+                Call e.Node.Tag.Move(e.Node.Tag.X, e.Node.Tag.Y, True)
 
-                lrModel.ModelId = Me.zrPage.Model.ModelId
-                lrPage.Id = Me.zrPage.PageId
-                lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
-                lrPage.ConceptInstance.X = loORMObject.Shape.Bounds.X
-                lrPage.ConceptInstance.Y = loORMObject.Shape.Bounds.Y
-                lrPage.ConceptInstance.ModelElementId = loORMObject.Id
-                lrModel.Page = lrPage
+                Dim loORMObject As Object = e.Node.Tag
+                '==============================================================================
+                'Broadcast the moving of the Object
+                '  NB See also: SelectionMoved. Need this code in both places for some reason VM-20180316
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
 
-                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                lrBroadcast.Model = lrModel
-                Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
+                    Dim lrModel As New Viev.FBM.Interface.Model
+                    Dim lrPage As New Viev.FBM.Interface.Page()
+
+                    lrModel.ModelId = Me.zrPage.Model.ModelId
+                    lrPage.Id = Me.zrPage.PageId
+                    lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
+                    lrPage.ConceptInstance.X = loORMObject.Shape.Bounds.X
+                    lrPage.ConceptInstance.Y = loORMObject.Shape.Bounds.Y
+                    lrPage.ConceptInstance.ModelElementId = loORMObject.Id
+                    lrModel.Page = lrPage
+
+                    Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                    lrBroadcast.Model = lrModel
+                    Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
+                End If
+                '==============================================================================
+
+                'lrUserAction.PostActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
+                'prApplication.AddUndoAction(lrUserAction)
+                'frmMain.ToolStripMenuItemUndo.Enabled = True
+
+                Select Case e.Node.Tag.ConceptType
+                    Case Is = pcenumConceptType.EntityType
+                        Call Me.SortJoiningFactTypes(e.Node.Tag)
+                        Call CType(e.Node.Tag, FBM.EntityTypeInstance).ResetSubtypeRelationshipLinks()
+
+                    Case Is = pcenumConceptType.ValueType
+                        Call Me.SortJoiningFactTypes(e.Node.Tag)
+
+                    Case Is = pcenumConceptType.FactType
+                        Call Me.SortJoiningFactTypes(e.Node.Tag)
+
+                        '-------------------------------------------------------------------
+                        'Set the X,Y coordinants of the Roles within the FactType/RoleGroup
+                        '-------------------------------------------------------------------
+                        Dim lo_role_instance As FBM.RoleInstance
+
+                        For Each lo_role_instance In e.Node.Tag.RoleGroup
+                            lo_role_instance.X = lo_role_instance.Shape.Bounds.X
+                            lo_role_instance.Y = lo_role_instance.Shape.Bounds.Y
+                        Next
+
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance = e.Node.Tag
+                        Call lrFactTypeInstance.NodeModified()
+                        Select Case lrFactTypeInstance.Arity
+                            Case Is = 1
+                                lrFactTypeInstance.SortRoleGroup()
+                        End Select
+                    Case Is = pcenumConceptType.FactTypeReading
+                        Dim lrFactTypeReading As FBM.FactTypeReadingInstance = e.Node.Tag
+                        lrFactTypeReading.Shape.AttachTo(lrFactTypeReading.FactType.Shape, AttachToNode.MiddleRight)
+                End Select
             End If
+
+            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) Not x.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint)
+
+                Try
+                    Call lrRoleConstraintInstance.LinkToClosestModelElements()
+                Catch ex As Exception
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                End Try
+            Next
+
+            '==============================================================================
+            'Broadcast the moving of the Object is done in Me.SelectionMoved
             '==============================================================================
 
-            'lrUserAction.PostActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
-            'prApplication.AddUndoAction(lrUserAction)
-            'frmMain.ToolStripMenuItemUndo.Enabled = True
+            Call Me.zrPage.MakeDirty() 'Leave this as last call, because triggers events
 
-            Select Case e.Node.Tag.ConceptType
-                Case Is = pcenumConceptType.EntityType
-                    Call Me.SortJoiningFactTypes(e.Node.Tag)
-                    Call CType(e.Node.Tag, FBM.EntityTypeInstance).ResetSubtypeRelationshipLinks()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                Case Is = pcenumConceptType.ValueType
-                    Call Me.SortJoiningFactTypes(e.Node.Tag)
-
-                Case Is = pcenumConceptType.FactType
-                    Call Me.SortJoiningFactTypes(e.Node.Tag)
-
-                    '-------------------------------------------------------------------
-                    'Set the X,Y coordinants of the Roles within the FactType/RoleGroup
-                    '-------------------------------------------------------------------
-                    Dim lo_role_instance As FBM.RoleInstance
-
-                    For Each lo_role_instance In e.Node.Tag.RoleGroup
-                        lo_role_instance.X = lo_role_instance.Shape.Bounds.X
-                        lo_role_instance.Y = lo_role_instance.Shape.Bounds.Y
-                    Next
-
-                    Dim lrFactTypeInstance As FBM.FactTypeInstance = e.Node.Tag
-                    Call lrFactTypeInstance.NodeModified()
-                    Select Case lrFactTypeInstance.Arity
-                        Case Is = 1
-                            lrFactTypeInstance.SortRoleGroup()
-                    End Select
-                Case Is = pcenumConceptType.FactTypeReading
-                    Dim lrFactTypeReading As FBM.FactTypeReadingInstance = e.Node.Tag
-                    lrFactTypeReading.Shape.AttachTo(lrFactTypeReading.FactType.Shape, AttachToNode.MiddleRight)
-            End Select
-        End If
-
-        For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) Not x.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint)
-
-            Try
-                Call lrRoleConstraintInstance.LinkToClosestModelElements
-            Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-            End Try
-        Next
-
-        '==============================================================================
-        'Broadcast the moving of the Object is done in Me.SelectionMoved
-        '==============================================================================
-
-        Call Me.zrPage.MakeDirty() 'Leave this as last call, because triggers events
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -5150,8 +5315,8 @@ SkipPopup:
             'Set the ContextMenuStrip menu for the selected item.
             '------------------------------------------------------
 #Region "Context Menu Strip"
-            Select Case e.Node.Tag.ConceptType 'Me.Diagram.Selection.Items(0).Tag.ConceptType
-                Case Is = pcenumConceptType.Role
+            Select Case e.Node.Tag.GetType 'Me.Diagram.Selection.Items(0).Tag.ConceptType
+                Case Is = GetType(FBM.RoleInstance)
                     Dim lrRoleInstance As FBM.RoleInstance
                     lrRoleInstance = e.Node.Tag
                     If lrRoleInstance.Mandatory Then
@@ -5160,7 +5325,7 @@ SkipPopup:
                         mnuOption_Mandatory.Checked = False
                     End If
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Role
-                Case Is = pcenumConceptType.FactType
+                Case Is = GetType(FBM.FactTypeInstance)
                     Dim lrFactTypeInstance As New FBM.FactTypeInstance
                     lrFactTypeInstance = e.Node.Tag
                     If Me.zrPage.SelectedObject.Count > 0 Then
@@ -5171,25 +5336,25 @@ SkipPopup:
                         End If
                     End If
                     Call lrFactTypeInstance.Selected()
-                Case Is = pcenumConceptType.EntityType
+                Case Is = GetType(FBM.EntityTypeInstance)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_EntityType
                     Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                     lrEntityTypeInstance = e.Node.Tag
                     Call lrEntityTypeInstance.NodeSelected()
-                Case Is = pcenumConceptType.EntityTypeName
+                Case Is = GetType(FBM.EntityTypeName)
                     Dim lrEntityTypeName As FBM.EntityTypeName
                     lrEntityTypeName = e.Node.Tag
                     Call lrEntityTypeName.EntityTypeInstance.NodeSelected()
-                Case Is = pcenumConceptType.FactTable
+                Case Is = GetType(FBM.FactTable)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactTable
 
                     Dim lo_table_node As TableNode = e.Node.Tag.TableShape
                     lo_table_node.TextColor = Color.Black
                     DeleteRowToolStripMenuItem.Enabled = False
                     Me.DeleteRowFactFromPageAndModelToolStripMenuItem.Enabled = False
-                Case Is = pcenumConceptType.ValueType
+                Case Is = GetType(FBM.ValueType)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ValueType
-                Case Is = pcenumConceptType.RoleConstraint
+                Case Is = GetType(FBM.RoleConstraintInstance)
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                     lrRoleConstraintInstance = e.Node.Tag
                     Select Case lrRoleConstraintInstance.RoleConstraintType
@@ -5210,14 +5375,14 @@ SkipPopup:
                     End Select
                     'NodeSelected sets Role text/color values (Pastel)
                     Call lrRoleConstraintInstance.NodeSelected()
-                Case Is = pcenumConceptType.RoleConstraintRole
+                Case Is = GetType(FBM.RoleConstraintRoleInstance)
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     lrRoleConstraintRoleInstance = e.Node.Tag
                     Select Case lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraintType
                         Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                             Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_InternalUniquenessConstraint
                     End Select
-                Case Is = pcenumConceptType.ModelNote
+                Case Is = GetType(FBM.ModelNoteInstance)
                     Me.DiagramView.ContextMenuStrip = Me.ContextMenuStripModelNote
                 Case Else
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
@@ -5232,25 +5397,25 @@ SkipPopup:
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
             If IsSomething(lrToolboxForm) Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
-                Select Case e.Node.Tag.ConceptType
-                    Case Is = pcenumConceptType.EntityType
+                Select Case e.Node.Tag.GetType
+                    Case Is = GetType(FBM.EntityTypeInstance)
                         Call lrToolboxForm.VerbaliseEntityType(e.Node.Tag.EntityType)
-                    Case Is = pcenumConceptType.ValueType
+                    Case Is = GetType(FBM.ValueTypeInstance)
                         Call lrToolboxForm.VerbaliseValueType(e.Node.Tag.ValueType)
-                    Case Is = pcenumConceptType.FactType
+                    Case Is = GetType(FBM.FactTypeInstance)
                         Call lrToolboxForm.VerbaliseFactType(e.Node.Tag.FactType)
-                    Case Is = pcenumConceptType.Role
+                    Case Is = GetType(FBM.RoleInstance)
                         Call lrToolboxForm.VerbaliseFactType(e.Node.Tag.FactType, e.Node.Tag.Role)
                         If Control.ModifierKeys And Keys.Control Then
                             Call lrToolboxForm.verbaliseRole(e.Node.Tag.Role)
                         End If
-                    Case Is = pcenumConceptType.FactTable
+                    Case Is = GetType(FBM.FactTable)
                         '----------------------------------------------------------------------------------
                         'See frmDiagramORM.Diagram.CellClicked
                         '  The Fact selected for verbalisation is set there and event comes after 
                         '  NodeSelected.
                         '----------------------------------------------------------------------------------
-                    Case Is = pcenumConceptType.RoleConstraint
+                    Case Is = GetType(FBM.RoleConstraintInstance)
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                         lrRoleConstraintInstance = e.Node.Tag
                         Select Case lrRoleConstraintInstance.RoleConstraintType
@@ -5440,7 +5605,7 @@ SkipPopup:
                     Case Else
                 End Select
 #End Region
-            ElseIf TypeOf (e.Node) Is TableNode Then
+            ElseIf TypeOf (e.Node) Is TableNode And e.Node.Tag.GetType = GetType(FBM.FactTable) Then
                 Dim lo_table_node As TableNode = e.Node
                 lo_table_node.CellFrameStyle = MindFusion.Diagramming.CellFrameStyle.Simple
 
@@ -6861,13 +7026,13 @@ SkipPopup:
             '------------------------------------------------------------------------------------
             For liInd = 1 To Diagram.Nodes.Count
                 If Diagram.Nodes(liInd - 1).Selected Then
-                    If IsSomething(Diagram.Nodes(liInd - 1).Tag) Then
-                        Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
-                            Case Is = pcenumConceptType.EntityType
+                    If IsSomething(Diagram.Nodes(liInd - 1).Tag) And Not Diagram.Nodes(liInd - 1).Tag.GetType = GetType(TableNode) Then
+                        Select Case Diagram.Nodes(liInd - 1).Tag.GetType
+                            Case Is = GetType(FBM.EntityTypeInstance)
                                 Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
                                 lrEntityTypeInstance = Diagram.Nodes(liInd - 1).Tag
                                 lrEntityTypeInstance.Shape.Pen.Color = Color.Blue
-                            Case Is = pcenumConceptType.FactType
+                            Case Is = GetType(FBM.FactTypeInstance)
                                 If Diagram.Nodes(liInd - 1).Selected Then
                                     Dim lrFactTypeInstance As FBM.FactTypeInstance
                                     Dim lrRoleInstance As FBM.RoleInstance
@@ -6892,9 +7057,10 @@ SkipPopup:
                     End If
 
                 Else 'Non-Selected Nodes.
+
                     If IsSomething(Diagram.Nodes(liInd - 1).Tag) Then
-                        Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
-                            Case Is = pcenumConceptType.EntityType
+                        Select Case Diagram.Nodes(liInd - 1).Tag.GetType
+                            Case Is = GetType(FBM.EntityTypeInstance)
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                 lrEntityTypeInstance = Diagram.Nodes(liInd - 1).Tag
                                 If lrEntityTypeInstance.Shape.Selected Then
@@ -6904,10 +7070,10 @@ SkipPopup:
                                 End If
                                 lrEntityTypeInstance.EntityTypeNameShape.Pen.Color = Color.White
                                 Call Diagram.Nodes(liInd - 1).Tag.SetAppropriateColour()
-                            Case Is = pcenumConceptType.ValueType
+                            Case Is = GetType(FBM.ValueTypeInstance)
                                 'Diagram.Nodes(liInd - 1).Pen.Color = Color.Navy
                                 Call Diagram.Nodes(liInd - 1).Tag.SetAppropriateColour()
-                            Case Is = pcenumConceptType.FactType
+                            Case Is = GetType(FBM.FactTypeInstance)
                                 Dim lrFactTypeInstance As FBM.FactTypeInstance
                                 lrFactTypeInstance = Diagram.Nodes(liInd - 1).Tag
                                 If Diagram.Nodes(liInd - 1).Tag.IsObjectified Then
@@ -6928,16 +7094,16 @@ SkipPopup:
                                     End If
                                 End If
                                 Call Diagram.Nodes(liInd - 1).Tag.SetAppropriateColour()
-                            Case Is = pcenumConceptType.FactTypeName
+                            Case Is = GetType(FBM.FactTypeName)
                                 Dim lrShapeNode As New ShapeNode
                                 lrShapeNode = Diagram.Nodes(liInd - 1)
                                 lrShapeNode.TextColor = Color.Blue
-                            Case Is = pcenumConceptType.Role
+                            Case Is = GetType(FBM.RoleInstance)
                                 Diagram.Nodes(liInd - 1).Pen.Color = Color.Black
                                 Diagram.Nodes(liInd - 1).Brush = New MindFusion.Drawing.SolidBrush(Color.White)
-                            Case Is = pcenumConceptType.RoleName
+                            Case Is = GetType(FBM.RoleName)
                                 Diagram.Nodes(liInd - 1).Pen.Color = Color.Blue
-                            Case Is = pcenumConceptType.RoleConstraint
+                            Case Is = GetType(FBM.RoleConstraintInstance)
                                 Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraintType
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.White
@@ -6954,7 +7120,7 @@ SkipPopup:
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.White
                                 End Select
                                 Call Diagram.Nodes(liInd - 1).Tag.SetAppropriateColour()
-                            Case Is = pcenumConceptType.RoleConstraintRole
+                            Case Is = GetType(FBM.RoleConstraintRoleInstance)
 
                                 Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraint.RoleConstraintType
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
@@ -6964,7 +7130,7 @@ SkipPopup:
                                     Case Else
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.Purple
                                 End Select
-                            Case Is = pcenumConceptType.FactTable
+                            Case Is = GetType(FBM.FactTable)
                                 Diagram.Nodes(liInd - 1).Pen.Color = Color.LightGray
                                 Dim lo_table_node As TableNode = Diagram.Nodes(liInd - 1)
                                 If lo_table_node.Selected Then
@@ -6981,7 +7147,7 @@ SkipPopup:
                                     lo_table_node.Scrollable = False
                                     lo_table_node.TextColor = Color.LightGray
                                 End If
-                            Case Is = pcenumConceptType.ModelNote
+                            Case Is = GetType(FBM.ModelNoteInstance)
                                 Diagram.Nodes(liInd - 1).Pen.Color = Color.Gray
                             Case Else
                                 Diagram.Nodes(liInd - 1).Pen.Color = Color.Black
@@ -13077,6 +13243,95 @@ SkipRemovalFromModel:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub DisplayNodeTypeProperties(ByRef arModelElement As FBM.ModelObject,
+                                          ByVal aiX As Integer,
+                                          ByVal aiY As Integer,
+                                          Optional ByVal abRemoveExistingPropertyTableNode As Boolean = False)
+
+        Try
+            If abRemoveExistingPropertyTableNode And Me.PropertyTableNode IsNot Nothing Then
+                Me.Diagram.Nodes.Remove(Me.PropertyTableNode)
+            End If
+
+            Me.PropertyTableNode = Me.zrPage.Diagram.Factory.CreateTableNode(aiX, aiY, 30, 20, 1, 0)
+            Me.PropertyTableNode.EnableStyledText = True
+            Me.PropertyTableNode.Caption = "<B>" & " " & arModelElement.Id & " "
+            Me.PropertyTableNode.Tag = arModelElement
+
+
+            Dim lrRDSTable As RDS.Table = arModelElement.getCorrespondingRDSTable
+
+            'CodeSafe
+            If lrRDSTable Is Nothing Then Exit Sub
+
+            Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
+
+            '--------------------------------------------------------------------
+            'Refined sort of Columns based on Supertype Column ordering and Subtype ordering
+            Dim liInd As Integer
+            Dim larSupertypeTable = lrRDSTable.getSupertypeTables
+            If larSupertypeTable.Count > 0 Then
+                larSupertypeTable.Reverse()
+                larSupertypeTable.Add(lrRDSTable)
+                liInd = 0
+                For Each lrSupertypeTable In larSupertypeTable
+                    For Each lrColumn In larColumn.FindAll(Function(x) x.Role.JoinedORMObject.Id = lrSupertypeTable.Name).OrderBy(Function(x) x.OrdinalPosition)
+                        larColumn.Remove(lrColumn)
+                        larColumn.Insert(liInd, lrColumn)
+                        liInd += 1
+                    Next
+                Next
+            End If
+
+            For Each lrColumn In larColumn
+
+                '============================================================
+                'If lrColumn.ContributesToPrimaryKey And lrRDSTable.Column.Count > 1 Then
+                '    'Don't show the Column
+                'Else
+
+                '20200326-VM-Removed for demo purposes.
+                'If lrColumn.Relation.FindAll(Function(x) x.OriginTable.Name = lrColumn.Table.Name).Count > 0 Then
+                '    'ForeignKey. Don't show the Column
+                'Else
+                Me.PropertyTableNode.RowCount += 1
+
+                Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Tag = lrColumn
+                Me.PropertyTableNode.Item(0, Me.PropertyTableNode.RowCount - 1).Text = lrColumn.Name
+                'End If
+                '============================================================
+            Next
+            Me.PropertyTableNode.ResizeToFitText(True)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Public Sub resetAttributeCellColours()
+
+        Dim lrCell As MindFusion.Diagramming.TableNode.Cell
+        Dim liInd As Integer = 0
+
+        Try
+            If Me.PropertyTableNode IsNot Nothing Then
+                For liInd = 0 To Me.PropertyTableNode.RowCount - 1
+                    lrCell = Me.PropertyTableNode.Item(0, liInd)
+                    lrCell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                    lrCell.TextColor = Color.Black
+                Next
+            End If
+        Catch ex As Exception
+            'Not a biggie.
         End Try
 
     End Sub

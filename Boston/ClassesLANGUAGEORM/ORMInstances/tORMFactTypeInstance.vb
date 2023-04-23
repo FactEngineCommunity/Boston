@@ -1075,10 +1075,15 @@ Namespace FBM
                 End If
 
 ReattachRoles:
+                Call Me.SortRoleGroup()
                 For Each lrRoleInstance In Me.RoleGroup
                     lrRoleInstance.Shape.Detach()
                     lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
                 Next
+
+                If Me.FactTypeReadingShape IsNot Nothing Then
+                    Me.FactTypeReadingShape.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
+                End If
 
                 If Me.FactTypeName IsNot Nothing Then
                     If Me.FactTypeName.Shape IsNot Nothing Then

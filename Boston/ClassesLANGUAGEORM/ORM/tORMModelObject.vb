@@ -1216,6 +1216,39 @@ Namespace FBM
             End If
         End Function
 
+        Public Function IsInstanceObjectType() As Boolean
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueTypeInstance),
+                              GetType(FBM.EntityTypeInstance),
+                              GetType(FBM.FactTypeInstance),
+                              GetType(FBM.RoleInstance),
+                              GetType(FBM.RoleConstraintRoleInstance),
+                              GetType(FBM.ModelNoteInstance),
+                              GetType(FBM.FactTable),
+                              GetType(FBM.EntityTypeName)
+
+                        Return True
+
+                    Case Else
+                        Return False
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+
+            End Try
+
+        End Function
+
         Public Function isSubtypeOfModelElement(ByRef arModelElement As FBM.ModelObject) As Boolean
 
             Try
