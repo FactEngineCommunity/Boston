@@ -1420,6 +1420,36 @@ Namespace RDS
 
         End Function
 
+        Public Function IsManyToManyJoinTable() As Boolean
+
+            Try
+                If Me.getPrimaryKeyColumns.Count <= 1 Then
+                    Return False
+                ElseIf Me.FBMModelElement.IsObjectified Then
+                    Return True 'Because we know the PK has more than one Column.
+                Else
+                    Try
+                        Return Me.getOutgoingRelations(0).OriginColumns(0).isPartOfPrimaryKey()
+                    Catch
+                        'Return False below.
+                    End Try
+                End If
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Function isPGSNode() As Boolean
 
             Try

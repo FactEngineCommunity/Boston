@@ -14,6 +14,7 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_OWNER As String = "owner" 'Boston specific. Not part of orginal Metadrone.        
         Public Const VARIABLE_ATTRIBUTE_ID As String = "id" 'Boston specific. Not part of orginal Metadrone.        
         Public Const VARIABLE_ATTRIBUTE_NAME As String = "name" 'Boston specific. Not part of orginal Metadrone.        
+        Public Const VARIABLE_ATTRIBUTE_ISPRIMARYKEYRELATION As String = "isprimarykeyrelation" 'Boston specific. True if any one of the Origin Columns of the Relation is part of the Primary Key of the table.
         Public Const VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME As String = "referencingtablename" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME As String = "referencingcolumnname" 'Boston specific. Not part of orginal Metadrone.
         Public Const VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "referencedtablename" 'Boston specific. Not part of orginal Metadrone.
@@ -27,6 +28,7 @@ Namespace Parser.Syntax
         Public Const VARIABLE_ATTRIBUTE_PGSEDGENAME As String = "pgsedgename" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ISPGSRELATION As String = "ispgsrelation" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_ISOBJECTIFIED As String = "isobjectified" 'Boston specific. Not part of original Metadrone.                        
+        Public Const VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE As String = "ismanytomanyjointable" 'Boston specific. Not part of original Metadrone.                                
         Public Const VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME As String = "primarysupertypename" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_RELATIONS As String = "relations" 'Boston specific. Not part of original Metadrone.
         Public Const VARIABLE_ATTRIBUTE_INCOMINGRELATIONS As String = "incomingrelations" 'Boston specific. Not part of original Metadrone.
@@ -238,6 +240,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_OWNER As String = "Owner Table of an Index." 'Boston specific. Not part of original Metadrone        
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ID As String = "Id of variable." 'Boston specific. Not part of original Metadrone        
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_NAME As String = "Name of variable." 'Boston specific. Not part of original Metadrone        
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISPRIMARYKEYRELATION As String = "True if any Origin Column is part of the Primary Key of the Table of the Relation."
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME As String = "The name of the Table to which the Relation belongs, of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME As String = "The name of the Column referencing another Table/Column by the Relation, of variable." 'Boston specific. Not part of original Metadrone
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME As String = "The name of the Table referenced by the Relation, of variable." 'Boston specific. Not part of original Metadrone
@@ -252,6 +255,7 @@ Namespace Parser.Syntax
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PGSEDGENAME As String = "The name of the Edge if the Table is a Property Graph Schema Relation/Edge." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISPGSRELATION As String = "True if the Table is a Property Graph Schema Relation/Edge." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISOBJECTIFIED As String = "True if the Fact Type for the Table is an Objectified Fact Type." 'Boston specific. Not part of original Metadrone.        
+        Friend Shared DOCO_VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE As String = "True if has more than one Relation based on the Primary Key of the Table. As in, for exapmle, for an Objectified Fact Type that links more than one other Entity Type / Objectified Fact Type.." 'Boston specific. Not part of original Metadrone.        
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME As String = "The primary supertype name of the Table." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_RELATIONS As String = "Set of Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
         Friend Shared DOCO_VARIABLE_ATTRIBUTE_INCOMINGRELATIONS As String = "Set of Incoming Relations relating to the Table." 'Boston specific. Not part of original Metadrone.
@@ -382,6 +386,7 @@ Namespace Parser.Syntax
 
             If StrEq(value, VARIABLE_ATTRIBUTE_OWNER) Then Return True 'Boston specific. Not part of original Metadrone.            
             If StrEq(value, VARIABLE_ATTRIBUTE_NAME) Then Return True 'Boston specific. Not part of original Metadrone.            
+            If StrEq(value, VARIABLE_ATTRIBUTE_ISPRIMARYKEYRELATION) Then Return True 'Boston specific. Not part of original Metadrone.                        
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME) Then Return True 'Boston specific. Not part of original Metadrone.
@@ -394,7 +399,8 @@ Namespace Parser.Syntax
             If StrEq(value, VARIABLE_ATTRIBUTE_NULLABLE) Then Return True
             If StrEq(value, VARIABLE_ATTRIBUTE_PGSEDGENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_ISPGSRELATION) Then Return True 'Boston specific. Not part of original Metadrone.
-            If StrEq(value, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then Return True 'Boston specific. Not part of original Metadrone.            
+            If StrEq(value, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then Return True 'Boston specific. Not part of original Metadrone.                        
+            If StrEq(value, VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE) Then Return True 'Boston specific. Not part of original Metadrone.            
             If StrEq(value, VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_RELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.
             If StrEq(value, VARIABLE_ATTRIBUTE_INCOMINGRELATIONS) Then Return True 'Boston specific. Not part of original Metadrone.

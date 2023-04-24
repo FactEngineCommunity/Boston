@@ -28,6 +28,7 @@ Namespace Parser.Meta.Database
         Private mColumnCount As Integer = 0
         Private mIsLinkFactType As Boolean = False
         Private mFBMFactTypeName As String = ""
+        Private mIsPrimaryKeyRelation As Boolean = False 'Boston specific. True if any Origin Column is part of the Primary Key of the Entity/Table.
         Private ReplaceAllList As New ReplaceAllList()
 
         Public Sub New()
@@ -42,7 +43,8 @@ Namespace Parser.Meta.Database
                        ByVal asFBMFactTypeName As String,
                        ByVal asReferencingRoleName As String,
                        ByVal asReferencedRoleName As String,
-                       ByVal abIsLinkFactType As Boolean)
+                       ByVal abIsLinkFactType As Boolean,
+                       ByVal abIsPrimaryKeyRelation As Boolean)
 
             Me.mId = asId
             Me.mReferencingTableName = asReferencingTableName
@@ -54,6 +56,7 @@ Namespace Parser.Meta.Database
             Me.mColumnCount = aiColumnCount
             Me.mFBMFactTypeName = asFBMFactTypeName
             Me.mIsLinkFactType = abIsLinkFactType
+            Me.mIsPrimaryKeyRelation = abIsPrimaryKeyRelation
 
         End Sub
 
@@ -87,6 +90,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ID) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.Id
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISPRIMARYKEYRELATION) And LookTransformsIfNotFound Then
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.IsPrimaryKeyRelation
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME) And LookTransformsIfNotFound Then
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
@@ -285,6 +292,7 @@ Namespace Parser.Meta.Database
                 rel.ColumnCount = .mColumnCount
                 rel.FBMFactTypeName = .mFBMFactTypeName
                 rel.IsLinkFactType = .mIsLinkFactType
+                rel.IsPrimaryKeyRelation = .mIsPrimaryKeyRelation
             End With
             'col.ListCount = Me.ListCount
             'col.ListPos = Me.ListPos
@@ -352,6 +360,15 @@ Namespace Parser.Meta.Database
             End Get
             Set(value As Boolean)
                 Me.mIsLinkFactType = value
+            End Set
+        End Property
+
+        Public Property IsPrimaryKeyRelation() As Boolean
+            Get
+                Return Me.mIsPrimaryKeyRelation
+            End Get
+            Set(value As Boolean)
+                Me.mIsPrimaryKeyRelation = value
             End Set
         End Property
 

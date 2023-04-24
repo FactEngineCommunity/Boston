@@ -33,6 +33,7 @@ Namespace Parser.Meta.Database
         Private mIsObjectified As Boolean = False 'Boston specific. True if the Table represents a Property Graph Schema Relation.
         Private mPGSEdgeName As String = ""
         Private mPrimarySupertypeName As String = "" 'Boston specific. The primary supertype name of the table. Could be 'entity' or 'relation'. TypeDB specific.
+        Private mIsManyToManyJoinTable As Boolean = False 'Boston specific. True if is Many-to-Many Join Table. As in, for example, an Objectified Fact Type that links more than one other EntityType/ObjectifiedFactType.
 
         Friend Columns As New List(Of IEntity)
 
@@ -73,6 +74,7 @@ Namespace Parser.Meta.Database
                 Me.Value = aarSchemaRow(SchemaRowIdx).Name
                 Me.SchemaRowVal = aarSchemaRow(SchemaRowIdx)
                 Me.mPrimarySupertypeName = aarSchemaRow(SchemaRowIdx).PrimarySupertypeName
+                Me.mIsManyToManyJoinTable = aarSchemaRow(SchemaRowIdx).IsManyToManyJoinTable
 
                 '20200705-VM-Remove if all seems okay. Moved to below, so that the Relations are loaded.
                 'Me.AddCol(Schema(SchemaRowIdx), Connection)
@@ -148,15 +150,16 @@ Namespace Parser.Meta.Database
                                 End If
 
                                 Dim lrOutgoingRelation As New Relation(lrRelation.Id,
-                                                                    lrRelation.OriginTable.Name,
+                                                                    lrRelation.OriginTable.DBName, '20230423-VM-Was Name
                                                                     lsOriginColumnName,
-                                                                    lrRelation.DestinationTable.Name,
+                                                                    lrRelation.DestinationTable.DBName, ''20230423-VM-Was Name
                                                                     lsDestinationColumnName,
                                                                     lrRelation.OriginColumns.Count,
                                                                     lsResponsibleFactTypeName,
                                                                     lsOriginRoleName,
                                                                     lsDestinationRoleName,
-                                                                    lrRelation.ResponsibleFactType.IsLinkFactType)
+                                                                    lrRelation.ResponsibleFactType.IsLinkFactType,
+                                                                    lrRelation.OriginColumns(0).isPartOfPrimaryKey)
 
                                 If Me.Relations.Find(Function(x) CType(x, Relation).Id = lrOutgoingRelation.Id) Is Nothing Then
                                     Me.Relations.AddUnique(lrOutgoingRelation)
@@ -240,15 +243,16 @@ Namespace Parser.Meta.Database
                                 End If
 
                                 Dim lrIncomingRelation As New Relation(lrRelation.Id,
-                                                                       lrRelation.OriginTable.Name,
+                                                                       lrRelation.OriginTable.DBName, '20230423-VM-Was Name
                                                                        lsOriginColumnName,
-                                                                       lrRelation.DestinationTable.Name,
+                                                                       lrRelation.DestinationTable.DBName, '20230423-VM-Was Name
                                                                        lsDestinationColumnName,
                                                                        lrRelation.OriginColumns.Count,
                                                                        lsResponsibleFactTypeName,
                                                                        lsOriginRoleName,
                                                                        lsDestinationRoleName,
-                                                                       lrRelation.ResponsibleFactType.IsLinkFactType)
+                                                                       lrRelation.ResponsibleFactType.IsLinkFactType,
+                                                                       lrRelation.OriginColumns(0).isPartOfPrimaryKey)
 
                                 If Me.IncomingRelations.Find(Function(x) CType(x, Relation).Id = lrIncomingRelation.Id) Is Nothing Then
                                     Me.IncomingRelations.AddUnique(lrIncomingRelation)
@@ -432,6 +436,10 @@ Namespace Parser.Meta.Database
                 'set value
                 Me.mIsObjectified = value
 
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE) Then
+                'set value
+                Me.mIsManyToManyJoinTable = value
+
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME) Then
                 'set value
                 Me.mPrimarySupertypeName = value
@@ -564,6 +572,10 @@ Namespace Parser.Meta.Database
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISOBJECTIFIED) Then 'Boston specific. Not part of original Metadrone.
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)
                 Return Me.mIsObjectified
+
+            ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE) Then 'Boston specific. Not part of original Metadrone.
+                Call Me.CheckParamsForPropertyCall(AttribName, Params)
+                Return Me.mIsManyToManyJoinTable
 
             ElseIf StrEq(AttribName, VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME) Then 'Boston specific. Not part of original Metadrone.
                 Call Me.CheckParamsForPropertyCall(AttribName, Params)

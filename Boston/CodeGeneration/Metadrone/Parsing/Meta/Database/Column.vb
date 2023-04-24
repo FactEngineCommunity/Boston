@@ -69,16 +69,17 @@ Namespace Parser.Meta.Database
                                 lsDestinationRoleName = lrDestinationColumn.Role.Name
                             End If
 
-                            Me.Relations.Add(New Relation(lrRelation.Id,
-                                                          Me.Owner.GetAttributeValue("Value", Nothing, False, False),
-                                                          Me.Value,
-                                                          lrRelation.DestinationTable.Name,
-                                                          lsDestinationColumnName,
-                                                          lrRelation.OriginColumns.Count,
-                                                          lrRelation.ResponsibleFactType.Id,
-                                                          lsOriginRoleName,
-                                                          lsDestinationRoleName,
-                                                          lrRelation.ResponsibleFactType.IsLinkFactType))
+                        Me.Relations.Add(New Relation(lrRelation.Id,
+                                                      Me.Owner.GetAttributeValue("Value", Nothing, False, False),
+                                                      Me.Value,
+                                                      lrRelation.DestinationTable.DBName, '20230423-VM-Was Name
+                                                      lsDestinationColumnName,
+                                                      lrRelation.OriginColumns.Count,
+                                                      lrRelation.ResponsibleFactType.Id,
+                                                      lsOriginRoleName,
+                                                      lsDestinationRoleName,
+                                                      lrRelation.ResponsibleFactType.IsLinkFactType,
+                                                      lrRelation.OriginColumns(0).isPartOfPrimaryKey))
 
                         'Next
                     End If

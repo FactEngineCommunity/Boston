@@ -159,6 +159,8 @@ Namespace SourcePlugins.Boston
                             sr.ColumnId = lrColumn.Id
                             sr.ShortDescription = lrColumn.ActiveRole.JoinedORMObject.ShortDescription
                             sr.PrimarySupertypeName = lrTable.PrimarySupertypeName
+                            Dim lbHasOutgoingRelationWithPrimaryKeyOriginColumn As Boolean = False
+                            sr.IsManyToManyJoinTable = lrTable.IsManyToManyJoinTable
                             If lrColumn.ActiveRole.JoinsValueType IsNot Nothing Then
                                 sr.CheckValue = lrColumn.ActiveRole.JoinsValueType.ValueConstraint.Cast(Of String)().ToList()
                             End If

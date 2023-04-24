@@ -282,6 +282,7 @@ Namespace UI
 
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ISPGSRELATION, DOCO_VARIABLE_ATTRIBUTE_ISPGSRELATION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ISOBJECTIFIED, DOCO_VARIABLE_ATTRIBUTE_ISOBJECTIFIED, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE, DOCO_VARIABLE_ATTRIBUTE_ISMANYTOMANYJOINTABLE, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME, DOCO_VARIABLE_ATTRIBUTE_PRIMARYSUPERTYPENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_PGSEDGENAME, DOCO_VARIABLE_ATTRIBUTE_PGSEDGENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_COLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
@@ -376,6 +377,7 @@ Namespace UI
                         Case Parser.CodeCompletion.Variable.Types.Relation 'Boston specific. Not part of original Metadrone.
                             Me.AddListItem(VARIABLE_ATTRIBUTE_ID, DOCO_VARIABLE_ATTRIBUTE_ID, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_COLUMNCOUNT, DOCO_VARIABLE_ATTRIBUTE_COLUMNCOUNT, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
+                            Me.AddListItem(VARIABLE_ATTRIBUTE_ISPRIMARYKEYRELATION, DOCO_VARIABLE_ATTRIBUTE_ISPRIMARYKEYRELATION, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCINGTABLENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCINGCOLUMNNAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
                             Me.AddListItem(VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, DOCO_VARIABLE_ATTRIBUTE_REFERENCEDTABLENAME, Nothing, SyntaxPopupListItem.Icons.PROPERTY)
