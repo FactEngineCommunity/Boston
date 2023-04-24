@@ -23,7 +23,12 @@ Namespace RDS
                 If Me.FBMModelElement Is Nothing Then
                     Return Me.Name
                 Else
-                    Return Me.FBMModelElement.DBName
+                    If Me.FBMModelElement.DBName Is Nothing Or Me.FBMModelElement.DBName = "" Then
+                        Return Me.FBMModelElement.Id
+                    Else
+                        Return Me.FBMModelElement.DBName
+                    End If
+
                 End If
             End Get
         End Property
