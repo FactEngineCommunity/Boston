@@ -1790,8 +1790,12 @@ CreateSuggestions:
 
         Try
             Dim lsMessage As String = ""
-
             Dim lrFactTypeReading As FBM.FactTypeReading
+
+            If Me.DataGrid_Readings.SelectedRows.Count = 0 Then
+                prApplication.ThrowErrorMessage("Select a Fact Type Reading in the grid.", pcenumErrorType.Warning,, False,, True,, True)
+                Exit Sub
+            End If
 
             lrFactTypeReading = Me.DataGrid_Readings.SelectedRows(0).Tag
 

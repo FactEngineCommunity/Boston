@@ -20,6 +20,11 @@ Namespace Boston
 
         Private ReadOnly random As Random = New Random()
 
+        Public Function ListsCommonElementCount(ByVal list1 As List(Of String), ByVal list2 As List(Of String)) As Integer
+            Dim commonCount As Integer = list1.Intersect(list2).Count()
+            Return commonCount
+        End Function
+
         Public Function RandomString(ByVal length As Integer) As String
             Const chars As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
             Return New String(Enumerable.Repeat(chars, length).[Select](Function(s) s(random.[Next](s.Length))).ToArray())
@@ -38,6 +43,41 @@ Namespace Boston
             Array.Resize(arr, arr.Length + 1)
             arr(arr.Length - 1) = item
         End Sub
+
+        ''' <summary>
+        ''' Returns where the last word/s is/are an Adjective or Compound Adjective,
+        '''   based on the word/s ending in: "-ful," "-ous," "-ing," "-ed," "-ive," "-ic," and "-ice".
+        ''' </summary>
+        ''' <param name="sentence"></param>
+        ''' <param name="aiIndex"></param>
+        ''' <returns></returns>
+        Function ExtractLastAdjectiveFromSentence(ByVal sentence As String, ByRef aiIndex As Integer) As String
+
+            Dim adjectiveEndingsPattern As String = "\b(\w+(?:ful|ous|ing|ed|ive|ic|ice))\b(?=(?:\s*\w+(?:ful|ous|ing|ed|ive|ic|ice)\b)*\s*$)" ''"(?:\w+ful\b|\w+ous\b|\w+ing\b|\w+ed\b|\w+ive\b|\w+ic\b|\w+ice\b)"
+            Dim compoundAdjectivePattern As String = "(?:\b\w+\s+)*(?:" & adjectiveEndingsPattern & ")*\b"
+
+            Dim lastAdjective As String = Nothing
+
+            Dim matches As MatchCollection = Regex.Matches(sentence, adjectiveEndingsPattern)
+            If matches.Count > 0 Then
+                Dim lasMatches = matches.Cast(Of Match)().Select(Function(m) m.Value).ToArray
+                lastAdjective = Strings.Join(lasMatches, " ")
+                aiIndex = matches(0).Index
+            Else
+                Dim words As String() = sentence.Split(" "c)
+                For i As Integer = words.Length - 1 To 0 Step -1
+                    Dim currentWord As String = words(i)
+                    If Regex.IsMatch(currentWord, adjectiveEndingsPattern) Then
+                        lastAdjective = currentWord & If(String.IsNullOrEmpty(lastAdjective), "", " " & lastAdjective)
+                    Else
+                        Exit For
+                    End If
+                Next
+            End If
+
+            Return lastAdjective
+
+        End Function
 
         Public Function GetAdjustedFont(ByVal g As Graphics, ByVal graphicString As String, ByVal originalFont As Font, ByVal containerWidth As Integer, ByVal maxFontSize As Integer, ByVal minFontSize As Integer, ByVal smallestOnFail As Boolean) As Font
             Dim testFont As Font = Nothing

@@ -29,6 +29,8 @@ Public Class frmGlossary
     Private Sub frmGlossary_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Try
+            Me.LabelModelElement.Text = ""
+
             If prApplication.WorkingModel IsNot Nothing Then
                 Me.mrModel = prApplication.WorkingModel
                 Me.LabelModelName.Text = Me.mrModel.Name
@@ -153,7 +155,7 @@ Public Class frmGlossary
 
     End Sub
 
-    Public Sub VerbaliseEntityType(ByVal arEntityType As FBM.EntityType)
+    Public Sub VerbaliseEntityType(ByVal arEntityType As FBM.EntityType, Optional aasAdditionalModelElement As List(Of String) = Nothing)
         '------------------------------------------------------
         'PSEUDOCODE
         '  * Declare that the EntityType(Name) is an EntityType
@@ -186,13 +188,15 @@ Public Class frmGlossary
                 If arEntityType.ShortDescription <> "" Then
                     lrVerbaliser.VerbaliseQuantifier("(Short Description) ")
                     lrVerbaliser.VerbaliseHeading(arEntityType.ShortDescription)
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
                 End If
                 If arEntityType.LongDescription <> "" Then
                     lrVerbaliser.VerbaliseQuantifier("(Long Description) ")
                     lrVerbaliser.VerbaliseHeading(arEntityType.LongDescription)
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
                 End If
-                lrVerbaliser.HTW.WriteBreak()
-                lrVerbaliser.HTW.WriteBreak()
             End If
 
             '------------------------------
@@ -208,6 +212,7 @@ Public Class frmGlossary
                 lrTopmostSupertype = arEntityType
             End If
 
+#Region "Reference Scheme"
             If lrTopmostSupertype.HasSimpleReferenceScheme Then
                 lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
@@ -247,7 +252,7 @@ Public Class frmGlossary
                 lrVerbaliser.VerbaliseError("Provide a Reference Mode for the Entity Type:")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
             End If
-
+#End Region
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
@@ -261,13 +266,33 @@ Public Class frmGlossary
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
+#Region "Fact Types"
             'LINQ
-            Dim FactType = From ft In Me.mrModel.FactType,
-                                rl In ft.RoleGroup
-                           Where rl.JoinedORMObject.Id = arEntityType.Id
-                           Select ft Distinct
+            Dim larFactType As List(Of FBM.FactType) = Nothing
 
-            For Each lrFactType In FactType
+            If aasAdditionalModelElement IsNot Nothing And Me.mrCurrentModelElement IsNot Nothing Then
+
+                Dim lasAdditionalModelElement = aasAdditionalModelElement
+
+                Dim larFactType2 = (From ft In Me.mrModel.FactType
+                                    From rl In ft.RoleGroup
+                                    Where rl.JoinedORMObject.Id = arEntityType.Id
+                                    Select ft Distinct).ToList
+
+                larFactType = (From ft In larFactType2
+                               From ftr In ft.FactTypeReading
+                               Where ftr.PredicatePart.Select(Function(x) x.Role.JoinedORMObject.Id).Where(Function(str1) lasAdditionalModelElement.Any(Function(str2) str1.StartsWith(str2))).Count = lasAdditionalModelElement.Count
+                               Select ft Distinct).ToList
+            Else
+
+
+                larFactType = (From ft In Me.mrModel.FactType
+                               From rl In ft.RoleGroup
+                               Where rl.JoinedORMObject.Id = arEntityType.Id
+                               Select ft Distinct).ToList
+            End If
+
+            For Each lrFactType In larFactType
 
                 lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "FTR")
                 lrVerbaliser.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
@@ -293,58 +318,76 @@ Public Class frmGlossary
                     End If
                     '=======================================================================================
                     If lrFactType.IsBinaryFactType Then
-                            If lrFactType.Is1To1BinaryFactType Then
-                                If lrFactType.FactTypeReading.Count = 1 Then
-                                    'No reverse reading is provided for the FactType.
-                                    lrVerbaliser.HTW.WriteBreak()
-                                    lrVerbaliser.VerbaliseIndent()
-                                    Dim lrRole As FBM.Role
-                                    Dim larRole As New List(Of FBM.Role)
-                                    lrRole = lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id)
-                                    larRole.Add(lrRole)
-                                    lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
-                                    larRole.Add(lrRole)
-                                    Dim lrSentence As New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
-                                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
-                                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
-                                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
-                                    lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
-                                    If lrFactTypeReading IsNot Nothing Then
-                                        lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
-                                    End If
-                                    lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
-                                    lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
-                                    lrVerbaliser.VerbaliseModelObject(arEntityType)
-                                Else
-                                    lrVerbaliser.HTW.WriteBreak()
-                                    lrVerbaliser.VerbaliseIndent()
-                                    lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
+                        If lrFactType.Is1To1BinaryFactType Then
+                            If lrFactType.FactTypeReading.Count = 1 Then
+                                'No reverse reading is provided for the FactType.
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                Dim lrRole As FBM.Role
+                                Dim larRole As New List(Of FBM.Role)
+                                lrRole = lrFactType.GetRoleByJoinedObjectTypeId(arEntityType.Id)
+                                larRole.Add(lrRole)
+                                lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                                larRole.Add(lrRole)
+                                Dim lrSentence As New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
+                                If lrFactTypeReading IsNot Nothing Then
+                                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
                                 End If
+                                lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
+                                lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
+                                lrVerbaliser.VerbaliseModelObject(arEntityType)
                             Else
-                                If lrFactType.FactTypeReading.Count > 1 Then
-                                    lrVerbaliser.HTW.WriteBreak()
-                                    lrVerbaliser.VerbaliseIndent()
-                                    Try
-                                        lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
-                                    Catch ex As Exception
-                                        'Not a biggie.
-                                    End Try
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
+                            End If
+                        Else
+                            If lrFactType.FactTypeReading.Count > 1 Then
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                Try
+                                    lrFactType.getNotOutgoingFactTypeReadings(arEntityType)(0).GetReadingText(lrVerbaliser, True)
+                                Catch ex As Exception
+                                    'Not a biggie.
+                                End Try
 
-                                End If
                             End If
                         End If
-                        '=======================================================================================                
                     End If
+                    '=======================================================================================                
+                End If
 
-                    lrVerbaliser.HTW.RenderEndTag()
+                lrVerbaliser.HTW.RenderEndTag()
                 lrVerbaliser.HTW.WriteBreak()
 
             Next
+#End Region
+
+#Region "Constraints"
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Constraints:")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+            'LINQ
+            Dim larConstraint = From Constraint In Me.mrModel.RoleConstraint
+                                From Role In Constraint.Role
+                                Where Role.JoinedORMObject.Id = arEntityType.Id
+                                Select Constraint
+
+            For Each lrConstraint In larConstraint
+                Call lrConstraint.GenerateReadingVerbalisation(lrVerbaliser)
+            Next
+#End Region
 
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseQuantifier("Subtypes:")
             lrVerbaliser.HTW.WriteBreak()
-
+#Region "Subtype Relationships"
             Dim lrModelObject As FBM.ModelObject
             If arEntityType.childModelObjectList.Count = 0 Then
                 lrVerbaliser.VerbaliseQuantifierLight("There are no Subtypes of this Entity Type.")
@@ -387,6 +430,7 @@ Public Class frmGlossary
                     Next
                 End If
             End If
+#End Region
 
         Catch ex As Exception
             lrVerbaliser.HTW.WriteBreak()
@@ -445,52 +489,61 @@ Public Class frmGlossary
 
     End Sub
 
-    Public Sub DescribeModelElement(ByVal arModelElement As FBM.ModelObject)
+    Public Sub DescribeModelElement(ByVal arModelElement As FBM.ModelObject, Optional aasAdditionalModelElement As List(Of String) = Nothing)
 
         Try
+            'CodeSafe
+            If arModelElement Is Nothing Then Exit Sub
+
             Me.mrCurrentModelElement = arModelElement
 
-            Select Case Me.mrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
-                Case Is = pcenumConceptType.EntityType
-                    Dim lrEntityType As FBM.EntityType
-                    lrEntityType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
-                    Call Me.VerbaliseEntityType(lrEntityType)
+            Me.LabelModelElement.Text = Me.mrCurrentModelElement.Id & " AND ..."
+
+            With New WaitCursor
+
+                Select Case Me.mrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
+                    Case Is = pcenumConceptType.EntityType
+                        Dim lrEntityType As FBM.EntityType
+                        lrEntityType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
+                        Call Me.VerbaliseEntityType(lrEntityType, aasAdditionalModelElement)
 
 #Region "ORM Verbalisation"
-                    '-------------------------------------------------------
-                    'ORM Verbalisation
-                    '-------------------------------------------------------
-                    Dim lrToolboxForm As frmToolboxORMVerbalisation
-                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
-                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                        lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
-                    End If
+                        '-------------------------------------------------------
+                        'ORM Verbalisation
+                        '-------------------------------------------------------
+                        Dim lrToolboxForm As frmToolboxORMVerbalisation
+                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                        If IsSomething(lrToolboxForm) Then
+                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                            lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
+                        End If
 #End Region
-                Case Is = pcenumConceptType.ValueType
-                    Dim lrValueType As FBM.ValueType
-                    lrValueType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
-                    Call Me.VerbaliseValueType(lrValueType)
+                    Case Is = pcenumConceptType.ValueType
+                        Dim lrValueType As FBM.ValueType
+                        lrValueType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
+                        Call Me.VerbaliseValueType(lrValueType, aasAdditionalModelElement)
 
 #Region "ORM Verbalisation"
-                    '-------------------------------------------------------
-                    'ORM Verbalisation
-                    '-------------------------------------------------------
-                    Dim lrToolboxForm As frmToolboxORMVerbalisation
-                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
-                        Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                        lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
-                    End If
+                        '-------------------------------------------------------
+                        'ORM Verbalisation
+                        '-------------------------------------------------------
+                        Dim lrToolboxForm As frmToolboxORMVerbalisation
+                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                        If IsSomething(lrToolboxForm) Then
+                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                            lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
+                        End If
 #End Region
 
-                Case Is = pcenumConceptType.FactType
-                    Dim lrFactType As FBM.FactType
-                    lrFactType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
-                    Call Me.VerbaliseFactType(lrFactType)
-                Case Is = pcenumConceptType.GeneralConcept
-                    Call Me.VerbaliseGeneralConcept(Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
-            End Select
+                    Case Is = pcenumConceptType.FactType
+                        Dim lrFactType As FBM.FactType
+                        lrFactType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
+                        Call Me.VerbaliseFactType(lrFactType, aasAdditionalModelElement)
+                    Case Is = pcenumConceptType.GeneralConcept
+                        Call Me.VerbaliseGeneralConcept(Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
+                End Select
+
+            End With
 
             '-----------------------------------------------
             If arModelElement Is Nothing Then
@@ -641,7 +694,7 @@ Public Class frmGlossary
 
     End Sub
 
-    Public Sub VerbaliseValueType(ByVal arValueType As FBM.ValueType)
+    Public Sub VerbaliseValueType(ByVal arValueType As FBM.ValueType, Optional aasAdditionalModelElement As List(Of String) = Nothing)
         '------------------------------------------------------
         'PSEUDOCODE
         '  * Declare that the ValueType(Name) is an ValueType
@@ -800,7 +853,7 @@ Public Class frmGlossary
 
     End Sub
 
-    Public Sub VerbaliseFactType(ByVal arFactType As FBM.FactType)
+    Public Sub VerbaliseFactType(ByVal arFactType As FBM.FactType, Optional aasAdditionalModelElement As List(Of String) = Nothing)
         '------------------------------------------------------
         'PSEUDOCODE
         '  * Declare that the FactType(Name) is an FactType
@@ -1807,6 +1860,38 @@ Public Class frmGlossary
         Try
             Call Me.ShowGlossary(Me.mrModel)
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SearchTextbox_InitiateSearch(asSearchString As String) Handles SearchTextbox.InitiateSearch
+
+        Try
+            Dim lasAdditionalModelElement As List(Of String) = Me.SearchTextbox.TextBox.Text.Split(" "c).ToList
+            Call Me.DescribeModelElement(Me.mrCurrentModelElement, lasAdditionalModelElement)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SearchTextbox_TextBoxCleared() Handles SearchTextbox.TextBoxCleared
+
+        Try
+            Call Me.DescribeModelElement(Me.mrCurrentModelElement)
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

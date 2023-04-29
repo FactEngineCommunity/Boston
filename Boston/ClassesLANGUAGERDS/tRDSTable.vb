@@ -852,18 +852,32 @@ Namespace RDS
 
             Dim larSubtypeTable As New List(Of RDS.Table)
 
-            Dim larModelObject = Me.FBMModelElement.getSubtypes(abPrimarySubtypeRelationshipsOnly)
+            Try
 
-            For Each lrModelObject In larModelObject
-                If Not lrModelObject.IsAbsorbed Then 'Absorbed Subtypes do not have Tables.
-                    Dim lrTable = CType(lrModelObject, FBM.EntityType).getCorrespondingRDSTable(abCreateTableIfNotExists)
-                    If lrTable IsNot Nothing Then
-                        larSubtypeTable.Add(lrTable)
+                Dim larModelObject = Me.FBMModelElement.getSubtypes(abPrimarySubtypeRelationshipsOnly)
+
+                For Each lrModelObject In larModelObject
+                    If Not lrModelObject.IsAbsorbed Then 'Absorbed Subtypes do not have Tables.
+                        Dim lrTable = CType(lrModelObject, FBM.EntityType).getCorrespondingRDSTable(abCreateTableIfNotExists)
+                        If lrTable IsNot Nothing Then
+                            larSubtypeTable.Add(lrTable)
+                        End If
                     End If
-                End If
-            Next
+                Next
 
-            Return larSubtypeTable
+                Return larSubtypeTable
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return larSubtypeTable
+
+            End Try
 
         End Function
 

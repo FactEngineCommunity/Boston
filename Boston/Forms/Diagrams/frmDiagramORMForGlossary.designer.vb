@@ -239,6 +239,8 @@ Partial Class frmDiagramORMForGlossary
         Me.HideMeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -755,7 +757,7 @@ Partial Class frmDiagramORMForGlossary
         Me.ContextMenuStrip_FactType.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ContextMenuStrip_FactType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator11, Me.ToolStripMenuItemFactTypeModelErrors, Me.ToolStripSeparator22, Me.mnuOption_IsObjectified, Me.ToolStripMenuItemViewFactTable, Me.RemoveallInternalUniquenessConstraintsToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItem1, Me.ToolStripSeparator10, Me.ToolStripMenuItem14, Me.ToolStripSeparator17, Me.PropertieToolStripMenuItem})
         Me.ContextMenuStrip_FactType.Name = "ContextMenuStrip_FactType"
-        Me.ContextMenuStrip_FactType.Size = New System.Drawing.Size(319, 296)
+        Me.ContextMenuStrip_FactType.Size = New System.Drawing.Size(319, 274)
         '
         'MorphToToolStripMenuItem
         '
@@ -852,9 +854,9 @@ Partial Class frmDiagramORMForGlossary
         '
         'ContextMenuStrip_EntityType
         '
-        Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
+        Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.ToolStripMenuItem18, Me.ToolStripSeparator12, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
         Me.ContextMenuStrip_EntityType.Name = "ContextMenuStrip_EntityType"
-        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(226, 110)
+        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(226, 160)
         '
         'mnuOption_EntityTypeMorphTo
         '
@@ -867,34 +869,34 @@ Partial Class frmDiagramORMForGlossary
         '
         Me.ORMDiagramToolStripMenuItem.Image = CType(resources.GetObject("ORMDiagramToolStripMenuItem.Image"), System.Drawing.Image)
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
-        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'ERDiagramToolStripMenu
         '
         Me.ERDiagramToolStripMenu.Name = "ERDiagramToolStripMenu"
-        Me.ERDiagramToolStripMenu.Size = New System.Drawing.Size(177, 22)
+        Me.ERDiagramToolStripMenu.Size = New System.Drawing.Size(180, 22)
         Me.ERDiagramToolStripMenu.Text = "&ER Diagram"
         Me.ERDiagramToolStripMenu.Visible = False
         '
         'UseCToolStripMenuItem
         '
         Me.UseCToolStripMenuItem.Name = "UseCToolStripMenuItem"
-        Me.UseCToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.UseCToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.UseCToolStripMenuItem.Text = "&Use Case Diagram"
         Me.UseCToolStripMenuItem.Visible = False
         '
         'MenuOptionDataFlowDiagramEntityType
         '
         Me.MenuOptionDataFlowDiagramEntityType.Name = "MenuOptionDataFlowDiagramEntityType"
-        Me.MenuOptionDataFlowDiagramEntityType.Size = New System.Drawing.Size(177, 22)
+        Me.MenuOptionDataFlowDiagramEntityType.Size = New System.Drawing.Size(180, 22)
         Me.MenuOptionDataFlowDiagramEntityType.Text = "&Data Flow Diagram"
         Me.MenuOptionDataFlowDiagramEntityType.Visible = False
         '
         'UMLClassDiagramToolStripMenuItem
         '
         Me.UMLClassDiagramToolStripMenuItem.Name = "UMLClassDiagramToolStripMenuItem"
-        Me.UMLClassDiagramToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.UMLClassDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.UMLClassDiagramToolStripMenuItem.Text = "UML &Class Diagram"
         Me.UMLClassDiagramToolStripMenuItem.Visible = False
         '
@@ -1687,6 +1689,18 @@ Partial Class frmDiagramORMForGlossary
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ToolStripMenuItem18
+        '
+        Me.ToolStripMenuItem18.Image = Global.Boston.My.Resources.Resources.Glossary16x16
+        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
+        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(225, 22)
+        Me.ToolStripMenuItem18.Text = "Show in &Glossary"
+        '
+        'ToolStripSeparator12
+        '
+        Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(222, 6)
+        '
         'frmDiagramORMForGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1936,5 +1950,6 @@ Partial Class frmDiagramORMForGlossary
     Friend WithEvents ToolStripSeparator28 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripMenuItemRemoveArgument As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem17 As System.Windows.Forms.ToolStripMenuItem
-
+    Friend WithEvents ToolStripMenuItem18 As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator12 As ToolStripSeparator
 End Class

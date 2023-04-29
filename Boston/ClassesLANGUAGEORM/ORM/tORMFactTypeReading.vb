@@ -966,9 +966,18 @@ Namespace FBM
                 End If
 
                 For Each lrPredicatePart In Me.PredicatePart
+
                     liSequenceNr += 1
 
+                    Dim liIndex As Integer
+                    Dim lsPredicatePartText As String = lrPredicatePart.PredicatePartText
+                    Dim lsEndingAdjectives As String = Boston.ExtractLastAdjectiveFromSentence(lsPredicatePartText, liIndex)
+                    If lsEndingAdjectives IsNot Nothing Then
+                        lsPredicatePartText = lsPredicatePartText.Substring(0, liIndex)
+                    End If
+
                     arVerbaliser.VerbalisePredicateText(lrPredicatePart.PreBoundText)
+
                     If lrPredicatePart.Role.JoinedORMObject IsNot Nothing Then
                         arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
                     End If
@@ -998,7 +1007,7 @@ Namespace FBM
 
 
                     arVerbaliser.VerbalisePredicateText(lrPredicatePart.PostBoundText)
-                    If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then
+                    If (liSequenceNr < Me.PredicatePart.Count) Or (lsPredicatePartText <> "") Then
                         arVerbaliser.HTW.Write(" ")
                     End If
 
@@ -1006,7 +1015,7 @@ Namespace FBM
                         If Me.FactType.IsManyTo1BinaryFactType Then
                             If Me.MatchesRoleConstraintRoleOrder(Me.FactType.InternalUniquenessConstraint(0)) Then
 
-                                arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
+                                arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
 
                                 If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
                                     arVerbaliser.VerbaliseQuantifierLight(" one ")
@@ -1015,19 +1024,19 @@ Namespace FBM
                                 End If
                             Else
                                 If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
-                                    arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
+                                    arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
 
                                     arVerbaliser.VerbaliseQuantifierLight(" more than one ")
                                 Else
                                     arVerbaliser.VerbaliseQuantifierLight(" possibly ")
-                                    arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
+                                    arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
                                     arVerbaliser.VerbaliseQuantifierLight(" more than one ")
 
                                 End If
                             End If
                         ElseIf Me.FactType.Is1To1BinaryFactType Then '  InternalUniquenessConstraint.Count = 1 Then..
 
-                            arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
+                            arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
 
                             If Me.MatchesRoleConstraintRoleOrder(Me.FactType.InternalUniquenessConstraint(0)) Then
                                 If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
@@ -1043,10 +1052,14 @@ Namespace FBM
                                 End If
                             End If
                         Else
-                            arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
+                            arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
                         End If
                     Else
-                        arVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
+                        arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
+                    End If
+
+                    If lsEndingAdjectives IsNot Nothing Then
+                        arVerbaliser.VerbalisePredicateText(lsEndingAdjectives)
                     End If
 
                     If liSequenceNr < Me.PredicatePart.Count Then
