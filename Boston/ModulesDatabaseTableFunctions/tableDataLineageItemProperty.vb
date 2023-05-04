@@ -33,6 +33,76 @@ Public Module tableDataLineageItemProperty
 
     End Sub
 
+    Public Sub DeleteDataLineageItemProperty(ByVal arDataLineageItemProperty As DataLineage.DataLineageItemProperty)
+
+        Dim lsSQLQuery As String = ""
+
+        Try
+            lsSQLQuery = "DELETE FROM DataLineageItemProperty"
+            lsSQLQuery &= " WHERE ModelId = '" & arDataLineageItemProperty.Model.ModelId & "'"
+            lsSQLQuery &= " AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
+            lsSQLQuery &= " AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
+            lsSQLQuery &= " AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+
+            pdbConnection.BeginTrans()
+            pdbConnection.Execute(lsSQLQuery)
+            pdbConnection.CommitTrans()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Function ExistsDataLineageItemProperty(ByVal arDataLineageItemProperty As DataLineage.DataLineageItemProperty) As Boolean
+
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New ADODB.Recordset
+
+        Try
+            '------------------------
+            'Initialise return value
+            '------------------------
+            ExistsDataLineageItemProperty = False
+
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
+
+            lsSQLQuery = "SELECT COUNT(*)"
+            lsSQLQuery &= "  FROM DataLineageItemProperty"
+            lsSQLQuery &= " WHERE ModelId = '" & arDataLineageItemProperty.Model.ModelId & "'"
+            lsSQLQuery &= " AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
+            lsSQLQuery &= " AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
+            lsSQLQuery &= " AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If lREcordset(0).Value > 0 Then
+                ExistsDataLineageItemProperty = True
+            Else
+                ExistsDataLineageItemProperty = False
+            End If
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
     Public Function getDataLineageItemPropertyCount() As Integer
 
         Try
@@ -61,6 +131,52 @@ Public Module tableDataLineageItemProperty
         End Try
 
     End Function
+
+    Public Function getDataLineageItemPropertyDetails(ByRef arDataLineageItemProperty As DataLineage.DataLineageItemProperty,
+                                                      Optional abIgnoreErrors As Boolean = False) As DataLineage.DataLineageItemProperty
+
+        Dim lsSQLQuery As String = ""
+        Dim lRecordset As New ADODB.Recordset
+
+        Try
+            lRecordset.ActiveConnection = pdbConnection
+            lRecordset.CursorType = pcOpenStatic
+
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM DataLineageItemProperty"
+            lsSQLQuery &= " WHERE ModelId = '" & arDataLineageItemProperty.Model.ModelId & "'"
+            lsSQLQuery &= " AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
+            lsSQLQuery &= " AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
+            lsSQLQuery &= " AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+
+            lRecordset.Open(lsSQLQuery)
+
+            If Not lRecordset.EOF Then
+                arDataLineageItemProperty.Property = lRecordset("DataLineageProperty").Value
+            Else
+                If Not abIgnoreErrors Then
+                    Dim lsMessage As String = "No DataLineageItemProperty returned for DataLineageItemName: " & arDataLineageItemProperty.Name & ", Property Type: " & arDataLineageItemProperty.PropertyType
+                    Throw New Exception(lsMessage)
+                End If
+            End If
+
+            lRecordset.Close()
+
+            Return arDataLineageItemProperty
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
 
     Public Function getDataLineageItemPropertyDetailsByNameCategoryPropertyType(ByRef arModel As FBM.Model,
                                                             ByVal asDataLineageItemName As String,
@@ -117,7 +233,7 @@ Public Module tableDataLineageItemProperty
 
     End Function
 
-    Public Sub updateDataLineageItemProperty(ByRef arModel As FBM.Model, ByRef arDataLineageItemProperty As DataLineage.DataLineageItemProperty)
+    Public Sub updateDataLineageItemProperty(ByRef arDataLineageItemProperty As DataLineage.DataLineageItemProperty)
 
         Dim lsSQLQuery As String
 
@@ -126,12 +242,12 @@ Public Module tableDataLineageItemProperty
             lsSQLQuery &= "   SET ModelId = '" & Trim(arDataLineageItemProperty.Model.ModelId) & "'"
             lsSQLQuery &= "      ,DataLineageItemName = '" & Trim(Replace(arDataLineageItemProperty.Name, "'", "`")) & "'"
             lsSQLQuery &= "      ,DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
-            lsSQLQuery &= "      ,DataLineagePropertytype = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
-            lsSQLQuery &= "      ,Property = '" & Trim(Replace(arDataLineageItemProperty.Property, "'", "`")) & "'"
+            lsSQLQuery &= "      ,DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+            lsSQLQuery &= "      ,DataLineageProperty = '" & Trim(Replace(arDataLineageItemProperty.Property, "'", "`")) & "'"
             lsSQLQuery &= " WHERE ModelId = '" & Trim(arDataLineageItemProperty.Model.ModelId) & "'"
-            lsSQLQuery &= " WHERE DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
-            lsSQLQuery &= " WHERE DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
-            lsSQLQuery &= " WHERE DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+            lsSQLQuery &= "   AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
+            lsSQLQuery &= "   AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
+            lsSQLQuery &= "   AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
 
             pdbConnection.BeginTrans()
             pdbConnection.Execute(lsSQLQuery)

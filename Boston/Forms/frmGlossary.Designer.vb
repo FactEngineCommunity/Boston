@@ -25,7 +25,6 @@ Partial Class frmGlossary
         Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextboxSearch = New SearchTextbox()
-        Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         Me.CheckBoxShowGeneralConcepts = New System.Windows.Forms.CheckBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
@@ -33,23 +32,24 @@ Partial Class frmGlossary
         Me.ListBoxGlossary = New System.Windows.Forms.ListBox()
         Me.ContextMenuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
-        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
-        Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.CopyToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.CheckBoxHideFadedFactTypeNamesVerbalisationView = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.SearchTextbox = New SearchTextbox()
         Me.LabelModelElement = New System.Windows.Forms.Label()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
+        Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DataLineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.CopyToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -94,15 +94,6 @@ Partial Class frmGlossary
         Me.TextboxSearch.Name = "TextboxSearch"
         Me.TextboxSearch.Size = New System.Drawing.Size(195, 26)
         Me.TextboxSearch.TabIndex = 10
-        '
-        'ButtonRefresh
-        '
-        Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
-        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
-        Me.ButtonRefresh.Name = "ButtonRefresh"
-        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
-        Me.ButtonRefresh.TabIndex = 6
-        Me.ButtonRefresh.UseVisualStyleBackColor = True
         '
         'ButtonGenerateHTMLGlossary
         '
@@ -168,43 +159,15 @@ Partial Class frmGlossary
         Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemViewOnPage.Text = "&View on Page..."
         '
-        'ToolStripMenuItemViewInDiagramSpy
-        '
-        Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.MenuImages.Spyglass16x16
-        Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
-        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(210, 22)
-        Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
-        '
-        'ShowInModelDictionaryToolStripMenuItem
-        '
-        Me.ShowInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
-        Me.ShowInModelDictionaryToolStripMenuItem.Name = "ShowInModelDictionaryToolStripMenuItem"
-        Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
-        Me.ShowInModelDictionaryToolStripMenuItem.Text = "Show in Model &Dictionary"
-        '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
         Me.ToolStripSeparator1.Size = New System.Drawing.Size(207, 6)
         '
-        'ToolStripMenuItemRemoveFromModel
-        '
-        Me.ToolStripMenuItemRemoveFromModel.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
-        Me.ToolStripMenuItemRemoveFromModel.Name = "ToolStripMenuItemRemoveFromModel"
-        Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(210, 22)
-        Me.ToolStripMenuItemRemoveFromModel.Text = "&Remove From Model"
-        '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
         Me.ToolStripSeparator2.Size = New System.Drawing.Size(207, 6)
-        '
-        'PropertiesToolStripMenuItem1
-        '
-        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
-        Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(210, 22)
-        Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'SplitContainer2
         '
@@ -231,31 +194,6 @@ Partial Class frmGlossary
         Me.StatusStrip1.Size = New System.Drawing.Size(673, 22)
         Me.StatusStrip1.TabIndex = 8
         Me.StatusStrip1.Text = "StatusStrip1"
-        '
-        'ToolStripDropDownButton1
-        '
-        Me.ToolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardToolStripMenuItem})
-        Me.ToolStripDropDownButton1.Image = Global.Boston.My.Resources.MenuImages.Copy16x16
-        Me.ToolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripDropDownButton1.Name = "ToolStripDropDownButton1"
-        Me.ToolStripDropDownButton1.Size = New System.Drawing.Size(29, 20)
-        Me.ToolStripDropDownButton1.Text = "ToolStripDropDownButton1"
-        '
-        'CopyToClipboardToolStripMenuItem
-        '
-        Me.CopyToClipboardToolStripMenuItem.Name = "CopyToClipboardToolStripMenuItem"
-        Me.CopyToClipboardToolStripMenuItem.Size = New System.Drawing.Size(171, 22)
-        Me.CopyToClipboardToolStripMenuItem.Text = "&Copy to Clipboard"
-        '
-        'ToolStripDropDownButton2
-        '
-        Me.ToolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripDropDownButton2.Image = Global.Boston.My.Resources.MenuImages.Expand16x16
-        Me.ToolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripDropDownButton2.Name = "ToolStripDropDownButton2"
-        Me.ToolStripDropDownButton2.Size = New System.Drawing.Size(29, 20)
-        Me.ToolStripDropDownButton2.Text = "ToolStripDropDownButton2"
         '
         'CheckBoxHideFadedFactTypeNamesVerbalisationView
         '
@@ -313,11 +251,74 @@ Partial Class frmGlossary
         Me.WebBrowser.Size = New System.Drawing.Size(670, 320)
         Me.WebBrowser.TabIndex = 2
         '
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 6
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
+        '
+        'ToolStripMenuItemViewInDiagramSpy
+        '
+        Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.MenuImages.Spyglass16x16
+        Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
+        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
+        '
+        'ShowInModelDictionaryToolStripMenuItem
+        '
+        Me.ShowInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
+        Me.ShowInModelDictionaryToolStripMenuItem.Name = "ShowInModelDictionaryToolStripMenuItem"
+        Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.ShowInModelDictionaryToolStripMenuItem.Text = "Show in Model &Dictionary"
+        '
         'DataLineageToolStripMenuItem
         '
+        Me.DataLineageToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Lineage16x16
         Me.DataLineageToolStripMenuItem.Name = "DataLineageToolStripMenuItem"
         Me.DataLineageToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
-        Me.DataLineageToolStripMenuItem.Text = "&Data Lineage"
+        Me.DataLineageToolStripMenuItem.Text = "&Lineage"
+        '
+        'ToolStripMenuItemRemoveFromModel
+        '
+        Me.ToolStripMenuItemRemoveFromModel.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
+        Me.ToolStripMenuItemRemoveFromModel.Name = "ToolStripMenuItemRemoveFromModel"
+        Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemRemoveFromModel.Text = "&Remove From Model"
+        '
+        'PropertiesToolStripMenuItem1
+        '
+        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(210, 22)
+        Me.PropertiesToolStripMenuItem1.Text = "&Properties"
+        '
+        'ToolStripDropDownButton1
+        '
+        Me.ToolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardToolStripMenuItem})
+        Me.ToolStripDropDownButton1.Image = Global.Boston.My.Resources.MenuImages.Copy16x16
+        Me.ToolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripDropDownButton1.Name = "ToolStripDropDownButton1"
+        Me.ToolStripDropDownButton1.Size = New System.Drawing.Size(29, 20)
+        Me.ToolStripDropDownButton1.Text = "ToolStripDropDownButton1"
+        '
+        'CopyToClipboardToolStripMenuItem
+        '
+        Me.CopyToClipboardToolStripMenuItem.Name = "CopyToClipboardToolStripMenuItem"
+        Me.CopyToClipboardToolStripMenuItem.Size = New System.Drawing.Size(171, 22)
+        Me.CopyToClipboardToolStripMenuItem.Text = "&Copy to Clipboard"
+        '
+        'ToolStripDropDownButton2
+        '
+        Me.ToolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripDropDownButton2.Image = Global.Boston.My.Resources.MenuImages.Expand16x16
+        Me.ToolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripDropDownButton2.Name = "ToolStripDropDownButton2"
+        Me.ToolStripDropDownButton2.Size = New System.Drawing.Size(29, 20)
+        Me.ToolStripDropDownButton2.Text = "ToolStripDropDownButton2"
         '
         'frmGlossary
         '

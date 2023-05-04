@@ -17,6 +17,8 @@ Namespace DataLineage
 
         Public LineageSetNumber As Integer 'E.g. 1 (mostly). Counter for the Data Lineage Category allocated against a Data Lineage Item and where a Data Lineage Category can be against a Data Lineage Item more than once.
 
+        Public [Control] As Control
+
         'Parameterless Constructor
         Public Sub New()
         End Sub
@@ -54,6 +56,43 @@ Namespace DataLineage
             Return Me.Name = other.Name And Me.PropertyType = other.PropertyType And Me.Property = other.Property And Me.LineageSetNumber = other.LineageSetNumber
         End Function
 
+
+        Public Sub Save(Optional ByVal abIgnoreErrors As Boolean = False)
+
+            Try
+                If Me.Control Is Nothing Then
+                    Exit Sub
+                Else
+                    Select Case Me.Control.GetType
+                        Case Is = GetType(Windows.Forms.TextBox)
+                            Me.Property = Trim(CType(Me.Control, Windows.Forms.TextBox).Text)
+                    End Select
+                End If
+
+                If Trim(Me.Property) = "" Then
+                    Call tableDataLineageItemProperty.DeleteDataLineageItemProperty(Me)
+                Else
+                    If tableDataLineageItemProperty.ExistsDataLineageItemProperty(Me) Then
+                        Call tableDataLineageItemProperty.updateDataLineageItemProperty(Me)
+                    Else
+                        Call tableDataLineageItemProperty.addDataLineageItemProperty(Me)
+                    End If
+                End If
+
+
+            Catch ex As Exception
+
+                If abIgnoreErrors Then Exit Sub
+
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
     End Class
 
