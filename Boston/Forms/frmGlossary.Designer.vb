@@ -43,11 +43,13 @@ Partial Class frmGlossary
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.CopyToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.CheckBoxHideFadedFactTypeNamesVerbalisationView = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.SearchTextbox = New SearchTextbox()
         Me.LabelModelElement = New System.Windows.Forms.Label()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.DataLineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -95,7 +97,7 @@ Partial Class frmGlossary
         '
         'ButtonRefresh
         '
-        Me.ButtonRefresh.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
         Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
         Me.ButtonRefresh.Name = "ButtonRefresh"
         Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
@@ -156,9 +158,9 @@ Partial Class frmGlossary
         '
         'ContextMenuStripMain
         '
-        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ShowInModelDictionaryToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripSeparator2, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ShowInModelDictionaryToolStripMenuItem, Me.DataLineageToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripSeparator2, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(211, 126)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(211, 170)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -175,7 +177,7 @@ Partial Class frmGlossary
         '
         'ShowInModelDictionaryToolStripMenuItem
         '
-        Me.ShowInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.dictionary16x16
+        Me.ShowInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
         Me.ShowInModelDictionaryToolStripMenuItem.Name = "ShowInModelDictionaryToolStripMenuItem"
         Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
         Me.ShowInModelDictionaryToolStripMenuItem.Text = "Show in Model &Dictionary"
@@ -223,7 +225,7 @@ Partial Class frmGlossary
         '
         'StatusStrip1
         '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1, Me.ToolStripDropDownButton2})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 336)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(673, 22)
@@ -234,7 +236,7 @@ Partial Class frmGlossary
         '
         Me.ToolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.ToolStripDropDownButton1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardToolStripMenuItem})
-        Me.ToolStripDropDownButton1.Image = Global.Boston.My.Resources.Resources.Copy16x16
+        Me.ToolStripDropDownButton1.Image = Global.Boston.My.Resources.MenuImages.Copy16x16
         Me.ToolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripDropDownButton1.Name = "ToolStripDropDownButton1"
         Me.ToolStripDropDownButton1.Size = New System.Drawing.Size(29, 20)
@@ -245,6 +247,15 @@ Partial Class frmGlossary
         Me.CopyToClipboardToolStripMenuItem.Name = "CopyToClipboardToolStripMenuItem"
         Me.CopyToClipboardToolStripMenuItem.Size = New System.Drawing.Size(171, 22)
         Me.CopyToClipboardToolStripMenuItem.Text = "&Copy to Clipboard"
+        '
+        'ToolStripDropDownButton2
+        '
+        Me.ToolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripDropDownButton2.Image = Global.Boston.My.Resources.MenuImages.Expand16x16
+        Me.ToolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripDropDownButton2.Name = "ToolStripDropDownButton2"
+        Me.ToolStripDropDownButton2.Size = New System.Drawing.Size(29, 20)
+        Me.ToolStripDropDownButton2.Text = "ToolStripDropDownButton2"
         '
         'CheckBoxHideFadedFactTypeNamesVerbalisationView
         '
@@ -302,6 +313,12 @@ Partial Class frmGlossary
         Me.WebBrowser.Size = New System.Drawing.Size(670, 320)
         Me.WebBrowser.TabIndex = 2
         '
+        'DataLineageToolStripMenuItem
+        '
+        Me.DataLineageToolStripMenuItem.Name = "DataLineageToolStripMenuItem"
+        Me.DataLineageToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.DataLineageToolStripMenuItem.Text = "&Data Lineage"
+        '
         'frmGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -353,4 +370,6 @@ Partial Class frmGlossary
     Friend WithEvents SearchTextbox As SearchTextbox
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents LabelModelElement As Label
+    Friend WithEvents ToolStripDropDownButton2 As ToolStripDropDownButton
+    Friend WithEvents DataLineageToolStripMenuItem As ToolStripMenuItem
 End Class

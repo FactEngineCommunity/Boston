@@ -97,6 +97,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Public Shared ReadOnly Property Collapse16x16() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Collapse16x16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Public Shared ReadOnly Property Copy16x16() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Copy16x16", resourceCulture)
@@ -210,6 +220,16 @@ Namespace My.Resources
         Public Shared ReadOnly Property ErrorList() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("ErrorList", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Public Shared ReadOnly Property Expand16x16() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Expand16x16", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

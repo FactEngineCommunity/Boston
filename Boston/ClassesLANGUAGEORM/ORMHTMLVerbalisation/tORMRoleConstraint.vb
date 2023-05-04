@@ -9,9 +9,10 @@ Namespace FBM
                 Select Case Me.RoleConstraintType
                     Case Is = pcenumRoleConstraintType.ExclusionConstraint
                         Call Me.verbaliseHTMLExclusionConstraint(arVerbaliser)
+                    Case Is = pcenumRoleConstraintType.ExclusiveORConstraint
+                        Call Me.VerbaliseHTMLExclusiveORConstraint(arVerbaliser)
                     Case Is = pcenumRoleConstraintType.SubsetConstraint
                         Call Me.VerbaliseHTMLSubset(arVerbaliser)
-
                 End Select
 
             Catch ex As Exception
@@ -92,6 +93,82 @@ Namespace FBM
             End Try
         End Sub
 
+        Public Sub VerbaliseHTMLExclusiveORConstraint(ByRef arVerbaliser As FBM.ORMVerbailser)
+
+            Try
+                '------------------------------------------------------------
+                'Declare that the RoleConstraint(Name) is an RoleConstraint
+                '------------------------------------------------------------
+                arVerbaliser.VerbaliseModelObject(Me)
+                arVerbaliser.VerbaliseQuantifier(" is a Role Constraint (of type, 'Exclusive OR Constraint')")
+                arVerbaliser.HTW.WriteBreak()
+                arVerbaliser.HTW.WriteBreak()
+
+
+                Dim liInd As Integer = 0
+                Dim liReadingInd As Integer = 0
+                Dim lrModelObject As New FBM.ModelObject
+                Dim lrFactType As FBM.FactType
+                Dim larFactTypeModelObjects As New List(Of FBM.ModelObject)
+
+                '-----------------------------
+                'Find the common ModelObject
+                '-----------------------------
+                If Me.RoleConstraintRole.Count = 0 Then
+                    arVerbaliser.VerbaliseError("The Role Constraint has no arguments.")
+                    Exit Sub
+                End If
+                lrModelObject = Me.RoleConstraintRole(0).Role.JoinedORMObject
+
+                arVerbaliser.VerbaliseIndent()
+                arVerbaliser.VerbaliseQuantifier("For each ")
+                arVerbaliser.VerbaliseModelObject(lrModelObject)
+                arVerbaliser.VerbaliseQuantifier(", exactly one of the following holds:")
+                arVerbaliser.HTW.WriteBreak()
+
+                For Each lrRoleConstraintRole In Me.RoleConstraintRole
+                    lrFactType = lrRoleConstraintRole.Role.FactType
+                    arVerbaliser.VerbaliseIndent()
+                    arVerbaliser.VerbaliseIndent()
+                    If lrFactType.FactTypeReading.Count > 0 Then
+
+                        Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                                 From PredicatePart In FactTypeReading.PredicatePart
+                                                 Where Me.Role.Select(Function(x) x.Id).Contains(PredicatePart.Role.Id)
+                                                 Where PredicatePart.SequenceNr > 1
+                                                 Select FactTypeReading
+
+                        arVerbaliser.VerbaliseIndent()
+                        arVerbaliser.VerbaliseBlackText("- ")
+
+                        If larFactTypeReading.Count > 0 Then
+
+                            Call larFactTypeReading(0).VerbaliseHTML(arVerbaliser,,,,,,,,, lrModelObject)
+
+                        Else
+                            lrFactType.FactTypeReading(0).VerbaliseHTML(arVerbaliser,,,,,,,,, lrModelObject)
+                        End If
+
+                        arVerbaliser.HTW.WriteBreak()
+                    Else
+                        arVerbaliser.VerbaliseError("<Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation>")
+                        arVerbaliser.HTW.WriteBreak()
+                    End If
+                Next
+
+                arVerbaliser.HTW.WriteBreak()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Sub VerbaliseHTMLSubset(ByRef arVerbaliser As FBM.ORMVerbailser)
 
             Try
@@ -123,6 +200,8 @@ Namespace FBM
 
                 Dim liEntriesProcessed As Integer = 0
 
+
+                arVerbaliser.VerbaliseIndent()
                 arVerbaliser.VerbaliseQuantifier("If ")
 
                 Dim lrArgument As FBM.RoleConstraintArgument
@@ -139,6 +218,7 @@ Namespace FBM
 
                     arVerbaliser.VerbaliseQuantifier(", then")
                     arVerbaliser.HTW.WriteBreak()
+                    arVerbaliser.VerbaliseIndent()
 
                     If Me.Argument.Count > 1 Then
                         lrArgument = Me.getArgument(2)

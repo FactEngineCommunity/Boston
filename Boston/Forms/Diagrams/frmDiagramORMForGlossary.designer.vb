@@ -125,6 +125,8 @@ Partial Class frmDiagramORMForGlossary
         Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemEntityTypeModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator20 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
         Me.RemoveFromPageModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
         Me.mnuOption_EntityTypeProperties = New System.Windows.Forms.ToolStripMenuItem()
@@ -239,8 +241,8 @@ Partial Class frmDiagramORMForGlossary
         Me.HideMeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripSeparator12 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ShowInDiagramSpyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -854,9 +856,9 @@ Partial Class frmDiagramORMForGlossary
         '
         'ContextMenuStrip_EntityType
         '
-        Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.ToolStripMenuItem18, Me.ToolStripSeparator12, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
+        Me.ContextMenuStrip_EntityType.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_EntityTypeMorphTo, Me.ToolStripSeparator5, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator20, Me.ShowInDiagramSpyToolStripMenuItem, Me.ShowInModelDictionaryToolStripMenuItem, Me.ToolStripMenuItem18, Me.ToolStripSeparator12, Me.RemoveFromPageModelToolStripMenuItem, Me.ToolStripSeparator15, Me.mnuOption_EntityTypeProperties})
         Me.ContextMenuStrip_EntityType.Name = "ContextMenuStrip_EntityType"
-        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(226, 160)
+        Me.ContextMenuStrip_EntityType.Size = New System.Drawing.Size(226, 204)
         '
         'mnuOption_EntityTypeMorphTo
         '
@@ -869,34 +871,34 @@ Partial Class frmDiagramORMForGlossary
         '
         Me.ORMDiagramToolStripMenuItem.Image = CType(resources.GetObject("ORMDiagramToolStripMenuItem.Image"), System.Drawing.Image)
         Me.ORMDiagramToolStripMenuItem.Name = "ORMDiagramToolStripMenuItem"
-        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ORMDiagramToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.ORMDiagramToolStripMenuItem.Text = "&ORM Diagram"
         '
         'ERDiagramToolStripMenu
         '
         Me.ERDiagramToolStripMenu.Name = "ERDiagramToolStripMenu"
-        Me.ERDiagramToolStripMenu.Size = New System.Drawing.Size(180, 22)
+        Me.ERDiagramToolStripMenu.Size = New System.Drawing.Size(177, 22)
         Me.ERDiagramToolStripMenu.Text = "&ER Diagram"
         Me.ERDiagramToolStripMenu.Visible = False
         '
         'UseCToolStripMenuItem
         '
         Me.UseCToolStripMenuItem.Name = "UseCToolStripMenuItem"
-        Me.UseCToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.UseCToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.UseCToolStripMenuItem.Text = "&Use Case Diagram"
         Me.UseCToolStripMenuItem.Visible = False
         '
         'MenuOptionDataFlowDiagramEntityType
         '
         Me.MenuOptionDataFlowDiagramEntityType.Name = "MenuOptionDataFlowDiagramEntityType"
-        Me.MenuOptionDataFlowDiagramEntityType.Size = New System.Drawing.Size(180, 22)
+        Me.MenuOptionDataFlowDiagramEntityType.Size = New System.Drawing.Size(177, 22)
         Me.MenuOptionDataFlowDiagramEntityType.Text = "&Data Flow Diagram"
         Me.MenuOptionDataFlowDiagramEntityType.Visible = False
         '
         'UMLClassDiagramToolStripMenuItem
         '
         Me.UMLClassDiagramToolStripMenuItem.Name = "UMLClassDiagramToolStripMenuItem"
-        Me.UMLClassDiagramToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.UMLClassDiagramToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.UMLClassDiagramToolStripMenuItem.Text = "UML &Class Diagram"
         Me.UMLClassDiagramToolStripMenuItem.Visible = False
         '
@@ -915,6 +917,18 @@ Partial Class frmDiagramORMForGlossary
         '
         Me.ToolStripSeparator20.Name = "ToolStripSeparator20"
         Me.ToolStripSeparator20.Size = New System.Drawing.Size(222, 6)
+        '
+        'ToolStripMenuItem18
+        '
+        Me.ToolStripMenuItem18.Image = Global.Boston.My.Resources.Resources.Glossary16x16
+        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
+        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(225, 22)
+        Me.ToolStripMenuItem18.Text = "Show in &Glossary"
+        '
+        'ToolStripSeparator12
+        '
+        Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
+        Me.ToolStripSeparator12.Size = New System.Drawing.Size(222, 6)
         '
         'RemoveFromPageModelToolStripMenuItem
         '
@@ -1689,17 +1703,19 @@ Partial Class frmDiagramORMForGlossary
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'ToolStripMenuItem18
+        'ShowInDiagramSpyToolStripMenuItem
         '
-        Me.ToolStripMenuItem18.Image = Global.Boston.My.Resources.Resources.Glossary16x16
-        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
-        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(225, 22)
-        Me.ToolStripMenuItem18.Text = "Show in &Glossary"
+        Me.ShowInDiagramSpyToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Spyglass16x16
+        Me.ShowInDiagramSpyToolStripMenuItem.Name = "ShowInDiagramSpyToolStripMenuItem"
+        Me.ShowInDiagramSpyToolStripMenuItem.Size = New System.Drawing.Size(225, 22)
+        Me.ShowInDiagramSpyToolStripMenuItem.Text = "Show in Diagram Spy"
         '
-        'ToolStripSeparator12
+        'ShowInModelDictionaryToolStripMenuItem
         '
-        Me.ToolStripSeparator12.Name = "ToolStripSeparator12"
-        Me.ToolStripSeparator12.Size = New System.Drawing.Size(222, 6)
+        Me.ShowInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.dictionary16x16
+        Me.ShowInModelDictionaryToolStripMenuItem.Name = "ShowInModelDictionaryToolStripMenuItem"
+        Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(225, 22)
+        Me.ShowInModelDictionaryToolStripMenuItem.Text = "Show in Model Dictionary"
         '
         'frmDiagramORMForGlossary
         '
@@ -1952,4 +1968,6 @@ Partial Class frmDiagramORMForGlossary
     Friend WithEvents ToolStripMenuItem17 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem18 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator12 As ToolStripSeparator
+    Friend WithEvents ShowInDiagramSpyToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ShowInModelDictionaryToolStripMenuItem As ToolStripMenuItem
 End Class

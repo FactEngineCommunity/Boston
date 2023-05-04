@@ -8546,4 +8546,57 @@ Public Class frmDiagramORMForGlossary
 
     End Sub
 
+    Private Sub ShowInDiagramSpyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInDiagramSpyToolStripMenuItem.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrPage.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrEntityTypeInstance.EntityType, Control.ModifierKeys = Keys.Control)
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ShowInModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInModelDictionaryToolStripMenuItem.Click
+
+        Dim lfrmModelDictionary As New frmToolboxModelDictionary
+
+        Try
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                Exit Sub
+            End If
+
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            If prApplication.RightToolboxForms.FindAll(AddressOf lfrmModelDictionary.EqualsByName).Count = 0 Then
+                Call frmMain.LoadToolboxModelDictionary()
+            End If
+
+            lfrmModelDictionary = prApplication.RightToolboxForms.Find(AddressOf lfrmModelDictionary.EqualsByName)
+
+            Call lfrmModelDictionary.FindTreeNode(lrEntityTypeInstance.Id)
+
+            lfrmModelDictionary.Show()
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

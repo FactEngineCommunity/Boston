@@ -20,6 +20,31 @@ Namespace Boston
 
         Private ReadOnly random As Random = New Random()
 
+        ''' <summary>
+        ''' This Function Will Extract The Exception Line Number and Method In Which
+        ''' Exception Occurred And The Exception Message
+        ''' </summary>
+        ''' <param name="arException">Provide Exception Object</param>
+        ''' <returns>Tab Separated String Of Extracted Exception</returns>
+        Public Function ExtractLineAndMethod(ByRef arException As Exception, Optional abShowStackTrace As Boolean = False) As String
+
+            Dim lrStackTrace As New StackTrace(arException, True)
+            Dim lrMethodBase As MethodBase = lrStackTrace.GetFrame(lrStackTrace.FrameCount - 1).GetMethod()
+            Try
+                Dim lsMethodName As String = $"{lrMethodBase.ReflectedType.Name}.{lrMethodBase.Name}"
+                Dim liLineNumber As Integer = lrStackTrace.GetFrame(lrStackTrace.FrameCount - 1).GetFileLineNumber()
+                Dim lsMessage As String = $"Error: {lsMethodName} - {liLineNumber}" & vbCrLf & vbCrLf & arException.Message
+                If abShowStackTrace Then
+                    lsMessage &= vbCrLf & vbCrLf & arException.StackTrace.ToString()
+                End If
+                Return lsMessage
+            Finally
+                lrStackTrace = Nothing
+                lrMethodBase = Nothing
+            End Try
+
+        End Function
+
         Public Function ListsCommonElementCount(ByVal list1 As List(Of String), ByVal list2 As List(Of String)) As Integer
             Dim commonCount As Integer = list1.Intersect(list2).Count()
             Return commonCount

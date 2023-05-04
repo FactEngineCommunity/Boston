@@ -484,6 +484,9 @@ Public Class tApplication
         Dim lsStackTrace As String = ""
         Dim lsErrorMessage As String = Nothing
 
+        '20230503-VM-See Public Function ExtractLineAndMethod(ByRef arException As Exception,
+        '  Function supplied by Ali to get the Line Number, Method and Message from an Exception.
+
         Try
             asErrorMessage.AppendLine("")
 

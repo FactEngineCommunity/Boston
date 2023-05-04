@@ -1842,7 +1842,26 @@ Public Class frmToolboxORMVerbalisation
         For Each lrRoleConstraintRole In arRoleConstraint.RoleConstraintRole
             lrFactType = lrRoleConstraintRole.Role.FactType
             If lrFactType.FactTypeReading.Count > 0 Then
-                Call Me.VerbaliseFactTypePart(lrVerbaliser, lrFactType, Color.Purple, Color.Green, " that ", pcenumFollowingThatOrSome.Some)
+
+                Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                         From PredicatePart In FactTypeReading.PredicatePart
+                                         Where arRoleConstraint.Role.Select(Function(x) x.Id).Contains(PredicatePart.Role.Id)
+                                         Where PredicatePart.SequenceNr > 1
+                                         Select FactTypeReading
+
+                lrVerbaliser.VerbaliseIndent()
+                lrVerbaliser.VerbaliseBlackText("- ")
+
+                If larFactTypeReading.Count > 0 Then
+
+                    Call larFactTypeReading(0).VerbaliseHTML(lrVerbaliser,,,,,,,,, lrModelObject)
+
+                Else
+                    lrFactType.FactTypeReading(0).VerbaliseHTML(lrVerbaliser,,,,,,,,, lrModelObject)
+                End If
+
+                '20230501-VM-Was: Call Me.VerbaliseFactTypePart(lrVerbaliser, lrFactType, Color.Purple, Color.Green, " that ", pcenumFollowingThatOrSome.Some)
+
                 lrVerbaliser.HTW.WriteBreak()
             Else
                 lrVerbaliser.VerbaliseError("<Provide a Fact Type Reading for Fact Type, '" & lrFactType.Name & "', to complete this verbalisation>")

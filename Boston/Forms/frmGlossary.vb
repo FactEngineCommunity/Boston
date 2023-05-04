@@ -7,6 +7,8 @@ Public Class frmGlossary
     Private zrFrmORMDiagramViewer As frmDiagramORMForGlossary
     Private mrCurrentModelElement As FBM.ModelObject
 
+    Private mbORMViewExpanded As Boolean = False
+
     ''' <summary>
     ''' If a verbalisation is for a FactType, on the right hand side there is a faded-text link to that FactType.
     ''' Trouble is...if you copy the verbalisation text to a Word document (for example)...the faded-text FactType names
@@ -374,12 +376,22 @@ Public Class frmGlossary
             lrVerbaliser.HTW.WriteBreak()
 
             'LINQ
-            Dim larConstraint = From Constraint In Me.mrModel.RoleConstraint
-                                From Role In Constraint.Role
-                                Where Role.JoinedORMObject.Id = arEntityType.Id
-                                Select Constraint
+            Dim larConstraint = (From Constraint In Me.mrModel.RoleConstraint
+                                 From Role In Constraint.Role
+                                 Where Role.JoinedORMObject.Id = arEntityType.Id
+                                 Select Constraint).Distinct
 
-            For Each lrConstraint In larConstraint
+            Dim larSubtypeRelationshipRC = (From Constraint In Me.mrModel.RoleConstraint
+                                            Where Constraint.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint
+                                            From Role In Constraint.Role
+                                            Where Role.FactType.IsSubtypeRelationshipFactType
+                                            Where Role.FactType.RoleGroup(1).JoinedORMObject.Id = arEntityType.Id
+                                            Select Constraint).Distinct
+
+            Dim larAllConstraints = larConstraint.ToList
+            larAllConstraints.AddRange(larSubtypeRelationshipRC.ToList)
+
+            For Each lrConstraint In larAllConstraints
                 Call lrConstraint.GenerateReadingVerbalisation(lrVerbaliser)
             Next
 #End Region
@@ -664,7 +676,7 @@ Public Class frmGlossary
         'zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 80
         '===================================================================================
-
+        Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Expand16x16
     End Sub
 
     Public Sub VerbaliseGeneralConcept(ByVal arDictionaryEntry As FBM.DictionaryEntry)
@@ -1894,6 +1906,61 @@ Public Class frmGlossary
             Call Me.DescribeModelElement(Me.mrCurrentModelElement)
         Catch ex As Exception
             Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripDropDownButton2_Click(sender As Object, e As EventArgs) Handles ToolStripDropDownButton2.Click
+
+        Try
+
+            Me.mbORMViewExpanded = Not Me.mbORMViewExpanded
+
+            If Me.mbORMViewExpanded Then
+                Me.SplitContainer2.SplitterDistance = Me.SplitContainer2.Height / 4
+                Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Collapse16x16
+            Else
+                Dim liHeight As Integer = Me.WebBrowser.Height - 1
+
+                Me.SplitContainer2.SplitterDistance = 0
+
+                liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 22 'StatusBar Height=22
+
+                Me.SplitContainer2.SplitterDistance = liHeight
+                zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 80
+                Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Expand16x16
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DataLineageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DataLineageToolStripMenuItem.Click
+
+        Dim lrModelObject As FBM.ModelObject
+        Try
+            Try
+                lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id)
+            Catch
+                Exit Sub
+            End Try
+
+            Call frmMain.LoadDataLineageForm(lrModelObject)
+
+        Catch ex As Exception
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

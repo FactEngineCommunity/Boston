@@ -2471,6 +2471,31 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Sub LoadDataLineageForm(Optional arModelElement As FBM.ModelObject = Nothing)
+
+        Dim child As New frmDataLineage
+
+        Try
+            Me.Cursor = Cursors.WaitCursor
+
+            child.mrModelElement = arModelElement
+
+            child.Show(DockPanel)
+
+            Me.Cursor = Cursors.Default
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+
     ''' <summary>
     ''' Loads the Glossary form within the main DockPanel
     ''' </summary>

@@ -434,6 +434,11 @@
     <Compile Include="ClassesClientServer\tRole.vb" />
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
+    <Compile Include="ClassesDataLineage\tDataLineageCategoryPropertyType.vb" />
+    <Compile Include="ClassesDataLineage\tDataLineageCategory.vb" />
+    <Compile Include="ClassesDataLineage\tDataLineageItemProperty.vb" />
+    <Compile Include="ClassesDataLineage\tDataLineageItemModelElement.vb" />
+    <Compile Include="ClassesDataLineage\tDataLineageItem.vb" />
     <Compile Include="ClassesFactEngine\Constants.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tODBCDb.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMSAccess.vb" />
@@ -615,6 +620,8 @@
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelFacts.vb" />
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelObjectifiedType.vb" />
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMFactTypeReading.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMRoleConstraint.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker131PopulationHasNULLValueError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker130ModelElementAppearsOnNoPage.vb" />
@@ -1497,6 +1504,12 @@
     <Compile Include="Forms\frmBroadcastEventMonitor.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\frmDataLineage.Designer.vb">
+      <DependentUpon>frmDataLineage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmDataLineage.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmDocumentGeneratorSettings.Designer.vb">
       <DependentUpon>frmDocumentGeneratorSettings.vb</DependentUpon>
     </Compile>
@@ -1616,6 +1629,9 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroupUser.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerInvitation.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerLog.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableDataLineageItemProperty.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableDataLineageItemModelElement.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableDataLineageItem.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNamespace.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNotifications.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProject.vb" />
@@ -1677,11 +1693,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="My Project\Resources1.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -2392,6 +2403,9 @@
     <EmbeddedResource Include="Forms\frmDatabaseUpgrade.resx">
       <DependentUpon>frmDatabaseUpgrade.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmDataLineage.resx">
+      <DependentUpon>frmDataLineage.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmDocumentGeneratorSettings.resx">
       <DependentUpon>frmDocumentGeneratorSettings.vb</DependentUpon>
@@ -3414,6 +3428,8 @@
     <None Include="Images\MenuImages\Convert16x16.jpg" />
     <None Include="Images\MenuImages\DataFlowDiagram16x16.png" />
     <None Include="Images\MenuImages\delete10x10.png" />
+    <None Include="Images\MenuImages\Collapse.png" />
+    <None Include="Images\MenuImages\Collapse16x16.png" />
     <Content Include="Images\MenuImages\dictionary16x16.png" />
     <None Include="Images\MenuImages\edit16x16.jpg" />
     <None Include="Images\MenuImages\empty16x16.jpg" />
@@ -3423,6 +3439,8 @@
     <Content Include="Images\MenuImages\ErrorList.png" />
     <None Include="Images\MenuImages\Export16x16.png" />
     <None Include="Images\MenuImages\FactEngine16x16.png" />
+    <None Include="Images\MenuImages\Expand.png" />
+    <None Include="Images\MenuImages\Expand16x16.png" />
     <Content Include="Images\MenuImages\FactTables16x16.png" />
     <Content Include="Images\MenuImages\FactTypeObjectified16x16.png" />
     <Content Include="Images\MenuImages\FactTypeReading16x16.png" />
