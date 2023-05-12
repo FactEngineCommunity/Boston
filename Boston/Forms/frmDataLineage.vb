@@ -9,6 +9,8 @@ Public Class frmDataLineage
 
     Private marDataLineageItemProperty As New List(Of DataLineage.DataLineageItemProperty)
 
+    Private msDataLineageItemName As String
+
     Private Sub frmDataLineage_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Call Me.SetupForm()
@@ -18,10 +20,25 @@ Public Class frmDataLineage
     Private Sub SetupForm()
 
         Try
+
             If Me.mrModelElement IsNot Nothing Then
                 Me.mrModel = Me.mrModelElement.Model
                 Me.LabelLineageItem.Text = Me.mrModelElement.Id
             End If
+
+            '==Data Lineage Item Name==================================
+#Region "Data Lineage Item Name"
+
+            If Me.mrModelElement IsNot Nothing Then
+                Select Case Me.mrModelElement.GetType
+                    Case Is = GetType(FBM.ValueType),
+                                      GetType(FBM.EntityType),
+                                      GetType(FBM.FactType)
+                        Me.msDataLineageItemName = Me.mrModelElement.Id & " - Object Type"
+                End Select
+            End If
+
+#End Region
 
             '==Categories==============================================
 #Region "Lineage Categories"
@@ -69,67 +86,71 @@ Public Class frmDataLineage
 
                 Dim liFieldTop = 25
 
-                For Each lrDataLineageCategoryPropertyType In lrDataLineageCategory.DataLineagaeCategoryPropertyType
+                Dim liLineageSetNumber = tableDataLineageItemProperty.getHighestLineageSetNrForDataLineageItemCategory(Me.mrModel,
+                                                                                                                       Me.msDataLineageItemName,
+                                                                                                                       lrDataLineageCategory.Name)
+                If liLineageSetNumber = 0 Then liLineageSetNumber = 1
 
-                    Dim loLabelPrompt As New Windows.Forms.Label
+                'For each set of Properties for the Data Lineage Category
+                For liInd = 1 To liLineageSetNumber
+                    For Each lrDataLineageCategoryPropertyType In lrDataLineageCategory.DataLineagaeCategoryPropertyType
 
+                        Dim loLabelPrompt As New Windows.Forms.Label
+#Region "Data Lineage Category Property Type"
 #Region "Field Prompt"
-                    loLabelPrompt.Top = liFieldTop
-                    loLabelPrompt.Left = 5
-                    loLabelPrompt.Font = SystemFonts.DefaultFont
-                    loLabelPrompt.Text = lrDataLineageCategoryPropertyType.PropertyType & ":"
-                    loLabelPrompt.AutoSize = True
-                    loLabelPrompt.ForeColor = Color.SteelBlue
+                        loLabelPrompt.Top = liFieldTop
+                        loLabelPrompt.Left = 5
+                        loLabelPrompt.Font = SystemFonts.DefaultFont
+                        loLabelPrompt.Text = lrDataLineageCategoryPropertyType.PropertyType & ":"
+                        loLabelPrompt.AutoSize = True
+                        loLabelPrompt.ForeColor = Color.SteelBlue
 
-                    loGroupBox.Controls.Add(loLabelPrompt)
+                        loGroupBox.Controls.Add(loLabelPrompt)
 #End Region
 
 #Region "Get the Data Lineage Property"
-                    'Gets the actual data for the Data Lineage Property Type for the Data Lineage Category
-                    Dim lrDataLineageItemProperty As New DataLineage.DataLineageItemProperty
-                    lrDataLineageItemProperty.Model = Me.mrModel
-                    lrDataLineageItemProperty.Category = lrDataLineageCategory.Name
-                    lrDataLineageItemProperty.PropertyType = lrDataLineageCategoryPropertyType.PropertyType
+                        'Gets the actual data for the Data Lineage Property Type for the Data Lineage Category
+                        Dim lrDataLineageItemProperty As New DataLineage.DataLineageItemProperty
+                        lrDataLineageItemProperty.Model = Me.mrModel
+                        lrDataLineageItemProperty.Category = lrDataLineageCategory.Name
+                        lrDataLineageItemProperty.PropertyType = lrDataLineageCategoryPropertyType.PropertyType
+                        lrDataLineageItemProperty.LineageSetNumber = liLineageSetNumber
+                        lrDataLineageItemProperty.Name = Me.msDataLineageItemName
 
-                    If Me.mrModelElement IsNot Nothing Then
-                        Select Case Me.mrModelElement.GetType
-                            Case Is = GetType(FBM.ValueType),
-                                      GetType(FBM.EntityType),
-                                      GetType(FBM.FactType)
-                                lrDataLineageItemProperty.Name = Me.mrModelElement.Id & " - Object Type"
-                        End Select
-                    End If
 
-                    Call tableDataLineageItemProperty.getDataLineageItemPropertyDetails(lrDataLineageItemProperty, True)
+                        Call tableDataLineageItemProperty.getDataLineageItemPropertyDetails(lrDataLineageItemProperty, True)
 #End Region
 
 #Region "Text Field"
-                    Dim loTextField As New Windows.Forms.TextBox
+                        Dim loTextField As New Windows.Forms.TextBox
 
-                    loTextField.Top = loLabelPrompt.Top - 3
-                    loTextField.Left = loLabelPrompt.Width + 8
-                    loTextField.Width = loGroupBox.Width - loTextField.Left - 10
-                    loTextField.BorderStyle = BorderStyle.None
+                        loTextField.Top = loLabelPrompt.Top - 3
+                        loTextField.Left = loLabelPrompt.Width + 8
+                        loTextField.Width = loGroupBox.Width - loTextField.Left - 10
+                        loTextField.BorderStyle = BorderStyle.None
 
-                    loGroupBox.Controls.Add(loTextField)
+                        loGroupBox.Controls.Add(loTextField)
 
-                    loTextField.Tag = lrDataLineageItemProperty
-                    lrDataLineageItemProperty.Control = loTextField
-                    loTextField.Text = lrDataLineageItemProperty.Property
+                        loTextField.Tag = lrDataLineageItemProperty
+                        lrDataLineageItemProperty.Control = loTextField
+                        loTextField.Text = lrDataLineageItemProperty.Property
 #End Region
 
 
-                    Me.marDataLineageItemProperty.Add(lrDataLineageItemProperty)
+                        Me.marDataLineageItemProperty.Add(lrDataLineageItemProperty)
 
-                    liFieldTop = loTextField.Top + loLabelPrompt.Height + 20
+                        liFieldTop = loTextField.Top + loLabelPrompt.Height + 20
 
-                    loGroupBox.Height = liFieldTop + 5
-                Next
+                        loGroupBox.Height = liFieldTop + 5
+#End Region
+                    Next
+                Next 'LineageSetNr
 
                 Me.GroupBoxCategories.Controls.Add(loGroupBox)
 
                 liCategoryGroupboxTop = loGroupBox.Top + loGroupBox.Height + 10
             Next
+
 
         Catch ex As Exception
             Dim lsMessage As String

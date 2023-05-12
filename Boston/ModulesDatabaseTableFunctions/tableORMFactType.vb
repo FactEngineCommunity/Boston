@@ -542,7 +542,6 @@ MoveNext:
 
                 If Not lREcordset.EOF Then
 
-                    Boston.WriteToStatusBar("Found " & lREcordset.RecordCount.ToString & " related Fact Types.", True)
                     While Not lREcordset.EOF
                         lrFactType = New FBM.FactType
                         lrFactType.isDirty = False

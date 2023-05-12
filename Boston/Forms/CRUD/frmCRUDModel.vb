@@ -281,6 +281,7 @@ Public Class frmCRUDModel
 
     Private Function TestConnection() As Boolean
 
+        Dim lsMessage As String = ""
         Try
             If Me.zrModel.RequiresConnectionString Then
                 If Trim(Me.TextBoxDatabaseConnectionString.Text) = "" Then
@@ -346,11 +347,12 @@ ConnectionFailed:
                             Return True
 
                         Catch ex As Exception
+                            lsMessage = ex.Message
                             GoTo RAIConnectionFailed
                         End Try
 RAIConnectionFailed:
                         Me.LabelOpenSuccessfull.ForeColor = Color.Red
-                        Me.LabelOpenSuccessfull.Text = "Fail"
+                        Me.LabelOpenSuccessfull.Text = "Fail" & lsMessage
 
                     Case Is = pcenumDatabaseType.MSJet
 

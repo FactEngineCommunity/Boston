@@ -132,6 +132,42 @@ Public Module tableDataLineageItemProperty
 
     End Function
 
+    Public Function getHighestLineageSetNrForDataLineageItemCategory(ByRef arModel As FBM.Model,
+                                                                     ByVal asDataLineageItemName As String,
+                                                                     ByVal asDataLineageItemCategory As String) As Integer
+
+        Dim lsSQLQuery As String = ""
+        Dim lRecordset As New ADODB.Recordset
+
+        Try
+            lRecordset.ActiveConnection = pdbConnection
+            lRecordset.CursorType = pcOpenStatic
+
+            lsSQLQuery = "SELECT MAX(LineageSetNr)"
+            lsSQLQuery &= " FROM DataLineageItemProperty"
+            lsSQLQuery &= " WHERE ModelId = '" & arModel.ModelId & "'"
+            lsSQLQuery &= " AND DataLineageItemName = '" & Trim(asDataLineageItemName) & "'"
+            lsSQLQuery &= " AND DataLineageCategory = '" & Trim(asDataLineageItemCategory) & "'"
+
+            lRecordset.Open(lsSQLQuery)
+
+            getHighestLineageSetNrForDataLineageItemCategory = NullVal(lRecordset(0).Value, 0)
+
+            lRecordset.Close()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return 0
+        End Try
+
+    End Function
+
     Public Function getDataLineageItemPropertyDetails(ByRef arDataLineageItemProperty As DataLineage.DataLineageItemProperty,
                                                       Optional abIgnoreErrors As Boolean = False) As DataLineage.DataLineageItemProperty
 
@@ -248,6 +284,7 @@ Public Module tableDataLineageItemProperty
             lsSQLQuery &= "   AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
             lsSQLQuery &= "   AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
             lsSQLQuery &= "   AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+            lsSQLQuery &= "   AND LineageSetNumber = '" & Trim(arDataLineageItemProperty.LineageSetNumber) & "'"
 
             pdbConnection.BeginTrans()
             pdbConnection.Execute(lsSQLQuery)

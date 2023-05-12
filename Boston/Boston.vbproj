@@ -82,6 +82,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Animator.dll</HintPath>
     </Reference>
+    <Reference Include="Apache.Arrow">
+      <HintPath>..\Dependencies\Relational.AI\Apache.Arrow.dll</HintPath>
+    </Reference>
     <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
     </Reference>
@@ -178,6 +181,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\LinFu.Reflection.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -185,8 +191,8 @@
       <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.0.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.0.3\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=3.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.3.1.2\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -268,7 +274,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\PdfExport.dll</HintPath>
     </Reference>
+    <Reference Include="Polly">
+      <HintPath>..\Dependencies\Relational.AI\Polly.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework" />
+    <Reference Include="RelationalAI">
+      <HintPath>..\Dependencies\Relational.AI\RelationalAI.dll</HintPath>
+    </Reference>
     <Reference Include="Ruler, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Ruler.dll</HintPath>
@@ -434,6 +446,8 @@
     <Compile Include="ClassesClientServer\tRole.vb" />
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
+    <Compile Include="ClassesDatabase\SQLite\tSQLiteRecordset.vb" />
+    <Compile Include="ClassesDatabase\tGenericRecordset.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageCategoryPropertyType.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageCategory.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageItemProperty.vb" />
