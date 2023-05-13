@@ -60,7 +60,11 @@ Public Class frmCRUDBostonConfiguration
             Me.CheckBoxVirtualAnalystDisplayBriana.Checked = My.Settings.DisplayBrianaVirtualAnalyst
             Me.CheckBoxStartVirtualAnalystInQuietMode.Checked = My.Settings.StartVirtualAnalystInQuietMode
 
+            '---------------------------------------------------------
+            'Database
+            '-----------------
             Call Me.LoadDatabaseTypes()
+            Me.CheckBoxUseThreadingDatabaseLoad.Checked = My.Settings.ModelLoadPagesUseThreading
 
             Me.TextBoxDatabaseConnectionString.Text = My.Settings.DatabaseConnectionString
 
@@ -196,6 +200,9 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.DatabaseConnectionString = Me.TextBoxDatabaseConnectionString.Text
                 My.Settings.DisplayBrianaVirtualAnalyst = Me.CheckBoxVirtualAnalystDisplayBriana.Checked
                 My.Settings.StartVirtualAnalystInQuietMode = Me.CheckBoxStartVirtualAnalystInQuietMode.Checked
+
+                'Database
+                My.Settings.ModelLoadPagesUseThreading = Me.CheckBoxUseThreadingDatabaseLoad.Checked
 
                 'Import/Export
                 My.Settings.ExportFBMExcludeMDAModelElements = Me.CheckBoxExportSuppressMDAModelElements.Checked
@@ -709,6 +716,24 @@ Public Class frmCRUDBostonConfiguration
                     End Using
             End Select
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CheckBoxUseThreadingDatabaseLoad_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxUseThreadingDatabaseLoad.CheckedChanged
+
+        Try
+            Dim lsMessage = "For some database types it is recommended that Threading is turned off for Boston database loading."
+            lsMessage.AppendDoubleLineBreak("E.g. Databases such as SQLite may lock during database load if threading is turned on.")
+            lsMessage.AppendDoubleLineBreak("Consult with FactEngine if you are unsure as to how to proceed with this option.")
+            MsgBox(lsMessage)
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

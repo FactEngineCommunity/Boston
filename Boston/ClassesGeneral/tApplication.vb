@@ -687,7 +687,10 @@ Public Class tApplication
                 '--------------------------------------
                 'Throw the ErrorMessage to the screen
                 '--------------------------------------
-                MsgBox(asErrorMessage)
+                Dim lfrmFlashCard As New frmFlashCard
+                lfrmFlashCard.ziIntervalMilliseconds = 2500
+                lfrmFlashCard.zsText = asErrorMessage
+                lfrmFlashCard.Show(frmMain, "LightGray")
             End If
 
         Catch ex As Exception

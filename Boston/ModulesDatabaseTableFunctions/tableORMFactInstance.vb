@@ -17,7 +17,7 @@ Module tableORMFactInstance
 
         Try
 
-            lsSQLQuery = "  SELECT f.Symbol, fci.x AS FCIX, fci.y AS FCIY, fd.RoleId, fd.ValueSymbol, fdci.x, fdci.y"
+            lsSQLQuery = "  SELECT f.Symbol, fci.x AS FCIX, fci.y AS FCIY, fd.RoleId, fd.ValueSymbol, fdci.x AS FDCIX, fdci.y AS FDCIY"
             lsSQLQuery &= "   FROM MetaModelFact f,"
             lsSQLQuery &= "        MetaModelFactData fd,"
             lsSQLQuery &= "        ModelConceptInstance fci," 'Fact
@@ -93,8 +93,8 @@ Module tableORMFactInstance
                                     'Create the FactDataInstance
                                     '----------------------------
                                     lrFactDataInstance = New FBM.FactDataInstance(arFactTypeInstance.Page, lrFactInstance, lrRoleInstance, lrConcept)
-                                    lrFactDataInstance.X = lRecordset("fdci.x").Value
-                                    lrFactDataInstance.Y = lRecordset("fdci.y").Value
+                                    lrFactDataInstance.X = lRecordset("FDCIX").Value
+                                    lrFactDataInstance.Y = lRecordset("FDCIY").Value
 
                                     '-------------------------------------
                                     'Add the FactDataInstance to the Role
@@ -120,31 +120,32 @@ Module tableORMFactInstance
 #Region "Exception"
                                     'Probaly a EOF Error on lRecordset.MoveNext
                                     'Get the FactInstance from the Database
-                                    lrFactInstance = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId).CloneInstance(arFactTypeInstance.Page)
-                                    For Each lrFactDataInstance In lrFactInstance.Data
+                                    Dim lrFact2 As FBM.Fact = arFactTypeInstance.FactType.Fact.Find(Function(x) x.Id = lsFactId).CloneInstance(arFactTypeInstance.Page)
+                                    For Each lrFactData2 As FBM.FactData In lrFact2.Data
                                         '-------------------------------------
                                         'Add the FactDataInstance to the Role
                                         '-------------------------------------
-                                        lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrFactDataInstance.Role.Id)
-                                        lrRoleInstance.Data.Add(lrFactDataInstance)
+                                        lrRoleInstance = arFactTypeInstance.RoleGroup.Find(Function(x) x.Id = lrFactData2.Role.Id)
+                                        Dim lrFactDataInstance2 = lrFactData2.CloneInstance(arFactTypeInstance.Page, lrFactInstance)
+                                        lrRoleInstance.Data.AddUnique(lrFactDataInstance2)
 
                                         '-------------------------------------
                                         'Add the FactDataInstance to the Fact
                                         '-------------------------------------
-                                        lrFactInstance.Data.Add(lrFactDataInstance)
+                                        lrFactInstance.Data.AddUnique(lrFactDataInstance2)
                                         '-------------------------------------
                                         'Add the FactDataInstance to the Page
                                         '  Most useful in XML Export
                                         '-------------------------------------
                                         'SyncLock arFactTypeInstance.Page.ValueInstance
-                                        arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance)
+                                        arFactTypeInstance.Page.ValueInstance.Add(lrFactDataInstance2)
                                     Next
                                     Dim lsMessage = "Not all Fact Data was found on the Page for:"
                                     lsMessage &= vbCrLf & vbCrLf
                                     lsMessage &= "Page: " & arFactTypeInstance.Page.Name
-                                    lsMessage &= "Fact Type: " & arFactTypeInstance.Id
-                                    lsMessage &= "Fact :" & lsFactId
-                                    MsgBox(lsMessage)
+                                    lsMessage.AppendLine("Fact Type: " & arFactTypeInstance.Id)
+                                    lsMessage.AppendLine("Fact :" & lsFactId)
+                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,, True)
 #End Region
                                 End Try
                             Else
@@ -210,7 +211,7 @@ Module tableORMFactInstance
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id
 
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,, True,, True)
 
             lRecordset.Close()
         End Try

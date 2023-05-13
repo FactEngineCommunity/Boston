@@ -267,6 +267,7 @@ Namespace TableReferenceFieldValue
 
                 Dim lrReferenceTuple As New ReferenceTuple
 
+                lREcordset.MoveFirst()
 
                 While Not lREcordset.EOF
                     loTupleObject = loTuple.clone
@@ -275,7 +276,6 @@ Namespace TableReferenceFieldValue
                     '-------------------
                     lrReferenceTuple = New ReferenceTuple("DummyRowId") '20230513-VM-Was lREcordset("row_id").Value
                     liInd = 0
-                    lREcordset.MoveFirst()
                     For Each loField In lREcordset.Fields
                         Select Case liInd
                             Case Is = 0
@@ -289,7 +289,8 @@ Namespace TableReferenceFieldValue
                                 Dim pro As System.Reflection.PropertyInfo
                                 pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
                                 Try
-                                    pro.SetValue(loTupleObject, If(loField.value Is Nothing, " ", loField.value), Nothing)
+                                    Dim lsValue = If(lREcordset(loField.Name).Value Is Nothing, " ", lREcordset(loField.Name).Value)
+                                    pro.SetValue(loTupleObject, lsValue, Nothing)
                                 Catch ex As Exception
                                     pro.SetValue(loTupleObject, loField.value.ToString, Nothing)
                                 End Try

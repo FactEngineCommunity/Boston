@@ -111,6 +111,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxUseThreadingDatabaseLoad = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -166,14 +167,14 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDebugging)
         Me.GroupBox_main.Location = New System.Drawing.Point(6, 6)
         Me.GroupBox_main.Name = "GroupBox_main"
-        Me.GroupBox_main.Size = New System.Drawing.Size(595, 592)
+        Me.GroupBox_main.Size = New System.Drawing.Size(595, 623)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
         'GroupBoxAutoComplete
         '
         Me.GroupBoxAutoComplete.Controls.Add(Me.CheckBoxAutoCompleteSingleClickSelects)
-        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 517)
+        Me.GroupBoxAutoComplete.Location = New System.Drawing.Point(17, 548)
         Me.GroupBoxAutoComplete.Name = "GroupBoxAutoComplete"
         Me.GroupBoxAutoComplete.Size = New System.Drawing.Size(556, 69)
         Me.GroupBoxAutoComplete.TabIndex = 15
@@ -194,7 +195,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.GroupBox2.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Location = New System.Drawing.Point(17, 383)
+        Me.GroupBox2.Location = New System.Drawing.Point(17, 414)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(556, 128)
         Me.GroupBox2.TabIndex = 14
@@ -262,7 +263,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox1.Controls.Add(Me.CheckBoxStartVirtualAnalystInQuietMode)
         Me.GroupBox1.Controls.Add(Me.CheckBoxVirtualAnalystDisplayBriana)
         Me.GroupBox1.Controls.Add(Me.ButtonImportLanguageRules)
-        Me.GroupBox1.Location = New System.Drawing.Point(17, 265)
+        Me.GroupBox1.Location = New System.Drawing.Point(17, 294)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(443, 114)
         Me.GroupBox1.TabIndex = 13
@@ -300,6 +301,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxDatabase
         '
+        Me.GroupBoxDatabase.Controls.Add(Me.CheckBoxUseThreadingDatabaseLoad)
         Me.GroupBoxDatabase.Controls.Add(Me.ButtonFileSelect)
         Me.GroupBoxDatabase.Controls.Add(Me.TextBoxDatabaseConnectionString)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelConnectionString)
@@ -307,7 +309,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxDatabase.Controls.Add(Me.ComboBoxDatabaseType)
         Me.GroupBoxDatabase.Location = New System.Drawing.Point(17, 18)
         Me.GroupBoxDatabase.Name = "GroupBoxDatabase"
-        Me.GroupBoxDatabase.Size = New System.Drawing.Size(556, 88)
+        Me.GroupBoxDatabase.Size = New System.Drawing.Size(556, 117)
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
@@ -369,7 +371,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxDebugging.Controls.Add(Me.CheckBoxThrowInformationDebugMessagesToScreen)
         Me.GroupBoxDebugging.Controls.Add(Me.ComboBoxDebugMode)
         Me.GroupBoxDebugging.Controls.Add(Me.LabelPrompt_StrategyTerm)
-        Me.GroupBoxDebugging.Location = New System.Drawing.Point(17, 112)
+        Me.GroupBoxDebugging.Location = New System.Drawing.Point(17, 141)
         Me.GroupBoxDebugging.Name = "GroupBoxDebugging"
         Me.GroupBoxDebugging.Size = New System.Drawing.Size(443, 147)
         Me.GroupBoxDebugging.TabIndex = 11
@@ -451,7 +453,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(614, 630)
+        Me.TabControl1.Size = New System.Drawing.Size(614, 661)
         Me.TabControl1.TabIndex = 9
         '
         'TabPage1
@@ -460,7 +462,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage1.Size = New System.Drawing.Size(606, 635)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "General"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -1052,11 +1054,21 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
+        'CheckBoxUseThreadingDatabaseLoad
+        '
+        Me.CheckBoxUseThreadingDatabaseLoad.AutoSize = True
+        Me.CheckBoxUseThreadingDatabaseLoad.Location = New System.Drawing.Point(28, 84)
+        Me.CheckBoxUseThreadingDatabaseLoad.Name = "CheckBoxUseThreadingDatabaseLoad"
+        Me.CheckBoxUseThreadingDatabaseLoad.Size = New System.Drawing.Size(223, 17)
+        Me.CheckBoxUseThreadingDatabaseLoad.TabIndex = 11
+        Me.CheckBoxUseThreadingDatabaseLoad.Text = "Use &Threading on Boston Database Load"
+        Me.CheckBoxUseThreadingDatabaseLoad.UseVisualStyleBackColor = True
+        '
         'frmCRUDBostonConfiguration
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(762, 647)
+        Me.ClientSize = New System.Drawing.Size(762, 684)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
         Me.Controls.Add(Me.button_okay)
@@ -1196,4 +1208,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxImportColumnNameEqualsFKReferencedEntityName As CheckBox
     Friend WithEvents CheckBoxModelllingUseThreadingLoadingXMLPage As CheckBox
     Friend WithEvents ButtonFileSelect As Button
+    Friend WithEvents CheckBoxUseThreadingDatabaseLoad As CheckBox
 End Class

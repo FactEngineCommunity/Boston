@@ -237,8 +237,12 @@ Namespace Boston
                 Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
                 If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
-
+#Region "SQLite"
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    pdbConnection = New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
+                    pdb_OLEDB_connection = New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
+
 
 #Region "SHIFT KEY DOWN - User Points to database"
                     If My.Computer.Keyboard.ShiftKeyDown Then
@@ -315,9 +319,13 @@ StillCannotFindTheDatabaseSQLite:
 
                         End If
                     End If
+#End Region
                 ElseIf My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-
+#Region "MS Jet"
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    pdbConnection = New ADODB.Connection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
+                    pdb_OLEDB_connection = New OleDb.OleDbConnection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
 
 #Region "SHIFT KEY DOWN - User Points to database"
                     If My.Computer.Keyboard.ShiftKeyDown Then
@@ -345,7 +353,7 @@ UserSelectedDatabase:
                             End If
 
                         End Using
-
+#End Region
                     End If
 #End Region
 
@@ -357,6 +365,7 @@ CheckExistsDatabaseLocation:
 
 
                     If Not System.IO.File.Exists(lsDatabaseLocation) Then
+#Region "Database can't be found"
                         '-----------------------------------
                         'Try and find the database locally
                         '-----------------------------------
@@ -378,7 +387,7 @@ CheckExistsDatabaseLocation:
                         End Try
 
 StillCannotFindTheDatabase:
-                            If Not My.Settings.SilentPreConfiguration Then
+                        If Not My.Settings.SilentPreConfiguration Then
 
                             lsMessage = "Cannot find the Boston database at the default/configured location:"
                             lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
@@ -427,6 +436,7 @@ StillCannotFindTheDatabase:
                         'End If
 #End Region
                     End If
+#End Region
                 End If
 
 

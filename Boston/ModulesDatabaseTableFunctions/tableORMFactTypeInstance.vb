@@ -270,7 +270,7 @@ Namespace TableFactTypeInstance
                             '20220410-VM-Replace with passing lrFactTypeInstance to lrRole.CloneInstance (above)
                             'lrRoleInstance.FactType = lrFactTypeInstance
 
-                            If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.FactType Then
+                            If lrRoleInstance.Role.TypeOfJoin = pcenumRoleJoinType.FactType Then
                                 If lrRoleInstance.JoinedORMObject Is Nothing Then
                                     lrRoleInstance.JoinedORMObject = TableFactTypeInstance.GetFactTypeInstanceByPage(lrRoleInstance.Role.JoinsFactType.Id, arPage)
 

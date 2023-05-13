@@ -172,8 +172,13 @@ Namespace TablePage
 
                         liPageLoadedInd += 1
                         If aoBackgroundWorker IsNot Nothing Then
-                            aoBackgroundWorker.ReportProgress(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
-                            Boston.WriteToProgressBar(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
+                            Try
+                                aoBackgroundWorker.ReportProgress(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
+                                Boston.WriteToProgressBar(60 + ((liPageLoadedInd / lREcordset.RecordCount) * 40))
+                            Catch
+                                'RecordCount not implemented on all database types. E.g. SQLiteDataReader does not have a RecordCount.
+                            End Try
+
                         End If
 
                         If ar_model.Page.Contains(lrPage) Then

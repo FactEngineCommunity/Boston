@@ -6285,7 +6285,7 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     If abUseThreading And TablePage.GetPageCountByModel(Me.ModelId) < 30 Then
                         Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
                     Else
-                        Call TablePage.GetPagesByModel(Me, True, False, aoBackgroundWorker, False)
+                        Call TablePage.GetPagesByModel(Me, True, abUseThreading, aoBackgroundWorker, False)
                     End If
                 Else
                     Call TablePage.GetPagesByModel(Me, False)
@@ -6314,47 +6314,66 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                 If Not {"English", "Core"}.Contains(Me.ModelId) Then 'Thre is no need to modify the English or Core models
 
-                    If Not Me.HasCoreModel Then
+                    Try
+                        If Not Me.HasCoreModel Then
 #Region "Has No Core Model"
-                        Call Me.AddCoreERDPGSSTMUMLModelElements(aoBackgroundWorker)
-                        Me.RDSCreated = True
+                            Call Me.AddCoreERDPGSSTMUMLModelElements(aoBackgroundWorker)
+                            Me.RDSCreated = True
 #End Region
 
-                    ElseIf Me.CoreVersionNumber = "1.0" Then
-                        '---------------------------------------------------------------------------------------
-                        'Only contains ERD and PGS Model Elements. Need to add State Transition Model Elements
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                        ElseIf Me.CoreVersionNumber = "1.0" Then
+                            '---------------------------------------------------------------------------------------
+                            'Only contains ERD and PGS Model Elements. Need to add State Transition Model Elements
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
 
-                        Call Me.AddCoreSTDModelElements()
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                            Call Me.AddCoreSTDModelElements()
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
 
-                        Me.CoreVersionNumber = "2.0"
+                            Me.CoreVersionNumber = "2.0"
 
-                        Call Me.Save()
+                            Call Me.Save()
 
-                    ElseIf Me.CoreVersionNumber = "" Then 'Makes up for anomaly where CoreVersionNumber wasn't added when creating a new model in earlier versions.
-                        'The CMML metamodels should be in all customer's models.
-                        Me.CoreVersionNumber = "2.0"
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                        ElseIf Me.CoreVersionNumber = "" Then 'Makes up for anomaly where CoreVersionNumber wasn't added when creating a new model in earlier versions.
+                            'The CMML metamodels should be in all customer's models.
+                            Me.CoreVersionNumber = "2.0"
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
 
-                    ElseIf Me.CoreVersionNumber >= "2.3" Then
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.UMLUseCaseDiagram)
+                        ElseIf Me.CoreVersionNumber >= "2.3" Then
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.UMLUseCaseDiagram)
 
-                    ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
-                        'Nothing to do (at this point), because is the latest version of the Core @ 04/11/2021. See also performCoreManagement (below).
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
-                        Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
-                    End If
+                        ElseIf CDbl(Me.CoreVersionNumber) >= 2.0 Then
+                            'Nothing to do (at this point), because is the latest version of the Core @ 04/11/2021. See also performCoreManagement (below).
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.EntityRelationshipDiagram)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.PropertyGraphSchema)
+                            Me.ContainsLanguage.AddUnique(pcenumLanguage.StateTransitionDiagram)
+                        End If
+
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    End Try
 
                     '============================================================================================
                     'Core Management. E.g. If the Core needs modification for a new release.
-                    Call Me.performCoreManagement()
+                    Try
+                        Call Me.performCoreManagement()
+                    Catch ex As Exception
+                        Dim lsMessage As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    End Try
 
                     '==============================================
                     'Populate the RDS,STM,CMML data structure.

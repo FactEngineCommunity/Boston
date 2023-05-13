@@ -1140,7 +1140,7 @@ Public Class frmToolboxEnterpriseExplorer
                     pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                     Boston.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                 End If
-                Call arModel.Load(True, False, Me.BackgroundWorkerModelLoader)
+                Call arModel.Load(True, My.Settings.ModelLoadPagesUseThreading, Me.BackgroundWorkerModelLoader)
                 Call Me.HideCircularProgressBar()
                 Me.Cursor = Cursors.Default
                 Boston.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
