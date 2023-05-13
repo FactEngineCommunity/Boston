@@ -39,6 +39,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxVirtualAnalystDisplayBriana = New System.Windows.Forms.CheckBox()
         Me.ButtonImportLanguageRules = New System.Windows.Forms.Button()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
+        Me.ButtonFileSelect = New System.Windows.Forms.Button()
         Me.TextBoxDatabaseConnectionString = New System.Windows.Forms.TextBox()
         Me.LabelConnectionString = New System.Windows.Forms.Label()
         Me.LabelDatabaseType = New System.Windows.Forms.Label()
@@ -100,6 +101,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.GroupBoxModelling = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage = New System.Windows.Forms.CheckBox()
         Me.ComboBoxDefaultGeneralConceptConversion = New System.Windows.Forms.ComboBox()
         Me.LabelPromptNLAPIConvertsGeneralConceptsTo = New System.Windows.Forms.Label()
         Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
@@ -109,7 +111,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -299,6 +300,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxDatabase
         '
+        Me.GroupBoxDatabase.Controls.Add(Me.ButtonFileSelect)
         Me.GroupBoxDatabase.Controls.Add(Me.TextBoxDatabaseConnectionString)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelConnectionString)
         Me.GroupBoxDatabase.Controls.Add(Me.LabelDatabaseType)
@@ -309,6 +311,21 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
+        '
+        'ButtonFileSelect
+        '
+        Me.ButtonFileSelect.BackColor = System.Drawing.Color.White
+        Me.ButtonFileSelect.BackgroundImage = Global.Boston.My.Resources.Resources.folder16x16
+        Me.ButtonFileSelect.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonFileSelect.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.ButtonFileSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonFileSelect.ForeColor = System.Drawing.Color.White
+        Me.ButtonFileSelect.Location = New System.Drawing.Point(244, 25)
+        Me.ButtonFileSelect.Name = "ButtonFileSelect"
+        Me.ButtonFileSelect.Size = New System.Drawing.Size(16, 16)
+        Me.ButtonFileSelect.TabIndex = 10
+        Me.ButtonFileSelect.UseVisualStyleBackColor = False
+        Me.ButtonFileSelect.Visible = False
         '
         'TextBoxDatabaseConnectionString
         '
@@ -947,6 +964,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxModelling.TabIndex = 0
         Me.GroupBoxModelling.TabStop = False
         '
+        'CheckBoxModelllingUseThreadingLoadingXMLPage
+        '
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.AutoSize = True
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Location = New System.Drawing.Point(18, 123)
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Name = "CheckBoxModelllingUseThreadingLoadingXMLPage"
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Size = New System.Drawing.Size(190, 17)
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.TabIndex = 5
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Text = "Use Threading Loading XML Page"
+        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.UseVisualStyleBackColor = True
+        '
         'ComboBoxDefaultGeneralConceptConversion
         '
         Me.ComboBoxDefaultGeneralConceptConversion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
@@ -1024,16 +1051,6 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
-        '
-        'CheckBoxModelllingUseThreadingLoadingXMLPage
-        '
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.AutoSize = True
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Location = New System.Drawing.Point(18, 123)
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Name = "CheckBoxModelllingUseThreadingLoadingXMLPage"
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Size = New System.Drawing.Size(190, 17)
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.TabIndex = 5
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Text = "Use Threading Loading XML Page"
-        Me.CheckBoxModelllingUseThreadingLoadingXMLPage.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -1178,4 +1195,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents TextBoxFactEngineOpenAIAPIKey As TextBox
     Friend WithEvents CheckBoxImportColumnNameEqualsFKReferencedEntityName As CheckBox
     Friend WithEvents CheckBoxModelllingUseThreadingLoadingXMLPage As CheckBox
+    Friend WithEvents ButtonFileSelect As Button
 End Class

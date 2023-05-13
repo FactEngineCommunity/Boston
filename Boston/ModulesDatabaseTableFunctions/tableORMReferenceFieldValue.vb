@@ -122,29 +122,41 @@ Namespace TableReferenceFieldValue
                                         Optional ByVal abIgnoreErrors As Boolean = False) As String
 
             Dim lsSQLQuery As String
-            Dim lREcordset As New ADODB.Recordset
+            '20230513-VM-Was - Dim lREcordset As New ADODB.Recordset 'Changed when moved to SQLite database
+            Dim lRecordset As New RecordsetProxy()
 
-            lREcordset.ActiveConnection = pdbConnection
-            lREcordset.CursorType = pcOpenStatic
+            Try
 
-            lsSQLQuery = "SELECT Data"
-            lsSQLQuery &= " FROM ReferenceFieldValue"
-            lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
-            lsSQLQuery &= " AND reference_field_Id = " & aiReference_field_id
+                lRecordset.ActiveConnection = pdbConnection
+                lRecordset.CursorType = pcOpenStatic
 
-            lREcordset.Open(lsSQLQuery)
+                lsSQLQuery = "SELECT Data"
+                lsSQLQuery &= " FROM ReferenceFieldValue"
+                lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
+                lsSQLQuery &= " AND reference_field_Id = " & aiReference_field_id
 
-            If Not lREcordset.EOF Then
-                GetReferenceFieldValue = lREcordset("Data").Value
-            Else
-                If Not abIgnoreErrors Then
-                    MsgBox("Error: get_reference_field_value_data: no record returned: parameter: aiReferenceTableId=" & aiReferenceTableId & ", aiReference_field_id=" & aiReference_field_id)
+                lREcordset.Open(lsSQLQuery)
+
+                If Not lREcordset.EOF Then
+                    GetReferenceFieldValue = lREcordset("Data").Value
+                Else
+                    If Not abIgnoreErrors Then
+                        MsgBox("Error: get_reference_field_value_data: no record returned: parameter: aiReferenceTableId=" & aiReferenceTableId & ", aiReference_field_id=" & aiReference_field_id)
+                    End If
+                    GetReferenceFieldValue = ""
                 End If
-                GetReferenceFieldValue = ""
-            End If
 
-            lREcordset.Close()
-            lREcordset = Nothing
+                lREcordset.Close()
+                lREcordset = Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Function
 

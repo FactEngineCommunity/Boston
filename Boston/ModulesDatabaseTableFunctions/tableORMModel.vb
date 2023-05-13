@@ -132,7 +132,7 @@ Namespace TableModel
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy()
                 Dim lsMessage As String
 
                 lREcordset.ActiveConnection = pdbConnection

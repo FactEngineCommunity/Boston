@@ -5,10 +5,11 @@ Namespace SQLite
     Public Class Recordset
         Inherits Database.GenericRecordset
 
-        Public Shadows ActiveConnection As SQLiteConnection
+        Public Shadows ActiveConnection As FactEngine.SQLiteConnection
         Public Shadows CursorType As Integer
 
         Private _EOF As Boolean = False
+        Private _RowIndex As Integer = -1
 
         Private SQLiteDataReader As SQLiteDataReader
 
@@ -27,44 +28,48 @@ Namespace SQLite
         Default Public Overrides Property Item(ByVal asItemValue As String) As Object
             Get
                 Try
+                    If Me._RowIndex = -1 And Me.SQLiteDataReader.HasRows Then
+                        Me.Read()
+                    End If
+
                     If asItemValue.IsNumeric Then
                         Dim liIndex = CInt(asItemValue)
                         Dim value As Object = Me.SQLiteDataReader.GetValue(liIndex)
                         Select Case value.GetType
                             Case GetType(Integer)
-                                Return CInt(value)
+                                Return New With {.value = CInt(value)}
                             Case GetType(Double)
-                                Return CDbl(value)
+                                Return New With {.value = CDbl(value)}
                             Case GetType(String)
-                                Return CStr(value)
+                                Return New With {.value = CStr(value)}
                             Case GetType(Boolean)
-                                Return CBool(value)
+                                Return New With {.value = CBool(value)}
                             Case GetType(DateTime)
-                                Return CDate(value)
+                                Return New With {.value = CDate(value)}
                             Case GetType(Byte())
                                 Return CType(value, Byte())
                                 ' handle binary data
                             Case Else
-                                Return value
+                                Return New With {.value = value}
                         End Select
                     Else
                         Dim value As Object = Me.SQLiteDataReader.GetValue(Me.SQLiteDataReader.GetOrdinal(asItemValue))
                         Select Case Me.SQLiteDataReader.GetFieldType(Me.SQLiteDataReader.GetOrdinal(asItemValue))
                             Case GetType(Int32)
-                                Return CInt(value)
+                                Return New With {.value = CInt(value)}
                             Case GetType(String)
-                                Return CStr(value)
+                                Return New With {.value = CStr(NullVal(value, ""))}
+                                'Return CStr(value)
                             Case GetType(Double)
-                                Return CDbl(value)
+                                Return New With {.value = CDbl(value)}
                             Case GetType(Boolean)
-                                Return CBool(value)
+                                Return New With {.value = CBool(NullVal(value, False))}
                             Case GetType(DateTime)
-                                Return CDate(value)
+                                Return New With {.value = CDate(value)}
                             Case GetType(Byte())
-                                Return CType(value, Byte())
+                                Return New With {.value = CType(value, Byte())}
                             Case Else
-
-                                Return Nothing
+                                Return New With {.value = value}
                         End Select
                     End If
                 Catch ex As Exception
@@ -76,6 +81,10 @@ Namespace SQLite
             End Set
 
         End Property
+
+        Public Overrides Sub Close()
+            Me.SQLiteDataReader.Close()
+        End Sub
 
         Public Overrides Function MoveNext()
             Try
@@ -93,11 +102,11 @@ Namespace SQLite
         Public Overrides Function Open(ByVal asQuery As String) As Boolean
 
             Try
-                Dim lSQLiteCommand As New SQLiteCommand
+                Dim sqlite_cmd As SQLiteCommand
+                sqlite_cmd = Me.ActiveConnection.Connection.CreateCommand()
+                sqlite_cmd.CommandText = asQuery
 
-                lSQLiteCommand.Connection = Me.ActiveConnection
-
-                Me.SQLiteDataReader = lSQLiteCommand.ExecuteReader(asQuery)
+                Me.SQLiteDataReader = sqlite_cmd.ExecuteReader()
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -115,6 +124,7 @@ Namespace SQLite
             Try
                 If Me.SQLiteDataReader.Read() Then
                     _EOF = False
+                    Me._RowIndex += 1
                     Return True
                 Else
                     _EOF = True

@@ -28,6 +28,9 @@ Namespace Database
 
         End Property
 
+        Public Overridable Sub Close()
+        End Sub
+
         Public Overridable Function MoveNext()
             Return True
         End Function

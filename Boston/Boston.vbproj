@@ -14,7 +14,7 @@
     <AssemblyName>Boston</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <OptionExplicit>On</OptionExplicit>
     <OptionCompare>Binary</OptionCompare>
     <OptionStrict>Off</OptionStrict>
@@ -222,6 +222,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Microsoft.SqlServer.SqlEnum.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic.Compatibility" />
     <Reference Include="MindFusion.Common, Version=1.2.3214.16975, Culture=neutral, PublicKeyToken=7fed53ada5b92263, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\MindFusion.Common.dll</HintPath>
@@ -334,6 +335,9 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.DispatchProxy, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.DispatchProxy.4.7.1\lib\net461\System.Reflection.DispatchProxy.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
@@ -448,6 +452,7 @@
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesDatabase\SQLite\tSQLiteRecordset.vb" />
     <Compile Include="ClassesDatabase\tGenericRecordset.vb" />
+    <Compile Include="ClassesDatabase\tRecordsetProxy.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageCategoryPropertyType.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageCategory.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageItemProperty.vb" />

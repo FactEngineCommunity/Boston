@@ -236,14 +236,93 @@ Namespace Boston
                 '------------------------------------------------                 
                 Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
-                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+#Region "SHIFT KEY DOWN - User Points to database"
+                    If My.Computer.Keyboard.ShiftKeyDown Then
+UserSelectedDatabaseSQLite:
+                        Using lrOpenFileDialog As New OpenFileDialog
+
+                            lrOpenFileDialog.Filter = "Boston Database (*.db)|*.db; *.db|All Files|*.*"
+
+                            If System.IO.Directory.Exists(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database") Then
+                                lrOpenFileDialog.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
+                            End If
+
+                            If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+
+                                If File.Exists(lrOpenFileDialog.FileName) Then
+                                    lsDatabaseLocation = lrOpenFileDialog.FileName
+                                    'Reaffirm/Set My.Settings.DatabaseConnectionString (for upgrades etc).
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    My.Settings.Save()
+                                    GoTo CheckExistsDatabaseLocation
+                                Else
+                                    MsgBox("No file exists at the given location/name.")
+                                End If
+                            End If
+
+                        End Using
+
+                    End If
+#End Region
+
+                    lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
+
+CheckExistsDatabaseLocationSQLite:
+                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+
+                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
+                        '-----------------------------------
+                        'Try and find the database locally
+                        '-----------------------------------
+                        Try
+                            lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
+                            If lsDatabaseLocation IsNot Nothing Then
+                                If System.IO.File.Exists(lsDatabaseLocation) Then
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+                                    If Not File.Exists(lsDatabaseLocation) Then GoTo StillCannotFindTheDatabase
+
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    lsConnectionString = My.Settings.DatabaseConnectionString
+                                    GoTo OpenConnection
+                                End If
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie.
+                        End Try
+
+StillCannotFindTheDatabaseSQLite:
+                        If Not My.Settings.SilentPreConfiguration Then
+
+                            lsMessage = "Cannot find the Boston database at the default/configured location:"
+                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
+                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
+                            lsMessage.AppendDoubleLineBreak("Click [Yes] to locate the database yourself or [No] to close Boston.")
+                            lsMessage.AppendDoubleLineBreak("The default name for the Boston database is boston.vdb")
+
+
+                            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                                GoTo UserSelectedDatabaseSQLite
+                            Else
+                                Return False
+                            End If
+
+                        End If
+                    End If
+                ElseIf My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
 
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
 #Region "SHIFT KEY DOWN - User Points to database"
                     If My.Computer.Keyboard.ShiftKeyDown Then
 UserSelectedDatabase:
-                        Using lrOpenFileDialog As New OpenFileDialog
+                            Using lrOpenFileDialog As New OpenFileDialog
 
                             lrOpenFileDialog.Filter = "Boston Database (*.vdb, *.mdb)|*.vdb; *.mdb|All Files|*.*"
 
@@ -299,7 +378,7 @@ CheckExistsDatabaseLocation:
                         End Try
 
 StillCannotFindTheDatabase:
-                        If Not My.Settings.SilentPreConfiguration Then
+                            If Not My.Settings.SilentPreConfiguration Then
 
                             lsMessage = "Cannot find the Boston database at the default/configured location:"
                             lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
@@ -317,38 +396,39 @@ StillCannotFindTheDatabase:
                         End If
 
 #Region "Abandoned 20220830"
-                            'If System.IO.File.Exists(lsLocalDatabaseLocation) Then
-                            '    lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
-                            '    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                            '    lsMessage = "Saving the following as the Database Connection String for your installation of Boston."
-                            '    lsMessage.AppendDoubleLineBreak(lrSQLConnectionStringBuilder.ConnectionString)
-                            '    lsMessage.AppendDoubleLineBreak("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
-                            '    lsMessage.AppendDoubleLineBreak("To make changes to the Boston database connection string, go to [Boston]->[Configuration]")
+                        'If System.IO.File.Exists(lsLocalDatabaseLocation) Then
+                        '    lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
+                        '    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        '    lsMessage = "Saving the following as the Database Connection String for your installation of Boston."
+                        '    lsMessage.AppendDoubleLineBreak(lrSQLConnectionStringBuilder.ConnectionString)
+                        '    lsMessage.AppendDoubleLineBreak("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
+                        '    lsMessage.AppendDoubleLineBreak("To make changes to the Boston database connection string, go to [Boston]->[Configuration]")
 
-                            '    If Not My.Settings.SilentPreConfiguration Then
-                            '        MsgBox(lsMessage)
-                            '    End If
+                        '    If Not My.Settings.SilentPreConfiguration Then
+                        '        MsgBox(lsMessage)
+                        '    End If
 
-                            '    My.Settings.Save()
-                            '    lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                            'Else
-                            '    lsMessage = "Cannot find the Boston database at:"
-                            '    lsMessage &= vbCrLf & vbCrLf
-                            '    lsMessage &= lsDatabaseLocation
-                            '    lsMessage &= vbCrLf
-                            '    lsMessage &= "or..."
-                            '    lsMessage &= vbCrLf
-                            '    lsMessage &= lsLocalDatabaseLocation
-                            '    lsMessage &= vbCrLf & vbCrLf
-                            '    'lsMessage &= "Adjust the setting, 'database_connection_str', in the 'Boston.exe.config' file and restart Boston."
-                            '    lsMessage &= "Adjust the Database Connection String for your database and restart Boston."
-                            '    MsgBox(lsMessage)
-                            '    frmCRUDBostonConfiguration.ShowDialog()
-                            '    Return False
-                            'End If
-                        End If
-                End If
+                        '    My.Settings.Save()
+                        '    lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        'Else
+                        '    lsMessage = "Cannot find the Boston database at:"
+                        '    lsMessage &= vbCrLf & vbCrLf
+                        '    lsMessage &= lsDatabaseLocation
+                        '    lsMessage &= vbCrLf
+                        '    lsMessage &= "or..."
+                        '    lsMessage &= vbCrLf
+                        '    lsMessage &= lsLocalDatabaseLocation
+                        '    lsMessage &= vbCrLf & vbCrLf
+                        '    'lsMessage &= "Adjust the setting, 'database_connection_str', in the 'Boston.exe.config' file and restart Boston."
+                        '    lsMessage &= "Adjust the Database Connection String for your database and restart Boston."
+                        '    MsgBox(lsMessage)
+                        '    frmCRUDBostonConfiguration.ShowDialog()
+                        '    Return False
+                        'End If
 #End Region
+                    End If
+                End If
+
 
 OpenConnection:
                 Dim regKey As Microsoft.Win32.RegistryKey

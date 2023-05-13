@@ -11,7 +11,17 @@ Namespace FactEngine
 
         Private FBMModel As FBM.Model
 
-        Public DatabaseConnectionString As String
+        Private ReadOnly _activeTransactions As List(Of IDbTransaction) = New List(Of IDbTransaction)()
+
+        Private _Connection As Data.SQLite.SQLiteConnection
+        Public Property Connection As Data.SQLite.SQLiteConnection
+            Get
+                Return Me._Connection
+            End Get
+            Set(value As Data.SQLite.SQLiteConnection)
+                Me._Connection = value
+            End Set
+        End Property
 
         Public Sub New(ByRef arFBMModel As FBM.Model,
                        ByVal asDatabaseConnectionString As String,
@@ -27,7 +37,9 @@ Namespace FactEngine
             Try
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
                 Me.Connected = True 'Connections are actually made for each Query.
-                lrSQLiteConnection.Close()
+                'lrSQLiteConnection.Close() 'Keep open for Boston. I.e. When SQLite is the database type for Boston itself.
+                Me._Connection = lrSQLiteConnection
+                Me.State = 1
             Catch ex As Exception
                 Me.Connected = False
                 Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
@@ -219,6 +231,31 @@ Namespace FactEngine
             End Try
         End Sub
 
+        Public Shadows Function BeginTrans() As SQLiteTransaction
+            Dim transaction = Me._Connection.BeginTransaction
+            _activeTransactions.Add(transaction)
+            Return transaction
+        End Function
+
+        Public Shadows Function BeginTransaction() As SQLiteTransaction
+            Return Me.BeginTrans
+        End Function
+
+        Public Overrides Sub Close()
+            Try
+                Me._Connection.Close()
+                Me.State = 0
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
 
         ''' <summary>
         ''' Changes the data type of the nominated column.
@@ -335,6 +372,27 @@ Namespace FactEngine
 
         End Sub
 
+        Public Overrides Sub CommitTrans()
+
+            Try
+                If _activeTransactions.Count = 0 Then
+                    Throw New InvalidOperationException("There are no active transactions to commit.")
+                End If
+
+                Dim transaction = _activeTransactions(_activeTransactions.Count - 1)
+                _activeTransactions.RemoveAt(_activeTransactions.Count - 1)
+                transaction.Commit()
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Overrides Function createDatabase(ByVal asDatabaseLocationName As String) As ORMQL.Recordset
 
             Dim lrRecordset As New ORMQL.Recordset
@@ -405,6 +463,21 @@ Namespace FactEngine
         Public Overrides Function DateTimeFormat() As String
             Return "yyyy-MM-dd HH:mm:ss"
         End Function
+
+        Public Overrides Sub Execute(asQuery As String)
+
+            Try
+                Call Me.GONonQuery(asQuery)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
 
         Public Overrides Function FormatDate(ByVal asOriginalDate As String,
                                                  Optional ByVal abIgnoreError As Boolean = False) As String
@@ -1340,6 +1413,39 @@ Namespace FactEngine
 
         End Sub
 
+        Public Overrides Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+
+            Try
+                If asDatabaseConnectionString IsNot Nothing Then
+                    Me.DatabaseConnectionString = asDatabaseConnectionString
+                End If
+
+                If Me.DatabaseConnectionString Is Nothing Then
+                    Throw New Exception("Must have Database Connection String for the database")
+                End If
+
+                Try
+                    Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                    Me.Connected = True 'Connections are actually made for each Query.
+                    Me._Connection = lrSQLiteConnection
+                    Me.State = 1
+                Catch ex As Exception
+                    Me.Connected = False
+                    Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
+                End Try
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         ''' <summary>
         ''' Creates or Recreates the Table in the database.
         ''' </summary>
@@ -1521,6 +1627,29 @@ Namespace FactEngine
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+
+        Public Overrides Sub RollbackTrans()
+
+            Try
+                If _activeTransactions.Count = 0 Then
+                    Throw New InvalidOperationException("There are no active transactions to rollback.")
+                End If
+
+                Dim transaction = _activeTransactions(_activeTransactions.Count - 1)
+                _activeTransactions.RemoveAt(_activeTransactions.Count - 1)
+                transaction.Rollback()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

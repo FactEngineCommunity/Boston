@@ -321,7 +321,7 @@ Namespace TableModelDictionary
         Public Function GetModelDictionaryCountByModel(ByVal ar_model As FBM.Model) As Integer
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

@@ -70,7 +70,7 @@ Public Class frmCRUDBostonConfiguration
             'Boston Tab
             Me.CheckBoxAutomaticallyCheckForUpdates.Checked = My.Settings.UseAutoUpdateChecker
 
-            Me.ComboBoxDatabaseType.Enabled = False
+            Me.ComboBoxDatabaseType.Enabled = True
 
             'Client/Server
             Me.CheckBoxUseRemoteUI.Checked = My.Settings.UseVirtualUI
@@ -277,7 +277,7 @@ Public Class frmCRUDBostonConfiguration
 
     Private Function check_fields(ByRef asReturnMessage As String) As Boolean
 
-        If Not Me.checkDatabaseConnectionString(asReturnMessage) Then
+        If Not Me.checkDatabaseConnectionString(asReturnMessage, Trim(Me.TextBoxDatabaseConnectionString.Text)) Then
             Return False
         End If
 
@@ -285,20 +285,28 @@ Public Class frmCRUDBostonConfiguration
 
     End Function
 
-    Private Function checkDatabaseConnectionString(ByRef asReturnMessage As String) As Boolean
+    Private Function checkDatabaseConnectionString(ByRef asReturnMessage As String,
+                                                   Optional ByVal asConnectionString As String = Nothing) As Boolean
 
-        Dim lsDatabaseLocation, lsDataProvider As String
+        Dim lsDatabaseLocation As String
+        Dim lsConnectionString As String
+
+        If asConnectionString IsNot Nothing Then
+            lsConnectionString = asConnectionString
+        Else
+            lsConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+        End If
 
         Try
+
             Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
 
             Try
                 lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
-                   .ConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+                   .ConnectionString = lsConnectionString
                 }
 
                 lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
-                lsDataProvider = lrSQLConnectionStringBuilder("Provider")
 
             Catch ex As Exception
                 asReturnMessage = "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
@@ -312,21 +320,20 @@ Public Class frmCRUDBostonConfiguration
                 Return False
             End If
 
-            If lsDataProvider <> "Microsoft.Jet.OLEDB.4.0" Then
-                asReturnMessage = "This version of Boston uses a MSJet database. Please fix the Data Provider in the Database Connection String and try again."
-                asReturnMessage &= vbCrLf & vbCrLf & "Try Provider=Microsoft.Jet.OLEDB.4.0"
-                Return False
-            End If
-
             Try
-                Dim ldbConnection As New ADODB.Connection
-                Call ldbConnection.Open(Trim(Me.TextBoxDatabaseConnectionString.Text))
-
+                Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                    Case Is = pcenumDatabaseType.SQLite
+                        If Database.SQLiteDatabase.CreateConnection(lsConnectionString) Is Nothing Then
+                            Throw New Exception("Can't connect to the database with that connection string.")
+                        End If
+                    Case Is = pcenumDatabaseType.MSJet
+                        Dim ldbConnection As New ADODB.Connection
+                        Call ldbConnection.Open(lsConnectionString)
+                End Select
             Catch ex As Exception
                 asReturnMessage &= "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
                 Return False
             End Try
-
 
             Return True
 
@@ -346,18 +353,22 @@ Public Class frmCRUDBostonConfiguration
     Sub LoadDatabaseTypes()
 
         Dim loWorkingClass As New Object
-        Dim llo_strategy_terms As New List(Of Object)
+        Dim larDatabaseType As New List(Of Object)
         Dim liReferenceTableId As Integer = 0
         Dim liInd As Integer = 0
         Dim liNewIndex As Integer = 0
 
         If pdbConnection.State <> 0 Then
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
-            llo_strategy_terms = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
+            larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
-            For liInd = 1 To llo_strategy_terms.Count
-                liNewIndex = Me.ComboBoxDatabaseType.Items.Add(llo_strategy_terms(liInd - 1).DatabaseType)
-                If llo_strategy_terms(liInd - 1).DatabaseType = My.Settings.DatabaseType Then
+            For liInd = 1 To larDatabaseType.Count
+
+                Dim liDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(larDatabaseType(liInd - 1).DatabaseType, pcenumDatabaseType.None)), pcenumDatabaseType)
+                Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
+                liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+
+                If larDatabaseType(liInd - 1).DatabaseType = My.Settings.DatabaseType Then
                     Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
                 End If
             Next
@@ -632,6 +643,74 @@ Public Class frmCRUDBostonConfiguration
             End If
 
         Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ComboBoxDatabaseType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxDatabaseType.SelectedIndexChanged
+
+        Try
+            Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                Case Is = pcenumDatabaseType.SQLite,
+                          pcenumDatabaseType.MSJet
+                    Me.ButtonFileSelect.Visible = True
+                    Me.ButtonFileSelect.Enabled = True
+                Case Else
+                    Me.ButtonFileSelect.Visible = False
+                    Me.ButtonFileSelect.Enabled = False
+            End Select
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonFileSelect_Click(sender As Object, e As EventArgs) Handles ButtonFileSelect.Click
+
+        Try
+            Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                Case Is = pcenumDatabaseType.SQLite
+                    Using lrOpenFileDialog As New OpenFileDialog
+
+                        If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+                            Dim lsReturnMessage As String = Nothing
+                            Dim lsConnectionString = "Data Source=" & lrOpenFileDialog.FileName & ";Version=3;"
+                            If Me.checkDatabaseConnectionString(lsReturnMessage, lsConnectionString) Then
+                                Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                            Else
+                                MsgBox("The file you selected is not a SQLite database.")
+                            End If
+                        End If
+
+                    End Using
+                Case Is = pcenumDatabaseType.MSJet
+                    Using lrOpenFileDialog As New OpenFileDialog
+
+                        If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+                            Dim lsReturnMessage As String = Nothing
+                            Dim lsConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lrOpenFileDialog.FileName
+                            If Me.checkDatabaseConnectionString(lsReturnMessage, lsConnectionString) Then
+                                Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                            Else
+                                MsgBox("The file you selected is not a MSJet database.")
+                            End If
+                        End If
+
+                    End Using
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

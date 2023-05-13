@@ -59,7 +59,7 @@ Namespace TableValueType
         Public Function ExistsValueType(ByVal arValueType As FBM.ValueType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -90,7 +90,7 @@ Namespace TableValueType
         Public Function ExistsValueTypeByModel(ByVal arValueType As FBM.ValueType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '-------------------------
             'Initialise return value
@@ -125,7 +125,7 @@ Namespace TableValueType
 
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -149,7 +149,7 @@ Namespace TableValueType
         Public Function GetValueTypeDetails(ByRef arValueType As FBM.ValueType) As FBM.ValueType
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -199,7 +199,7 @@ Namespace TableValueType
             Dim lsMessage As String
             Dim lrValueType As FBM.ValueType
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

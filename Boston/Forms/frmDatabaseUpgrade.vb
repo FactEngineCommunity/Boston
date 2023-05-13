@@ -91,7 +91,7 @@ Public Class frmDatabaseUpgrade
         Dim lsSQLQuery As String
         Dim lrRecordset As New ADODB.Recordset
 
-        Dim transaction As OleDb.OleDbTransaction = Nothing
+        Dim transaction As Object '20230513-VM-Was OleDb.OleDbTransaction = Nothing  '(Changed when moving to SQLite database)
 
         Try
 
@@ -160,10 +160,11 @@ Public Class frmDatabaseUpgrade
                                 If Trim(lsCommand) <> "" Then
                                     Try
                                         'Call pdbConnection.Execute(lsCommand)
-                                        Dim command As New OleDb.OleDbCommand(lsCommand)
-                                        command.Connection = pdb_OLEDB_connection
-                                        command.Transaction = transaction
-                                        Call command.ExecuteNonQuery()
+                                        '20230513-VM-Was (Changed when moved to SQLite database for Boston)
+                                        'Dim command As New OleDb.OleDbCommand(lsCommand)
+                                        'command.Connection = pdb_OLEDB_connection
+                                        'command.Transaction = transaction
+                                        'Call command.ExecuteNonQuery()
                                     Catch ex As Exception
 
                                         If lrDatabaseUpgradeSQL.AllowFail Then

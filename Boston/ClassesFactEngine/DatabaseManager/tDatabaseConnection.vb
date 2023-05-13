@@ -1,9 +1,22 @@
 ﻿Namespace FactEngine
     Public Class DatabaseConnection
 
+        Public DatabaseConnectionString As String = Nothing
+
         Public Connected As Boolean = False
 
         Public DefaultQueryLimit As Integer = 100
+
+        Public State As Integer = 0
+
+        Public Property ConnectionString As String
+            Get
+                Return Me.DatabaseConnectionString
+            End Get
+            Set(value As String)
+                Me.DatabaseConnectionString = value
+            End Set
+        End Property
 
         Public Overridable Function DataTypeWrapper(ByVal aiDataType As pcenumORMDataType) As String
             Return ""
@@ -44,6 +57,16 @@
         ''' </summary>
         ''' <param name="arRelation"></param>
         Public Overridable Sub AddForeignKey(ByRef arRelation As RDS.Relation)
+        End Sub
+
+        Public Overridable Sub BeginTrans()
+        End Sub
+
+        Public Overridable Sub BeginTransaction()
+            Call Me.BeginTrans()
+        End Sub
+
+        Public Overridable Sub Close()
         End Sub
 
         ''' <summary>
@@ -91,6 +114,10 @@
         Public Overridable Function dateToTextOperator() As String
             Return ""
         End Function
+
+        Public Overridable Sub Execute(asQuery As String)
+        End Sub
+
 
         Public Overridable Function FormatDate(ByVal asOriginalDate As String,
                                                Optional ByVal abIgnoreError As Boolean = False) As String
@@ -184,6 +211,9 @@
         Public Overridable Sub IndexUpdate(ByRef arIndex As RDS.Index)
         End Sub
 
+        Public Overridable Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+        End Sub
+
         ''' <summary>
         ''' Creates or Recreates the Table in the database.
         ''' </summary>
@@ -219,6 +249,12 @@
         ''' <param name="arTable"></param>
         ''' <param name="asNewName"></param>
         Public Overridable Sub RenameTable(ByRef arTable As RDS.Table, ByVal asNewName As String)
+        End Sub
+
+        Public Overridable Sub RollbackTrans()
+        End Sub
+
+        Public Overridable Sub CommitTrans()
         End Sub
 
         ''' <summary>

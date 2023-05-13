@@ -135,7 +135,7 @@ Namespace Database
             Dim lsSQLQuery As String
             Dim lrRecordset As New ADODB.Recordset
 
-            Dim transaction As OleDb.OleDbTransaction = Nothing
+            Dim transaction As Object '20230513-VM-Was OleDb.OleDbTransaction = Nothing '(Changed when moved to SQLite database for Boston)
             Dim locker As Object = New Object()
 
             Call Boston.WriteToStatusBar("Performing database upgrade from Version " & asFromVersionNr & " to Version " & asToVersionNr, True)
@@ -396,7 +396,7 @@ Namespace Database
 
 error_handler:
 
-            pdbConnection.Rollback()
+            pdbConnection.RollbackTrans()
             'Call transaction.Rollback()
 
             lsErrorMessage = Err.Number & ", " & Err.Source & ", " & Err.Description
