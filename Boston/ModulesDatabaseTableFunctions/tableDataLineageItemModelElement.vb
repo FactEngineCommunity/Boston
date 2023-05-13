@@ -36,7 +36,7 @@ Public Module tableDataLineageItemModelElement
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -66,7 +66,7 @@ Public Module tableDataLineageItemModelElement
                                                                 Optional abIgnoreErrors As Boolean = False) As List(Of DataLineage.DataLineageItemModelElement)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrDataLineageItemModelElement As DataLineage.DataLineageItemModelElement = Nothing
         Dim larDataLineageItemModelElement As New List(Of DataLineage.DataLineageItemModelElement)
@@ -116,7 +116,7 @@ Public Module tableDataLineageItemModelElement
                                                                                       ByVal asDataLineageItemName As String) As List(Of DataLineage.DataLineageItemModelElement)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrDataLineageItemModelElement As DataLineage.DataLineageItemModelElement
         Dim larDataLineageItemModelElement As New List(Of DataLineage.DataLineageItemModelElement)

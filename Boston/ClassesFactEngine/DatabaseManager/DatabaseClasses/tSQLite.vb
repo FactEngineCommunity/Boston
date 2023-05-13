@@ -232,9 +232,21 @@ Namespace FactEngine
         End Sub
 
         Public Shadows Function BeginTrans() As SQLiteTransaction
-            Dim transaction = Me._Connection.BeginTransaction
-            _activeTransactions.Add(transaction)
-            Return transaction
+            Try
+                Dim transaction = Me._Connection.BeginTransaction
+                _activeTransactions.Add(transaction)
+                Return transaction
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
+
+                Return Nothing
+            End Try
+
         End Function
 
         Public Shadows Function BeginTransaction() As SQLiteTransaction
@@ -244,6 +256,7 @@ Namespace FactEngine
         Public Overrides Sub Close()
             Try
                 Me._Connection.Close()
+                Me._Connection = Nothing
                 Me.State = 0
             Catch ex As Exception
                 Dim lsMessage As String
@@ -388,7 +401,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
             End Try
 
         End Sub
@@ -1210,7 +1223,10 @@ Namespace FactEngine
 
                 lrRecordset.Facts = larFact
                 lrRecordset.Reset()
-                lrSQLiteConnection.Close()
+
+                If Me.Connection Is Nothing Then
+                    lrSQLiteConnection.Close()
+                End If
 
                 'Run the SQL against the database
                 Return lrRecordset
@@ -1230,7 +1246,11 @@ Namespace FactEngine
             Try
                 lrRecordset.Query = asSQLQuery
 
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Dim lrSQLiteConnection As Data.SQLite.SQLiteConnection = Me.Connection
+
+                If Me.Connection Is Nothing Then
+                    lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                End If
 
                 If lrSQLiteConnection Is Nothing Then
                     Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
@@ -1248,7 +1268,9 @@ Namespace FactEngine
                     End Try
                 End Using
 
-                lrSQLiteConnection.Close()
+                If Me.Connection Is Nothing Then
+                    lrSQLiteConnection.Close()
+                End If
 
                 Return lrRecordset
 

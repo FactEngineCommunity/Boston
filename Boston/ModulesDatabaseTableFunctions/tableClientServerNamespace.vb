@@ -35,7 +35,7 @@ Public Module tableClientServerNamespace
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -65,7 +65,7 @@ Public Module tableClientServerNamespace
                                             Optional abIgnoreErrors As Boolean = False) As ClientServer.Namespace
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection
@@ -114,7 +114,7 @@ Public Module tableClientServerNamespace
     Public Function getNamespacesForProject(ByRef arProject As ClientServer.Project) As List(Of ClientServer.Namespace)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrNamespace As ClientServer.Namespace
         Dim larNamespace As New List(Of ClientServer.Namespace)

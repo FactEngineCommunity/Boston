@@ -152,45 +152,55 @@ Namespace FBM
                        Optional ByVal abMakeDictionaryEntryDirty As Boolean = False,
                        Optional ByVal asDBName As String = "")
 
-            Me.Model = arModel
-            Me.Symbol = asSymbol
-            Me.DBName = asDBName
+            Try
+                Me.Model = arModel
+                Me.Symbol = asSymbol
+                Me.DBName = asDBName
 
-            '-------------------------------------------------------------------------------
-            'NB Only used in Model.AddModelDictionaryEntry and Me.EqualsByOtherConceptType
-            '  A DictionaryEntry can have many ConceptTypes
-            '-------------------------------------------------------------------------------
-            Me.ConceptType = aiConceptType
+                '-------------------------------------------------------------------------------
+                'NB Only used in Model.AddModelDictionaryEntry and Me.EqualsByOtherConceptType
+                '  A DictionaryEntry can have many ConceptTypes
+                '-------------------------------------------------------------------------------
+                Me.ConceptType = aiConceptType
 
-            Select Case aiConceptType
-                Case Is = pcenumConceptType.GeneralConcept
-                    Me.isGeneralConcept = True
-                Case Is = pcenumConceptType.EntityType
-                    Me.isEntityType = True
-                Case Is = pcenumConceptType.ValueType
-                    Me.isValueType = True
-                Case Is = pcenumConceptType.FactType
-                    Me.isFactType = True
-                Case Is = pcenumConceptType.RoleConstraint
-                    Me.isRoleConstraint = True
-                Case Is = pcenumConceptType.Fact
-                    Me.isFact = True
-                Case Is = pcenumConceptType.Value
-                    Me.isValue = True
-                Case Is = pcenumConceptType.ModelNote
-                    Me.isModelNote = True
-            End Select
+                Select Case aiConceptType
+                    Case Is = pcenumConceptType.GeneralConcept
+                        Me.isGeneralConcept = True
+                    Case Is = pcenumConceptType.EntityType
+                        Me.isEntityType = True
+                    Case Is = pcenumConceptType.ValueType
+                        Me.isValueType = True
+                    Case Is = pcenumConceptType.FactType
+                        Me.isFactType = True
+                    Case Is = pcenumConceptType.RoleConstraint
+                        Me.isRoleConstraint = True
+                    Case Is = pcenumConceptType.Fact
+                        Me.isFact = True
+                    Case Is = pcenumConceptType.Value
+                        Me.isValue = True
+                    Case Is = pcenumConceptType.ModelNote
+                        Me.isModelNote = True
+                End Select
 
-            Me.Concept = New FBM.Concept(asSymbol, abMakeConceptDirty)
+                Me.Concept = New FBM.Concept(asSymbol, abMakeConceptDirty)
 
-            Me.ShortDescription = asShortDescription
-            Me.LongDescription = asLongDescription
+                Me.ShortDescription = asShortDescription
+                Me.LongDescription = asLongDescription
 
-            '--------------------------------------------------------
-            'NB Me.isDirty = False by default for DictionaryEntries
-            If Me.Model.Loaded Then
-                If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = abMakeDictionaryEntryDirty
-            End If
+                '--------------------------------------------------------
+                'NB Me.isDirty = False by default for DictionaryEntries
+                If Me.Model.Loaded Then
+                    If Me.Model.Page.FindAll(Function(x) x.Loaded = False) IsNot Nothing Then Me.isDirty = abMakeDictionaryEntryDirty
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

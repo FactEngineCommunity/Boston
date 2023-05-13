@@ -12,8 +12,8 @@ Namespace TableSubtypeRelationship
 
                 lsSQLQuery = "INSERT INTO MetaModelSubtypeRelationship"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.ModelElement.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arSubtypeRelationship.parentModelElement.Id) & "'"
@@ -52,7 +52,7 @@ Namespace TableSubtypeRelationship
         Public Function exists_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 '------------------------
@@ -96,7 +96,7 @@ Namespace TableSubtypeRelationship
             Dim lrEntityType As FBM.EntityType
             Dim lrParentEntityType As FBM.EntityType
             Dim lsSQLQuery As String
-            Dim lrRecordset As New ADODB.Recordset
+            Dim lrRecordset As New RecordsetProxy
             Dim lsId As String
 
             '-----------------------------
@@ -159,7 +159,7 @@ Namespace TableSubtypeRelationship
 
             Dim lrSupertypeModelElement As FBM.ModelObject
             Dim lsSQLQuery As String
-            Dim lrRecordset As New ADODB.Recordset
+            Dim lrRecordset As New RecordsetProxy
             Dim lsSubtypeModelElementId As String = arSubtypeModelElement.Id
             Dim lsId As String
             Dim lsMessage As String
@@ -249,7 +249,7 @@ SkipSubtypeRelationship:
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrParentEntityTypeInstance As FBM.EntityTypeInstance
             Dim lsMessage As String
-            Dim lrRecordset As New ADODB.Recordset
+            Dim lrRecordset As New RecordsetProxy
             Dim lsSQLQuery As String
             Dim lsId As String
 

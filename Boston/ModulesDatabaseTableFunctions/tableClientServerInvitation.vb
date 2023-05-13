@@ -104,7 +104,7 @@ Public Module tableClientServerInvitation
     Public Function getOpenInvitationsForUserByType(ByRef arUser As ClientServer.User, aiInvitationType As pcenumInvitationType) As List(Of ClientServer.Invitation)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larInvitation As New List(Of ClientServer.Invitation)
 
@@ -171,7 +171,7 @@ Public Module tableClientServerInvitation
     Public Function getOpenInvitationsForGroupByType(ByRef arGroup As ClientServer.Group, aiInvitationType As pcenumInvitationType) As List(Of ClientServer.Invitation)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larInvitation As New List(Of ClientServer.Invitation)
 

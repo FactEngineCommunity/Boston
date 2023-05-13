@@ -11,8 +11,8 @@ Namespace TableRoleConstraintArgument
 
                 lsSQLQuery = "INSERT INTO MetaModelRoleConstraintArgument"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arArgument.Model.ModelId) & "'"                
                 lsSQLQuery &= " ,'" & Trim(arArgument.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arArgument.RoleConstraint.Id) & "'"
@@ -86,7 +86,7 @@ Namespace TableRoleConstraintArgument
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
@@ -125,7 +125,7 @@ Namespace TableRoleConstraintArgument
                 Dim larRoleConstraintArgument As New List(Of FBM.RoleConstraintArgument)
                 Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic

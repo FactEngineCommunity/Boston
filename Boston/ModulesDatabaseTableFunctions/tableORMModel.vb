@@ -71,7 +71,7 @@ Namespace TableModel
         Public Function ExistsModelByName(ByVal asModelName As String) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -101,7 +101,7 @@ Namespace TableModel
         Public Function ExistsModelById(ByVal asModelId As String) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -200,7 +200,7 @@ Namespace TableModel
 
             Dim lrModel As FBM.Model
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '-----------------------------
             'Initialise the return value

@@ -74,7 +74,7 @@ Module tableReferenceField
     Function ExistsReferenceTableFieldByLabel(ByVal aiReferenceTableId As Integer, ByVal as_reference_field_label As String, Optional ByRef av_return_value As Integer = 0) As Boolean
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -105,7 +105,7 @@ Module tableReferenceField
     Function GetReferenceFieldLabel(ByVal aiReferenceFieldId As Integer) As String
 
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -132,7 +132,7 @@ Module tableReferenceField
 
         'returns the number of reference_fields
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -154,7 +154,7 @@ Module tableReferenceField
 
         Dim laa_reference_field As New List(Of String)
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -187,7 +187,7 @@ Module tableReferenceField
         'given a reference_field_Id
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -224,7 +224,7 @@ Module tableReferenceField
     Function GetReferenceTableFieldIdByLabel(ByVal aiReferenceTableId As Integer, ByVal as_reference_field_label As String) As Integer
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -251,7 +251,7 @@ Module tableReferenceField
     Function IsReferenceFieldRequired(ByVal l_reference_field_id As Integer) As Integer
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -285,7 +285,7 @@ Module tableReferenceField
         '    if l_reference_field_id = 0 then user is adding reference_field and there
         '       must be no previous instances of label in the database
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic

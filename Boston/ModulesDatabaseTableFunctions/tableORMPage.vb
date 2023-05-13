@@ -70,7 +70,7 @@ Namespace TablePage
         Public Function ExistsPageById(ByVal asPageId As String) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -100,7 +100,7 @@ Namespace TablePage
         Public Function GetPageCountByModel(ByVal as_ModelId As String, Optional ByVal abIncludeCorePages As Boolean = False)
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -130,7 +130,7 @@ Namespace TablePage
             Try
                 Dim lrPage As FBM.Page
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
                 Dim loPageLoadThread As System.Threading.Thread
                 Dim liPageLoadedInd As Integer = 0
 

@@ -18,6 +18,12 @@ Namespace Database
             End Get
         End Property
 
+        Public Overridable ReadOnly Property Fields As ADODB.Fields
+            Get
+                Return Nothing
+            End Get
+        End Property
+
         Default Public Overridable Property Item(ByVal asItemValue As String) As Object
             Get
                 Return Nothing
@@ -30,6 +36,10 @@ Namespace Database
 
         Public Overridable Sub Close()
         End Sub
+
+        Public Overridable Function MoveFirst()
+            Return True
+        End Function
 
         Public Overridable Function MoveNext()
             Return True

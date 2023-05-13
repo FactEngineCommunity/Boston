@@ -46,7 +46,7 @@ Public Module tableDatabaseUpgrade
     Function ExistsDatabaseUpgradeInRichmond(ByVal as_FromVersion_nr As String, ByVal as_ToVersion_nr As String) As Boolean
 
         Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New ADODB.Recordset
+        Dim lrRecordset As New RecordsetProxy
 
         lrRecordset.ActiveConnection = pdbConnection
         lrRecordset.CursorType = pcOpenStatic
@@ -90,7 +90,7 @@ Public Module tableDatabaseUpgrade
 
         Dim lrDatabaesUpgrade As DatabaseUpgrade.Upgrade
         Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New ADODB.Recordset
+        Dim lrRecordset As New RecordsetProxy
 
         Try
             Dim lsDatabaseVersionNumber As String = ""
@@ -138,7 +138,7 @@ Public Module tableDatabaseUpgrade
     Function GetMinimumUpgradeVersionRequired() As String
 
         Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New ADODB.Recordset
+        Dim lrRecordset As New RecordsetProxy
 
         lrRecordset.ActiveConnection = pdbConnection
         lrRecordset.CursorType = pcOpenStatic
@@ -188,7 +188,7 @@ Public Module tableDatabaseUpgrade
     Public Function GetNextRequiredUpgrade(ByRef ar_upgrade As DatabaseUpgrade.Upgrade, Optional ByVal abSilent As Boolean = False) As DatabaseUpgrade.Upgrade
 
         Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New ADODB.Recordset
+        Dim lrRecordset As New RecordsetProxy
 
         lrRecordset.ActiveConnection = pdbConnection
         lrRecordset.CursorType = pcOpenStatic
@@ -235,7 +235,7 @@ Public Module tableDatabaseUpgrade
     Function GetRequiredUpgradeCount() As Integer
 
         Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New ADODB.Recordset
+        Dim lrRecordset As New RecordsetProxy
 
         lrRecordset.ActiveConnection = pdbConnection
         lrRecordset.CursorType = pcOpenStatic

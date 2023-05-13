@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports System.Data.SQLite
+Imports ADODB
 
 Namespace SQLite
     Public Class Recordset
@@ -21,7 +22,28 @@ Namespace SQLite
 
         Public Overrides ReadOnly Property EOF As Boolean
             Get
-                Return Me._eof
+                If Me.SQLiteDataReader.HasRows Then
+                    Return Me._EOF
+                Else
+                    Return True
+                End If
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property Fields As ADODB.Fields
+            Get
+                '====================
+                Dim larField As New Database.Fields
+                Dim schemaTable As DataTable = Me.SQLiteDataReader.GetSchemaTable()
+                For Each row As DataRow In schemaTable.Rows
+                    Dim fieldType As DataTypeEnum = Me.GetFieldType(row("DataType").ToString)
+                    Dim lrField As New Database.FieldClass(row("ColumnName").ToString(),
+                                                   fieldType,
+                                                   Me.Item(row("ColumnName").ToString()))
+                    larField.Append(lrField)
+                Next
+                Return larField
+
             End Get
         End Property
 
@@ -29,7 +51,9 @@ Namespace SQLite
             Get
                 Try
                     If Me._RowIndex = -1 And Me.SQLiteDataReader.HasRows Then
-                        Me.Read()
+                        Dim lbSuccess = Me.Read()
+                        If lbSuccess Then Me._RowIndex += 1
+
                     End If
 
                     If asItemValue.IsNumeric Then
@@ -53,7 +77,12 @@ Namespace SQLite
                                 Return New With {.value = value}
                         End Select
                     Else
-                        Dim value As Object = Me.SQLiteDataReader.GetValue(Me.SQLiteDataReader.GetOrdinal(asItemValue))
+                        Dim value As Object = System.DBNull.Value
+                        Try
+                            value = Me.SQLiteDataReader.GetValue(Me.SQLiteDataReader.GetOrdinal(asItemValue))
+                        Catch
+                        End Try
+
                         Select Case Me.SQLiteDataReader.GetFieldType(Me.SQLiteDataReader.GetOrdinal(asItemValue))
                             Case GetType(Int32)
                                 Return New With {.value = CInt(value)}
@@ -73,7 +102,7 @@ Namespace SQLite
                         End Select
                     End If
                 Catch ex As Exception
-                    Return Nothing
+                    Return System.DBNull.Value
                 End Try
             End Get
             Set(ByVal value As Object)
@@ -83,12 +112,58 @@ Namespace SQLite
         End Property
 
         Public Overrides Sub Close()
-            Me.SQLiteDataReader.Close()
+            'Me.SQLiteDataReader.Close()
         End Sub
+
+
+        Private Function GetFieldType(dataType As String) As DataTypeEnum
+            Select Case dataType
+                Case "System.String", "System.Char", "System.Guid"
+                    Return DataTypeEnum.adVarChar
+                Case "System.Byte", "System.SByte", "System.Int16", "System.UInt16", "System.Int32", "System.UInt32", "System.Int64", "System.UInt64"
+                    Return DataTypeEnum.adInteger
+                Case "System.Single", "System.Double", "System.Decimal"
+                    Return DataTypeEnum.adDouble
+                Case "System.Boolean"
+                    Return DataTypeEnum.adBoolean
+                Case "System.DateTime"
+                    Return DataTypeEnum.adDate
+                Case Else
+                    Return DataTypeEnum.adEmpty
+            End Select
+        End Function
+
+        Private Function GetDefinedSize(dataType As ADODB.DataTypeEnum, columnSize As Object) As Integer
+            'Get the defined size of the field based on the data type
+            Select Case dataType
+                Case ADODB.DataTypeEnum.adBoolean, ADODB.DataTypeEnum.adInteger, ADODB.DataTypeEnum.adDouble, ADODB.DataTypeEnum.adDate
+                    Return 0
+                Case ADODB.DataTypeEnum.adVarChar, ADODB.DataTypeEnum.adLongVarBinary
+                    Return CInt(columnSize)
+                Case Else
+                    Throw New Exception("Unhandled ADODB data type: " + dataType.ToString())
+            End Select
+        End Function
+
+        Public Overrides Function MoveFirst()
+            'Here as a filler. Not needed/capabile-of-being-used for SLQiteDataReader
+            If Me._RowIndex = -1 Then
+                Call Me.Read()
+                Return True
+            Else
+                'Can't do anything
+                Return False
+            End If
+        End Function
 
         Public Overrides Function MoveNext()
             Try
-                Return Me.SQLiteDataReader.Read
+                Dim lbSuccess = Me.SQLiteDataReader.Read
+                If lbSuccess Then
+                    Me._RowIndex += 1
+                Else
+                    Me._EOF = True
+                End If
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

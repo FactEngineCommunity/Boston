@@ -10,8 +10,8 @@ Namespace TableRoleConstraintRole
             Try
                 lsSQLQuery = "INSERT INTO MetaModelRoleConstraintRole"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraintRole.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraintRole.RoleConstraint.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraintRole.Role.Id) & "'"
@@ -103,7 +103,7 @@ Namespace TableRoleConstraintRole
         Public Function ExistsRoleConstraintRole(ByVal arRoleConstraintRole As FBM.RoleConstraintRole) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 '------------------------
@@ -146,7 +146,7 @@ Namespace TableRoleConstraintRole
 
             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsId As String
 
             '-----------------------------

@@ -11,8 +11,8 @@ Namespace TableRole
             Try
                 lsSQLQuery = "INSERT INTO MetaModelRole"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arRole.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRole.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRole.Name) & "'"
@@ -82,7 +82,7 @@ Namespace TableRole
         Public Function ExistsRole(ByVal arRole As FBM.Role) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -118,7 +118,7 @@ Namespace TableRole
 
             Dim lrRole As FBM.Role
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsMessage As String = ""
             Dim lsId As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

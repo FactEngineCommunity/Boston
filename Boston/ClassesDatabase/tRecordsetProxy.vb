@@ -47,11 +47,17 @@ Public Class RecordsetProxy
 
     Default Public Overridable Property Item(ByVal asItemValue As String) As Object
         Get
-            If asItemValue.IsNumeric Then
-                Return Me._innerRecordset(CInt(asItemValue))
-            Else
-                Return Me._innerRecordset(asItemValue)
-            End If
+            Try
+                If Not asItemValue.IsNumeric Then
+                    Return Me._innerRecordset(asItemValue)
+
+                Else
+                    Return Me._innerRecordset(CInt(asItemValue))
+                End If
+            Catch ex As Exception
+                Return Nothing
+            End Try
+
 
         End Get
         Set(value As Object)
@@ -148,7 +154,7 @@ Public Class RecordsetProxy
     End Sub
 
     Public Sub MoveFirst() Implements _Recordset.MoveFirst
-        Throw New NotImplementedException()
+        Call Me._innerRecordset.MoveFirst
     End Sub
 
     Public Sub MoveLast() Implements _Recordset.MoveLast
@@ -284,7 +290,7 @@ Public Class RecordsetProxy
 
     Public ReadOnly Property Fields As Fields Implements _Recordset.Fields
         Get
-            Throw New NotImplementedException()
+            Return Me._innerRecordset.Fields
         End Get
     End Property
 

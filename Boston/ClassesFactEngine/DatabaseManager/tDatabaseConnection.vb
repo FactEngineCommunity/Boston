@@ -1,4 +1,6 @@
-﻿Namespace FactEngine
+﻿Imports System.Reflection
+
+Namespace FactEngine
     Public Class DatabaseConnection
 
         Public DatabaseConnectionString As String = Nothing
@@ -24,6 +26,28 @@
 
         Public Overridable Function DateTimeFormat() As String
             Return "yyyy-MM-dd HH:mm:ss"
+        End Function
+
+        Public Overridable Function DateWrap(ByVal asDate As String) As String
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FactEngine.SQLiteConnection)
+                        Return "'" & Me.FormatDate(asDate, True) & "'"
+                    Case Else
+                        Return "#" & asDate & "#"
+                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return "#" & asDate & "#"
+            End Try
+
         End Function
 
         Public Overridable Function GO(ByVal asQuery As String) As ORMQL.Recordset

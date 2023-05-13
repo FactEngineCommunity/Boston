@@ -5976,7 +5976,7 @@ SkipRDSProcessing:
             If Me.StoreAsXML Then
                 Call Me.LoadFromXML(aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
             Else
-                Call Me.LoadFromDatabase(abLoadPages, abUseThreading, aoBackgroundWorker)
+                Call Me.LoadFromDatabase(abLoadPages, abUseThreading And My.Settings.ModelLoadPagesUseThreading, aoBackgroundWorker)
             End If
 
             Me.Loaded = True

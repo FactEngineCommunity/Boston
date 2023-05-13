@@ -31,7 +31,7 @@ Public Module tableClientServerProjectGroup
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrGroup As ClientServer.Group
         Dim larGroup As New List(Of ClientServer.Group)
@@ -83,7 +83,7 @@ Public Module tableClientServerProjectGroup
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrProject As ClientServer.Project
         Dim larProject As New List(Of ClientServer.Project)

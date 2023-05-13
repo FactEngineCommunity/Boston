@@ -9,8 +9,8 @@ Public Module tableORMPredicatePart
         Try
             lsSQLQuery = "INSERT INTO MetaModelPredicatePart"
             lsSQLQuery &= " VALUES ("
-            lsSQLQuery &= " #" & Now & "#"
-            lsSQLQuery &= " ,#" & Now & "#"
+            lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+            lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
             lsSQLQuery &= " ,'" & Trim(arPredicatePart.Model.ModelId) & "'"
             lsSQLQuery &= " ,'" & Trim(arPredicatePart.FactTypeReading.Id) & "'"
             lsSQLQuery &= " ," & arPredicatePart.SequenceNr            
@@ -48,7 +48,7 @@ Public Module tableORMPredicatePart
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -130,7 +130,7 @@ Public Module tableORMPredicatePart
 
         Dim lrPredicatePart As FBM.PredicatePart
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
         Dim lsMessage As String = ""
 
         lREcordset.ActiveConnection = pdbConnection

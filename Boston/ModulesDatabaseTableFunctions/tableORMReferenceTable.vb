@@ -65,7 +65,7 @@ Namespace TableReferenceTable
         Function ExistsReferenceTableByName(ByVal as_reference_table_name As String, Optional ByRef av_return_value As Integer = 0) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -95,7 +95,7 @@ Namespace TableReferenceTable
         Function GetNextReferenceTableId() As Integer
 
             'Returns the next reference_field_id in sequence
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -122,7 +122,7 @@ Namespace TableReferenceTable
             'Returns the TableId of a ReferenceTable given the as_table_name
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -150,7 +150,7 @@ Namespace TableReferenceTable
             'Returns the TableId of a ReferenceTable given the as_table_name
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

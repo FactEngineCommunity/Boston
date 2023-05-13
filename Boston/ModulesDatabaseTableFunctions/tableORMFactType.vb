@@ -15,8 +15,8 @@ Namespace TableFactType
             Try
                 lsSQLQuery = "INSERT INTO MetaModelFactType"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(Replace(arFactType.Model.ModelId, "'", "`")) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arFactType.Id, "'", "`")) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arFactType.Name, "'", "`")) & "'"
@@ -110,7 +110,7 @@ Namespace TableFactType
         Function ExistsFactType(ByVal arFactType As FBM.FactType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -142,7 +142,7 @@ Namespace TableFactType
         Function ExistsFactTypeByModel(ByVal arFactType As FBM.FactType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -182,7 +182,7 @@ Namespace TableFactType
         Function ExistsFactTypeByAnyModel(ByVal arFactType As FBM.FactType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -231,7 +231,7 @@ Namespace TableFactType
 
             Dim lsMessage As String
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
 
@@ -385,7 +385,7 @@ FinishAnyway:
                 Dim lsFactTypeId As String = ""
 
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
@@ -426,7 +426,7 @@ FinishAnyway:
             Dim lsMessage As String
             Dim lrFactType As FBM.FactType
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -521,7 +521,7 @@ MoveNext:
             Dim lsMessage As String
             Dim lrFactType As FBM.FactType
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Dim larFactType As New List(Of FBM.FactType)
 
@@ -613,7 +613,7 @@ SkipFactType:
 
             Dim lsMessage As String
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Try
                 Dim lsFactTypeId As String = arFactType.Id
 
@@ -672,7 +672,7 @@ SkipRoleConstraint:
         Function getFactTypeCountByModel(ByVal as_ModelId As String) As Integer
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

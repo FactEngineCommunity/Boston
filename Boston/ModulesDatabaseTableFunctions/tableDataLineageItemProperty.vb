@@ -62,7 +62,7 @@ Public Module tableDataLineageItemProperty
     Public Function ExistsDataLineageItemProperty(ByVal arDataLineageItemProperty As DataLineage.DataLineageItemProperty) As Boolean
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             '------------------------
@@ -107,7 +107,7 @@ Public Module tableDataLineageItemProperty
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -137,7 +137,7 @@ Public Module tableDataLineageItemProperty
                                                                      ByVal asDataLineageItemCategory As String) As Integer
 
         Dim lsSQLQuery As String = ""
-        Dim lRecordset As New ADODB.Recordset
+        Dim lRecordset As New RecordsetProxy
 
         Try
             lRecordset.ActiveConnection = pdbConnection
@@ -172,7 +172,7 @@ Public Module tableDataLineageItemProperty
                                                       Optional abIgnoreErrors As Boolean = False) As DataLineage.DataLineageItemProperty
 
         Dim lsSQLQuery As String = ""
-        Dim lRecordset As New ADODB.Recordset
+        Dim lRecordset As New RecordsetProxy
 
         Try
             lRecordset.ActiveConnection = pdbConnection
@@ -221,7 +221,7 @@ Public Module tableDataLineageItemProperty
                                                             Optional abIgnoreErrors As Boolean = False) As DataLineage.DataLineageItemProperty
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrDataLineageItemProperty As DataLineage.DataLineageItemProperty = Nothing
 

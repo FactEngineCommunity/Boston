@@ -12,8 +12,8 @@ Namespace TableEntityType
 
                 lsSQLQuery = "INSERT INTO MetaModelEntityType"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arEntityType.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arEntityType.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arEntityType.Name, "'", "`")) & "'"
@@ -66,7 +66,7 @@ Namespace TableEntityType
         Public Function ExistsEntityType(ByVal arEntityType As FBM.EntityType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 '------------------------
@@ -108,7 +108,7 @@ Namespace TableEntityType
         Public Function ExistsEntityTypeByModel(ByVal arEntityType As FBM.EntityType) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 '------------------------
@@ -171,7 +171,7 @@ Namespace TableEntityType
             '  so that Object Identity is preserved within any one Model under review within Boston.
             '------------------------------------------------------------------------------------------------------------
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -202,7 +202,7 @@ Namespace TableEntityType
 
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -227,7 +227,7 @@ Namespace TableEntityType
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
@@ -285,7 +285,7 @@ Namespace TableEntityType
             Dim lb_at_least_one_entity_type_found As Boolean = False 'Safeguard. Usually we don't require this type of simplistic Boolean, however
             'the two sets of SQL make it easier to manage this way. Leave here for this function.
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsId As String
 
             lREcordset.ActiveConnection = pdbConnection
@@ -369,7 +369,7 @@ Namespace TableEntityType
             Dim lrEntityType As New FBM.EntityType
             Dim lr_parentEntityType As New FBM.EntityType
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

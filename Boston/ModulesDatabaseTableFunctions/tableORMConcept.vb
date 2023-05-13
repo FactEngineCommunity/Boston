@@ -66,7 +66,7 @@
         Public Function ExistsConcept(ByVal ar_concept As FBM.Concept) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
 

@@ -33,7 +33,7 @@ Public Module tableDataLineageItem
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -63,7 +63,7 @@ Public Module tableDataLineageItem
                                                     Optional abIgnoreErrors As Boolean = False) As DataLineage.DataLineageItem
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection

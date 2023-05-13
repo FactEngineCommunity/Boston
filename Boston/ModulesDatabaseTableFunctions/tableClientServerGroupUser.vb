@@ -30,7 +30,7 @@ Public Module tableClientServerGroupUser
     Public Function GetGroupsCreatedByUser(ByRef arUser As ClientServer.User) As List(Of ClientServer.Group)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larGroup As New List(Of ClientServer.Group)
 
@@ -75,7 +75,7 @@ Public Module tableClientServerGroupUser
     Public Function GetGroupsForUser(ByRef arUser As ClientServer.User) As List(Of ClientServer.Group)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larGroup As New List(Of ClientServer.Group)
 
@@ -120,7 +120,7 @@ Public Module tableClientServerGroupUser
     Public Function GetUsersForGroup(ByRef arGroup As ClientServer.Group) As List(Of ClientServer.User)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larUser As New List(Of ClientServer.User)
 
@@ -172,7 +172,7 @@ Public Module tableClientServerGroupUser
     Public Function GetUsersForGroupOnProject(ByRef arGroup As ClientServer.Group, ByRef arProject As ClientServer.Project) As List(Of ClientServer.User)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larUser As New List(Of ClientServer.User)
 

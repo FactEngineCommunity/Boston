@@ -58,7 +58,7 @@ Namespace TableFactTypeInstance
         Public Function ExistsFactTypeInstance(ByVal arFactTypeInstance As FBM.FactTypeInstance) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -90,7 +90,7 @@ Namespace TableFactTypeInstance
             '-------------------------------------------------------------------------------------------------
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -124,7 +124,7 @@ Namespace TableFactTypeInstance
             Dim lrRoleInstance As FBM.RoleInstance
             Dim lsMessage As String = ""
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lrRole As FBM.Role
             Dim lrFactTypeInstance As FBM.FactTypeInstance
 
@@ -403,7 +403,7 @@ Namespace TableFactTypeInstance
             Dim lrRoleInstance As FBM.RoleInstance
             'Dim lrRole As FBM.Role
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

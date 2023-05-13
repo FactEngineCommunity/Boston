@@ -11,8 +11,8 @@ Namespace TableFact
             Try
                 lsSQLQuery = "INSERT INTO MetaModelFact"
                 lsSQLQuery &= " VALUES("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & arFact.Model.ModelId & "'"
                 lsSQLQuery &= " ,'" & arFact.Symbol & "'"
                 lsSQLQuery &= " ,'" & arFact.FactType.Id & "'"
@@ -78,7 +78,7 @@ Namespace TableFact
             'The FactTypeId or RowId is the Symbol attribute in the Fact table
             '------------------------------------------------------------------
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -115,7 +115,7 @@ Namespace TableFact
             Dim lsMessage As String
 
             Dim lsSQLQuery As String
-            Dim lRecordset As New ADODB.Recordset
+            Dim lRecordset As New RecordsetProxy
 
             Try
 

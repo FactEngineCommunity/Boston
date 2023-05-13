@@ -68,7 +68,7 @@ Namespace TableModelNote
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
@@ -103,7 +103,7 @@ Namespace TableModelNote
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
@@ -136,7 +136,7 @@ Namespace TableModelNote
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lRecordset As New ADODB.Recordset
+                Dim lRecordset As New RecordsetProxy
 
                 Dim lsMessage As String
 
@@ -222,7 +222,7 @@ Namespace TableModelNote
 
             Dim lrModelNote As FBM.ModelNote
             Dim lsSQLQuery As String = ""
-            Dim lRecordset As New ADODB.Recordset
+            Dim lRecordset As New RecordsetProxy
 
             Dim lsMessage As String
 

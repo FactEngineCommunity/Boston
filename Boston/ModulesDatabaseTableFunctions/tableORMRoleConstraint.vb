@@ -16,8 +16,8 @@ Namespace TableRoleConstraint
             Try
                 lsSQLQuery = "INSERT INTO MetaModelRoleConstraint"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraint.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraint.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(arRoleConstraint.Name) & "'"
@@ -51,7 +51,7 @@ Namespace TableRoleConstraint
         Public Function ExistsRoleConstraint(ByVal arRoleConstraint As FBM.RoleConstraint) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -103,7 +103,7 @@ Namespace TableRoleConstraint
 
                 Dim lrFactType As FBM.FactType
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
@@ -247,7 +247,7 @@ LastResortObjectifyingEntityType:
             Try
                 Dim lsMessage As String
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 Dim lrFactType As FBM.FactType
 
@@ -385,7 +385,7 @@ LastResortObjectifyingEntityType:
         Function getRoleConstraintCountByModel(ByVal ar_model As FBM.Model) As Integer
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -406,7 +406,7 @@ LastResortObjectifyingEntityType:
             Dim lsMessage As String
             Dim lrRoleConstraint As FBM.RoleConstraint
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Dim lrFactType As FBM.FactType
 
@@ -550,7 +550,7 @@ LastResortObjectifyingEntityType:
 
             Dim lrRole As FBM.Role
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsMessage As String = ""
             Dim lsId As String
 

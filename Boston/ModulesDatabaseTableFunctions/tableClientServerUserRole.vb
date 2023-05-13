@@ -31,7 +31,7 @@ Public Module tableClientServerUserRole
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrRole As ClientServer.Role
         Dim larRole As New List(Of ClientServer.Role)

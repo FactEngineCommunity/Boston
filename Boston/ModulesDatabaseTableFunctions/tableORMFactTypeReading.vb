@@ -10,8 +10,8 @@ Namespace TableFactTypeReading
             Try
                 lsSQLQuery = "INSERT INTO MetaModelFactTypeReading"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arFactTypeReading.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arFactTypeReading.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arFactTypeReading.FactType.Id, "'", "`")) & "'"
@@ -36,7 +36,7 @@ Namespace TableFactTypeReading
         Public Function ExistsFactTypeReading(ByVal arFactTypeReading As FBM.FactTypeReading) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -92,7 +92,7 @@ Namespace TableFactTypeReading
 
             Dim lrFactTypeReading As FBM.FactTypeReading
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsMessage As String = ""
 
             lREcordset.ActiveConnection = pdbConnection

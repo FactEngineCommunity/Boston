@@ -12,8 +12,8 @@ Namespace TableValueTypeValueConstraint
 
                 lsSQLQuery = "INSERT INTO MetaModelValueTypeValueConstraint"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(arValueType.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arValueType.Id) & "'"
                 lsSQLQuery &= " ,'" & Database.MakeStringSafe(Trim(ar_concept.Symbol)) & "'"
@@ -48,7 +48,7 @@ Namespace TableValueTypeValueConstraint
         Public Function ExistsValueTypeValueConstraint(ByVal arValueType As FBM.ValueType, ByVal ar_concept As FBM.Concept) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 '------------------------
@@ -87,7 +87,7 @@ Namespace TableValueTypeValueConstraint
         Sub GetValueConstraintsByValueType(ByRef arValueType As FBM.ValueType)
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
 

@@ -11,8 +11,8 @@ Namespace TableJoinPathRole
             Try
                 lsSQLQuery = "INSERT INTO MetaModelJoinPathRole"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(Replace(arJoinPathRole.Argument.Model.ModelId, "'", "`")) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arJoinPathRole.Argument.Id, "'", "`")) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arJoinPathRole.Role.Id, "'", "`")) & "'"
@@ -35,7 +35,7 @@ Namespace TableJoinPathRole
 
             Try
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
                 '------------------------
                 'Initialise return value
@@ -82,7 +82,7 @@ Namespace TableJoinPathRole
                 Dim lrRole As FBM.Role
                 Dim lrJoinPath As New FBM.JoinPath
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
                 Dim lsId As String
 
                 lREcordset.ActiveConnection = pdbConnection

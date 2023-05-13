@@ -49,7 +49,7 @@ Namespace Language
         Public Function ExistsLPTSWS(ByRef arLPTSWS As Language.LanguagePhraseTokenSequenceWordSense) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -83,7 +83,7 @@ Namespace Language
             Dim lsMessage As String
             Dim lrLPTSWS As Language.LanguagePhraseTokenSequenceWordSense
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

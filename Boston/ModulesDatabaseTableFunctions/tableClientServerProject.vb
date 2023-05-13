@@ -35,7 +35,7 @@ Public Module tableClientServerProject
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -63,7 +63,7 @@ Public Module tableClientServerProject
     Function GetProjectCountByCreatedByUser(ByVal arUser As ClientServer.User) As Integer
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -85,7 +85,7 @@ Public Module tableClientServerProject
                                           Optional abIgnoreErrors As Boolean = False) As ClientServer.Project
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection
@@ -126,7 +126,7 @@ Public Module tableClientServerProject
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
-			Return Nothing
+            Return Nothing
         End Try
 
     End Function
@@ -136,7 +136,7 @@ Public Module tableClientServerProject
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrProject As ClientServer.Project
 
@@ -189,7 +189,7 @@ Public Module tableClientServerProject
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

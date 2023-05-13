@@ -13,8 +13,8 @@ Namespace TableModelDictionary
             Try
                 lsSQLQuery = "INSERT INTO MetaModelModelDictionary"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= ",'" & Trim(arModelDictionaryEntry.Model.ModelId) & "'"
                 lsSQLQuery &= ",'" & Trim(Replace(arModelDictionaryEntry.Symbol, "'", "`")) & "'"
                 lsSQLQuery &= ",'" & Trim(Replace(arModelDictionaryEntry.ShortDescription, "'", "`")) & "'"
@@ -105,7 +105,7 @@ Namespace TableModelDictionary
 
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -140,7 +140,7 @@ Namespace TableModelDictionary
 
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
 
@@ -174,7 +174,7 @@ Namespace TableModelDictionary
         Function get_model_concept_count_by_type(Optional ByVal aiConceptType As pcenumConceptType = Nothing) As Integer
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -201,7 +201,7 @@ Namespace TableModelDictionary
 
             Dim lrDictionaryEntry As FBM.DictionaryEntry
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -244,8 +244,8 @@ Namespace TableModelDictionary
 
                 lREcordset.Open(lsSQLQuery)
 
-                If Not lREcordset.EOF Then
-                    While Not lREcordset.EOF
+
+                While Not lREcordset.EOF
 
                         'If lREcordset("IsEntityType").Value = True Then
                         '    liConceptType = pcenumConceptType.EntityType
@@ -266,7 +266,7 @@ Namespace TableModelDictionary
                         'End If
                         'CType([Enum].Parse(GetType(pcenumRoleConstraintType), lREcordset("RoleConstraintType").Value), pcenumRoleConstraintType)
 
-                        lrDictionaryEntry = New FBM.DictionaryEntry(ar_model, Trim(lREcordset("Symbol").Value), pcenumConceptType.GeneralConcept, , , False)
+                        lrDictionaryEntry = New FBM.DictionaryEntry(ar_model, Trim(NullVal(lREcordset("Symbol").Value, "")), pcenumConceptType.GeneralConcept, , , False)
 
                         lrDictionaryEntry.isEntityType = lREcordset("IsEntityType").Value
                         lrDictionaryEntry.isValueType = lREcordset("IsValueType").Value
@@ -299,9 +299,9 @@ Namespace TableModelDictionary
 
                         lREcordset.MoveNext()
                     End While
-                End If
 
-                lREcordset.Close()
+
+                    lREcordset.Close()
 
                 Return ar_model.ModelDictionary
 
@@ -433,8 +433,8 @@ Namespace TableModelDictionary
                 lsSQLQuery &= "   ,IsRoleConstraint = " & arModelDictionaryEntry.isRoleConstraint
                 lsSQLQuery &= "   ,IsModelNote = " & arModelDictionaryEntry.isModelNote
                 lsSQLQuery &= "   ,IsGeneralConcept = " & arModelDictionaryEntry.isGeneralConcept
-                lsSQLQuery &= "   ,StartDate = Now"
-                lsSQLQuery &= "   ,EndDate = #31/12/9999#"
+                lsSQLQuery &= "   ,StartDate = " & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "   ,EndDate = " & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 If arModelDictionaryEntry.isEntityType Or arModelDictionaryEntry.isValueType Or arModelDictionaryEntry.isFactType Then
                     lsSQLQuery &= "   ,DBName = '" & Trim(arModelDictionaryEntry.DBName) & "'"
                 End If

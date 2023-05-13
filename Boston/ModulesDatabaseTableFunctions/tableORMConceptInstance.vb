@@ -11,8 +11,8 @@ Namespace TableConceptInstance
             Try
                 lsSQLQuery = "INSERT INTO ModelConceptInstance"
                 lsSQLQuery &= "  VALUES("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= ",'" & Trim(arConceptInstance.ModelId) & "'"
                 lsSQLQuery &= ",'" & Trim(arConceptInstance.PageId) & "'"
                 lsSQLQuery &= ",'" & Replace(Trim(arConceptInstance.Symbol), "'", "`") & "'"
@@ -124,7 +124,7 @@ Namespace TableConceptInstance
         Public Sub GetConceptInstanceDetails(ByRef arConceptInstance As FBM.ConceptInstance)
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -158,7 +158,7 @@ Namespace TableConceptInstance
             Try
                 Dim lrConceptInstance As FBM.ConceptInstance
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
 
                 lREcordset.ActiveConnection = pdbConnection
@@ -213,7 +213,7 @@ Namespace TableConceptInstance
             Try
                 Dim lrPage As FBM.Page
                 Dim lsSQLQuery As String = ""
-                Dim lREcordset As New ADODB.Recordset
+                Dim lREcordset As New RecordsetProxy
 
 
                 lREcordset.ActiveConnection = pdbConnection
@@ -265,7 +265,7 @@ Namespace TableConceptInstance
                                               Optional ByVal abReturnExistingConceptInstance As Boolean = True) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -313,7 +313,7 @@ Namespace TableConceptInstance
         Public Function ExistsConceptInstanceByModelPageConceptTypeRoleId(ByVal arConceptInstance As FBM.ConceptInstance) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

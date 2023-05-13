@@ -35,7 +35,7 @@ Public Module tableClientServerProjectUserRole
                                              Optional ByVal abGetFunctions As Boolean = False) As List(Of ClientServer.Role)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larRole As New List(Of ClientServer.Role)
 

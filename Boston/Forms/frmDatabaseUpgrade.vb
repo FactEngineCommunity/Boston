@@ -231,7 +231,7 @@ Public Class frmDatabaseUpgrade
 
                             Dim lbIsLastRequiredUpgrade As Boolean = Database.IsLastRequiredUpgradeById(CInt(aiUpgradeId))
 
-                            If Not Database.Database.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute, lbIsLastRequiredUpgrade) Then
+                            If Not Database.DatabaseModule.ExecuteUpgradeCode(lrDatabaseUpgradeSQL.CodeToExecute, lbIsLastRequiredUpgrade) Then
                                 GoTo error_handler
                             End If
                             transaction = pdb_OLEDB_connection.BeginTransaction()

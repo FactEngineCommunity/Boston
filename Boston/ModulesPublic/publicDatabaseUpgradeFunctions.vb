@@ -131,8 +131,8 @@ Namespace DatabaseUpgradeFunctions
                     If Trim(NullVal(lrRecordset("Symbol2").Value, "")) <> "" Then
                         lsSQLQuery = "INSERT INTO MetaModelPredicatePart"
                         lsSQLQuery &= " VALUES ("
-                        lsSQLQuery &= " #" & Now & "#"
-                        lsSQLQuery &= " ,#" & Now & "#"
+                        lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                        lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                         lsSQLQuery &= " ,'" & Trim(lrRecordset("ModelId").Value) & "'"
                         lsSQLQuery &= " ,'" & Trim(lrRecordset("FactTypeReadingId").Value) & "'"
                         lsSQLQuery &= " ," & lrRecordset("SequenceNr").Value + 1

@@ -34,7 +34,7 @@ Module tableClientServerGroup
     Public Sub getGroupDetailsById(ByVal asGroupId As String, ByRef arGroup As ClientServer.Group)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection

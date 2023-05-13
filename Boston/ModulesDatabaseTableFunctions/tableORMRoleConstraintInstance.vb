@@ -30,7 +30,7 @@
         Public Function getRoleConstraintInstanceCountForPage(ByVal ar_page As FBM.Page)
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -65,7 +65,7 @@
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsMessage As String = ""
 
             lREcordset.ActiveConnection = pdbConnection

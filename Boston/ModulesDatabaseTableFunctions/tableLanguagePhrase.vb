@@ -42,7 +42,7 @@ Namespace Language
         Public Function ExistsLanguagePhrase(ByVal arLanguagePhrase As Language.LanguagePhrase) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -72,7 +72,7 @@ Namespace Language
         Sub GetLanguagePhraseDetails(ByRef arLanguagePhrase As Language.LanguagePhrase)
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -121,7 +121,7 @@ Namespace Language
             Dim lsMessage As String
             Dim lrLanguagePhrase As Language.LanguagePhrase
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

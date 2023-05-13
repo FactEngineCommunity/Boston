@@ -10,14 +10,14 @@ Module tableORMFactInstance
     Public Sub GetFactsForFactTypeInstance(ByRef arFactTypeInstance As FBM.FactTypeInstance)
 
         Dim lsSQLQuery As String = ""
-        Dim lRecordset As New ADODB.Recordset
+        Dim lRecordset As New RecordsetProxy
 
         lRecordset.ActiveConnection = pdbConnection
         lRecordset.CursorType = pcOpenStatic
 
         Try
 
-            lsSQLQuery = "  SELECT f.Symbol, fci.x, fci.y, fd.RoleId, fd.ValueSymbol, fdci.x, fdci.y"
+            lsSQLQuery = "  SELECT f.Symbol, fci.x AS FCIX, fci.y AS FCIY, fd.RoleId, fd.ValueSymbol, fdci.x, fdci.y"
             lsSQLQuery &= "   FROM MetaModelFact f,"
             lsSQLQuery &= "        MetaModelFactData fd,"
             lsSQLQuery &= "        ModelConceptInstance fci," 'Fact
@@ -65,8 +65,8 @@ Module tableORMFactInstance
                     lrFactInstance = New FBM.FactInstance(lsFactId, arFactTypeInstance)
                     lsSuccessFactId = ""
 
-                    lrFactInstance.X = lRecordset("fci.x").Value
-                    lrFactInstance.Y = lRecordset("fci.y").Value
+                    lrFactInstance.X = lRecordset("FCIX").Value
+                    lrFactInstance.Y = lRecordset("FCIY").Value
                     Dim lrFactDataInstance As FBM.FactDataInstance
 
                     '-----------------------------------

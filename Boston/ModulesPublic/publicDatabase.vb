@@ -3,7 +3,7 @@ Imports adox
 
 Namespace Database
 
-    Public Module Database
+    Public Module DatabaseModule
 
         Public Sub CompactAndRepairDatabase()
 

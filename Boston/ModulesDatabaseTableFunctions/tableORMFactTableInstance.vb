@@ -34,7 +34,7 @@ Namespace TableFactTableInstance
             '-------------------------------------------------------------------------------------------------
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -58,7 +58,7 @@ Namespace TableFactTableInstance
 
             Dim lrConceptInstance As New FBM.ConceptInstance
 
-            lrConceptInstance.ModelId = arFactTable.model.ModelId
+            lrConceptInstance.ModelId = arFactTable.Model.ModelId
             lrConceptInstance.PageId = arFactTable.Page.PageId
             lrConceptInstance.Symbol = arFactTable.Id
             lrConceptInstance.ConceptType = pcenumConceptType.FactTable
@@ -84,7 +84,7 @@ Namespace TableFactTableInstance
 
             Dim lrFactTableInstance As FBM.FactTable
             Dim lsSQLQuery As String = ""
-            Dim lRecordset As New ADODB.Recordset
+            Dim lRecordset As New RecordsetProxy
 
             lRecordset.ActiveConnection = pdbConnection
             lRecordset.CursorType = pcOpenStatic

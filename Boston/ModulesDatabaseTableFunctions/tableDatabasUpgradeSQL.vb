@@ -11,7 +11,7 @@ Public Module tableDatabasUpgradeSQL
     Function GetUpgradeSequenceStepCount(ByVal ai_upgrade_id As Integer) As Integer
 
         Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New ADODB.Recordset
+        Dim lrRecordset As New RecordsetProxy
 
         Try
             lrRecordset.ActiveConnection = pdbDatabaseUpgradeConnection

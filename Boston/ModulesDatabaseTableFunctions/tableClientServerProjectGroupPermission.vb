@@ -64,7 +64,7 @@ Module tableClientServerProjectGroupPermission
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrProjectGroupPermission As ClientServer.ProjectGroupPermission
 

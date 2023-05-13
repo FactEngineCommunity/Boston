@@ -12,8 +12,8 @@ Namespace TableValueType
             Try
                 lsSQLQuery = "INSERT INTO MetaModelValueType"
                 lsSQLQuery &= " VALUES ("
-                lsSQLQuery &= " #" & Now & "#"
-                lsSQLQuery &= " ,#" & Now & "#"
+                lsSQLQuery &= pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
+                lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
                 lsSQLQuery &= " ,'" & Trim(Replace(arValueType.Model.ModelId, "'", "`")) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arValueType.Id, "'", "`")) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arValueType.Name, "'", "`")) & "'"

@@ -42,7 +42,7 @@ Namespace TableUnifiedOntology
         Public Function ExistsUnifiedOntology(ByVal arUnifiedOntology As Ontology.UnifiedOntology) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             '------------------------
             'Initialise return value
@@ -72,7 +72,7 @@ Namespace TableUnifiedOntology
 
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -91,7 +91,7 @@ Namespace TableUnifiedOntology
         Sub GetUnifiedOntologyDetails(ByRef arUnifiedOntology As Ontology.UnifiedOntology)
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             Try
                 lREcordset.ActiveConnection = pdbConnection
@@ -165,7 +165,7 @@ Namespace TableUnifiedOntology
             Dim lsMessage As String
             Dim lrUnifiedOntology As Ontology.UnifiedOntology
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic

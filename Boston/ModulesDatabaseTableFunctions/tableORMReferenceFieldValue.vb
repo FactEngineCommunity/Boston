@@ -89,7 +89,7 @@ Namespace TableReferenceFieldValue
         Function ExistsReferenceFieldValue(ByVal ar_reference_field_value As tReferenceFieldValue, Optional ByVal av_return_value As Object = Nothing) As Boolean
 
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -122,7 +122,7 @@ Namespace TableReferenceFieldValue
                                         Optional ByVal abIgnoreErrors As Boolean = False) As String
 
             Dim lsSQLQuery As String
-            '20230513-VM-Was - Dim lREcordset As New ADODB.Recordset 'Changed when moved to SQLite database
+            '20230513-VM-Was - Dim lREcordset As New RecordsetProxy 'Changed when moved to SQLite database
             Dim lRecordset As New RecordsetProxy()
 
             Try
@@ -135,10 +135,10 @@ Namespace TableReferenceFieldValue
                 lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
                 lsSQLQuery &= " AND reference_field_Id = " & aiReference_field_id
 
-                lREcordset.Open(lsSQLQuery)
+                lRecordset.Open(lsSQLQuery)
 
-                If Not lREcordset.EOF Then
-                    GetReferenceFieldValue = lREcordset("Data").Value
+                If Not lRecordset.EOF Then
+                    GetReferenceFieldValue = lRecordset("Data").Value
                 Else
                     If Not abIgnoreErrors Then
                         MsgBox("Error: get_reference_field_value_data: no record returned: parameter: aiReferenceTableId=" & aiReferenceTableId & ", aiReference_field_id=" & aiReference_field_id)
@@ -146,8 +146,8 @@ Namespace TableReferenceFieldValue
                     GetReferenceFieldValue = ""
                 End If
 
-                lREcordset.Close()
-                lREcordset = Nothing
+                lRecordset.Close()
+                lRecordset = Nothing
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -180,7 +180,7 @@ Namespace TableReferenceFieldValue
             Dim laaReferenceFieldList As New List(Of String)
             Dim lsFieldName As String = ""
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
             Dim lsOrderByClause As String = " ORDER BY "
             Dim liFieldCount As Integer
 
@@ -215,9 +215,9 @@ Namespace TableReferenceFieldValue
 
 #End Region
 
-                lsSQLQuery = "SELECT rfv1.row_id,"
+                lsSQLQuery = "SELECT rfv1.row_id AS RowId,"
                 For liInd = 1 To liFieldCount
-                    lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".data"
+                    lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".data AS [Data]"
                     If liInd < liFieldCount Then
                         lsSQLQuery &= ","
                     End If
@@ -245,6 +245,9 @@ Namespace TableReferenceFieldValue
                 Next
                 lsSQLQuery &= lsOrderByClause
 
+                lREcordset = New RecordsetProxy
+                lREcordset.ActiveConnection = pdbConnection
+                lREcordset.CursorType = ADODB.CursorTypeEnum.adOpenStatic
                 lREcordset.Open(lsSQLQuery)
 
                 '------------------------------------
@@ -264,48 +267,52 @@ Namespace TableReferenceFieldValue
 
                 Dim lrReferenceTuple As New ReferenceTuple
 
-                If Not lREcordset.EOF Then
-                    While Not lREcordset.EOF
-                        loTupleObject = loTuple.clone
-                        '-------------------
-                        'Set the values
-                        '-------------------
-                        lrReferenceTuple = New ReferenceTuple(lREcordset("row_id").Value)
-                        liInd = 0
-                        For Each loField In lREcordset.Fields
-                            Select Case liInd
-                                Case Is = 0
-                                    '------------------------------------------------------------
-                                    'The first Column is always the unique RowId for the Tuple.
-                                    '  NB This concept is consistent with models such as the
-                                    '  ORACLE database, RowId, for unique tuples etc.
-                                    '------------------------------------------------------------
-                                    loTupleObject.row_id = lREcordset("row_id").Value
-                                Case Else
-                                    Dim pro As System.Reflection.PropertyInfo
-                                    pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
-                                    pro.SetValue(loTupleObject, CStr(Viev.NullVal(loField.value, " ")), Nothing)
 
-                                    If arReferenceTable IsNot Nothing Then
-                                        lrReferenceTuple.KeyValuePair.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(loField.value, " "))))
-                                    End If
-                            End Select
+                While Not lREcordset.EOF
+                    loTupleObject = loTuple.clone
+                    '-------------------
+                    'Set the values
+                    '-------------------
+                    lrReferenceTuple = New ReferenceTuple("DummyRowId") '20230513-VM-Was lREcordset("row_id").Value
+                    liInd = 0
+                    lREcordset.MoveFirst()
+                    For Each loField In lREcordset.Fields
+                        Select Case liInd
+                            Case Is = 0
+                                '------------------------------------------------------------
+                                'The first Column is always the unique RowId for the Tuple.
+                                '  NB This concept is consistent with models such as the
+                                '  ORACLE database, RowId, for unique tuples etc.
+                                '------------------------------------------------------------
+                                loTupleObject.row_id = lREcordset("RowId").Value
+                            Case Else
+                                Dim pro As System.Reflection.PropertyInfo
+                                pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
+                                Try
+                                    pro.SetValue(loTupleObject, If(loField.value Is Nothing, " ", loField.value), Nothing)
+                                Catch ex As Exception
+                                    pro.SetValue(loTupleObject, loField.value.ToString, Nothing)
+                                End Try
 
-                            liInd += 1
-                        Next
-                        loTuple_list.Add(loTupleObject)
 
-                        If arReferenceTable IsNot Nothing Then
-                            arReferenceTable.ReferenceTableId = CStr(aiReferenceTableId)
-                            arReferenceTable.ReferenceTuple.Add(lrReferenceTuple)
-                        End If
+                                If arReferenceTable IsNot Nothing Then
+                                    lrReferenceTuple.KeyValuePair.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(loField.value, " "))))
+                                End If
+                        End Select
 
-                        lREcordset.MoveNext()
-                    End While
-                    lREcordset.Close()
-                Else
-                    lREcordset.Close()
-                End If
+                        liInd += 1
+                    Next
+                    loTuple_list.Add(loTupleObject)
+
+                    If arReferenceTable IsNot Nothing Then
+                        arReferenceTable.ReferenceTableId = CStr(aiReferenceTableId)
+                        arReferenceTable.ReferenceTuple.Add(lrReferenceTuple)
+                    End If
+
+                    lREcordset.MoveNext()
+                End While
+
+                lREcordset.Close()
 
                 Return loTuple_list
 

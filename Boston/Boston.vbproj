@@ -451,6 +451,8 @@
     <Compile Include="ClassesClientServer\tUser.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesDatabase\SQLite\tSQLiteRecordset.vb" />
+    <Compile Include="ClassesDatabase\tFieldClass.vb" />
+    <Compile Include="ClassesDatabase\tFields.vb" />
     <Compile Include="ClassesDatabase\tGenericRecordset.vb" />
     <Compile Include="ClassesDatabase\tRecordsetProxy.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageCategoryPropertyType.vb" />

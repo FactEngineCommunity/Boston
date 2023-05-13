@@ -95,7 +95,7 @@ Public Module tableClientServerUser
     Public Function IsValidUser(ByVal asUsername As String, ByVal asPassword As String) As Boolean
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         '------------------------
         'Initialise return value
@@ -121,7 +121,7 @@ Public Module tableClientServerUser
     Public Sub getAvailableFunctions(ByRef arUser As ClientServer.User)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim liFunction As pcenumFunction
 
@@ -158,7 +158,7 @@ Public Module tableClientServerUser
     Public Function getAllUsers(Optional ByVal abIgnoreErrorMessage As Boolean = False) As List(Of ClientServer.User)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
         Dim lrUser As ClientServer.User = Nothing
 
         Try
@@ -216,7 +216,7 @@ Public Module tableClientServerUser
     Public Function getUserDetailsByUsername(ByVal asUsername As String, ByRef arUser As ClientServer.User, Optional ByVal abIgnoreErrorMessage As Boolean = False) As ClientServer.User
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection
@@ -272,7 +272,7 @@ Public Module tableClientServerUser
                                   Optional ByVal abGetRoleDetails As Boolean = True)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection

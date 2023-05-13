@@ -33,7 +33,7 @@ Public Module tableClientServerRole
     Public Sub getRoleDetailsById(ByVal asRoleId As String, ByRef arRole As ClientServer.Role)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection
@@ -66,7 +66,7 @@ Public Module tableClientServerRole
     Public Sub getRoleDetailsByName(ByVal asRoleName As String, ByRef arRole As ClientServer.Role)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection

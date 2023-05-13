@@ -62,7 +62,7 @@ Public Module tableClientServerNotifications
                                                  As List(Of ClientServer.NotificationGeneral)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larNotification As New List(Of ClientServer.NotificationGeneral)
 

@@ -36,7 +36,7 @@ Public Module tableUnifiedOntologyModel
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -66,7 +66,7 @@ Public Module tableUnifiedOntologyModel
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim lrModel As FBM.Model
         Dim larModel As New List(Of FBM.Model)
@@ -86,7 +86,7 @@ Public Module tableUnifiedOntologyModel
                     lrModel = New FBM.Model
                     lrModel.ModelId = lREcordset("ModelId").Value
                     Call TableModel.GetModelDetails(lrModel)
-                    larModel.Add(lrmodel)
+                    larModel.Add(lrModel)
                     arUnifiedOntology.Model.Add(lrModel)
 
                     'Get the Pages for the Model (but don't load the Pages)
@@ -116,7 +116,7 @@ Public Module tableUnifiedOntologyModel
 
         Try
             Dim lsSQLQuery As String = ""
-            Dim lREcordset As New ADODB.Recordset
+            Dim lREcordset As New RecordsetProxy
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
